@@ -5,7 +5,7 @@
 /_/ |_/_/ /_/\____/\___/_/|_/_.___/\__,_/\___/_/|_(_)_/ /____/
                                                    /___/
 
-Knockback.js provides Knockout magic for Backbone.js Models.
+Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
 You can get the library here:
   - Development version: https://github.com/kmalakoff/knockback/raw/master/knockback.js
@@ -30,6 +30,8 @@ Enjoy!
 
 Kevin
 
+
+PS: check out the jsFiddle I set up to demonstrate localization: http://jsfiddle.net/kmalakoff/QSkpv/
 
 An Example:
 **********
