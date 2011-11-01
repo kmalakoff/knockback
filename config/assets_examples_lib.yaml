@@ -1,0 +1,10 @@
+gzip_assets: off
+compress_assets: off
+
+javascripts:
+  'examples_lib':
+    - examples_lib/build/contact.js
+    - examples_lib/build/locale_manager.js
+    - examples_lib/build/localized_string.js
+    - examples_lib/build/localized_observables.js
+    - examples_lib/build/contact.js

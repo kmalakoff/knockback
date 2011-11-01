@@ -1,0 +1,10 @@
+gzip_assets: off
+compress_assets: on
+
+javascripts:
+  'knockback.min':
+    - build/knockback_core.js
+    - build/knockback_collection_sync.js
+    - build/knockback_localized_observable.js
+    - build/knockback_model_attribute_observable.js
+    - build/knockback_model_attribute_observables.js
