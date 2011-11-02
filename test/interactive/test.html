@@ -27,25 +27,29 @@
       width: 100%; margin: 0;
       border-style:solid; border-width:1px; background: #ADADEB;
     }
+    h2 {
+      font-size:20px;
+    }
     div.header {
-      width: 100%; float: left; display: block; background: #ADADEB;
+       width: 100%; float: left; display: block; background: #ADADEB;
     }
     div.contact {
       position: relative;
       width: 250px; height: 100%; float: left; display: block; margin: 5px; padding: 0px 10px 10px 10px;
       border-style:solid; border-width:1px; background: #E9D4FF;
     }
-    div.contact label {width: 35%; float: left; text-align:right;}
-    div.contact input {width: 60%; float: right;}
+    div.contact label {width: 40%; text-align:right; float: left; font-size:18px;}
+    div.contact input {width: 55%; float: right;}
     div.contact button {position: absolute; right:10px; top:15px;}
   </style>
 </head>
 <body>
   <h1>Knockback.js Interactive Tests</h1>
   <div class="header">
+    <button data-bind="text: label_button_new, click: onAdd"></button>
     <select data-bind="options: available_languages, value: selected_language"></select>
     <div class="contact new">
-      <div><h3 data-bind="text: label_title_new"></h3><button data-bind="text: label_button_new, click: onAdd"></button></div>
+      <h3 data-bind="text: label_title_new"></h3>
       <div><label data-bind="text: label_name"></label><input data-bind="value: new_name" /></div>
       <div><label data-bind="text: label_email"></label><input data-bind="value: new_email" /></div>
       <div><label data-bind="text: label_date"></label><input data-bind="value: new_date" /></div>
@@ -65,6 +69,8 @@
   </script>
 
   <script type='text/javascript'>
+    <!-- SEE examples_lib for LocaleManager, Contact, ContactsCollection, and LocalizedObservable_LongDate -->
+
     Knockback.locale_manager = new LocaleManager('en', {
       'en': {
         label_title_new: "New Contact",
@@ -113,12 +119,12 @@
 
     var ContactViewModel = (function() {
       function ContactViewModel(model) {
-        this.labels = new kb.ModelAttributeObservables(Knockback.locale_manager, {
+        new kb.ModelAttributeObservables(Knockback.locale_manager, {
           label_name:     { keypath: 'label_name' },
           label_email:    { keypath: 'label_email' },
           label_date:     { keypath: 'label_date' }
         }, this);
-        this.attribute_observables = new kb.ModelAttributeObservables(model, {
+        new kb.ModelAttributeObservables(model, {
           name:           { keypath: 'name', read_write: true },
           email:          { keypath: 'email', read_write: true },
           date:           { keypath: 'date', read_write: true, localizer: function(value) { return new LocalizedObservable_LongDate(value); } }
@@ -133,7 +139,7 @@
       sortedIndex:      function(models, model) { return _.sortedIndex(models, model, function(test) { return test.get('name'); }); }
     });
 
-  ko.applyBindings(view_model);
+    ko.applyBindings(view_model);
   </script>
 
 </body>
