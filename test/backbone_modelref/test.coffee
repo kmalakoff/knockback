@@ -16,8 +16,8 @@ $(document).ready( ->
         @loading_message = new LocalizedObservable_LocalizedString(new LocalizedString('loading'))
         @attribute_observables = new kb.ModelAttributeObservables(model, {
           name:     {keypath:'name', default: @loading_message}
-          number:   {keypath:'number', read_write: true, default: @loading_message}
-          date:     {keypath:'date', read_write: true, default: @loading_message, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+          number:   {keypath:'number', write: true, default: @loading_message}
+          date:     {keypath:'date', write: true, default: @loading_message, localizer: (value) => return new LocalizedObservable_LongDate(value)}
         }, this)
       destroy: ->
         @attribute_observables.destroy()

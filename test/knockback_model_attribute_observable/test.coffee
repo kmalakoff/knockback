@@ -8,7 +8,7 @@ $(document).ready( ->
     class ContactViewModel
       constructor: (model) ->
         @name = new kb.ModelAttributeObservable(model, keypath:'name')
-        @number = new kb.ModelAttributeObservable(model, {keypath:'number', read_write: true}, this)
+        @number = new kb.ModelAttributeObservable(model, {keypath:'number', write: true}, this)
       destroy: ->
         @name.destroy(); @number.destroy()
 
@@ -38,7 +38,7 @@ $(document).ready( ->
       constructor: (model) ->
         @name = new kb.ModelAttributeObservable(model, {keypath:'name', read: -> return "First: #{model.get('name')}" })
         @number = new kb.ModelAttributeObservable(model, {
-          keypath:'number', read_write: true
+          keypath:'number'
           read: -> return "#: #{model.get('number')}"
           write: (value) -> model.set({number: value.substring(3)})
         }, this)

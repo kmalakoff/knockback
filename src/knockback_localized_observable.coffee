@@ -9,9 +9,8 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 
 ####################################################
 # options
-#   * read_write - bi-directional
 #   * read - called to get the value and each time the locale changes
-#   * write - called to set the value (if read_write)
+#   * write - called to set the value (optional)
 ####################################################
 
 class Knockback.LocalizedObservable
@@ -24,9 +23,9 @@ class Knockback.LocalizedObservable
     @current_localized_value = @options.read(@value)
     @options.onChange(@current_localized_value) if @options.onChange
 
-    if @options.read_write
+    if @options.write
       @view_model = {} if not @view_model
-      throw new Error('LocalizedObservable: options.write is missing for read_write model attribute') if not @options.write
+      throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if not _.isFunction(@options.write)
       @observable = ko.dependentObservable({read:@_onGetValue, write:@_onSetValue, owner:@view_model})
     else
       @observable = ko.dependentObservable(@_onGetValue)

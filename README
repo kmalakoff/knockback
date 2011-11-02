@@ -42,8 +42,8 @@ An Example:
       constructor: (model) ->
         new kb.ModelAttributeObservables(model, {
           name:     {keypath:'name'}
-          email:    {keypath:'email', read_write: true, default: 'your.name@yourplace.com'}
-          date:     {keypath:'date', read_write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+          email:    {keypath:'email', write: true, default: 'your.name@yourplace.com'}
+          date:     {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
         }, this)
 
   The HTML:
@@ -76,7 +76,21 @@ The library includes the following classes:
       label_date:         { keypath: 'label_date' }
     }, view_model)
 
-  Note 2: you can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading. If the model unloads, the default behavior is to retain the last value, but you can force a refresh on unload using attribute_observable.forceRefresh():
+  Note 2: you can provide custom read and write methods to provide custom formatting to the attributes just like in Knockout.
+
+    new kb.ModelAttributeObservable(model, {
+      keypath:'number'
+      read: -> return "#: #{model.get('number')}"
+      write: (value) -> model.set({number: value.substring(3)})
+    }, this)
+
+  Note 3: you can provide a localizer (see Knockback.LocalizedObservable) to both provide read and write localization for an attribute.
+
+    new kb.ModelAttributeObservables(model, {
+      date:     {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+    }, this)
+
+  Note 4: you can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading. If the model unloads, the default behavior is to retain the last value, but you can force a refresh on unload using attribute_observable.forceRefresh():
 
   2) Knockback.CollectionSync - this basically takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "viewModelCreate: (model) -> return new myViewModel(model)" function which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
 

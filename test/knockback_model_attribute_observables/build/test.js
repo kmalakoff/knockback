@@ -17,11 +17,11 @@ $(document).ready(function() {
           },
           number: {
             keypath: 'number',
-            read_write: true
+            write: true
           },
           date: {
             keypath: 'date',
-            read_write: true,
+            write: true,
             localizer: __bind(function(value) {
               return new LocalizedObservable_LongDate(value);
             }, this)

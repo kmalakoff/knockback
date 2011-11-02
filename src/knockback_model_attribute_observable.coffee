@@ -9,9 +9,8 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 
 ####################################################
 # options
-#   * read_write - bi-directional
 #   * read - called to get the value and each time the locale changes
-#   * write - called to set the value (if read_write)
+#   * write - called to set the value (if read_write) or a boolean to indicate write is enabled
 ####################################################
 
 class Knockback.ModelAttributeObservable
@@ -30,7 +29,7 @@ class Knockback.ModelAttributeObservable
       @model = @model_ref.getModel()
 
     @in_create = true # filter the forcing on setup
-    if @bind_info.read_write
+    if @bind_info.write
       throw new Error('ModelAttributeObservable: view_model is missing for read_write model attribute') if not @view_model
       @observable = ko.dependentObservable({read: @_onGetValue, write: @_onSetValue, owner: @view_model})
     else
@@ -80,7 +79,7 @@ class Knockback.ModelAttributeObservable
     @localizer = @bind_info.localizer(value) if value and @bind_info.localizer
 
     set_info = {}; set_info[@bind_info.keypath] = value
-    if @bind_info.write then @bind_info.write.apply(@view_model, [value, @model, set_info]) else @model.set(set_info)
+    if _.isFunction(@bind_info.write) then @bind_info.write.apply(@view_model, [value, @model, set_info]) else @model.set(set_info)
 
   _onModelLoaded:   (model) ->
     @model = model

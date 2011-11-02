@@ -37,7 +37,6 @@ LocalizedObservable_LongDate = (function() {
       options = {};
     }
     return LocalizedObservable_LongDate.__super__.constructor.call(this, value, _.extend(options, {
-      read_write: true,
       read: __bind(function() {
         var date;
         date = this.getObservedValue();
@@ -69,7 +68,6 @@ LocalizedObservable_ShortDate = (function() {
       options = {};
     }
     return LocalizedObservable_ShortDate.__super__.constructor.call(this, value, _.extend(options, {
-      read_write: true,
       read: __bind(function() {
         var date;
         date = this.getObservedValue();

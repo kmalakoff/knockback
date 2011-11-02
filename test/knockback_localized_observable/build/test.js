@@ -115,7 +115,6 @@ $(document).ready(function() {
         options = {};
       }
       return LocalizedObservable_LongDate.__super__.constructor.call(this, value, _.extend(options, {
-        read_write: true,
         read: __bind(function() {
           var date;
           date = this.getObservedValue();
@@ -146,7 +145,7 @@ $(document).ready(function() {
       function ContactViewModelDate(model) {
         this.date = new kb.ModelAttributeObservable(model, {
           keypath: 'date',
-          read_write: true,
+          write: true,
           localizer: __bind(function(value) {
             return new LocalizedObservable_LongDate(value);
           }, this)

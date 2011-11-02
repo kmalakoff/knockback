@@ -125,9 +125,9 @@
           label_date:     { keypath: 'label_date' }
         }, this);
         new kb.ModelAttributeObservables(model, {
-          name:           { keypath: 'name', read_write: true },
-          email:          { keypath: 'email', read_write: true },
-          date:           { keypath: 'date', read_write: true, localizer: function(value) { return new LocalizedObservable_LongDate(value); } }
+          name:           { keypath: 'name', write: true },
+          email:          { keypath: 'email', write: true },
+          date:           { keypath: 'date', write: true, localizer: function(value) { return new LocalizedObservable_LongDate(value); } }
         }, this);
       }
       return ContactViewModel;

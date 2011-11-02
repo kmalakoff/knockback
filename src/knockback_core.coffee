@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.1.0
+  knockback.js 0.1.1
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:

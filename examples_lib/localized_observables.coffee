@@ -10,7 +10,6 @@ class LocalizedObservable_LocalizedString extends kb.LocalizedObservable
 class LocalizedObservable_LongDate extends kb.LocalizedObservable
   constructor: (value, options={}, view_model) ->
     return super(value, _.extend(options, {
-      read_write: true
       read: =>
         date = @getObservedValue(); return '' if not date
         return Globalize.format(date, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
@@ -25,7 +24,6 @@ class LocalizedObservable_LongDate extends kb.LocalizedObservable
 class LocalizedObservable_ShortDate extends kb.LocalizedObservable
   constructor: (value, options={}, view_model) ->
     return super(value, _.extend(options, {
-      read_write: true
       read: =>
         date = @getObservedValue(); return '' if not date
         return Globalize.format(date, Globalize.cultures[Knockback.locale_manager.getLocale()].calendars.standard.patterns.d, Knockback.locale_manager.getLocale())

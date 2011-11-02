@@ -11,8 +11,8 @@ $(document).ready( ->
       constructor: (model) ->
         @attribute_observables = new kb.ModelAttributeObservables(model, {
           name:     {keypath:'name'}
-          number:   {keypath:'number', read_write: true}
-          date:     {keypath:'date', read_write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+          number:   {keypath:'number', write: true}
+          date:     {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
         }, this)
       destroy: ->
         @attribute_observables.destroy()

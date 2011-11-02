@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.1.0
+  knockback.js 0.1.1
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -318,12 +318,12 @@ Knockback.LocalizedObservable = (function() {
     if (this.options.onChange) {
       this.options.onChange(this.current_localized_value);
     }
-    if (this.options.read_write) {
+    if (this.options.write) {
       if (!this.view_model) {
         this.view_model = {};
       }
-      if (!this.options.write) {
-        throw new Error('LocalizedObservable: options.write is missing for read_write model attribute');
+      if (!_.isFunction(this.options.write)) {
+        throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute');
       }
       this.observable = ko.dependentObservable({
         read: this._onGetValue,
@@ -403,7 +403,7 @@ Knockback.ModelAttributeObservable = (function() {
       this.model = this.model_ref.getModel();
     }
     this.in_create = true;
-    if (this.bind_info.read_write) {
+    if (this.bind_info.write) {
       if (!this.view_model) {
         throw new Error('ModelAttributeObservable: view_model is missing for read_write model attribute');
       }
@@ -488,7 +488,7 @@ Knockback.ModelAttributeObservable = (function() {
     }
     set_info = {};
     set_info[this.bind_info.keypath] = value;
-    if (this.bind_info.write) {
+    if (_.isFunction(this.bind_info.write)) {
       return this.bind_info.write.apply(this.view_model, [value, this.model, set_info]);
     } else {
       return this.model.set(set_info);

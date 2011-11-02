@@ -70,7 +70,6 @@ $(document).ready( ->
   class LocalizedObservable_LongDate extends kb.LocalizedObservable
     constructor: (value, options={}, view_model) ->
       return super(value, _.extend(options, {
-        read_write: true
         read: =>
           date = @getObservedValue(); return '' if not date
           return Globalize.format(date, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
@@ -83,7 +82,7 @@ $(document).ready( ->
   test("Date and time with jquery.globalize", ->
     class ContactViewModelDate
       constructor: (model) ->
-        @date = new kb.ModelAttributeObservable(model, {keypath:'date', read_write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}, this)
+        @date = new kb.ModelAttributeObservable(model, {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}, this)
       destroy: ->
         @date.destroy()
 

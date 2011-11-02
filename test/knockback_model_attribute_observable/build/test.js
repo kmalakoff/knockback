@@ -14,7 +14,7 @@ $(document).ready(function() {
         });
         this.number = new kb.ModelAttributeObservable(model, {
           keypath: 'number',
-          read_write: true
+          write: true
         }, this);
       }
       ContactViewModel.prototype.destroy = function() {
@@ -57,7 +57,6 @@ $(document).ready(function() {
         });
         this.number = new kb.ModelAttributeObservable(model, {
           keypath: 'number',
-          read_write: true,
           read: function() {
             return "#: " + (model.get('number'));
           },
