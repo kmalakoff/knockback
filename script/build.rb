@@ -9,6 +9,12 @@ PROJECT_ROOT = File.expand_path('../..', __FILE__)
 `cd #{PROJECT_ROOT}; jammit -c config/assets.yaml -o .`
 
 ####################################################
+# Modified Knockout Library
+####################################################
+`cd #{PROJECT_ROOT}; cp test/vendor/knockout-1.2.1-kmalakoff.js #{PROJECT_ROOT}/knockout-1.2.1-kmalakoff.js`
+`cd #{PROJECT_ROOT}; cp test/vendor/knockout-1.2.1.debug-kmalakoff.js #{PROJECT_ROOT}/knockout-1.2.1.debug-kmalakoff.js`
+
+####################################################
 # Library for examples
 ####################################################
 `cd #{PROJECT_ROOT}; coffee -b -o examples_lib/build -c #{PROJECT_ROOT}/examples_lib`
