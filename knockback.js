@@ -19,6 +19,12 @@ this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
 Knockback.VERSION = '0.1.1';
 Knockback.locale_manager;
+Knockback.getDependentObservable = Knockback.observable = function(instance) {
+  if (!instance._kb_observable) {
+    throw new Error('Knockback: _kb_observable missing from your instance');
+  }
+  return instance._kb_observable;
+};
 /*
   knockback_collection_sync.js
   (c) 2011 Kevin Malakoff.
@@ -307,45 +313,55 @@ Knockback.LocalizedObservable = (function() {
     if (!this.value) {
       throw new Error('LocalizedObservable: value is missing');
     }
-    if (!this.options.read) {
+    if (!(this.options.read || this.read)) {
       throw new Error('LocalizedObservable: options.read is missing');
+    }
+    if (this.options.read && this.read) {
+      throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.');
+    }
+    if (this.options.write && this.write) {
+      throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.');
     }
     if (!Knockback.locale_manager) {
       throw new Error('LocalizedObservable: Knockback.locale_manager is not defined');
     }
     _.bindAll(this, 'destroy', '_onGetValue', '_onSetValue', 'getObservedValue', 'setObservedValue', '_onLocaleChange');
-    this.current_localized_value = this.options.read(this.value);
+    this._kb_read = this.options.read ? this.options.read : this.read;
+    this._kb_write = this.options.write ? this.options.write : this.write;
+    if (this.value) {
+      this.current_localized_value = this._kb_read.call(this, this.value, this._kb_observable);
+    }
     if (this.options.onChange) {
       this.options.onChange(this.current_localized_value);
     }
-    if (this.options.write) {
+    if (this._kb_write) {
       if (!this.view_model) {
         this.view_model = {};
       }
-      if (!_.isFunction(this.options.write)) {
+      if (!_.isFunction(this._kb_write)) {
         throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute');
       }
-      this.observable = ko.dependentObservable({
+      this._kb_observable = ko.dependentObservable({
         read: this._onGetValue,
         write: this._onSetValue,
         owner: this.view_model
       });
     } else {
-      this.observable = ko.dependentObservable(this._onGetValue);
+      this._kb_observable = ko.dependentObservable(this._onGetValue);
     }
-    if (_.isUndefined(this.observable.forceRefresh)) {
+    if (_.isUndefined(this._kb_observable.forceRefresh)) {
       throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js');
     }
     Knockback.locale_manager.bind('change', this._onLocaleChange);
-    this.observable.getObservedValue = this.getObservedValue;
-    this.observable.setObservedValue = this.setObservedValue;
-    this.observable.destroy = this.destroy;
-    return this.observable;
+    this._kb_observable.getObservedValue = this.getObservedValue;
+    this._kb_observable.setObservedValue = this.setObservedValue;
+    this._kb_observable.destroy = this.destroy;
+    return kb.observable(this);
   }
   LocalizedObservable.prototype.destroy = function() {
     Knockback.locale_manager.unbind('change', this._onLocaleChange);
-    this.observable.dispose();
-    this.observable = null;
+    this._kb_observable.dispose();
+    this._kb_observable = null;
     this.options = {};
     return this.view_model = null;
   };
@@ -356,15 +372,25 @@ Knockback.LocalizedObservable = (function() {
     this.value = value;
     return this;
   };
+  LocalizedObservable.prototype._getDefault = function() {
+    if (!this.options.hasOwnProperty('default')) {
+      return '';
+    }
+    if (_.isFunction(this.options["default"])) {
+      return this.options["default"]();
+    } else {
+      return this.options["default"];
+    }
+  };
   LocalizedObservable.prototype._onGetValue = function() {
     return this.current_localized_value;
   };
   LocalizedObservable.prototype._onSetValue = function(value) {
-    return this.options.write(value, this.value);
+    return this._kb_write.call(this, value, this.value, this._kb_observable);
   };
   LocalizedObservable.prototype._onLocaleChange = function() {
-    this.current_localized_value = this.options.read(this.value);
-    this.observable.forceRefresh();
+    this.current_localized_value = !this.value ? this._getDefault() : this._kb_read.call(this, this.value, this._kb_observable);
+    this._kb_observable.forceRefresh();
     if (this.options.onChange) {
       return this.options.onChange(this.current_localized_value);
     }
@@ -407,27 +433,27 @@ Knockback.ModelAttributeObservable = (function() {
       if (!this.view_model) {
         throw new Error('ModelAttributeObservable: view_model is missing for read_write model attribute');
       }
-      this.observable = ko.dependentObservable({
+      this._kb_observable = ko.dependentObservable({
         read: this._onGetValue,
         write: this._onSetValue,
         owner: this.view_model
       });
     } else {
-      this.observable = ko.dependentObservable(this._onGetValue);
+      this._kb_observable = ko.dependentObservable(this._onGetValue);
     }
     this.in_create = false;
-    if (_.isUndefined(this.observable.forceRefresh)) {
+    if (_.isUndefined(this._kb_observable.forceRefresh)) {
       throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js');
     }
-    this.observable.destroy = this.destroy;
+    this._kb_observable.destroy = this.destroy;
     if (!this.model_ref || this.model_ref.isLoaded()) {
       this._onModelLoaded(this.model);
     }
-    return this.observable;
+    return kb.observable(this);
   }
   ModelAttributeObservable.prototype.destroy = function() {
-    this.observable.dispose();
-    this.observable = null;
+    this._kb_observable.dispose();
+    this._kb_observable = null;
     if (this.model) {
       this._onModelUnloaded(this.model);
     }
@@ -457,7 +483,7 @@ Knockback.ModelAttributeObservable = (function() {
       }
       this.localizer.forceRefresh();
     }
-    return this.observable.forceRefresh();
+    return this._kb_observable.forceRefresh();
   };
   ModelAttributeObservable.prototype._onGetValue = function() {
     var value;
@@ -557,6 +583,16 @@ Knockback.ModelAttributeObservables = (function() {
     this.view_model = null;
     this.mappings_info = null;
     return this.model = null;
+  };
+  ModelAttributeObservables.prototype.forceRefresh = function() {
+    var mapping_info, view_model_property_name, _ref, _results;
+    _ref = this.mappings_info;
+    _results = [];
+    for (view_model_property_name in _ref) {
+      mapping_info = _ref[view_model_property_name];
+      _results.push(this.view_model[view_model_property_name].forceRefresh());
+    }
+    return _results;
   };
   return ModelAttributeObservables;
 })();

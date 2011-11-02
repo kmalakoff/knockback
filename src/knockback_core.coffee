@@ -20,3 +20,6 @@ Knockback.VERSION = '0.1.1'
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 Knockback.locale_manager
+
+# helpers
+Knockback.getDependentObservable = Knockback.observable = (instance) -> throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable; return instance._kb_observable

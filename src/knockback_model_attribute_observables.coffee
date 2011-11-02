@@ -19,3 +19,6 @@ class Knockback.ModelAttributeObservables
     (@view_model[view_model_property_name].destroy(); delete @view_model[view_model_property_name]) for view_model_property_name, mapping_info of @mappings_info; @view_model = null
     @mappings_info = null
     @model = null
+
+  forceRefresh: ->
+    @view_model[view_model_property_name].forceRefresh() for view_model_property_name, mapping_info of @mappings_info

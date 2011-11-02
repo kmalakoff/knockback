@@ -7,7 +7,7 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   return child;
 }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 $(document).ready(function() {
-  var LocalizedObservable_LocalizedString, LocalizedObservable_LongDate;
+  var LocalizedStringLocalizer, LongDateLocalizer;
   module("knockback_localized_observable.js");
   test("TEST DEPENDENCY MISSING", function() {
     ko.utils;
@@ -34,28 +34,20 @@ $(document).ready(function() {
       formal_goodbye: 'Au revoir'
     }
   });
-  LocalizedObservable_LocalizedString = (function() {
-    __extends(LocalizedObservable_LocalizedString, kb.LocalizedObservable);
-    function LocalizedObservable_LocalizedString(value, options, view_model) {
-      if (options == null) {
-        options = {};
-      }
-      return LocalizedObservable_LocalizedString.__super__.constructor.call(this, value, _.extend(options, {
-        read: __bind(function() {
-          var localized_string;
-          localized_string = this.getObservedValue();
-          if (!localized_string) {
-            return '';
-          }
-          if (localized_string.string_id) {
-            return Knockback.locale_manager.get(localized_string.string_id);
-          } else {
-            return '';
-          }
-        }, this)
-      }), view_model);
+  LocalizedStringLocalizer = (function() {
+    __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
+    function LocalizedStringLocalizer(value, options, view_model) {
+      LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
+      return kb.observable(this);
     }
-    return LocalizedObservable_LocalizedString;
+    LocalizedStringLocalizer.prototype.read = function(value) {
+      if (value.string_id) {
+        return Knockback.locale_manager.get(value.string_id);
+      } else {
+        return '';
+      }
+    };
+    return LocalizedStringLocalizer;
   })();
   test("Localized greeting", function() {
     var ContactViewModelGreeting, model, view_model;
@@ -64,13 +56,13 @@ $(document).ready(function() {
         this.hello = new kb.ModelAttributeObservable(model, {
           keypath: 'hello_greeting',
           localizer: __bind(function(value) {
-            return new LocalizedObservable_LocalizedString(value);
+            return new LocalizedStringLocalizer(value);
           }, this)
         });
         this.goodbye = new kb.ModelAttributeObservable(model, {
           keypath: 'goodbye_greeting',
           localizer: __bind(function(value) {
-            return new LocalizedObservable_LocalizedString(value);
+            return new LocalizedStringLocalizer(value);
           }, this)
         });
       }
@@ -108,36 +100,24 @@ $(document).ready(function() {
     equal(view_model.hello(), 'Bonjour', "fr-FR: Hello");
     return equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye");
   });
-  LocalizedObservable_LongDate = (function() {
-    __extends(LocalizedObservable_LongDate, kb.LocalizedObservable);
-    function LocalizedObservable_LongDate(value, options, view_model) {
-      if (options == null) {
-        options = {};
-      }
-      return LocalizedObservable_LongDate.__super__.constructor.call(this, value, _.extend(options, {
-        read: __bind(function() {
-          var date;
-          date = this.getObservedValue();
-          if (!date) {
-            return '';
-          }
-          return Globalize.format(date, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
-        }, this),
-        write: __bind(function(localized_string) {
-          var date, new_value;
-          date = this.getObservedValue();
-          if (!date) {
-            return '';
-          }
-          new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
-          if (!new_value) {
-            return;
-          }
-          return date.setTime(new_value.valueOf());
-        }, this)
-      }), view_model);
+  LongDateLocalizer = (function() {
+    __extends(LongDateLocalizer, kb.LocalizedObservable);
+    function LongDateLocalizer(value, options, view_model) {
+      LongDateLocalizer.__super__.constructor.apply(this, arguments);
+      return kb.observable(this);
     }
-    return LocalizedObservable_LongDate;
+    LongDateLocalizer.prototype.read = function(value) {
+      return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
+    };
+    LongDateLocalizer.prototype.write = function(localized_string, value, observable) {
+      var new_value;
+      new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
+      if (!(new_value && _.isDate(new_value))) {
+        return observable.forceRefresh();
+      }
+      return value.setTime(new_value.valueOf());
+    };
+    return LongDateLocalizer;
   })();
   test("Date and time with jquery.globalize", function() {
     var ContactViewModelDate, birthdate, current_date, model, view_model;
@@ -147,7 +127,7 @@ $(document).ready(function() {
           keypath: 'date',
           write: true,
           localizer: __bind(function(value) {
-            return new LocalizedObservable_LongDate(value);
+            return new LongDateLocalizer(value);
           }, this)
         }, this);
       }

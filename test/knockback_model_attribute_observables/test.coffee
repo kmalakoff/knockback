@@ -12,7 +12,7 @@ $(document).ready( ->
         @attribute_observables = new kb.ModelAttributeObservables(model, {
           name:     {keypath:'name'}
           number:   {keypath:'number', write: true}
-          date:     {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+          date:     {keypath:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
         }, this)
       destroy: ->
         @attribute_observables.destroy()

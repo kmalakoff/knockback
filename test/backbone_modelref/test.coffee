@@ -13,11 +13,11 @@ $(document).ready( ->
   test("Standard use case: just enough to get the picture", ->
     class ContactViewModel
       constructor: (model) ->
-        @loading_message = new LocalizedObservable_LocalizedString(new LocalizedString('loading'))
+        @loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'))
         @attribute_observables = new kb.ModelAttributeObservables(model, {
           name:     {keypath:'name', default: @loading_message}
           number:   {keypath:'number', write: true, default: @loading_message}
-          date:     {keypath:'date', write: true, default: @loading_message, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+          date:     {keypath:'date', write: true, default: @loading_message, localizer: (value) => return new LongDateLocalizer(value)}
         }, this)
       destroy: ->
         @attribute_observables.destroy()
@@ -74,7 +74,7 @@ $(document).ready( ->
     # go back to loading state
     collection.reset()
     equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    view_model.name.forceRefresh() # override default behavior and go back to loading state
+    view_model.attribute_observables.forceRefresh() # override default behavior and go back to loading state
     Knockback.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
     Knockback.locale_manager.setLocale('en-GB')

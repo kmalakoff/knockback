@@ -23,7 +23,7 @@ $(document).ready(function() {
             keypath: 'date',
             write: true,
             localizer: __bind(function(value) {
-              return new LocalizedObservable_LongDate(value);
+              return new LongDateLocalizer(value);
             }, this)
           }
         }, this);

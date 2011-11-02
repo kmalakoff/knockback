@@ -69,7 +69,7 @@
   </script>
 
   <script type='text/javascript'>
-    <!-- SEE examples_lib for LocaleManager, Contact, ContactsCollection, and LocalizedObservable_LongDate -->
+    <!-- SEE examples_lib for LocaleManager, Contact, ContactsCollection, and LongDateLocalizer -->
 
     Knockback.locale_manager = new LocaleManager('en', {
       'en': {
@@ -98,7 +98,7 @@
       available_languages:    ko.observableArray(['en', 'fr-FR']),
       new_name:               ko.observable(''),
       new_email:              ko.observable(''),
-      new_date:               new LocalizedObservable_LongDate(new Date()),
+      new_date:               new LongDateLocalizer(new Date()),
       onAdd:  function()      {
         collection.add({name: this.new_name(), email: this.new_email(), date: this.new_date()});
         this.new_name(''); this.new_email(''); this.new_date(new Date());
@@ -127,7 +127,7 @@
         new kb.ModelAttributeObservables(model, {
           name:           { keypath: 'name', write: true },
           email:          { keypath: 'email', write: true },
-          date:           { keypath: 'date', write: true, localizer: function(value) { return new LocalizedObservable_LongDate(value); } }
+          date:           { keypath: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
         }, this);
       }
       return ContactViewModel;

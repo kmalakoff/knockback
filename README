@@ -43,7 +43,7 @@ An Example:
         new kb.ModelAttributeObservables(model, {
           name:     {keypath:'name'}
           email:    {keypath:'email', write: true, default: 'your.name@yourplace.com'}
-          date:     {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+          date:     {keypath:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
         }, this)
 
   The HTML:
@@ -87,10 +87,13 @@ The library includes the following classes:
   Note 3: you can provide a localizer (see Knockback.LocalizedObservable) to both provide read and write localization for an attribute.
 
     new kb.ModelAttributeObservables(model, {
-      date:     {keypath:'date', write: true, localizer: (value) => return new LocalizedObservable_LongDate(value)}
+      date:     {keypath:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
     }, this)
 
   Note 4: you can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading. If the model unloads, the default behavior is to retain the last value, but you can force a refresh on unload using attribute_observable.forceRefresh():
+
+    - If the model reference gets unloaded and you want to restore the default values, you can call forceRefresh on either Knockback.ModelAttributeObservables or Knockback.ModelAttributeObservable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
+
 
   2) Knockback.CollectionSync - this basically takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "viewModelCreate: (model) -> return new myViewModel(model)" function which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
 
@@ -119,15 +122,13 @@ The library includes the following classes:
 
   3) Knockback.LocalizedObservable - this is the most tricky to implement (look in the examples_lib/localized_observables.coffee file for examples). Basically, a value is stored inside this class and is manually synced by a Knockback.ModelAttributeObservable whenever the model attribute changes since it can point to a new value instance for the same attribute. Here's an example of a read only one:
 
-  class LocalizedObservable_LocalizedString extends kb.LocalizedObservable
-    constructor: (value, options={}, view_model) ->
-      return super(value, _.extend(options, {
-        read: =>
-          localized_string = @getObservedValue(); return '' if not localized_string
-          return if (localized_string.string_id) then Knockback.locale_manager.get(localized_string.string_id) else ''
-      }), view_model)
+  class LocalizedStringLocalizer extends kb.LocalizedObservable
+    constructor: (value, options, view_model) ->
+      super; return kb.observable(this)
+    read: (value) ->
+      return if (value.string_id) then Knockback.locale_manager.get(value.string_id) else ''
 
-    Note 1: this looks like it returns an instance but it actually returns a ko.dependentObservable from super. Don't get caught out!
+    Note 1: this looks like it returns an instance but it actually returns a ko.dependentObservable from super (use kb.observable to accesss it). Don't get caught out!
 
     Note 2: if you use these localization helpers, you need to implement a Knockback.locale_manager.  As mentioned in 1) Note 1....you can watch a non-BackboneModel as long as it: a) mixes in Backbone.Events and triggers 'change' events and b) implements "get: (attribute_name) -> " and which is a minimal Backbone.Model interface...this is just what a Backbone.locale_manager is. Pretty clever, eh?
 

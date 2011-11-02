@@ -21,7 +21,7 @@ $(document).ready(function() {
     var ContactViewModel, collection, current_date, model, model_ref, view_model;
     ContactViewModel = (function() {
       function ContactViewModel(model) {
-        this.loading_message = new LocalizedObservable_LocalizedString(new LocalizedString('loading'));
+        this.loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'));
         this.attribute_observables = new kb.ModelAttributeObservables(model, {
           name: {
             keypath: 'name',
@@ -37,7 +37,7 @@ $(document).ready(function() {
             write: true,
             "default": this.loading_message,
             localizer: __bind(function(value) {
-              return new LocalizedObservable_LongDate(value);
+              return new LongDateLocalizer(value);
             }, this)
           }
         }, this);
@@ -101,7 +101,7 @@ $(document).ready(function() {
     equal(current_date.getDate(), 10, "day is good");
     collection.reset();
     equal(view_model.name(), 'Yoko', "Default is to retain the last value");
-    view_model.name.forceRefresh();
+    view_model.attribute_observables.forceRefresh();
     Knockback.locale_manager.setLocale('en');
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?");
     Knockback.locale_manager.setLocale('en-GB');

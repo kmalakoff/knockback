@@ -31,19 +31,19 @@ class Knockback.ModelAttributeObservable
     @in_create = true # filter the forcing on setup
     if @bind_info.write
       throw new Error('ModelAttributeObservable: view_model is missing for read_write model attribute') if not @view_model
-      @observable = ko.dependentObservable({read: @_onGetValue, write: @_onSetValue, owner: @view_model})
+      @_kb_observable = ko.dependentObservable({read: @_onGetValue, write: @_onSetValue, owner: @view_model})
     else
-      @observable = ko.dependentObservable(@_onGetValue)
+      @_kb_observable = ko.dependentObservable(@_onGetValue)
     @in_create = false
-    throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js') if _.isUndefined(@observable.forceRefresh)
+    throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js') if _.isUndefined(@_kb_observable.forceRefresh)
 
     # publish public interface on the observable and return instead of this
-    @observable.destroy = @destroy
+    @_kb_observable.destroy = @destroy
     @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
-    return @observable
+    return kb.observable(this)
 
   destroy: ->
-    @observable.dispose(); @observable = null
+    @_kb_observable.dispose(); @_kb_observable = null
     @_onModelUnloaded(@model) if @model
     if @model_ref
       @model_ref.unbind('loaded', @_onModelLoaded)
@@ -62,7 +62,7 @@ class Knockback.ModelAttributeObservable
     if @localizer and @localizer.forceRefresh
       @localizer.setObservedValue(@model.get(@bind_info.keypath)) if @model
       @localizer.forceRefresh()
-    @observable.forceRefresh()
+    @_kb_observable.forceRefresh()
 
   _onGetValue: ->
     return @_getDefault() if not @model

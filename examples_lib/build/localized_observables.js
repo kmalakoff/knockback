@@ -1,4 +1,4 @@
-var LocalizedObservable_LocalizedString, LocalizedObservable_LongDate, LocalizedObservable_ShortDate;
+var LocalizedStringLocalizer, LongDateLocalizer, ShortDateLocalizer;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -7,88 +7,60 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.__super__ = parent.prototype;
   return child;
 }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-LocalizedObservable_LocalizedString = (function() {
-  __extends(LocalizedObservable_LocalizedString, kb.LocalizedObservable);
-  function LocalizedObservable_LocalizedString(value, options, view_model) {
-    if (options == null) {
-      options = {};
-    }
-    return LocalizedObservable_LocalizedString.__super__.constructor.call(this, value, _.extend(options, {
-      read: __bind(function() {
-        var localized_string;
-        localized_string = this.getObservedValue();
-        if (!localized_string) {
-          return '';
-        }
-        if (localized_string.string_id) {
-          return Knockback.locale_manager.get(localized_string.string_id);
-        } else {
-          return '';
-        }
-      }, this)
-    }), view_model);
+LocalizedStringLocalizer = (function() {
+  __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
+  function LocalizedStringLocalizer(value, options, view_model) {
+    LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
+    return kb.observable(this);
   }
-  return LocalizedObservable_LocalizedString;
-})();
-LocalizedObservable_LongDate = (function() {
-  __extends(LocalizedObservable_LongDate, kb.LocalizedObservable);
-  function LocalizedObservable_LongDate(value, options, view_model) {
-    if (options == null) {
-      options = {};
+  LocalizedStringLocalizer.prototype.read = function(value) {
+    if (value.string_id) {
+      return Knockback.locale_manager.get(value.string_id);
+    } else {
+      return '';
     }
-    return LocalizedObservable_LongDate.__super__.constructor.call(this, value, _.extend(options, {
-      read: __bind(function() {
-        var date;
-        date = this.getObservedValue();
-        if (!date) {
-          return '';
-        }
-        return Globalize.format(date, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
-      }, this),
-      write: __bind(function(localized_string) {
-        var date, new_value;
-        date = this.getObservedValue();
-        if (!date) {
-          return '';
-        }
-        new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
-        if (!(new_value && _.isDate(new_value))) {
-          return this.observable.forceRefresh();
-        }
-        return date.setTime(new_value.valueOf());
-      }, this)
-    }), view_model);
+  };
+  return LocalizedStringLocalizer;
+})();
+LongDateLocalizer = (function() {
+  __extends(LongDateLocalizer, kb.LocalizedObservable);
+  function LongDateLocalizer(value, options, view_model) {
+    LongDateLocalizer.__super__.constructor.apply(this, arguments);
+    return kb.observable(this);
   }
-  return LocalizedObservable_LongDate;
+  LongDateLocalizer.prototype.read = function(value) {
+    return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
+  };
+  LongDateLocalizer.prototype.write = function(localized_string, value, observable) {
+    var new_value;
+    new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
+    if (!(new_value && _.isDate(new_value))) {
+      return observable.forceRefresh();
+    }
+    return value.setTime(new_value.valueOf());
+  };
+  return LongDateLocalizer;
 })();
-LocalizedObservable_ShortDate = (function() {
-  __extends(LocalizedObservable_ShortDate, kb.LocalizedObservable);
-  function LocalizedObservable_ShortDate(value, options, view_model) {
+ShortDateLocalizer = (function() {
+  __extends(ShortDateLocalizer, kb.LocalizedObservable);
+  function ShortDateLocalizer(value, options, view_model) {
     if (options == null) {
       options = {};
     }
-    return LocalizedObservable_ShortDate.__super__.constructor.call(this, value, _.extend(options, {
-      read: __bind(function() {
-        var date;
-        date = this.getObservedValue();
-        if (!date) {
-          return '';
-        }
+    ShortDateLocalizer.__super__.constructor.call(this, value, _.extend(options, {
+      read: function(value) {
         return Globalize.format(date, Globalize.cultures[Knockback.locale_manager.getLocale()].calendars.standard.patterns.d, Knockback.locale_manager.getLocale());
-      }, this),
-      write: __bind(function(localized_string) {
-        var date, new_value;
-        date = this.getObservedValue();
-        if (!date) {
-          return '';
-        }
+      },
+      write: __bind(function(localized_string, value, observable) {
+        var new_value;
         new_value = Globalize.parseDate(localized_string, Globalize.cultures[Knockback.locale_manager.getLocale()].calendars.standard.patterns.d, Knockback.locale_manager.getLocale());
         if (!(new_value && _.isDate(new_value))) {
-          return this.observable.forceRefresh();
+          return observable.forceRefresh();
         }
         return date.setTime(new_value.valueOf());
       }, this)
     }), view_model);
+    return kb.observable(this);
   }
-  return LocalizedObservable_ShortDate;
+  return ShortDateLocalizer;
 })();
