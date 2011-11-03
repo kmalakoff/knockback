@@ -10,12 +10,14 @@
 Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
 You can get the library here:
-  - Development version: https://github.com/kmalakoff/knockback/raw/master/knockback.js
-  - Production version: https://github.com/kmalakoff/knockback/raw/master/knockback.min.js
+
+* Development version: https://github.com/kmalakoff/knockback/raw/master/knockback.js
+* Production version: https://github.com/kmalakoff/knockback/raw/master/knockback.min.js
 
 You also will need to use my slightly modified copies of Knockout until the changes are merged into the main branch:
-  - Development version: https://github.com/kmalakoff/knockback/raw/master/knockout-1.2.1.debug-kmalakoff.js
-  - Production version: https://github.com/kmalakoff/knockback/raw/master/knockout-1.2.1-kmalakoff.js
+
+* Development version: https://github.com/kmalakoff/knockback/raw/master/knockout-1.2.1.debug-kmalakoff.js
+* Production version: https://github.com/kmalakoff/knockback/raw/master/knockout-1.2.1-kmalakoff.js
 
 If anyone wants to port this to Knockout 1.3 beta, please do and let me know! You can find my changes here: https://github.com/kmalakoff/knockout/tree/forceRefresh
 
@@ -146,16 +148,17 @@ collection_sync = kb.collectionSync(collection, view_models_array, {
 
 ### Note 2
 Collections cache some information on the view model and if you have a view model and want to get access to it, use the following helpers:
-    a) kb.vmModel - to get the model for the view model
-    b) kb.vmElement - to get the rendered element from Knockout.
+
+* kb.vmModel - to get the model for the view model
+* kb.vmElement - to get the rendered element from Knockout.
 
 ### Note 3
 There are some other helpers for collection sync view models that you may find useful:
 
-    a) modelByViewModel: (view_model) ->
-    b) viewModelByModel: (model) ->
-    c) elementByModel: (model) ->
-    d) eachViewModel: (iterator) ->
+* modelByViewModel: (view_model) ->
+* viewModelByModel: (model) ->
+* elementByModel: (model) ->
+* eachViewModel: (iterator) ->
 
 ## Knockback.localizedObservable
 
