@@ -100,7 +100,7 @@
       new_email:              ko.observable(''),
       new_date:               new LongDateLocalizer(new Date()),
       onAdd:  function()      {
-        collection.add({name: this.new_name(), email: this.new_email(), date: this.new_date()});
+        collection.add({name: this.new_name(), email: this.new_email(), date: this.new_date.getObservedValue()});
         this.new_name(''); this.new_email(''); this.new_date(new Date());
       }
     };
