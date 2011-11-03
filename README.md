@@ -176,7 +176,7 @@ This looks like it returns an instance but it actually returns a ko.dependentObs
 If you use these localization helpers, you need to implement a kb.locale_manager.  As mentioned in 1) Note 1....you can watch a non-BackboneModel as long as it: a) mixes in Backbone.Events and triggers 'change' events and b) implements "get: (attribute_name) -> " and which is a minimal Backbone.Model interface...this is just what a Backbone.locale_manager is. Pretty clever, eh?
 
 
-# Final notes:
+## Final notes:
 
 * Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
     -> Use the helper function: kb.vmDestroy() to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
