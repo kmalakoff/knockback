@@ -71,7 +71,7 @@
   <script type='text/javascript'>
     <!-- SEE examples_lib for LocaleManager, Contact, ContactsCollection, and LongDateLocalizer -->
 
-    Knockback.locale_manager = new LocaleManager('en', {
+    kb.locale_manager = new LocaleManager('en', {
       'en': {
         label_title_new: "New Contact",
         label_button_new: "Add",
@@ -105,34 +105,34 @@
       }
     };
     view_model.selected_language = ko.dependentObservable({
-      read:   function()      { return Knockback.locale_manager.getLocale(); },
-      write:  function(value) { return Knockback.locale_manager.setLocale(value); },
+      read:   function()      { return kb.locale_manager.getLocale(); },
+      write:  function(value) { return kb.locale_manager.setLocale(value); },
       owner: view_model
     });
-    new kb.ModelAttributeObservables(Knockback.locale_manager, {
-      label_title_new:    { keypath: 'label_title_new' },
-      label_button_new:   { keypath: 'label_button_new' },
-      label_name:         { keypath: 'label_name' },
-      label_email:        { keypath: 'label_email' },
-      label_date:         { keypath: 'label_date' }
+    kb.observables(kb.locale_manager, {
+      label_title_new:    { key: 'label_title_new' },
+      label_button_new:   { key: 'label_button_new' },
+      label_name:         { key: 'label_name' },
+      label_email:        { key: 'label_email' },
+      label_date:         { key: 'label_date' }
     }, view_model);
 
     var ContactViewModel = (function() {
       function ContactViewModel(model) {
-        new kb.ModelAttributeObservables(Knockback.locale_manager, {
-          label_name:     { keypath: 'label_name' },
-          label_email:    { keypath: 'label_email' },
-          label_date:     { keypath: 'label_date' }
+        kb.observables(kb.locale_manager, {
+          label_name:     { key: 'label_name' },
+          label_email:    { key: 'label_email' },
+          label_date:     { key: 'label_date' }
         }, this);
-        new kb.ModelAttributeObservables(model, {
-          name:           { keypath: 'name', write: true },
-          email:          { keypath: 'email', write: true },
-          date:           { keypath: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
+        kb.observables(model, {
+          name:           { key: 'name', write: true },
+          email:          { key: 'email', write: true },
+          date:           { key: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
         }, this);
       }
       return ContactViewModel;
     })();
-    var collection_sync = new Knockback.CollectionSync(collection, view_model.contacts, {
+    var collection_sync = Knockback.collectionSync(collection, view_model.contacts, {
       viewModelCreate:  function(model)         { return new ContactViewModel(model); },
       viewModelDestroy: function(view_model)    { return view_model.destroy(); },
       sort_attribute:   'name',

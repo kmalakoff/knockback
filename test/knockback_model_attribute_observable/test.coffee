@@ -7,8 +7,8 @@ $(document).ready( ->
   test("Standard use case: direct attributes with read and write", ->
     class ContactViewModel
       constructor: (model) ->
-        @name = new kb.ModelAttributeObservable(model, keypath:'name')
-        @number = new kb.ModelAttributeObservable(model, {keypath:'number', write: true}, this)
+        @name = kb.observable(model, key:'name')
+        @number = kb.observable(model, {key:'number', write: true}, this)
       destroy: ->
         @name.destroy(); @number.destroy()
 
@@ -36,9 +36,9 @@ $(document).ready( ->
   test("Standard use case: direct attributes with custom read and write", ->
     class ContactViewModelCustom
       constructor: (model) ->
-        @name = new kb.ModelAttributeObservable(model, {keypath:'name', read: -> return "First: #{model.get('name')}" })
-        @number = new kb.ModelAttributeObservable(model, {
-          keypath:'number'
+        @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+        @number = kb.observable(model, {
+          key:'number'
           read: -> return "#: #{model.get('number')}"
           write: (value) -> model.set({number: value.substring(3)})
         }, this)

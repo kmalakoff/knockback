@@ -38,7 +38,7 @@ $(document).ready(function() {
     __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
     function LocalizedStringLocalizer(value, options, view_model) {
       LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
-      return kb.observable(this);
+      return kb.wrappedObservable(this);
     }
     LocalizedStringLocalizer.prototype.read = function(value) {
       if (value.string_id) {
@@ -53,14 +53,14 @@ $(document).ready(function() {
     var ContactViewModelGreeting, model, view_model;
     ContactViewModelGreeting = (function() {
       function ContactViewModelGreeting(model) {
-        this.hello = new kb.ModelAttributeObservable(model, {
-          keypath: 'hello_greeting',
+        this.hello = kb.observable(model, {
+          key: 'hello_greeting',
           localizer: __bind(function(value) {
             return new LocalizedStringLocalizer(value);
           }, this)
         });
-        this.goodbye = new kb.ModelAttributeObservable(model, {
-          keypath: 'goodbye_greeting',
+        this.goodbye = kb.observable(model, {
+          key: 'goodbye_greeting',
           localizer: __bind(function(value) {
             return new LocalizedStringLocalizer(value);
           }, this)
@@ -104,7 +104,7 @@ $(document).ready(function() {
     __extends(LongDateLocalizer, kb.LocalizedObservable);
     function LongDateLocalizer(value, options, view_model) {
       LongDateLocalizer.__super__.constructor.apply(this, arguments);
-      return kb.observable(this);
+      return kb.wrappedObservable(this);
     }
     LongDateLocalizer.prototype.read = function(value) {
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
@@ -123,8 +123,8 @@ $(document).ready(function() {
     var ContactViewModelDate, birthdate, current_date, model, view_model;
     ContactViewModelDate = (function() {
       function ContactViewModelDate(model) {
-        this.date = new kb.ModelAttributeObservable(model, {
-          keypath: 'date',
+        this.date = kb.observable(model, {
+          key: 'date',
           write: true,
           localizer: __bind(function(value) {
             return new LongDateLocalizer(value);

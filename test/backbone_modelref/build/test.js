@@ -6,7 +6,7 @@ $(document).ready(function() {
     _.VERSION;
     return Backbone.VERSION;
   });
-  Knockback.locale_manager = new LocaleManager('en', {
+  kb.locale_manager = new LocaleManager('en', {
     'en': {
       loading: "Loading dude"
     },
@@ -22,18 +22,18 @@ $(document).ready(function() {
     ContactViewModel = (function() {
       function ContactViewModel(model) {
         this.loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'));
-        this.attribute_observables = new kb.ModelAttributeObservables(model, {
+        this.attribute_observables = kb.observables(model, {
           name: {
-            keypath: 'name',
+            key: 'name',
             "default": this.loading_message
           },
           number: {
-            keypath: 'number',
+            key: 'number',
             write: true,
             "default": this.loading_message
           },
           date: {
-            keypath: 'date',
+            key: 'date',
             write: true,
             "default": this.loading_message,
             localizer: __bind(function(value) {
@@ -50,11 +50,11 @@ $(document).ready(function() {
     collection = new ContactsCollection();
     model_ref = new Backbone.ModelRef(collection, 'b4');
     view_model = new ContactViewModel(model_ref);
-    Knockback.locale_manager.setLocale('en');
+    kb.locale_manager.setLocale('en');
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?");
-    Knockback.locale_manager.setLocale('en-GB');
+    kb.locale_manager.setLocale('en-GB');
     equal(view_model.name(), 'Loading sir', "Maybe too formal");
-    Knockback.locale_manager.setLocale('fr-FR');
+    kb.locale_manager.setLocale('fr-FR');
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
     collection.add(collection.parse({
       id: 'b4',
@@ -65,9 +65,9 @@ $(document).ready(function() {
     model = collection.get('b4');
     equal(view_model.name(), 'John', "It is a name");
     equal(view_model.number(), '555-555-5558', "Not so interesting number");
-    Knockback.locale_manager.setLocale('en-GB');
+    kb.locale_manager.setLocale('en-GB');
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
-    Knockback.locale_manager.setLocale('fr-FR');
+    kb.locale_manager.setLocale('fr-FR');
     equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format");
     raises((function() {
       return view_model.name('Paul');
@@ -77,7 +77,7 @@ $(document).ready(function() {
     view_model.number('9222-222-222');
     equal(model.get('number'), '9222-222-222', "Number was changed");
     equal(view_model.number(), '9222-222-222', "Number was changed");
-    Knockback.locale_manager.setLocale('en-GB');
+    kb.locale_manager.setLocale('en-GB');
     view_model.date('10 December 1963');
     current_date = model.get('date');
     equal(current_date.getFullYear(), 1963, "year is good");
@@ -92,7 +92,7 @@ $(document).ready(function() {
     model.set({
       date: new Date(1940, 10, 9)
     });
-    Knockback.locale_manager.setLocale('fr-FR');
+    kb.locale_manager.setLocale('fr-FR');
     equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format");
     view_model.date('10 novembre 1940');
     current_date = model.get('date');
@@ -102,11 +102,11 @@ $(document).ready(function() {
     collection.reset();
     equal(view_model.name(), 'Yoko', "Default is to retain the last value");
     view_model.attribute_observables.forceRefresh();
-    Knockback.locale_manager.setLocale('en');
+    kb.locale_manager.setLocale('en');
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?");
-    Knockback.locale_manager.setLocale('en-GB');
+    kb.locale_manager.setLocale('en-GB');
     equal(view_model.name(), 'Loading sir', "Maybe too formal");
-    Knockback.locale_manager.setLocale('fr-FR');
+    kb.locale_manager.setLocale('fr-FR');
     return equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
   });
 });

@@ -24,15 +24,15 @@ $(document).ready( ->
 
   class LocalizedStringLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super; return kb.observable(this)
+      super; return kb.wrappedObservable(this)
     read: (value) ->
       return if (value.string_id) then Knockback.locale_manager.get(value.string_id) else ''
 
   test("Localized greeting", ->
     class ContactViewModelGreeting
       constructor: (model) ->
-        @hello = new kb.ModelAttributeObservable(model, {keypath:'hello_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
-        @goodbye = new kb.ModelAttributeObservable(model, {keypath:'goodbye_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
+        @hello = kb.observable(model, {key:'hello_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
+        @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
       destroy: ->
         @hello.destroy(); @goodbye.destroy()
 
@@ -68,7 +68,7 @@ $(document).ready( ->
   # NOTE: dependency on globalize
   class LongDateLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super; return kb.observable(this)
+      super; return kb.wrappedObservable(this)
     read: (value) ->
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
     write: (localized_string, value, observable) ->
@@ -79,7 +79,7 @@ $(document).ready( ->
   test("Date and time with jquery.globalize", ->
     class ContactViewModelDate
       constructor: (model) ->
-        @date = new kb.ModelAttributeObservable(model, {keypath:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}, this)
+        @date = kb.observable(model, {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}, this)
       destroy: ->
         @date.destroy()
 

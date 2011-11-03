@@ -11,16 +11,16 @@ $(document).ready(function() {
     var ContactViewModel, current_date, model, view_model;
     ContactViewModel = (function() {
       function ContactViewModel(model) {
-        this.attribute_observables = new kb.ModelAttributeObservables(model, {
+        this.attribute_observables = kb.observables(model, {
           name: {
-            keypath: 'name'
+            key: 'name'
           },
           number: {
-            keypath: 'number',
+            key: 'number',
             write: true
           },
           date: {
-            keypath: 'date',
+            key: 'date',
             write: true,
             localizer: __bind(function(value) {
               return new LongDateLocalizer(value);

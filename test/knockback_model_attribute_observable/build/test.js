@@ -9,11 +9,11 @@ $(document).ready(function() {
     var ContactViewModel, model, view_model;
     ContactViewModel = (function() {
       function ContactViewModel(model) {
-        this.name = new kb.ModelAttributeObservable(model, {
-          keypath: 'name'
+        this.name = kb.observable(model, {
+          key: 'name'
         });
-        this.number = new kb.ModelAttributeObservable(model, {
-          keypath: 'number',
+        this.number = kb.observable(model, {
+          key: 'number',
           write: true
         }, this);
       }
@@ -49,14 +49,14 @@ $(document).ready(function() {
     var ContactViewModelCustom, model, view_model;
     ContactViewModelCustom = (function() {
       function ContactViewModelCustom(model) {
-        this.name = new kb.ModelAttributeObservable(model, {
-          keypath: 'name',
+        this.name = kb.observable(model, {
+          key: 'name',
           read: function() {
             return "First: " + (model.get('name'));
           }
         });
-        this.number = new kb.ModelAttributeObservable(model, {
-          keypath: 'number',
+        this.number = kb.observable(model, {
+          key: 'number',
           read: function() {
             return "#: " + (model.get('number'));
           },

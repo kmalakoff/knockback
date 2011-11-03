@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.1.1
+  knockback.js 0.2.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -15,11 +15,11 @@ throw new Error('Knockback: Dependency alert! Underscore.js must be included bef
 this.Knockback||this.Knockback={}; this.kb||this.kb=this.Knockback
 
 # Current version.
-Knockback.VERSION = '0.1.1'
+Knockback.VERSION = '0.2.0'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 Knockback.locale_manager
 
 # helpers
-Knockback.getDependentObservable = Knockback.observable = (instance) -> throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable; return instance._kb_observable
+Knockback.wrappedObservable = (instance) -> throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable; return instance._kb_observable

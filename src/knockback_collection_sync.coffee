@@ -143,7 +143,9 @@ class Knockback.CollectionSync
     @observable_array.splice(previous_index, 1); @observable_array.splice(new_index, 0, view_model) # move
     @options.onViewModelResort(view_model, @observable_array(), new_index) if @options.onViewModelResort # notify
 
+# factory function
+Knockback.collectionSync = (collection, observable_array, options) -> return new Knockback.CollectionSync(collection, observable_array, options)
+
 # helpers
 Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> view_model._kb_model
 Knockback.viewModelGetElement = Knockback.vmElement = (view_model) -> view_model._kb_element
-

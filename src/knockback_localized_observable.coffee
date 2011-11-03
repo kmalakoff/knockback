@@ -12,7 +12,7 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 #   For example:
 #     constructor: ->
 #       super
-#       return kb.observable(this)
+#       return kb.wrappedObservable(this)
 #
 # You can either provide a read or a read and write function in the options or on the class itself.
 # Options (all optional)
@@ -28,7 +28,7 @@ class Knockback.LocalizedObservable
     throw new Error('LocalizedObservable: options.read is missing') if not (@options.read or @read)
     throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.read and @read
     throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.write and @write
-    throw new Error('LocalizedObservable: Knockback.locale_manager is not defined') if not Knockback.locale_manager
+    throw new Error('LocalizedObservable: Knockback.locale_manager is not defined') if not kb.locale_manager
 
     _.bindAll(this, 'destroy', '_onGetValue', '_onSetValue', 'getObservedValue', 'setObservedValue', '_onLocaleChange')
 
@@ -47,16 +47,16 @@ class Knockback.LocalizedObservable
       @_kb_observable = ko.dependentObservable(@_onGetValue)
     throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js') if _.isUndefined(@_kb_observable.forceRefresh)
 
-    Knockback.locale_manager.bind('change', @_onLocaleChange)
+    kb.locale_manager.bind('change', @_onLocaleChange)
 
     # publish public interface on the observable and return instead of this
     @_kb_observable.getObservedValue = @getObservedValue
     @_kb_observable.setObservedValue = @setObservedValue
     @_kb_observable.destroy = @destroy
-    return kb.observable(this)
+    return kb.wrappedObservable(this)
 
   destroy: ->
-    Knockback.locale_manager.unbind('change', @_onLocaleChange)
+    kb.locale_manager.unbind('change', @_onLocaleChange)
     @_kb_observable.dispose(); @_kb_observable = null
     @options = {}
     @view_model = null
@@ -79,3 +79,6 @@ class Knockback.LocalizedObservable
     @current_localized_value = if not @value then @_getDefault() else @_kb_read.call(this, @value, @_kb_observable)
     @_kb_observable.forceRefresh()
     @options.onChange(@current_localized_value) if @options.onChange
+
+# factory function
+Knockback.localizedObservable = (value, options, view_model) -> return new Knockback.LocalizedObservable(value, options, view_model)

@@ -8,11 +8,11 @@ $(document).ready(function() {
   });
   ContactViewModel = (function() {
     function ContactViewModel(model) {
-      this.name = new kb.ModelAttributeObservable(model, {
-        keypath: 'name'
+      this.name = kb.observable(model, {
+        key: 'name'
       }, this);
-      this.number = new kb.ModelAttributeObservable(model, {
-        keypath: 'number'
+      this.number = kb.observable(model, {
+        key: 'number'
       }, this);
     }
     ContactViewModel.prototype.destroy = function() {
@@ -25,7 +25,7 @@ $(document).ready(function() {
     var collection, collection_sync, view_models_array;
     collection = new ContactsCollection();
     view_models_array = ko.observableArray([]);
-    collection_sync = new Knockback.CollectionSync(collection, view_models_array, {
+    collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
       },
@@ -63,7 +63,7 @@ $(document).ready(function() {
     view_models_array = ko.observableArray([]);
     view_model_count = 0;
     view_model_resort_count = 0;
-    collection_sync = new Knockback.CollectionSync(collection, view_models_array, {
+    collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
       },
@@ -138,7 +138,7 @@ $(document).ready(function() {
     view_models_array = ko.observableArray([]);
     view_model_count = 0;
     view_model_resort_count = 0;
-    collection_sync = new Knockback.CollectionSync(collection, view_models_array, {
+    collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
       },
@@ -202,16 +202,16 @@ $(document).ready(function() {
   });
   return test("Error cases", function() {
     raises((function() {
-      return new Knockback.CollectionSync();
+      return kb.collectionSync();
     }), Error, "CollectionSync: collection is missing");
     raises((function() {
-      return new Knockback.CollectionSync(new ContactsCollection());
+      return kb.collectionSync(new ContactsCollection());
     }), Error, "CollectionSync: observable_array is missing");
     raises((function() {
-      return new Knockback.CollectionSync(new ContactsCollection(), ko.observableArray([]));
+      return kb.collectionSync(new ContactsCollection(), ko.observableArray([]));
     }), Error, "CollectionSync: options is missing");
     return raises((function() {
-      return new Knockback.CollectionSync(new ContactsCollection(), ko.observableArray([]), {});
+      return kb.collectionSync(new ContactsCollection(), ko.observableArray([]), {});
     }), Error, "CollectionSync: options.viewModelCreate is missing");
   });
 });

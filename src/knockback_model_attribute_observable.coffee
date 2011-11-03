@@ -17,7 +17,7 @@ class Knockback.ModelAttributeObservable
   constructor: (@model, @bind_info, @view_model) ->
     throw new Error('ModelAttributeObservable: value is missing') if not @model
     throw new Error('ModelAttributeObservable: bind_info is missing') if not @bind_info
-    throw new Error('ModelAttributeObservable: bind_info.keypath is missing') if not @bind_info.keypath
+    throw new Error('ModelAttributeObservable: bind_info.key is missing') if not @bind_info.key
 
     _.bindAll(this, 'destroy', '_onValueChange', '_onGetValue', '_onSetValue', '_onModelLoaded', '_onModelUnloaded')
 
@@ -40,7 +40,7 @@ class Knockback.ModelAttributeObservable
     # publish public interface on the observable and return instead of this
     @_kb_observable.destroy = @destroy
     @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
-    return kb.observable(this)
+    return kb.wrappedObservable(this)
 
   destroy: ->
     @_kb_observable.dispose(); @_kb_observable = null
@@ -60,7 +60,7 @@ class Knockback.ModelAttributeObservable
 
   _onValueChange: ->
     if @localizer and @localizer.forceRefresh
-      @localizer.setObservedValue(@model.get(@bind_info.keypath)) if @model
+      @localizer.setObservedValue(@model.get(@bind_info.key)) if @model
       @localizer.forceRefresh()
     @_kb_observable.forceRefresh()
 
@@ -68,7 +68,7 @@ class Knockback.ModelAttributeObservable
     return @_getDefault() if not @model
     return @localizer() if @localizer
 
-    value = if @bind_info.read then @bind_info.read.apply(@view_model, [@model, @bind_info.keypath]) else @model.get(@bind_info.keypath)
+    value = if @bind_info.read then @bind_info.read.apply(@view_model, [@model, @bind_info.key]) else @model.get(@bind_info.key)
     return if value then value else @_getDefault()
 
   _onSetValue: (value) ->
@@ -78,14 +78,14 @@ class Knockback.ModelAttributeObservable
     # use a localized observable
     @localizer = @bind_info.localizer(value) if value and @bind_info.localizer
 
-    set_info = {}; set_info[@bind_info.keypath] = value
+    set_info = {}; set_info[@bind_info.key] = value
     if _.isFunction(@bind_info.write) then @bind_info.write.apply(@view_model, [value, @model, set_info]) else @model.set(set_info)
 
   _onModelLoaded:   (model) ->
     @model = model
     @model.bind('change', @_onValueChange) # all attributes
-    @model.bind("change:#{@bind_info.keypath}", @_onValueChange)
-    value = if @bind_info.read then @bind_info.read.apply(@view_model, [@model, @bind_info.keypath]) else @model.get(@bind_info.keypath)
+    @model.bind("change:#{@bind_info.key}", @_onValueChange)
+    value = if @bind_info.read then @bind_info.read.apply(@view_model, [@model, @bind_info.key]) else @model.get(@bind_info.key)
 
     # use a localized observable
     @localizer = @bind_info.localizer(value) if value and @bind_info.localizer
@@ -95,5 +95,11 @@ class Knockback.ModelAttributeObservable
   _onModelUnloaded: ->
     (@localizer.destroy(); @localizer = null) if @localizer and @localizer.destroy
     @model.unbind('change', @_onValueChange) # all attributes
-    @model.unbind("change:#{@bind_info.keypath}", @_onValueChange)
+    @model.unbind("change:#{@bind_info.key}", @_onValueChange)
     @model = null
+
+# alias
+Knockback.Observable = Knockback.ModelAttributeObservable
+
+# factory function
+Knockback.observable = (model, bind_info, view_model) -> return new Knockback.Observable(model, bind_info, view_model)

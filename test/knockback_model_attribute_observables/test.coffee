@@ -9,10 +9,10 @@ $(document).ready( ->
   test("Standard use case: just enough to get the picture", ->
     class ContactViewModel
       constructor: (model) ->
-        @attribute_observables = new kb.ModelAttributeObservables(model, {
-          name:     {keypath:'name'}
-          number:   {keypath:'number', write: true}
-          date:     {keypath:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
+        @attribute_observables = kb.observables(model, {
+          name:     {key:'name'}
+          number:   {key:'number', write: true}
+          date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
         }, this)
       destroy: ->
         @attribute_observables.destroy()

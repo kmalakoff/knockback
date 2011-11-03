@@ -6,8 +6,8 @@ $(document).ready( ->
 
   class ContactViewModel
     constructor: (model) ->
-      @name = new kb.ModelAttributeObservable(model, keypath:'name', this)
-      @number = new kb.ModelAttributeObservable(model, keypath:'number', this)
+      @name = kb.observable(model, key:'name', this)
+      @number = kb.observable(model, key:'number', this)
     destroy: ->
       @name.destroy(); @number.destroy()
 
@@ -15,7 +15,7 @@ $(document).ready( ->
     collection = new ContactsCollection()
     view_models_array = ko.observableArray([])
 
-    collection_sync = new Knockback.CollectionSync(collection, view_models_array, {
+    collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
       viewModelDestroy:   (view_model) -> view_model.destroy()
     })
@@ -44,7 +44,7 @@ $(document).ready( ->
     view_models_array = ko.observableArray([])
     view_model_count = 0; view_model_resort_count = 0
 
-    collection_sync = new Knockback.CollectionSync(collection, view_models_array, {
+    collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
       viewModelDestroy:   (view_model) -> view_model.destroy()
       sort_attribute:     'name'
@@ -99,7 +99,7 @@ $(document).ready( ->
     view_models_array = ko.observableArray([])
     view_model_count = 0; view_model_resort_count = 0
 
-    collection_sync = new Knockback.CollectionSync(collection, view_models_array, {
+    collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
       viewModelDestroy:   (view_model) -> view_model.destroy()
 
@@ -147,9 +147,9 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
-    raises((->new Knockback.CollectionSync()), Error, "CollectionSync: collection is missing")
-    raises((->new Knockback.CollectionSync(new ContactsCollection())), Error, "CollectionSync: observable_array is missing")
-    raises((->new Knockback.CollectionSync(new ContactsCollection(), ko.observableArray([]))), Error, "CollectionSync: options is missing")
-    raises((->new Knockback.CollectionSync(new ContactsCollection(), ko.observableArray([]), {})), Error, "CollectionSync: options.viewModelCreate is missing")
+    raises((->kb.collectionSync()), Error, "CollectionSync: collection is missing")
+    raises((->kb.collectionSync(new ContactsCollection())), Error, "CollectionSync: observable_array is missing")
+    raises((->kb.collectionSync(new ContactsCollection(), ko.observableArray([]))), Error, "CollectionSync: options is missing")
+    raises((->kb.collectionSync(new ContactsCollection(), ko.observableArray([]), {})), Error, "CollectionSync: options.viewModelCreate is missing")
   )
 )

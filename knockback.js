@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.1.1
+  knockback.js 0.2.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,9 +17,9 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.1.1';
+Knockback.VERSION = '0.2.0';
 Knockback.locale_manager;
-Knockback.getDependentObservable = Knockback.observable = function(instance) {
+Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
     throw new Error('Knockback: _kb_observable missing from your instance');
   }
@@ -290,6 +290,9 @@ Knockback.CollectionSync = (function() {
   };
   return CollectionSync;
 })();
+Knockback.collectionSync = function(collection, observable_array, options) {
+  return new Knockback.CollectionSync(collection, observable_array, options);
+};
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
   return view_model._kb_model;
 };
@@ -322,7 +325,7 @@ Knockback.LocalizedObservable = (function() {
     if (this.options.write && this.write) {
       throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.');
     }
-    if (!Knockback.locale_manager) {
+    if (!kb.locale_manager) {
       throw new Error('LocalizedObservable: Knockback.locale_manager is not defined');
     }
     _.bindAll(this, 'destroy', '_onGetValue', '_onSetValue', 'getObservedValue', 'setObservedValue', '_onLocaleChange');
@@ -352,14 +355,14 @@ Knockback.LocalizedObservable = (function() {
     if (_.isUndefined(this._kb_observable.forceRefresh)) {
       throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js');
     }
-    Knockback.locale_manager.bind('change', this._onLocaleChange);
+    kb.locale_manager.bind('change', this._onLocaleChange);
     this._kb_observable.getObservedValue = this.getObservedValue;
     this._kb_observable.setObservedValue = this.setObservedValue;
     this._kb_observable.destroy = this.destroy;
-    return kb.observable(this);
+    return kb.wrappedObservable(this);
   }
   LocalizedObservable.prototype.destroy = function() {
-    Knockback.locale_manager.unbind('change', this._onLocaleChange);
+    kb.locale_manager.unbind('change', this._onLocaleChange);
     this._kb_observable.dispose();
     this._kb_observable = null;
     this.options = {};
@@ -397,6 +400,9 @@ Knockback.LocalizedObservable = (function() {
   };
   return LocalizedObservable;
 })();
+Knockback.localizedObservable = function(value, options, view_model) {
+  return new Knockback.LocalizedObservable(value, options, view_model);
+};
 /*
   knockback_model_attribute_observable.js
   (c) 2011 Kevin Malakoff.
@@ -417,8 +423,8 @@ Knockback.ModelAttributeObservable = (function() {
     if (!this.bind_info) {
       throw new Error('ModelAttributeObservable: bind_info is missing');
     }
-    if (!this.bind_info.keypath) {
-      throw new Error('ModelAttributeObservable: bind_info.keypath is missing');
+    if (!this.bind_info.key) {
+      throw new Error('ModelAttributeObservable: bind_info.key is missing');
     }
     _.bindAll(this, 'destroy', '_onValueChange', '_onGetValue', '_onSetValue', '_onModelLoaded', '_onModelUnloaded');
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
@@ -449,7 +455,7 @@ Knockback.ModelAttributeObservable = (function() {
     if (!this.model_ref || this.model_ref.isLoaded()) {
       this._onModelLoaded(this.model);
     }
-    return kb.observable(this);
+    return kb.wrappedObservable(this);
   }
   ModelAttributeObservable.prototype.destroy = function() {
     this._kb_observable.dispose();
@@ -479,7 +485,7 @@ Knockback.ModelAttributeObservable = (function() {
   ModelAttributeObservable.prototype._onValueChange = function() {
     if (this.localizer && this.localizer.forceRefresh) {
       if (this.model) {
-        this.localizer.setObservedValue(this.model.get(this.bind_info.keypath));
+        this.localizer.setObservedValue(this.model.get(this.bind_info.key));
       }
       this.localizer.forceRefresh();
     }
@@ -493,7 +499,7 @@ Knockback.ModelAttributeObservable = (function() {
     if (this.localizer) {
       return this.localizer();
     }
-    value = this.bind_info.read ? this.bind_info.read.apply(this.view_model, [this.model, this.bind_info.keypath]) : this.model.get(this.bind_info.keypath);
+    value = this.bind_info.read ? this.bind_info.read.apply(this.view_model, [this.model, this.bind_info.key]) : this.model.get(this.bind_info.key);
     if (value) {
       return value;
     } else {
@@ -513,7 +519,7 @@ Knockback.ModelAttributeObservable = (function() {
       this.localizer = this.bind_info.localizer(value);
     }
     set_info = {};
-    set_info[this.bind_info.keypath] = value;
+    set_info[this.bind_info.key] = value;
     if (_.isFunction(this.bind_info.write)) {
       return this.bind_info.write.apply(this.view_model, [value, this.model, set_info]);
     } else {
@@ -524,8 +530,8 @@ Knockback.ModelAttributeObservable = (function() {
     var value;
     this.model = model;
     this.model.bind('change', this._onValueChange);
-    this.model.bind("change:" + this.bind_info.keypath, this._onValueChange);
-    value = this.bind_info.read ? this.bind_info.read.apply(this.view_model, [this.model, this.bind_info.keypath]) : this.model.get(this.bind_info.keypath);
+    this.model.bind("change:" + this.bind_info.key, this._onValueChange);
+    value = this.bind_info.read ? this.bind_info.read.apply(this.view_model, [this.model, this.bind_info.key]) : this.model.get(this.bind_info.key);
     if (value && this.bind_info.localizer) {
       this.localizer = this.bind_info.localizer(value);
     }
@@ -539,11 +545,15 @@ Knockback.ModelAttributeObservable = (function() {
       this.localizer = null;
     }
     this.model.unbind('change', this._onValueChange);
-    this.model.unbind("change:" + this.bind_info.keypath, this._onValueChange);
+    this.model.unbind("change:" + this.bind_info.key, this._onValueChange);
     return this.model = null;
   };
   return ModelAttributeObservable;
 })();
+Knockback.Observable = Knockback.ModelAttributeObservable;
+Knockback.observable = function(model, bind_info, view_model) {
+  return new Knockback.Observable(model, bind_info, view_model);
+};
 /*
   knockback_model_attribute_observables.js
   (c) 2011 Kevin Malakoff.
@@ -568,7 +578,7 @@ Knockback.ModelAttributeObservables = (function() {
     _ref = this.mappings_info;
     for (view_model_property_name in _ref) {
       mapping_info = _ref[view_model_property_name];
-      this.view_model[view_model_property_name] = new Knockback.ModelAttributeObservable(this.model, mapping_info, this.view_model);
+      this.view_model[view_model_property_name] = kb.observable(this.model, mapping_info, this.view_model);
     }
     return this;
   }
@@ -596,3 +606,7 @@ Knockback.ModelAttributeObservables = (function() {
   };
   return ModelAttributeObservables;
 })();
+Knockback.Observables = Knockback.ModelAttributeObservables;
+Knockback.observables = function(model, mappings_info, view_model) {
+  return new Knockback.Observables(model, mappings_info, view_model);
+};

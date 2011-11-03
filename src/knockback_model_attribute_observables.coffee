@@ -12,7 +12,7 @@ class Knockback.ModelAttributeObservables
     throw new Error('ModelAttributeObservables: model is missing') if not @model
     throw new Error('ModelAttributeObservables: mappings_info is missing') if not @mappings_info
 
-    (@view_model[view_model_property_name] = new Knockback.ModelAttributeObservable(@model, mapping_info, @view_model)) for view_model_property_name, mapping_info of @mappings_info
+    (@view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model)) for view_model_property_name, mapping_info of @mappings_info
     return this
 
   destroy: ->
@@ -22,3 +22,9 @@ class Knockback.ModelAttributeObservables
 
   forceRefresh: ->
     @view_model[view_model_property_name].forceRefresh() for view_model_property_name, mapping_info of @mappings_info
+
+# alias
+Knockback.Observables = Knockback.ModelAttributeObservables
+
+# factory function
+Knockback.observables = (model, mappings_info, view_model) -> return new Knockback.Observables(model, mappings_info, view_model)

@@ -11,11 +11,11 @@ LocalizedStringLocalizer = (function() {
   __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
   function LocalizedStringLocalizer(value, options, view_model) {
     LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
-    return kb.observable(this);
+    return kb.wrappedObservable(this);
   }
   LocalizedStringLocalizer.prototype.read = function(value) {
     if (value.string_id) {
-      return Knockback.locale_manager.get(value.string_id);
+      return kb.locale_manager.get(value.string_id);
     } else {
       return '';
     }
@@ -26,14 +26,14 @@ LongDateLocalizer = (function() {
   __extends(LongDateLocalizer, kb.LocalizedObservable);
   function LongDateLocalizer(value, options, view_model) {
     LongDateLocalizer.__super__.constructor.apply(this, arguments);
-    return kb.observable(this);
+    return kb.wrappedObservable(this);
   }
   LongDateLocalizer.prototype.read = function(value) {
-    return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
+    return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale());
   };
   LongDateLocalizer.prototype.write = function(localized_string, value, observable) {
     var new_value;
-    new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
+    new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale());
     if (!(new_value && _.isDate(new_value))) {
       return observable.forceRefresh();
     }
@@ -49,18 +49,18 @@ ShortDateLocalizer = (function() {
     }
     ShortDateLocalizer.__super__.constructor.call(this, value, _.extend(options, {
       read: function(value) {
-        return Globalize.format(date, Globalize.cultures[Knockback.locale_manager.getLocale()].calendars.standard.patterns.d, Knockback.locale_manager.getLocale());
+        return Globalize.format(date, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
       },
       write: __bind(function(localized_string, value, observable) {
         var new_value;
-        new_value = Globalize.parseDate(localized_string, Globalize.cultures[Knockback.locale_manager.getLocale()].calendars.standard.patterns.d, Knockback.locale_manager.getLocale());
+        new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
         if (!(new_value && _.isDate(new_value))) {
           return observable.forceRefresh();
         }
         return date.setTime(new_value.valueOf());
       }, this)
     }), view_model);
-    return kb.observable(this);
+    return kb.wrappedObservable(this);
   }
   return ShortDateLocalizer;
 })();
