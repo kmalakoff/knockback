@@ -7,22 +7,16 @@ $(document).ready(function() {
   });
   test("Standard use case: direct attributes with read and write", function() {
     var ContactViewModel, model, view_model;
-    ContactViewModel = (function() {
-      function ContactViewModel(model) {
-        this.name = kb.observable(model, {
-          key: 'name'
-        });
-        this.number = kb.observable(model, {
-          key: 'number',
-          write: true
-        }, this);
-      }
-      ContactViewModel.prototype.destroy = function() {
-        this.name.destroy();
-        return this.number.destroy();
-      };
-      return ContactViewModel;
-    })();
+    ContactViewModel = function(model) {
+      this.name = kb.observable(model, {
+        key: 'name'
+      });
+      this.number = kb.observable(model, {
+        key: 'number',
+        write: true
+      }, this);
+      return this;
+    };
     model = new Contact({
       name: 'Ringo',
       number: '555-555-5556'
@@ -43,36 +37,31 @@ $(document).ready(function() {
       number: 'XXX-XXX-XXXX'
     });
     equal(view_model.name(), 'Starr', "Name changed");
-    return equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
+    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
+    return kb.vmDestroy(view_model);
   });
   test("Standard use case: direct attributes with custom read and write", function() {
     var ContactViewModelCustom, model, view_model;
-    ContactViewModelCustom = (function() {
-      function ContactViewModelCustom(model) {
-        this.name = kb.observable(model, {
-          key: 'name',
-          read: function() {
-            return "First: " + (model.get('name'));
-          }
-        });
-        this.number = kb.observable(model, {
-          key: 'number',
-          read: function() {
-            return "#: " + (model.get('number'));
-          },
-          write: function(value) {
-            return model.set({
-              number: value.substring(3)
-            });
-          }
-        }, this);
-      }
-      ContactViewModelCustom.prototype.destroy = function() {
-        this.name.destroy();
-        return this.number.destroy();
-      };
-      return ContactViewModelCustom;
-    })();
+    ContactViewModelCustom = function(model) {
+      this.name = kb.observable(model, {
+        key: 'name',
+        read: function() {
+          return "First: " + (model.get('name'));
+        }
+      });
+      this.number = kb.observable(model, {
+        key: 'number',
+        read: function() {
+          return "#: " + (model.get('number'));
+        },
+        write: function(value) {
+          return model.set({
+            number: value.substring(3)
+          });
+        }
+      }, this);
+      return this;
+    };
     model = new Contact({
       name: 'Ringo',
       number: '555-555-5556'
@@ -93,7 +82,8 @@ $(document).ready(function() {
       number: 'XXX-XXX-XXXX'
     });
     equal(view_model.name(), 'First: Starr', "Name changed");
-    return equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed");
+    equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed");
+    return kb.vmDestroy(view_model);
   });
   return test("Error cases", function() {});
 });

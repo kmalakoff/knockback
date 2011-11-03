@@ -53,6 +53,7 @@ class Knockback.LocalizedObservable
     @_kb_observable.getObservedValue = @getObservedValue
     @_kb_observable.setObservedValue = @setObservedValue
     @_kb_observable.destroy = @destroy
+    @_kb_observable.__kb_owner = this
     return kb.wrappedObservable(this)
 
   destroy: ->

@@ -9,30 +9,25 @@ $(document).ready(function() {
   Knockback.locale_manager = new LocaleManager('en', {});
   test("Standard use case: just enough to get the picture", function() {
     var ContactViewModel, current_date, model, view_model;
-    ContactViewModel = (function() {
-      function ContactViewModel(model) {
-        this.attribute_observables = kb.observables(model, {
-          name: {
-            key: 'name'
-          },
-          number: {
-            key: 'number',
-            write: true
-          },
-          date: {
-            key: 'date',
-            write: true,
-            localizer: __bind(function(value) {
-              return new LongDateLocalizer(value);
-            }, this)
-          }
-        }, this);
-      }
-      ContactViewModel.prototype.destroy = function() {
-        return this.attribute_observables.destroy();
-      };
-      return ContactViewModel;
-    })();
+    ContactViewModel = function(model) {
+      this.attribute_observables = kb.observables(model, {
+        name: {
+          key: 'name'
+        },
+        number: {
+          key: 'number',
+          write: true
+        },
+        date: {
+          key: 'date',
+          write: true,
+          localizer: __bind(function(value) {
+            return new LongDateLocalizer(value);
+          }, this)
+        }
+      }, this);
+      return this;
+    };
     model = new Contact({
       name: 'John',
       number: '555-555-5558',
@@ -74,7 +69,8 @@ $(document).ready(function() {
     current_date = model.get('date');
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
-    return equal(current_date.getDate(), 10, "day is good");
+    equal(current_date.getDate(), 10, "day is good");
+    return kb.vmDestroy(view_model);
   });
   return test("Error cases", function() {});
 });

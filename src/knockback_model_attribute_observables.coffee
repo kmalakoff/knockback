@@ -16,7 +16,11 @@ class Knockback.ModelAttributeObservables
     return this
 
   destroy: ->
-    (@view_model[view_model_property_name].destroy(); delete @view_model[view_model_property_name]) for view_model_property_name, mapping_info of @mappings_info; @view_model = null
+    for view_model_property_name, mapping_info of @mappings_info
+      do (view_model_property_name, mapping_info) =>
+        @view_model[view_model_property_name].destroy() if @view_model[view_model_property_name]
+        @view_model[view_model_property_name] = null
+    @view_model = null
     @mappings_info = null
     @model = null
 

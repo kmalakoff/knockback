@@ -6,21 +6,15 @@ $(document).ready(function() {
     _.VERSION;
     return Backbone.VERSION;
   });
-  ContactViewModel = (function() {
-    function ContactViewModel(model) {
-      this.name = kb.observable(model, {
-        key: 'name'
-      }, this);
-      this.number = kb.observable(model, {
-        key: 'number'
-      }, this);
-    }
-    ContactViewModel.prototype.destroy = function() {
-      this.name.destroy();
-      return this.number.destroy();
-    };
-    return ContactViewModel;
-  })();
+  ContactViewModel = function(model) {
+    this.name = kb.observable(model, {
+      key: 'name'
+    }, this);
+    this.number = kb.observable(model, {
+      key: 'number'
+    }, this);
+    return this;
+  };
   test("Basic Usage: no sorting and no callbacks", function() {
     var collection, collection_sync, view_models_array;
     collection = new ContactsCollection();
@@ -28,9 +22,6 @@ $(document).ready(function() {
     collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
-      },
-      viewModelDestroy: function(view_model) {
-        return view_model.destroy();
       }
     });
     equal(collection.length, 0, "no models");
@@ -66,9 +57,6 @@ $(document).ready(function() {
     collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
-      },
-      viewModelDestroy: function(view_model) {
-        return view_model.destroy();
       },
       sort_attribute: 'name',
       sortedIndex: function(models, model) {
@@ -141,9 +129,6 @@ $(document).ready(function() {
     collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
-      },
-      viewModelDestroy: function(view_model) {
-        return view_model.destroy();
       },
       onViewModelAdd: function(view_model, view_models_array_array) {
         return view_model_count++;

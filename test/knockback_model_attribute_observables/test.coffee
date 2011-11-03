@@ -7,15 +7,13 @@ $(document).ready( ->
   Knockback.locale_manager = new LocaleManager('en', {})
 
   test("Standard use case: just enough to get the picture", ->
-    class ContactViewModel
-      constructor: (model) ->
-        @attribute_observables = kb.observables(model, {
-          name:     {key:'name'}
-          number:   {key:'number', write: true}
-          date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
-        }, this)
-      destroy: ->
-        @attribute_observables.destroy()
+    ContactViewModel = (model) ->
+      @attribute_observables = kb.observables(model, {
+        name:     {key:'name'}
+        number:   {key:'number', write: true}
+        date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
+      }, this)
+      return this
 
     model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
@@ -54,6 +52,9 @@ $(document).ready( ->
     equal(current_date.getFullYear(), 1940, "year is good")
     equal(current_date.getMonth(), 10, "month is good")
     equal(current_date.getDate(), 10, "day is good")
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
   )
 
   test("Error cases", ->

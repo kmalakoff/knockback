@@ -39,6 +39,7 @@ class Knockback.ModelAttributeObservable
 
     # publish public interface on the observable and return instead of this
     @_kb_observable.destroy = @destroy
+    @_kb_observable.__kb_owner = this
     @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
     return kb.wrappedObservable(this)
 

@@ -117,21 +117,18 @@
       label_date:         { key: 'label_date' }
     }, view_model);
 
-    var ContactViewModel = (function() {
-      function ContactViewModel(model) {
-        kb.observables(kb.locale_manager, {
-          label_name:     { key: 'label_name' },
-          label_email:    { key: 'label_email' },
-          label_date:     { key: 'label_date' }
-        }, this);
-        kb.observables(model, {
-          name:           { key: 'name', write: true },
-          email:          { key: 'email', write: true },
-          date:           { key: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
-        }, this);
-      }
-      return ContactViewModel;
-    })();
+    var ContactViewModel = function(model) {
+      kb.observables(kb.locale_manager, {
+        label_name:     { key: 'label_name' },
+        label_email:    { key: 'label_email' },
+        label_date:     { key: 'label_date' }
+      }, this);
+      kb.observables(model, {
+        name:           { key: 'name', write: true },
+        email:          { key: 'email', write: true },
+        date:           { key: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
+      }, this);
+    };
     var collection_sync = Knockback.collectionSync(collection, view_model.contacts, {
       viewModelCreate:  function(model)         { return new ContactViewModel(model); },
       viewModelDestroy: function(view_model)    { return view_model.destroy(); },

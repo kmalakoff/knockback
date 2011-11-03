@@ -11,16 +11,14 @@ $(document).ready( ->
   })
 
   test("Standard use case: just enough to get the picture", ->
-    class ContactViewModel
-      constructor: (model) ->
-        @loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'))
-        @attribute_observables = kb.observables(model, {
-          name:     {key:'name', default: @loading_message}
-          number:   {key:'number', write: true, default: @loading_message}
-          date:     {key:'date', write: true, default: @loading_message, localizer: (value) => return new LongDateLocalizer(value)}
-        }, this)
-      destroy: ->
-        @attribute_observables.destroy()
+    ContactViewModel = (model) ->
+      @loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'))
+      @attribute_observables = kb.observables(model, {
+        name:     {key:'name', default: @loading_message}
+        number:   {key:'number', write: true, default: @loading_message}
+        date:     {key:'date', write: true, default: @loading_message, localizer: (value) => return new LongDateLocalizer(value)}
+      }, this)
+      return this
 
     collection = new ContactsCollection()
     model_ref = new Backbone.ModelRef(collection, 'b4')
@@ -81,5 +79,8 @@ $(document).ready( ->
     equal(view_model.name(), 'Loading sir', "Maybe too formal")
     kb.locale_manager.setLocale('fr-FR')
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
   )
 )

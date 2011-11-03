@@ -4,12 +4,10 @@ $(document).ready( ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
-  class ContactViewModel
-    constructor: (model) ->
-      @name = kb.observable(model, key:'name', this)
-      @number = kb.observable(model, key:'number', this)
-    destroy: ->
-      @name.destroy(); @number.destroy()
+  ContactViewModel = (model) ->
+    @name = kb.observable(model, key:'name', this)
+    @number = kb.observable(model, key:'number', this)
+    return this
 
   test("Basic Usage: no sorting and no callbacks", ->
     collection = new ContactsCollection()
@@ -17,7 +15,6 @@ $(document).ready( ->
 
     collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
-      viewModelDestroy:   (view_model) -> view_model.destroy()
     })
 
     equal(collection.length, 0, "no models")
@@ -46,7 +43,6 @@ $(document).ready( ->
 
     collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
-      viewModelDestroy:   (view_model) -> view_model.destroy()
       sort_attribute:     'name'
       sortedIndex:        (models, model) -> _.sortedIndex(models, model, (test) -> test.get('name'))
 
@@ -101,7 +97,6 @@ $(document).ready( ->
 
     collection_sync = kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
-      viewModelDestroy:   (view_model) -> view_model.destroy()
 
       onViewModelAdd:     (view_model, view_models_array_array) -> view_model_count++
       onViewModelResort:  (view_model, view_models_array_array, new_index) -> view_model_resort_count++

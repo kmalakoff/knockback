@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.2.0
+  knockback.js 0.3.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,13 +17,28 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.2.0';
+Knockback.VERSION = '0.3.0';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
     throw new Error('Knockback: _kb_observable missing from your instance');
   }
   return instance._kb_observable;
+};
+Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_model) {
+  var key, observable, _results;
+  _results = [];
+  for (key in view_model) {
+    observable = view_model[key];
+    _results.push((function(key, observable) {
+      if (!observable || !(observable.__kb_owner || (observable instanceof kb.ModelAttributeObservables) || (observable instanceof kb.CollectionSync))) {
+        return;
+      }
+      observable.destroy();
+      return view_model[key] = null;
+    })(key, observable));
+  }
+  return _results;
 };
 /*
   knockback_collection_sync.js
@@ -112,14 +127,14 @@ Knockback.CollectionSync = (function() {
     var id_attribute;
     id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
     return _.find(this.observable_array(), function(test) {
-      return test._kb_model[id_attribute] === model[id_attribute];
+      return test.__kb_model[id_attribute] === model[id_attribute];
     });
   };
   CollectionSync.prototype.elementByModel = function(model) {
     var view_model;
     view_model = this.viewModelByModel(model);
     if (view_model) {
-      return view_model._kb_element;
+      return view_model.__kb_element;
     } else {
       return null;
     }
@@ -141,9 +156,7 @@ Knockback.CollectionSync = (function() {
       if (this.options.onViewModelRemove) {
         this.options.onViewModelRemove(view_model);
       }
-      if (this.options.viewModelDestroy) {
-        return this.options.viewModelDestroy(view_model);
-      }
+      return kb.vmDestroy(view_model);
     }, this);
     for (_i = 0, _len = view_models.length; _i < _len; _i++) {
       view_model = view_models[_i];
@@ -202,7 +215,7 @@ Knockback.CollectionSync = (function() {
     var add_index, sorted_models, view_model;
     view_model = this._viewModelCreate(model);
     if (this.options.sortedIndex) {
-      sorted_models = _.pluck(this.observable_array(), '_kb_model');
+      sorted_models = _.pluck(this.observable_array(), '__kb_model');
       add_index = this.options.sortedIndex(sorted_models, model);
     } else {
       add_index = this.collection.indexOf(model);
@@ -222,7 +235,9 @@ Knockback.CollectionSync = (function() {
     if (this.options.onViewModelRemove) {
       this.options.onViewModelRemove(view_model, this.observable_array());
     }
-    return this._viewModelDestroy(view_model);
+    kb.vmDestroy(view_model);
+    view_model.__kb_model = null;
+    return view_model.__kb_element = null;
   };
   CollectionSync.prototype._onModelChanged = function(model) {
     var view_model;
@@ -241,13 +256,13 @@ Knockback.CollectionSync = (function() {
   CollectionSync.prototype._viewModelCreate = function(model) {
     var view_model;
     view_model = this.options.viewModelCreate(model);
-    if (view_model._kb_model) {
+    if (view_model.__kb_model) {
       throw new Error("CollectionSync: _model is reserved");
     }
-    if (view_model._kb_element) {
+    if (view_model.__kb_element) {
       throw new Error("CollectionSync: _element is reserved");
     }
-    view_model._kb_model = model;
+    view_model.__kb_model = model;
     view_model.afterRender = this._bindAfterRender(view_model);
     return view_model;
   };
@@ -255,25 +270,18 @@ Knockback.CollectionSync = (function() {
     var their_after_render;
     their_after_render = view_model.afterRender;
     return view_model.afterRender = function(element) {
-      view_model._kb_element = element;
+      view_model.__kb_element = element;
       if (their_after_render) {
         return their_after_render.call(view_model, element);
       }
     };
   };
-  CollectionSync.prototype._viewModelDestroy = function(view_model) {
-    if (this.options.viewModelDestroy) {
-      this.options.viewModelDestroy(view_model);
-    }
-    view_model._kb_model = null;
-    return view_model._kb_element = null;
-  };
   CollectionSync.prototype._viewModelResort = function(view_model) {
     var model, new_index, previous_index, sorted_models;
     previous_index = this.observable_array.indexOf(view_model);
-    model = view_model._kb_model;
+    model = view_model.__kb_model;
     if (this.options.sortedIndex) {
-      sorted_models = _.pluck(this.observable_array(), '_kb_model');
+      sorted_models = _.pluck(this.observable_array(), '__kb_model');
       sorted_models.splice(previous_index, 1);
       new_index = this.options.sortedIndex(sorted_models, model);
     } else {
@@ -294,10 +302,10 @@ Knockback.collectionSync = function(collection, observable_array, options) {
   return new Knockback.CollectionSync(collection, observable_array, options);
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
-  return view_model._kb_model;
+  return view_model.__kb_model;
 };
 Knockback.viewModelGetElement = Knockback.vmElement = function(view_model) {
-  return view_model._kb_element;
+  return view_model.__kb_element;
 };
 /*
   knockback_localized_observable.js
@@ -359,6 +367,7 @@ Knockback.LocalizedObservable = (function() {
     this._kb_observable.getObservedValue = this.getObservedValue;
     this._kb_observable.setObservedValue = this.setObservedValue;
     this._kb_observable.destroy = this.destroy;
+    this._kb_observable.__kb_owner = this;
     return kb.wrappedObservable(this);
   }
   LocalizedObservable.prototype.destroy = function() {
@@ -452,6 +461,7 @@ Knockback.ModelAttributeObservable = (function() {
       throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js');
     }
     this._kb_observable.destroy = this.destroy;
+    this._kb_observable.__kb_owner = this;
     if (!this.model_ref || this.model_ref.isLoaded()) {
       this._onModelLoaded(this.model);
     }
@@ -560,7 +570,9 @@ Knockback.observable = function(model, bind_info, view_model) {
   Knockback.ModelAttributeObservables is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
+*/
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
 Knockback.ModelAttributeObservables = (function() {
@@ -583,12 +595,17 @@ Knockback.ModelAttributeObservables = (function() {
     return this;
   }
   ModelAttributeObservables.prototype.destroy = function() {
-    var mapping_info, view_model_property_name, _ref;
+    var mapping_info, view_model_property_name, _fn, _ref;
     _ref = this.mappings_info;
+    _fn = __bind(function(view_model_property_name, mapping_info) {
+      if (this.view_model[view_model_property_name]) {
+        this.view_model[view_model_property_name].destroy();
+      }
+      return this.view_model[view_model_property_name] = null;
+    }, this);
     for (view_model_property_name in _ref) {
       mapping_info = _ref[view_model_property_name];
-      this.view_model[view_model_property_name].destroy();
-      delete this.view_model[view_model_property_name];
+      _fn(view_model_property_name, mapping_info);
     }
     this.view_model = null;
     this.mappings_info = null;

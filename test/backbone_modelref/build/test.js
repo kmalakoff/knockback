@@ -19,34 +19,29 @@ $(document).ready(function() {
   });
   return test("Standard use case: just enough to get the picture", function() {
     var ContactViewModel, collection, current_date, model, model_ref, view_model;
-    ContactViewModel = (function() {
-      function ContactViewModel(model) {
-        this.loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'));
-        this.attribute_observables = kb.observables(model, {
-          name: {
-            key: 'name',
-            "default": this.loading_message
-          },
-          number: {
-            key: 'number',
-            write: true,
-            "default": this.loading_message
-          },
-          date: {
-            key: 'date',
-            write: true,
-            "default": this.loading_message,
-            localizer: __bind(function(value) {
-              return new LongDateLocalizer(value);
-            }, this)
-          }
-        }, this);
-      }
-      ContactViewModel.prototype.destroy = function() {
-        return this.attribute_observables.destroy();
-      };
-      return ContactViewModel;
-    })();
+    ContactViewModel = function(model) {
+      this.loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'));
+      this.attribute_observables = kb.observables(model, {
+        name: {
+          key: 'name',
+          "default": this.loading_message
+        },
+        number: {
+          key: 'number',
+          write: true,
+          "default": this.loading_message
+        },
+        date: {
+          key: 'date',
+          write: true,
+          "default": this.loading_message,
+          localizer: __bind(function(value) {
+            return new LongDateLocalizer(value);
+          }, this)
+        }
+      }, this);
+      return this;
+    };
     collection = new ContactsCollection();
     model_ref = new Backbone.ModelRef(collection, 'b4');
     view_model = new ContactViewModel(model_ref);
@@ -107,6 +102,7 @@ $(document).ready(function() {
     kb.locale_manager.setLocale('en-GB');
     equal(view_model.name(), 'Loading sir', "Maybe too formal");
     kb.locale_manager.setLocale('fr-FR');
-    return equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
+    equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
+    return kb.vmDestroy(view_model);
   });
 });

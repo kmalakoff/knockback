@@ -5,12 +5,10 @@ $(document).ready( ->
   )
 
   test("Standard use case: direct attributes with read and write", ->
-    class ContactViewModel
-      constructor: (model) ->
-        @name = kb.observable(model, key:'name')
-        @number = kb.observable(model, {key:'number', write: true}, this)
-      destroy: ->
-        @name.destroy(); @number.destroy()
+    ContactViewModel = (model) ->
+      @name = kb.observable(model, key:'name')
+      @number = kb.observable(model, {key:'number', write: true}, this)
+      return this
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModel(model)
@@ -31,19 +29,20 @@ $(document).ready( ->
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
     equal(view_model.name(), 'Starr', "Name changed")
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
   )
 
   test("Standard use case: direct attributes with custom read and write", ->
-    class ContactViewModelCustom
-      constructor: (model) ->
-        @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
-        @number = kb.observable(model, {
-          key:'number'
-          read: -> return "#: #{model.get('number')}"
-          write: (value) -> model.set({number: value.substring(3)})
-        }, this)
-      destroy: ->
-        @name.destroy(); @number.destroy()
+    ContactViewModelCustom = (model) ->
+      @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+      @number = kb.observable(model, {
+        key:'number'
+        read: -> return "#: #{model.get('number')}"
+        write: (value) -> model.set({number: value.substring(3)})
+      }, this)
+      return this
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
@@ -64,6 +63,9 @@ $(document).ready( ->
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
     equal(view_model.name(), 'First: Starr', "Name changed")
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
   )
 
   test("Error cases", ->

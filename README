@@ -38,13 +38,13 @@ An Example:
 
   The view model:
 
-    class ContactViewModel
-      constructor: (model) ->
-        kb.observables(model, {
-          name:     {key:'name'}
-          email:    {key:'email', write: true, default: 'your.name@yourplace.com'}
-          date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
-        }, this)
+    ContactViewModel = (model) ->
+      kb.observables(model, {
+        name:     {key:'name'}
+        email:    {key:'email', write: true, default: 'your.name@yourplace.com'}
+        date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
+      }, this)
+      return this
 
   The HTML:
 
@@ -56,6 +56,11 @@ An Example:
 
     view_model = new ContactViewModel(collection.get('some_id'))
     ko.applyBindings(view_model)
+
+    ...
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
 
 And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
 
@@ -110,7 +115,6 @@ The library includes the following classes:
 
     kb.collectionSync(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
-      viewModelDestroy:   (view_model) -> view_model.destroy()
     })
 
   Note 1: you can either have the collection sort for you (eg. using a Backbone.Collection "comparator") or you can provide your own sorting methods that are decoupled from the collection like:
@@ -146,9 +150,11 @@ The library includes the following classes:
 
 Final notes:
 
-  a) Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget! I'm hoping to change this: https://github.com/kmalakoff/knockback/issues/2
+  a) Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
+    -> Use the helper function: kb.vmDestroy() to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
+    -> I'm hoping to change this: https://github.com/kmalakoff/knockback/issues/2
 
-  b) Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your own, look at the source files (like Knockback.observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
+  b) Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
 
 
 In addition to the examples in the test folder (https://github.com/kmalakoff/knockback/blob/master/test), you can look at the examples_lib folder for a sample kb.locale_manager, a localized string, and some examples of localized observables.

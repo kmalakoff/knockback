@@ -29,12 +29,10 @@ $(document).ready( ->
       return if (value.string_id) then Knockback.locale_manager.get(value.string_id) else ''
 
   test("Localized greeting", ->
-    class ContactViewModelGreeting
-      constructor: (model) ->
-        @hello = kb.observable(model, {key:'hello_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
-        @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
-      destroy: ->
-        @hello.destroy(); @goodbye.destroy()
+    ContactViewModelGreeting = (model) ->
+      @hello = kb.observable(model, {key:'hello_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
+      @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
+      return this
 
     model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
@@ -63,6 +61,9 @@ $(document).ready( ->
     Knockback.locale_manager.setLocale('fr-FR')
     equal(view_model.hello(), 'Bonjour', "fr-FR: Hello")
     equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye")
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
   )
 
   # NOTE: dependency on globalize
@@ -77,11 +78,9 @@ $(document).ready( ->
       value.setTime(new_value.valueOf())
 
   test("Date and time with jquery.globalize", ->
-    class ContactViewModelDate
-      constructor: (model) ->
-        @date = kb.observable(model, {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}, this)
-      destroy: ->
-        @date.destroy()
+    ContactViewModelDate = (model) ->
+      @date = kb.observable(model, {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}, this)
+      return this
 
     birthdate = new Date(1940, 10, 9)
     model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
@@ -105,6 +104,9 @@ $(document).ready( ->
     equal(current_date.getFullYear(), 1940, "year is good")
     equal(current_date.getMonth(), 10, "month is good")
     equal(current_date.getDate(), 10, "day is good")
+
+    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
+    kb.vmDestroy(view_model)
   )
 
   test("Error cases", ->

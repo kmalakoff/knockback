@@ -51,27 +51,21 @@ $(document).ready(function() {
   })();
   test("Localized greeting", function() {
     var ContactViewModelGreeting, model, view_model;
-    ContactViewModelGreeting = (function() {
-      function ContactViewModelGreeting(model) {
-        this.hello = kb.observable(model, {
-          key: 'hello_greeting',
-          localizer: __bind(function(value) {
-            return new LocalizedStringLocalizer(value);
-          }, this)
-        });
-        this.goodbye = kb.observable(model, {
-          key: 'goodbye_greeting',
-          localizer: __bind(function(value) {
-            return new LocalizedStringLocalizer(value);
-          }, this)
-        });
-      }
-      ContactViewModelGreeting.prototype.destroy = function() {
-        this.hello.destroy();
-        return this.goodbye.destroy();
-      };
-      return ContactViewModelGreeting;
-    })();
+    ContactViewModelGreeting = function(model) {
+      this.hello = kb.observable(model, {
+        key: 'hello_greeting',
+        localizer: __bind(function(value) {
+          return new LocalizedStringLocalizer(value);
+        }, this)
+      });
+      this.goodbye = kb.observable(model, {
+        key: 'goodbye_greeting',
+        localizer: __bind(function(value) {
+          return new LocalizedStringLocalizer(value);
+        }, this)
+      });
+      return this;
+    };
     model = new Contact({
       hello_greeting: new LocalizedString('formal_hello'),
       goodbye_greeting: new LocalizedString('formal_goodbye')
@@ -98,7 +92,8 @@ $(document).ready(function() {
     equal(view_model.goodbye(), 'Toodles', "en-GB: Goobye");
     Knockback.locale_manager.setLocale('fr-FR');
     equal(view_model.hello(), 'Bonjour', "fr-FR: Hello");
-    return equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye");
+    equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye");
+    return kb.vmDestroy(view_model);
   });
   LongDateLocalizer = (function() {
     __extends(LongDateLocalizer, kb.LocalizedObservable);
@@ -121,21 +116,16 @@ $(document).ready(function() {
   })();
   test("Date and time with jquery.globalize", function() {
     var ContactViewModelDate, birthdate, current_date, model, view_model;
-    ContactViewModelDate = (function() {
-      function ContactViewModelDate(model) {
-        this.date = kb.observable(model, {
-          key: 'date',
-          write: true,
-          localizer: __bind(function(value) {
-            return new LongDateLocalizer(value);
-          }, this)
-        }, this);
-      }
-      ContactViewModelDate.prototype.destroy = function() {
-        return this.date.destroy();
-      };
-      return ContactViewModelDate;
-    })();
+    ContactViewModelDate = function(model) {
+      this.date = kb.observable(model, {
+        key: 'date',
+        write: true,
+        localizer: __bind(function(value) {
+          return new LongDateLocalizer(value);
+        }, this)
+      }, this);
+      return this;
+    };
     birthdate = new Date(1940, 10, 9);
     model = new Contact({
       name: 'John',
@@ -158,7 +148,8 @@ $(document).ready(function() {
     current_date = model.get('date');
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
-    return equal(current_date.getDate(), 10, "day is good");
+    equal(current_date.getDate(), 10, "day is good");
+    return kb.vmDestroy(view_model);
   });
   return test("Error cases", function() {});
 });

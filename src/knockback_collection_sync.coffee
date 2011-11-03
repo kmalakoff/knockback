@@ -10,7 +10,6 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ####################################################
 # options
 #   viewModelCreate: (model) -> return view_model_instance
-#   viewModelDestroy: (view_model). Optional hook for destroying a view model.
 #   sortedIndex: (models, model) -> return add_index. Optional hook for sorting a model.
 #     Default: the model's index in the collection is used.
 #   sort_attribute: attribute_name. An optimization to check if a specific attribute has changed.
@@ -51,8 +50,8 @@ class Knockback.CollectionSync
   modelByViewModel: (view_model) -> return _.find(@observable_array(), (test) -> return test == view_model)
   viewModelByModel: (model) ->
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(@observable_array(), (test) -> return (test._kb_model[id_attribute] == model[id_attribute]))
-  elementByModel: (model) -> view_model = @viewModelByModel(model); return if view_model then view_model._kb_element else null
+    return _.find(@observable_array(), (test) -> return (test.__kb_model[id_attribute] == model[id_attribute]))
+  elementByModel: (model) -> view_model = @viewModelByModel(model); return if view_model then view_model.__kb_element else null
   eachViewModel: (iterator) -> iterator(view_model) for view_model in @observable_array()
 
   ####################################################
@@ -63,7 +62,7 @@ class Knockback.CollectionSync
     for view_model in view_models
       do (view_model) =>
         @options.onViewModelRemove(view_model) if @options.onViewModelRemove # notify
-        @options.viewModelDestroy(view_model) if @options.viewModelDestroy # cleanup
+        kb.vmDestroy(view_model)
 
     view_models = [] # batch
     if @options.sortedIndex
@@ -89,7 +88,7 @@ class Knockback.CollectionSync
   _onModelAdd: (model) ->
     view_model = @_viewModelCreate(model)
     if @options.sortedIndex
-      sorted_models = _.pluck(@observable_array(), '_kb_model')
+      sorted_models = _.pluck(@observable_array(), '__kb_model')
       add_index = @options.sortedIndex(sorted_models, model)
     else
       add_index = @collection.indexOf(model)
@@ -101,7 +100,9 @@ class Knockback.CollectionSync
     throw new Error("CollectionSync: view_model not found for remove") if not view_model
     @observable_array.remove(view_model)
     @options.onViewModelRemove(view_model, @observable_array()) if @options.onViewModelRemove # notify
-    @_viewModelDestroy(view_model)
+    kb.vmDestroy(view_model)
+    view_model.__kb_model = null
+    view_model.__kb_element = null
 
   _onModelChanged: (model) ->
     throw new Error("CollectionSync: change sorting unexpected") if not @options.sortedIndex
@@ -112,9 +113,9 @@ class Knockback.CollectionSync
 
   _viewModelCreate: (model) ->
     view_model = @options.viewModelCreate(model)
-    throw new Error("CollectionSync: _model is reserved") if view_model._kb_model
-    throw new Error("CollectionSync: _element is reserved") if view_model._kb_element
-    view_model._kb_model = model
+    throw new Error("CollectionSync: _model is reserved") if view_model.__kb_model
+    throw new Error("CollectionSync: _element is reserved") if view_model.__kb_element
+    view_model.__kb_model = model
     view_model.afterRender = @_bindAfterRender(view_model)
     return view_model
 
@@ -122,19 +123,14 @@ class Knockback.CollectionSync
   _bindAfterRender: (view_model) ->
     their_after_render = view_model.afterRender
     view_model.afterRender = (element) ->
-      view_model._kb_element = element
+      view_model.__kb_element = element
       their_after_render.call(view_model, element) if their_after_render
-
-  _viewModelDestroy: (view_model) ->
-    @options.viewModelDestroy(view_model) if @options.viewModelDestroy
-    view_model._kb_model = null
-    view_model._kb_element = null
 
   _viewModelResort: (view_model) ->
     previous_index = @observable_array.indexOf(view_model)
-    model = view_model._kb_model
+    model = view_model.__kb_model
     if @options.sortedIndex
-      sorted_models = _.pluck(@observable_array(), '_kb_model')
+      sorted_models = _.pluck(@observable_array(), '__kb_model')
       sorted_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
       new_index = @options.sortedIndex(sorted_models, model)
     else
@@ -147,5 +143,5 @@ class Knockback.CollectionSync
 Knockback.collectionSync = (collection, observable_array, options) -> return new Knockback.CollectionSync(collection, observable_array, options)
 
 # helpers
-Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> view_model._kb_model
-Knockback.viewModelGetElement = Knockback.vmElement = (view_model) -> view_model._kb_element
+Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> view_model.__kb_model
+Knockback.viewModelGetElement = Knockback.vmElement = (view_model) -> view_model.__kb_element
