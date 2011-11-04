@@ -37,8 +37,6 @@ You also will need to use my slightly modified copies of Knockout until the chan
 [5]: https://github.com/kmalakoff/knockback/raw/master/knockout-1.3.beta.debug-kmalakoff.js
 [6]: https://github.com/kmalakoff/knockback/raw/master/knockout-1.3.beta-kmalakoff.js
 
-If anyone wants to port this to Knockout 1.3 beta, please do and let me know! You can find my changes [here](https://github.com/kmalakoff/knockout/tree/forceRefresh).
-
 
 When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to "mix and match" the best features. I started with [Backbone.js](http://documentcloud.github.com/backbone/) and really loved the Models and Collections, and used [Brunch](http://brunch.io/) to get me up and running quickly.
 
@@ -183,8 +181,8 @@ collection_sync = kb.collectionSync(collection, view_models_array, {
 
 Collections cache some information on the view model and if you have a view model and want to get access to it, use the following helpers:
 
-* **kb.vmModel** to get the model for the view model
-* **kb.vmElement** to get the rendered element from Knockout.
+* **kb.vmModel** to get the model for a view model
+* **kb.vmElement** to get the rendered element from Knockout for a view model
 
 ### Note 3
 There are some other helpers for collection sync view models that you may find useful:
