@@ -1,5 +1,5 @@
 $(document).ready( ->
-  module("knockback_model_attribute_observable.js")
+  module("knockback_observable.js")
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )

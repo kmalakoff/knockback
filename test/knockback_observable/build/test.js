@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  module("knockback_model_attribute_observable.js");
+  module("knockback_observable.js");
   test("TEST DEPENDENCY MISSING", function() {
     ko.utils;
     _.VERSION;

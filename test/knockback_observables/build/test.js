@@ -1,6 +1,6 @@
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 $(document).ready(function() {
-  module("knockback_model_attribute_observables.js");
+  module("knockback_observables.js");
   test("TEST DEPENDENCY MISSING", function() {
     ko.utils;
     _.VERSION;

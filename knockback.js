@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.3.0
+  knockback.js 0.4.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.3.0';
+Knockback.VERSION = '0.4.0';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -31,7 +31,7 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_mode
   for (key in view_model) {
     observable = view_model[key];
     _results.push((function(key, observable) {
-      if (!observable || !(observable.__kb_owner || (observable instanceof kb.ModelAttributeObservables) || (observable instanceof kb.CollectionSync))) {
+      if (!observable || !(observable.__kb_owner || (observable instanceof kb.Observables) || (observable instanceof kb.CollectionSync))) {
         return;
       }
       observable.destroy();
@@ -413,27 +413,27 @@ Knockback.localizedObservable = function(value, options, view_model) {
   return new Knockback.LocalizedObservable(value, options, view_model);
 };
 /*
-  knockback_model_attribute_observable.js
+  knockback_observable.js
   (c) 2011 Kevin Malakoff.
-  Knockback.ModelAttributeObservable is freely distributable under the MIT license.
+  Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
-Knockback.ModelAttributeObservable = (function() {
-  function ModelAttributeObservable(model, bind_info, view_model) {
+Knockback.Observable = (function() {
+  function Observable(model, bind_info, view_model) {
     this.model = model;
     this.bind_info = bind_info;
     this.view_model = view_model;
     if (!this.model) {
-      throw new Error('ModelAttributeObservable: value is missing');
+      throw new Error('Observable: value is missing');
     }
     if (!this.bind_info) {
-      throw new Error('ModelAttributeObservable: bind_info is missing');
+      throw new Error('Observable: bind_info is missing');
     }
     if (!this.bind_info.key) {
-      throw new Error('ModelAttributeObservable: bind_info.key is missing');
+      throw new Error('Observable: bind_info.key is missing');
     }
     _.bindAll(this, 'destroy', '_onValueChange', '_onGetValue', '_onSetValue', '_onModelLoaded', '_onModelUnloaded');
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
@@ -446,7 +446,7 @@ Knockback.ModelAttributeObservable = (function() {
     this.in_create = true;
     if (this.bind_info.write) {
       if (!this.view_model) {
-        throw new Error('ModelAttributeObservable: view_model is missing for read_write model attribute');
+        throw new Error('Observable: view_model is missing for read_write model attribute');
       }
       this._kb_observable = ko.dependentObservable({
         read: this._onGetValue,
@@ -467,7 +467,7 @@ Knockback.ModelAttributeObservable = (function() {
     }
     return kb.wrappedObservable(this);
   }
-  ModelAttributeObservable.prototype.destroy = function() {
+  Observable.prototype.destroy = function() {
     this._kb_observable.dispose();
     this._kb_observable = null;
     if (this.model) {
@@ -482,7 +482,7 @@ Knockback.ModelAttributeObservable = (function() {
     this.bind_info = null;
     return this.view_model = null;
   };
-  ModelAttributeObservable.prototype._getDefault = function() {
+  Observable.prototype._getDefault = function() {
     if (!this.bind_info.hasOwnProperty('default')) {
       return;
     }
@@ -492,7 +492,7 @@ Knockback.ModelAttributeObservable = (function() {
       return this.bind_info["default"];
     }
   };
-  ModelAttributeObservable.prototype._onValueChange = function() {
+  Observable.prototype._onValueChange = function() {
     if (this.localizer && this.localizer.forceRefresh) {
       if (this.model) {
         this.localizer.setObservedValue(this.model.get(this.bind_info.key));
@@ -501,7 +501,7 @@ Knockback.ModelAttributeObservable = (function() {
     }
     return this._kb_observable.forceRefresh();
   };
-  ModelAttributeObservable.prototype._onGetValue = function() {
+  Observable.prototype._onGetValue = function() {
     var value;
     if (!this.model) {
       return this._getDefault();
@@ -516,7 +516,7 @@ Knockback.ModelAttributeObservable = (function() {
       return this._getDefault();
     }
   };
-  ModelAttributeObservable.prototype._onSetValue = function(value) {
+  Observable.prototype._onSetValue = function(value) {
     var set_info;
     if (!this.model) {
       return;
@@ -536,7 +536,7 @@ Knockback.ModelAttributeObservable = (function() {
       return this.model.set(set_info);
     }
   };
-  ModelAttributeObservable.prototype._onModelLoaded = function(model) {
+  Observable.prototype._onModelLoaded = function(model) {
     var value;
     this.model = model;
     this.model.bind('change', this._onValueChange);
@@ -549,7 +549,7 @@ Knockback.ModelAttributeObservable = (function() {
       return this._onValueChange();
     }
   };
-  ModelAttributeObservable.prototype._onModelUnloaded = function() {
+  Observable.prototype._onModelUnloaded = function() {
     if (this.localizer && this.localizer.destroy) {
       this.localizer.destroy();
       this.localizer = null;
@@ -558,16 +558,15 @@ Knockback.ModelAttributeObservable = (function() {
     this.model.unbind("change:" + this.bind_info.key, this._onValueChange);
     return this.model = null;
   };
-  return ModelAttributeObservable;
+  return Observable;
 })();
-Knockback.Observable = Knockback.ModelAttributeObservable;
 Knockback.observable = function(model, bind_info, view_model) {
   return new Knockback.Observable(model, bind_info, view_model);
 };
 /*
-  knockback_model_attribute_observables.js
+  knockback_observables.js
   (c) 2011 Kevin Malakoff.
-  Knockback.ModelAttributeObservables is freely distributable under the MIT license.
+  Knockback.Observables is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
@@ -575,17 +574,17 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
-Knockback.ModelAttributeObservables = (function() {
-  function ModelAttributeObservables(model, mappings_info, view_model) {
+Knockback.Observables = (function() {
+  function Observables(model, mappings_info, view_model) {
     var mapping_info, view_model_property_name, _ref;
     this.model = model;
     this.mappings_info = mappings_info;
     this.view_model = view_model;
     if (!this.model) {
-      throw new Error('ModelAttributeObservables: model is missing');
+      throw new Error('Observables: model is missing');
     }
     if (!this.mappings_info) {
-      throw new Error('ModelAttributeObservables: mappings_info is missing');
+      throw new Error('Observables: mappings_info is missing');
     }
     _ref = this.mappings_info;
     for (view_model_property_name in _ref) {
@@ -594,7 +593,7 @@ Knockback.ModelAttributeObservables = (function() {
     }
     return this;
   }
-  ModelAttributeObservables.prototype.destroy = function() {
+  Observables.prototype.destroy = function() {
     var mapping_info, view_model_property_name, _fn, _ref;
     _ref = this.mappings_info;
     _fn = __bind(function(view_model_property_name, mapping_info) {
@@ -611,7 +610,7 @@ Knockback.ModelAttributeObservables = (function() {
     this.mappings_info = null;
     return this.model = null;
   };
-  ModelAttributeObservables.prototype.forceRefresh = function() {
+  Observables.prototype.forceRefresh = function() {
     var mapping_info, view_model_property_name, _ref, _results;
     _ref = this.mappings_info;
     _results = [];
@@ -621,9 +620,8 @@ Knockback.ModelAttributeObservables = (function() {
     }
     return _results;
   };
-  return ModelAttributeObservables;
+  return Observables;
 })();
-Knockback.Observables = Knockback.ModelAttributeObservables;
 Knockback.observables = function(model, mappings_info, view_model) {
   return new Knockback.Observables(model, mappings_info, view_model);
 };

@@ -13,8 +13,8 @@ SRC_DIRS = [
   'test/backbone_modelref/**/*.coffee',
   'test/knockback_collection_sync/**/*.coffee',
   'test/knockback_localized_observable/**/*.coffee',
-  'test/knockback_model_attribute_observable/**/*.coffee',
-  'test/knockback_model_attribute_observables/**/*.coffee',
+  'test/knockback_observable/**/*.coffee',
+  'test/knockback_observables/**/*.coffee',
 ]
 
 in_build = false

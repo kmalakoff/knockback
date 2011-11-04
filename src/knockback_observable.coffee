@@ -1,7 +1,7 @@
 ###
-  knockback_model_attribute_observable.js
+  knockback_observable.js
   (c) 2011 Kevin Malakoff.
-  Knockback.ModelAttributeObservable is freely distributable under the MIT license.
+  Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
@@ -13,11 +13,11 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 #   * write - called to set the value (if read_write) or a boolean to indicate write is enabled
 ####################################################
 
-class Knockback.ModelAttributeObservable
+class Knockback.Observable
   constructor: (@model, @bind_info, @view_model) ->
-    throw new Error('ModelAttributeObservable: value is missing') if not @model
-    throw new Error('ModelAttributeObservable: bind_info is missing') if not @bind_info
-    throw new Error('ModelAttributeObservable: bind_info.key is missing') if not @bind_info.key
+    throw new Error('Observable: value is missing') if not @model
+    throw new Error('Observable: bind_info is missing') if not @bind_info
+    throw new Error('Observable: bind_info.key is missing') if not @bind_info.key
 
     _.bindAll(this, 'destroy', '_onValueChange', '_onGetValue', '_onSetValue', '_onModelLoaded', '_onModelUnloaded')
 
@@ -30,7 +30,7 @@ class Knockback.ModelAttributeObservable
 
     @in_create = true # filter the forcing on setup
     if @bind_info.write
-      throw new Error('ModelAttributeObservable: view_model is missing for read_write model attribute') if not @view_model
+      throw new Error('Observable: view_model is missing for read_write model attribute') if not @view_model
       @_kb_observable = ko.dependentObservable({read: @_onGetValue, write: @_onSetValue, owner: @view_model})
     else
       @_kb_observable = ko.dependentObservable(@_onGetValue)
@@ -98,9 +98,6 @@ class Knockback.ModelAttributeObservable
     @model.unbind('change', @_onValueChange) # all attributes
     @model.unbind("change:#{@bind_info.key}", @_onValueChange)
     @model = null
-
-# alias
-Knockback.Observable = Knockback.ModelAttributeObservable
 
 # factory function
 Knockback.observable = (model, bind_info, view_model) -> return new Knockback.Observable(model, bind_info, view_model)

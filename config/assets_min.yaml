@@ -6,5 +6,5 @@ javascripts:
     - build/knockback_core.js
     - build/knockback_collection_sync.js
     - build/knockback_localized_observable.js
-    - build/knockback_model_attribute_observable.js
-    - build/knockback_model_attribute_observables.js
+    - build/knockback_observable.js
+    - build/knockback_observables.js

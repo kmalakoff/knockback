@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.3.0
+  knockback.js 0.4.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -15,7 +15,7 @@ throw new Error('Knockback: Dependency alert! Underscore.js must be included bef
 this.Knockback||this.Knockback={}; this.kb||this.kb=this.Knockback
 
 # Current version.
-Knockback.VERSION = '0.3.0'
+Knockback.VERSION = '0.4.0'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
@@ -29,6 +29,6 @@ Knockback.wrappedObservable = (instance) ->
 Knockback.viewModelDestroyObservables = Knockback.vmDestroy = (view_model) ->
   for key, observable of view_model
     do (key, observable) ->
-      return if not observable or not (observable.__kb_owner or (observable instanceof kb.ModelAttributeObservables) or (observable instanceof kb.CollectionSync))
+      return if not observable or not (observable.__kb_owner or (observable instanceof kb.Observables) or (observable instanceof kb.CollectionSync))
       observable.destroy(); view_model[key] = null
 
