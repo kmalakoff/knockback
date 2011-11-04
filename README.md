@@ -150,9 +150,9 @@ kb.observables(model, {
 
 ### Note 4
 
-You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading. If the model unloads, the default behavior is to retain the last value, but you can force a refresh on unload using attribute_observable.forceRefresh():
+You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading. 
 
-* If the model reference gets unloaded and you want to restore the default values, you can call forceRefresh on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
+If the model unloads, the default behavior is to retain the last value; however, if you want to restore the default values, you can call forceRefresh on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
 
 
 Knockback.CollectionSync
@@ -173,7 +173,7 @@ You can either have the collection sort for you (eg. using a Backbone.Collection
 ```coffeescript
 collection_sync = kb.collectionSync(collection, view_models_array, {
   sort_attribute: 'name' # optimization to only refresh when this attribute changes
-  sortedIndex:    (models, model) -> _.sortedIndex(models, model, (test) -> test.get('name'))
+  sortedIndex:    (models, model) -> return _.sortedIndex(models, model, (test) -> test.get('name'))
 })
 ```
 
@@ -222,7 +222,7 @@ Final notes
     -> Use the helper function: kb.vmDestroy() to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
     -> I'm hoping to change this: https://github.com/kmalakoff/knockback/issues/2
 
-* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
+* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
 
 
 In addition to the examples in the test folder (https://github.com/kmalakoff/knockback/blob/master/test), you can look at the examples_lib folder for a sample kb.locale_manager, a localized string, and some examples of localized observables.
