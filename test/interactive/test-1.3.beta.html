@@ -131,7 +131,6 @@
     };
     var collection_sync = Knockback.collectionSync(collection, view_model.contacts, {
       viewModelCreate:  function(model)         { return new ContactViewModel(model); },
-      viewModelDestroy: function(view_model)    { return view_model.destroy(); },
       sort_attribute:   'name',
       sortedIndex:      function(models, model) { return _.sortedIndex(models, model, function(test) { return test.get('name'); }); }
     });
