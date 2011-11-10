@@ -12,7 +12,7 @@ class LongDateLocalizer extends kb.LocalizedObservable
     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())
   write: (localized_string, value, observable) ->
     new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale())
-    return observable.forceRefresh() if not (new_value and _.isDate(new_value)) # reset if invalid
+    return observable.resetToCurrent() if not (new_value and _.isDate(new_value)) # reset if invalid
     value.setTime(new_value.valueOf())
 
 # NOTE: dependency on globalize - notice the alternative formulation
@@ -23,7 +23,7 @@ class ShortDateLocalizer extends kb.LocalizedObservable
         return Globalize.format(date, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
       write: (localized_string, value, observable) =>
         new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
-        return observable.forceRefresh() if not (new_value and _.isDate(new_value)) # reset if invalid
+        return observable.resetToCurrent() if not (new_value and _.isDate(new_value)) # reset if invalid
         date.setTime(new_value.valueOf())
     }), view_model)
     return kb.wrappedObservable(this)

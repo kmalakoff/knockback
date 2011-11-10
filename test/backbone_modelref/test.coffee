@@ -16,7 +16,7 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key:'name', default: @loading_message}
         number:   {key:'number', write: true, default: @loading_message}
-        date:     {key:'date', write: true, default: @loading_message, localizer: (value) => return new LongDateLocalizer(value)}
+        date:     {key:'date', write: true, default: @loading_message, localizer: (value) -> return new LongDateLocalizer(value)}
       }, this)
       return this
 
@@ -72,7 +72,7 @@ $(document).ready( ->
     # go back to loading state
     collection.reset()
     equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    view_model.attribute_observables.forceRefresh() # override default behavior and go back to loading state
+    view_model.attribute_observables.setToDefault() # override default behavior and go back to loading state
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
     kb.locale_manager.setLocale('en-GB')

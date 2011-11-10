@@ -74,7 +74,7 @@ $(document).ready( ->
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
     write: (localized_string, value, observable) ->
       new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
-      return observable.forceRefresh() if not (new_value and _.isDate(new_value)) # reset if invalid
+      return observable.setToDefault() if not (new_value and _.isDate(new_value)) # reset if invalid
       value.setTime(new_value.valueOf())
 
   test("Date and time with jquery.globalize", ->

@@ -19,23 +19,11 @@ You can get the library here:
 [1]: https://github.com/kmalakoff/knockback/raw/master/knockback.js
 [2]: https://github.com/kmalakoff/knockback/raw/master/knockback.min.js
 
-You also will need to use my slightly modified copies of Knockout until the changes are merged into the main branch:
+You can find Knockout [here][3], Backbone.js [here][4], and Underscore.js [here][5].
 
-## Knockout 1.2.1
-
-* [Development version][3]
-* [Production version][4]
-
-[3]: https://github.com/kmalakoff/knockback/raw/master/knockout-1.2.1.debug-kmalakoff.js
-[4]: https://github.com/kmalakoff/knockback/raw/master/knockout-1.2.1-kmalakoff.js
-
-## Knockout 1.3.beta
-
-* [Development version][5]
-* [Production version][6]
-
-[5]: https://github.com/kmalakoff/knockback/raw/master/knockout-1.3.beta.debug-kmalakoff.js
-[6]: https://github.com/kmalakoff/knockback/raw/master/knockout-1.3.beta-kmalakoff.js
+[3]: https://github.com/SteveSanderson/knockout/downloads/
+[4]: http://documentcloud.github.com/backbone/
+[5]: http://documentcloud.github.com/underscore/
 
 
 When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to "mix and match" the best features. I started with [Backbone.js](http://documentcloud.github.com/backbone/) and really loved the Models and Collections, and used [Brunch](http://brunch.io/) to get me up and running quickly.
@@ -152,7 +140,7 @@ kb.observables(model, {
 
 You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading.
 
-If the model unloads, the default behavior is to retain the last value; however, if you want to restore the default values, you can call forceRefresh on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
+If the model unloads, the default behavior is to retain the last value; however, if you want to restore the default values, you can call setToDefault on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
 
 
 Knockback.CollectionSync

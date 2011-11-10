@@ -24,8 +24,8 @@ class Knockback.Observables
     @mappings_info = null
     @model = null
 
-  forceRefresh: ->
-    @view_model[view_model_property_name].forceRefresh() for view_model_property_name, mapping_info of @mappings_info
+  setToDefault: ->
+    @view_model[view_model_property_name].setToDefault() for view_model_property_name, mapping_info of @mappings_info
 
 # factory function
 Knockback.observables = (model, mappings_info, view_model) -> return new Knockback.Observables(model, mappings_info, view_model)

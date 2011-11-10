@@ -134,7 +134,7 @@ LongDateLocalizer = (function() {
     var new_value;
     new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale());
     if (!(new_value && _.isDate(new_value))) {
-      return observable.forceRefresh();
+      return observable.resetToCurrent();
     }
     return value.setTime(new_value.valueOf());
   };
@@ -154,7 +154,7 @@ ShortDateLocalizer = (function() {
         var new_value;
         new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
         if (!(new_value && _.isDate(new_value))) {
-          return observable.forceRefresh();
+          return observable.resetToCurrent();
         }
         return date.setTime(new_value.valueOf());
       }, this)

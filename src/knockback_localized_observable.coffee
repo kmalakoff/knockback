@@ -24,20 +24,20 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 
 class Knockback.LocalizedObservable
   constructor: (@value, @options={}, @view_model) ->
-    throw new Error('LocalizedObservable: value is missing') if not @value
     throw new Error('LocalizedObservable: options.read is missing') if not (@options.read or @read)
     throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.read and @read
-    throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.write and @write
+    throw new Error('LocalizedObservable: options.write and write class function exist. You need to choose one.') if @options.write and @write
     throw new Error('LocalizedObservable: Knockback.locale_manager is not defined') if not kb.locale_manager
 
-    _.bindAll(this, 'destroy', '_onGetValue', '_onSetValue', 'getObservedValue', 'setObservedValue', '_onLocaleChange')
+    _.bindAll(this, 'destroy', 'setToDefault', 'resetToCurrent', 'getObservedValue', 'setObservedValue', '_onGetValue', '_onSetValue', '_onLocaleChange')
 
     # either take the option or the class method
     @_kb_read = if @options.read then @options.read else @read
     @_kb_write = if @options.write then @options.write else @write
+    @_kb_default = if @options.default then @options.default else @default
 
-    @current_localized_value = @_kb_read.call(this, @value, @_kb_observable) if @value
-    @options.onChange(@current_localized_value) if @options.onChange
+    # internal state
+    @_kb_value_observable = ko.observable()
 
     if @_kb_write
       @view_model = {} if not @view_model
@@ -45,15 +45,19 @@ class Knockback.LocalizedObservable
       @_kb_observable = ko.dependentObservable({read:@_onGetValue, write:@_onSetValue, owner:@view_model})
     else
       @_kb_observable = ko.dependentObservable(@_onGetValue)
-    throw new Error('Knockback: forceRefresh is missing. Please upgrade to a compatible version of Knockout.js') if _.isUndefined(@_kb_observable.forceRefresh)
 
     kb.locale_manager.bind('change', @_onLocaleChange)
 
     # publish public interface on the observable and return instead of this
+    @_kb_observable.destroy = @destroy
     @_kb_observable.getObservedValue = @getObservedValue
     @_kb_observable.setObservedValue = @setObservedValue
-    @_kb_observable.destroy = @destroy
-    @_kb_observable.__kb_owner = this
+    @_kb_observable.setToDefault = @setToDefault
+    @_kb_observable.resetToCurrent = @resetToCurrent
+
+    # start
+    @_onLocaleChange()
+
     return kb.wrappedObservable(this)
 
   destroy: ->
@@ -62,24 +66,41 @@ class Knockback.LocalizedObservable
     @options = {}
     @view_model = null
 
+  setToDefault: ->
+    @_kb_value_observable(null) # force KO to think a change occurred
+    @_onSetValue(@_getDefaultValue())
+
+  resetToCurrent: ->
+    @_kb_value_observable(null) # force KO to think a change occurred
+    @_onSetValue(@_getCurrentValue())
+
   getObservedValue: -> return @value
-  setObservedValue: (value) -> @value = value; return this
+  setObservedValue: (value) -> @value = value; @_onLocaleChange(); return this
 
   ####################################################
   # Internal
   ####################################################
-  _getDefault: ->
-    return '' if not @options.hasOwnProperty('default')
-    return if _.isFunction(@options.default) then @options.default() else @options.default
+  _getDefaultValue: ->
+    return '' if not @_kb_default
+    return if _.isFunction(@_kb_default) then @_kb_default() else @_kb_default
 
-  _onGetValue:            -> return @current_localized_value
-  _onSetValue: (value)    ->
+  _getCurrentValue: ->
+    return @_getDefaultValue() if not (@value and @_kb_observable)
+    return @_kb_read.call(this, @value, @_kb_observable)
+
+  _onGetValue: ->
+    return @_kb_value_observable()
+
+  _onSetValue: (value) ->
     @_kb_write.call(this, value, @value, @_kb_observable)
+    value = @_kb_read.call(this, @value, @_kb_observable)
+    @_kb_value_observable(value)
+    @options.onChange(value) if @options.onChange
 
-  _onLocaleChange:        ->
-    @current_localized_value = if not @value then @_getDefault() else @_kb_read.call(this, @value, @_kb_observable)
-    @_kb_observable.forceRefresh()
-    @options.onChange(@current_localized_value) if @options.onChange
+  _onLocaleChange: ->
+    value = @_kb_read.call(this, @value, @_kb_observable)
+    @_kb_value_observable(value)
+    @options.onChange(value) if @options.onChange
 
 # factory function
 Knockback.localizedObservable = (value, options, view_model) -> return new Knockback.LocalizedObservable(value, options, view_model)

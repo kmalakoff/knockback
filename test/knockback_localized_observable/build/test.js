@@ -108,7 +108,7 @@ $(document).ready(function() {
       var new_value;
       new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
       if (!(new_value && _.isDate(new_value))) {
-        return observable.forceRefresh();
+        return observable.setToDefault();
       }
       return value.setTime(new_value.valueOf());
     };

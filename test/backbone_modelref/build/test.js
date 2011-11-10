@@ -1,4 +1,3 @@
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 $(document).ready(function() {
   module("knockback.js with Backbone.ModelRef.js");
   test("TEST DEPENDENCY MISSING", function() {
@@ -35,9 +34,9 @@ $(document).ready(function() {
           key: 'date',
           write: true,
           "default": this.loading_message,
-          localizer: __bind(function(value) {
+          localizer: function(value) {
             return new LongDateLocalizer(value);
-          }, this)
+          }
         }
       }, this);
       return this;
@@ -96,7 +95,7 @@ $(document).ready(function() {
     equal(current_date.getDate(), 10, "day is good");
     collection.reset();
     equal(view_model.name(), 'Yoko', "Default is to retain the last value");
-    view_model.attribute_observables.forceRefresh();
+    view_model.attribute_observables.setToDefault();
     kb.locale_manager.setLocale('en');
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?");
     kb.locale_manager.setLocale('en-GB');
