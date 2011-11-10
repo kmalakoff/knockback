@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.4.0
+  knockback.js 0.5.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.4.0';
+Knockback.VERSION = '0.5.0';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -130,15 +130,6 @@ Knockback.CollectionSync = (function() {
       return test.__kb_model[id_attribute] === model[id_attribute];
     });
   };
-  CollectionSync.prototype.elementByModel = function(model) {
-    var view_model;
-    view_model = this.viewModelByModel(model);
-    if (view_model) {
-      return view_model.__kb_element;
-    } else {
-      return null;
-    }
-  };
   CollectionSync.prototype.eachViewModel = function(iterator) {
     var view_model, _i, _len, _ref, _results;
     _ref = this.observable_array();
@@ -236,8 +227,7 @@ Knockback.CollectionSync = (function() {
       this.options.onViewModelRemove(view_model, this.observable_array());
     }
     kb.vmDestroy(view_model);
-    view_model.__kb_model = null;
-    return view_model.__kb_element = null;
+    return view_model.__kb_model = null;
   };
   CollectionSync.prototype._onModelChanged = function(model) {
     var view_model;
@@ -257,24 +247,10 @@ Knockback.CollectionSync = (function() {
     var view_model;
     view_model = this.options.viewModelCreate(model);
     if (view_model.__kb_model) {
-      throw new Error("CollectionSync: _model is reserved");
-    }
-    if (view_model.__kb_element) {
-      throw new Error("CollectionSync: _element is reserved");
+      throw new Error("CollectionSync: __kb_model is reserved");
     }
     view_model.__kb_model = model;
-    view_model.afterRender = this._bindAfterRender(view_model);
     return view_model;
-  };
-  CollectionSync.prototype._bindAfterRender = function(view_model) {
-    var their_after_render;
-    their_after_render = view_model.afterRender;
-    return view_model.afterRender = function(element) {
-      view_model.__kb_element = element;
-      if (their_after_render) {
-        return their_after_render.call(view_model, element);
-      }
-    };
   };
   CollectionSync.prototype._viewModelResort = function(view_model) {
     var model, new_index, previous_index, sorted_models;
@@ -303,9 +279,6 @@ Knockback.collectionSync = function(collection, observable_array, options) {
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
   return view_model.__kb_model;
-};
-Knockback.viewModelGetElement = Knockback.vmElement = function(view_model) {
-  return view_model.__kb_element;
 };
 /*
   knockback_localized_observable.js

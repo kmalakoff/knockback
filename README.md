@@ -150,7 +150,7 @@ kb.observables(model, {
 
 ### Note 4
 
-You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading. 
+You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading.
 
 If the model unloads, the default behavior is to retain the last value; however, if you want to restore the default values, you can call forceRefresh on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
 
@@ -182,7 +182,6 @@ collection_sync = kb.collectionSync(collection, view_models_array, {
 Collections cache some information on the view model and if you have a view model and want to get access to it, use the following helpers:
 
 * **kb.vmModel** to get the model for a view model
-* **kb.vmElement** to get the rendered element from Knockout for a view model
 
 ### Note 3
 There are some other helpers for collection sync view models that you may find useful:

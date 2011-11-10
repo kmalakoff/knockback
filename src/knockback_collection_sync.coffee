@@ -51,7 +51,6 @@ class Knockback.CollectionSync
   viewModelByModel: (model) ->
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(@observable_array(), (test) -> return (test.__kb_model[id_attribute] == model[id_attribute]))
-  elementByModel: (model) -> view_model = @viewModelByModel(model); return if view_model then view_model.__kb_element else null
   eachViewModel: (iterator) -> iterator(view_model) for view_model in @observable_array()
 
   ####################################################
@@ -102,7 +101,6 @@ class Knockback.CollectionSync
     @options.onViewModelRemove(view_model, @observable_array()) if @options.onViewModelRemove # notify
     kb.vmDestroy(view_model)
     view_model.__kb_model = null
-    view_model.__kb_element = null
 
   _onModelChanged: (model) ->
     throw new Error("CollectionSync: change sorting unexpected") if not @options.sortedIndex
@@ -113,18 +111,9 @@ class Knockback.CollectionSync
 
   _viewModelCreate: (model) ->
     view_model = @options.viewModelCreate(model)
-    throw new Error("CollectionSync: _model is reserved") if view_model.__kb_model
-    throw new Error("CollectionSync: _element is reserved") if view_model.__kb_element
+    throw new Error("CollectionSync: __kb_model is reserved") if view_model.__kb_model
     view_model.__kb_model = model
-    view_model.afterRender = @_bindAfterRender(view_model)
     return view_model
-
-  # closured
-  _bindAfterRender: (view_model) ->
-    their_after_render = view_model.afterRender
-    view_model.afterRender = (element) ->
-      view_model.__kb_element = element
-      their_after_render.call(view_model, element) if their_after_render
 
   _viewModelResort: (view_model) ->
     previous_index = @observable_array.indexOf(view_model)
@@ -144,4 +133,3 @@ Knockback.collectionSync = (collection, observable_array, options) -> return new
 
 # helpers
 Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> view_model.__kb_model
-Knockback.viewModelGetElement = Knockback.vmElement = (view_model) -> view_model.__kb_element
