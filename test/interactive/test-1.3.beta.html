@@ -129,7 +129,7 @@
         date:           { key: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
       }, this);
     };
-    var collection_sync = Knockback.collectionSync(collection, view_model.contacts, {
+    var collection_observable = Knockback.collectionObservable(collection, view_model.contacts, {
       viewModelCreate:  function(model)         { return new ContactViewModel(model); },
       sort_attribute:   'name',
       sortedIndex:      function(models, model) { return _.sortedIndex(models, model, function(test) { return test.get('name'); }); }

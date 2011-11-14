@@ -29,6 +29,6 @@ Knockback.wrappedObservable = (instance) ->
 Knockback.viewModelDestroyObservables = Knockback.vmDestroy = (view_model) ->
   for key, observable of view_model
     do (key, observable) ->
-      return if not observable or not (observable.__kb_owner or (observable instanceof kb.Observables) or (observable instanceof kb.CollectionSync))
+      return if not observable or not (observable.__kb_owner or (observable instanceof kb.Observables) or (observable instanceof kb.CollectionObservable))
       observable.destroy(); view_model[key] = null
 

@@ -49,7 +49,7 @@ ShortDateLocalizer = (function() {
     }
     ShortDateLocalizer.__super__.constructor.call(this, value, _.extend(options, {
       read: function(value) {
-        return Globalize.format(date, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+        return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
       },
       write: __bind(function(localized_string, value, observable) {
         var new_value;
@@ -57,7 +57,7 @@ ShortDateLocalizer = (function() {
         if (!(new_value && _.isDate(new_value))) {
           return observable.resetToCurrent();
         }
-        return date.setTime(new_value.valueOf());
+        return value.setTime(new_value.valueOf());
       }, this)
     }), view_model);
     return kb.wrappedObservable(this);

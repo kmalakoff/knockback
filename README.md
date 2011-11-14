@@ -143,13 +143,13 @@ You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Ba
 If the model unloads, the default behavior is to retain the last value; however, if you want to restore the default values, you can call setToDefault on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
 
 
-Knockback.CollectionSync
+Knockback.CollectionObservable
 ------------------------
 
 This takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "viewModelCreate: (model) -> return new myViewModel(model)" function which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
 
 ```coffeescript
-kb.collectionSync(collection, view_models_array, {
+kb.collectionObservable(collection, view_models_array, {
   viewModelCreate: (model) -> return new ContactViewModel(model)
 })
 ```
@@ -159,7 +159,7 @@ kb.collectionSync(collection, view_models_array, {
 You can either have the collection sort for you (eg. using a Backbone.Collection "comparator") or you can provide your own sorting methods that are decoupled from the collection like:
 
 ```coffeescript
-collection_sync = kb.collectionSync(collection, view_models_array, {
+collection_observable = kb.collectionObservable(collection, view_models_array, {
   sort_attribute: 'name' # optimization to only refresh when this attribute changes
   sortedIndex:    (models, model) -> return _.sortedIndex(models, model, (test) -> test.get('name'))
 })
@@ -174,7 +174,6 @@ Collections cache some information on the view model and if you have a view mode
 ### Note 3
 There are some other helpers for collection sync view models that you may find useful:
 
-* **modelByViewModel**: (view_model) -> ...
 * **viewModelByModel**: (model) -> ...
 * **elementByModel**: (model) -> ...
 * **eachViewModel**: (iterator) -> ...

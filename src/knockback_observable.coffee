@@ -49,6 +49,7 @@ class Knockback.Observable
 
   destroy: ->
     @_kb_observable.dispose(); @_kb_observable = null
+    @_kb_value_observable = null
     @_onModelUnloaded(@model) if @model
     if @model_ref
       @model_ref.unbind('loaded', @_onModelLoaded)

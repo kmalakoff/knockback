@@ -1,4 +1,4 @@
-var Contact, ContactsCollection, SortedContactsCollection;
+var Contact, ContactsCollection, NameSortedContactsCollection;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -27,14 +27,14 @@ ContactsCollection = (function() {
   ContactsCollection.prototype.model = Contact;
   return ContactsCollection;
 })();
-SortedContactsCollection = (function() {
-  __extends(SortedContactsCollection, Backbone.Collection);
-  function SortedContactsCollection() {
-    SortedContactsCollection.__super__.constructor.apply(this, arguments);
+NameSortedContactsCollection = (function() {
+  __extends(NameSortedContactsCollection, Backbone.Collection);
+  function NameSortedContactsCollection() {
+    NameSortedContactsCollection.__super__.constructor.apply(this, arguments);
   }
-  SortedContactsCollection.prototype.model = Contact;
-  SortedContactsCollection.prototype.comparator = function(model) {
+  NameSortedContactsCollection.prototype.model = Contact;
+  NameSortedContactsCollection.prototype.comparator = function(model) {
     return model.get('name');
   };
-  return SortedContactsCollection;
+  return NameSortedContactsCollection;
 })();

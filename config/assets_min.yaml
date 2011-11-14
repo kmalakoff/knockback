@@ -4,7 +4,7 @@ compress_assets: on
 javascripts:
   'knockback.min':
     - build/knockback_core.js
-    - build/knockback_collection_sync.js
+    - build/knockback_collection_observable.js
     - build/knockback_localized_observable.js
     - build/knockback_observable.js
     - build/knockback_observables.js

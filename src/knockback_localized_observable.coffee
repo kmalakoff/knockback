@@ -46,8 +46,6 @@ class Knockback.LocalizedObservable
     else
       @_kb_observable = ko.dependentObservable(@_onGetValue)
 
-    kb.locale_manager.bind('change', @_onLocaleChange)
-
     # publish public interface on the observable and return instead of this
     @_kb_observable.destroy = @destroy
     @_kb_observable.getObservedValue = @getObservedValue
@@ -56,6 +54,7 @@ class Knockback.LocalizedObservable
     @_kb_observable.resetToCurrent = @resetToCurrent
 
     # start
+    kb.locale_manager.bind('change', @_onLocaleChange)
     @_onLocaleChange()
 
     return kb.wrappedObservable(this)
@@ -63,6 +62,7 @@ class Knockback.LocalizedObservable
   destroy: ->
     kb.locale_manager.unbind('change', @_onLocaleChange)
     @_kb_observable.dispose(); @_kb_observable = null
+    @_kb_value_observable = null
     @options = {}
     @view_model = null
 

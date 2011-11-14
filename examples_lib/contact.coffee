@@ -7,6 +7,6 @@ class Contact extends Backbone.Model
 class ContactsCollection extends Backbone.Collection
   model: Contact
 
-class SortedContactsCollection extends Backbone.Collection
+class NameSortedContactsCollection extends Backbone.Collection
   model: Contact
   comparator: (model) -> return model.get('name')

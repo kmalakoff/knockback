@@ -10,7 +10,7 @@ CLEAN_PATTERNS = [
   'examples_lib/build/**.js',
 
   'test/backbone_modelref/build/**.js',
-  'test/knockback_collection_sync/build/**.js',
+  'test/knockback_collection_observable/build/**.js',
   'test/knockback_localized_observable/build/**.js',
   'test/knockback_observable/build/**.js',
   'test/knockback_observables/build/**.js',

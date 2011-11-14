@@ -1,4 +1,4 @@
-var Contact, ContactsCollection, SortedContactsCollection;
+var Contact, ContactsCollection, NameSortedContactsCollection;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
@@ -27,16 +27,16 @@ ContactsCollection = (function() {
   ContactsCollection.prototype.model = Contact;
   return ContactsCollection;
 })();
-SortedContactsCollection = (function() {
-  __extends(SortedContactsCollection, Backbone.Collection);
-  function SortedContactsCollection() {
-    SortedContactsCollection.__super__.constructor.apply(this, arguments);
+NameSortedContactsCollection = (function() {
+  __extends(NameSortedContactsCollection, Backbone.Collection);
+  function NameSortedContactsCollection() {
+    NameSortedContactsCollection.__super__.constructor.apply(this, arguments);
   }
-  SortedContactsCollection.prototype.model = Contact;
-  SortedContactsCollection.prototype.comparator = function(model) {
+  NameSortedContactsCollection.prototype.model = Contact;
+  NameSortedContactsCollection.prototype.comparator = function(model) {
     return model.get('name');
   };
-  return SortedContactsCollection;
+  return NameSortedContactsCollection;
 })();
 var LocaleManager;
 var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
@@ -48,21 +48,30 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   return child;
 };
 LocaleManager = (function() {
-  function LocaleManager(locale_identifier, id_to_string_map_by_culture) {
-    this.id_to_string_map_by_culture = id_to_string_map_by_culture;
-    this.setLocale(locale_identifier);
+  function LocaleManager(locale_identifier, translations_by_locale) {
+    this.translations_by_locale = translations_by_locale;
+    if (locale_identifier) {
+      this.setLocale(locale_identifier);
+    }
   }
-  LocaleManager.prototype.get = function(string_id) {
-    var culture_map;
-    culture_map = this.id_to_string_map_by_culture[this.locale_identifier];
+  LocaleManager.prototype.get = function(string_id, parameters) {
+    var arg, culture_map, index, string, _len, _ref;
+    if (this.locale_identifier) {
+      culture_map = this.translations_by_locale[this.locale_identifier];
+    }
     if (!culture_map) {
       return '';
     }
-    if (culture_map.hasOwnProperty(string_id)) {
-      return culture_map[string_id];
-    } else {
-      return '';
+    string = culture_map.hasOwnProperty(string_id) ? culture_map[string_id] : '';
+    if (arguments === 1) {
+      return string;
     }
+    _ref = Array.prototype.slice.call(arguments, 1);
+    for (index = 0, _len = _ref.length; index < _len; index++) {
+      arg = _ref[index];
+      string = string.replace("{" + index + "}", arg);
+    }
+    return string;
   };
   LocaleManager.prototype.getLocale = function() {
     return this.locale_identifier;
@@ -72,7 +81,7 @@ LocaleManager = (function() {
     this.locale_identifier = locale_identifier;
     Globalize.culture = Globalize.findClosestCulture(locale_identifier);
     this.trigger('change', this);
-    culture_map = this.id_to_string_map_by_culture[this.locale_identifier];
+    culture_map = this.translations_by_locale[this.locale_identifier];
     if (!culture_map) {
       return;
     }
@@ -82,6 +91,16 @@ LocaleManager = (function() {
       _results.push(this.trigger("change:" + key, value));
     }
     return _results;
+  };
+  LocaleManager.prototype.getLocales = function() {
+    var locales, string_id, value, _ref;
+    locales = [];
+    _ref = this.translations_by_locale;
+    for (string_id in _ref) {
+      value = _ref[string_id];
+      locales.push(string_id);
+    }
+    return locales;
   };
   return LocaleManager;
 })();
@@ -148,7 +167,7 @@ ShortDateLocalizer = (function() {
     }
     ShortDateLocalizer.__super__.constructor.call(this, value, _.extend(options, {
       read: function(value) {
-        return Globalize.format(date, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+        return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
       },
       write: __bind(function(localized_string, value, observable) {
         var new_value;
@@ -156,7 +175,7 @@ ShortDateLocalizer = (function() {
         if (!(new_value && _.isDate(new_value))) {
           return observable.resetToCurrent();
         }
-        return date.setTime(new_value.valueOf());
+        return value.setTime(new_value.valueOf());
       }, this)
     }), view_model);
     return kb.wrappedObservable(this);

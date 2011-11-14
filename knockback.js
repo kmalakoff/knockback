@@ -31,7 +31,7 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_mode
   for (key in view_model) {
     observable = view_model[key];
     _results.push((function(key, observable) {
-      if (!observable || !(observable.__kb_owner || (observable instanceof kb.Observables) || (observable instanceof kb.CollectionSync))) {
+      if (!observable || !(observable.__kb_owner || (observable instanceof kb.Observables) || (observable instanceof kb.CollectionObservable))) {
         return;
       }
       observable.destroy();
@@ -41,9 +41,9 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_mode
   return _results;
 };
 /*
-  knockback_collection_sync.js
+  knockback_collection_observable.js
   (c) 2011 Kevin Malakoff.
-  Knockback.CollectionSync is freely distributable under the MIT license.
+  Knockback.CollectionObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
@@ -51,86 +51,94 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
-Knockback.CollectionSync = (function() {
-  function CollectionSync(collection, observable_array, options) {
+Knockback.CollectionObservable = (function() {
+  function CollectionObservable(collection, observable_array, options) {
     var event, _i, _j, _len, _len2, _ref, _ref2;
-    this.collection = collection;
     this.observable_array = observable_array;
     this.options = options;
-    if (!this.collection) {
-      throw new Error('CollectionSync: collection is missing');
+    if (!collection) {
+      throw new Error('CollectionObservable: collection is missing');
     }
     if (!this.observable_array) {
-      throw new Error('CollectionSync: observable_array is missing');
+      throw new Error('CollectionObservable: observable_array is missing');
     }
     if (!this.options) {
-      throw new Error('CollectionSync: options is missing');
+      throw new Error('CollectionObservable: options is missing');
     }
     if (!this.options.viewModelCreate) {
-      throw new Error('CollectionSync: options.viewModelCreate is missing');
+      throw new Error('CollectionObservable: options.viewModelCreate is missing');
     }
-    _.bindAll(this, '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged');
-    if (this.collection.retain) {
-      this.collection.retain();
+    _.bindAll(this, 'destroy', 'collection', 'sorting', 'viewModelByModel', 'eachViewModel');
+    _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged');
+    this._kb_collection = collection;
+    if (this._kb_collection.retain) {
+      this._kb_collection.retain();
     }
-    this.collection.bind('reset', this._onCollectionReset);
+    this._kb_collection.bind('reset', this._onCollectionReset);
     if (!this.options.sortedIndex) {
-      this.collection.bind('resort', this._onCollectionResort);
+      this._kb_collection.bind('resort', this._onCollectionResort);
     }
     _ref = ['new', 'add'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];
-      this.collection.bind(event, this._onModelAdd);
+      this._kb_collection.bind(event, this._onModelAdd);
     }
     _ref2 = ['remove', 'destroy'];
     for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
       event = _ref2[_j];
-      this.collection.bind(event, this._onModelRemove);
+      this._kb_collection.bind(event, this._onModelRemove);
     }
-    if (this.options.sortedIndex) {
-      this.collection.bind('change', this._onModelChanged);
-    }
-    this._onCollectionReset(this.collection);
+    this._kb_collection.bind('change', this._onModelChanged);
+    this._kb_value_observable = ko.observableArray([]);
+    this._kb_observable = ko.dependentObservable(this._onGetValue);
+    this._kb_observable.destroy = this.destroy;
+    this._kb_observable.collection = this.collection;
+    this._kb_observable.viewModelByModel = this.viewModelByModel;
+    this._kb_observable.eachViewModel = this.eachViewModel;
+    this._kb_observable.sorting = this.sorting;
+    this._onCollectionReset(this._kb_collection);
+    return kb.wrappedObservable(this);
   }
-  CollectionSync.prototype.destroy = function() {
+  CollectionObservable.prototype.destroy = function() {
     var event, _i, _j, _len, _len2, _ref, _ref2;
-    this.collection.unbind('reset', this._onCollectionReset);
+    this._kb_collection.unbind('reset', this._onCollectionReset);
     if (!this.options.sortedIndex) {
-      this.collection.unbind('resort', this._onCollectionResort);
+      this._kb_collection.unbind('resort', this._onCollectionResort);
     }
     _ref = ['new', 'add'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       event = _ref[_i];
-      this.collection.unbind(event, this._onModelAdd);
+      this._kb_collection.unbind(event, this._onModelAdd);
     }
     _ref2 = ['remove', 'destroy'];
     for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
       event = _ref2[_j];
-      this.collection.unbind(event, this._onModelRemove);
+      this._kb_collection.unbind(event, this._onModelRemove);
     }
-    if (this.options.sortedIndex) {
-      this.collection.unbind('change', this._onModelChanged);
+    this._kb_collection.unbind('change', this._onModelChanged);
+    if (this._kb_collection.release) {
+      this._kb_collection.release();
     }
-    if (this.collection.release) {
-      this.collection.release();
-    }
-    this.collection = null;
-    this.observable_array;
+    this._kb_collection = null;
+    this._kb_observable.dispose();
+    this._kb_observable = null;
+    this._kb_value_observable.dispose();
+    this._kb_value_observable = null;
+    this.observable_array = null;
     return this.options = null;
   };
-  CollectionSync.prototype.modelByViewModel = function(view_model) {
-    return _.find(this.observable_array(), function(test) {
-      return test === view_model;
-    });
+  CollectionObservable.prototype.collection = function() {
+    this._kb_value_observable();
+    return this._kb_collection;
   };
-  CollectionSync.prototype.viewModelByModel = function(model) {
+  CollectionObservable.prototype.viewModelByModel = function(model) {
     var id_attribute;
     id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
     return _.find(this.observable_array(), function(test) {
       return test.__kb_model[id_attribute] === model[id_attribute];
     });
   };
-  CollectionSync.prototype.eachViewModel = function(iterator) {
+  CollectionObservable.prototype.eachViewModel = function(iterator) {
     var view_model, _i, _len, _ref, _results;
     _ref = this.observable_array();
     _results = [];
@@ -140,8 +148,22 @@ Knockback.CollectionSync = (function() {
     }
     return _results;
   };
-  CollectionSync.prototype._onCollectionReset = function() {
-    var model, sorted_models, view_model, view_models, _fn, _fn2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _results;
+  CollectionObservable.prototype.sorting = function(sortedIndex, sort_attribute) {
+    if (arguments.length === 0) {
+      return {
+        sortedIndex: this.options.sortedIndex,
+        sort_attribute: this.options.sort_attribute
+      };
+    }
+    this.options.sort_attribute = sort_attribute;
+    this.options.sortedIndex = sortedIndex;
+    return this._onCollectionReset();
+  };
+  CollectionObservable.prototype._onGetValue = function() {
+    return this._kb_value_observable();
+  };
+  CollectionObservable.prototype._onCollectionReset = function() {
+    var model, models, view_model, view_models, _fn, _fn2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _results;
     view_models = this.observable_array.removeAll();
     _fn = __bind(function(view_model) {
       if (this.options.onViewModelRemove) {
@@ -153,15 +175,16 @@ Knockback.CollectionSync = (function() {
       view_model = view_models[_i];
       _fn(view_model);
     }
+    this._kb_value_observable.removeAll();
     view_models = [];
     if (this.options.sortedIndex) {
-      sorted_models = [];
-      _ref = this.collection.models;
+      models = [];
+      _ref = this._kb_collection.models;
       _fn2 = __bind(function(model) {
         var add_index;
         view_model = this._viewModelCreate(model);
-        add_index = this.options.sortedIndex(sorted_models, model);
-        sorted_models.splice(add_index, 0, model);
+        add_index = this.options.sortedIndex(models, model);
+        models.splice(add_index, 0, model);
         return view_models.splice(add_index, 0, view_model);
       }, this);
       for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
@@ -169,13 +192,15 @@ Knockback.CollectionSync = (function() {
         _fn2(model);
       }
     } else {
-      _ref2 = this.collection.models;
+      _ref2 = this._kb_collection.models;
       for (_k = 0, _len3 = _ref2.length; _k < _len3; _k++) {
         model = _ref2[_k];
         view_models.push(this._viewModelCreate(model));
       }
+      models = _.clone(this._kb_collection.models);
     }
     this.observable_array(view_models);
+    this._kb_value_observable(models);
     if (this.options.onViewModelAdd) {
       _ref3 = this.observable_array();
       _results = [];
@@ -186,10 +211,10 @@ Knockback.CollectionSync = (function() {
       return _results;
     }
   };
-  CollectionSync.prototype._onCollectionResort = function(model_or_models) {
+  CollectionObservable.prototype._onCollectionResort = function(model_or_models) {
     var model, _i, _len, _results;
     if (this.options.sortedIndex) {
-      throw new Error("CollectionSync: collection sorting unexpected");
+      throw new Error("CollectionObservable: collection sorting unexpected");
     }
     if (_.isArray(model_or_models)) {
       _results = [];
@@ -202,57 +227,56 @@ Knockback.CollectionSync = (function() {
       return this._viewModelResort(this.viewModelByModel(model_or_models));
     }
   };
-  CollectionSync.prototype._onModelAdd = function(model) {
+  CollectionObservable.prototype._onModelAdd = function(model) {
     var add_index, sorted_models, view_model;
     view_model = this._viewModelCreate(model);
     if (this.options.sortedIndex) {
       sorted_models = _.pluck(this.observable_array(), '__kb_model');
       add_index = this.options.sortedIndex(sorted_models, model);
     } else {
-      add_index = this.collection.indexOf(model);
+      add_index = this._kb_collection.indexOf(model);
     }
     this.observable_array.splice(add_index, 0, view_model);
+    this._kb_value_observable.splice(add_index, 0, model);
     if (this.options.onViewModelAdd) {
       return this.options.onViewModelAdd(view_model, this.observable_array());
     }
   };
-  CollectionSync.prototype._onModelRemove = function(model) {
+  CollectionObservable.prototype._onModelRemove = function(model) {
     var view_model;
     view_model = this.viewModelByModel(model);
     if (!view_model) {
-      throw new Error("CollectionSync: view_model not found for remove");
+      return;
     }
     this.observable_array.remove(view_model);
+    this._kb_value_observable.remove(model);
     if (this.options.onViewModelRemove) {
       this.options.onViewModelRemove(view_model, this.observable_array());
     }
     kb.vmDestroy(view_model);
     return view_model.__kb_model = null;
   };
-  CollectionSync.prototype._onModelChanged = function(model) {
+  CollectionObservable.prototype._onModelChanged = function(model) {
     var view_model;
-    if (!this.options.sortedIndex) {
-      throw new Error("CollectionSync: change sorting unexpected");
+    if (this.options.sortedIndex && (!this.options.sort_attribute || model.hasChanged(this.options.sort_attribute))) {
+      view_model = this.viewModelByModel(model);
+      if (!view_model) {
+        throw new Error("CollectionObservable: view_model not found for resort");
+      }
+      this._viewModelResort(view_model);
     }
-    if (this.options.sort_attribute && !model.hasChanged(this.options.sort_attribute)) {
-      return;
-    }
-    view_model = this.viewModelByModel(model);
-    if (!view_model) {
-      throw new Error("CollectionSync: view_model not found for resort");
-    }
-    return this._viewModelResort(view_model);
+    return this._kb_value_observable.valueHasMutated();
   };
-  CollectionSync.prototype._viewModelCreate = function(model) {
+  CollectionObservable.prototype._viewModelCreate = function(model) {
     var view_model;
     view_model = this.options.viewModelCreate(model);
     if (view_model.__kb_model) {
-      throw new Error("CollectionSync: __kb_model is reserved");
+      throw new Error("CollectionObservable: __kb_model is reserved");
     }
     view_model.__kb_model = model;
     return view_model;
   };
-  CollectionSync.prototype._viewModelResort = function(view_model) {
+  CollectionObservable.prototype._viewModelResort = function(view_model) {
     var model, new_index, previous_index, sorted_models;
     previous_index = this.observable_array.indexOf(view_model);
     model = view_model.__kb_model;
@@ -261,21 +285,23 @@ Knockback.CollectionSync = (function() {
       sorted_models.splice(previous_index, 1);
       new_index = this.options.sortedIndex(sorted_models, model);
     } else {
-      new_index = this.collection.indexOf(model);
+      new_index = this._kb_collection.indexOf(model);
     }
     if (previous_index === new_index) {
       return;
     }
     this.observable_array.splice(previous_index, 1);
     this.observable_array.splice(new_index, 0, view_model);
+    this._kb_value_observable.splice(previous_index, 1);
+    this._kb_value_observable.splice(new_index, 0, model);
     if (this.options.onViewModelResort) {
       return this.options.onViewModelResort(view_model, this.observable_array(), new_index);
     }
   };
-  return CollectionSync;
+  return CollectionObservable;
 })();
-Knockback.collectionSync = function(collection, observable_array, options) {
-  return new Knockback.CollectionSync(collection, observable_array, options);
+Knockback.collectionObservable = function(collection, observable_array, options) {
+  return new Knockback.CollectionObservable(collection, observable_array, options);
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
   return view_model.__kb_model;
@@ -326,12 +352,12 @@ Knockback.LocalizedObservable = (function() {
     } else {
       this._kb_observable = ko.dependentObservable(this._onGetValue);
     }
-    kb.locale_manager.bind('change', this._onLocaleChange);
     this._kb_observable.destroy = this.destroy;
     this._kb_observable.getObservedValue = this.getObservedValue;
     this._kb_observable.setObservedValue = this.setObservedValue;
     this._kb_observable.setToDefault = this.setToDefault;
     this._kb_observable.resetToCurrent = this.resetToCurrent;
+    kb.locale_manager.bind('change', this._onLocaleChange);
     this._onLocaleChange();
     return kb.wrappedObservable(this);
   }
@@ -339,6 +365,7 @@ Knockback.LocalizedObservable = (function() {
     kb.locale_manager.unbind('change', this._onLocaleChange);
     this._kb_observable.dispose();
     this._kb_observable = null;
+    this._kb_value_observable = null;
     this.options = {};
     return this.view_model = null;
   };
@@ -455,6 +482,7 @@ Knockback.Observable = (function() {
   Observable.prototype.destroy = function() {
     this._kb_observable.dispose();
     this._kb_observable = null;
+    this._kb_value_observable = null;
     if (this.model) {
       this._onModelUnloaded(this.model);
     }
