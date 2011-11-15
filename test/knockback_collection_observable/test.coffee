@@ -55,11 +55,10 @@ $(document).ready( ->
       viewModelCreate:    (model) -> return new ContactViewModel(model)
       sort_attribute:     'name'
       sortedIndex:        (models, model) -> _.sortedIndex(models, model, (test) -> test.get('name'))
-
-      onViewModelAdd:     (view_model, view_models_array_array) -> view_model_count++
-      onViewModelResort:  (view_model, view_models_array_array, new_index) -> view_model_resort_count++
-      onViewModelRemove:  (view_model, view_models_array_array) -> view_model_count--
     })
+    collection_observable.bind('add', (view_model, view_models_array_array) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
+    collection_observable.bind('resort', (view_model, view_models_array_array, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
+    collection_observable.bind('remove', (view_model, view_models_array_array) -> if _.isArray(view_model) then (view_model_count-=view_model.length) else view_model_count--)
 
     equal(collection.length, 0, "no models")
     equal(view_model_count, 0, "no view models")
@@ -107,11 +106,10 @@ $(document).ready( ->
 
     collection_observable = kb.collectionObservable(collection, view_models_array, {
       viewModelCreate:    (model) -> return new ContactViewModel(model)
-
-      onViewModelAdd:     (view_model, view_models_array_array) -> view_model_count++
-      onViewModelResort:  (view_model, view_models_array_array, new_index) -> view_model_resort_count++
-      onViewModelRemove:  (view_model, view_models_array_array) -> view_model_count--
     })
+    collection_observable.bind('add', (view_model, view_models_array_array) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
+    collection_observable.bind('resort', (view_model, view_models_array_array, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
+    collection_observable.bind('remove', (view_model, view_models_array_array) -> if _.isArray(view_model) then (view_model_count-=view_model.length) else view_model_count--)
 
     equal(collection.length, 0, "no models")
     equal(view_models_array().length, 0, "no view models")

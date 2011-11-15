@@ -72,14 +72,26 @@ $(document).ready(function() {
         return _.sortedIndex(models, model, function(test) {
           return test.get('name');
         });
-      },
-      onViewModelAdd: function(view_model, view_models_array_array) {
+      }
+    });
+    collection_observable.bind('add', function(view_model, view_models_array_array) {
+      if (_.isArray(view_model)) {
+        return view_model_count += view_model.length;
+      } else {
         return view_model_count++;
-      },
-      onViewModelResort: function(view_model, view_models_array_array, new_index) {
+      }
+    });
+    collection_observable.bind('resort', function(view_model, view_models_array_array, new_index) {
+      if (_.isArray(view_model)) {
+        return view_model_resort_count += view_model.length;
+      } else {
         return view_model_resort_count++;
-      },
-      onViewModelRemove: function(view_model, view_models_array_array) {
+      }
+    });
+    collection_observable.bind('remove', function(view_model, view_models_array_array) {
+      if (_.isArray(view_model)) {
+        return view_model_count -= view_model.length;
+      } else {
         return view_model_count--;
       }
     });
@@ -138,14 +150,26 @@ $(document).ready(function() {
     collection_observable = kb.collectionObservable(collection, view_models_array, {
       viewModelCreate: function(model) {
         return new ContactViewModel(model);
-      },
-      onViewModelAdd: function(view_model, view_models_array_array) {
+      }
+    });
+    collection_observable.bind('add', function(view_model, view_models_array_array) {
+      if (_.isArray(view_model)) {
+        return view_model_count += view_model.length;
+      } else {
         return view_model_count++;
-      },
-      onViewModelResort: function(view_model, view_models_array_array, new_index) {
+      }
+    });
+    collection_observable.bind('resort', function(view_model, view_models_array_array, new_index) {
+      if (_.isArray(view_model)) {
+        return view_model_resort_count += view_model.length;
+      } else {
         return view_model_resort_count++;
-      },
-      onViewModelRemove: function(view_model, view_models_array_array) {
+      }
+    });
+    collection_observable.bind('remove', function(view_model, view_models_array_array) {
+      if (_.isArray(view_model)) {
+        return view_model_count -= view_model.length;
+      } else {
         return view_model_count--;
       }
     });

@@ -14,9 +14,10 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 #     Default: the model's index in the collection is used.
 #   sort_attribute: attribute_name. An optimization to check if a specific attribute has changed.
 #     Default: resort on all changes to a model.
-#   onViewModelAdd: (view_model, view_models_array)
-#   onViewModelResort: (view_model, view_models_array, new_index)
-#   onViewModelRemove: (view_model, view_models_array)
+# Triggers the following Backbone.Events
+#   add: (view_model, view_models_array) or if batch: (view_models_array)
+#   resort: (view_model, view_models_array, new_index) or if batch: (view_models_array)
+#   remove: (view_model, view_models_array) or if batch: (view_models_array)
 ####################################################
 
 class Knockback.CollectionObservable
@@ -26,7 +27,7 @@ class Knockback.CollectionObservable
     throw new Error('CollectionObservable: options is missing') if not @options
     throw new Error('CollectionObservable: options.viewModelCreate is missing') if not @options.viewModelCreate
 
-    _.bindAll(this, 'destroy', 'collection', 'sorting', 'viewModelByModel', 'eachViewModel')
+    _.bindAll(this, 'destroy', 'collection', 'sorting', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger')
     _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged')
     @_kb_collection = collection
     @_kb_collection.retain() if @_kb_collection.retain
@@ -47,6 +48,10 @@ class Knockback.CollectionObservable
     @_kb_observable.viewModelByModel = @viewModelByModel
     @_kb_observable.eachViewModel = @eachViewModel
     @_kb_observable.sorting = @sorting
+    # Backbone.Event interface
+    @_kb_observable.bind = @bind
+    @_kb_observable.unbind = @unbind
+    @_kb_observable.trigger = @trigger
 
     # start
     @_onCollectionReset(@_kb_collection)
@@ -68,16 +73,18 @@ class Knockback.CollectionObservable
   collection: ->
     @_kb_value_observable() # force a dependency
     return @_kb_collection
+
+  sorting: (sortedIndex, sort_attribute) ->
+    return {sortedIndex: @options.sortedIndex, sort_attribute: @options.sort_attribute} if arguments.length == 0
+    @options.sort_attribute = sort_attribute
+    @options.sortedIndex = sortedIndex
+    @_onCollectionReset() # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
+
   viewModelByModel: (model) ->
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(@observable_array(), (test) -> return (test.__kb_model[id_attribute] == model[id_attribute]))
-  eachViewModel: (iterator) -> iterator(view_model) for view_model in @observable_array()
-  sorting: (sortedIndex, sort_attribute) ->
-    return {sortedIndex: @options.sortedIndex, sort_attribute: @options.sort_attribute} if arguments.length == 0
 
-    @options.sort_attribute = sort_attribute
-    @options.sortedIndex = sortedIndex
-    @_onCollectionReset() # resort everything (TODO: do it incrementally if not too complex)
+  eachViewModel: (iterator) -> iterator(view_model) for view_model in @observable_array()
 
   ####################################################
   # Internal
@@ -86,11 +93,10 @@ class Knockback.CollectionObservable
     return @_kb_value_observable()
 
   _onCollectionReset: ->
+    @trigger('remove', @observable_array())  # notify
+
     view_models = @observable_array.removeAll() # batch
-    for view_model in view_models
-      do (view_model) =>
-        @options.onViewModelRemove(view_model) if @options.onViewModelRemove # notify
-        kb.vmDestroy(view_model)
+    kb.vmDestroy(view_model) for view_model in view_models
     @_kb_value_observable.removeAll()
 
     view_models = [] # batch
@@ -107,7 +113,8 @@ class Knockback.CollectionObservable
       models = _.clone(@_kb_collection.models)
     @observable_array(view_models) # batch
     @_kb_value_observable(models)
-    @options.onViewModelAdd(view_model) for view_model in @observable_array() if @options.onViewModelAdd # notify
+
+    @trigger('add', @observable_array())  # notify
 
   _onCollectionResort: (model_or_models) ->
     throw new Error("CollectionObservable: collection sorting unexpected") if @options.sortedIndex
@@ -115,6 +122,8 @@ class Knockback.CollectionObservable
       @_viewModelResort(@viewModelByModel(model)) for model in model_or_models
     else
       @_viewModelResort(@viewModelByModel(model_or_models))
+
+    @trigger('resort', @observable_array())  # notify
 
   _onModelAdd: (model) ->
     view_model = @_viewModelCreate(model)
@@ -125,14 +134,17 @@ class Knockback.CollectionObservable
       add_index = @_kb_collection.indexOf(model)
     @observable_array.splice(add_index, 0, view_model)
     @_kb_value_observable.splice(add_index, 0, model)
-    @options.onViewModelAdd(view_model, @observable_array()) if @options.onViewModelAdd # notify
+
+    @trigger('add', view_model, @observable_array()) # notify
 
   _onModelRemove: (model) ->
     view_model = @viewModelByModel(model)
     return if not view_model # both the model and collection notify of destroy so may already have been removed
     @observable_array.remove(view_model)
     @_kb_value_observable.remove(model)
-    @options.onViewModelRemove(view_model, @observable_array()) if @options.onViewModelRemove # notify
+
+    @trigger('remove', view_model, @observable_array()) # notify
+
     kb.vmDestroy(view_model)
     view_model.__kb_model = null
 
@@ -164,7 +176,13 @@ class Knockback.CollectionObservable
     return if previous_index == new_index # no change
     @observable_array.splice(previous_index, 1); @observable_array.splice(new_index, 0, view_model) # move
     @_kb_value_observable.splice(previous_index, 1); @_kb_value_observable.splice(new_index, 0, model) # move
-    @options.onViewModelResort(view_model, @observable_array(), new_index) if @options.onViewModelResort # notify
+
+    @trigger('resort', view_model, @observable_array(), new_index) # notify
+
+#######################################
+# Mix in Backbone.Events so callers can subscribe
+#######################################
+Knockback.CollectionObservable.prototype extends Backbone.Events
 
 # factory function
 Knockback.collectionObservable = (collection, observable_array, options) -> return new Knockback.CollectionObservable(collection, observable_array, options)

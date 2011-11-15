@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.6.0
+  knockback.js 0.8.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.6.0';
+Knockback.VERSION = '0.8.0';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -47,7 +47,14 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_mode
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+  function ctor() { this.constructor = child; }
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor;
+  child.__super__ = parent.prototype;
+  return child;
+};
 if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
@@ -68,7 +75,7 @@ Knockback.CollectionObservable = (function() {
     if (!this.options.viewModelCreate) {
       throw new Error('CollectionObservable: options.viewModelCreate is missing');
     }
-    _.bindAll(this, 'destroy', 'collection', 'sorting', 'viewModelByModel', 'eachViewModel');
+    _.bindAll(this, 'destroy', 'collection', 'sorting', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger');
     _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged');
     this._kb_collection = collection;
     if (this._kb_collection.retain) {
@@ -96,6 +103,9 @@ Knockback.CollectionObservable = (function() {
     this._kb_observable.viewModelByModel = this.viewModelByModel;
     this._kb_observable.eachViewModel = this.eachViewModel;
     this._kb_observable.sorting = this.sorting;
+    this._kb_observable.bind = this.bind;
+    this._kb_observable.unbind = this.unbind;
+    this._kb_observable.trigger = this.trigger;
     this._onCollectionReset(this._kb_collection);
     return kb.wrappedObservable(this);
   }
@@ -130,6 +140,17 @@ Knockback.CollectionObservable = (function() {
     this._kb_value_observable();
     return this._kb_collection;
   };
+  CollectionObservable.prototype.sorting = function(sortedIndex, sort_attribute) {
+    if (arguments.length === 0) {
+      return {
+        sortedIndex: this.options.sortedIndex,
+        sort_attribute: this.options.sort_attribute
+      };
+    }
+    this.options.sort_attribute = sort_attribute;
+    this.options.sortedIndex = sortedIndex;
+    return this._onCollectionReset();
+  };
   CollectionObservable.prototype.viewModelByModel = function(model) {
     var id_attribute;
     id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
@@ -147,39 +168,23 @@ Knockback.CollectionObservable = (function() {
     }
     return _results;
   };
-  CollectionObservable.prototype.sorting = function(sortedIndex, sort_attribute) {
-    if (arguments.length === 0) {
-      return {
-        sortedIndex: this.options.sortedIndex,
-        sort_attribute: this.options.sort_attribute
-      };
-    }
-    this.options.sort_attribute = sort_attribute;
-    this.options.sortedIndex = sortedIndex;
-    return this._onCollectionReset();
-  };
   CollectionObservable.prototype._onGetValue = function() {
     return this._kb_value_observable();
   };
   CollectionObservable.prototype._onCollectionReset = function() {
-    var model, models, view_model, view_models, _fn, _fn2, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2, _ref3, _results;
+    var model, models, view_model, view_models, _fn, _i, _j, _k, _len, _len2, _len3, _ref, _ref2;
+    this.trigger('remove', this.observable_array());
     view_models = this.observable_array.removeAll();
-    _fn = __bind(function(view_model) {
-      if (this.options.onViewModelRemove) {
-        this.options.onViewModelRemove(view_model);
-      }
-      return kb.vmDestroy(view_model);
-    }, this);
     for (_i = 0, _len = view_models.length; _i < _len; _i++) {
       view_model = view_models[_i];
-      _fn(view_model);
+      kb.vmDestroy(view_model);
     }
     this._kb_value_observable.removeAll();
     view_models = [];
     if (this.options.sortedIndex) {
       models = [];
       _ref = this._kb_collection.models;
-      _fn2 = __bind(function(model) {
+      _fn = __bind(function(model) {
         var add_index;
         view_model = this._viewModelCreate(model);
         add_index = this.options.sortedIndex(models, model);
@@ -188,7 +193,7 @@ Knockback.CollectionObservable = (function() {
       }, this);
       for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
         model = _ref[_j];
-        _fn2(model);
+        _fn(model);
       }
     } else {
       _ref2 = this._kb_collection.models;
@@ -200,31 +205,22 @@ Knockback.CollectionObservable = (function() {
     }
     this.observable_array(view_models);
     this._kb_value_observable(models);
-    if (this.options.onViewModelAdd) {
-      _ref3 = this.observable_array();
-      _results = [];
-      for (_l = 0, _len4 = _ref3.length; _l < _len4; _l++) {
-        view_model = _ref3[_l];
-        _results.push(this.options.onViewModelAdd(view_model));
-      }
-      return _results;
-    }
+    return this.trigger('add', this.observable_array());
   };
   CollectionObservable.prototype._onCollectionResort = function(model_or_models) {
-    var model, _i, _len, _results;
+    var model, _i, _len;
     if (this.options.sortedIndex) {
       throw new Error("CollectionObservable: collection sorting unexpected");
     }
     if (_.isArray(model_or_models)) {
-      _results = [];
       for (_i = 0, _len = model_or_models.length; _i < _len; _i++) {
         model = model_or_models[_i];
-        _results.push(this._viewModelResort(this.viewModelByModel(model)));
+        this._viewModelResort(this.viewModelByModel(model));
       }
-      return _results;
     } else {
-      return this._viewModelResort(this.viewModelByModel(model_or_models));
+      this._viewModelResort(this.viewModelByModel(model_or_models));
     }
+    return this.trigger('resort', this.observable_array());
   };
   CollectionObservable.prototype._onModelAdd = function(model) {
     var add_index, sorted_models, view_model;
@@ -237,9 +233,7 @@ Knockback.CollectionObservable = (function() {
     }
     this.observable_array.splice(add_index, 0, view_model);
     this._kb_value_observable.splice(add_index, 0, model);
-    if (this.options.onViewModelAdd) {
-      return this.options.onViewModelAdd(view_model, this.observable_array());
-    }
+    return this.trigger('add', view_model, this.observable_array());
   };
   CollectionObservable.prototype._onModelRemove = function(model) {
     var view_model;
@@ -249,9 +243,7 @@ Knockback.CollectionObservable = (function() {
     }
     this.observable_array.remove(view_model);
     this._kb_value_observable.remove(model);
-    if (this.options.onViewModelRemove) {
-      this.options.onViewModelRemove(view_model, this.observable_array());
-    }
+    this.trigger('remove', view_model, this.observable_array());
     kb.vmDestroy(view_model);
     return view_model.__kb_model = null;
   };
@@ -293,12 +285,11 @@ Knockback.CollectionObservable = (function() {
     this.observable_array.splice(new_index, 0, view_model);
     this._kb_value_observable.splice(previous_index, 1);
     this._kb_value_observable.splice(new_index, 0, model);
-    if (this.options.onViewModelResort) {
-      return this.options.onViewModelResort(view_model, this.observable_array(), new_index);
-    }
+    return this.trigger('resort', view_model, this.observable_array(), new_index);
   };
   return CollectionObservable;
 })();
+__extends(Knockback.CollectionObservable.prototype, Backbone.Events);
 Knockback.collectionObservable = function(collection, observable_array, options) {
   return new Knockback.CollectionObservable(collection, observable_array, options);
 };
