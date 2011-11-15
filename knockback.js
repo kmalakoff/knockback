@@ -228,8 +228,9 @@ Knockback.CollectionObservable = (function() {
   };
   CollectionObservable.prototype._onModelChanged = function(model) {
     if (this.options.sortedIndex && (!this.options.sort_attribute || model.hasChanged(this.options.sort_attribute))) {
-      return this._onModelResort(model);
+      this._onModelResort(model);
     }
+    return this._kb_value_observable.valueHasMutated();
   };
   CollectionObservable.prototype._onModelResort = function(model) {
     var new_index, previous_index, sorted_models, view_model;

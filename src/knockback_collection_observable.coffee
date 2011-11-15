@@ -137,6 +137,7 @@ class Knockback.CollectionObservable
     # sorting required
     if @options.sortedIndex and (not @options.sort_attribute or model.hasChanged(@options.sort_attribute))
       @_onModelResort(model)
+    @_kb_value_observable.valueHasMutated()
 
   _onModelResort: (model) ->
     previous_index = @_kb_value_observable.indexOf(model)
