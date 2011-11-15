@@ -172,12 +172,19 @@ Collections cache some information on the view model and if you have a view mode
 * **kb.vmModel** to get the model for a view model
 
 ### Note 3
+
 There are some other helpers for collection sync view models that you may find useful:
 
 * **viewModelByModel**: (model) -> ...
-* **elementByModel**: (model) -> ...
 * **eachViewModel**: (iterator) -> ...
 
+### Note 4
+
+You can subscribe for events on view models using Backbone.Events
+
+* **'add'**: (view_model, view_models_array) or if batch: (view_models_array)
+* **'resort'**: (view_model, view_models_array, new_index) or if batch: (view_models_array)
+* **'remove'**: (view_model, view_models_array) or if batch: (view_models_array)
 
 Knockback.localizedObservable
 -----------------------------
