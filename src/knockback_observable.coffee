@@ -76,8 +76,11 @@ class Knockback.Observable
     return if @options.read then @options.read.apply(@view_model, [@model, @options.key]) else @model.get(@options.key)
 
   _onGetValue: ->
-    value = @_kb_value_observable()   # trigger the dependable
-    return @_getDefaultValue() if not @model
+    # trigger all the dependables
+    @_kb_value_observable()
+    value = @_getCurrentValue()
+
+    return value if not @model
     return if @_kb_localizer then @_kb_localizer() else value
 
   _onSetValue: (value) ->

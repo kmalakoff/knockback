@@ -539,9 +539,10 @@ Knockback.Observable = (function() {
   };
   Observable.prototype._onGetValue = function() {
     var value;
-    value = this._kb_value_observable();
+    this._kb_value_observable();
+    value = this._getCurrentValue();
     if (!this.model) {
-      return this._getDefaultValue();
+      return value;
     }
     if (this._kb_localizer) {
       return this._kb_localizer();
