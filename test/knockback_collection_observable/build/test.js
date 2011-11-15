@@ -15,14 +15,83 @@ $(document).ready(function() {
     }, this);
     return this;
   };
+  test("Basic Usage: collection observable with ko.dependentObservable", function() {
+    var collection, collection_observable, view_model;
+    collection = new ContactsCollection();
+    collection_observable = kb.collectionObservable(collection);
+    view_model = {
+      count: ko.dependentObservable(function() {
+        return collection_observable().length;
+      })
+    };
+    equal(collection.length, 0, "no models");
+    equal(view_model.count(), 0, "no count");
+    collection.add(new Contact({
+      id: 'b1',
+      name: 'Ringo',
+      number: '555-555-5556'
+    }));
+    collection.add(new Contact({
+      id: 'b2',
+      name: 'George',
+      number: '555-555-5555'
+    }));
+    equal(collection.length, 2, "2 models");
+    equal(view_model.count(), 2, "2 count");
+    collection.add(new Contact({
+      id: 'b3',
+      name: 'Paul',
+      number: '555-555-5557'
+    }));
+    equal(collection.length, 3, "3 models");
+    equal(view_model.count(), 3, "3 count");
+    collection.remove('b2').remove('b3');
+    equal(collection.length, 1, "1 model");
+    return equal(view_model.count(), 1, "1 count");
+  });
+  test("Basic Usage: collection observable with ko.dependentObservable and view model array", function() {
+    var collection, collection_observable, view_model, view_models_array;
+    collection = new ContactsCollection();
+    view_models_array = ko.observableArray([]);
+    collection_observable = kb.collectionObservable(collection, view_models_array, {
+      view_model: ContactViewModel
+    });
+    view_model = {
+      count: ko.dependentObservable(function() {
+        return collection_observable().length;
+      })
+    };
+    equal(collection.length, 0, "no models");
+    equal(view_model.count(), 0, "no count");
+    collection.add(new Contact({
+      id: 'b1',
+      name: 'Ringo',
+      number: '555-555-5556'
+    }));
+    collection.add(new Contact({
+      id: 'b2',
+      name: 'George',
+      number: '555-555-5555'
+    }));
+    equal(collection.length, 2, "2 models");
+    equal(view_model.count(), 2, "2 count");
+    collection.add(new Contact({
+      id: 'b3',
+      name: 'Paul',
+      number: '555-555-5557'
+    }));
+    equal(collection.length, 3, "3 models");
+    equal(view_model.count(), 3, "3 count");
+    collection.remove('b2').remove('b3');
+    equal(collection.length, 1, "1 model");
+    return equal(view_model.count(), 1, "1 count");
+  });
   test("Basic Usage: no sorting and no callbacks", function() {
     var collection, collection_observable, model, view_model, view_model_count, view_models_array;
     collection = new ContactsCollection();
     view_models_array = ko.observableArray([]);
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      viewModelCreate: function(model) {
-        return new ContactViewModel(model);
-      }
+      view_model: ContactViewModel
     });
     equal(collection.length, 0, "no models");
     equal(view_models_array().length, 0, "no view models");
@@ -64,9 +133,7 @@ $(document).ready(function() {
     view_model_count = 0;
     view_model_resort_count = 0;
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      viewModelCreate: function(model) {
-        return new ContactViewModel(model);
-      },
+      view_model: ContactViewModel,
       sort_attribute: 'name',
       sortedIndex: function(models, model) {
         return _.sortedIndex(models, model, function(test) {
@@ -148,9 +215,7 @@ $(document).ready(function() {
     view_model_count = 0;
     view_model_resort_count = 0;
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      viewModelCreate: function(model) {
-        return new ContactViewModel(model);
-      }
+      view_model: ContactViewModel
     });
     collection_observable.bind('add', function(view_model, view_models_array_array) {
       if (_.isArray(view_model)) {
@@ -223,9 +288,7 @@ $(document).ready(function() {
     collection = new ContactsCollection();
     view_models_array = ko.observableArray([]);
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      viewModelCreate: function(model) {
-        return new ContactViewModel(model);
-      }
+      view_model: ContactViewModel
     });
     equal(collection.length, 0, "no models");
     equal(view_models_array().length, 0, "no view models");
@@ -292,56 +355,15 @@ $(document).ready(function() {
     equal(collection.length, 0, "no models");
     return equal(view_models_array().length, 0, "no view models");
   });
-  test("Basic Usage: collection observable with ko.dependentObservable", function() {
-    var collection, collection_observable, view_model, view_models_array;
-    collection = new ContactsCollection();
-    view_models_array = ko.observableArray([]);
-    collection_observable = kb.collectionObservable(collection, view_models_array, {
-      viewModelCreate: function(model) {
-        return new ContactViewModel(model);
-      }
-    });
-    view_model = {};
-    view_model.count = ko.dependentObservable(function() {
-      return collection_observable().length;
-    });
-    equal(collection.length, 0, "no models");
-    equal(view_model.count(), 0, "no count");
-    collection.add(new Contact({
-      id: 'b1',
-      name: 'Ringo',
-      number: '555-555-5556'
-    }));
-    collection.add(new Contact({
-      id: 'b2',
-      name: 'George',
-      number: '555-555-5555'
-    }));
-    equal(collection.length, 2, "2 models");
-    equal(view_model.count(), 2, "2 count");
-    collection.add(new Contact({
-      id: 'b3',
-      name: 'Paul',
-      number: '555-555-5557'
-    }));
-    equal(collection.length, 3, "3 models");
-    equal(view_model.count(), 3, "3 count");
-    collection.remove('b2').remove('b3');
-    equal(collection.length, 1, "1 model");
-    return equal(view_model.count(), 1, "1 count");
-  });
   return test("Error cases", function() {
     raises((function() {
       return kb.collectionObservable();
     }), Error, "CollectionObservable: collection is missing");
     raises((function() {
-      return kb.collectionObservable(new ContactsCollection());
-    }), Error, "CollectionObservable: observable_array is missing");
-    raises((function() {
       return kb.collectionObservable(new ContactsCollection(), ko.observableArray([]));
     }), Error, "CollectionObservable: options is missing");
     return raises((function() {
       return kb.collectionObservable(new ContactsCollection(), ko.observableArray([]), {});
-    }), Error, "CollectionObservable: options.viewModelCreate is missing");
+    }), Error, "CollectionObservable: options.view_model is missing");
   });
 });

@@ -29,7 +29,7 @@ class Knockback.LocalizedObservable
     throw new Error('LocalizedObservable: options.write and write class function exist. You need to choose one.') if @options.write and @write
     throw new Error('LocalizedObservable: Knockback.locale_manager is not defined') if not kb.locale_manager
 
-    _.bindAll(this, 'destroy', 'setToDefault', 'resetToCurrent', 'getObservedValue', 'setObservedValue', '_onGetValue', '_onSetValue', '_onLocaleChange')
+    _.bindAll(this, 'destroy', 'setToDefault', 'resetToCurrent', 'observedValue', '_onGetValue', '_onSetValue', '_onLocaleChange')
 
     # either take the option or the class method
     @_kb_read = if @options.read then @options.read else @read
@@ -48,8 +48,7 @@ class Knockback.LocalizedObservable
 
     # publish public interface on the observable and return instead of this
     @_kb_observable.destroy = @destroy
-    @_kb_observable.getObservedValue = @getObservedValue
-    @_kb_observable.setObservedValue = @setObservedValue
+    @_kb_observable.observedValue = @observedValue
     @_kb_observable.setToDefault = @setToDefault
     @_kb_observable.resetToCurrent = @resetToCurrent
 
@@ -75,8 +74,11 @@ class Knockback.LocalizedObservable
     @_kb_value_observable(null) # force KO to think a change occurred
     @_onSetValue(@_getCurrentValue())
 
-  getObservedValue: -> return @value
-  setObservedValue: (value) -> @value = value; @_onLocaleChange(); return this
+  # dual purpose set/get
+  observedValue: (value) ->
+    return @value if arguments.length == 0
+    @value = value; @_onLocaleChange()
+    return this
 
   ####################################################
   # Internal

@@ -16,7 +16,7 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key:'name', default: @loading_message}
         number:   {key:'number', write: true, default: @loading_message}
-        date:     {key:'date', write: true, default: @loading_message, localizer: (value) -> return new LongDateLocalizer(value)}
+        date:     {key:'date', write: true, default: @loading_message, localizer: LongDateLocalizer}
       }, this)
       return this
 

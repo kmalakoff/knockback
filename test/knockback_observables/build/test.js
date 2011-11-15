@@ -1,4 +1,3 @@
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 $(document).ready(function() {
   module("knockback_observables.js");
   test("TEST DEPENDENCY MISSING", function() {
@@ -21,9 +20,7 @@ $(document).ready(function() {
         date: {
           key: 'date',
           write: true,
-          localizer: __bind(function(value) {
-            return new LongDateLocalizer(value);
-          }, this)
+          localizer: LongDateLocalizer
         }
       }, this);
       return this;

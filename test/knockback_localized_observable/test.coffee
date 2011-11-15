@@ -30,8 +30,8 @@ $(document).ready( ->
 
   test("Localized greeting", ->
     ContactViewModelGreeting = (model) ->
-      @hello = kb.observable(model, {key:'hello_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
-      @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: (value) => return new LocalizedStringLocalizer(value)})
+      @hello = kb.observable(model, {key:'hello_greeting', localizer: LocalizedStringLocalizer})
+      @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: LocalizedStringLocalizer})
       return this
 
     model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
@@ -79,7 +79,7 @@ $(document).ready( ->
 
   test("Date and time with jquery.globalize", ->
     ContactViewModelDate = (model) ->
-      @date = kb.observable(model, {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}, this)
+      @date = kb.observable(model, {key:'date', write: true, localizer: LongDateLocalizer}, this)
       return this
 
     birthdate = new Date(1940, 10, 9)

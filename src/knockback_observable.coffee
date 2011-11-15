@@ -30,7 +30,7 @@ class Knockback.Observable
 
     # internal state
     @_kb_value_observable = ko.observable()
-    @_kb_localizer = @options.localizer(@_getCurrentValue()) if @options.localizer
+    @_kb_localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
 
     if @options.write
       throw new Error('Observable: view_model is missing for read_write model attribute') if not @view_model
@@ -60,7 +60,7 @@ class Knockback.Observable
   setToDefault: ->
     value = @_getDefaultValue()
     if @_kb_localizer
-      @_kb_localizer.setObservedValue(value)
+      @_kb_localizer.observedValue(value)
       value = @_kb_localizer()
     @_kb_value_observable(value) # trigger the dependable
 
@@ -83,7 +83,7 @@ class Knockback.Observable
   _onSetValue: (value) ->
     if @_kb_localizer
       @_kb_localizer(value)
-      value = @_kb_localizer.getObservedValue()
+      value = @_kb_localizer.observedValue()
 
     if @model
       set_info = {}; set_info[@options.key] = value
@@ -105,7 +105,7 @@ class Knockback.Observable
   _onValueChange: ->
     value = @_getCurrentValue()
     if @_kb_localizer
-      @_kb_localizer.setObservedValue(value)
+      @_kb_localizer.observedValue(value)
       value = @_kb_localizer()
     @_kb_value_observable(value) # trigger the dependable
 

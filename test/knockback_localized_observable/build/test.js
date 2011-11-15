@@ -5,7 +5,7 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.prototype = new ctor;
   child.__super__ = parent.prototype;
   return child;
-}, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+};
 $(document).ready(function() {
   var LocalizedStringLocalizer, LongDateLocalizer;
   module("knockback_localized_observable.js");
@@ -54,15 +54,11 @@ $(document).ready(function() {
     ContactViewModelGreeting = function(model) {
       this.hello = kb.observable(model, {
         key: 'hello_greeting',
-        localizer: __bind(function(value) {
-          return new LocalizedStringLocalizer(value);
-        }, this)
+        localizer: LocalizedStringLocalizer
       });
       this.goodbye = kb.observable(model, {
         key: 'goodbye_greeting',
-        localizer: __bind(function(value) {
-          return new LocalizedStringLocalizer(value);
-        }, this)
+        localizer: LocalizedStringLocalizer
       });
       return this;
     };
@@ -120,9 +116,7 @@ $(document).ready(function() {
       this.date = kb.observable(model, {
         key: 'date',
         write: true,
-        localizer: __bind(function(value) {
-          return new LongDateLocalizer(value);
-        }, this)
+        localizer: LongDateLocalizer
       }, this);
       return this;
     };

@@ -52,7 +52,7 @@ ContactViewModel = (model) ->
   kb.observables(model, {
     name:     {key:'name'}
     email:    {key:'email', write: true, default: 'your.name@yourplace.com'}
-    date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
+    date:     {key:'date', write: true, localizer: LongDateLocalizer}
   }, this)
   return this
 ````
@@ -132,7 +132,7 @@ You can provide a localizer (see the Knockback.LocalizedObservable class) to bot
 
 ```coffeescript
 kb.observables(model, {
-  date:     {key:'date', write: true, localizer: (value) => return new LongDateLocalizer(value)}
+  date:     {key:'date', write: true, localizer: LongDateLocalizer}
 }, this)
 ```
 
@@ -146,11 +146,11 @@ If the model unloads, the default behavior is to retain the last value; however,
 Knockback.CollectionObservable
 ------------------------
 
-This takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "viewModelCreate: (model) -> return new myViewModel(model)" function which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
+This takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "view_model: MyViewModel" constructor which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
 
 ```coffeescript
 kb.collectionObservable(collection, view_models_array, {
-  viewModelCreate: (model) -> return new ContactViewModel(model)
+  view_model: ContactViewModel
 })
 ```
 
@@ -182,12 +182,12 @@ There are some other helpers for collection sync view models that you may find u
 
 You can subscribe for events on view models using Backbone.Events
 
-* **'add'**: (view_model, view_models_array) -> ... 
-or if batch, **'add'**: (view_models_array) -> ... 
-* **'resort'**: (view_model, view_models_array, new_index) -> ... 
-or if batch, **'resort'**: (view_models_array) -> ... 
-* **'remove'**: (view_model, view_models_array) -> ... 
-or if batch, **'remove'**: (view_models_array) -> ... 
+* **'add'**: (view_model, view_models_array) -> ...
+or if batch, **'add'**: (view_models_array) -> ...
+* **'resort'**: (view_model, view_models_array, new_index) -> ...
+or if batch, **'resort'**: (view_models_array) -> ...
+* **'remove'**: (view_model, view_models_array) -> ...
+or if batch, **'remove'**: (view_models_array) -> ...
 
 Knockback.localizedObservable
 -----------------------------

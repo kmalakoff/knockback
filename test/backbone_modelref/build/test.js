@@ -34,9 +34,7 @@ $(document).ready(function() {
           key: 'date',
           write: true,
           "default": this.loading_message,
-          localizer: function(value) {
-            return new LongDateLocalizer(value);
-          }
+          localizer: LongDateLocalizer
         }
       }, this);
       return this;

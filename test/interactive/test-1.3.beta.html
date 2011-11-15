@@ -100,7 +100,7 @@
       new_email:              ko.observable(''),
       new_date:               new LongDateLocalizer(new Date()),
       onAdd:  function()      {
-        collection.add({name: this.new_name(), email: this.new_email(), date: this.new_date.getObservedValue()});
+        collection.add({name: this.new_name(), email: this.new_email(), date: this.new_date.observedValue()});
         this.new_name(''); this.new_email(''); this.new_date(new Date());
       }
     };
@@ -126,11 +126,11 @@
       kb.observables(model, {
         name:           { key: 'name', write: true },
         email:          { key: 'email', write: true },
-        date:           { key: 'date', write: true, localizer: function(value) { return new LongDateLocalizer(value); } }
+        date:           { key: 'date', write: true, localizer: LongDateLocalizer }
       }, this);
     };
     var collection_observable = Knockback.collectionObservable(collection, view_model.contacts, {
-      viewModelCreate:  function(model)         { return new ContactViewModel(model); },
+      view_model:       ContactViewModel,
       sort_attribute:   'name',
       sortedIndex:      function(models, model) { return _.sortedIndex(models, model, function(test) { return test.get('name'); }); }
     });
