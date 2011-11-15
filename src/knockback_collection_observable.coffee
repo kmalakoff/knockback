@@ -60,8 +60,8 @@ class Knockback.CollectionObservable
     @_kb_collection.unbind(event, @_onModelRemove) for event in ['remove', 'destroy']
     @_kb_collection.unbind('change', @_onModelChanged)
     @_kb_collection.release() if @_kb_collection.release; @_kb_collection = null
+    @_kb_value_observable = null
     @_kb_observable.dispose(); @_kb_observable = null
-    @_kb_value_observable.dispose(); @_kb_value_observable = null
     @observable_array = null
     @options = null
 

@@ -15,6 +15,7 @@ SRC_DIRS = [
   'test/knockback_localized_observable/**/*.coffee',
   'test/knockback_observable/**/*.coffee',
   'test/knockback_observables/**/*.coffee',
+  'test/knockback_triggered_observable/**/*.coffee',
 ]
 
 in_build = false

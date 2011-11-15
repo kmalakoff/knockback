@@ -8,3 +8,4 @@ javascripts:
     - build/knockback_localized_observable.js
     - build/knockback_observable.js
     - build/knockback_observables.js
+    - build/knockback_triggered_observable.js

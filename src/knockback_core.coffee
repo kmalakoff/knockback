@@ -23,12 +23,12 @@ Knockback.locale_manager
 
 # helpers
 Knockback.wrappedObservable = (instance) ->
- throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable
- return instance._kb_observable
+  throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable
+  return instance._kb_observable
 
 Knockback.viewModelDestroyObservables = Knockback.vmDestroy = (view_model) ->
   for key, observable of view_model
     do (key, observable) ->
-      return if not observable or not (observable.__kb_owner or (observable instanceof kb.Observables) or (observable instanceof kb.CollectionObservable))
+      return if not observable or not ((ko.isObservable(observable) and observable.destroy) or (observable instanceof kb.Observables))
       observable.destroy(); view_model[key] = null
 

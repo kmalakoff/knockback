@@ -61,14 +61,15 @@ class Knockback.LocalizedObservable
 
   destroy: ->
     kb.locale_manager.unbind('change', @_onLocaleChange)
-    @_kb_observable.dispose(); @_kb_observable = null
     @_kb_value_observable = null
+    @_kb_observable.dispose(); @_kb_observable = null
     @options = {}
     @view_model = null
 
   setToDefault: ->
-    @_kb_value_observable(null) # force KO to think a change occurred
-    @_onSetValue(@_getDefaultValue())
+    current_value = @_kb_value_observable()
+    default_value = @_getDefaultValue()
+    if current_value != default_value then @_onSetValue(default_value) else @_kb_value_observable.valueHasMutated() # trigger the dependable
 
   resetToCurrent: ->
     @_kb_value_observable(null) # force KO to think a change occurred
