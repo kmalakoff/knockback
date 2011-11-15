@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.8.0
+  knockback.js 0.8.1
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.8.0';
+Knockback.VERSION = '0.8.1';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -31,10 +31,14 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_mode
   for (key in view_model) {
     observable = view_model[key];
     _results.push((function(key, observable) {
-      if (!observable || !((ko.isObservable(observable) && observable.destroy) || (observable instanceof kb.Observables))) {
+      if (!observable || !(ko.isObservable(observable) || (observable instanceof kb.Observables))) {
         return;
       }
-      observable.destroy();
+      if (observable.destroy) {
+        observable.destroy();
+      } else if (observable.dispose) {
+        observable.dispose();
+      }
       return view_model[key] = null;
     })(key, observable));
   }
