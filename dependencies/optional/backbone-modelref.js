@@ -80,6 +80,15 @@ Backbone.ModelRef = (function() {
     this.collection = null;
     return this;
   };
+  ModelRef.prototype.get = function(attribute_name) {
+    if (attribute_name !== 'id') {
+      throw new Error("Backbone.ModelRef.get(): only id is permitted");
+    }
+    if (this.cached_model && !this.cached_model.isNew()) {
+      this.model_id = this.cached_model.id;
+    }
+    return this.model_id;
+  };
   ModelRef.prototype.getModel = function() {
     if (this.cached_model && !this.cached_model.isNew()) {
       this.model_id = this.cached_model.id;
