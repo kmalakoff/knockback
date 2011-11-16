@@ -290,7 +290,7 @@
 
   // Use a comparator function to figure out at what index an object should
   // be inserted so as to maintain order. Uses binary search.
-  _.sorted_index = function(array, obj, iterator) {
+  _.sortedIndex = function(array, obj, iterator) {
     iterator || (iterator = _.identity);
     var low = 0, high = array.length;
     while (low < high) {
@@ -424,7 +424,7 @@
     if (array == null) return -1;
     var i, l;
     if (isSorted) {
-      i = _.sorted_index(array, item);
+      i = _.sortedIndex(array, item);
       return array[i] === item ? i : -1;
     }
     if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);

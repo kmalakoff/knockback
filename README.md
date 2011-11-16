@@ -168,7 +168,7 @@ or
 
 ```coffeescript
 collection_observable = kb.collectionObservable(collection, view_models_array, {
-  sorted_index:    (models, model) -> return _.sorted_index(models, model, (test) -> return test.get('first_name') + " " + test.get('last_name'))
+  sorted_index:    (models, model) -> return _.sortedIndex(models, model, (test) -> return test.get('first_name') + " " + test.get('last_name'))
 })
 ```
 

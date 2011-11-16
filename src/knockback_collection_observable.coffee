@@ -97,7 +97,7 @@ class Knockback.CollectionObservable
     return this
 
   sortAttribute: (sorted_index, sort_attribute, silent) -> return @sortedIndex(sort_attribute, sorted_index, silent)
-  _sortAttributeFn: (sort_attribute) -> return (models, model) -> _.sorted_index(models, model, (test) -> test.get(sort_attribute))
+  _sortAttributeFn: (sort_attribute) -> return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
   viewModelByModel: (model) ->
     throw new Error("CollectionObservable: cannot get a view model if vm_observable_array was not supplied") if not @vm_observable_array

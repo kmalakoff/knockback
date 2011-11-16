@@ -219,7 +219,7 @@ $(document).ready( ->
     equal(kb.vmModel(view_models_array()[0]).get('name'), 'Ringo', "Ringo is first - no sorting")
     equal(kb.vmModel(view_models_array()[1]).get('name'), 'George', "George is first - no sorting")
 
-    collection_observable.sortedIndex(((models, model) -> _.sorted_index(models, model, (test) -> test.get('name'))), 'name')
+    collection_observable.sortedIndex(((models, model) -> _.sortedIndex(models, model, (test) -> test.get('name'))), 'name')
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(kb.vmModel(view_models_array()[0]).get('name'), 'George', "George is first - sorting worked!")

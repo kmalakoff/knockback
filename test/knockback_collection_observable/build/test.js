@@ -304,7 +304,7 @@ $(document).ready(function() {
     equal(kb.vmModel(view_models_array()[0]).get('name'), 'Ringo', "Ringo is first - no sorting");
     equal(kb.vmModel(view_models_array()[1]).get('name'), 'George', "George is first - no sorting");
     collection_observable.sortedIndex((function(models, model) {
-      return _.sorted_index(models, model, function(test) {
+      return _.sortedIndex(models, model, function(test) {
         return test.get('name');
       });
     }), 'name');

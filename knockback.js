@@ -169,7 +169,7 @@ Knockback.CollectionObservable = (function() {
   };
   CollectionObservable.prototype._sortAttributeFn = function(sort_attribute) {
     return function(models, model) {
-      return _.sorted_index(models, model, function(test) {
+      return _.sortedIndex(models, model, function(test) {
         return test.get(sort_attribute);
       });
     };
