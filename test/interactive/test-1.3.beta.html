@@ -131,8 +131,7 @@
     };
     var collection_observable = Knockback.collectionObservable(collection, view_model.contacts, {
       view_model:       ContactViewModel,
-      sort_attribute:   'name',
-      sortedIndex:      function(models, model) { return _.sortedIndex(models, model, function(test) { return test.get('name'); }); }
+      sort_attribute:   'name'
     });
 
     ko.applyBindings(view_model);

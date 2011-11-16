@@ -587,7 +587,7 @@
       this._byId[model.id] = model;
       this._byCid[model.cid] = model;
       var index = options.at != null ? options.at :
-                  this.comparator ? this.sortedIndex(model, this.comparator) :
+                  this.comparator ? this.sorted_index(model, this.comparator) :
                   this.length;
       this.models.splice(index, 0, model);
       model.bind('all', this._onModelEvent);
@@ -640,7 +640,7 @@
   // Underscore methods that we want to implement on the Collection.
   var methods = ['forEach', 'each', 'map', 'reduce', 'reduceRight', 'find', 'detect',
     'filter', 'select', 'reject', 'every', 'all', 'some', 'any', 'include',
-    'contains', 'invoke', 'max', 'min', 'sortBy', 'sortedIndex', 'toArray', 'size',
+    'contains', 'invoke', 'max', 'min', 'sortBy', 'sorted_index', 'toArray', 'size',
     'first', 'rest', 'last', 'without', 'indexOf', 'lastIndexOf', 'isEmpty', 'groupBy'];
 
   // Mix in each Underscore method as a proxy to `Collection#models`.

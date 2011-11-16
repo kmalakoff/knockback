@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.9.0
+  knockback.js 0.10.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -15,7 +15,7 @@ throw new Error('Knockback: Dependency alert! Underscore.js must be included bef
 this.Knockback||this.Knockback={}; this.kb||this.kb=this.Knockback
 
 # Current version.
-Knockback.VERSION = '0.9.0'
+Knockback.VERSION = '0.10.0'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing

@@ -161,7 +161,14 @@ You can either have the collection sort for you (eg. using a Backbone.Collection
 ```coffeescript
 collection_observable = kb.collectionObservable(collection, view_models_array, {
   sort_attribute: 'name' # optimization to only refresh when this attribute changes
-  sortedIndex:    (models, model) -> return _.sortedIndex(models, model, (test) -> test.get('name'))
+})
+```
+
+or
+
+```coffeescript
+collection_observable = kb.collectionObservable(collection, view_models_array, {
+  sorted_index:    (models, model) -> return _.sorted_index(models, model, (test) -> return test.get('first_name') + " " + test.get('last_name'))
 })
 ```
 

@@ -9,10 +9,12 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 
 ####################################################
 # options
-#   sortedIndex: (models, model) -> return add_index. Optional hook for sorting a model.
+#   sorted_index: (models, model) -> return add_index. Optional hook for sorted_index a model.
 #     Default: the model's index in the collection is used.
+#     Setter: sorted_index: (sorted_index, sort_attribute) -> where sort_attribute is optional
 #   sort_attribute: attribute_name. An optimization to check if a specific attribute has changed.
 #     Default: resort on all changes to a model.
+#     Setter: sort_attribute: (sort_attribute, sorted_index) -> where sort_attribute is optional
 #
 # Optional: If you wish to create view models, you must supply a target observable array and this option:
 #   view_model: view_model_class
@@ -23,19 +25,20 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ####################################################
 
 class Knockback.CollectionObservable
-  constructor: (collection, @vm_observable_array, @options={}) ->
+  constructor: (collection, @vm_observable_array, options) ->
+    @options = if options then _.clone(options) else {}
     throw new Error('CollectionObservable: collection is missing') if not collection
     if @vm_observable_array or @options.view_model
       throw new Error('CollectionObservable: vm_observable_array is missing') if not @vm_observable_array
       throw new Error('CollectionObservable: options is missing') if not @options
       throw new Error('CollectionObservable: options.view_model is missing') if not @options.view_model
 
-    _.bindAll(this, 'destroy', 'collection', 'sorting', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger')
+    _.bindAll(this, 'destroy', 'collection', 'sortedIndex', 'sortAttribute', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger')
     _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged')
     @_kb_collection = collection
     @_kb_collection.retain() if @_kb_collection.retain
     @_kb_collection.bind('reset', @_onCollectionReset)
-    @_kb_collection.bind('resort', @_onCollectionResort) if not @options.sortedIndex
+    @_kb_collection.bind('resort', @_onCollectionResort) if not @options.sorted_index
     @_kb_collection.bind(event, @_onModelAdd) for event in ['new', 'add']
     @_kb_collection.bind(event, @_onModelRemove) for event in ['remove', 'destroy']
     @_kb_collection.bind('change', @_onModelChanged)
@@ -50,20 +53,21 @@ class Knockback.CollectionObservable
     @_kb_observable.collection = @collection
     @_kb_observable.viewModelByModel = @viewModelByModel
     @_kb_observable.eachViewModel = @eachViewModel
-    @_kb_observable.sorting = @sorting
+    @_kb_observable.sortedIndex = @sortedIndex
+    @_kb_observable.sortAttribute = @sortAttribute
     # Backbone.Event interface
     @_kb_observable.bind = @bind
     @_kb_observable.unbind = @unbind
     @_kb_observable.trigger = @trigger
 
     # start
-    @_collectionResync()
+    @sortedIndex(@options.sorted_index, @options.sort_attribute, true)
 
     return kb.wrappedObservable(this)
 
   destroy: ->
     @_kb_collection.unbind('reset', @_onCollectionReset)
-    @_kb_collection.unbind('resort', @_onCollectionResort) if not @options.sortedIndex
+    @_kb_collection.unbind('resort', @_onCollectionResort) if not @options.sorted_index
     @_kb_collection.unbind(event, @_onModelAdd) for event in ['new', 'add']
     @_kb_collection.unbind(event, @_onModelRemove) for event in ['remove', 'destroy']
     @_kb_collection.unbind('change', @_onModelChanged)
@@ -77,12 +81,23 @@ class Knockback.CollectionObservable
     @_kb_value_observable() # force a dependency
     return @_kb_collection
 
-  sorting: (sortedIndex, sort_attribute) ->
-    return {sortedIndex: @options.sortedIndex, sort_attribute: @options.sort_attribute} if arguments.length == 0
-    @options.sort_attribute = sort_attribute
-    @options.sortedIndex = sortedIndex
+  sortedIndex: (sorted_index, sort_attribute, silent) ->
+    if sorted_index
+      @options.sorted_index = sorted_index
+      @options.sort_attribute = sort_attribute
+    else if @options.sort_attribute
+      @options.sort_attribute = sort_attribute
+      @options.sorted_index = @_sortAttributeFn(sort_attribute)
+    else
+      @options.sort_attribute = null
+      @options.sorted_index = null
+
     @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
-    @trigger('resort', @vm_observable_array()) # notify
+    @trigger('resort', @vm_observable_array()) if not silent # notify
+    return this
+
+  sortAttribute: (sorted_index, sort_attribute, silent) -> return @sortedIndex(sort_attribute, sorted_index, silent)
+  _sortAttributeFn: (sort_attribute) -> return (models, model) -> _.sorted_index(models, model, (test) -> test.get(sort_attribute))
 
   viewModelByModel: (model) ->
     throw new Error("CollectionObservable: cannot get a view model if vm_observable_array was not supplied") if not @vm_observable_array
@@ -98,17 +113,17 @@ class Knockback.CollectionObservable
   _onCollectionReset: -> @_collectionResync()
 
   _onCollectionResort: (model_or_models) ->
-    throw new Error("CollectionObservable: collection sorting unexpected") if @options.sortedIndex
+    throw new Error("CollectionObservable: collection sorted_index unexpected") if @options.sorted_index
     if _.isArray(model_or_models)
-      @_collectionResync(true) # TODO optimized with incremental resorting
+      @_collectionResync(true) # TODO optimized with incremental resorted_index
       @trigger('resort', @vm_observable_array()) # notify
     else
       @_onModelResort(model_or_models)
 
   _onModelAdd: (model) ->
-    if @options.sortedIndex
+    if @options.sorted_index
       sorted_models = _.pluck(@vm_observable_array(), '__kb_model')
-      add_index = @options.sortedIndex(sorted_models, model)
+      add_index = @options.sorted_index(sorted_models, model)
     else
       add_index = @_kb_collection.indexOf(model)
 
@@ -134,17 +149,17 @@ class Knockback.CollectionObservable
       view_model.__kb_model = null
 
   _onModelChanged: (model) ->
-    # sorting required
-    if @options.sortedIndex and (not @options.sort_attribute or model.hasChanged(@options.sort_attribute))
+    # sorted_index required
+    if @options.sorted_index and (not @options.sort_attribute or model.hasChanged(@options.sort_attribute))
       @_onModelResort(model)
     @_kb_value_observable.valueHasMutated()
 
   _onModelResort: (model) ->
     previous_index = @_kb_value_observable.indexOf(model)
-    if @options.sortedIndex
+    if @options.sorted_index
       sorted_models = _.clone(@_kb_value_observable())
       sorted_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
-      new_index = @options.sortedIndex(sorted_models, model)
+      new_index = @options.sorted_index(sorted_models, model)
     else
       new_index = @_kb_collection.indexOf(model)
     return if previous_index == new_index # no change
@@ -158,19 +173,19 @@ class Knockback.CollectionObservable
     if @vm_observable_array
       @trigger('resort', view_model, @vm_observable_array(), new_index) # notify
 
-  _collectionResync: (skip_notifications) ->
+  _collectionResync: (silent) ->
     if @vm_observable_array
-      @trigger('remove', @vm_observable_array()) if not skip_notifications # notify
+      @trigger('remove', @vm_observable_array()) if not silent # notify
       view_models = @vm_observable_array.removeAll() # batch
       kb.vmDestroy(view_model) for view_model in view_models
 
     @_kb_value_observable.removeAll()
 
-    if @options.sortedIndex
+    if @options.sorted_index
       models = []
       for model in @_kb_collection.models
         do (model) =>
-          add_index = @options.sortedIndex(models, model)
+          add_index = @options.sorted_index(models, model)
           models.splice(add_index, 0, model)
     else
       models = _.clone(@_kb_collection.models)
@@ -183,7 +198,7 @@ class Knockback.CollectionObservable
     @_kb_value_observable(models)
 
     if @vm_observable_array
-      @trigger('add', @vm_observable_array()) if not skip_notifications # notify
+      @trigger('add', @vm_observable_array()) if not silent # notify
 
   _viewModelCreate: (model) ->
     view_model = new @options.view_model(model)

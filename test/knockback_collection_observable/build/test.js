@@ -134,12 +134,7 @@ $(document).ready(function() {
     view_model_resort_count = 0;
     collection_observable = kb.collectionObservable(collection, view_models_array, {
       view_model: ContactViewModel,
-      sort_attribute: 'name',
-      sortedIndex: function(models, model) {
-        return _.sortedIndex(models, model, function(test) {
-          return test.get('name');
-        });
-      }
+      sort_attribute: 'name'
     });
     collection_observable.bind('add', function(view_model, view_models_array_array) {
       if (_.isArray(view_model)) {
@@ -308,8 +303,8 @@ $(document).ready(function() {
     equal(view_models_array().length, 2, "two view models");
     equal(kb.vmModel(view_models_array()[0]).get('name'), 'Ringo', "Ringo is first - no sorting");
     equal(kb.vmModel(view_models_array()[1]).get('name'), 'George', "George is first - no sorting");
-    collection_observable.sorting((function(models, model) {
-      return _.sortedIndex(models, model, function(test) {
+    collection_observable.sortedIndex((function(models, model) {
+      return _.sorted_index(models, model, function(test) {
         return test.get('name');
       });
     }), 'name');
@@ -330,22 +325,14 @@ $(document).ready(function() {
     equal(kb.vmModel(view_models_array()[0]).get('name'), 'George', "George is first - sorting worked!");
     equal(kb.vmModel(view_models_array()[1]).get('name'), 'Paul', "Paul is second - sorting worked!");
     equal(kb.vmModel(view_models_array()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!");
-    collection_observable.sorting(function(models, model) {
-      return _.sortedIndex(models, model, function(test) {
-        return test.get('number');
-      });
-    });
+    collection_observable.sortAttribute('number');
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first");
     equal(collection.models[1].get('name'), 'George', "George is second");
     equal(collection.models[2].get('name'), 'Paul', "Paul is second");
     equal(kb.vmModel(view_models_array()[0]).get('name'), 'Paul', "Paul is first - sorting worked!");
     equal(kb.vmModel(view_models_array()[1]).get('name'), 'George', "Paul is second - sorting worked!");
     equal(kb.vmModel(view_models_array()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!");
-    collection_observable.sorting((function(models, model) {
-      return _.sortedIndex(models, model, function(test) {
-        return test.get('name');
-      });
-    }));
+    collection_observable.sortAttribute('name');
     collection.remove('b2').remove('b3');
     equal(collection.length, 1, "one models");
     equal(view_models_array().length, 1, "one view models");
