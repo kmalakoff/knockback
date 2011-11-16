@@ -85,7 +85,7 @@ class Knockback.CollectionObservable
     if sorted_index
       @options.sorted_index = sorted_index
       @options.sort_attribute = sort_attribute
-    else if @options.sort_attribute
+    else if sort_attribute
       @options.sort_attribute = sort_attribute
       @options.sorted_index = @_sortAttributeFn(sort_attribute)
     else
@@ -96,7 +96,7 @@ class Knockback.CollectionObservable
     @trigger('resort', @vm_observable_array()) if not silent # notify
     return this
 
-  sortAttribute: (sorted_index, sort_attribute, silent) -> return @sortedIndex(sort_attribute, sorted_index, silent)
+  sortAttribute: (sort_attribute, sorted_index, silent) -> return @sortedIndex(sorted_index, sort_attribute, silent)
   _sortAttributeFn: (sort_attribute) -> return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
   viewModelByModel: (model) ->

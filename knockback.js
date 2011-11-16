@@ -151,7 +151,7 @@ Knockback.CollectionObservable = (function() {
     if (sorted_index) {
       this.options.sorted_index = sorted_index;
       this.options.sort_attribute = sort_attribute;
-    } else if (this.options.sort_attribute) {
+    } else if (sort_attribute) {
       this.options.sort_attribute = sort_attribute;
       this.options.sorted_index = this._sortAttributeFn(sort_attribute);
     } else {
@@ -164,8 +164,8 @@ Knockback.CollectionObservable = (function() {
     }
     return this;
   };
-  CollectionObservable.prototype.sortAttribute = function(sorted_index, sort_attribute, silent) {
-    return this.sortedIndex(sort_attribute, sorted_index, silent);
+  CollectionObservable.prototype.sortAttribute = function(sort_attribute, sorted_index, silent) {
+    return this.sortedIndex(sorted_index, sort_attribute, silent);
   };
   CollectionObservable.prototype._sortAttributeFn = function(sort_attribute) {
     return function(models, model) {
