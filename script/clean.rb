@@ -15,6 +15,7 @@ CLEAN_PATTERNS = [
   'test/knockback_observable/build/**.js',
   'test/knockback_observables/build/**.js',
   'test/knockback_triggered_observable/build/**.js',
+  'test/knockback_view_model/build/**.js'
 ]
 
 CLEAN_PATTERNS.each do |pattern|

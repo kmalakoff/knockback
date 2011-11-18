@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.10.0
+  knockback.js 0.11.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -15,7 +15,7 @@ throw new Error('Knockback: Dependency alert! Underscore.js must be included bef
 this.Knockback||this.Knockback={}; this.kb||this.kb=this.Knockback
 
 # Current version.
-Knockback.VERSION = '0.10.0'
+Knockback.VERSION = '0.11.0'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
@@ -26,9 +26,14 @@ Knockback.wrappedObservable = (instance) ->
   throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable
   return instance._kb_observable
 
-Knockback.viewModelDestroyObservables = Knockback.vmDestroy = (view_model) ->
+Knockback.vmRelease = (view_model) ->
+  (view_model.release(); return) if (view_model instanceof kb.ViewModel)
+  Knockback.vmDestroyObservables(view_model)
+
+Knockback.vmDestroyObservables = (view_model, keys) ->
   for key, observable of view_model
     do (key, observable) ->
+      return if keys and not _.contains(keys, key) # skip
       return if not observable or not (ko.isObservable(observable) or (observable instanceof kb.Observables))
       if observable.destroy
         observable.destroy()
@@ -36,3 +41,15 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = (view_model) ->
         observable.dispose()
       view_model[key] = null
 
+Knockback.attributeConnector = (model, key, read_only) ->
+  result = ko.observable(model.get(key))
+  result.subscription = result.subscribe((value) ->
+    if read_only
+      value = model.get(key)
+      return if result() == value
+      result(value)
+      throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters."
+    set_info = {}; set_info[key] = value
+    model.set(set_info)
+  )
+  return result

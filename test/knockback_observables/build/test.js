@@ -67,7 +67,7 @@ $(document).ready(function() {
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
     equal(current_date.getDate(), 10, "day is good");
-    return kb.vmDestroy(view_model);
+    return kb.vmRelease(view_model);
   });
   return test("Error cases", function() {});
 });

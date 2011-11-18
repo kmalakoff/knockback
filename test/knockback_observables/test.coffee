@@ -53,8 +53,8 @@ $(document).ready( ->
     equal(current_date.getMonth(), 10, "month is good")
     equal(current_date.getDate(), 10, "day is good")
 
-    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
-    kb.vmDestroy(view_model)
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
   )
 
   test("Error cases", ->

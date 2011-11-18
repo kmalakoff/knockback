@@ -89,7 +89,7 @@ $(document).ready(function() {
     Knockback.locale_manager.setLocale('fr-FR');
     equal(view_model.hello(), 'Bonjour', "fr-FR: Hello");
     equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye");
-    return kb.vmDestroy(view_model);
+    return kb.vmRelease(view_model);
   });
   LongDateLocalizer = (function() {
     __extends(LongDateLocalizer, kb.LocalizedObservable);
@@ -143,7 +143,7 @@ $(document).ready(function() {
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
     equal(current_date.getDate(), 10, "day is good");
-    return kb.vmDestroy(view_model);
+    return kb.vmRelease(view_model);
   });
   return test("Error cases", function() {});
 });

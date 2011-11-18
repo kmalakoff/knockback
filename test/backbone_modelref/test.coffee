@@ -80,7 +80,7 @@ $(document).ready( ->
     kb.locale_manager.setLocale('fr-FR')
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
-    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
-    kb.vmDestroy(view_model)
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
   )
 )

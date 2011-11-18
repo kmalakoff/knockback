@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.10.0
+  knockback.js 0.11.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.10.0';
+Knockback.VERSION = '0.11.0';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -25,12 +25,22 @@ Knockback.wrappedObservable = function(instance) {
   }
   return instance._kb_observable;
 };
-Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_model) {
+Knockback.vmRelease = function(view_model) {
+  if (view_model instanceof kb.ViewModel) {
+    view_model.release();
+    return;
+  }
+  return Knockback.vmDestroyObservables(view_model);
+};
+Knockback.vmDestroyObservables = function(view_model, keys) {
   var key, observable, _results;
   _results = [];
   for (key in view_model) {
     observable = view_model[key];
     _results.push((function(key, observable) {
+      if (keys && !_.contains(keys, key)) {
+        return;
+      }
       if (!observable || !(ko.isObservable(observable) || (observable instanceof kb.Observables))) {
         return;
       }
@@ -43,6 +53,25 @@ Knockback.viewModelDestroyObservables = Knockback.vmDestroy = function(view_mode
     })(key, observable));
   }
   return _results;
+};
+Knockback.attributeConnector = function(model, key, read_only) {
+  var result;
+  result = ko.observable(model.get(key));
+  result.subscription = result.subscribe(function(value) {
+    var set_info;
+    if (read_only) {
+      value = model.get(key);
+      if (result() === value) {
+        return;
+      }
+      result(value);
+      throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.";
+    }
+    set_info = {};
+    set_info[key] = value;
+    return model.set(set_info);
+  });
+  return result;
 };
 /*
   knockback_collection_observable.js
@@ -76,9 +105,6 @@ Knockback.CollectionObservable = (function() {
       }
       if (!this.options) {
         throw new Error('CollectionObservable: options is missing');
-      }
-      if (!this.options.view_model) {
-        throw new Error('CollectionObservable: options.view_model is missing');
       }
     }
     _.bindAll(this, 'destroy', 'collection', 'sortedIndex', 'sortAttribute', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger');
@@ -238,7 +264,7 @@ Knockback.CollectionObservable = (function() {
       }
       this.vm_observable_array.remove(view_model);
       this.trigger('remove', view_model, this.vm_observable_array());
-      kb.vmDestroy(view_model);
+      kb.vmRelease(view_model);
       return view_model.__kb_model = null;
     }
   };
@@ -282,7 +308,7 @@ Knockback.CollectionObservable = (function() {
       _results = [];
       for (_i = 0, _len = view_models.length; _i < _len; _i++) {
         view_model = view_models[_i];
-        _results.push(kb.vmDestroy(view_model));
+        _results.push(kb.vmRelease(view_model));
       }
       return _results;
     }
@@ -323,7 +349,7 @@ Knockback.CollectionObservable = (function() {
   };
   CollectionObservable.prototype._viewModelCreate = function(model) {
     var view_model;
-    view_model = new this.options.view_model(model);
+    view_model = this.options.view_model ? new this.options.view_model(model) : kb.viewModel(model);
     view_model.__kb_model = model;
     return view_model;
   };
@@ -768,4 +794,84 @@ Knockback.TriggeredObservable = (function() {
 })();
 Knockback.triggeredObservable = function(model, event_name) {
   return new Knockback.TriggeredObservable(model, event_name);
+};
+/*
+  knockback_view_model.js
+  (c) 2011 Kevin Malakoff.
+  Knockback.Observable is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+*/if (!this.Knockback) {
+  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
+}
+Knockback.ViewModel = (function() {
+  function ViewModel(model, options, view_model) {
+    var key;
+    this.model = model;
+    this.options = options != null ? options : {};
+    this.view_model = view_model;
+    this.ref_count = 1;
+    if (!this.model) {
+      throw new Error('ViewModel: model is missing');
+    }
+    if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
+      throw new Error('ViewModel: model cannot be a Backbone.ModelRef because the atrributes may not be laoded');
+    }
+    _.bindAll(this, '_onModelChange');
+    this.model.bind('change', this._onModelChange);
+    if (!this.view_model) {
+      this.view_model = this;
+    }
+    for (key in this.model.attributes) {
+      this._updateAttributeObservor(this.model, key);
+    }
+  }
+  ViewModel.prototype._destroy = function() {
+    kb.vmDestroyObservables(this.view_model, this.view_model !== this ? _.keys(this.model.attributes) : void 0);
+    this.view_model = null;
+    this.model.unbind('change', this._onModelChange);
+    return this.model = null;
+  };
+  ViewModel.prototype.retain = function() {
+    if (this.ref_count <= 0) {
+      throw new Error("ViewModel: ref_count is corrupt: " + this.ref_count);
+    }
+    this.ref_count++;
+    return this;
+  };
+  ViewModel.prototype.release = function() {
+    if (this.ref_count <= 0) {
+      throw new Error("ViewModel: ref_count is corrupt: " + this.ref_count);
+    }
+    this.ref_count--;
+    if (this.ref_count === 0) {
+      this._destroy(this);
+    }
+    return this;
+  };
+  ViewModel.prototype.refCount = function() {
+    return this.ref_count;
+  };
+  ViewModel.prototype._onModelChange = function() {
+    var key, _results;
+    if (!this.model._changed) {
+      return;
+    }
+    _results = [];
+    for (key in this.model.attributes) {
+      _results.push((this.model.hasChanged(key) ? this._updateAttributeObservor(this.model, key) : void 0));
+    }
+    return _results;
+  };
+  ViewModel.prototype._updateAttributeObservor = function(model, key) {
+    if (this.view_model.hasOwnProperty(key)) {
+      return this.view_model[key](model.get(key));
+    } else {
+      return this.view_model[key] = kb.attributeConnector(model, key, this.options.read_only);
+    }
+  };
+  return ViewModel;
+})();
+Knockback.viewModel = function(model, options, view_model) {
+  return new Knockback.ViewModel(model, options, view_model);
 };

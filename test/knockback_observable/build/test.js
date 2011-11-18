@@ -38,7 +38,7 @@ $(document).ready(function() {
     });
     equal(view_model.name(), 'Starr', "Name changed");
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
-    return kb.vmDestroy(view_model);
+    return kb.vmRelease(view_model);
   });
   test("Standard use case: direct attributes with custom read and write", function() {
     var ContactViewModelCustom, model, view_model;
@@ -83,7 +83,54 @@ $(document).ready(function() {
     });
     equal(view_model.name(), 'First: Starr', "Name changed");
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed");
-    return kb.vmDestroy(view_model);
+    return kb.vmRelease(view_model);
+  });
+  test("Using in conjunction with kb.viewModel", function() {
+    var ContactViewModelCustom, model, view_model;
+    ContactViewModelCustom = function(model) {
+      var view_model;
+      view_model = kb.viewModel(model);
+      view_model.formatted_name = kb.observable(model, {
+        key: 'name',
+        read: function() {
+          return "First: " + (model.get('name'));
+        }
+      });
+      view_model.formatted_number = kb.observable(model, {
+        key: 'number',
+        read: function() {
+          return "#: " + (model.get('number'));
+        },
+        write: function(value) {
+          return model.set({
+            number: value.substring(3)
+          });
+        }
+      }, view_model);
+      return view_model;
+    };
+    model = new Contact({
+      name: 'Ringo',
+      number: '555-555-5556'
+    });
+    view_model = new ContactViewModelCustom(model);
+    equal(view_model.name(), 'Ringo', "Interesting name");
+    equal(view_model.formatted_name(), 'First: Ringo', "Interesting name");
+    equal(view_model.number(), '555-555-5556', "Not so interesting number");
+    equal(view_model.formatted_number(), '#: 555-555-5556', "Not so interesting number");
+    view_model.formatted_number('#: 9222-222-222');
+    equal(model.get('number'), '9222-222-222', "Number was changed");
+    equal(view_model.number(), '9222-222-222', "Number was changed");
+    equal(view_model.formatted_number(), '#: 9222-222-222', "Number was changed");
+    model.set({
+      name: 'Starr',
+      number: 'XXX-XXX-XXXX'
+    });
+    equal(view_model.name(), 'Starr', "Name changed");
+    equal(view_model.formatted_name(), 'First: Starr', "Name changed");
+    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
+    equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed");
+    return kb.vmRelease(view_model);
   });
   return test("Error cases", function() {});
 });

@@ -31,8 +31,8 @@ $(document).ready( ->
     kb.locale_manager.setLocale('fr-FR')
     equal(trigger_count, 3, "3: changed")
 
-    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
-    kb.vmDestroy(view_model)
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
 
     # KO doesn't have a dispose for ko.observable
     kb.locale_manager.setLocale('fr-FR')

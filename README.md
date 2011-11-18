@@ -73,8 +73,8 @@ ko.applyBindings(view_model)
 
 # ...
 
-# and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
-kb.vmDestroy(view_model)
+# and cleanup after yourself when you are done.
+kb.vmRelease(view_model)
 ```
 
 And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
@@ -143,7 +143,7 @@ You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Ba
 If the model unloads, the default behavior is to retain the last value; however, if you want to restore the default values, you can call setToDefault on either Knockback.observables or Knockback.observable, and they will restore the defaults. The assumption is that normally, keeping the old values is a desired behavior.
 
 
-Knockback.CollectionObservable
+Knockback.collectionObservable
 ------------------------
 
 This takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "view_model: MyViewModel" constructor which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
@@ -153,6 +153,7 @@ kb.collectionObservable(collection, view_models_array, {
   view_model: ContactViewModel
 })
 ```
+**Note:** view_model is optional. If it is not supplied, a default view model with read and write observables will be created for all of the attributes in your model (see kb.viewModel).
 
 ### Note 1
 
@@ -217,12 +218,45 @@ This looks like it returns an instance but it actually returns a ko.dependentObs
 
 If you use these localization helpers, you need to implement a kb.locale_manager.  As mentioned in 1) Note 1....you can watch a non-BackboneModel as long as it: a) mixes in Backbone.Events and triggers 'change' events and b) implements `get: (attribute_name) -> ... ` and which is a minimal Backbone.Model interface... this is just what a Backbone.locale_manager is. Pretty clever, eh?
 
+Knockback.viewModel
+-------------------
+
+Although they are only useful for a subset of scenarios, you can automatically create a view model for all of attributes for your model.
+
+Read write observables for each attribute:
+```coffeescript
+model = new Contact({name: 'Ringo', number: '555-555-5556'})
+view_model = kb.viewModel(model)
+...
+kb.vmRelease(view_model)
+```
+
+Read only observables for each attribute:
+```coffeescript
+model = new Contact({name: 'Ringo', number: '555-555-5556'})
+view_model = kb.viewModel(model, {read_only: true})
+...
+kb.vmRelease(view_model)
+```
+
+Dynamically create the observables in an external view model
+```coffeescript
+model = new Contact({name: 'Ringo', number: '555-555-5556'})
+view_model = {
+  something: ko.observable('foo')
+}
+view_model_instance = kb.viewModel(model, {}, view_model)
+...
+kb.vmRelease(view_model_instance)
+kb.vmRelease(view_model)
+```
+
 
 Final notes
 -----------
 
 * Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
-    -> Use the helper function: kb.vmDestroy() to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
+    -> Use the helper function: kb.vmRelease() to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
     -> I'm hoping to change this: https://github.com/kmalakoff/knockback/issues/2
 
 * Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)

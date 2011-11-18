@@ -31,7 +31,6 @@ class Knockback.CollectionObservable
     if @vm_observable_array or @options.view_model
       throw new Error('CollectionObservable: vm_observable_array is missing') if not @vm_observable_array
       throw new Error('CollectionObservable: options is missing') if not @options
-      throw new Error('CollectionObservable: options.view_model is missing') if not @options.view_model
 
     _.bindAll(this, 'destroy', 'collection', 'sortedIndex', 'sortAttribute', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger')
     _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged')
@@ -145,7 +144,7 @@ class Knockback.CollectionObservable
 
       @trigger('remove', view_model, @vm_observable_array()) # notify
 
-      kb.vmDestroy(view_model)
+      kb.vmRelease(view_model)
       view_model.__kb_model = null
 
   _onModelChanged: (model) ->
@@ -177,7 +176,7 @@ class Knockback.CollectionObservable
     if @vm_observable_array
       @trigger('remove', @vm_observable_array()) if not silent # notify
       view_models = @vm_observable_array.removeAll() # batch
-      kb.vmDestroy(view_model) for view_model in view_models
+      kb.vmRelease(view_model) for view_model in view_models
 
   _collectionResync: (silent) ->
     @_clearViewModels(silent)
@@ -203,7 +202,7 @@ class Knockback.CollectionObservable
       @trigger('add', @vm_observable_array()) if not silent # notify
 
   _viewModelCreate: (model) ->
-    view_model = new @options.view_model(model)
+    view_model = if @options.view_model then new @options.view_model(model) else kb.viewModel(model)
     view_model.__kb_model = model
     return view_model
 

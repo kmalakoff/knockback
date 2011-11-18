@@ -23,3 +23,4 @@ PROJECT_ROOT = File.expand_path('../..', __FILE__)
 `cd #{PROJECT_ROOT}; coffee -b -o test/knockback_observable/build -c test/knockback_observable`
 `cd #{PROJECT_ROOT}; coffee -b -o test/knockback_observables/build -c test/knockback_observables`
 `cd #{PROJECT_ROOT}; coffee -b -o test/knockback_triggered_observable/build -c test/knockback_triggered_observable`
+`cd #{PROJECT_ROOT}; coffee -b -o test/knockback_view_model/build -c test/knockback_view_model`

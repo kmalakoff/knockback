@@ -30,8 +30,8 @@ $(document).ready( ->
     equal(view_model.name(), 'Starr', "Name changed")
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
 
-    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
-    kb.vmDestroy(view_model)
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
   )
 
   test("Standard use case: direct attributes with custom read and write", ->
@@ -64,8 +64,45 @@ $(document).ready( ->
     equal(view_model.name(), 'First: Starr', "Name changed")
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
 
-    # and cleanup after yourself when you are done. We'll try to get rid of this step: https://github.com/kmalakoff/knockback/issues/2
-    kb.vmDestroy(view_model)
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
+  )
+
+  test("Using in conjunction with kb.viewModel", ->
+    ContactViewModelCustom = (model) ->
+      view_model = kb.viewModel(model)
+      view_model.formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+      view_model.formatted_number = kb.observable(model, {
+        key:'number'
+        read: -> return "#: #{model.get('number')}"
+        write: (value) -> model.set({number: value.substring(3)})
+      }, view_model)
+      return view_model
+
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    view_model = new ContactViewModelCustom(model)
+
+    # get
+    equal(view_model.name(), 'Ringo', "Interesting name")
+    equal(view_model.formatted_name(), 'First: Ringo', "Interesting name")
+    equal(view_model.number(), '555-555-5556', "Not so interesting number")
+    equal(view_model.formatted_number(), '#: 555-555-5556', "Not so interesting number")
+
+    # set from the view model
+    view_model.formatted_number('#: 9222-222-222')
+    equal(model.get('number'), '9222-222-222', "Number was changed")
+    equal(view_model.number(), '9222-222-222', "Number was changed")
+    equal(view_model.formatted_number(), '#: 9222-222-222', "Number was changed")
+
+    # set from the model
+    model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
+    equal(view_model.name(), 'Starr', "Name changed")
+    equal(view_model.formatted_name(), 'First: Starr', "Name changed")
+    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
+    equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed")
+
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
   )
 
   test("Error cases", ->

@@ -100,6 +100,6 @@ $(document).ready(function() {
     equal(view_model.name(), 'Loading sir', "Maybe too formal");
     kb.locale_manager.setLocale('fr-FR');
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
-    return kb.vmDestroy(view_model);
+    return kb.vmRelease(view_model);
   });
 });
