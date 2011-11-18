@@ -104,7 +104,7 @@ class Knockback.Observable
     @model = null
 
   _onValueChange: ->
-    return if not (@model and @model.hasChanged and @model.hasChanged(@options.key)) # no change, nothing to do
+    return if (@model and @model.hasChanged) and not @model.hasChanged(@options.key) # no change, nothing to do
     @_updateValue()
 
   _updateValue: ->

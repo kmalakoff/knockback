@@ -607,7 +607,7 @@ Knockback.Observable = (function() {
     return this.model = null;
   };
   Observable.prototype._onValueChange = function() {
-    if (!(this.model && this.model.hasChanged && this.model.hasChanged(this.options.key))) {
+    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(this.options.key)) {
       return;
     }
     return this._updateValue();
