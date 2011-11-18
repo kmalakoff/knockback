@@ -96,7 +96,7 @@ class Knockback.Observable
   _onModelLoaded: (model) ->
     @model = model
     @model.bind('change', @_onValueChange) # all attributes if it is manually triggered
-    @_onValueChange()
+    @_updateValue()
 
   _onModelUnloaded: (model) ->
     (@_kb_localizer.destroy(); @_kb_localizer = null) if @_kb_localizer and @_kb_localizer.destroy
@@ -104,6 +104,10 @@ class Knockback.Observable
     @model = null
 
   _onValueChange: ->
+    return if not (@model and @model.hasChanged and @model.hasChanged(@options.key)) # no change, nothing to do
+    @_updateValue()
+
+  _updateValue: ->
     value = @_getCurrentValue()
     if @_kb_localizer
       @_kb_localizer.observedValue(value)
