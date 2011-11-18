@@ -118,7 +118,7 @@ Knockback.CollectionObservable = (function() {
   }
   CollectionObservable.prototype.destroy = function() {
     var event, _i, _j, _len, _len2, _ref, _ref2;
-    this._clearViewModels(silent);
+    this._clearViewModels();
     this._kb_collection.unbind('reset', this._onCollectionReset);
     if (!this.options.sorted_index) {
       this._kb_collection.unbind('resort', this._onCollectionResort);

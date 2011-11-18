@@ -66,7 +66,7 @@ class Knockback.CollectionObservable
     return kb.wrappedObservable(this)
 
   destroy: ->
-    @_clearViewModels(silent)
+    @_clearViewModels()
     @_kb_collection.unbind('reset', @_onCollectionReset)
     @_kb_collection.unbind('resort', @_onCollectionResort) if not @options.sorted_index
     @_kb_collection.unbind(event, @_onModelAdd) for event in ['new', 'add']
