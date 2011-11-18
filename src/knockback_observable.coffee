@@ -93,15 +93,15 @@ class Knockback.Observable
       if _.isFunction(@options.write) then @options.write.apply(@view_model, [value, @model, set_info]) else @model.set(set_info)
     if @_kb_localizer then @_kb_value_observable(@_kb_localizer()) else @_kb_value_observable(value) # trigger the dependable and store the correct value
 
-  _onModelLoaded:   (model) ->
+  _onModelLoaded: (model) ->
     @model = model
-    @model.bind('change', @_onValueChange) # all attributes
+    @model.bind('change', @_onValueChange) # all attributes if it is manually triggered
     @model.bind("change:#{@options.key}", @_onValueChange)
     @_onValueChange()
 
-  _onModelUnloaded: ->
+  _onModelUnloaded: (model) ->
     (@_kb_localizer.destroy(); @_kb_localizer = null) if @_kb_localizer and @_kb_localizer.destroy
-    @model.unbind('change', @_onValueChange) # all attributes
+    @model.unbind('change', @_onValueChange) # all attributes if it is manually triggered
     @model.unbind("change:#{@options.key}", @_onValueChange)
     @model = null
 
