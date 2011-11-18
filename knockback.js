@@ -596,7 +596,6 @@ Knockback.Observable = (function() {
   Observable.prototype._onModelLoaded = function(model) {
     this.model = model;
     this.model.bind('change', this._onValueChange);
-    this.model.bind("change:" + this.options.key, this._onValueChange);
     return this._onValueChange();
   };
   Observable.prototype._onModelUnloaded = function(model) {
@@ -605,7 +604,6 @@ Knockback.Observable = (function() {
       this._kb_localizer = null;
     }
     this.model.unbind('change', this._onValueChange);
-    this.model.unbind("change:" + this.options.key, this._onValueChange);
     return this.model = null;
   };
   Observable.prototype._onValueChange = function() {

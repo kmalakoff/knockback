@@ -96,13 +96,11 @@ class Knockback.Observable
   _onModelLoaded: (model) ->
     @model = model
     @model.bind('change', @_onValueChange) # all attributes if it is manually triggered
-    @model.bind("change:#{@options.key}", @_onValueChange)
     @_onValueChange()
 
   _onModelUnloaded: (model) ->
     (@_kb_localizer.destroy(); @_kb_localizer = null) if @_kb_localizer and @_kb_localizer.destroy
     @model.unbind('change', @_onValueChange) # all attributes if it is manually triggered
-    @model.unbind("change:#{@options.key}", @_onValueChange)
     @model = null
 
   _onValueChange: ->
