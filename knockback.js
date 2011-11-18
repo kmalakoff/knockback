@@ -118,6 +118,7 @@ Knockback.CollectionObservable = (function() {
   }
   CollectionObservable.prototype.destroy = function() {
     var event, _i, _j, _len, _len2, _ref, _ref2;
+    this._clearViewModels(silent);
     this._kb_collection.unbind('reset', this._onCollectionReset);
     if (!this.options.sorted_index) {
       this._kb_collection.unbind('resort', this._onCollectionResort);
@@ -140,7 +141,6 @@ Knockback.CollectionObservable = (function() {
     this._kb_value_observable = null;
     this._kb_observable.dispose();
     this._kb_observable = null;
-    this.vm_observable_array = null;
     return this.options = null;
   };
   CollectionObservable.prototype.collection = function() {
@@ -272,18 +272,24 @@ Knockback.CollectionObservable = (function() {
       return this.trigger('resort', view_model, this.vm_observable_array(), new_index);
     }
   };
-  CollectionObservable.prototype._collectionResync = function(silent) {
-    var model, models, view_model, view_models, _fn, _i, _j, _k, _len, _len2, _len3, _ref;
+  CollectionObservable.prototype._clearViewModels = function(silent) {
+    var view_model, view_models, _i, _len, _results;
     if (this.vm_observable_array) {
       if (!silent) {
         this.trigger('remove', this.vm_observable_array());
       }
       view_models = this.vm_observable_array.removeAll();
+      _results = [];
       for (_i = 0, _len = view_models.length; _i < _len; _i++) {
         view_model = view_models[_i];
-        kb.vmDestroy(view_model);
+        _results.push(kb.vmDestroy(view_model));
       }
+      return _results;
     }
+  };
+  CollectionObservable.prototype._collectionResync = function(silent) {
+    var model, models, view_models, _fn, _i, _j, _len, _len2, _ref;
+    this._clearViewModels(silent);
     this._kb_value_observable.removeAll();
     if (this.options.sorted_index) {
       models = [];
@@ -293,8 +299,8 @@ Knockback.CollectionObservable = (function() {
         add_index = this.options.sorted_index(models, model);
         return models.splice(add_index, 0, model);
       }, this);
-      for (_j = 0, _len2 = _ref.length; _j < _len2; _j++) {
-        model = _ref[_j];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        model = _ref[_i];
         _fn(model);
       }
     } else {
@@ -302,8 +308,8 @@ Knockback.CollectionObservable = (function() {
     }
     if (this.vm_observable_array) {
       view_models = [];
-      for (_k = 0, _len3 = models.length; _k < _len3; _k++) {
-        model = models[_k];
+      for (_j = 0, _len2 = models.length; _j < _len2; _j++) {
+        model = models[_j];
         view_models.push(this._viewModelCreate(model));
       }
       this.vm_observable_array(view_models);

@@ -66,6 +66,7 @@ class Knockback.CollectionObservable
     return kb.wrappedObservable(this)
 
   destroy: ->
+    @_clearViewModels(silent)
     @_kb_collection.unbind('reset', @_onCollectionReset)
     @_kb_collection.unbind('resort', @_onCollectionResort) if not @options.sorted_index
     @_kb_collection.unbind(event, @_onModelAdd) for event in ['new', 'add']
@@ -74,7 +75,6 @@ class Knockback.CollectionObservable
     @_kb_collection.release() if @_kb_collection.release; @_kb_collection = null
     @_kb_value_observable = null
     @_kb_observable.dispose(); @_kb_observable = null
-    @vm_observable_array = null
     @options = null
 
   collection: ->
@@ -173,12 +173,14 @@ class Knockback.CollectionObservable
     if @vm_observable_array
       @trigger('resort', view_model, @vm_observable_array(), new_index) # notify
 
-  _collectionResync: (silent) ->
+  _clearViewModels: (silent) ->
     if @vm_observable_array
       @trigger('remove', @vm_observable_array()) if not silent # notify
       view_models = @vm_observable_array.removeAll() # batch
       kb.vmDestroy(view_model) for view_model in view_models
 
+  _collectionResync: (silent) ->
+    @_clearViewModels(silent)
     @_kb_value_observable.removeAll()
 
     if @options.sorted_index
