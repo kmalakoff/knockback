@@ -62,7 +62,7 @@ or
 ```coffeescript
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
-    super(model, {internals: ['email', 'date']})
+    super(model, {internals: ['email', 'date']})  # @name, @_email, and @_date created in super from the model attributes 
     @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
     @date = new LongDateLocalizer(@_date)
 ````
