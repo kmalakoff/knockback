@@ -37,7 +37,8 @@ class Knockback.LocalizedObservable
     @_kb_default = if @options.default then @options.default else @default
 
     # internal state
-    @_kb_value_observable = ko.observable()
+    value = ko.utils.unwrapObservable(@value) if @value
+    @_kb_value_observable = ko.observable(if not value then @_getDefaultValue() else @_kb_read.call(this, value, null))
 
     if @_kb_write
       @view_model = {} if not @view_model
@@ -54,7 +55,6 @@ class Knockback.LocalizedObservable
 
     # start
     kb.locale_manager.bind('change', @_onLocaleChange)
-    @_onLocaleChange()
 
     return kb.wrappedObservable(this)
 
@@ -92,6 +92,7 @@ class Knockback.LocalizedObservable
     return @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
 
   _onGetValue: ->
+    ko.utils.unwrapObservable(@value) if @value # create a depdenency
     return @_kb_value_observable()
 
   _onSetValue: (value) ->

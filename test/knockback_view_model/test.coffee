@@ -4,6 +4,8 @@ $(document).ready( ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
+  Knockback.locale_manager = new LocaleManager('en', {})
+
   test("Standard use case: read and write", ->
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model)
@@ -51,6 +53,70 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
+  test("internals test", ->
+    class ContactViewModel extends kb.ViewModel
+      constructor: (model) ->
+        super(model, {internals: ['email', 'date']})
+        @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+        @date = new LongDateLocalizer(@_date)
+
+    birthdate = new Date(1940, 10, 9)
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    view_model = new ContactViewModel(model)
+
+    # check email
+    equal(view_model._email(), undefined, "no email")
+    equal(view_model.email(), 'your.name@yourplace.com', "default message")
+
+    view_model._email('j@imagine.com')
+    equal(view_model._email(), 'j@imagine.com', "received email")
+    equal(view_model.email(), 'j@imagine.com', "received email")
+
+    view_model.email('john@imagine.com')
+    equal(view_model._email(), 'john@imagine.com', "received email")
+    equal(view_model.email(), 'john@imagine.com', "received email")
+
+    # set from the view model
+    Knockback.locale_manager.setLocale('en-GB')
+    equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
+    view_model.date('10 December 1963')
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1963, "year is good")
+    equal(current_date.getMonth(), 11, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1963, "year is good")
+    equal(view_model._date().getMonth(), 11, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
+
+    # set from the model
+    model.set({date: new Date(birthdate.valueOf())})
+    Knockback.locale_manager.setLocale('fr-FR')
+    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+    view_model.date('10 novembre 1940')
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1940, "year is good")
+    equal(current_date.getMonth(), 10, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1940, "year is good")
+    equal(view_model._date().getMonth(), 10, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
+
+    # set from the automatically-generated date observable
+    view_model.date(new Date(birthdate.valueOf()))
+    Knockback.locale_manager.setLocale('fr-FR')
+    equal(view_model.date(), '10 novembre 1940', "One past John's birthdate in France format")
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1940, "year is good")
+    equal(current_date.getMonth(), 10, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1940, "year is good")
+    equal(view_model._date().getMonth(), 10, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
+
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
+  )
+
   test("merge into an external view model", ->
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = {
@@ -80,43 +146,45 @@ $(document).ready( ->
     ok(view_model.something == null, "Something removed")
   )
 
-  test("Using in conjunction with Coffeescript classes", ->
+  test("Using Coffeescript classes", ->
     class ContactViewModelCustom extends kb.ViewModel
       constructor: (model) ->
-        super(model)
-        @formatted_name = ko.dependentObservable(=> return "First: #{@name()}")
-        @formatted_number = ko.dependentObservable({
-          read: => return "#: #{@number()}"
-          write: (value) => @number(value.substring(3))
-        }, this)
+        super(model, {internals: ['name', 'number']})
+        @name = ko.dependentObservable(=> return "First: #{@_name()}")
+        @number = kb.formatWrapper('#: {0}', @_number)
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
-    equal(view_model.name(), 'Ringo', "Interesting name")
-    equal(view_model.formatted_name(), 'First: Ringo', "Interesting name")
-    equal(view_model.number(), '555-555-5556', "Not so interesting number")
-    equal(view_model.formatted_number(), '#: 555-555-5556', "Not so interesting number")
+    equal(view_model._name(), 'Ringo', "Interesting name")
+    equal(view_model.name(), 'First: Ringo', "Interesting name")
+    equal(view_model._number(), '555-555-5556', "Not so interesting number")
+    equal(view_model.number(), '#: 555-555-5556', "Not so interesting number")
 
     # set from the view model
-    view_model.formatted_number('#: 9222-222-222')
+    view_model.number('#: 9222-222-222')
     equal(model.get('number'), '9222-222-222', "Number was changed")
-    equal(view_model.number(), '9222-222-222', "Number was changed")
-    equal(view_model.formatted_number(), '#: 9222-222-222', "Number was changed")
+    equal(view_model._number(), '9222-222-222', "Number was changed")
+    equal(view_model.number(), '#: 9222-222-222', "Number was changed")
 
     # set from the model
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
-    equal(view_model.name(), 'Starr', "Name changed")
-    equal(view_model.formatted_name(), 'First: Starr', "Name changed")
-    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
-    equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed")
+    equal(view_model._name(), 'Starr', "Name changed")
+    equal(view_model.name(), 'First: Starr', "Name changed")
+    equal(view_model._number(), 'XXX-XXX-XXXX', "Number was changed")
+    equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
+
+    # set from the generated attribute
+    view_model._name('Ringo')
+    equal(view_model._name(), 'Ringo', "Interesting name")
+    equal(view_model.name(), 'First: Ringo', "Interesting name")
 
     # and cleanup after yourself when you are done.
     kb.vmRelease(view_model)
   )
 
-  test("Using in conjunction with simple Javascript classes", ->
+  test("Using simple Javascript classes", ->
     ContactViewModelCustom = (model) ->
       view_model = kb.viewModel(model)
       view_model.formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
@@ -153,13 +221,32 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
-  test("Using in conjunction with kb.localizedObservable", ->
-    Knockback.locale_manager = new LocaleManager('en', {})
+  test("requires", ->
+    class ContactViewModelFullName extends kb.ViewModel
+      constructor: (model) ->
+        super(model, {requires: ['first', 'last']})
+        @full_name = kb.formatWrapper('Last: {1}, First: {0}', @first, @last)
 
+    model = new Backbone.Model()
+    view_model = new ContactViewModelFullName(model)
+    equal(view_model.full_name(), 'Last: , First: ', "full name is good")
+
+    model.set({first: 'Ringo', last: 'Starr'})
+    equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
+
+    model.set({first: 'Bongo'})
+    equal(view_model.full_name(), 'Last: Starr, First: Bongo', "full name is good")
+
+    view_model.full_name('Last: The Starr, First: Ringo')
+    equal(model.get('first'), 'Ringo', "first name is good")
+    equal(model.get('last'), 'The Starr', "last name is good")
+  )
+
+  test("Using kb.localizedObservable", ->
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
-        super(model)
-        @formatted_date = new LongDateLocalizer(@date)
+        super(model, {internals: ['date']})
+        @date = new LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
     model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
@@ -167,40 +254,40 @@ $(document).ready( ->
 
     # set from the view model
     Knockback.locale_manager.setLocale('en-GB')
-    equal(view_model.formatted_date(), '09 November 1940', "John's birthdate in Great Britain format")
-    view_model.formatted_date('10 December 1963')
+    equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
+    view_model.date('10 December 1963')
     current_date = model.get('date')
     equal(current_date.getFullYear(), 1963, "year is good")
     equal(current_date.getMonth(), 11, "month is good")
     equal(current_date.getDate(), 10, "day is good")
-    equal(view_model.date().getFullYear(), 1963, "year is good")
-    equal(view_model.date().getMonth(), 11, "month is good")
-    equal(view_model.date().getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1963, "year is good")
+    equal(view_model._date().getMonth(), 11, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
 
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
     Knockback.locale_manager.setLocale('fr-FR')
-    equal(view_model.date().valueOf(), birthdate.valueOf(), "John's birthdate in France format")
-    view_model.formatted_date('10 novembre 1940')
+    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+    view_model.date('10 novembre 1940')
     current_date = model.get('date')
     equal(current_date.getFullYear(), 1940, "year is good")
     equal(current_date.getMonth(), 10, "month is good")
     equal(current_date.getDate(), 10, "day is good")
-    equal(view_model.date().getFullYear(), 1940, "year is good")
-    equal(view_model.date().getMonth(), 10, "month is good")
-    equal(view_model.date().getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1940, "year is good")
+    equal(view_model._date().getMonth(), 10, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
 
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
     Knockback.locale_manager.setLocale('fr-FR')
-    equal(view_model.date().valueOf(), birthdate.valueOf(), "John's birthdate in France format")
+    equal(view_model.date(), '10 novembre 1940', "John's birthdate in France format")
     current_date = model.get('date')
     equal(current_date.getFullYear(), 1940, "year is good")
     equal(current_date.getMonth(), 10, "month is good")
-    equal(current_date.getDate(), 9, "day is good")
-    equal(view_model.date().getFullYear(), 1940, "year is good")
-    equal(view_model.date().getMonth(), 10, "month is good")
-    equal(view_model.date().getDate(), 9, "day is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1940, "year is good")
+    equal(view_model._date().getMonth(), 10, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
     kb.vmRelease(view_model)

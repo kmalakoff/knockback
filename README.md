@@ -57,6 +57,30 @@ ContactViewModel = (model) ->
   return this
 ````
 
+or
+
+```coffeescript
+class ContactViewModel extends kb.ViewModel
+  constructor: (model) ->
+    super(model, {internals: ['email', 'date']})
+    @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+    @date = new LongDateLocalizer(@_date)
+````
+
+class ContactViewModelCustom extends kb.ViewModel
+  constructor: (model) ->
+    super(model)
+    @formatted_name = ko.dependentObservable(=> return "First: #{@name()}")
+    @formatted_number = ko.dependentObservable({
+      read: => return "#: #{@number()}"
+      write: (value) => @number(value.substring(3)))
+    }, this)
+    @formatted_date = new LongDateLocalizer(@date)
+...
+kb.vmRelease(view_model)
+
+
+
 ### The HTML:
 
 ```html
@@ -97,7 +121,9 @@ Knockback.observable = (model, bind_info, view_model) -> return new Knockback.Ob
 
 The library includes the following classes:
 
-1. **Knockback.observables and Knockback.observable**:
+Knockback.observables and Knockback.observable
+----------------------------------------------
+
    These are the foundations for watching model attributes for one and two-way changes. The pluralized form provides a short-hand for multiple attributes like in the above example.
 
 ### Note 1
@@ -197,6 +223,26 @@ or if batch, **'resort'**: (view_models_array) -> ...
 * **'remove'**: (view_model, view_models_array) -> ...
 or if batch, **'remove'**: (view_models_array) -> ...
 
+Knockback.formatWrapper
+-----------------------------
+You can format an arbitrary number of arguments in both read and write directions:
+
+```coffeescript
+class ContactViewModelFullName extends kb.ViewModel
+  constructor: (model) ->
+    super(model, {internals: ['first', 'last']})
+    @full_name = kb.formatWrapper('Last: {1}, First: {0}', @_first, @_last)
+
+model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
+view_model = new ContactViewModelFullName(model)
+equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
+
+view_model.full_name('Last: The Starr, First: Ringo')
+equal(view_model.full_name(), 'Last: The Starr, First: Ringo', "full name is good")
+equal(model.get('first'), 'Ringo', "first name is good")
+equal(model.get('last'), 'The Starr', "last name is good")
+```
+
 Knockback.localizedObservable
 -----------------------------
 
@@ -281,6 +327,33 @@ kb.vmRelease(view_model_instance)
 kb.vmRelease(view_model)
 ```
 
+Stub out an observable if you are not sure it will be in the model (so if/when it does arrive, the observing had already been established):
+
+```coffeescript
+class ContactViewModelFullName extends kb.ViewModel
+  constructor: (model) ->
+    super(model, {requires: ['first', 'last']})
+    @full_name = kb.formatWrapper('Last: {1}, First: {0}', @first, @last)
+
+model = new Backbone.Model()
+view_model = new ContactViewModelFullName(model)
+equal(view_model.full_name(), 'Last: , First: ', "full name is good")
+
+model.set({first: 'Ringo', last: 'Starr'})
+equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
+```
+
+Knockback.defaultWrapper
+-----------------------------
+
+You can wrap an observable with a default value to provide a value when it is missing:
+
+```coffeescript
+class ContactViewModel extends kb.ViewModel
+  constructor: (model) ->
+    super(model, {internals: ['email']})
+    @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+```
 
 Final notes
 -----------

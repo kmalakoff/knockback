@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.11.0
+  knockback.js 0.11.1
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.11.0';
+Knockback.VERSION = '0.11.1';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -75,6 +75,118 @@ Knockback.attributeConnector = function(model, key, read_only) {
     set_info = {};
     set_info[key] = value;
     return model.set(set_info);
+  });
+  return result;
+};
+Knockback.defaultWrapper = function(observable, default_value) {
+  var result;
+  result = ko.dependentObservable({
+    read: function() {
+      var value;
+      value = ko.utils.unwrapObservable(observable());
+      if (!value) {
+        return ko.utils.unwrapObservable(default_value);
+      } else {
+        return value;
+      }
+    },
+    write: function(value) {
+      return observable(value);
+    },
+    owner: {}
+  });
+  return result;
+};
+Knockback.toFormattedString = function(format) {
+  var arg, args, index, result, _fn;
+  result = format.slice();
+  args = Array.prototype.slice.call(arguments, 1);
+  _fn = function(index, arg) {
+    var value;
+    value = ko.utils.unwrapObservable(arg);
+    if (!value) {
+      value = '';
+    }
+    return result = result.replace("{" + index + "}", value);
+  };
+  for (index in args) {
+    arg = args[index];
+    _fn(index, arg);
+  }
+  return result;
+};
+Knockback.parseFormattedString = function(string, format) {
+  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_index, positions, regex, regex_string, results, sorted_positions, _fn;
+  regex_string = format.slice();
+  index = 0;
+  positions = {};
+  while (regex_string.search("\\{" + index + "\\}") >= 0) {
+    regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
+    parameter_index = format.indexOf("\{" + index + "\}");
+    while (parameter_index >= 0) {
+      positions[parameter_index] = index;
+      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+    }
+    index++;
+  }
+  count = index;
+  regex = new RegExp(regex_string);
+  matches = regex.exec(string);
+  if (matches) {
+    matches.shift();
+  }
+  if (!matches || (matches.length !== index)) {
+    return null;
+  }
+  sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
+    return parseInt(parameter_index, 10);
+  });
+  format_indices_to_matched_indices = {};
+  _fn = function(match_index, parameter_index) {
+    index = positions[parameter_index];
+    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
+      return;
+    }
+    return format_indices_to_matched_indices[index] = match_index;
+  };
+  for (match_index in sorted_positions) {
+    parameter_index = sorted_positions[match_index];
+    _fn(match_index, parameter_index);
+  }
+  results = [];
+  index = 0;
+  while (index < count) {
+    results.push(matches[format_indices_to_matched_indices[index]]);
+    index++;
+  }
+  return results;
+};
+Knockback.formatWrapper = function(format, args) {
+  var observable_args, result;
+  observable_args = Array.prototype.slice.call(arguments, 1);
+  result = ko.dependentObservable({
+    read: function() {
+      var arg, _i, _len;
+      args = [format];
+      for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
+        arg = observable_args[_i];
+        args.push(ko.utils.unwrapObservable(arg));
+      }
+      return kb.toFormattedString.apply(null, args);
+    },
+    write: function(value) {
+      var index, matches, max_count, _results;
+      matches = kb.parseFormattedString(value, format);
+      max_count = Math.min(observable_args.length, matches.length);
+      index = 0;
+      _results = [];
+      while (index < max_count) {
+        observable_args[index](matches[index]);
+        _results.push(index++);
+      }
+      return _results;
+    },
+    owner: {}
   });
   return result;
 };
@@ -397,7 +509,10 @@ Knockback.LocalizedObservable = (function() {
     this._kb_read = this.options.read ? this.options.read : this.read;
     this._kb_write = this.options.write ? this.options.write : this.write;
     this._kb_default = this.options["default"] ? this.options["default"] : this["default"];
-    this._kb_value_observable = ko.observable();
+    if (this.value) {
+      value = ko.utils.unwrapObservable(this.value);
+    }
+    this._kb_value_observable = ko.observable(!value ? this._getDefaultValue() : this._kb_read.call(this, value, null));
     if (this._kb_write) {
       if (!this.view_model) {
         this.view_model = {};
@@ -418,7 +533,6 @@ Knockback.LocalizedObservable = (function() {
     this._kb_observable.setToDefault = this.setToDefault;
     this._kb_observable.resetToCurrent = this.resetToCurrent;
     kb.locale_manager.bind('change', this._onLocaleChange);
-    this._onLocaleChange();
     return kb.wrappedObservable(this);
   }
   LocalizedObservable.prototype.destroy = function() {
@@ -468,6 +582,9 @@ Knockback.LocalizedObservable = (function() {
     return this._kb_read.call(this, ko.utils.unwrapObservable(this.value), this._kb_observable);
   };
   LocalizedObservable.prototype._onGetValue = function() {
+    if (this.value) {
+      ko.utils.unwrapObservable(this.value);
+    }
     return this._kb_value_observable();
   };
   LocalizedObservable.prototype._onSetValue = function(value) {
@@ -811,7 +928,7 @@ Knockback.triggeredObservable = function(model, event_name) {
 }
 Knockback.ViewModel = (function() {
   function ViewModel(model, options, view_model) {
-    var key;
+    var key, missing, total_requires, _i, _len;
     this.model = model;
     this.options = options != null ? options : {};
     this.view_model = view_model;
@@ -828,6 +945,15 @@ Knockback.ViewModel = (function() {
       this.view_model = this;
     }
     for (key in this.model.attributes) {
+      this._updateAttributeObservor(this.model, key);
+    }
+    if (!this.options.internals && !this.options.requires) {
+      return this;
+    }
+    total_requires = _.union((this.options.internals ? this.options.internals : []), (this.options.requires ? this.options.requires : []));
+    missing = _.difference(total_requires, _.keys(this.model.attributes));
+    for (_i = 0, _len = missing.length; _i < _len; _i++) {
+      key = missing[_i];
       this._updateAttributeObservor(this.model, key);
     }
   }
@@ -871,10 +997,12 @@ Knockback.ViewModel = (function() {
     return _results;
   };
   ViewModel.prototype._updateAttributeObservor = function(model, key) {
-    if (this.view_model.hasOwnProperty(key)) {
-      return this.view_model[key](model.get(key));
+    var vm_key;
+    vm_key = this.options.internals && _.contains(this.options.internals, key) ? '_' + key : key;
+    if (this.view_model.hasOwnProperty(vm_key)) {
+      return this.view_model[vm_key](model.get(key));
     } else {
-      return this.view_model[key] = kb.attributeConnector(model, key, this.options.read_only);
+      return this.view_model[vm_key] = kb.attributeConnector(model, key, this.options.read_only);
     }
   };
   return ViewModel;

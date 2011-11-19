@@ -10,6 +10,10 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ####################################################
 # options
 #   * read_only - default is read_write
+#   * internals - an array of atttributes that should be scoped with an underscore, eg. name -> _name
+#       internals can be used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
+#   * requires - an array of atttributes that should be stubbed out if they don't exist on the model
+#       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 ####################################################
 
 class Knockback.ViewModel
@@ -23,6 +27,11 @@ class Knockback.ViewModel
     @view_model = this if not @view_model
 
     @_updateAttributeObservor(@model, key) for key of @model.attributes
+    return this if not @options.internals and not @options.requires
+
+    total_requires = _.union((if @options.internals then @options.internals else []), (if @options.requires then @options.requires else []))
+    missing = _.difference(total_requires, _.keys(@model.attributes))
+    @_updateAttributeObservor(@model, key) for key in missing
 
   _destroy: ->
     view_model = @view_model; @view_model = null
@@ -51,10 +60,12 @@ class Knockback.ViewModel
     (@_updateAttributeObservor(@model, key) if @model.hasChanged(key)) for key of @model.attributes
 
   _updateAttributeObservor: (model, key) ->
-    if (@view_model.hasOwnProperty(key))
-      @view_model[key](model.get(key))
+    vm_key = if @options.internals and _.contains(@options.internals, key) then '_' + key else key
+
+    if (@view_model.hasOwnProperty(vm_key))
+      @view_model[vm_key](model.get(key))
     else
-      @view_model[key] = kb.attributeConnector(model, key, @options.read_only)
+      @view_model[vm_key] = kb.attributeConnector(model, key, @options.read_only)
 
 # factory function
 Knockback.viewModel = (model, options, view_model) -> return new Knockback.ViewModel(model, options, view_model)

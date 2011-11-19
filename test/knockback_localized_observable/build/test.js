@@ -145,5 +145,32 @@ $(document).ready(function() {
     equal(current_date.getDate(), 10, "day is good");
     return kb.vmRelease(view_model);
   });
+  test("Knockback.formatWrapper", function() {
+    var ContactViewModelFullName, model, view_model;
+    ContactViewModelFullName = (function() {
+      __extends(ContactViewModelFullName, kb.ViewModel);
+      function ContactViewModelFullName(model) {
+        ContactViewModelFullName.__super__.constructor.call(this, model, {
+          internals: ['first', 'last']
+        });
+        this.full_name = kb.formatWrapper('Last: {1}, First: {0}', this._first, this._last);
+      }
+      return ContactViewModelFullName;
+    })();
+    model = new Backbone.Model({
+      first: 'Ringo',
+      last: 'Starr'
+    });
+    view_model = new ContactViewModelFullName(model);
+    equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good");
+    model.set({
+      first: 'Bongo'
+    });
+    equal(view_model.full_name(), 'Last: Starr, First: Bongo', "full name is good");
+    view_model.full_name('Last: The Starr, First: Ringo');
+    equal(view_model.full_name(), 'Last: The Starr, First: Ringo', "full name is good");
+    equal(model.get('first'), 'Ringo', "first name is good");
+    return equal(model.get('last'), 'The Starr', "last name is good");
+  });
   return test("Error cases", function() {});
 });

@@ -109,6 +109,25 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
+  test("Knockback.formatWrapper", ->
+    class ContactViewModelFullName extends kb.ViewModel
+      constructor: (model) ->
+        super(model, {internals: ['first', 'last']})
+        @full_name = kb.formatWrapper('Last: {1}, First: {0}', @_first, @_last)
+
+    model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
+    view_model = new ContactViewModelFullName(model)
+    equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
+
+    model.set({first: 'Bongo'})
+    equal(view_model.full_name(), 'Last: Starr, First: Bongo', "full name is good")
+
+    view_model.full_name('Last: The Starr, First: Ringo')
+    equal(view_model.full_name(), 'Last: The Starr, First: Ringo', "full name is good")
+    equal(model.get('first'), 'Ringo', "first name is good")
+    equal(model.get('last'), 'The Starr', "last name is good")
+  )
+
   test("Error cases", ->
     # TODO
   )
