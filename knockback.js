@@ -1031,18 +1031,20 @@ Knockback.triggeredObservable = function(model, event_name) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
 Knockback.ViewModel = (function() {
-  function ViewModel(model, options, view_model) {
+  function ViewModel(model, options, _kb_view_model) {
     var key, missing, _i, _len;
     this.model = model;
     this.options = options != null ? options : {};
-    this.view_model = view_model;
+    this._kb_view_model = _kb_view_model;
     this.ref_count = 1;
     if (!this.model) {
       throw new Error('ViewModel: model is missing');
     }
     _.bindAll(this, '_onModelChange', '_onModelLoaded', '_onModelUnloaded');
-    if (!this.view_model) {
-      this.view_model = this;
+    if (!this._kb_view_model) {
+      this._kb_view_model = this;
+    } else {
+      this._kb_observables = [];
     }
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
       this.model_ref = this.model;
@@ -1068,12 +1070,15 @@ Knockback.ViewModel = (function() {
   }
   ViewModel.prototype._destroy = function() {
     var view_model;
-    view_model = this.view_model;
-    this.view_model = null;
-    kb.vmReleaseObservables(view_model, view_model !== this ? _.keys(this.model.attributes) : void 0);
     if (this.model) {
       this.model.unbind('change', this._onModelChange);
-      return this.model = null;
+      this.model = null;
+    }
+    view_model = this._kb_view_model;
+    this._kb_view_model = null;
+    kb.vmReleaseObservables(view_model, this._kb_observables);
+    if (this._kb_observables) {
+      return this._kb_observables = null;
     }
   };
   ViewModel.prototype.retain = function() {
@@ -1131,12 +1136,15 @@ Knockback.ViewModel = (function() {
   ViewModel.prototype._updateAttributeObservor = function(model, key) {
     var vm_key;
     vm_key = this.options.internals && _.contains(this.options.internals, key) ? '_' + key : key;
-    if (this.view_model.hasOwnProperty(vm_key)) {
-      if (this.view_model[vm_key]) {
-        return this.view_model[vm_key].setModel(model);
+    if (this._kb_view_model.hasOwnProperty(vm_key)) {
+      if (this._kb_view_model[vm_key]) {
+        return this._kb_view_model[vm_key].setModel(model);
       }
     } else {
-      return this.view_model[vm_key] = kb.attributeConnector(model, key, this.options.read_only);
+      if (this._kb_observables) {
+        this._kb_observables.push(vm_key);
+      }
+      return this._kb_view_model[vm_key] = kb.attributeConnector(model, key, this.options.read_only);
     }
   };
   return ViewModel;

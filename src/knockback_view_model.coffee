@@ -17,12 +17,15 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ####################################################
 
 class Knockback.ViewModel
-  constructor: (@model, @options={}, @view_model) ->
+  constructor: (@model, @options={}, @_kb_view_model) ->
     @ref_count = 1
     throw new Error('ViewModel: model is missing') if not @model
 
     _.bindAll(this, '_onModelChange', '_onModelLoaded', '_onModelUnloaded')
-    @view_model = this if not @view_model
+    if not @_kb_view_model
+      @_kb_view_model = this
+    else
+      @_kb_observables = [] # we are being added to an external view model so we clean up only our observables
 
     # determine model or model_ref type
     if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
@@ -40,9 +43,10 @@ class Knockback.ViewModel
     @_updateAttributeObservor(@model, key) for key in missing
 
   _destroy: ->
-    view_model = @view_model; @view_model = null
-    kb.vmReleaseObservables(view_model, if (view_model != this) then _.keys(@model.attributes) else undefined)
     (@model.unbind('change', @_onModelChange); @model = null) if @model
+    view_model = @_kb_view_model; @_kb_view_model = null
+    kb.vmReleaseObservables(view_model, @_kb_observables)
+    @_kb_observables = null if @_kb_observables
 
   # reference counting
   retain: ->
@@ -78,10 +82,11 @@ class Knockback.ViewModel
   _updateAttributeObservor: (model, key) ->
     vm_key = if @options.internals and _.contains(@options.internals, key) then '_' + key else key
 
-    if (@view_model.hasOwnProperty(vm_key))
-      @view_model[vm_key].setModel(model) if @view_model[vm_key]
+    if (@_kb_view_model.hasOwnProperty(vm_key))
+      @_kb_view_model[vm_key].setModel(model) if @_kb_view_model[vm_key]
     else
-      @view_model[vm_key] = kb.attributeConnector(model, key, @options.read_only)
+      @_kb_observables.push(vm_key) if @_kb_observables
+      @_kb_view_model[vm_key] = kb.attributeConnector(model, key, @options.read_only)
 
 # factory function
 Knockback.viewModel = (model, options, view_model) -> return new Knockback.ViewModel(model, options, view_model)
