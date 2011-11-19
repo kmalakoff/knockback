@@ -362,8 +362,7 @@ Final notes
 -----------
 
 * Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
-    -> Use the helper function: kb.vmRelease() to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
-    -> I'm hoping to change this: https://github.com/kmalakoff/knockback/issues/2
+    -> Use the helper function: **kb.vmRelease()** to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
 
 * Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
 
