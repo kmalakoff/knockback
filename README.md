@@ -239,6 +239,26 @@ view_model = kb.viewModel(model, {read_only: true})
 kb.vmRelease(view_model)
 ```
 
+Derive and specialize a view model Coffeescript class
+```coffeescript
+class ContactViewModelCustom extends kb.ViewModel
+  constructor: (model) ->
+    super(model)
+    @formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+...
+kb.vmRelease(view_model)
+```
+
+Specialize using a simple function constructor
+```coffeescript
+ContactViewModelCustom = (model) ->
+  view_model = kb.viewModel(model)
+  view_model.formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+  return view_model
+...
+kb.vmRelease(view_model)
+```
+
 Dynamically create the observables in an external view model
 ```coffeescript
 model = new Contact({name: 'Ringo', number: '555-555-5556'})
