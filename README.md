@@ -62,7 +62,7 @@ or
 ```coffeescript
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
-    super(model, {internals: ['email', 'date']})
+    super(model, {internals: ['email', 'date']})  # @name, @_email, and @_date created in super from the model attributes 
     @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
     @date = new LongDateLocalizer(@_date)
 ````
@@ -223,7 +223,9 @@ model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
 view_model = new ContactViewModelFullName(model)
 equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
 
+# use a complex formatted string to set multiple attributes at once
 view_model.full_name('Last: The Starr, First: Ringo')
+
 equal(view_model.full_name(), 'Last: The Starr, First: Ringo', "full name is good")
 equal(model.get('first'), 'Ringo', "first name is good")
 equal(model.get('last'), 'The Starr', "last name is good")
@@ -313,7 +315,7 @@ kb.vmRelease(view_model_instance)
 kb.vmRelease(view_model)
 ```
 
-Stub out an observable if you are not sure it will be in the model (so if/when it does arrive, the observing had already been established):
+Stub out an observable if you are not sure if specific attributes will be in the model. If/when the attributes do arrive, the observing had already been established reducing conditional checks.
 
 ```coffeescript
 class ContactViewModelFullName extends kb.ViewModel
@@ -329,6 +331,16 @@ model.set({first: 'Ringo', last: 'Starr'})
 equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
 ```
 
+Reassign (and stub out) specific defaut observable names to _{name} if you plan to use them only as internal, intermediate values. This way you can use your attribute names with advanced logic in your template bindings. 
+
+```coffeescript
+class ContactViewModel extends kb.ViewModel
+  constructor: (model) ->
+    super(model, {internals: ['email', 'date']})
+    @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+    @date = new LongDateLocalizer(@_date)
+````
+
 Knockback.defaultWrapper
 -----------------------------
 
@@ -339,6 +351,12 @@ class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
     super(model, {internals: ['email']})
     @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+
+view_model = new ContactViewModel(model)
+...
+view_model.email.setToDefault()
+# or
+kb.vmSetToDefault(view_model)
 ```
 
 Final notes
