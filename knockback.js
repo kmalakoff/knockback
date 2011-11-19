@@ -33,24 +33,29 @@ Knockback.vmRelease = function(view_model) {
   return Knockback.vmDestroyObservables(view_model);
 };
 Knockback.vmDestroyObservables = function(view_model, keys) {
-  var key, observable, _results;
+  var key, value, _results;
   _results = [];
   for (key in view_model) {
-    observable = view_model[key];
-    _results.push((function(key, observable) {
+    value = view_model[key];
+    _results.push((function(key, value) {
+      if (!value) {
+        return;
+      }
       if (keys && !_.contains(keys, key)) {
         return;
       }
-      if (!observable || !(ko.isObservable(observable) || (observable instanceof kb.Observables))) {
+      if (!(ko.isObservable(value) || (value instanceof kb.Observables) || (value instanceof kb.ViewModel))) {
         return;
       }
-      if (observable.destroy) {
-        observable.destroy();
-      } else if (observable.dispose) {
-        observable.dispose();
+      view_model[key] = null;
+      if (value.destroy) {
+        return value.destroy();
+      } else if (value.dispose) {
+        return value.dispose();
+      } else if (value.release) {
+        return value.release();
       }
-      return view_model[key] = null;
-    })(key, observable));
+    })(key, value));
   }
   return _results;
 };
@@ -827,8 +832,10 @@ Knockback.ViewModel = (function() {
     }
   }
   ViewModel.prototype._destroy = function() {
-    kb.vmDestroyObservables(this.view_model, this.view_model !== this ? _.keys(this.model.attributes) : void 0);
+    var view_model;
+    view_model = this.view_model;
     this.view_model = null;
+    kb.vmDestroyObservables(view_model, view_model !== this ? _.keys(this.model.attributes) : void 0);
     this.model.unbind('change', this._onModelChange);
     return this.model = null;
   };

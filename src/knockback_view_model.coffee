@@ -25,7 +25,8 @@ class Knockback.ViewModel
     @_updateAttributeObservor(@model, key) for key of @model.attributes
 
   _destroy: ->
-    kb.vmDestroyObservables(@view_model, if (@view_model != this) then _.keys(@model.attributes) else undefined); @view_model = null
+    view_model = @view_model; @view_model = null
+    kb.vmDestroyObservables(view_model, if (view_model != this) then _.keys(@model.attributes) else undefined)
     @model.unbind('change', @_onModelChange); @model = null
 
   # reference counting

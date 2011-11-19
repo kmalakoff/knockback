@@ -31,15 +31,18 @@ Knockback.vmRelease = (view_model) ->
   Knockback.vmDestroyObservables(view_model)
 
 Knockback.vmDestroyObservables = (view_model, keys) ->
-  for key, observable of view_model
-    do (key, observable) ->
+  for key, value of view_model
+    do (key, value) ->
+      return if not value
       return if keys and not _.contains(keys, key) # skip
-      return if not observable or not (ko.isObservable(observable) or (observable instanceof kb.Observables))
-      if observable.destroy
-        observable.destroy()
-      else if observable.dispose
-        observable.dispose()
+      return if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel))
       view_model[key] = null
+      if value.destroy
+        value.destroy()
+      else if value.dispose
+        value.dispose()
+      else if value.release
+        value.release()
 
 Knockback.attributeConnector = (model, key, read_only) ->
   result = ko.observable(model.get(key))
