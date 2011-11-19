@@ -247,7 +247,12 @@ Derive and specialize a view model Coffeescript class:
 class ContactViewModelCustom extends kb.ViewModel
   constructor: (model) ->
     super(model)
-    @formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+    @formatted_name = ko.dependentObservable(=> return "First: #{@name()}")
+    @formatted_number = ko.dependentObservable({
+      read: => return "#: #{@number()}"
+      write: (value) => @number(value.substring(3)))
+    }, this)
+    @formatted_date = new LongDateLocalizer(@date)
 ...
 kb.vmRelease(view_model)
 ```

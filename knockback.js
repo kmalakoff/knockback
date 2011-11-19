@@ -465,14 +465,14 @@ Knockback.LocalizedObservable = (function() {
     if (!(this.value && this._kb_observable)) {
       return this._getDefaultValue();
     }
-    return this._kb_read.call(this, this.value, this._kb_observable);
+    return this._kb_read.call(this, ko.utils.unwrapObservable(this.value), this._kb_observable);
   };
   LocalizedObservable.prototype._onGetValue = function() {
     return this._kb_value_observable();
   };
   LocalizedObservable.prototype._onSetValue = function(value) {
-    this._kb_write.call(this, value, this.value, this._kb_observable);
-    value = this._kb_read.call(this, this.value, this._kb_observable);
+    this._kb_write.call(this, value, ko.utils.unwrapObservable(this.value), this._kb_observable);
+    value = this._kb_read.call(this, ko.utils.unwrapObservable(this.value), this._kb_observable);
     this._kb_value_observable(value);
     if (this.options.onChange) {
       return this.options.onChange(value);
@@ -480,7 +480,7 @@ Knockback.LocalizedObservable = (function() {
   };
   LocalizedObservable.prototype._onLocaleChange = function() {
     var value;
-    value = this._kb_read.call(this, this.value, this._kb_observable);
+    value = this._kb_read.call(this, ko.utils.unwrapObservable(this.value), this._kb_observable);
     this._kb_value_observable(value);
     if (this.options.onChange) {
       return this.options.onChange(value);

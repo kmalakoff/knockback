@@ -89,19 +89,19 @@ class Knockback.LocalizedObservable
 
   _getCurrentValue: ->
     return @_getDefaultValue() if not (@value and @_kb_observable)
-    return @_kb_read.call(this, @value, @_kb_observable)
+    return @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
 
   _onGetValue: ->
     return @_kb_value_observable()
 
   _onSetValue: (value) ->
-    @_kb_write.call(this, value, @value, @_kb_observable)
-    value = @_kb_read.call(this, @value, @_kb_observable)
+    @_kb_write.call(this, value, ko.utils.unwrapObservable(@value), @_kb_observable)
+    value = @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
     @_kb_value_observable(value)
     @options.onChange(value) if @options.onChange
 
   _onLocaleChange: ->
-    value = @_kb_read.call(this, @value, @_kb_observable)
+    value = @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
     @_kb_value_observable(value)
     @options.onChange(value) if @options.onChange
 
