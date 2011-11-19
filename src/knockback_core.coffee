@@ -174,11 +174,11 @@ Knockback.formatWrapper = (format, args) ->
   observable_args = Array.prototype.slice.call(arguments, 1)
   result = ko.dependentObservable({
     read: ->
-      args = [format]
+      args = [ko.utils.unwrapObservable(format)]
       args.push(ko.utils.unwrapObservable(arg)) for arg in observable_args
       return kb.toFormattedString.apply(null, args)
     write: (value) ->
-      matches = kb.parseFormattedString(value, format)
+      matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format))
       max_count = Math.min(observable_args.length, matches.length); index = 0
       while (index<max_count)
         observable_args[index](matches[index])

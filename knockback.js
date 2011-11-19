@@ -233,7 +233,7 @@ Knockback.formatWrapper = function(format, args) {
   result = ko.dependentObservable({
     read: function() {
       var arg, _i, _len;
-      args = [format];
+      args = [ko.utils.unwrapObservable(format)];
       for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
         arg = observable_args[_i];
         args.push(ko.utils.unwrapObservable(arg));
@@ -242,7 +242,7 @@ Knockback.formatWrapper = function(format, args) {
     },
     write: function(value) {
       var index, matches, max_count, _results;
-      matches = kb.parseFormattedString(value, format);
+      matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
       max_count = Math.min(observable_args.length, matches.length);
       index = 0;
       _results = [];
