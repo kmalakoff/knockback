@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.11.1
+  knockback.js 0.11.2
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -19,7 +19,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.11.1';
+Knockback.VERSION = '0.11.2';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -727,7 +727,7 @@ Knockback.Observable = (function() {
     this._kb_observable.destroy = this.destroy;
     this._kb_observable.setToDefault = this.setToDefault;
     if (!this.model_ref || this.model_ref.isLoaded()) {
-      this._onModelLoaded(this.model);
+      this.model.bind('change', this._onModelChange);
     }
     return kb.wrappedObservable(this);
   }
@@ -767,41 +767,76 @@ Knockback.Observable = (function() {
     }
   };
   Observable.prototype._getCurrentValue = function() {
+    var arg, args, key, _i, _len, _ref;
     if (!this.model) {
       return this._getDefaultValue();
     }
+    key = ko.utils.unwrapObservable(this.options.key);
+    args = [key];
+    if (!_.isUndefined(this.options.args)) {
+      if (_.isArray(this.options.args)) {
+        _ref = this.options.args;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          arg = _ref[_i];
+          args.push(ko.utils.unwrapObservable(arg));
+        }
+      } else {
+        args.push(ko.utils.unwrapObservable(this.options.args));
+      }
+    }
     if (this.options.read) {
-      return this.options.read.apply(this.view_model, [this.model, this.options.key]);
+      return this.options.read.apply(this.view_model, args);
     } else {
-      return this.model.get(this.options.key);
+      return this.model.get.apply(this.model, args);
     }
   };
   Observable.prototype._onGetValue = function() {
-    var value;
+    var arg, value, _i, _len, _ref;
     this._kb_value_observable();
+    ko.utils.unwrapObservable(this.options.key);
+    if (!_.isUndefined(this.options.args)) {
+      if (_.isArray(this.options.args)) {
+        _ref = this.options.args;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          arg = _ref[_i];
+          ko.utils.unwrapObservable(arg);
+        }
+      } else {
+        ko.utils.unwrapObservable(this.options.args);
+      }
+    }
     value = this._getCurrentValue();
-    if (!this.model) {
-      return value;
-    }
     if (this._kb_localizer) {
-      return this._kb_localizer();
-    } else {
-      return value;
+      this._kb_localizer.observedValue(value);
+      value = this._kb_localizer();
     }
+    return value;
   };
   Observable.prototype._onSetValue = function(value) {
-    var set_info;
+    var arg, args, set_info, _i, _len, _ref;
     if (this._kb_localizer) {
       this._kb_localizer(value);
       value = this._kb_localizer.observedValue();
     }
     if (this.model) {
       set_info = {};
-      set_info[this.options.key] = value;
+      set_info[ko.utils.unwrapObservable(this.options.key)] = value;
+      args = _.isFunction(this.options.write) ? [value] : [set_info];
+      if (!_.isUndefined(this.options.args)) {
+        if (_.isArray(this.options.args)) {
+          _ref = this.options.args;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            arg = _ref[_i];
+            args.push(ko.utils.unwrapObservable(arg));
+          }
+        } else {
+          args.push(ko.utils.unwrapObservable(this.options.args));
+        }
+      }
       if (_.isFunction(this.options.write)) {
-        this.options.write.apply(this.view_model, [value, this.model, set_info]);
+        this.options.write.apply(this.view_model, args);
       } else {
-        this.model.set(set_info);
+        this.model.set.apply(this.model, args);
       }
     }
     if (this._kb_localizer) {
@@ -824,7 +859,7 @@ Knockback.Observable = (function() {
     return this.model = null;
   };
   Observable.prototype._onModelChange = function() {
-    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(this.options.key)) {
+    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(ko.utils.unwrapObservable(this.options.key))) {
       return;
     }
     return this._updateValue();

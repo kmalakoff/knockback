@@ -68,6 +68,18 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
+  test("Read args", ->
+    args = []
+    ContactViewModelCustom = (model) ->
+      @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
+      @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
+      return this
+
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    view_model = new ContactViewModelCustom(model)
+    ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
+  )
+
   test("Error cases", ->
     # TODO
   )

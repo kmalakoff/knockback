@@ -128,6 +128,39 @@ $(document).ready( ->
     equal(model.get('last'), 'The Starr', "last name is good")
   )
 
+  test("Localization with a changing key", ->
+    # directly with the locale manager
+    greeting_key = ko.observable('formal_hello')
+    locale_manager_greeting = kb.observable(kb.locale_manager, {key:greeting_key})
+
+    Knockback.locale_manager.setLocale('en')
+    equal(locale_manager_greeting(), 'Hello', "en: Hello")
+    Knockback.locale_manager.setLocale('en-GB')
+    equal(locale_manager_greeting(), 'Good day sir', "en-GB: Hello")
+
+    greeting_key('formal_goodbye')
+    equal(locale_manager_greeting(), 'Goodbye darling', "en-GB: Goodbye")
+    Knockback.locale_manager.setLocale('en')
+    equal(locale_manager_greeting(), 'Goodbye', "en: Goodbye")
+
+    ContactViewModelGreeting = (model) ->
+      @greeting_key = ko.observable('hello_greeting')
+      @greeting = kb.observable(model, {key:@greeting_key, localizer: LocalizedStringLocalizer})
+      return this
+
+    model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
+    view_model = new ContactViewModelGreeting(model)
+
+    equal(view_model.greeting(), 'Hello', "en: Hello")
+    Knockback.locale_manager.setLocale('en-GB')
+    equal(view_model.greeting(), 'Good day sir', "en-GB: Hello")
+
+    view_model.greeting_key('goodbye_greeting')
+    equal(view_model.greeting(), 'Goodbye darling', "en-GB: Goodbye")
+    Knockback.locale_manager.setLocale('en')
+    equal(view_model.greeting(), 'Goodbye', "en: Goodbye")
+  )
+
   test("Error cases", ->
     # TODO
   )

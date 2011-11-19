@@ -85,5 +85,35 @@ $(document).ready(function() {
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed");
     return kb.vmRelease(view_model);
   });
+  test("Read args", function() {
+    var ContactViewModelCustom, args, model, view_model;
+    args = [];
+    ContactViewModelCustom = function(model) {
+      this.name = kb.observable(model, {
+        key: 'name',
+        read: (function(key, arg1, arg2) {
+          args.push(arg1);
+          args.push(arg2);
+          return model.get('name');
+        }),
+        args: ['name', 1]
+      });
+      this.number = kb.observable(model, {
+        key: 'name',
+        read: (function(key, arg) {
+          args.push(arg);
+          return model.get('number');
+        }),
+        args: 'number'
+      });
+      return this;
+    };
+    model = new Contact({
+      name: 'Ringo',
+      number: '555-555-5556'
+    });
+    view_model = new ContactViewModelCustom(model);
+    return ok(_.isEqual(args, ['name', 1, 'number']), "got the args");
+  });
   return test("Error cases", function() {});
 });
