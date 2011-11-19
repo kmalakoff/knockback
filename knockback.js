@@ -6,7 +6,9 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
     Optional dependency: Backbone.ModelRef.js.
-*/if (!this.ko) {
+*/
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+if (!this.ko) {
   throw new Error('Knockback: Dependency alert! Knockout.js must be included before this file');
 }
 if (!this.Backbone) {
@@ -25,14 +27,28 @@ Knockback.wrappedObservable = function(instance) {
   }
   return instance._kb_observable;
 };
+Knockback.setToDefault = function(observable) {
+  if (observable && observable.setToDefault) {
+    return observable.setToDefault();
+  }
+};
+Knockback.vmSetToDefault = function(view_model) {
+  var key, observable, _results;
+  _results = [];
+  for (key in view_model) {
+    observable = view_model[key];
+    _results.push(kb.setToDefault(observable));
+  }
+  return _results;
+};
 Knockback.vmRelease = function(view_model) {
   if (view_model instanceof kb.ViewModel) {
     view_model.release();
     return;
   }
-  return Knockback.vmDestroyObservables(view_model);
+  return Knockback.vmReleaseObservables(view_model);
 };
-Knockback.vmDestroyObservables = function(view_model, keys) {
+Knockback.vmReleaseObservables = function(view_model, keys) {
   var key, value, _results;
   _results = [];
   for (key in view_model) {
@@ -41,61 +57,111 @@ Knockback.vmDestroyObservables = function(view_model, keys) {
       if (!value) {
         return;
       }
-      if (keys && !_.contains(keys, key)) {
-        return;
-      }
       if (!(ko.isObservable(value) || (value instanceof kb.Observables) || (value instanceof kb.ViewModel))) {
         return;
       }
-      view_model[key] = null;
-      if (value.destroy) {
-        return value.destroy();
-      } else if (value.dispose) {
-        return value.dispose();
-      } else if (value.release) {
-        return value.release();
+      if (keys && !_.contains(keys, key)) {
+        return;
       }
+      view_model[key] = null;
+      return kb.vmReleaseObservable(value);
     })(key, value));
   }
   return _results;
 };
-Knockback.attributeConnector = function(model, key, read_only) {
-  var result;
-  result = ko.observable(model.get(key));
-  result.subscription = result.subscribe(function(value) {
-    var set_info;
-    if (read_only) {
-      value = model.get(key);
-      if (result() === value) {
-        return;
-      }
-      result(value);
-      throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.";
-    }
-    set_info = {};
-    set_info[key] = value;
-    return model.set(set_info);
-  });
-  return result;
+Knockback.vmReleaseObservable = function(observable) {
+  if (!(ko.isObservable(observable) || (observable instanceof kb.Observables) || (observable instanceof kb.ViewModel))) {
+    return;
+  }
+  if (observable.destroy) {
+    return observable.destroy();
+  } else if (observable.dispose) {
+    return observable.dispose();
+  } else if (observable.release) {
+    return observable.release();
+  }
 };
-Knockback.defaultWrapper = function(observable, default_value) {
-  var result;
-  result = ko.dependentObservable({
-    read: function() {
-      var value;
-      value = ko.utils.unwrapObservable(observable());
-      if (!value) {
-        return ko.utils.unwrapObservable(default_value);
-      } else {
-        return value;
+Knockback.AttributeConnector = (function() {
+  function AttributeConnector(model, key, read_only) {
+    this.key = key;
+    this.read_only = read_only;
+    _.bindAll(this, 'destroy', 'setModel');
+    this._kb_observable = ko.observable();
+    this._kb_observable.subscription = this._kb_observable.subscribe(__bind(function(value) {
+      var set_info;
+      if (this.read_only) {
+        if (this.model) {
+          value = this.model.get(this.key);
+          if (this._kb_observable() === value) {
+            return;
+          }
+          this._kb_observable(value);
+        }
+        throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.";
+      } else if (this.model) {
+        set_info = {};
+        set_info[this.key] = value;
+        return this.model.set(set_info);
       }
-    },
-    write: function(value) {
-      return observable(value);
-    },
-    owner: {}
-  });
-  return result;
+    }, this));
+    this._kb_observable.destroy = this.destroy;
+    this._kb_observable.setModel = this.setModel;
+    if (model) {
+      this.setModel(model);
+    }
+    return kb.wrappedObservable(this);
+  }
+  AttributeConnector.prototype.destroy = function() {
+    this.model = null;
+    return this._kb_observable = null;
+  };
+  AttributeConnector.prototype.setModel = function(model) {
+    if (model) {
+      this.model = model;
+      return this._kb_observable(this.model.get(this.key));
+    } else {
+      return this.model = null;
+    }
+  };
+  return AttributeConnector;
+})();
+Knockback.attributeConnector = function(model, key, read_only) {
+  return new Knockback.AttributeConnector(model, key, read_only);
+};
+Knockback.DefaultWrapper = (function() {
+  function DefaultWrapper(observable, default_value) {
+    this.default_value = default_value;
+    _.bindAll(this, 'destroy', 'setToDefault');
+    this._kb_observable = ko.dependentObservable({
+      read: __bind(function() {
+        var value;
+        value = ko.utils.unwrapObservable(observable());
+        if (!value) {
+          return ko.utils.unwrapObservable(this.default_value);
+        } else {
+          return value;
+        }
+      }, this),
+      write: function(value) {
+        return observable(value);
+      },
+      owner: {}
+    });
+    this._kb_observable.destroy = this.destroy;
+    this._kb_observable.setToDefault = this.setToDefault;
+    return kb.wrappedObservable(this);
+  }
+  DefaultWrapper.prototype.destroy = function() {
+    this._kb_observable = null;
+    return this.default_value = null;
+  };
+  DefaultWrapper.prototype.setToDefault = function() {
+    return this._kb_observable(this.default_value);
+  };
+  return DefaultWrapper;
+})();
+Knockback.defaultWrapper = function(observable, default_value) {
+  return new Knockback.DefaultWrapper(observable, default_value);
 };
 Knockback.toFormattedString = function(format) {
   var arg, args, index, result, _fn;
@@ -545,8 +611,11 @@ Knockback.LocalizedObservable = (function() {
   };
   LocalizedObservable.prototype.setToDefault = function() {
     var current_value, default_value;
-    current_value = this._kb_value_observable();
+    if (!this._kb_default) {
+      return;
+    }
     default_value = this._getDefaultValue();
+    current_value = this._kb_value_observable();
     if (current_value !== default_value) {
       return this._onSetValue(default_value);
     } else {
@@ -631,7 +700,7 @@ Knockback.Observable = (function() {
     if (!this.options.key) {
       throw new Error('Observable: options.key is missing');
     }
-    _.bindAll(this, 'destroy', 'setToDefault', '_onGetValue', '_onSetValue', '_onValueChange', '_onModelLoaded', '_onModelUnloaded');
+    _.bindAll(this, 'destroy', 'setToDefault', '_onGetValue', '_onSetValue', '_onModelChange', '_onModelLoaded', '_onModelUnloaded');
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
       this.model_ref = this.model;
       this.model_ref.retain();
@@ -743,7 +812,7 @@ Knockback.Observable = (function() {
   };
   Observable.prototype._onModelLoaded = function(model) {
     this.model = model;
-    this.model.bind('change', this._onValueChange);
+    this.model.bind('change', this._onModelChange);
     return this._updateValue();
   };
   Observable.prototype._onModelUnloaded = function(model) {
@@ -751,10 +820,10 @@ Knockback.Observable = (function() {
       this._kb_localizer.destroy();
       this._kb_localizer = null;
     }
-    this.model.unbind('change', this._onValueChange);
+    this.model.unbind('change', this._onModelChange);
     return this.model = null;
   };
-  Observable.prototype._onValueChange = function() {
+  Observable.prototype._onModelChange = function() {
     if ((this.model && this.model.hasChanged) && !this.model.hasChanged(this.options.key)) {
       return;
     }
@@ -928,7 +997,7 @@ Knockback.triggeredObservable = function(model, event_name) {
 }
 Knockback.ViewModel = (function() {
   function ViewModel(model, options, view_model) {
-    var key, missing, total_requires, _i, _len;
+    var key, missing, _i, _len;
     this.model = model;
     this.options = options != null ? options : {};
     this.view_model = view_model;
@@ -936,22 +1005,27 @@ Knockback.ViewModel = (function() {
     if (!this.model) {
       throw new Error('ViewModel: model is missing');
     }
-    if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
-      throw new Error('ViewModel: model cannot be a Backbone.ModelRef because the atrributes may not be laoded');
-    }
-    _.bindAll(this, '_onModelChange');
-    this.model.bind('change', this._onModelChange);
+    _.bindAll(this, '_onModelChange', '_onModelLoaded', '_onModelUnloaded');
     if (!this.view_model) {
       this.view_model = this;
     }
-    for (key in this.model.attributes) {
-      this._updateAttributeObservor(this.model, key);
+    if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
+      this.model_ref = this.model;
+      this.model_ref.retain();
+      this.model_ref.bind('loaded', this._onModelLoaded);
+      this.model_ref.bind('unloaded', this._onModelUnloaded);
+      this.model = this.model_ref.getModel();
+    }
+    if (!this.model_ref || this.model_ref.isLoaded()) {
+      this._onModelLoaded(this.model);
     }
     if (!this.options.internals && !this.options.requires) {
       return this;
     }
-    total_requires = _.union((this.options.internals ? this.options.internals : []), (this.options.requires ? this.options.requires : []));
-    missing = _.difference(total_requires, _.keys(this.model.attributes));
+    missing = _.union((this.options.internals ? this.options.internals : []), (this.options.requires ? this.options.requires : []));
+    if (!this.model_ref || this.model_ref.isLoaded()) {
+      missing = _.difference(missing, _.keys(this.model.attributes));
+    }
     for (_i = 0, _len = missing.length; _i < _len; _i++) {
       key = missing[_i];
       this._updateAttributeObservor(this.model, key);
@@ -961,9 +1035,11 @@ Knockback.ViewModel = (function() {
     var view_model;
     view_model = this.view_model;
     this.view_model = null;
-    kb.vmDestroyObservables(view_model, view_model !== this ? _.keys(this.model.attributes) : void 0);
-    this.model.unbind('change', this._onModelChange);
-    return this.model = null;
+    kb.vmReleaseObservables(view_model, view_model !== this ? _.keys(this.model.attributes) : void 0);
+    if (this.model) {
+      this.model.unbind('change', this._onModelChange);
+      return this.model = null;
+    }
   };
   ViewModel.prototype.retain = function() {
     if (this.ref_count <= 0) {
@@ -985,6 +1061,27 @@ Knockback.ViewModel = (function() {
   ViewModel.prototype.refCount = function() {
     return this.ref_count;
   };
+  ViewModel.prototype._onModelLoaded = function(model) {
+    var key, _results;
+    this.model = model;
+    this.model.bind('change', this._onModelChange);
+    _results = [];
+    for (key in this.model.attributes) {
+      _results.push(this._updateAttributeObservor(this.model, key));
+    }
+    return _results;
+  };
+  ViewModel.prototype._onModelUnloaded = function(model) {
+    var key, _results;
+    this.model.unbind('change', this._onModelChange);
+    model = this.model;
+    this.model = null;
+    _results = [];
+    for (key in model.attributes) {
+      _results.push(this._updateAttributeObservor(this.model, key));
+    }
+    return _results;
+  };
   ViewModel.prototype._onModelChange = function() {
     var key, _results;
     if (!this.model._changed) {
@@ -1000,7 +1097,9 @@ Knockback.ViewModel = (function() {
     var vm_key;
     vm_key = this.options.internals && _.contains(this.options.internals, key) ? '_' + key : key;
     if (this.view_model.hasOwnProperty(vm_key)) {
-      return this.view_model[vm_key](model.get(key));
+      if (this.view_model[vm_key]) {
+        return this.view_model[vm_key].setModel(model);
+      }
     } else {
       return this.view_model[vm_key] = kb.attributeConnector(model, key, this.options.read_only);
     }

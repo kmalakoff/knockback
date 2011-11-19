@@ -19,7 +19,7 @@ class Knockback.Observable
     throw new Error('Observable: options is missing') if not @options
     throw new Error('Observable: options.key is missing') if not @options.key
 
-    _.bindAll(this, 'destroy', 'setToDefault', '_onGetValue', '_onSetValue', '_onValueChange', '_onModelLoaded', '_onModelUnloaded')
+    _.bindAll(this, 'destroy', 'setToDefault', '_onGetValue', '_onSetValue', '_onModelChange', '_onModelLoaded', '_onModelUnloaded')
 
     # determine model or model_ref type
     if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
@@ -95,15 +95,15 @@ class Knockback.Observable
 
   _onModelLoaded: (model) ->
     @model = model
-    @model.bind('change', @_onValueChange) # all attributes if it is manually triggered
+    @model.bind('change', @_onModelChange) # all attributes if it is manually triggered
     @_updateValue()
 
   _onModelUnloaded: (model) ->
     (@_kb_localizer.destroy(); @_kb_localizer = null) if @_kb_localizer and @_kb_localizer.destroy
-    @model.unbind('change', @_onValueChange) # all attributes if it is manually triggered
+    @model.unbind('change', @_onModelChange) # all attributes if it is manually triggered
     @model = null
 
-  _onValueChange: ->
+  _onModelChange: ->
     return if (@model and @model.hasChanged) and not @model.hasChanged(@options.key) # no change, nothing to do
     @_updateValue()
 

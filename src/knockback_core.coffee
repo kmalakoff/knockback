@@ -26,47 +26,107 @@ Knockback.wrappedObservable = (instance) ->
   throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable
   return instance._kb_observable
 
+Knockback.setToDefault = (observable) -> observable.setToDefault() if observable and observable.setToDefault
+Knockback.vmSetToDefault = (view_model) -> kb.setToDefault(observable) for key, observable of view_model
+
 Knockback.vmRelease = (view_model) ->
   (view_model.release(); return) if (view_model instanceof kb.ViewModel)
-  Knockback.vmDestroyObservables(view_model)
+  Knockback.vmReleaseObservables(view_model)
 
-Knockback.vmDestroyObservables = (view_model, keys) ->
+Knockback.vmReleaseObservables = (view_model, keys) ->
   for key, value of view_model
     do (key, value) ->
       return if not value
-      return if keys and not _.contains(keys, key) # skip
       return if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel))
+      return if keys and not _.contains(keys, key) # skip
       view_model[key] = null
-      if value.destroy
-        value.destroy()
-      else if value.dispose
-        value.dispose()
-      else if value.release
-        value.release()
+      kb.vmReleaseObservable(value)
 
-Knockback.attributeConnector = (model, key, read_only) ->
-  result = ko.observable(model.get(key))
-  result.subscription = result.subscribe((value) ->
-    if read_only
-      value = model.get(key)
-      return if result() == value
-      result(value)
-      throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters."
-    set_info = {}; set_info[key] = value
-    model.set(set_info)
-  )
-  return result
+Knockback.vmReleaseObservable = (observable) ->
+  return if not (ko.isObservable(observable) or (observable instanceof kb.Observables) or (observable instanceof kb.ViewModel))
+  if observable.destroy
+    observable.destroy()
+  else if observable.dispose
+    observable.dispose()
+  else if observable.release
+    observable.release()
 
-Knockback.defaultWrapper = (observable, default_value) ->
-  result = ko.dependentObservable({
-    read: ->
-      value = ko.utils.unwrapObservable(observable())
-      return if not value then ko.utils.unwrapObservable(default_value) else value
-    write: (value) -> observable(value)
-    owner: {}
-  })
-  return result
+######################################
+# Knockback.attributeConnector helper
+######################################
+class Knockback.AttributeConnector
+  constructor: (model, @key, @read_only) ->
+    _.bindAll(this, 'destroy', 'setModel')
 
+    @_kb_observable = ko.observable()
+    @_kb_observable.subscription = @_kb_observable.subscribe((value) =>
+      if @read_only
+        if @model
+          value = @model.get(@key)
+          return if @_kb_observable() == value
+          @_kb_observable(value)
+        throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters."
+      else if @model
+        set_info = {}; set_info[@key] = value
+        @model.set(set_info)
+    )
+
+    # publish public interface on the observable and return instead of this
+    @_kb_observable.destroy = @destroy
+    @_kb_observable.setModel = @setModel
+
+    # start
+    @setModel(model) if model
+
+    return kb.wrappedObservable(this)
+
+  destroy: ->
+    @model = null
+    @_kb_observable = null
+
+  setModel: (model) ->
+    if model
+      @model = model
+      @_kb_observable(@model.get(@key))
+    else
+      @model = null
+
+Knockback.attributeConnector = (model, key, read_only) -> return new Knockback.AttributeConnector(model, key, read_only)
+
+
+######################################
+# Knockback.defaultWrapper helper
+######################################
+class Knockback.DefaultWrapper
+  constructor: (observable, @default_value) ->
+    _.bindAll(this, 'destroy', 'setToDefault')
+
+    @_kb_observable = ko.dependentObservable({
+      read: =>
+        value = ko.utils.unwrapObservable(observable())
+        return if not value then ko.utils.unwrapObservable(@default_value) else value
+      write: (value) -> observable(value)
+      owner: {}
+    })
+
+    # publish public interface on the observable and return instead of this
+    @_kb_observable.destroy = @destroy
+    @_kb_observable.setToDefault = @setToDefault
+
+    return kb.wrappedObservable(this)
+
+  destroy: ->
+    @_kb_observable = null
+    @default_value = null
+
+  setToDefault: -> @_kb_observable(@default_value)
+
+Knockback.defaultWrapper = (observable, default_value) -> return new Knockback.DefaultWrapper(observable, default_value)
+
+
+######################################
+# Knockback.formatWrapper helper
+######################################
 Knockback.toFormattedString = (format) ->
   result = format.slice()
   args = Array.prototype.slice.call(arguments, 1)

@@ -20,23 +20,29 @@ class Knockback.ViewModel
   constructor: (@model, @options={}, @view_model) ->
     @ref_count = 1
     throw new Error('ViewModel: model is missing') if not @model
-    throw new Error('ViewModel: model cannot be a Backbone.ModelRef because the atrributes may not be laoded') if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
 
-    _.bindAll(this, '_onModelChange')
-    @model.bind('change', @_onModelChange)
+    _.bindAll(this, '_onModelChange', '_onModelLoaded', '_onModelUnloaded')
     @view_model = this if not @view_model
 
-    @_updateAttributeObservor(@model, key) for key of @model.attributes
-    return this if not @options.internals and not @options.requires
+    # determine model or model_ref type
+    if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
+      @model_ref = @model; @model_ref.retain()
+      @model_ref.bind('loaded', @_onModelLoaded)
+      @model_ref.bind('unloaded', @_onModelUnloaded)
+      @model = @model_ref.getModel()
 
-    total_requires = _.union((if @options.internals then @options.internals else []), (if @options.requires then @options.requires else []))
-    missing = _.difference(total_requires, _.keys(@model.attributes))
+    # start
+    @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
+
+    return this if not @options.internals and not @options.requires
+    missing = _.union((if @options.internals then @options.internals else []), (if @options.requires then @options.requires else []))
+    missing = _.difference(missing, _.keys(@model.attributes)) if not @model_ref or @model_ref.isLoaded()
     @_updateAttributeObservor(@model, key) for key in missing
 
   _destroy: ->
     view_model = @view_model; @view_model = null
-    kb.vmDestroyObservables(view_model, if (view_model != this) then _.keys(@model.attributes) else undefined)
-    @model.unbind('change', @_onModelChange); @model = null
+    kb.vmReleaseObservables(view_model, if (view_model != this) then _.keys(@model.attributes) else undefined)
+    (@model.unbind('change', @_onModelChange); @model = null) if @model
 
   # reference counting
   retain: ->
@@ -55,6 +61,16 @@ class Knockback.ViewModel
   ####################################################
   # Internal
   ####################################################
+  _onModelLoaded: (model) ->
+    @model = model
+    @model.bind('change', @_onModelChange) # all attributes if it is manually triggered
+    @_updateAttributeObservor(@model, key) for key of @model.attributes
+
+  _onModelUnloaded: (model) ->
+    @model.unbind('change', @_onModelChange) # all attributes if it is manually triggered
+    model = @model; @model = null
+    @_updateAttributeObservor(@model, key) for key of model.attributes
+
   _onModelChange: ->
     return if not @model._changed
     (@_updateAttributeObservor(@model, key) if @model.hasChanged(key)) for key of @model.attributes
@@ -63,7 +79,7 @@ class Knockback.ViewModel
     vm_key = if @options.internals and _.contains(@options.internals, key) then '_' + key else key
 
     if (@view_model.hasOwnProperty(vm_key))
-      @view_model[vm_key](model.get(key))
+      @view_model[vm_key].setModel(model) if @view_model[vm_key]
     else
       @view_model[vm_key] = kb.attributeConnector(model, key, @options.read_only)
 

@@ -66,8 +66,9 @@ class Knockback.LocalizedObservable
     @view_model = null
 
   setToDefault: ->
-    current_value = @_kb_value_observable()
+    return if not @_kb_default
     default_value = @_getDefaultValue()
+    current_value = @_kb_value_observable()
     if current_value != default_value then @_onSetValue(default_value) else @_kb_value_observable.valueHasMutated() # trigger the dependable
 
   resetToCurrent: ->
