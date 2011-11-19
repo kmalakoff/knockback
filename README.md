@@ -224,6 +224,7 @@ Knockback.viewModel
 Although they are only useful for a subset of scenarios, you can automatically create a view model for all of attributes for your model.
 
 Read write observables for each attribute:
+
 ```coffeescript
 model = new Contact({name: 'Ringo', number: '555-555-5556'})
 view_model = kb.viewModel(model)
@@ -232,6 +233,7 @@ kb.vmRelease(view_model)
 ```
 
 Read only observables for each attribute:
+
 ```coffeescript
 model = new Contact({name: 'Ringo', number: '555-555-5556'})
 view_model = kb.viewModel(model, {read_only: true})
@@ -239,7 +241,8 @@ view_model = kb.viewModel(model, {read_only: true})
 kb.vmRelease(view_model)
 ```
 
-Derive and specialize a view model Coffeescript class
+Derive and specialize a view model Coffeescript class:
+
 ```coffeescript
 class ContactViewModelCustom extends kb.ViewModel
   constructor: (model) ->
@@ -249,7 +252,8 @@ class ContactViewModelCustom extends kb.ViewModel
 kb.vmRelease(view_model)
 ```
 
-Specialize using a simple function constructor
+Specialize using a simple function constructor:
+
 ```coffeescript
 ContactViewModelCustom = (model) ->
   view_model = kb.viewModel(model)
@@ -259,7 +263,8 @@ ContactViewModelCustom = (model) ->
 kb.vmRelease(view_model)
 ```
 
-Dynamically create the observables in an external view model
+Dynamically create the observables in an external view model:
+
 ```coffeescript
 model = new Contact({name: 'Ringo', number: '555-555-5556'})
 view_model = {
