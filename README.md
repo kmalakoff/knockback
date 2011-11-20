@@ -117,11 +117,11 @@ You can watch a non-BackboneModel as long as it: a) mixes in Backbone.Events and
 
 ```coffeescript
 kb.observables(kb.locale_manager, {
-  label_title_new:    { key: 'label_title_new' },
-  label_button_new:   { key: 'label_button_new' },
-  label_name:         { key: 'label_name' },
-  label_email:        { key: 'label_email' },
-  label_date:         { key: 'label_date' }
+  label_title_new:    { key: 'title_new' },
+  label_button_new:   { key: 'button_new' },
+  label_name:         { key: 'name' },
+  label_email:        { key: 'email' },
+  label_date:         { key: 'date' }
 }, view_model)
 ```
 
