@@ -891,7 +891,6 @@ Knockback.Observables = (function() {
       mapping_info = _ref[view_model_property_name];
       this.view_model[view_model_property_name] = kb.observable(this.model, mapping_info, this.view_model);
     }
-    return this;
   }
   Observables.prototype.destroy = function() {
     var mapping_info, view_model_property_name, _ref;

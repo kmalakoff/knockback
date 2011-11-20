@@ -8,7 +8,7 @@ $(document).ready( ->
     ContactViewModel = (model) ->
       @name = kb.observable(model, key:'name')
       @number = kb.observable(model, {key:'number', write: true}, this)
-      return this
+      @
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModel(model)
@@ -42,7 +42,7 @@ $(document).ready( ->
         read: -> return "#: #{model.get('number')}"
         write: (value) -> model.set({number: value.substring(3)})
       }, this)
-      return this
+      @
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
@@ -73,7 +73,7 @@ $(document).ready( ->
     ContactViewModelCustom = (model) ->
       @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
       @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
-      return this
+      @
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)

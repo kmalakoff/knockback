@@ -53,7 +53,7 @@ ContactViewModel = (model) ->
     email:    {key:'email', write: true, default: 'your.name@yourplace.com'}
     date:     {key:'date', write: true, localizer: LongDateLocalizer}
   }, this)
-  return this
+  @           # must return this or Coffeescript will return the last statement which is not what we want!
 ````
 
 or
@@ -61,7 +61,7 @@ or
 ```coffeescript
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
-    super(model, {internals: ['email', 'date']})  # @name, @_email, and @_date created in super from the model attributes 
+    super(model, {internals: ['email', 'date']})  # @name, @_email, and @_date created in super from the model attributes
     @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
     @date = new LongDateLocalizer(@_date)
 ````
@@ -330,7 +330,7 @@ model.set({first: 'Ringo', last: 'Starr'})
 equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
 ```
 
-Reassign (and stub out) specific defaut observable names to _{name} if you plan to use them only as internal, intermediate values. This way you can use your attribute names with advanced logic in your template bindings. 
+Reassign (and stub out) specific defaut observable names to _{name} if you plan to use them only as internal, intermediate values. This way you can use your attribute names with advanced logic in your template bindings.
 
 ```coffeescript
 class ContactViewModel extends kb.ViewModel

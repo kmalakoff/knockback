@@ -93,7 +93,7 @@ class Knockback.CollectionObservable
 
     @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
     @trigger('resort', @vm_observable_array()) if not silent # notify
-    return this
+    @
 
   sortAttribute: (sort_attribute, sorted_index, silent) -> return @sortedIndex(sorted_index, sort_attribute, silent)
   _sortAttributeFn: (sort_attribute) -> return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))

@@ -37,7 +37,7 @@ class Knockback.ViewModel
     # start
     @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
 
-    return this if not @options.internals and not @options.requires
+    return @ if not @options.internals and not @options.requires
     missing = _.union((if @options.internals then @options.internals else []), (if @options.requires then @options.requires else []))
     missing = _.difference(missing, _.keys(@model.attributes)) if not @model_ref or @model_ref.isLoaded()
     @_updateAttributeObservor(@model, key) for key in missing
@@ -52,13 +52,13 @@ class Knockback.ViewModel
   retain: ->
     throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
     @ref_count++
-    return this
+    @
 
   release: ->
     throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
     @ref_count--
     @_destroy(this) if (@ref_count == 0)
-    return this
+    @
 
   refCount: -> return @ref_count
 

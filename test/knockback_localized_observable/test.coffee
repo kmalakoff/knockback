@@ -32,7 +32,7 @@ $(document).ready( ->
     ContactViewModelGreeting = (model) ->
       @hello = kb.observable(model, {key:'hello_greeting', localizer: LocalizedStringLocalizer})
       @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: LocalizedStringLocalizer})
-      return this
+      @
 
     model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
@@ -80,7 +80,7 @@ $(document).ready( ->
   test("Date and time with jquery.globalize", ->
     ContactViewModelDate = (model) ->
       @date = kb.observable(model, {key:'date', write: true, localizer: LongDateLocalizer}, this)
-      return this
+      @
 
     birthdate = new Date(1940, 10, 9)
     model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
@@ -146,7 +146,7 @@ $(document).ready( ->
     ContactViewModelGreeting = (model) ->
       @greeting_key = ko.observable('hello_greeting')
       @greeting = kb.observable(model, {key:@greeting_key, localizer: LocalizedStringLocalizer})
-      return this
+      @
 
     model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)

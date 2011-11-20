@@ -13,7 +13,6 @@ class Knockback.Observables
     throw new Error('Observables: mappings_info is missing') if not @mappings_info
 
     (@view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model)) for view_model_property_name, mapping_info of @mappings_info
-    return this
 
   destroy: ->
     for view_model_property_name, mapping_info of @mappings_info

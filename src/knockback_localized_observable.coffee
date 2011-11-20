@@ -79,7 +79,7 @@ class Knockback.LocalizedObservable
   observedValue: (value) ->
     return @value if arguments.length == 0
     @value = value; @_onLocaleChange()
-    return this
+    @
 
   ####################################################
   # Internal

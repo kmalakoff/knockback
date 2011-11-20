@@ -13,7 +13,7 @@ $(document).ready( ->
         number:   {key:'number', write: true}
         date:     {key:'date', write: true, localizer: LongDateLocalizer}
       }, this)
-      return this
+      @
 
     model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)

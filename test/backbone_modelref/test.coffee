@@ -18,7 +18,7 @@ $(document).ready( ->
         number:   {key:'number', write: true, default: @loading_message}
         date:     {key:'date', write: true, default: @loading_message, localizer: LongDateLocalizer}
       }, this)
-      return this
+      @
 
     collection = new ContactsCollection()
     model_ref = new Backbone.ModelRef(collection, 'b4')

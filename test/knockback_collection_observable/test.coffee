@@ -7,7 +7,7 @@ $(document).ready( ->
   ContactViewModel = (model) ->
     @name = kb.observable(model, key:'name', this)
     @number = kb.observable(model, key:'number', this)
-    return this
+    @
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
     collection = new ContactsCollection()
