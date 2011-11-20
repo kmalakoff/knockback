@@ -53,19 +53,17 @@ Knockback.vmReleaseObservables = function(view_model, keys) {
   _results = [];
   for (key in view_model) {
     value = view_model[key];
-    _results.push((function(key, value) {
-      if (!value) {
-        return;
-      }
-      if (!(ko.isObservable(value) || (value instanceof kb.Observables) || (value instanceof kb.ViewModel))) {
-        return;
-      }
-      if (keys && !_.contains(keys, key)) {
-        return;
-      }
-      view_model[key] = null;
-      return kb.vmReleaseObservable(value);
-    })(key, value));
+    if (!value) {
+      continue;
+    }
+    if (!(ko.isObservable(value) || (value instanceof kb.Observables) || (value instanceof kb.ViewModel))) {
+      continue;
+    }
+    if (keys && !_.contains(keys, key)) {
+      continue;
+    }
+    view_model[key] = null;
+    _results.push(kb.vmReleaseObservable(value));
   }
   return _results;
 };
@@ -164,25 +162,21 @@ Knockback.defaultWrapper = function(observable, default_value) {
   return new Knockback.DefaultWrapper(observable, default_value);
 };
 Knockback.toFormattedString = function(format) {
-  var arg, args, index, result, _fn;
+  var arg, args, index, result, value;
   result = format.slice();
   args = Array.prototype.slice.call(arguments, 1);
-  _fn = function(index, arg) {
-    var value;
+  for (index in args) {
+    arg = args[index];
     value = ko.utils.unwrapObservable(arg);
     if (!value) {
       value = '';
     }
-    return result = result.replace("{" + index + "}", value);
-  };
-  for (index in args) {
-    arg = args[index];
-    _fn(index, arg);
+    result = result.replace("{" + index + "}", value);
   }
   return result;
 };
 Knockback.parseFormattedString = function(string, format) {
-  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_index, positions, regex, regex_string, results, sorted_positions, _fn;
+  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_index, positions, regex, regex_string, results, sorted_positions;
   regex_string = format.slice();
   index = 0;
   positions = {};
@@ -208,16 +202,13 @@ Knockback.parseFormattedString = function(string, format) {
     return parseInt(parameter_index, 10);
   });
   format_indices_to_matched_indices = {};
-  _fn = function(match_index, parameter_index) {
-    index = positions[parameter_index];
-    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
-      return;
-    }
-    return format_indices_to_matched_indices[index] = match_index;
-  };
   for (match_index in sorted_positions) {
     parameter_index = sorted_positions[match_index];
-    _fn(match_index, parameter_index);
+    index = positions[parameter_index];
+    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
+      continue;
+    }
+    format_indices_to_matched_indices[index] = match_index;
   }
   results = [];
   index = 0;
@@ -263,7 +254,7 @@ Knockback.formatWrapper = function(format, args) {
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
   ctor.prototype = parent.prototype;
@@ -497,20 +488,16 @@ Knockback.CollectionObservable = (function() {
     }
   };
   CollectionObservable.prototype._collectionResync = function(silent) {
-    var model, models, view_models, _fn, _i, _j, _len, _len2, _ref;
+    var add_index, model, models, view_models, _i, _j, _len, _len2, _ref;
     this._clearViewModels(silent);
     this._kb_value_observable.removeAll();
     if (this.options.sorted_index) {
       models = [];
       _ref = this._kb_collection.models;
-      _fn = __bind(function(model) {
-        var add_index;
-        add_index = this.options.sorted_index(models, model);
-        return models.splice(add_index, 0, model);
-      }, this);
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         model = _ref[_i];
-        _fn(model);
+        add_index = this.options.sorted_index(models, model);
+        models.splice(add_index, 0, model);
       }
     } else {
       models = _.clone(this._kb_collection.models);
@@ -884,9 +871,7 @@ Knockback.observable = function(model, options, view_model) {
   Knockback.Observables is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-if (!this.Knockback) {
+*/if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
 Knockback.Observables = (function() {
@@ -909,17 +894,14 @@ Knockback.Observables = (function() {
     return this;
   }
   Observables.prototype.destroy = function() {
-    var mapping_info, view_model_property_name, _fn, _ref;
+    var mapping_info, view_model_property_name, _ref;
     _ref = this.mappings_info;
-    _fn = __bind(function(view_model_property_name, mapping_info) {
+    for (view_model_property_name in _ref) {
+      mapping_info = _ref[view_model_property_name];
       if (this.view_model[view_model_property_name]) {
         this.view_model[view_model_property_name].destroy();
       }
-      return this.view_model[view_model_property_name] = null;
-    }, this);
-    for (view_model_property_name in _ref) {
-      mapping_info = _ref[view_model_property_name];
-      _fn(view_model_property_name, mapping_info);
+      this.view_model[view_model_property_name] = null;
     }
     this.view_model = null;
     this.mappings_info = null;

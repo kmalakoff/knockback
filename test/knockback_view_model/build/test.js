@@ -148,7 +148,7 @@ $(document).ready(function() {
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
     kb.vmRelease(view_model_instance);
     ok(view_model.number === null, "Number removed");
-    ok(view_model.something !== null, "Somthing remains removed");
+    ok(view_model.something !== null, "Something remains removed");
     kb.vmRelease(view_model);
     return ok(view_model.something === null, "Something removed");
   });

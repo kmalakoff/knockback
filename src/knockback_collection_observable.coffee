@@ -185,9 +185,8 @@ class Knockback.CollectionObservable
     if @options.sorted_index
       models = []
       for model in @_kb_collection.models
-        do (model) =>
-          add_index = @options.sorted_index(models, model)
-          models.splice(add_index, 0, model)
+        add_index = @options.sorted_index(models, model)
+        models.splice(add_index, 0, model)
     else
       models = _.clone(@_kb_collection.models)
 

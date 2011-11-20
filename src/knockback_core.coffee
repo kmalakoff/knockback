@@ -35,12 +35,11 @@ Knockback.vmRelease = (view_model) ->
 
 Knockback.vmReleaseObservables = (view_model, keys) ->
   for key, value of view_model
-    do (key, value) ->
-      return if not value
-      return if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel))
-      return if keys and not _.contains(keys, key) # skip
-      view_model[key] = null
-      kb.vmReleaseObservable(value)
+    continue if not value
+    continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel))
+    continue if keys and not _.contains(keys, key) # skip
+    view_model[key] = null
+    kb.vmReleaseObservable(value)
 
 Knockback.vmReleaseObservable = (observable) ->
   return if not (ko.isObservable(observable) or (observable instanceof kb.Observables) or (observable instanceof kb.ViewModel))
@@ -131,10 +130,9 @@ Knockback.toFormattedString = (format) ->
   result = format.slice()
   args = Array.prototype.slice.call(arguments, 1)
   for index, arg of args
-    do (index, arg) ->
-      value = ko.utils.unwrapObservable(arg)
-      value = '' if not value
-      result = result.replace("{#{index}}", value)
+    value = ko.utils.unwrapObservable(arg)
+    value = '' if not value
+    result = result.replace("{#{index}}", value)
   return result
 
 Knockback.parseFormattedString = (string, format) ->
@@ -159,10 +157,9 @@ Knockback.parseFormattedString = (string, format) ->
   sorted_positions = _.sortBy(_.keys(positions), (parameter_index, format_index)->return parseInt(parameter_index,10))
   format_indices_to_matched_indices = {}
   for match_index, parameter_index of sorted_positions
-    do (match_index, parameter_index) ->
-      index = positions[parameter_index]
-      return if format_indices_to_matched_indices.hasOwnProperty(index)
-      format_indices_to_matched_indices[index] = match_index
+    index = positions[parameter_index]
+    continue if format_indices_to_matched_indices.hasOwnProperty(index)
+    format_indices_to_matched_indices[index] = match_index
 
   results = []; index=0
   while (index<count)

@@ -17,9 +17,8 @@ class Knockback.Observables
 
   destroy: ->
     for view_model_property_name, mapping_info of @mappings_info
-      do (view_model_property_name, mapping_info) =>
-        @view_model[view_model_property_name].destroy() if @view_model[view_model_property_name]
-        @view_model[view_model_property_name] = null
+      @view_model[view_model_property_name].destroy() if @view_model[view_model_property_name]
+      @view_model[view_model_property_name] = null
     @view_model = null
     @mappings_info = null
     @model = null

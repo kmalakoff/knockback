@@ -141,7 +141,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.vmRelease(view_model_instance)
     ok(view_model.number == null, "Number removed")
-    ok(view_model.something != null, "Somthing remains removed")
+    ok(view_model.something != null, "Something remains removed")
     kb.vmRelease(view_model)
     ok(view_model.something == null, "Something removed")
   )
