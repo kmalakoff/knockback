@@ -163,7 +163,7 @@ $(document).ready(function() {
         this.name = ko.dependentObservable(__bind(function() {
           return "First: " + (this._name());
         }, this));
-        this.number = kb.formatWrapper('#: {0}', this._number);
+        this.number = kb.formattedObservable('#: {0}', this._number);
       }
       return ContactViewModelCustom;
     })();
@@ -248,7 +248,7 @@ $(document).ready(function() {
         ContactViewModelFullName.__super__.constructor.call(this, model, {
           requires: ['first', 'last']
         });
-        this.full_name = kb.formatWrapper('Last: {1}, First: {0}', this.first, this.last);
+        this.full_name = kb.formattedObservable('Last: {1}, First: {0}', this.first, this.last);
       }
       return ContactViewModelFullName;
     })();

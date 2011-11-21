@@ -109,11 +109,11 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
-  test("Knockback.formatWrapper", ->
+  test("Knockback.formattedObservable", ->
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['first', 'last']})
-        @full_name = kb.formatWrapper('Last: {1}, First: {0}', @_first, @_last)
+        @full_name = kb.formattedObservable('Last: {1}, First: {0}', @_first, @_last)
 
     model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
     view_model = new ContactViewModelFullName(model)

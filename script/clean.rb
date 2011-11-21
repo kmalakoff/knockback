@@ -11,6 +11,7 @@ CLEAN_PATTERNS = [
 
   'test/backbone_modelref/build/**.js',
   'test/knockback_collection_observable/build/**.js',
+  'test/knockback_formatted_observable/build/**.js',
   'test/knockback_localized_observable/build/**.js',
   'test/knockback_observable/build/**.js',
   'test/knockback_observables/build/**.js',

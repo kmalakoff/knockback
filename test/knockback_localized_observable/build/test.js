@@ -145,7 +145,7 @@ $(document).ready(function() {
     equal(current_date.getDate(), 10, "day is good");
     return kb.vmRelease(view_model);
   });
-  test("Knockback.formatWrapper", function() {
+  test("Knockback.formattedObservable", function() {
     var ContactViewModelFullName, model, view_model;
     ContactViewModelFullName = (function() {
       __extends(ContactViewModelFullName, kb.ViewModel);
@@ -153,7 +153,7 @@ $(document).ready(function() {
         ContactViewModelFullName.__super__.constructor.call(this, model, {
           internals: ['first', 'last']
         });
-        this.full_name = kb.formatWrapper('Last: {1}, First: {0}', this._first, this._last);
+        this.full_name = kb.formattedObservable('Last: {1}, First: {0}', this._first, this._last);
       }
       return ContactViewModelFullName;
     })();

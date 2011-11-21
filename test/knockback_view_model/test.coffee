@@ -151,7 +151,7 @@ $(document).ready( ->
       constructor: (model) ->
         super(model, {internals: ['name', 'number']})
         @name = ko.dependentObservable(=> return "First: #{@_name()}")
-        @number = kb.formatWrapper('#: {0}', @_number)
+        @number = kb.formattedObservable('#: {0}', @_number)
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
@@ -225,7 +225,7 @@ $(document).ready( ->
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
-        @full_name = kb.formatWrapper('Last: {1}, First: {0}', @first, @last)
+        @full_name = kb.formattedObservable('Last: {1}, First: {0}', @first, @last)
 
     model = new Backbone.Model()
     view_model = new ContactViewModelFullName(model)

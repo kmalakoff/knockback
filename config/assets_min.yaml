@@ -5,6 +5,8 @@ javascripts:
   'knockback.min':
     - build/knockback_core.js
     - build/knockback_collection_observable.js
+    - build/knockback_default_wrapper.js
+    - build/knockback_formatted_observable.js
     - build/knockback_localized_observable.js
     - build/knockback_observable.js
     - build/knockback_observables.js

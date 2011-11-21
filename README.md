@@ -208,7 +208,7 @@ or if batch, **'resort'**: (view_models_array) -> ...
 * **'remove'**: (view_model, view_models_array) -> ...
 or if batch, **'remove'**: (view_models_array) -> ...
 
-Knockback.formatWrapper
+Knockback.formattedObservable
 -----------------------------
 You can format an arbitrary number of arguments in both read and write directions:
 
@@ -216,7 +216,7 @@ You can format an arbitrary number of arguments in both read and write direction
 class ContactViewModelFullName extends kb.ViewModel
   constructor: (model) ->
     super(model, {internals: ['first', 'last']})
-    @full_name = kb.formatWrapper('Last: {1}, First: {0}', @_first, @_last)
+    @full_name = kb.formattedObservable('Last: {1}, First: {0}', @_first, @_last)
 
 model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
 view_model = new ContactViewModelFullName(model)
@@ -320,7 +320,7 @@ Stub out an observable if you are not sure if specific attributes will be in the
 class ContactViewModelFullName extends kb.ViewModel
   constructor: (model) ->
     super(model, {requires: ['first', 'last']})
-    @full_name = kb.formatWrapper('Last: {1}, First: {0}', @first, @last)
+    @full_name = kb.formattedObservable('Last: {1}, First: {0}', @first, @last)
 
 model = new Backbone.Model()
 view_model = new ContactViewModelFullName(model)

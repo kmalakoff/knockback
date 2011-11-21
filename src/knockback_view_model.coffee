@@ -7,6 +7,44 @@
 ###
 throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file') if not @Knockback
 
+# internal helper
+class AttributeConnector
+  constructor: (model, @key, @read_only) ->
+    _.bindAll(this, 'destroy', 'setModel')
+
+    @_kb_observable = ko.observable()
+    @_kb_observable.subscription = @_kb_observable.subscribe((value) =>
+      if @read_only
+        if @model
+          value = @model.get(@key)
+          return if @_kb_observable() == value
+          @_kb_observable(value)
+        throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters."
+      else if @model
+        set_info = {}; set_info[@key] = value
+        @model.set(set_info)
+    )
+
+    # publish public interface on the observable and return instead of this
+    @_kb_observable.destroy = @destroy
+    @_kb_observable.setModel = @setModel
+
+    # start
+    @setModel(model) if model
+
+    return kb.wrappedObservable(this)
+
+  destroy: ->
+    @model = null
+    @_kb_observable = null
+
+  setModel: (model) ->
+    if model
+      @model = model
+      @_kb_observable(@model.get(@key))
+    else
+      @model = null
+
 ####################################################
 # options
 #   * read_only - default is read_write
@@ -86,7 +124,7 @@ class Knockback.ViewModel
       @_kb_view_model[vm_key].setModel(model) if @_kb_view_model[vm_key]
     else
       @_kb_observables.push(vm_key) if @_kb_observables
-      @_kb_view_model[vm_key] = kb.attributeConnector(model, key, @options.read_only)
+      @_kb_view_model[vm_key] = new AttributeConnector(model, key, @options.read_only)
 
 # factory function
 Knockback.viewModel = (model, options, view_model) -> return new Knockback.ViewModel(model, options, view_model)

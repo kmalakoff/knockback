@@ -1,14 +1,12 @@
 /*
-  knockback.js 0.11.2
+  knockback.js 0.11.3
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
     Optional dependency: Backbone.ModelRef.js.
-*/
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-if (!this.ko) {
+*/if (!this.ko) {
   throw new Error('Knockback: Dependency alert! Knockout.js must be included before this file');
 }
 if (!this.Backbone) {
@@ -19,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.11.2';
+Knockback.VERSION = '0.11.3';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -78,174 +76,6 @@ Knockback.vmReleaseObservable = function(observable) {
   } else if (observable.release) {
     return observable.release();
   }
-};
-Knockback.AttributeConnector = (function() {
-  function AttributeConnector(model, key, read_only) {
-    this.key = key;
-    this.read_only = read_only;
-    _.bindAll(this, 'destroy', 'setModel');
-    this._kb_observable = ko.observable();
-    this._kb_observable.subscription = this._kb_observable.subscribe(__bind(function(value) {
-      var set_info;
-      if (this.read_only) {
-        if (this.model) {
-          value = this.model.get(this.key);
-          if (this._kb_observable() === value) {
-            return;
-          }
-          this._kb_observable(value);
-        }
-        throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.";
-      } else if (this.model) {
-        set_info = {};
-        set_info[this.key] = value;
-        return this.model.set(set_info);
-      }
-    }, this));
-    this._kb_observable.destroy = this.destroy;
-    this._kb_observable.setModel = this.setModel;
-    if (model) {
-      this.setModel(model);
-    }
-    return kb.wrappedObservable(this);
-  }
-  AttributeConnector.prototype.destroy = function() {
-    this.model = null;
-    return this._kb_observable = null;
-  };
-  AttributeConnector.prototype.setModel = function(model) {
-    if (model) {
-      this.model = model;
-      return this._kb_observable(this.model.get(this.key));
-    } else {
-      return this.model = null;
-    }
-  };
-  return AttributeConnector;
-})();
-Knockback.attributeConnector = function(model, key, read_only) {
-  return new Knockback.AttributeConnector(model, key, read_only);
-};
-Knockback.DefaultWrapper = (function() {
-  function DefaultWrapper(observable, default_value) {
-    this.default_value = default_value;
-    _.bindAll(this, 'destroy', 'setToDefault');
-    this._kb_observable = ko.dependentObservable({
-      read: __bind(function() {
-        var value;
-        value = ko.utils.unwrapObservable(observable());
-        if (!value) {
-          return ko.utils.unwrapObservable(this.default_value);
-        } else {
-          return value;
-        }
-      }, this),
-      write: function(value) {
-        return observable(value);
-      },
-      owner: {}
-    });
-    this._kb_observable.destroy = this.destroy;
-    this._kb_observable.setToDefault = this.setToDefault;
-    return kb.wrappedObservable(this);
-  }
-  DefaultWrapper.prototype.destroy = function() {
-    this._kb_observable = null;
-    return this.default_value = null;
-  };
-  DefaultWrapper.prototype.setToDefault = function() {
-    return this._kb_observable(this.default_value);
-  };
-  return DefaultWrapper;
-})();
-Knockback.defaultWrapper = function(observable, default_value) {
-  return new Knockback.DefaultWrapper(observable, default_value);
-};
-Knockback.toFormattedString = function(format) {
-  var arg, args, index, result, value;
-  result = format.slice();
-  args = Array.prototype.slice.call(arguments, 1);
-  for (index in args) {
-    arg = args[index];
-    value = ko.utils.unwrapObservable(arg);
-    if (!value) {
-      value = '';
-    }
-    result = result.replace("{" + index + "}", value);
-  }
-  return result;
-};
-Knockback.parseFormattedString = function(string, format) {
-  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_index, positions, regex, regex_string, results, sorted_positions;
-  regex_string = format.slice();
-  index = 0;
-  positions = {};
-  while (regex_string.search("\\{" + index + "\\}") >= 0) {
-    regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
-    parameter_index = format.indexOf("\{" + index + "\}");
-    while (parameter_index >= 0) {
-      positions[parameter_index] = index;
-      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
-    }
-    index++;
-  }
-  count = index;
-  regex = new RegExp(regex_string);
-  matches = regex.exec(string);
-  if (matches) {
-    matches.shift();
-  }
-  if (!matches || (matches.length !== index)) {
-    return null;
-  }
-  sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
-    return parseInt(parameter_index, 10);
-  });
-  format_indices_to_matched_indices = {};
-  for (match_index in sorted_positions) {
-    parameter_index = sorted_positions[match_index];
-    index = positions[parameter_index];
-    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
-      continue;
-    }
-    format_indices_to_matched_indices[index] = match_index;
-  }
-  results = [];
-  index = 0;
-  while (index < count) {
-    results.push(matches[format_indices_to_matched_indices[index]]);
-    index++;
-  }
-  return results;
-};
-Knockback.formatWrapper = function(format, args) {
-  var observable_args, result;
-  observable_args = Array.prototype.slice.call(arguments, 1);
-  result = ko.dependentObservable({
-    read: function() {
-      var arg, _i, _len;
-      args = [ko.utils.unwrapObservable(format)];
-      for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
-        arg = observable_args[_i];
-        args.push(ko.utils.unwrapObservable(arg));
-      }
-      return kb.toFormattedString.apply(null, args);
-    },
-    write: function(value) {
-      var index, matches, max_count, _results;
-      matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
-      max_count = Math.min(observable_args.length, matches.length);
-      index = 0;
-      _results = [];
-      while (index < max_count) {
-        observable_args[index](matches[index]);
-        _results.push(index++);
-      }
-      return _results;
-    },
-    owner: {}
-  });
-  return result;
 };
 /*
   knockback_collection_observable.js
@@ -531,6 +361,151 @@ Knockback.collectionObservable = function(collection, vm_observable_array, optio
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
   return view_model.__kb_model;
+};
+/*
+  knockback_default_wrapper.js
+  (c) 2011 Kevin Malakoff.
+  Knockback.DefaultWrapper is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+*/
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+if (!this.Knockback) {
+  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
+}
+Knockback.DefaultWrapper = (function() {
+  function DefaultWrapper(observable, default_value) {
+    this.default_value = default_value;
+    _.bindAll(this, 'destroy', 'setToDefault');
+    this._kb_observable = ko.dependentObservable({
+      read: __bind(function() {
+        var value;
+        value = ko.utils.unwrapObservable(observable());
+        if (!value) {
+          return ko.utils.unwrapObservable(this.default_value);
+        } else {
+          return value;
+        }
+      }, this),
+      write: function(value) {
+        return observable(value);
+      },
+      owner: {}
+    });
+    this._kb_observable.destroy = this.destroy;
+    this._kb_observable.setToDefault = this.setToDefault;
+    return kb.wrappedObservable(this);
+  }
+  DefaultWrapper.prototype.destroy = function() {
+    this._kb_observable = null;
+    return this.default_value = null;
+  };
+  DefaultWrapper.prototype.setToDefault = function() {
+    return this._kb_observable(this.default_value);
+  };
+  return DefaultWrapper;
+})();
+Knockback.defaultWrapper = function(observable, default_value) {
+  return new Knockback.DefaultWrapper(observable, default_value);
+};
+/*
+  knockback_formatted_observable.js
+  (c) 2011 Kevin Malakoff.
+  Knockback.FormattedObservable is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+*/if (!this.Knockback) {
+  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
+}
+Knockback.toFormattedString = function(format) {
+  var arg, args, index, parameter_index, result, value;
+  result = format.slice();
+  args = Array.prototype.slice.call(arguments, 1);
+  for (index in args) {
+    arg = args[index];
+    value = ko.utils.unwrapObservable(arg);
+    if (!value) {
+      value = '';
+    }
+    parameter_index = format.indexOf("\{" + index + "\}");
+    while (parameter_index >= 0) {
+      result = result.replace("{" + index + "}", value);
+      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+    }
+  }
+  return result;
+};
+Knockback.parseFormattedString = function(string, format) {
+  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_index, positions, regex, regex_string, results, sorted_positions;
+  regex_string = format.slice();
+  index = 0;
+  positions = {};
+  while (regex_string.search("\\{" + index + "\\}") >= 0) {
+    regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
+    parameter_index = format.indexOf("\{" + index + "\}");
+    while (parameter_index >= 0) {
+      positions[parameter_index] = index;
+      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+    }
+    index++;
+  }
+  count = index;
+  regex = new RegExp(regex_string);
+  matches = regex.exec(string);
+  if (matches) {
+    matches.shift();
+  }
+  if (!matches || (matches.length !== index)) {
+    return null;
+  }
+  sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
+    return parseInt(parameter_index, 10);
+  });
+  format_indices_to_matched_indices = {};
+  for (match_index in sorted_positions) {
+    parameter_index = sorted_positions[match_index];
+    index = positions[parameter_index];
+    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
+      continue;
+    }
+    format_indices_to_matched_indices[index] = match_index;
+  }
+  results = [];
+  index = 0;
+  while (index < count) {
+    results.push(matches[format_indices_to_matched_indices[index]]);
+    index++;
+  }
+  return results;
+};
+Knockback.formattedObservable = function(format, args) {
+  var observable_args, result;
+  observable_args = Array.prototype.slice.call(arguments, 1);
+  result = ko.dependentObservable({
+    read: function() {
+      var arg, _i, _len;
+      args = [ko.utils.unwrapObservable(format)];
+      for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
+        arg = observable_args[_i];
+        args.push(ko.utils.unwrapObservable(arg));
+      }
+      return kb.toFormattedString.apply(null, args);
+    },
+    write: function(value) {
+      var index, matches, max_count, _results;
+      matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+      max_count = Math.min(observable_args.length, matches.length);
+      index = 0;
+      _results = [];
+      while (index < max_count) {
+        observable_args[index](matches[index]);
+        _results.push(index++);
+      }
+      return _results;
+    },
+    owner: {}
+  });
+  return result;
 };
 /*
   knockback_localized_observable.js
@@ -1008,9 +983,56 @@ Knockback.triggeredObservable = function(model, event_name) {
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
+*/
+var AttributeConnector;
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
+AttributeConnector = (function() {
+  function AttributeConnector(model, key, read_only) {
+    this.key = key;
+    this.read_only = read_only;
+    _.bindAll(this, 'destroy', 'setModel');
+    this._kb_observable = ko.observable();
+    this._kb_observable.subscription = this._kb_observable.subscribe(__bind(function(value) {
+      var set_info;
+      if (this.read_only) {
+        if (this.model) {
+          value = this.model.get(this.key);
+          if (this._kb_observable() === value) {
+            return;
+          }
+          this._kb_observable(value);
+        }
+        throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.";
+      } else if (this.model) {
+        set_info = {};
+        set_info[this.key] = value;
+        return this.model.set(set_info);
+      }
+    }, this));
+    this._kb_observable.destroy = this.destroy;
+    this._kb_observable.setModel = this.setModel;
+    if (model) {
+      this.setModel(model);
+    }
+    return kb.wrappedObservable(this);
+  }
+  AttributeConnector.prototype.destroy = function() {
+    this.model = null;
+    return this._kb_observable = null;
+  };
+  AttributeConnector.prototype.setModel = function(model) {
+    if (model) {
+      this.model = model;
+      return this._kb_observable(this.model.get(this.key));
+    } else {
+      return this.model = null;
+    }
+  };
+  return AttributeConnector;
+})();
 Knockback.ViewModel = (function() {
   function ViewModel(model, options, _kb_view_model) {
     var key, missing, _i, _len;
@@ -1125,7 +1147,7 @@ Knockback.ViewModel = (function() {
       if (this._kb_observables) {
         this._kb_observables.push(vm_key);
       }
-      return this._kb_view_model[vm_key] = kb.attributeConnector(model, key, this.options.read_only);
+      return this._kb_view_model[vm_key] = new AttributeConnector(model, key, this.options.read_only);
     }
   };
   return ViewModel;
