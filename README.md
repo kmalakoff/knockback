@@ -11,8 +11,6 @@ Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
 You can get the library here:
 
-## Knockback
-
 * [Development version][1]
 * [Production version][2]
 
