@@ -36,8 +36,11 @@ Enjoy!
 
 Kevin
 
+Demos and Documentation
+-----------------------
 
-Check out the jsFiddle that demonstrates dynamic localization: http://jsfiddle.net/kmalakoff/QSkpv/ or the obligatory Todo app (which is a comprehesive source of documentation and examples for Knockback): https://github.com/kmalakoff/knockback-todos
+1. Knockback Todo app provides a great example and **comprehesive documentation on Knockback**: https://github.com/kmalakoff/knockback-todos
+2. jsFiddle that demonstrates dynamic localization: http://jsfiddle.net/kmalakoff/QSkpv/ 
 
 An Example
 ----------
