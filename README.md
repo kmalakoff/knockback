@@ -39,7 +39,9 @@ Kevin
 Demos and Documentation
 -----------------------
 
-1. Knockback Todo app provides a great example and **comprehesive documentation on Knockback**: https://github.com/kmalakoff/knockback-todos
+### Try the live demo: http://kmalakoff.github.com/knockback-todos/
+
+1. Knockback Todo app provides a **comprehesive documentation on Knockback**: https://github.com/kmalakoff/knockback-todos
 2. jsFiddle that demonstrates dynamic localization: http://jsfiddle.net/kmalakoff/QSkpv/ 
 
 An Example
