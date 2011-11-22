@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.11.3
+  knockback.js 0.11.4
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.11.3';
+Knockback.VERSION = '0.11.4';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -436,15 +436,17 @@ Knockback.toFormattedString = function(format) {
   return result;
 };
 Knockback.parseFormattedString = function(string, format) {
-  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_index, positions, regex, regex_string, results, sorted_positions;
+  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, results, sorted_positions, _i, _results;
   regex_string = format.slice();
   index = 0;
+  parameter_count = 0;
   positions = {};
   while (regex_string.search("\\{" + index + "\\}") >= 0) {
-    regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
     parameter_index = format.indexOf("\{" + index + "\}");
     while (parameter_index >= 0) {
+      regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
       positions[parameter_index] = index;
+      parameter_count++;
       parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
     }
     index++;
@@ -455,8 +457,14 @@ Knockback.parseFormattedString = function(string, format) {
   if (matches) {
     matches.shift();
   }
-  if (!matches || (matches.length !== index)) {
-    return null;
+  if (!matches || (matches.length !== parameter_count)) {
+    return _.map((function() {
+      _results = [];
+      for (var _i = 1; 1 <= count ? _i <= count : _i >= count; 1 <= count ? _i++ : _i--){ _results.push(_i); }
+      return _results;
+    }).apply(this), function() {
+      return '';
+    });
   }
   sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
     return parseInt(parameter_index, 10);

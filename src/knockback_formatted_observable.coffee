@@ -21,14 +21,13 @@ Knockback.toFormattedString = (format) ->
   return result
 
 Knockback.parseFormattedString = (string, format) ->
-  regex_string = format.slice(); index = 0; positions = {}
+  regex_string = format.slice(); index = 0; parameter_count = 0; positions = {}
   while(regex_string.search("\\{#{index}\\}")>=0)
-    regex_string = regex_string.replace("\{#{index}\}", '(.*)')
-
     # store the positions of the replacements
     parameter_index = format.indexOf("\{#{index}\}")
     while (parameter_index>=0)
-      positions[parameter_index] = index
+      regex_string = regex_string.replace("\{#{index}\}", '(.*)')
+      positions[parameter_index] = index; parameter_count++
       parameter_index = format.indexOf("\{#{index}\}", parameter_index+1)
     index++
   count = index
@@ -36,7 +35,8 @@ Knockback.parseFormattedString = (string, format) ->
   regex = new RegExp(regex_string)
   matches = regex.exec(string)
   matches.shift() if (matches)
-  return null if not matches or (matches.length!=index)
+  # return fake empty data
+  return _.map([1..count], -> return '') if not matches or (matches.length!=parameter_count)
 
   # sort the matches since the parameters could be requested unordered
   sorted_positions = _.sortBy(_.keys(positions), (parameter_index, format_index)->return parseInt(parameter_index,10))

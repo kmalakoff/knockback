@@ -27,13 +27,15 @@ $(document).ready(function() {
         this.number = kb.formattedObservable('#: {0}', this._number);
         this.name_number = kb.formattedObservable('Name: {0}, #: {1}', this._name, this._number);
         this.number_name = kb.formattedObservable('#: {1}, Name: {0}', this._name, this._number);
-        this.name_number_name = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}', this._name, this._number, this._name);
+        this.name_number_name = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}', this._name, this._number);
+        this.name_number_name_song = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}, Song: "{2}"', this._name, this._number, this.favorite_song);
       }
       return ContactViewModelCustom;
     })();
     model = new Contact({
       name: 'Ringo',
-      number: '555-555-5556'
+      number: '555-555-5556',
+      favorite_song: 'Yellow Submarine'
     });
     view_model = new ContactViewModelCustom(model);
     equal(view_model._name(), 'Ringo', "Interesting name");
@@ -94,6 +96,17 @@ $(document).ready(function() {
     equal(view_model.name_number(), 'Name: Starr, #: XXX-XXX-XXXX', "combined in order");
     equal(view_model.number_name(), '#: XXX-XXX-XXXX, Name: Starr', "combined out of order");
     equal(view_model.name_number_name(), 'Name: Starr, #: XXX-XXX-XXXX, Name: Starr', "combined repeat");
+    equal(view_model.name_number_name_song(), 'Name: Starr, #: XXX-XXX-XXXX, Name: Starr, Song: "Yellow Submarine"', "works with repeat parameters");
+    view_model.name_number_name_song('Name: Ringo, #: 555-555-5556, Name: Ringo, Song: "Yellow"');
+    equal(view_model._name(), 'Ringo', "Interesting name");
+    equal(view_model.name(), 'Name: Ringo', "Interesting name");
+    equal(view_model._number(), '555-555-5556', "Not so interesting number");
+    equal(view_model.number(), '#: 555-555-5556', "Not so interesting number");
+    equal(view_model.name_number(), 'Name: Ringo, #: 555-555-5556', "combined in order");
+    equal(view_model.number_name(), '#: 555-555-5556, Name: Ringo', "combined out of order");
+    equal(view_model.name_number_name(), 'Name: Ringo, #: 555-555-5556, Name: Ringo', "combined repeat");
+    equal(view_model.favorite_song(), 'Yellow', "combined repeat");
+    equal(view_model.name_number_name_song(), 'Name: Ringo, #: 555-555-5556, Name: Ringo, Song: "Yellow"', "combined repeat");
     return kb.vmRelease(view_model);
   });
   return test("Error cases", function() {});
