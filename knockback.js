@@ -40,7 +40,7 @@ Knockback.vmSetToDefault = function(view_model) {
   return _results;
 };
 Knockback.vmRelease = function(view_model) {
-  if (view_model instanceof kb.ViewModel) {
+  if (view_model instanceof kb.ViewModel_RCBase) {
     view_model.release();
     return;
   }
@@ -54,7 +54,7 @@ Knockback.vmReleaseObservables = function(view_model, keys) {
     if (!value) {
       continue;
     }
-    if (!(ko.isObservable(value) || (value instanceof kb.Observables) || (value instanceof kb.ViewModel))) {
+    if (!(ko.isObservable(value) || (value instanceof kb.Observables) || (value instanceof kb.ViewModel_RCBase))) {
       continue;
     }
     if (keys && !_.contains(keys, key)) {
@@ -66,7 +66,7 @@ Knockback.vmReleaseObservables = function(view_model, keys) {
   return _results;
 };
 Knockback.vmReleaseObservable = function(observable) {
-  if (!(ko.isObservable(observable) || (observable instanceof kb.Observables) || (observable instanceof kb.ViewModel))) {
+  if (!(ko.isObservable(observable) || (observable instanceof kb.Observables) || (observable instanceof kb.ViewModel_RCBase))) {
     return;
   }
   if (observable.destroy) {
@@ -993,7 +993,14 @@ Knockback.triggeredObservable = function(model, event_name) {
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
 var AttributeConnector;
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+  for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
+  function ctor() { this.constructor = child; }
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor;
+  child.__super__ = parent.prototype;
+  return child;
+};
 if (!this.Knockback) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
@@ -1041,13 +1048,42 @@ AttributeConnector = (function() {
   };
   return AttributeConnector;
 })();
+Knockback.ViewModel_RCBase = (function() {
+  function ViewModel_RCBase() {
+    this.ref_count = 1;
+  }
+  ViewModel_RCBase.prototype._destroy = function() {
+    return kb.vmReleaseObservables(view_model);
+  };
+  ViewModel_RCBase.prototype.retain = function() {
+    if (this.ref_count <= 0) {
+      throw new Error("ViewModel: ref_count is corrupt: " + this.ref_count);
+    }
+    this.ref_count++;
+    return this;
+  };
+  ViewModel_RCBase.prototype.release = function() {
+    if (this.ref_count <= 0) {
+      throw new Error("ViewModel: ref_count is corrupt: " + this.ref_count);
+    }
+    this.ref_count--;
+    if (!this.ref_count) {
+      this._destroy();
+    }
+    return this;
+  };
+  ViewModel_RCBase.prototype.refCount = function() {
+    return this.ref_count;
+  };
+  return ViewModel_RCBase;
+})();
 Knockback.ViewModel = (function() {
+  __extends(ViewModel, kb.ViewModel_RCBase);
   function ViewModel(model, options, _kb_view_model) {
     var key, missing, _i, _len;
     this.model = model;
     this.options = options != null ? options : {};
     this._kb_view_model = _kb_view_model;
-    this.ref_count = 1;
     if (!this.model) {
       throw new Error('ViewModel: model is missing');
     }
@@ -1091,26 +1127,6 @@ Knockback.ViewModel = (function() {
     if (this._kb_observables) {
       return this._kb_observables = null;
     }
-  };
-  ViewModel.prototype.retain = function() {
-    if (this.ref_count <= 0) {
-      throw new Error("ViewModel: ref_count is corrupt: " + this.ref_count);
-    }
-    this.ref_count++;
-    return this;
-  };
-  ViewModel.prototype.release = function() {
-    if (this.ref_count <= 0) {
-      throw new Error("ViewModel: ref_count is corrupt: " + this.ref_count);
-    }
-    this.ref_count--;
-    if (this.ref_count === 0) {
-      this._destroy(this);
-    }
-    return this;
-  };
-  ViewModel.prototype.refCount = function() {
-    return this.ref_count;
   };
   ViewModel.prototype._onModelLoaded = function(model) {
     var key, _results;

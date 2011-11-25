@@ -54,9 +54,29 @@ class AttributeConnector
 #       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 ####################################################
 
-class Knockback.ViewModel
-  constructor: (@model, @options={}, @_kb_view_model) ->
+class Knockback.ViewModel_RCBase
+  constructor: ->
     @ref_count = 1
+
+  _destroy: ->
+    kb.vmReleaseObservables(view_model)
+
+  # reference counting
+  retain: ->
+    throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
+    @ref_count++
+    @
+
+  release: ->
+    throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
+    @ref_count--
+    @_destroy() unless @ref_count
+    @
+
+  refCount: -> return @ref_count
+
+class Knockback.ViewModel extends kb.ViewModel_RCBase
+  constructor: (@model, @options={}, @_kb_view_model) ->
     throw new Error('ViewModel: model is missing') if not @model
 
     _.bindAll(this, '_onModelChange', '_onModelLoaded', '_onModelUnloaded')
@@ -85,20 +105,6 @@ class Knockback.ViewModel
     view_model = @_kb_view_model; @_kb_view_model = null
     kb.vmReleaseObservables(view_model, @_kb_observables)
     @_kb_observables = null if @_kb_observables
-
-  # reference counting
-  retain: ->
-    throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
-    @ref_count++
-    @
-
-  release: ->
-    throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
-    @ref_count--
-    @_destroy(this) if (@ref_count == 0)
-    @
-
-  refCount: -> return @ref_count
 
   ####################################################
   # Internal

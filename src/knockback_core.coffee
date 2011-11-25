@@ -30,19 +30,19 @@ Knockback.setToDefault = (observable) -> observable.setToDefault() if observable
 Knockback.vmSetToDefault = (view_model) -> kb.setToDefault(observable) for key, observable of view_model
 
 Knockback.vmRelease = (view_model) ->
-  (view_model.release(); return) if (view_model instanceof kb.ViewModel)
+  (view_model.release(); return) if (view_model instanceof kb.ViewModel_RCBase)
   Knockback.vmReleaseObservables(view_model)
 
 Knockback.vmReleaseObservables = (view_model, keys) ->
   for key, value of view_model
     continue if not value
-    continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel))
+    continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel_RCBase))
     continue if keys and not _.contains(keys, key) # skip
     view_model[key] = null
     kb.vmReleaseObservable(value)
 
 Knockback.vmReleaseObservable = (observable) ->
-  return if not (ko.isObservable(observable) or (observable instanceof kb.Observables) or (observable instanceof kb.ViewModel))
+  return if not (ko.isObservable(observable) or (observable instanceof kb.Observables) or (observable instanceof kb.ViewModel_RCBase))
   if observable.destroy
     observable.destroy()
   else if observable.dispose
