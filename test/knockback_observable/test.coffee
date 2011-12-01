@@ -6,7 +6,7 @@ $(document).ready( ->
 
   test("Standard use case: direct attributes with read and write", ->
     ContactViewModel = (model) ->
-      @name = kb.observable(model, key:'name')
+      @name = kb.observable(model, 'name')
       @number = kb.observable(model, {key:'number', write: true}, this)
       @
 

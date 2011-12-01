@@ -42,7 +42,7 @@ Demos and Documentation
 ### Try the live demo: http://kmalakoff.github.com/knockback-todos/
 
 1. Knockback Todo app provides a **comprehesive documentation on Knockback**: https://github.com/kmalakoff/knockback-todos
-2. jsFiddle that demonstrates dynamic localization: http://jsfiddle.net/kmalakoff/QSkpv/ 
+2. jsFiddle that demonstrates dynamic localization: http://jsfiddle.net/kmalakoff/QSkpv/
 
 An Example
 ----------
@@ -52,7 +52,7 @@ An Example
 ```coffeescript
 ContactViewModel = (model) ->
   kb.observables(model, {
-    name:     {key:'name'}
+    name:     'name'
     email:    {key:'email', write: true, default: 'your.name@yourplace.com'}
     date:     {key:'date', write: true, localizer: LongDateLocalizer}
   }, this)
@@ -120,11 +120,11 @@ You can watch a non-BackboneModel as long as it: a) mixes in Backbone.Events and
 
 ```coffeescript
 kb.observables(kb.locale_manager, {
-  label_title_new:    { key: 'title_new' },
-  label_button_new:   { key: 'button_new' },
-  label_name:         { key: 'name' },
-  label_email:        { key: 'email' },
-  label_date:         { key: 'date' }
+  label_title_new:    'title_new'
+  label_button_new:   'button_new'
+  label_name:         'name'
+  label_email:        'email'
+  label_date:         'date'
 }, view_model)
 ```
 
@@ -151,6 +151,29 @@ kb.observables(model, {
 ```
 
 ### Note 4
+
+You can provide an option to the observables to fill in the write options for entries that have not been specified. Note: the default is read-only to reduce keep observable resource usage to a minimum.
+
+```coffeescript
+kb.observables(model, {
+  name:     'name'
+  status:   {key: 'status', write: false}
+  date:     {key:'date', localizer: LongDateLocalizer}
+  item1:    'something'
+}, this, true)    # fill in unspecified - name, date, item1 are writeable, status is read-only
+```
+or
+
+```coffeescript
+kb.observables(model, {
+  name:     'name'
+  status:   {key: 'status', write: false}
+  date:     {key:'date', localizer: LongDateLocalizer}
+  item1:    'something'
+}, this, {write: true})    # fill in unspecified - name, date, item1 are writeable, status is read-only
+```
+
+### Note 5
 
 You can also watch a Backbone.ModelRef instead of a Backbone.Model. What is a Backbone.ModelRef do you ask? It is the combination of a collection and a model id that tells you when it is loaded and unloaded (https://github.com/kmalakoff/backbone-modelref). That way, you can start rendering views on a page while the models are loading.
 
@@ -333,7 +356,7 @@ model.set({first: 'Ringo', last: 'Starr'})
 equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
 ```
 
-Reassign (and stub out) specific defaut observable names to _{name} if you plan to use them only as internal, intermediate values. This way you can use your attribute names with advanced logic in your template bindings.
+Reassign (and stub out) specific default observable names to _{name} if you plan to use them only as internal, intermediate values. This way you can use your attribute names with advanced logic in your template bindings.
 
 ```coffeescript
 class ContactViewModel extends kb.ViewModel

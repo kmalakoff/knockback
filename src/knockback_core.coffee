@@ -15,7 +15,7 @@ throw new Error('Knockback: Dependency alert! Underscore.js must be included bef
 this.Knockback||this.Knockback={}; this.kb||this.kb=this.Knockback
 
 # Current version.
-Knockback.VERSION = '0.11.4'
+Knockback.VERSION = '0.11.5'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing

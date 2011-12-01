@@ -8,9 +8,7 @@ $(document).ready(function() {
   test("Standard use case: direct attributes with read and write", function() {
     var ContactViewModel, model, view_model;
     ContactViewModel = function(model) {
-      this.name = kb.observable(model, {
-        key: 'name'
-      });
+      this.name = kb.observable(model, 'name');
       this.number = kb.observable(model, {
         key: 'number',
         write: true

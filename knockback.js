@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.11.4';
+Knockback.VERSION = '0.11.5';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -667,6 +667,11 @@ Knockback.Observable = (function() {
     if (!this.options) {
       throw new Error('Observable: options is missing');
     }
+    if (_.isString(this.options)) {
+      this.options = {
+        key: this.options
+      };
+    }
     if (!this.options.key) {
       throw new Error('Observable: options.key is missing');
     }
@@ -858,8 +863,8 @@ Knockback.observable = function(model, options, view_model) {
   throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
 }
 Knockback.Observables = (function() {
-  function Observables(model, mappings_info, view_model) {
-    var mapping_info, view_model_property_name, _ref;
+  function Observables(model, mappings_info, view_model, options_or_writeable) {
+    var is_string, mapping_info, view_model_property_name, write, _ref, _ref2;
     this.model = model;
     this.mappings_info = mappings_info;
     this.view_model = view_model;
@@ -869,10 +874,28 @@ Knockback.Observables = (function() {
     if (!this.mappings_info) {
       throw new Error('Observables: mappings_info is missing');
     }
-    _ref = this.mappings_info;
-    for (view_model_property_name in _ref) {
-      mapping_info = _ref[view_model_property_name];
-      this.view_model[view_model_property_name] = kb.observable(this.model, mapping_info, this.view_model);
+    if (!!options_or_writeable && ((_.isBoolean(options_or_writeable) && options_or_writeable) || !!options_or_writeable.write)) {
+      write = _.isBoolean(options_or_writeable) ? options_or_writeable : !!options_or_writeable.write;
+      _ref = this.mappings_info;
+      for (view_model_property_name in _ref) {
+        mapping_info = _ref[view_model_property_name];
+        is_string = _.isString(mapping_info);
+        if (is_string || !mapping_info.hasOwnProperty(write)) {
+          mapping_info = is_string ? {
+            key: mapping_info,
+            write: write
+          } : _.extend({
+            write: write
+          }, mapping_info);
+        }
+        this.view_model[view_model_property_name] = kb.observable(this.model, mapping_info, this.view_model);
+      }
+    } else {
+      _ref2 = this.mappings_info;
+      for (view_model_property_name in _ref2) {
+        mapping_info = _ref2[view_model_property_name];
+        this.view_model[view_model_property_name] = kb.observable(this.model, mapping_info, this.view_model);
+      }
     }
   }
   Observables.prototype.destroy = function() {
@@ -901,8 +924,8 @@ Knockback.Observables = (function() {
   };
   return Observables;
 })();
-Knockback.observables = function(model, mappings_info, view_model) {
-  return new Knockback.Observables(model, mappings_info, view_model);
+Knockback.observables = function(model, mappings_info, view_model, options) {
+  return new Knockback.Observables(model, mappings_info, view_model, options);
 };
 /*
   knockback_triggered_observable.js
