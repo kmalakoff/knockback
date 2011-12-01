@@ -667,7 +667,7 @@ Knockback.Observable = (function() {
     if (!this.options) {
       throw new Error('Observable: options is missing');
     }
-    if (_.isString(this.options)) {
+    if (_.isString(this.options) || ko.isObservable(this.options)) {
       this.options = {
         key: this.options
       };

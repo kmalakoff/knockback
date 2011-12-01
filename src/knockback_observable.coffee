@@ -19,7 +19,7 @@ class Knockback.Observable
   constructor: (@model, @options, @view_model) ->
     throw new Error('Observable: model is missing') if not @model
     throw new Error('Observable: options is missing') if not @options
-    @options = {key: @options} if _.isString(@options)
+    @options = {key: @options} if _.isString(@options) or ko.isObservable(@options)
     throw new Error('Observable: options.key is missing') if not @options.key
 
     _.bindAll(this, 'destroy', 'setToDefault', '_onGetValue', '_onSetValue', '_onModelChange', '_onModelLoaded', '_onModelUnloaded')
