@@ -187,10 +187,18 @@ This takes a ko.observableArray and makes sure it stays in sync and sorted with 
 
 ```coffeescript
 kb.collectionObservable(collection, view_models_array, {
-  view_model: ContactViewModel
+  view_model_constructor: ContactViewModel
 })
 ```
-**Note:** view_model is optional. If it is not supplied, a default view model with read and write observables will be created for all of the attributes in your model (see kb.viewModel).
+or
+
+```coffeescript
+kb.collectionObservable(collection, view_models_array, {
+  view_model_create: (model) -> return new ContactViewModel(model)
+})
+```
+
+**Note:** view_model_constructor and view_model_create are optional. If it is not supplied, a default view model with read and write observables will be created for all of the attributes in your model (see kb.viewModel).
 
 ### Note 1
 
@@ -207,6 +215,14 @@ or
 ```coffeescript
 collection_observable = kb.collectionObservable(collection, view_models_array, {
   sorted_index:    (models, model) -> return _.sortedIndex(models, model, (test) -> return test.get('first_name') + " " + test.get('last_name'))
+})
+```
+
+or
+
+```coffeescript
+collection_observable = kb.collectionObservable(collection, view_models_array, {
+  sorted_index:    kb.sortedIndexWrapAttr('name', NameWithNumber)  # or shorthand: kb.siwa
 })
 ```
 

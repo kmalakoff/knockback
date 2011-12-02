@@ -16,8 +16,12 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 #     Default: resort on all changes to a model.
 #     Setter: sort_attribute: (sort_attribute, sorted_index) -> where sort_attribute is optional
 #
-# Optional: If you wish to create view models, you must supply a target observable array and this option:
-#   view_model: view_model_class
+# Options:
+#   view_model_constructor: (model) -> ... view model constructor
+#   view_model_create: (model) -> ... view model create function
+#   defer: if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a cycle.
+# Optional: If you wish to create view models, you must supply a target observable array and the view_model_create or view_model_constructor option.
+#
 # With view models, the following are triggered the following Backbone.Events
 #   add: (view_model, view_models_array) or if batch: (view_models_array)
 #   resort: (view_model, view_models_array, new_index) or if batch: (view_models_array)
@@ -25,12 +29,14 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ####################################################
 
 class Knockback.CollectionObservable
-  constructor: (collection, @vm_observable_array, options) ->
-    @options = if options then _.clone(options) else {}
+  constructor: (collection, @vm_observable_array, options={}) ->
     throw new Error('CollectionObservable: collection is missing') if not collection
-    if @vm_observable_array or @options.view_model
+    # legacy
+    (options.view_model_constructor = options['view_model']; delete options['view_model']) if options.hasOwnProperty('view_model')
+    if @vm_observable_array or options.view_model_create or options.view_model_constructor
       throw new Error('CollectionObservable: vm_observable_array is missing') if not @vm_observable_array
-      throw new Error('CollectionObservable: options is missing') if not @options
+    (defer = options.defer; delete options['defer']) if options.hasOwnProperty('defer')
+    @options = _.clone(options)
 
     _.bindAll(this, 'destroy', 'collection', 'sortedIndex', 'sortAttribute', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger')
     _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged')
@@ -60,7 +66,7 @@ class Knockback.CollectionObservable
     @_kb_observable.trigger = @trigger
 
     # start
-    @sortedIndex(@options.sorted_index, @options.sort_attribute, true)
+    @sortedIndex(@options.sorted_index, @options.sort_attribute, {silent: true, defer: defer})
 
     return kb.wrappedObservable(this)
 
@@ -80,7 +86,7 @@ class Knockback.CollectionObservable
     @_kb_value_observable() # force a dependency
     return @_kb_collection
 
-  sortedIndex: (sorted_index, sort_attribute, silent) ->
+  sortedIndex: (sorted_index, sort_attribute, options={}) ->
     if sorted_index
       @options.sorted_index = sorted_index
       @options.sort_attribute = sort_attribute
@@ -91,8 +97,13 @@ class Knockback.CollectionObservable
       @options.sort_attribute = null
       @options.sorted_index = null
 
-    @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
-    @trigger('resort', @vm_observable_array()) if not silent # notify
+    _resync = =>
+      return if (@_kb_collection.models.length == 0) and (@_kb_value_observable().length == 0) # don't do anything
+      @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
+      @trigger('resort', @vm_observable_array()) unless options.silent # notify
+
+    # resync now or later
+    if options.defer then _.defer(_resync) else _resync()
     @
 
   sortAttribute: (sort_attribute, sorted_index, silent) -> return @sortedIndex(sorted_index, sort_attribute, silent)
@@ -201,7 +212,12 @@ class Knockback.CollectionObservable
       @trigger('add', @vm_observable_array()) if not silent # notify
 
   _viewModelCreate: (model) ->
-    view_model = if @options.view_model then new @options.view_model(model) else kb.viewModel(model)
+    if @options.view_model_create
+      view_model = @options.view_model_create(model)
+    else if @options.view_model_constructor
+      view_model = new @options.view_model_constructor(model)
+    else
+      view_model = kb.viewModel(model)
     view_model.__kb_model = model
     return view_model
 
@@ -215,3 +231,5 @@ Knockback.collectionObservable = (collection, vm_observable_array, options) -> r
 
 # helpers
 Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> view_model.__kb_model
+Knockback.sortedIndexWrapAttr = Knockback.siwa = (attribute_name, wrapper_constructor) ->
+  return (models, model) -> return _.sortedIndex(models, model, (test) -> return new wrapper_constructor(test.get(attribute_name)))

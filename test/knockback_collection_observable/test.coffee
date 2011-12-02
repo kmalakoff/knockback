@@ -5,9 +5,14 @@ $(document).ready( ->
   )
 
   ContactViewModel = (model) ->
-    @name = kb.observable(model, key:'name', this)
-    @number = kb.observable(model, key:'number', this)
+    @name = kb.observable(model, 'name')
+    @number = kb.observable(model, 'number')
     @
+
+  class ContactViewModelClass
+    constructor: (model) ->
+      @name = kb.observable(model, 'name')
+      @number = kb.observable(model, 'number')
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
     collection = new ContactsCollection()
@@ -37,7 +42,7 @@ $(document).ready( ->
     view_models_array = ko.observableArray([])
 
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      view_model: ContactViewModel
+      view_model_constructor: ContactViewModel
     })
 
     view_model =
@@ -100,7 +105,7 @@ $(document).ready( ->
     view_models_array = ko.observableArray([])
 
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      view_model: ContactViewModel
+      view_model_create: (model) -> return new ContactViewModel(model)
     })
 
     equal(collection.length, 0, "no models")
@@ -132,14 +137,14 @@ $(document).ready( ->
     ok(collection_observable.collection()==collection, "collections match")
   )
 
-  test("Basic Usage: collection sync sorting with callbacks", ->
+  test("Basic Usage: collection sync sorting with sort_attribute", ->
     collection = new ContactsCollection()
     view_models_array = ko.observableArray([])
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      view_model:         ContactViewModel
-      sort_attribute:     'name'
+      view_model_constructor:   ContactViewModelClass
+      sort_attribute:           'name'
     })
     collection_observable.bind('add', (view_model, view_models_array_array) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
     collection_observable.bind('resort', (view_model, view_models_array_array, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
@@ -184,13 +189,42 @@ $(document).ready( ->
     ok(view_model_resort_count==0, "not resorting happened because everything was inserted once") # TODO: make a rigorous check
   )
 
+  test("Basic Usage: collection sync sorting with sorted_index", ->
+    collection = new ContactsCollection()
+    view_models_array = ko.observableArray([])
+    view_model_count = 0; view_model_resort_count = 0
+
+    class SortWrapper
+      constructor: (value) ->
+        @parts = value.split('-')
+      compare: (that) ->
+        return (that.parts.length-@parts.length) if @parts.length != that.parts.length
+        for index, part of @parts
+          diff = that.parts[index] - Math.parseInt(part, 10)
+          return diff unless diff == 0
+        return 0
+
+    collection_observable = kb.collectionObservable(collection, view_models_array, {
+      view_model_constructor:   ContactViewModelClass
+      sorted_index:             kb.siwa('number', SortWrapper)
+    })
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    equal(collection.length, 2, "two models")
+    equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
+    equal(collection.models[1].get('name'), 'George', "George is second")
+    equal(view_models_array().length, 2, "two view models")
+    equal(kb.vmModel(view_models_array()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.vmModel(view_models_array()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
+  )
+
   test("Basic Usage: collection sorting with callbacks", ->
     collection = new NameSortedContactsCollection()
     view_models_array = ko.observableArray([])
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      view_model: ContactViewModel
+      view_model: ContactViewModel    # view_model is legacy for view_model_constructor, it should be replaced with view_model_constructor or view_model_create
     })
     collection_observable.bind('add', (view_model, view_models_array_array) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
     collection_observable.bind('resort', (view_model, view_models_array_array, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
@@ -239,7 +273,7 @@ $(document).ready( ->
     view_models_array = ko.observableArray([])
 
     collection_observable = kb.collectionObservable(collection, view_models_array, {
-      view_model: ContactViewModel
+      view_model_constructor: ContactViewModel
     })
 
     equal(collection.length, 0, "no models")

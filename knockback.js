@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.11.4
+  knockback.js 0.12.0
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.11.5';
+Knockback.VERSION = '0.12.0';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -84,7 +84,7 @@ Knockback.vmReleaseObservable = function(observable) {
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
-var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; }, __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
   for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
   function ctor() { this.constructor = child; }
   ctor.prototype = parent.prototype;
@@ -97,20 +97,28 @@ if (!this.Knockback) {
 }
 Knockback.CollectionObservable = (function() {
   function CollectionObservable(collection, vm_observable_array, options) {
-    var event, _i, _j, _len, _len2, _ref, _ref2;
+    var defer, event, _i, _j, _len, _len2, _ref, _ref2;
     this.vm_observable_array = vm_observable_array;
-    this.options = options ? _.clone(options) : {};
+    if (options == null) {
+      options = {};
+    }
     if (!collection) {
       throw new Error('CollectionObservable: collection is missing');
     }
-    if (this.vm_observable_array || this.options.view_model) {
+    if (options.hasOwnProperty('view_model')) {
+      options.view_model_constructor = options['view_model'];
+      delete options['view_model'];
+    }
+    if (this.vm_observable_array || options.view_model_create || options.view_model_constructor) {
       if (!this.vm_observable_array) {
         throw new Error('CollectionObservable: vm_observable_array is missing');
       }
-      if (!this.options) {
-        throw new Error('CollectionObservable: options is missing');
-      }
     }
+    if (options.hasOwnProperty('defer')) {
+      defer = options.defer;
+      delete options['defer'];
+    }
+    this.options = _.clone(options);
     _.bindAll(this, 'destroy', 'collection', 'sortedIndex', 'sortAttribute', 'viewModelByModel', 'eachViewModel', 'bind', 'unbind', 'trigger');
     _.bindAll(this, '_onGetValue', '_onCollectionReset', '_onCollectionResort', '_onModelAdd', '_onModelRemove', '_onModelChanged');
     this._kb_collection = collection;
@@ -143,7 +151,10 @@ Knockback.CollectionObservable = (function() {
     this._kb_observable.bind = this.bind;
     this._kb_observable.unbind = this.unbind;
     this._kb_observable.trigger = this.trigger;
-    this.sortedIndex(this.options.sorted_index, this.options.sort_attribute, true);
+    this.sortedIndex(this.options.sorted_index, this.options.sort_attribute, {
+      silent: true,
+      defer: defer
+    });
     return kb.wrappedObservable(this);
   }
   CollectionObservable.prototype.destroy = function() {
@@ -177,7 +188,11 @@ Knockback.CollectionObservable = (function() {
     this._kb_value_observable();
     return this._kb_collection;
   };
-  CollectionObservable.prototype.sortedIndex = function(sorted_index, sort_attribute, silent) {
+  CollectionObservable.prototype.sortedIndex = function(sorted_index, sort_attribute, options) {
+    var _resync;
+    if (options == null) {
+      options = {};
+    }
     if (sorted_index) {
       this.options.sorted_index = sorted_index;
       this.options.sort_attribute = sort_attribute;
@@ -188,9 +203,19 @@ Knockback.CollectionObservable = (function() {
       this.options.sort_attribute = null;
       this.options.sorted_index = null;
     }
-    this._collectionResync(true);
-    if (!silent) {
-      this.trigger('resort', this.vm_observable_array());
+    _resync = __bind(function() {
+      if ((this._kb_collection.models.length === 0) && (this._kb_value_observable().length === 0)) {
+        return;
+      }
+      this._collectionResync(true);
+      if (!options.silent) {
+        return this.trigger('resort', this.vm_observable_array());
+      }
+    }, this);
+    if (options.defer) {
+      _.defer(_resync);
+    } else {
+      _resync();
     }
     return this;
   };
@@ -349,7 +374,13 @@ Knockback.CollectionObservable = (function() {
   };
   CollectionObservable.prototype._viewModelCreate = function(model) {
     var view_model;
-    view_model = this.options.view_model ? new this.options.view_model(model) : kb.viewModel(model);
+    if (this.options.view_model_create) {
+      view_model = this.options.view_model_create(model);
+    } else if (this.options.view_model_constructor) {
+      view_model = new this.options.view_model_constructor(model);
+    } else {
+      view_model = kb.viewModel(model);
+    }
     view_model.__kb_model = model;
     return view_model;
   };
@@ -361,6 +392,13 @@ Knockback.collectionObservable = function(collection, vm_observable_array, optio
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
   return view_model.__kb_model;
+};
+Knockback.sortedIndexWrapAttr = Knockback.siwa = function(attribute_name, wrapper_constructor) {
+  return function(models, model) {
+    return _.sortedIndex(models, model, function(test) {
+      return new wrapper_constructor(test.get(attribute_name));
+    });
+  };
 };
 /*
   knockback_default_wrapper.js
