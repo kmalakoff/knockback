@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>CoffeeScript syntax highlighter for highlight.js sample</title>
+    <link rel="stylesheet" title="Default" href="highlightjs/styles/default.css" />
+    <link rel="alternate stylesheet" title="Dark" href="highlightjs/styles/dark.css"> 
+    <link rel="alternate stylesheet" title="FAR" href="highlightjs/styles/far.css"> 
+    <link rel="alternate stylesheet" title="IDEA" href="highlightjs/styles/idea.css"> 
+    <link rel="alternate stylesheet" title="Sunburst" href="highlightjs/styles/sunburst.css"> 
+    <link rel="alternate stylesheet" title="Zenburn" href="highlightjs/styles/zenburn.css"> 
+    <link rel="alternate stylesheet" title="Visual Studio" href="highlightjs/styles/vs.css"> 
+    <link rel="alternate stylesheet" title="Ascetic" href="highlightjs/styles/ascetic.css"> 
+    <link rel="alternate stylesheet" title="Magula" href="highlightjs/styles/magula.css"> 
+    <link rel="alternate stylesheet" title="GitHub" href="highlightjs/styles/github.css"> 
+    <link rel="alternate stylesheet" title="Brown Paper" href="highlightjs/styles/brown_paper.css"> 
+    <link rel="alternate stylesheet" title="School Book" href="highlightjs/styles/school_book.css"> 
+    <link rel="alternate stylesheet" title="IR Black" href="highlightjs/styles/ir_black.css"> 
+
+
+    <script src="highlightjs/highlight.js"></script>
+    <script src="highlight-coffee.js"></script>
+    <style>
+      #themes a { display: inline-block; padding: 20px }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script>
+      hljs.initHighlightingOnLoad();
+      var App = {
+        switchTheme: function(name) {
+          var $links = $('head link');
+          var href = $links.filter("link[title='" + name + "']").attr('href');
+          var $active = $links.filter("link.active");          
+          if ($active.length == 0)
+            $active = $("<link rel='alternate stylesheet' />").addClass('active').attr('href', href).appendTo($('head'));
+          $links.attr('rel', 'alternate stylesheet');
+          $active.attr('rel', 'stylesheet').attr('href', href);
+        }
+      };
+      $(function(){
+        var $themes = $('#themes');
+        $themes.delegate('a', 'click', function(e){
+          e.preventDefault();
+          App.switchTheme(this.href.split('#')[1]);
+        });
+        $('head link').each(function(){
+          $themes.append( $('<a />').attr('href', "#" + this.title).text(this.title) );
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id='themes'>
+    </div>
+
+    <pre><code class='coffee'>
+      # Assignment:
+      number   = 42
+      opposite = true
+
+      # Conditions:
+      number = -42 if opposite
+
+      # Functions:
+      square = (x) -&gt; x * x
+
+      # Arrays:
+      list = [1, 2, 3, 4, 5]
+
+      # Objects:
+      math =
+        root:   Math.sqrt
+        square: square
+        cube:   (x) -&gt; x * square x
+
+      # Splats:
+      race = (winner, runners...) -&gt;
+        print winner, runners
+
+      # Existence:
+      alert "I knew it!" if elvis?
+
+      # Array comprehensions:
+      cubes = (math.cube num for num in list)
+    </code></pre>
+
+    <pre><code class='coffee'>
+      square = (x) -&gt; x * x
+      cube   = (x) -&gt; square(x) * x
+    </code></pre>
+
+    <pre><code class='coffee'>
+      fill = (container, liquid = "coffee") -&gt;
+        "Filling the #{container} with #{liquid}..."
+    </code></pre>
+
+
+    <pre><code class='coffee'>
+      song = ["do", "re", "mi", "fa", "so"]
+
+      singers = {Jagger: "Rock", Elvis: "Roll"}
+
+      bitlist = [
+        1, 0, 1
+        0, 0, 1
+        1, 1, 0
+      ]
+
+      kids =
+        brother:
+          name: "Max"
+          age:  11
+        sister:
+          name: "Ida"
+          age:  9
+    </code></pre>
+
+    <pre><code class='coffee'>
+      $('.account').attr class: 'active'
+
+      log object.class
+    </code></pre>
+
+
+    <pre><code class='coffee'>
+      outer = 1
+      changeNumbers = -&gt;
+        inner = -1
+        outer = 10
+      inner = changeNumbers()
+    </code></pre>
+
+    <pre><code class='coffee'>
+      mood = greatlyImproved if singing
+
+      if happy and knowsIt
+        clapsHands()
+        chaChaCha()
+      else
+        showIt()
+
+      date = if friday then sue else jill
+
+      options or= defaults
+    </code></pre>
+
+
+
+
+
+    <pre><code class='coffee'>
+      gold = silver = rest = "unknown"
+
+      awardMedals = (first, second, others...) -&gt;
+        gold   = first
+        silver = second
+        rest   = others
+
+      contenders = [
+        "Michael Phelps"
+        "Liu Xiang"
+        "Yao Ming"
+        "Allyson Felix"
+        "Shawn Johnson"
+        "Roman Sebrle"
+        "Guo Jingjing"
+        "Tyson Gay"
+        "Asafa Powell"
+        "Usain Bolt"
+      ]
+
+      awardMedals contenders...
+
+      alert "Gold: " + gold
+      alert "Silver: " + silver
+      alert "The Field: " + rest
+    </code></pre>
+
+    <pre><code class='coffee'>
+      # Eat lunch.
+      eat food for food in ['toast', 'cheese', 'wine']
+    </code></pre>
+
+    <pre><code class='coffee'>
+      countdown = (num for num in [10..1])
+    </code></pre>
+
+    <pre><code class='coffee'>
+      yearsOld = max: 10, ida: 9, tim: 11
+
+      ages = for child, age of yearsOld
+        child + " is " + age
+    </code></pre>
+
+    <pre><code class='coffee'>
+      # Econ 101
+      if this.studyingEconomics
+        buy()  while supply &gt; demand
+        sell() until supply &gt; demand
+
+      # Nursery Rhyme
+      num = 6
+      lyrics = while num -= 1
+        num + " little monkeys, jumping on the bed.
+          One fell out and bumped his hea
+    </code></pre>
+
+    <pre><code class='coffee'>
+      for filename in list
+        do (filename) -&gt;
+          fs.readFile filename, (err, contents) -&gt;
+            compile filename, contents.toString()
+    </code></pre>
+
+    <pre><code class='coffee'>
+      numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+      copy    = numbers[0...numbers.length]
+
+      middle  = copy[3..6]
+    </code></pre>
+
+    <pre><code class='coffee'>
+      numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+      numbers[3..6] = [-3, -4, -5, -6]
+    </code></pre>
+
+
+    <pre><code class='coffee'>
+      grade = (student) -&gt;
+        if student.excellentWork
+          "A+"
+        else if student.okayStuff
+          if student.triedHard then "B" else "B-"
+        else
+          "C"
+
+      eldest = if 24 &gt; 21 then "Liz" else "Ike"
+    </code></pre>
+
+    <pre><code class='coffee'>
+      six = (one = 1) + (two = 2) + (three = 3)
+    </code></pre>
+
+
+    <pre><code class='coffee'>
+      # The first ten global properties.
+
+      globals = (name for name of window)[0...10]
+    </code></pre>
+
+    <pre><code class='coffee'>
+      alert(
+        try
+          nonexistent / undefined
+        catch error
+          "And the error is ... " + error
+      )
+    </code></pre>
+
+    <pre><code class='coffee'>
+      launch() if ignition is on
+
+      volume = 10 if band isnt SpinalTap
+
+      letTheWildRumpusBegin() unless answer is no
+
+      if car.speed &lt; limit then accelerate()
+
+      winner = yes if pick in [47, 92, 13]
+
+      print inspect "My name is " + @name
+    </code></pre>
+
+    <pre><code class='coffee'>
+      solipsism = true if mind? and not world?
+
+      speed ?= 75
+
+      footprints = yeti ? "bear"
+    </code></pre>
+
+    <pre><code class='coffee'>
+      zip = lottery.drawWinner?().address?.zipcode
+    </code></pre>
+
+    <pre><code class='coffee'>
+      class Animal
+        constructor: (@name) -&gt;
+
+        move: (meters) -&gt;
+          alert @name + " moved " + meters + "m."
+
+      class Snake extends Animal
+        move: -&gt;
+          alert "Slithering..."
+          super 5
+
+      class Horse extends Animal
+        move: -&gt;
+          alert "Galloping..."
+          super 45
+
+      sam = new Snake "Sammy the Python"
+      tom = new Horse "Tommy the Palomino"
+
+      sam.move()
+      tom.move()
+    </code></pre>
+
+    <pre><code class='coffee'>
+      String::dasherize = -&gt;
+        this.replace /_/g, "-"
+    </code></pre>
+
+    <pre><code class='coffee'>
+      theBait   = 1000
+      theSwitch = 0
+
+      [theBait, theSwitch] = [theSwitch, theBait]
+    </code></pre>
+
+
+    <pre><code class='coffee'>
+      weatherReport = (location) -&gt;
+        # Make an Ajax request to fetch the weather...
+        [location, 72, "Mostly Sunny"]
+
+      [city, temp, forecast] = weatherReport "Berkeley, CA"
+    </code></pre>
+
+    <pre><code class='coffee'>
+      futurists =
+        sculptor: "Umberto Boccioni"
+        painter:  "Vladimir Burliuk"
+        poet:
+          name:   "F.T. Marinetti"
+          address: [
+            "Via Roma 42R"
+            "Bellagio, Italy 22021"
+          ]
+
+      {poet: {name, address: [street, city]}} = futurists
+    </code></pre>
+
+    <pre><code class='coffee'>
+      tag = "&lt;impossible&gt;"
+
+      [open, contents..., close] = tag.split("")
+    </code></pre>
+
+
+
+
+
+    <pre><code class='coffee'>
+      Account = (customer, cart) -&gt;
+        @customer = customer
+        @cart = cart
+
+        $('.shopping_cart').bind 'click', (event) =&gt;
+          @customer.purchase @cart
+    </code></pre>
+
+    <pre><code class='coffee'>
+      switch day
+        when "Mon" then go work
+        when "Tue" then go relax
+        when "Thu" then go iceFishing
+        when "Fri", "Sat"
+          if day is bingoDay
+            go bingo
+            go dancing
+        when "Sun" then go church
+        else go work
+    </code></pre>
+
+    <pre><code class='coffee'>
+      try
+        allHellBreaksLoose()
+        catsAndDogsLivingTogether()
+      catch error
+        print error
+      finally
+        cleanUp()
+    </code></pre>
+
+    <pre><code class='coffee'>
+      cholesterol = 127
+
+      healthy = 200 &gt; cholesterol &gt; 60
+    </code></pre>
+
+    <pre><code class='coffee'>
+      author = "Wittgenstein"
+      quote  = "A picture is a fact. -- #{ author }"
+
+      sentence = "#{ 22 / 7 } is a decent approximation of π"
+    </code></pre>
+
+    <pre><code class='coffee'>
+      mobyDick = "Call me Ishmael. Some years ago --
+       never mind how long precisely -- having little
+       or no money in my purse, and nothing particular
+       to interest me on shore, I thought I would sail
+       about a little and see the watery part of the
+       world..."
+    </code></pre>
+
+    <pre><code class='coffee'>
+      html = '''
+             <strong>
+               cup of coffeescript
+             </strong>
+             '''
+    </code></pre>
+
+    <pre><code class='coffee'>
+###
+Multiline comment
+CoffeeScript Compiler v1.1.1
+Released under the MIT License
+###
+    </code></pre>
+
+    <pre><code class='coffee'>
+      # heregexes
+      OPERATOR = /// ^ (
+        ?: [-=]&gt;             # function
+         | [-+*/%&lt;&gt;&amp;|^!?=]=  # compound assign / compare
+         | &gt;&gt;&gt;=?             # zero-fill right shift
+         | ([-+:])\1         # doubles
+         | ([&amp;|&lt;&gt;])\2=?      # logic / shift
+         | \?\.              # soak access
+         | \.{2,3}           # range or splat
+      ) ///
+    </code></pre>
+
+    <pre><code class='coffee'>
+      fs = require 'fs'
+
+      option '-o', '--output [DIR]', 'directory for compiled code'
+
+      task 'build:parser', 'rebuild the Jison parser', (options) -&gt;
+        require 'jison'
+        code = require('./lib/grammar').parser.generate()
+        dir  = options.output or 'lib'
+        fs.writeFile "#{dir}/parser.js", code
+    </code></pre>
+
+  </body>
+</html>
