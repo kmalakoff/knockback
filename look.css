@@ -299,6 +299,10 @@ section#content .comparison tr td.mid,
 section#content .comparison tr th.mid {
   text-align: center;
 }
+section#content .comparison tr td.ref,
+section#content .comparison tr th.ref {
+  text-align: center;
+}
 section#content .comparison tbody td {
   border: 1px solid rgba(0,0,0,0.20);
 }
@@ -316,23 +320,26 @@ section#content .comparison td.hidden {
   background: none transparent;
 }
 section#content .comparison td.yes {
-  background: #bfbf40;
+  background: #80b34d;
   color: #fff;
+  text-shadow: 0px 1px 0px rgba(0,0,0,0.20);
 }
 section#content .comparison td.no {
   background: #bf4040;
   color: #fff;
+  text-shadow: 0px -1px 0px rgba(0,0,0,0.20);
 }
 section#content .comparison td.own {
   text-align: center;
-  background: #bfbf40;
-  color: #26260d;
+  background: #80b34d;
+  color: #1a240f;
+  text-shadow: 0px -1px 0px #b3e085;
 }
 section#content .comparison td.done {
   font-family: Helvetica, Arial, sans-serif;
-  background: #bfbf40;
-  color: #4d4d19;
-  text-shadow: 0px -1px 0px #26260d;
+  background: #80b34d;
+  color: #33471f;
+  text-shadow: 0px -1px 0px #1a240f;
   font-size: 2em;
   padding: 0px;
   text-align: center;
@@ -340,7 +347,6 @@ section#content .comparison td.done {
 section#content .comparison td.ref {
   padding-left: 0px;
   padding-right: 0px;
-  text-align: center;
   border: 0px none;
   line-height: 0.5em;
 }
@@ -362,7 +368,7 @@ section#content .comparison td.dependent:before {
   line-height: 1em;
   width: 3em;
   margin: -2px -1.5em;
-  color: #4d4d19;
+  color: #33471f;
 }
 section#content .notes {
   font-size: 0px;
