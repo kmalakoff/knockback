@@ -59,7 +59,7 @@ class Knockback.ViewModel_RCBase
     @ref_count = 1
 
   _destroy: ->
-    kb.vmReleaseObservables(view_model)
+    kb.vmReleaseObservables(this)
 
   # reference counting
   retain: ->

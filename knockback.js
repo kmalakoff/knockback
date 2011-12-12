@@ -1114,7 +1114,7 @@ Knockback.ViewModel_RCBase = (function() {
     this.ref_count = 1;
   }
   ViewModel_RCBase.prototype._destroy = function() {
-    return kb.vmReleaseObservables(view_model);
+    return kb.vmReleaseObservables(this);
   };
   ViewModel_RCBase.prototype.retain = function() {
     if (this.ref_count <= 0) {
