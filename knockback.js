@@ -1140,99 +1140,99 @@ Knockback.ViewModel_RCBase = (function() {
 })();
 Knockback.ViewModel = (function() {
   __extends(ViewModel, kb.ViewModel_RCBase);
-  function ViewModel(model, options, _kb_view_model) {
+  function ViewModel(_kb_vm_model, _kb_vm_options, _kb_vm_view_model) {
     var key, missing, _i, _len;
-    this.model = model;
-    this.options = options != null ? options : {};
-    this._kb_view_model = _kb_view_model;
-    if (!this.model) {
+    this._kb_vm_model = _kb_vm_model;
+    this._kb_vm_options = _kb_vm_options != null ? _kb_vm_options : {};
+    this._kb_vm_view_model = _kb_vm_view_model;
+    if (!this._kb_vm_model) {
       throw new Error('ViewModel: model is missing');
     }
-    _.bindAll(this, '_onModelChange', '_onModelLoaded', '_onModelUnloaded');
-    if (!this._kb_view_model) {
-      this._kb_view_model = this;
+    _.bindAll(this, '_kb_vm_onModelChange', '_kb_vm_onModelLoaded', '_kb_vm_onModelUnloaded');
+    if (!this._kb_vm_view_model) {
+      this._kb_vm_view_model = this;
     } else {
-      this._kb_observables = [];
+      this._kb_vm_observables = [];
     }
-    if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
-      this.model_ref = this.model;
-      this.model_ref.retain();
-      this.model_ref.bind('loaded', this._onModelLoaded);
-      this.model_ref.bind('unloaded', this._onModelUnloaded);
-      this.model = this.model_ref.getModel();
+    if (Backbone.ModelRef && (this._kb_vm_model instanceof Backbone.ModelRef)) {
+      this._kb_vm_model_ref = this._kb_vm_model;
+      this._kb_vm_model_ref.retain();
+      this._kb_vm_model_ref.bind('loaded', this._kb_vm_onModelLoaded);
+      this._kb_vm_model_ref.bind('unloaded', this._kb_vm_onModelUnloaded);
+      this._kb_vm_model = this._kb_vm_model_ref.getModel();
     }
-    if (!this.model_ref || this.model_ref.isLoaded()) {
-      this._onModelLoaded(this.model);
+    if (!this._kb_vm_model_ref || this._kb_vm_model_ref.isLoaded()) {
+      this._kb_vm_onModelLoaded(this._kb_vm_model);
     }
-    if (!this.options.internals && !this.options.requires) {
+    if (!this._kb_vm_options.internals && !this._kb_vm_options.requires) {
       return this;
     }
-    missing = _.union((this.options.internals ? this.options.internals : []), (this.options.requires ? this.options.requires : []));
-    if (!this.model_ref || this.model_ref.isLoaded()) {
-      missing = _.difference(missing, _.keys(this.model.attributes));
+    missing = _.union((this._kb_vm_options.internals ? this._kb_vm_options.internals : []), (this._kb_vm_options.requires ? this._kb_vm_options.requires : []));
+    if (!this._kb_vm_model_ref || this._kb_vm_model_ref.isLoaded()) {
+      missing = _.difference(missing, _.keys(this._kb_vm_model.attributes));
     }
     for (_i = 0, _len = missing.length; _i < _len; _i++) {
       key = missing[_i];
-      this._updateAttributeObservor(this.model, key);
+      this._updateAttributeObservor(this._kb_vm_model, key);
     }
   }
   ViewModel.prototype._destroy = function() {
     var view_model;
-    if (this.model) {
-      this.model.unbind('change', this._onModelChange);
-      this.model = null;
+    if (this._kb_vm_model) {
+      this._kb_vm_model.unbind('change', this._kb_vm_onModelChange);
+      this._kb_vm_model = null;
     }
-    view_model = this._kb_view_model;
-    this._kb_view_model = null;
-    kb.vmReleaseObservables(view_model, this._kb_observables);
-    if (this._kb_observables) {
-      return this._kb_observables = null;
+    view_model = this._kb_vm_view_model;
+    this._kb_vm_view_model = null;
+    kb.vmReleaseObservables(view_model, this._kb_vm_observables);
+    if (this._kb_vm_observables) {
+      return this._kb_vm_observables = null;
     }
   };
-  ViewModel.prototype._onModelLoaded = function(model) {
+  ViewModel.prototype._kb_vm_onModelLoaded = function(model) {
     var key, _results;
-    this.model = model;
-    this.model.bind('change', this._onModelChange);
+    this._kb_vm_model = model;
+    this._kb_vm_model.bind('change', this._kb_vm_onModelChange);
     _results = [];
-    for (key in this.model.attributes) {
-      _results.push(this._updateAttributeObservor(this.model, key));
+    for (key in this._kb_vm_model.attributes) {
+      _results.push(this._updateAttributeObservor(this._kb_vm_model, key));
     }
     return _results;
   };
-  ViewModel.prototype._onModelUnloaded = function(model) {
+  ViewModel.prototype._kb_vm_onModelUnloaded = function(model) {
     var key, _results;
-    this.model.unbind('change', this._onModelChange);
-    model = this.model;
-    this.model = null;
+    this._kb_vm_model.unbind('change', this._kb_vm_onModelChange);
+    model = this._kb_vm_model;
+    this._kb_vm_model = null;
     _results = [];
     for (key in model.attributes) {
-      _results.push(this._updateAttributeObservor(this.model, key));
+      _results.push(this._updateAttributeObservor(this._kb_vm_model, key));
     }
     return _results;
   };
-  ViewModel.prototype._onModelChange = function() {
+  ViewModel.prototype._kb_vm_onModelChange = function() {
     var key, _results;
-    if (!this.model._changed) {
+    if (!this._kb_vm_model._changed) {
       return;
     }
     _results = [];
-    for (key in this.model.attributes) {
-      _results.push((this.model.hasChanged(key) ? this._updateAttributeObservor(this.model, key) : void 0));
+    for (key in this._kb_vm_model.attributes) {
+      _results.push((this._kb_vm_model.hasChanged(key) ? this._updateAttributeObservor(this._kb_vm_model, key) : void 0));
     }
     return _results;
   };
   ViewModel.prototype._updateAttributeObservor = function(model, key) {
     var vm_key;
-    vm_key = this.options.internals && _.contains(this.options.internals, key) ? '_' + key : key;
-    if (this._kb_view_model.hasOwnProperty(vm_key)) {
-      if (this._kb_view_model[vm_key]) {
-        return this._kb_view_model[vm_key].setModel(model);
+    vm_key = this._kb_vm_options.internals && _.contains(this._kb_vm_options.internals, key) ? '_' + key : key;
+    if (this._kb_vm_view_model.hasOwnProperty(vm_key)) {
+      if (this._kb_vm_view_model[vm_key]) {
+        return this._kb_vm_view_model[vm_key].setModel(model);
       }
     } else {
-      if (this._kb_observables) {
-        this._kb_observables.push(vm_key);
+      if (this._kb_vm_observables) {
+        this._kb_vm_observables.push(vm_key);
       }
-      return this._kb_view_model[vm_key] = new AttributeConnector(model, key, this.options.read_only);
+      return this._kb_vm_view_model[vm_key] = new AttributeConnector(model, key, this._kb_vm_options.read_only);
     }
   };
   return ViewModel;
