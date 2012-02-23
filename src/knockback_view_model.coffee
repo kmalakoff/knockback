@@ -46,6 +46,8 @@ class AttributeConnector
       @model = null
 
 ####################################################
+# API
+#   * __destroy() - override for custom cleanup when all references are released. Note: this function is __destroy instead of _destroy due to an incompatibility with a Knockout convention (https://github.com/kmalakoff/knockback/pull/17)
 # options
 #   * read_only - default is read_write
 #   * internals - an array of atttributes that should be scoped with an underscore, eg. name -> _name
