@@ -293,6 +293,36 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
+  test("reference counting and custom __destroy", ->
+    class ContactViewModelFullName extends kb.ViewModel
+      constructor: (model) ->
+        super(model, {requires: ['first', 'last']})
+        @is_destroyed = false
+      __destroy: ->
+        @is_destroyed = true
+        super
+
+    model = new Backbone.Model({first: "Hello"})
+    view_model = new ContactViewModelFullName(model)
+
+    equal(view_model.first(), "Hello", "Hello exists")
+
+    view_model.retain()
+    equal(view_model.refCount(), 2, "ref count 2")
+    equal(view_model.is_destroyed, false, "not destroyed")
+
+    view_model.release()
+    equal(view_model.refCount(), 1, "ref count 1")
+    equal(view_model.is_destroyed, false, "not destroyed")
+
+    view_model.release()
+    equal(view_model.refCount(), 0, "ref count 0")
+    equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
+
+    raises((->view_model.first()), null, "Hello doesn't exist anymore")
+    raises((->view_model.release()), Error, "ViewModel: ref_count is corrupt: 1")
+  )
+
   test("Error cases", ->
     # TODO
   )

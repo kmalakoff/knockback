@@ -295,10 +295,10 @@ This looks like it returns an instance but it actually returns a ko.dependentObs
 
 If you use these localization helpers, you need to implement a kb.locale_manager.  As mentioned in 1) Note 1....you can watch a non-BackboneModel as long as it: a) mixes in Backbone.Events and triggers 'change' events and b) implements `get: (attribute_name) -> ... ` and which is a minimal Backbone.Model interface... this is just what a Backbone.locale_manager is. Pretty clever, eh?
 
-Knockback.viewModel
+Knockback.ViewModel
 -------------------
 
-Although they are only useful for a subset of scenarios, you can automatically create a view model for all of attributes for your model.
+You can automatically create a view model for all of attributes for your model. The view model is reference counted (using the retain/release signature) and if you require custom cleanup when all references are released, just override the __destroy function.
 
 Read write observables for each attribute:
 

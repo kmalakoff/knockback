@@ -321,5 +321,42 @@ $(document).ready(function() {
     equal(view_model._date().getDate(), 10, "day is good");
     return kb.vmRelease(view_model);
   });
+  test("reference counting and custom __destroy", function() {
+    var ContactViewModelFullName, model, view_model;
+    ContactViewModelFullName = (function() {
+      __extends(ContactViewModelFullName, kb.ViewModel);
+      function ContactViewModelFullName(model) {
+        ContactViewModelFullName.__super__.constructor.call(this, model, {
+          requires: ['first', 'last']
+        });
+        this.is_destroyed = false;
+      }
+      ContactViewModelFullName.prototype.__destroy = function() {
+        this.is_destroyed = true;
+        return ContactViewModelFullName.__super__.__destroy.apply(this, arguments);
+      };
+      return ContactViewModelFullName;
+    })();
+    model = new Backbone.Model({
+      first: "Hello"
+    });
+    view_model = new ContactViewModelFullName(model);
+    equal(view_model.first(), "Hello", "Hello exists");
+    view_model.retain();
+    equal(view_model.refCount(), 2, "ref count 2");
+    equal(view_model.is_destroyed, false, "not destroyed");
+    view_model.release();
+    equal(view_model.refCount(), 1, "ref count 1");
+    equal(view_model.is_destroyed, false, "not destroyed");
+    view_model.release();
+    equal(view_model.refCount(), 0, "ref count 0");
+    equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function");
+    raises((function() {
+      return view_model.first();
+    }), null, "Hello doesn't exist anymore");
+    return raises((function() {
+      return view_model.release();
+    }), Error, "ViewModel: ref_count is corrupt: 1");
+  });
   return test("Error cases", function() {});
 });

@@ -56,28 +56,29 @@ class AttributeConnector
 
 class Knockback.ViewModel_RCBase
   constructor: ->
-    @ref_count = 1
+    @_kb_vm = {}
+    @_kb_vm.ref_count = 1
 
   __destroy: ->
     kb.vmReleaseObservables(this)
 
   # reference counting
   retain: ->
-    throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
-    @ref_count++
+    throw new Error("ViewModel: ref_count is corrupt: " + @_kb_vm.ref_count) if (@_kb_vm.ref_count <= 0)
+    @_kb_vm.ref_count++
     @
 
   release: ->
-    throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
-    @ref_count--
-    @__destroy() unless @ref_count
+    throw new Error("ViewModel: ref_count is corrupt: " + @_kb_vm.ref_count) if (@_kb_vm.ref_count <= 0)
+    @_kb_vm.ref_count--
+    @__destroy() unless @_kb_vm.ref_count
     @
 
-  refCount: -> return @ref_count
+  refCount: -> return @_kb_vm.ref_count
 
 class Knockback.ViewModel extends kb.ViewModel_RCBase
   constructor: (model, options={}, view_model) ->
-    @_kb_vm = {}
+    super
     @_kb_vm.model = model
     @_kb_vm.options = options
     @_kb_vm.view_model = view_model
