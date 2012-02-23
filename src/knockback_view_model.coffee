@@ -58,7 +58,7 @@ class Knockback.ViewModel_RCBase
   constructor: ->
     @ref_count = 1
 
-  _destroy: ->
+  __destroy: ->
     kb.vmReleaseObservables(this)
 
   # reference counting
@@ -70,7 +70,7 @@ class Knockback.ViewModel_RCBase
   release: ->
     throw new Error("ViewModel: ref_count is corrupt: " + @ref_count) if (@ref_count <= 0)
     @ref_count--
-    @_destroy() unless @ref_count
+    @__destroy() unless @ref_count
     @
 
   refCount: -> return @ref_count
@@ -104,7 +104,7 @@ class Knockback.ViewModel extends kb.ViewModel_RCBase
     missing = _.difference(missing, _.keys(@_kb_vm.model.attributes)) if not @_kb_vm.model_ref or @_kb_vm.model_ref.isLoaded()
     @_updateAttributeObservor(@_kb_vm.model, key) for key in missing
 
-  _destroy: ->
+  __destroy: ->
     (@_kb_vm.model.unbind('change', @_kb_vm_onModelChange); @_kb_vm.model = null) if @_kb_vm.model
     view_model = @_kb_vm.view_model; @_kb_vm.view_model = null
     kb.vmReleaseObservables(view_model, @_kb_vm.observables)
