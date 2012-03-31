@@ -127,8 +127,13 @@ class Knockback.ViewModel extends kb.ViewModel_RCBase
     @_updateAttributeObservor(@_kb_vm.model, key) for key of model.attributes
 
   _kb_vm_onModelChange: ->
-    return if not @_kb_vm.model._changed
-    (@_updateAttributeObservor(@_kb_vm.model, key) if @_kb_vm.model.hasChanged(key)) for key of @_kb_vm.model.attributes
+    # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
+    if @_kb_vm.model._changed
+      (@_updateAttributeObservor(@_kb_vm.model, key) if @_kb_vm.model.hasChanged(key)) for key of @_kb_vm.model.attributes
+
+    # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
+    else if @_kb_vm.model.changed
+      @_updateAttributeObservor(@_kb_vm.model, key) for key of @_kb_vm.model.changed
 
   _updateAttributeObservor: (model, key) ->
     vm_key = if @_kb_vm.options.internals and _.contains(@_kb_vm.options.internals, key) then '_' + key else key
