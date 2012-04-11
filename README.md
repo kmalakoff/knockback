@@ -98,11 +98,24 @@ Of course, this is just a simple example, but hopefully you get the picture. For
 Conventions and useful tips
 ===========================
 
-1. Knockback and kb are aliased so you can use kb.observable or Knockback.observable.
+1. All Knockback observable types (kb.observable, kb.collectionObservable, and each property in kb.observables or kb.ViewModel) use a ko.observable or ko.computed under-the-hood (that get updated when the Backbone.Model or Backbone.Collection changes) so they can be used as intermediate values in ko.computed values. For example:
 
-2. The library is written with the following naming conventions: i) Classes are CamelCase, ii) functions are sortaCamelCased, iii) properties are written_with_underscores, and constants are BIG_AND_NOTICABLE.
+```coffeescript
+ContactViewModel = (model) ->
+  @name = kb.observable(model, {key: 'name', write: true}, @)
+  @formatted_name = ko.computed({
+    read: @name,
+    write: ((value) -> @name($.trim(value))),
+    owner: @
+  })
+  @           # must return this or Coffeescript will return the last statement which is not what we want!
+````
 
-3. What 2. means is that kb.observable() is actually a factory function and kb.Observable is the class it creates and from which you derive if you want to override behavior. In other words:
+2. Knockback and kb are aliased so you can use kb.observable or Knockback.observable.
+
+3. The library is written with the following naming conventions: i) Classes are CamelCase, ii) functions are sortaCamelCased, iii) properties are written_with_underscores, and constants are BIG_AND_NOTICABLE.
+
+4. What 2. means is that kb.observable() is actually a factory function and kb.Observable is the class it creates and from which you derive if you want to override behavior. In other words:
 
 ```coffeescript
 # factory function
@@ -289,7 +302,7 @@ class LocalizedStringLocalizer extends kb.LocalizedObservable
 
 ### Note 1
 
-This looks like it returns an instance but it actually returns a ko.dependentObservable from super (use kb.wrappedObservable() to access it). Don't get caught out!
+This looks like it returns an instance but it actually returns a ko.computed from super (use kb.wrappedObservable() to access it). Don't get caught out!
 
 ### Note 2
 
@@ -324,8 +337,8 @@ Derive and specialize a view model Coffeescript class:
 class ContactViewModelCustom extends kb.ViewModel
   constructor: (model) ->
     super(model)
-    @formatted_name = ko.dependentObservable(=> return "First: #{@name()}")
-    @formatted_number = ko.dependentObservable({
+    @formatted_name = ko.computed(=> return "First: #{@name()}")
+    @formatted_number = ko.computed({
       read: => return "#: #{@number()}"
       write: (value) => @number(value.substring(3)))
     }, this)
@@ -408,7 +421,7 @@ Final notes
 * Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
     -> Use the helper function: **kb.vmRelease()** to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
 
-* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
+* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.computed/ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
 
 
 In addition to the examples in the test folder (https://github.com/kmalakoff/knockback/blob/master/test), you can look at the examples_lib folder for a sample kb.locale_manager, a localized string, and some examples of localized observables.

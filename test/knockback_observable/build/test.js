@@ -113,5 +113,32 @@ $(document).ready(function() {
     view_model = new ContactViewModelCustom(model);
     return ok(_.isEqual(args, ['name', 1, 'number']), "got the args");
   });
+  test("Standard use case: ko.computed", function() {
+    var ContactViewModel, model, view_model;
+    ContactViewModel = function(model) {
+      this.name = kb.observable(model, {
+        key: 'name',
+        write: true
+      }, this);
+      this.formatted_name = ko.computed({
+        read: this.name,
+        write: (function(value) {
+          return this.name($.trim(value));
+        }),
+        owner: this
+      });
+      return this;
+    };
+    model = new Contact({
+      name: 'Ringo'
+    });
+    view_model = new ContactViewModel(model);
+    equal(view_model.name(), 'Ringo', "Interesting name");
+    equal(view_model.formatted_name(), 'Ringo', "Interesting name");
+    view_model.formatted_name(' John ');
+    equal(view_model.name(), 'John', "Name changed");
+    equal(view_model.formatted_name(), 'John', "Name changed");
+    return kb.vmRelease(view_model);
+  });
   return test("Error cases", function() {});
 });

@@ -80,6 +80,32 @@ $(document).ready( ->
     ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
   )
 
+  test("Standard use case: ko.computed", ->
+    ContactViewModel = (model) ->
+      @name = kb.observable(model, {key: 'name', write: true}, @)
+      @formatted_name = ko.computed({
+        read: @name,
+        write: ((value) -> @name($.trim(value))),
+        owner: @
+      })
+      @           # must return this or Coffeescript will return the last statement which is not what we want!
+
+    model = new Contact({name: 'Ringo'})
+    view_model = new ContactViewModel(model)
+
+    # get
+    equal(view_model.name(), 'Ringo', "Interesting name")
+    equal(view_model.formatted_name(), 'Ringo', "Interesting name")
+
+    # set from the model
+    view_model.formatted_name(' John ')
+    equal(view_model.name(), 'John', "Name changed")
+    equal(view_model.formatted_name(), 'John', "Name changed")
+
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
+  )
+
   test("Error cases", ->
     # TODO
   )
