@@ -102,7 +102,7 @@ Conventions and useful tips
 
 ```coffeescript
 ContactViewModel = (model) ->
-  @name = kb.observable(model, {key: 'name', write: true}, @)
+  @name = kb.observable(model, {key: 'name', write: true})
   @formatted_name = ko.computed({
     read: @name,
     write: ((value) -> @name($.trim(value))),

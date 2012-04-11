@@ -119,8 +119,8 @@ $(document).ready(function() {
       this.name = kb.observable(model, {
         key: 'name',
         write: true
-      }, this);
-      this.formatted_name = ko.computed({
+      });
+      this.formatted_name = ko.dependentObservable({
         read: this.name,
         write: (function(value) {
           return this.name($.trim(value));

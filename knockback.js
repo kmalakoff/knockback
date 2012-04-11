@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.14.0
+  knockback.js 0.14.1
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.14.0';
+Knockback.VERSION = '0.14.1';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -727,7 +727,7 @@ Knockback.Observable = (function() {
     }
     if (this.options.write) {
       if (!this.view_model) {
-        throw new Error('Observable: view_model is missing for read_write model attribute');
+        this.view_model = {};
       }
       this._kb_observable = ko.dependentObservable({
         read: this._onGetValue,

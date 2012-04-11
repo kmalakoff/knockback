@@ -36,7 +36,7 @@ class Knockback.Observable
     @_kb_localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
 
     if @options.write
-      throw new Error('Observable: view_model is missing for read_write model attribute') if not @view_model
+      @view_model = {} if not @view_model   # view model needs to be provided if you need "this" scoped in your view model write function
       @_kb_observable = ko.dependentObservable({read: @_onGetValue, write: @_onSetValue, owner: @view_model})
     else
       @_kb_observable = ko.dependentObservable(@_onGetValue)

@@ -82,8 +82,8 @@ $(document).ready( ->
 
   test("Standard use case: ko.computed", ->
     ContactViewModel = (model) ->
-      @name = kb.observable(model, {key: 'name', write: true}, @)
-      @formatted_name = ko.computed({
+      @name = kb.observable(model, {key: 'name', write: true})
+      @formatted_name = ko.dependentObservable({
         read: @name,
         write: ((value) -> @name($.trim(value))),
         owner: @
