@@ -397,7 +397,7 @@ class ContactViewModel extends kb.ViewModel
     @date = new LongDateLocalizer(@_date)
 ````
 
-# to use Plain Old Javascript (non-Coffeescript inheritance), use the kb.ViewModel.extend function
+### To use Plain Old Javascript (non-Coffeescript inheritance), use the kb.ViewModel.extend function
 
 See Backbone [extend paradigm][http://documentcloud.github.com/backbone/#Model-extend] for more information on using inheritance.
 
@@ -408,10 +408,12 @@ var ContactViewModelFullName_POJS = kb.ViewModel.extend({
     // add your custom initialization
     return this;
   },
-
   __destroy: function() {
     // add your custom clean up
-    return kb.ViewModel.prototype.__destroy.call(this); // call super destroy function
+    return kb.ViewModel.prototype.__destroy.call(this); // call super __destroy function
+  },
+  myFunction: function() {
+    // do something
   }
 });
 
