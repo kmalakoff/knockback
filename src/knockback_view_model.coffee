@@ -61,6 +61,9 @@ class Knockback.ViewModel_RCBase
     @_kb_vm = {}
     @_kb_vm.ref_count = 1
 
+  # from Backbone non-Coffeescript inheritance (use "Knockback.ViewModel_RCBase.extend({})" in Javascript instead of "class MyClass extends Knockback.ViewModel")
+  @extend = Backbone.Model.extend
+
   __destroy: ->
     kb.vmReleaseObservables(this)
 

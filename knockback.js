@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.14.1
+  knockback.js 0.14.2
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -17,7 +17,7 @@ if (!this._ || !this._.VERSION) {
 }
 this.Knockback || (this.Knockback = {});
 this.kb || (this.kb = this.Knockback);
-Knockback.VERSION = '0.14.1';
+Knockback.VERSION = '0.14.2';
 Knockback.locale_manager;
 Knockback.wrappedObservable = function(instance) {
   if (!instance._kb_observable) {
@@ -1114,6 +1114,7 @@ Knockback.ViewModel_RCBase = (function() {
     this._kb_vm = {};
     this._kb_vm.ref_count = 1;
   }
+  ViewModel_RCBase.extend = Backbone.Model.extend;
   ViewModel_RCBase.prototype.__destroy = function() {
     return kb.vmReleaseObservables(this);
   };

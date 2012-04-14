@@ -358,5 +358,41 @@ $(document).ready(function() {
       return view_model.release();
     }), Error, "ViewModel: ref_count is corrupt: 1");
   });
+  test("reference counting and custom __destroy non-Coffeescript inheritance", function() {
+    var ContactViewModelFullName_POJS, model, view_model;
+    ContactViewModelFullName_POJS = kb.ViewModel.extend({
+      constructor: function(model) {
+        kb.ViewModel.prototype.constructor.call(this, model, {
+          requires: ['first', 'last']
+        });
+        this.is_destroyed = false;
+        return this;
+      },
+      __destroy: function() {
+        this.is_destroyed = true;
+        return kb.ViewModel.prototype.__destroy.call(this);
+      }
+    });
+    model = new Backbone.Model({
+      first: "Hello"
+    });
+    view_model = new ContactViewModelFullName_POJS(model);
+    equal(view_model.first(), "Hello", "Hello exists");
+    view_model.retain();
+    equal(view_model.refCount(), 2, "ref count 2");
+    equal(view_model.is_destroyed, false, "not destroyed");
+    view_model.release();
+    equal(view_model.refCount(), 1, "ref count 1");
+    equal(view_model.is_destroyed, false, "not destroyed");
+    view_model.release();
+    equal(view_model.refCount(), 0, "ref count 0");
+    equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function");
+    raises((function() {
+      return view_model.first();
+    }), null, "Hello doesn't exist anymore");
+    return raises((function() {
+      return view_model.release();
+    }), Error, "ViewModel: ref_count is corrupt: 1");
+  });
   return test("Error cases", function() {});
 });
