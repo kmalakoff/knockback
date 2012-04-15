@@ -59,24 +59,24 @@ ContactViewModel = (model) ->
     date:     {key:'date', write: true, localizer: LongDateLocalizer}
   }, this)
   @           # must return this or Coffeescript will return the last statement which is not what we want!
-````
+```
 
-or
+or (Coffeescript)
 
 ```coffeescript
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
-    super(model, {internals: ['email', 'date']})  # @name, @_email, and @_date created in super from the model attributes
+    super(model, {internals: ['email', 'date']})  # call super constructor: @name, @_email, and @_date created in super from the model attributes
     @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
     @date = new LongDateLocalizer(@_date)
-````
+```
 
-or
+or (Javascript)
 
 ```javascript
 var ContactViewModel = kb.ViewModel.extend({
   constructor: function(model) {
-    kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']});   # @name, @_email, and @_date created in super from the model attributes
+    kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
     this.email = kb.defaultWrapper(this._email, 'your.name@yourplace.com');
     this.date = new LongDateLocalizer(this._date);
     return this;
@@ -122,7 +122,7 @@ ContactViewModel = (model) ->
     owner: @
   })
   @           # must return this or Coffeescript will return the last statement which is not what we want!
-````
+```
 
 2. Knockback and kb are aliased so you can use kb.observable or Knockback.observable.
 
@@ -408,7 +408,7 @@ class ContactViewModel extends kb.ViewModel
     super(model, {internals: ['email', 'date']})
     @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
     @date = new LongDateLocalizer(@_date)
-````
+```
 
 ### To use Plain Old Javascript (non-Coffeescript inheritance), use the kb.ViewModel.extend function
 
@@ -431,7 +431,7 @@ var ContactViewModelFullName = kb.ViewModel.extend({
 });
 
 var view_model = new ContactViewModelFullName(new Backbone.Model({first: "Hello"}));
-````
+```
 
 
 Knockback.defaultWrapper
