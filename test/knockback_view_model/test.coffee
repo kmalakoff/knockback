@@ -53,12 +53,78 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
-  test("internals test", ->
+  test("internals test (Coffeescript inheritance)", ->
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['email', 'date']})
         @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
         @date = new LongDateLocalizer(@_date)
+
+    birthdate = new Date(1940, 10, 9)
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    view_model = new ContactViewModel(model)
+
+    # check email
+    equal(view_model._email(), undefined, "no email")
+    equal(view_model.email(), 'your.name@yourplace.com', "default message")
+
+    view_model._email('j@imagine.com')
+    equal(view_model._email(), 'j@imagine.com', "received email")
+    equal(view_model.email(), 'j@imagine.com', "received email")
+
+    view_model.email('john@imagine.com')
+    equal(view_model._email(), 'john@imagine.com', "received email")
+    equal(view_model.email(), 'john@imagine.com', "received email")
+
+    # set from the view model
+    Knockback.locale_manager.setLocale('en-GB')
+    equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
+    view_model.date('10 December 1963')
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1963, "year is good")
+    equal(current_date.getMonth(), 11, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1963, "year is good")
+    equal(view_model._date().getMonth(), 11, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
+
+    # set from the model
+    model.set({date: new Date(birthdate.valueOf())})
+    Knockback.locale_manager.setLocale('fr-FR')
+    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+    view_model.date('10 novembre 1940')
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1940, "year is good")
+    equal(current_date.getMonth(), 10, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1940, "year is good")
+    equal(view_model._date().getMonth(), 10, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
+
+    # set from the automatically-generated date observable
+    view_model.date(new Date(birthdate.valueOf()))
+    Knockback.locale_manager.setLocale('fr-FR')
+    equal(view_model.date(), '10 novembre 1940', "One past John's birthdate in France format")
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1940, "year is good")
+    equal(current_date.getMonth(), 10, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+    equal(view_model._date().getFullYear(), 1940, "year is good")
+    equal(view_model._date().getMonth(), 10, "month is good")
+    equal(view_model._date().getDate(), 10, "day is good")
+
+    # and cleanup after yourself when you are done.
+    kb.vmRelease(view_model)
+  )
+
+  test("internals test (Javascript inheritance)", ->
+    ContactViewModel = kb.ViewModel.extend({
+      constructor: (model) ->
+        kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']})
+        @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+        @date = new LongDateLocalizer(@_date)
+        @
+    })
 
     birthdate = new Date(1940, 10, 9)
     model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
@@ -293,7 +359,7 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
-  test("reference counting and custom __destroy", ->
+  test("reference counting and custom __destroy (Coffeescript inheritance)", ->
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
@@ -323,8 +389,8 @@ $(document).ready( ->
     raises((->view_model.release()), Error, "ViewModel: ref_count is corrupt: 1")
   )
 
-  test("reference counting and custom __destroy non-Coffeescript inheritance", ->
-    ContactViewModelFullName_POJS = kb.ViewModel.extend({
+  test("reference counting and custom __destroy (Javascript inheritance)", ->
+    ContactViewModelFullName = kb.ViewModel.extend({
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {requires: ['first', 'last']})
         @is_destroyed = false
@@ -336,7 +402,7 @@ $(document).ready( ->
     })
 
     model = new Backbone.Model({first: "Hello"})
-    view_model = new ContactViewModelFullName_POJS(model)
+    view_model = new ContactViewModelFullName(model)
 
     equal(view_model.first(), "Hello", "Hello exists")
 

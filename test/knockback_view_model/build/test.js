@@ -63,7 +63,7 @@ $(document).ready(function() {
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
     return kb.vmRelease(view_model);
   });
-  test("internals test", function() {
+  test("internals test (Coffeescript inheritance)", function() {
     var ContactViewModel, birthdate, current_date, model, view_model;
     ContactViewModel = (function() {
       __extends(ContactViewModel, kb.ViewModel);
@@ -76,6 +76,67 @@ $(document).ready(function() {
       }
       return ContactViewModel;
     })();
+    birthdate = new Date(1940, 10, 9);
+    model = new Contact({
+      name: 'John',
+      date: new Date(birthdate.valueOf())
+    });
+    view_model = new ContactViewModel(model);
+    equal(view_model._email(), void 0, "no email");
+    equal(view_model.email(), 'your.name@yourplace.com', "default message");
+    view_model._email('j@imagine.com');
+    equal(view_model._email(), 'j@imagine.com', "received email");
+    equal(view_model.email(), 'j@imagine.com', "received email");
+    view_model.email('john@imagine.com');
+    equal(view_model._email(), 'john@imagine.com', "received email");
+    equal(view_model.email(), 'john@imagine.com', "received email");
+    Knockback.locale_manager.setLocale('en-GB');
+    equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
+    view_model.date('10 December 1963');
+    current_date = model.get('date');
+    equal(current_date.getFullYear(), 1963, "year is good");
+    equal(current_date.getMonth(), 11, "month is good");
+    equal(current_date.getDate(), 10, "day is good");
+    equal(view_model._date().getFullYear(), 1963, "year is good");
+    equal(view_model._date().getMonth(), 11, "month is good");
+    equal(view_model._date().getDate(), 10, "day is good");
+    model.set({
+      date: new Date(birthdate.valueOf())
+    });
+    Knockback.locale_manager.setLocale('fr-FR');
+    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format");
+    view_model.date('10 novembre 1940');
+    current_date = model.get('date');
+    equal(current_date.getFullYear(), 1940, "year is good");
+    equal(current_date.getMonth(), 10, "month is good");
+    equal(current_date.getDate(), 10, "day is good");
+    equal(view_model._date().getFullYear(), 1940, "year is good");
+    equal(view_model._date().getMonth(), 10, "month is good");
+    equal(view_model._date().getDate(), 10, "day is good");
+    view_model.date(new Date(birthdate.valueOf()));
+    Knockback.locale_manager.setLocale('fr-FR');
+    equal(view_model.date(), '10 novembre 1940', "One past John's birthdate in France format");
+    current_date = model.get('date');
+    equal(current_date.getFullYear(), 1940, "year is good");
+    equal(current_date.getMonth(), 10, "month is good");
+    equal(current_date.getDate(), 10, "day is good");
+    equal(view_model._date().getFullYear(), 1940, "year is good");
+    equal(view_model._date().getMonth(), 10, "month is good");
+    equal(view_model._date().getDate(), 10, "day is good");
+    return kb.vmRelease(view_model);
+  });
+  test("internals test (Javascript inheritance)", function() {
+    var ContactViewModel, birthdate, current_date, model, view_model;
+    ContactViewModel = kb.ViewModel.extend({
+      constructor: function(model) {
+        kb.ViewModel.prototype.constructor.call(this, model, {
+          internals: ['email', 'date']
+        });
+        this.email = kb.defaultWrapper(this._email, 'your.name@yourplace.com');
+        this.date = new LongDateLocalizer(this._date);
+        return this;
+      }
+    });
     birthdate = new Date(1940, 10, 9);
     model = new Contact({
       name: 'John',
@@ -321,7 +382,7 @@ $(document).ready(function() {
     equal(view_model._date().getDate(), 10, "day is good");
     return kb.vmRelease(view_model);
   });
-  test("reference counting and custom __destroy", function() {
+  test("reference counting and custom __destroy (Coffeescript inheritance)", function() {
     var ContactViewModelFullName, model, view_model;
     ContactViewModelFullName = (function() {
       __extends(ContactViewModelFullName, kb.ViewModel);
@@ -358,9 +419,9 @@ $(document).ready(function() {
       return view_model.release();
     }), Error, "ViewModel: ref_count is corrupt: 1");
   });
-  test("reference counting and custom __destroy non-Coffeescript inheritance", function() {
-    var ContactViewModelFullName_POJS, model, view_model;
-    ContactViewModelFullName_POJS = kb.ViewModel.extend({
+  test("reference counting and custom __destroy (Javascript inheritance)", function() {
+    var ContactViewModelFullName, model, view_model;
+    ContactViewModelFullName = kb.ViewModel.extend({
       constructor: function(model) {
         kb.ViewModel.prototype.constructor.call(this, model, {
           requires: ['first', 'last']
@@ -376,7 +437,7 @@ $(document).ready(function() {
     model = new Backbone.Model({
       first: "Hello"
     });
-    view_model = new ContactViewModelFullName_POJS(model);
+    view_model = new ContactViewModelFullName(model);
     equal(view_model.first(), "Hello", "Hello exists");
     view_model.retain();
     equal(view_model.refCount(), 2, "ref count 2");

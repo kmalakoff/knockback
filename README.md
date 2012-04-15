@@ -71,6 +71,19 @@ class ContactViewModel extends kb.ViewModel
     @date = new LongDateLocalizer(@_date)
 ````
 
+or
+
+```javascript
+var ContactViewModel = kb.ViewModel.extend({
+  constructor: function(model) {
+    kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']});   # @name, @_email, and @_date created in super from the model attributes
+    this.email = kb.defaultWrapper(this._email, 'your.name@yourplace.com');
+    this.date = new LongDateLocalizer(this._date);
+    return this;
+  }
+});
+```
+
 ### The HTML:
 
 ```html
@@ -402,7 +415,7 @@ class ContactViewModel extends kb.ViewModel
 See Backbone [extend paradigm][http://documentcloud.github.com/backbone/#Model-extend] for more information on using inheritance.
 
 ```javascript
-var ContactViewModelFullName_POJS = kb.ViewModel.extend({
+var ContactViewModelFullName = kb.ViewModel.extend({
   constructor: function(model) {
     kb.ViewModel.prototype.constructor.call(this, model, {requires: ['first', 'last']}); // call super constructor
     // add your custom initialization
@@ -415,7 +428,7 @@ var ContactViewModelFullName_POJS = kb.ViewModel.extend({
   }
 });
 
-var view_model = new ContactViewModelFullName_POJS(new Backbone.Model({first: "Hello"}));
+var view_model = new ContactViewModelFullName(new Backbone.Model({first: "Hello"}));
 ````
 
 
