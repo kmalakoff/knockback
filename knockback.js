@@ -391,7 +391,11 @@ Knockback.collectionObservable = function(collection, vm_observable_array, optio
   return new Knockback.CollectionObservable(collection, vm_observable_array, options);
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
-  return view_model.__kb_model;
+  if (view_model) {
+    return view_model.__kb_model;
+  } else {
+    return null;
+  }
 };
 Knockback.sortedIndexWrapAttr = Knockback.siwa = function(attribute_name, wrapper_constructor) {
   return function(models, model) {

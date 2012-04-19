@@ -230,6 +230,6 @@ Knockback.CollectionObservable.prototype extends Backbone.Events
 Knockback.collectionObservable = (collection, vm_observable_array, options) -> return new Knockback.CollectionObservable(collection, vm_observable_array, options)
 
 # helpers
-Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> view_model.__kb_model
+Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> if view_model then view_model.__kb_model else null
 Knockback.sortedIndexWrapAttr = Knockback.siwa = (attribute_name, wrapper_constructor) ->
   return (models, model) -> return _.sortedIndex(models, model, (test) -> return new wrapper_constructor(test.get(attribute_name)))
