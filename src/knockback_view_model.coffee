@@ -10,7 +10,7 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 # internal helper
 class AttributeConnector
   constructor: (model, @key, @read_only) ->
-    _.bindAll(this, 'destroy', 'setModel')
+    _.bindAll(this, 'destroy', 'update')
 
     @_kb_observable = ko.observable()
     @_kb_observable.subscription = @_kb_observable.subscribe((value) =>
@@ -27,10 +27,10 @@ class AttributeConnector
 
     # publish public interface on the observable and return instead of this
     @_kb_observable.destroy = @destroy
-    @_kb_observable.setModel = @setModel
+    @_kb_observable.update = @update
 
     # start
-    @setModel(model) if model
+    @update(model)
 
     return kb.wrappedObservable(this)
 
@@ -38,10 +38,12 @@ class AttributeConnector
     @model = null
     @_kb_observable = null
 
-  setModel: (model) ->
+  update: (model) ->
     if model
+      value = model.get(@key)
+      needs_update = (@model != model) or not _.isEqual(@_kb_observable(), value)
       @model = model
-      @_kb_observable(@model.get(@key))
+      @_kb_observable(value) if needs_update
     else
       @model = null
 
@@ -142,7 +144,7 @@ class Knockback.ViewModel extends kb.ViewModel_RCBase
     vm_key = if @_kb_vm.options.internals and _.contains(@_kb_vm.options.internals, key) then '_' + key else key
 
     if (@_kb_vm.view_model.hasOwnProperty(vm_key))
-      @_kb_vm.view_model[vm_key].setModel(model) if @_kb_vm.view_model[vm_key]
+      @_kb_vm.view_model[vm_key].update(model) if @_kb_vm.view_model[vm_key]
     else
       @_kb_vm.observables.push(vm_key) if @_kb_vm.observables
       @_kb_vm.view_model[vm_key] = new AttributeConnector(model, key, @_kb_vm.options.read_only)

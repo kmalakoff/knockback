@@ -1073,7 +1073,7 @@ AttributeConnector = (function() {
   function AttributeConnector(model, key, read_only) {
     this.key = key;
     this.read_only = read_only;
-    _.bindAll(this, 'destroy', 'setModel');
+    _.bindAll(this, 'destroy', 'update');
     this._kb_observable = ko.observable();
     this._kb_observable.subscription = this._kb_observable.subscribe(__bind(function(value) {
       var set_info;
@@ -1093,20 +1093,23 @@ AttributeConnector = (function() {
       }
     }, this));
     this._kb_observable.destroy = this.destroy;
-    this._kb_observable.setModel = this.setModel;
-    if (model) {
-      this.setModel(model);
-    }
+    this._kb_observable.update = this.update;
+    this.update(model);
     return kb.wrappedObservable(this);
   }
   AttributeConnector.prototype.destroy = function() {
     this.model = null;
     return this._kb_observable = null;
   };
-  AttributeConnector.prototype.setModel = function(model) {
+  AttributeConnector.prototype.update = function(model) {
+    var needs_update, value;
     if (model) {
+      value = model.get(this.key);
+      needs_update = (this.model !== model) || !_.isEqual(this._kb_observable(), value);
       this.model = model;
-      return this._kb_observable(this.model.get(this.key));
+      if (needs_update) {
+        return this._kb_observable(value);
+      }
     } else {
       return this.model = null;
     }
@@ -1241,7 +1244,7 @@ Knockback.ViewModel = (function() {
     vm_key = this._kb_vm.options.internals && _.contains(this._kb_vm.options.internals, key) ? '_' + key : key;
     if (this._kb_vm.view_model.hasOwnProperty(vm_key)) {
       if (this._kb_vm.view_model[vm_key]) {
-        return this._kb_vm.view_model[vm_key].setModel(model);
+        return this._kb_vm.view_model[vm_key].update(model);
       }
     } else {
       if (this._kb_vm.observables) {
