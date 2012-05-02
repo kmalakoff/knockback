@@ -211,29 +211,34 @@ If the model unloads, the default behavior is to retain the last value; however,
 Knockback.collectionObservable
 ------------------------
 
-This takes a ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "view_model: MyViewModel" constructor which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
+This is an ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "view_model: MyViewModel" constructor which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
 
 ```coffeescript
-kb.collectionObservable(collection, view_models_array, {
-  view_model_constructor: ContactViewModel
-})
+kb.collectionObservable(collection, {view_model_constructor: ContactViewModel})
 ```
 or
 
 ```coffeescript
-kb.collectionObservable(collection, view_models_array, {
+kb.collectionObservable(collection, {
   view_model_create: (model) -> return new ContactViewModel(model)
 })
 ```
 
-**Note:** view_model_constructor and view_model_create are optional. If it is not supplied, a default view model with read and write observables will be created for all of the attributes in your model (see kb.viewModel).
+**Note:** view_model_constructor and view_model_create are optional. If neither is not supplied, then view models will not be created.
 
 ### Note 1
+
+You may find the following helpers useful:
+
+* **kb.vmModel(view_model) -> **: to get the model for a view model
+* **hasViewModels**: returns true if the collectionObservable holds view models and false if it holds models
+
+### Note 2
 
 You can either have the collection sort for you (eg. using a Backbone.Collection "comparator") or you can provide your own sorting methods that are decoupled from the collection like:
 
 ```coffeescript
-collection_observable = kb.collectionObservable(collection, view_models_array, {
+collection_observable = kb.collectionObservable(collection, {
   sort_attribute: 'name' # optimization to only refresh when this attribute changes
 })
 ```
@@ -241,42 +246,36 @@ collection_observable = kb.collectionObservable(collection, view_models_array, {
 or
 
 ```coffeescript
-collection_observable = kb.collectionObservable(collection, view_models_array, {
+# if the collection contains models (you do not supply view_model_constructor nor view_model_create), an array of models will be supplied
+collection_observable = kb.collectionObservable(collection, {
   sorted_index:    (models, model) -> return _.sortedIndex(models, model, (test) -> return test.get('first_name') + " " + test.get('last_name'))
+})
+
+# if the collection contains view models (you supply view_model_constructor or view_model_create), an array of view models will be supplied
+collection_observable = kb.collectionObservable(collection, {
+  sorted_index:    (models, view_model) -> return _.sortedIndex(view_models, view_model, (test) -> return kb.vmModel(test).get('first_name') + " " + kb.vmModel(test).get('last_name'))
+	view_model_constructor: MyViewModel
 })
 ```
 
 or
 
 ```coffeescript
-collection_observable = kb.collectionObservable(collection, view_models_array, {
+collection_observable = kb.collectionObservable(collection, {
   sorted_index:    kb.sortedIndexWrapAttr('name', NameWithNumber)  # or shorthand: kb.siwa
 })
 ```
 
-### Note 2
-
-Collections cache some information on the view model and if you have a view model and want to get access to it, use the following helpers:
-
-* **kb.vmModel** to get the model for a view model
-
 ### Note 3
-
-There are some other helpers for collection sync view models that you may find useful:
-
-* **viewModelByModel**: (model) -> ...
-* **eachViewModel**: (iterator) -> ...
-
-### Note 4
 
 You can subscribe for events on view models using Backbone.Events
 
-* **'add'**: (view_model, view_models_array) -> ...
-or if batch, **'add'**: (view_models_array) -> ...
-* **'resort'**: (view_model, view_models_array, new_index) -> ...
-or if batch, **'resort'**: (view_models_array) -> ...
-* **'remove'**: (view_model, view_models_array) -> ...
-or if batch, **'remove'**: (view_models_array) -> ...
+* **'add'**: (view_model, collection_observable) -> ...
+or if batch, **'add'**: (collection_observable) -> ...
+* **'resort'**: (view_model, collection_observable, new_index) -> ...
+or if batch, **'resort'**: (collection_observable) -> ...
+* **'remove'**: (view_model, collection_observable) -> ...
+or if batch, **'remove'**: (collection_observable) -> ...
 
 Knockback.formattedObservable
 -----------------------------

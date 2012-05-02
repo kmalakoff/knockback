@@ -96,7 +96,6 @@
         {name: 'Curly', email: 'curly@3s.com',  date: new Date(1903, 10, 22)}
       ]);
       var view_model = {
-        contacts:               ko.observableArray([]),
         available_languages:    ko.observableArray(['en', 'fr-FR']),
         new_name:               ko.observable(''),
         new_email:              ko.observable(''),
@@ -131,7 +130,7 @@
           date:           { key: 'date', write: true, localizer: LongDateLocalizer }
         }, this);
       };
-      var collection_observable = Knockback.collectionObservable(collection, view_model.contacts, {
+      view_model.contacts = Knockback.collectionObservable(collection, {
         view_model:       ContactViewModel,
         sort_attribute:   'name'
       });
