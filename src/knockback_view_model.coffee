@@ -32,7 +32,7 @@ class AttributeConnector
     # start
     @update(model)
 
-    return kb.wrappedObservable(this)
+    return kb.unwrapObservable(this)
 
   destroy: ->
     @model = null

@@ -18,6 +18,7 @@ PROJECT_ROOT = File.expand_path('../..', __FILE__)
 # Tests
 ####################################################
 `cd #{PROJECT_ROOT}; coffee -b -o test/backbone_modelref/build -c test/backbone_modelref`
+`cd #{PROJECT_ROOT}; coffee -b -o test/backbone_relational/build -c test/backbone_relational`
 `cd #{PROJECT_ROOT}; coffee -b -o test/knockback_collection_observable/build -c test/knockback_collection_observable`
 `cd #{PROJECT_ROOT}; coffee -b -o test/knockback_formatted_observable/build -c test/knockback_formatted_observable`
 `cd #{PROJECT_ROOT}; coffee -b -o test/knockback_localized_observable/build -c test/knockback_localized_observable`

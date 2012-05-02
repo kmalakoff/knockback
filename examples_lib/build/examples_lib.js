@@ -129,7 +129,7 @@ LocalizedStringLocalizer = (function() {
   __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
   function LocalizedStringLocalizer(value, options, view_model) {
     LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
-    return kb.wrappedObservable(this);
+    return kb.unwrapObservable(this);
   }
   LocalizedStringLocalizer.prototype.read = function(value) {
     if (value.string_id) {
@@ -144,7 +144,7 @@ LongDateLocalizer = (function() {
   __extends(LongDateLocalizer, kb.LocalizedObservable);
   function LongDateLocalizer(value, options, view_model) {
     LongDateLocalizer.__super__.constructor.apply(this, arguments);
-    return kb.wrappedObservable(this);
+    return kb.unwrapObservable(this);
   }
   LongDateLocalizer.prototype.read = function(value) {
     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale());
@@ -178,7 +178,7 @@ ShortDateLocalizer = (function() {
         return value.setTime(new_value.valueOf());
       }, this)
     }), view_model);
-    return kb.wrappedObservable(this);
+    return kb.unwrapObservable(this);
   }
   return ShortDateLocalizer;
 })();

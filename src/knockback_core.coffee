@@ -21,10 +21,26 @@ Knockback.VERSION = '0.15.0'
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 Knockback.locale_manager
 
+# displays legacy warnings to the Knockback library user
+Knockback.legacyWarning = (identifier, message) ->
+  kb._legacy_warnings or= {}
+  kb._legacy_warnings[identifier] or= 0
+  kb._legacy_warnings[identifier]++
+  console.warn("Legacy warning! '#{identifier}' has been deprecated. #{message}")
+
 # helpers
-Knockback.wrappedObservable = (instance) ->
-  throw new Error('Knockback: _kb_observable missing from your instance') if not instance._kb_observable
+Knockback.unwrapObservable = (instance) ->
+  throw new Error('Knockback: instance is not wrapping an observable') unless instance and instance._kb_observable
   return instance._kb_observable
+Knockback.wrappedObservable = (instance) -> # LEGACY
+  kb.legacyWarning('kb.wrappedObservable', 'Please use kb.unwrapObservable instead')
+  return kb.unwrapObservable(instance)
+
+Knockback.unwrapModel = (instance) ->
+  return if (instance and instance.hasOwnProperty('__kb_model')) then instance.__kb_model else instance
+Knockback.viewModelGetModel = Knockback.vmModel = (instance) ->  # LEGACY
+  kb.legacyWarning('kb.vmModel', 'Please use kb.unwrapModel instead')
+  return kb.unwrapModel(instance)
 
 Knockback.setToDefault = (observable) -> observable.setToDefault() if observable and observable.setToDefault
 Knockback.vmSetToDefault = (view_model) -> kb.setToDefault(observable) for key, observable of view_model

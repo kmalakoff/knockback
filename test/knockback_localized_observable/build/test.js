@@ -38,7 +38,7 @@ $(document).ready(function() {
     __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
     function LocalizedStringLocalizer(value, options, view_model) {
       LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
-      return kb.wrappedObservable(this);
+      return kb.unwrapObservable(this);
     }
     LocalizedStringLocalizer.prototype.read = function(value) {
       if (value.string_id) {
@@ -95,7 +95,7 @@ $(document).ready(function() {
     __extends(LongDateLocalizer, kb.LocalizedObservable);
     function LongDateLocalizer(value, options, view_model) {
       LongDateLocalizer.__super__.constructor.apply(this, arguments);
-      return kb.wrappedObservable(this);
+      return kb.unwrapObservable(this);
     }
     LongDateLocalizer.prototype.read = function(value) {
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
@@ -207,5 +207,15 @@ $(document).ready(function() {
     Knockback.locale_manager.setLocale('en');
     return equal(view_model.greeting(), 'Goodbye', "en: Goodbye");
   });
-  return test("Error cases", function() {});
+  return test("Error cases", function() {
+    raises((function() {
+      return kb.unwrapObservable(null);
+    }), Error, "Knockback: instance is not wrapping an observable");
+    raises((function() {
+      return kb.unwrapObservable({});
+    }), Error, "Knockback: instance is not wrapping an observable");
+    return kb.wrappedObservable({
+      _kb_observable: ko.observable()
+    });
+  });
 });

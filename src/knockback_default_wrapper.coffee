@@ -28,7 +28,7 @@ class Knockback.DefaultWrapper
     @_kb_observable.destroy = @destroy
     @_kb_observable.setToDefault = @setToDefault
 
-    return kb.wrappedObservable(this)
+    return kb.unwrapObservable(this)
 
   destroy: ->
     @_kb_observable = null

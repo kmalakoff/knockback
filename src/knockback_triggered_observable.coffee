@@ -36,7 +36,7 @@ class Knockback.TriggeredObservable
     # start
     @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
 
-    return kb.wrappedObservable(this)
+    return kb.unwrapObservable(this)
 
   destroy: ->
     @_kb_observable.dispose(); @_kb_observable = null

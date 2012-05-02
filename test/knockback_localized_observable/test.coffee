@@ -24,7 +24,7 @@ $(document).ready( ->
 
   class LocalizedStringLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super; return kb.wrappedObservable(this)
+      super; return kb.unwrapObservable(this)
     read: (value) ->
       return if (value.string_id) then Knockback.locale_manager.get(value.string_id) else ''
 
@@ -69,7 +69,7 @@ $(document).ready( ->
   # NOTE: dependency on globalize
   class LongDateLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super; return kb.wrappedObservable(this)
+      super; return kb.unwrapObservable(this)
     read: (value) ->
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
     write: (localized_string, value, observable) ->
@@ -162,6 +162,8 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
-    # TODO
+    raises((->kb.unwrapObservable(null)), Error, "Knockback: instance is not wrapping an observable")
+    raises((->kb.unwrapObservable({})), Error, "Knockback: instance is not wrapping an observable")
+    kb.wrappedObservable({_kb_observable: ko.observable()})
   )
 )

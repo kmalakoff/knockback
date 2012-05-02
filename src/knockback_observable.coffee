@@ -48,7 +48,7 @@ class Knockback.Observable
     # start
     @model.bind('change', @_onModelChange) if not @model_ref or @model_ref.isLoaded()
 
-    return kb.wrappedObservable(this)
+    return kb.unwrapObservable(this)
 
   destroy: ->
     @_kb_value_observable = null

@@ -12,7 +12,7 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 #   For example:
 #     constructor: ->
 #       super
-#       return kb.wrappedObservable(this)
+#       return kb.unwrapObservable(this)
 #
 # You can either provide a read or a read and write function in the options or on the class itself.
 # Options (all optional)
@@ -56,7 +56,7 @@ class Knockback.LocalizedObservable
     # start
     kb.locale_manager.bind('change', @_onLocaleChange)
 
-    return kb.wrappedObservable(this)
+    return kb.unwrapObservable(this)
 
   destroy: ->
     kb.locale_manager.unbind('change', @_onLocaleChange)

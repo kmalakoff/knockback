@@ -31,7 +31,14 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 class Knockback.CollectionObservable
   constructor: (collection, options={}) ->
     throw new Error('CollectionObservable: collection is missing') if not collection
-    throw new Error('CollectionObservable: external ko.observableArray are no longer supported as of Knockback V0.15.0. Please use the kb.collectionObservable directly instead') if ko.isObservable(options)
+
+    # LEGACY
+    if ko.isObservable(options) and options.hasOwnProperty('indexOf')
+      Knockback.legacyWarning('kb.collectionObservable with an external ko.observableArray', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray')
+      @_kb_observable = options
+      options = arguments[2] || {}
+    else
+      @_kb_observable = ko.observableArray([])
 
     # options
     @vm_create_fn = @_viewModelCreateFn(options)
@@ -50,9 +57,6 @@ class Knockback.CollectionObservable
     @_kb_collection.bind(event, @_onModelRemove) for event in ['remove', 'destroy']
     @_kb_collection.bind('change', @_onModelChanged)
 
-    # internal state
-    @_kb_observable = ko.observableArray([])
-
     # publish public interface on the observable and return instead of this
     @_kb_observable.destroy = @destroy
     @_kb_observable.collection = @collection
@@ -68,7 +72,7 @@ class Knockback.CollectionObservable
     # start
     @sortedIndex(@sorted_index, @sort_attribute, {silent: true, defer: options.defer})
 
-    return kb.wrappedObservable(this)
+    return kb.unwrapObservable(this)
 
   destroy: ->
     @_clear()
@@ -121,7 +125,7 @@ class Knockback.CollectionObservable
   _onCollectionResort: (model_or_models) ->
     throw new Error("CollectionObservable: collection sorted_index unexpected") if @sorted_index
     if _.isArray(model_or_models)
-      @_collectionResync(true) # TODO optimized with incremental resorted_index
+      @(true) # TODO: optimize for incremental resorted_index
       @trigger('resort', @_kb_observable()) # notify
     else
       @_onModelResort(model_or_models)
@@ -137,9 +141,9 @@ class Knockback.CollectionObservable
     @trigger('add', target, @_kb_observable()) # notify
 
   _onModelRemove: (model) ->
-
     # either remove a view model or a model
     target = if @hasViewModels() then @viewModelByModel(model) else model
+    return unless target  # it may have already been removed
     @_kb_observable.remove(target)
     @trigger('remove', target, @_kb_observable()) # notify
 
@@ -195,7 +199,7 @@ class Knockback.CollectionObservable
 
   _sortAttributeFn: (sort_attribute) ->
     if @hasViewModels()
-      return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.vmModel(test).get(sort_attribute))
+      return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.unwrapModel(test).get(sort_attribute))
     else
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
@@ -221,12 +225,8 @@ class Knockback.CollectionObservable
 Knockback.CollectionObservable.prototype extends Backbone.Events
 
 # factory function
-Knockback.collectionObservable = (collection, options) -> return new Knockback.CollectionObservable(collection, options)
+Knockback.collectionObservable = (collection, options, legacy) -> return new Knockback.CollectionObservable(collection, options, legacy)
 
 # helpers
-Knockback.viewModelGetModel = Knockback.vmModel = (view_model) -> if view_model then view_model.__kb_model else null
-
 Knockback.sortedIndexWrapAttr = Knockback.siwa = (attribute_name, wrapper_constructor) ->
-  return (models, model) -> return _.sortedIndex(models, model, (test) -> return new wrapper_constructor(test.get(attribute_name)))
-Knockback.sortedIndexWrapAttrVM = Knockback.siwavm = (attribute_name, wrapper_constructor) ->
-  return (view_models, view_model) -> return _.sortedIndex(view_models, view_model, (test) -> return new wrapper_constructor(kb.vmModel(test).get(attribute_name)))
+  return (models, model) -> return _.sortedIndex(models, model, (test) -> return new wrapper_constructor(kb.unwrapModel(test).get(attribute_name)))

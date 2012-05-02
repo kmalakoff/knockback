@@ -230,7 +230,7 @@ kb.collectionObservable(collection, {
 
 You may find the following helpers useful:
 
-* **kb.vmModel(view_model) -> **: to get the model for a view model
+* **kb.unwrapModel(view_model) -> **: to get the model for a view model
 * **hasViewModels**: returns true if the collectionObservable holds view models and false if it holds models
 
 ### Note 2
@@ -253,7 +253,7 @@ collection_observable = kb.collectionObservable(collection, {
 
 # if the collection contains view models (you supply view_model_constructor or view_model_create), an array of view models will be supplied
 collection_observable = kb.collectionObservable(collection, {
-  sorted_index:    (models, view_model) -> return _.sortedIndex(view_models, view_model, (test) -> return kb.vmModel(test).get('first_name') + " " + kb.vmModel(test).get('last_name'))
+  sorted_index:    (models, view_model) -> return _.sortedIndex(view_models, view_model, (test) -> return kb.unwrapModel(test).get('first_name') + " " + kb.unwrapModel(test).get('last_name'))
 	view_model_constructor: MyViewModel
 })
 ```
@@ -307,14 +307,14 @@ This is the most tricky to implement (look in the examples_lib/localized_observa
 ```coffeescript
 class LocalizedStringLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
-    super; return kb.wrappedObservable(this)
+    super; return kb.unwrapObservable(this)
   read: (value) ->
     return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
 ```
 
 ### Note 1
 
-This looks like it returns an instance but it actually returns a ko.computed from super (use kb.wrappedObservable() to access it). Don't get caught out!
+This looks like it returns an instance but it actually returns a ko.computed from super (use kb.unwrapObservable() to access it). Don't get caught out!
 
 ### Note 2
 
@@ -457,7 +457,7 @@ Final notes
 * Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
     -> Use the helper function: **kb.vmRelease()** to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
 
-* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.computed/ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.wrappedObservable() is for)
+* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.computed/ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.unwrapObservable() is for)
 
 
 In addition to the examples in the test folder (https://github.com/kmalakoff/knockback/blob/master/test), you can look at the examples_lib folder for a sample kb.locale_manager, a localized string, and some examples of localized observables.
