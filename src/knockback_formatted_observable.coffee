@@ -70,6 +70,5 @@ Knockback.formattedObservable = (format, args) ->
       while (index<max_count)
         observable_args[index](matches[index])
         index++
-    owner: {}
   })
   return result

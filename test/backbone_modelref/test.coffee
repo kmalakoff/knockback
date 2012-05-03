@@ -84,7 +84,7 @@ $(document).ready( ->
     kb.vmRelease(view_model)
   )
 
-  test("Standard use case with kbViewModels: just enough to get the picture", ->
+  test("Standard use case with kbViewModels", ->
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number', 'date']})

@@ -10,15 +10,14 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 # internal helper
 class AttributeConnector
   constructor: (model, @key, @read_only) ->
-    _.bindAll(this, 'destroy', 'update')
-
-    @_kb_observable = ko.observable()
-    @_kb_observable.subscription = @_kb_observable.subscribe((value) =>
+    @__kb = {}
+    @__kb.observable = ko.observable()
+    @__kb.observable.subscription = @__kb.observable.subscribe((value) =>
       if @read_only
         if @model
           value = @model.get(@key)
-          return if @_kb_observable() == value
-          @_kb_observable(value)
+          return if @__kb.observable() == value
+          @__kb.observable(value)
         throw "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters."
       else if @model
         set_info = {}; set_info[@key] = value
@@ -26,8 +25,8 @@ class AttributeConnector
     )
 
     # publish public interface on the observable and return instead of this
-    @_kb_observable.destroy = @destroy
-    @_kb_observable.update = @update
+    @__kb.observable.destroy = _.bind(@destroy, @)
+    @__kb.observable.update = _.bind(@update, @)
 
     # start
     @update(model)
@@ -36,20 +35,23 @@ class AttributeConnector
 
   destroy: ->
     @model = null
-    @_kb_observable = null
+    @__kb.observable = null
 
   update: (model) ->
     if model
       value = model.get(@key)
-      needs_update = (@model != model) or not _.isEqual(@_kb_observable(), value)
+      needs_update = (@model != model) or not _.isEqual(@__kb.observable(), value)
       @model = model
-      @_kb_observable(value) if needs_update
+      @__kb.observable(value) if needs_update
     else
       @model = null
 
+class Knockback.ViewModel_RCBase extends Knockback.RefCountable
+  __destroy: ->
+    kb.vmReleaseObservables(this)
+    super
+
 ####################################################
-# API
-#   * __destroy() - override for custom cleanup when all references are released. Note: this function is __destroy instead of _destroy due to an incompatibility with a Knockout convention (https://github.com/kmalakoff/knockback/pull/17)
 # options
 #   * read_only - default is read_write
 #   * internals - an array of atttributes that should be scoped with an underscore, eg. name -> _name
@@ -58,96 +60,93 @@ class AttributeConnector
 #       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 ####################################################
 
-class Knockback.ViewModel_RCBase
-  constructor: ->
-    @_kb_vm = {}
-    @_kb_vm.ref_count = 1
-
-  # from Backbone non-Coffeescript inheritance (use "Knockback.ViewModel_RCBase.extend({})" in Javascript instead of "class MyClass extends Knockback.ViewModel")
-  @extend = Backbone.Model.extend
-
-  __destroy: ->
-    kb.vmReleaseObservables(this)
-
-  # reference counting
-  retain: ->
-    throw new Error("ViewModel: ref_count is corrupt: " + @_kb_vm.ref_count) if (@_kb_vm.ref_count <= 0)
-    @_kb_vm.ref_count++
-    @
-
-  release: ->
-    throw new Error("ViewModel: ref_count is corrupt: " + @_kb_vm.ref_count) if (@_kb_vm.ref_count <= 0)
-    @_kb_vm.ref_count--
-    @__destroy() unless @_kb_vm.ref_count
-    @
-
-  refCount: -> return @_kb_vm.ref_count
-
-class Knockback.ViewModel extends kb.ViewModel_RCBase
+class Knockback.ViewModel extends Knockback.ViewModel_RCBase
   constructor: (model, options={}, view_model) ->
     super
-    @_kb_vm.model = model
-    @_kb_vm.options = options
-    @_kb_vm.view_model = view_model
-    throw new Error('ViewModel: model is missing') if not @_kb_vm.model
 
-    _.bindAll(this, '_kb_vm_onModelChange', '_kb_vm_onModelLoaded', '_kb_vm_onModelUnloaded')
-    if not @_kb_vm.view_model
-      @_kb_vm.view_model = this
+    # register ourselves to handle recursive view models
+    @__kb.store = options.__kb_store || new kb.Store()
+    @__kb.store.add(options.__kb_store_key, this) if options.__kb_store_key
+
+    @__kb._onModelChange = _.bind(@_onModelChange, @)
+    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
+    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
+    @__kb.model = model
+    @__kb.internals = options.internals
+    @__kb.requires = options.requires
+    @__kb.read_only = options.read_only
+    @__kb.view_model = view_model
+    throw new Error('ViewModel: model is missing') if not @__kb.model
+
+    if not @__kb.view_model
+      @__kb.view_model = this
     else
-      @_kb_vm.observables = [] # we are being added to an external view model so we clean up only our observables
+      @__kb.observables = [] # we are being added to an external view model so we clean up only our observables
 
     # determine model or model_ref type
-    if Backbone.ModelRef and (@_kb_vm.model instanceof Backbone.ModelRef)
-      @_kb_vm.model_ref = @_kb_vm.model; @_kb_vm.model_ref.retain()
-      @_kb_vm.model_ref.bind('loaded', @_kb_vm_onModelLoaded)
-      @_kb_vm.model_ref.bind('unloaded', @_kb_vm_onModelUnloaded)
-      @_kb_vm.model = @_kb_vm.model_ref.getModel()
+    if Backbone.ModelRef and (@__kb.model instanceof Backbone.ModelRef)
+      @__kb.model_ref = @__kb.model; @__kb.model_ref.retain()
+      @__kb.model = @__kb.model_ref.getModel()
+      @__kb.model_ref.bind('loaded', @__kb._onModelLoaded)
+      @__kb.model_ref.bind('unloaded', @__kb._onModelUnloaded)
 
     # start
-    @_kb_vm_onModelLoaded(@_kb_vm.model) if not @_kb_vm.model_ref or @_kb_vm.model_ref.isLoaded()
+    @_onModelLoaded(@__kb.model) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
 
-    return @ if not @_kb_vm.options.internals and not @_kb_vm.options.requires
-    missing = _.union((if @_kb_vm.options.internals then @_kb_vm.options.internals else []), (if @_kb_vm.options.requires then @_kb_vm.options.requires else []))
-    missing = _.difference(missing, _.keys(@_kb_vm.model.attributes)) if not @_kb_vm.model_ref or @_kb_vm.model_ref.isLoaded()
-    @_updateAttributeObservor(@_kb_vm.model, key) for key in missing
+    return @ if not @__kb.internals and not @__kb.requires
+    missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
+    missing = _.difference(missing, _.keys(@__kb.model.attributes)) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
+    @_updateAttributeObservor(@__kb.model, key) for key in missing
 
   __destroy: ->
-    (@_kb_vm.model.unbind('change', @_kb_vm_onModelChange); @_kb_vm.model = null) if @_kb_vm.model
-    view_model = @_kb_vm.view_model; @_kb_vm.view_model = null
-    kb.vmReleaseObservables(view_model, @_kb_vm.observables)
-    @_kb_vm.observables = null if @_kb_vm.observables
+    (@__kb.model.unbind('change', @__kb._onModelChange); @__kb.model = null) if @__kb.model
+    view_model = @__kb.view_model; @__kb.view_model = null
+    kb.vmReleaseObservables(view_model, @__kb.observables)
+    @__kb.store = null
+    @__kb.vm = null
+    super
 
   ####################################################
   # Internal
   ####################################################
-  _kb_vm_onModelLoaded: (model) ->
-    @_kb_vm.model = model
-    @_kb_vm.model.bind('change', @_kb_vm_onModelChange) # all attributes if it is manually triggered
-    @_updateAttributeObservor(@_kb_vm.model, key) for key of @_kb_vm.model.attributes
+  _onModelLoaded: (model) ->
+    @__kb.model = model
+    @__kb.model.bind('change', @__kb._onModelChange) # all attributes if it is manually triggered
+    @_updateAttributeObservor(@__kb.model, key) for key of @__kb.model.attributes
 
-  _kb_vm_onModelUnloaded: (model) ->
-    @_kb_vm.model.unbind('change', @_kb_vm_onModelChange) # all attributes if it is manually triggered
-    model = @_kb_vm.model; @_kb_vm.model = null
-    @_updateAttributeObservor(@_kb_vm.model, key) for key of model.attributes
+  _onModelUnloaded: (model) ->
+    @__kb.model.unbind('change', @__kb._onModelChange) # all attributes if it is manually triggered
+    model = @__kb.model; @__kb.model = null
+    @_updateAttributeObservor(@__kb.model, key) for key of model.attributes
 
-  _kb_vm_onModelChange: ->
+  _onModelChange: ->
     # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
-    if @_kb_vm.model._changed
-      (@_updateAttributeObservor(@_kb_vm.model, key) if @_kb_vm.model.hasChanged(key)) for key of @_kb_vm.model.attributes
+    if @__kb.model._changed
+      (@_updateAttributeObservor(@__kb.model, key) if @__kb.model.hasChanged(key)) for key of @__kb.model.attributes
 
     # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
-    else if @_kb_vm.model.changed
-      @_updateAttributeObservor(@_kb_vm.model, key) for key of @_kb_vm.model.changed
+    else if @__kb.model.changed
+      @_updateAttributeObservor(@__kb.model, key) for key of @__kb.model.changed
 
   _updateAttributeObservor: (model, key) ->
-    vm_key = if @_kb_vm.options.internals and _.contains(@_kb_vm.options.internals, key) then '_' + key else key
+    vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
 
-    if (@_kb_vm.view_model.hasOwnProperty(vm_key))
-      @_kb_vm.view_model[vm_key].update(model) if @_kb_vm.view_model[vm_key]
+    if (@__kb.view_model.hasOwnProperty(vm_key))
+      throw new Error("Knockback.ViewModel: property '#{vm_key}' has been unexpectedly removed") unless @__kb.view_model[vm_key]
+      @__kb.view_model[vm_key].update(model) if (@__kb.view_model[vm_key].update)  # manual update required to optimize Backbone.trigger 'change' registrations
     else
-      @_kb_vm.observables.push(vm_key) if @_kb_vm.observables
-      @_kb_vm.view_model[vm_key] = new AttributeConnector(model, key, @_kb_vm.options.read_only)
+      @__kb.observables.push(vm_key) if @__kb.observables
+
+      value = if model then model.get(key) else null
+      if (value instanceof Backbone.Collection) or (value instanceof Backbone.Model)
+        @__kb.view_model[vm_key] = @__kb.store.resolve(value, =>
+          if (value instanceof Backbone.Collection)
+            return kb.collectionObservable(value, {view_model_constructor: @constructor, __kb_store: @__kb.store, __kb_store_key: value})
+          else
+            return new @constructor(value, {__kb_store: @__kb.store, __kb_store_key: value})
+        )
+      else
+        @__kb.view_model[vm_key] = new AttributeConnector(model, key, @__kb.read_only)
 
 # factory function
 Knockback.viewModel = (model, options, view_model) -> return new Knockback.ViewModel(model, options, view_model)

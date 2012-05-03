@@ -14,26 +14,24 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ######################################
 class Knockback.DefaultWrapper
   constructor: (observable, @default_value) ->
-    _.bindAll(this, 'destroy', 'setToDefault')
-
-    @_kb_observable = ko.dependentObservable({
+    @__kb = {}
+    @__kb.observable = ko.dependentObservable({
       read: =>
         value = ko.utils.unwrapObservable(observable())
         return if not value then ko.utils.unwrapObservable(@default_value) else value
       write: (value) -> observable(value)
-      owner: {}
     })
 
     # publish public interface on the observable and return instead of this
-    @_kb_observable.destroy = @destroy
-    @_kb_observable.setToDefault = @setToDefault
+    @__kb.observable.destroy = _.bind(@destroy, @)
+    @__kb.observable.setToDefault = _.bind(@setToDefault, @)
 
     return kb.unwrapObservable(this)
 
   destroy: ->
-    @_kb_observable = null
+    @__kb.observable = null
     @default_value = null
 
-  setToDefault: -> @_kb_observable(@default_value)
+  setToDefault: -> @__kb.observable(@default_value)
 
 Knockback.defaultWrapper = (observable, default_value) -> return new Knockback.DefaultWrapper(observable, default_value)

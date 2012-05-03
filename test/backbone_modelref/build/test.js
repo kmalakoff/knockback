@@ -110,7 +110,7 @@ $(document).ready(function() {
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
     return kb.vmRelease(view_model);
   });
-  return test("Standard use case with kbViewModels: just enough to get the picture", function() {
+  return test("Standard use case with kbViewModels", function() {
     var ContactViewModel, collection, current_date, model, model_ref, view_model;
     ContactViewModel = (function() {
       __extends(ContactViewModel, kb.ViewModel);

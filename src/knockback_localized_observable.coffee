@@ -23,56 +23,58 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ####################################################
 
 class Knockback.LocalizedObservable
-  constructor: (@value, @options={}, @view_model) ->
+  constructor: (@value, @options={}, @view_model={}) ->
     throw new Error('LocalizedObservable: options.read is missing') if not (@options.read or @read)
     throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.read and @read
     throw new Error('LocalizedObservable: options.write and write class function exist. You need to choose one.') if @options.write and @write
     throw new Error('LocalizedObservable: Knockback.locale_manager is not defined') if not kb.locale_manager
 
-    _.bindAll(this, 'destroy', 'setToDefault', 'resetToCurrent', 'observedValue', '_onGetValue', '_onSetValue', '_onLocaleChange')
+    @__kb = {}
+    @__kb._onLocaleChange = _.bind(@_onLocaleChange, @)
 
     # either take the option or the class method
-    @_kb_read = if @options.read then @options.read else @read
-    @_kb_write = if @options.write then @options.write else @write
-    @_kb_default = if @options.default then @options.default else @default
+    @__kb.read = if @options.read then @options.read else @read
+    @__kb.write = if @options.write then @options.write else @write
+    @__kb.default = if @options.default then @options.default else @default
 
     # internal state
     value = ko.utils.unwrapObservable(@value) if @value
-    @_kb_value_observable = ko.observable(if not value then @_getDefaultValue() else @_kb_read.call(this, value, null))
+    @__kb.value_observable = ko.observable(if not value then @_getDefaultValue() else @__kb.read.call(this, value, null))
 
-    if @_kb_write
-      @view_model = {} if not @view_model
-      throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if not _.isFunction(@_kb_write)
-      @_kb_observable = ko.dependentObservable({read:@_onGetValue, write:@_onSetValue, owner:@view_model})
-    else
-      @_kb_observable = ko.dependentObservable(@_onGetValue)
+    throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if @__kb.write and not _.isFunction(@__kb.write)
+    @__kb.observable = ko.dependentObservable({
+      read: _.bind(@_onGetValue, @)
+      write: if @__kb.write then _.bind(@_onSetValue, @) else (-> throw new Error("Knockback.LocalizedObservable: value is read only"))
+      owner:@view_model
+    })
 
     # publish public interface on the observable and return instead of this
-    @_kb_observable.destroy = @destroy
-    @_kb_observable.observedValue = @observedValue
-    @_kb_observable.setToDefault = @setToDefault
-    @_kb_observable.resetToCurrent = @resetToCurrent
+    @__kb.observable.destroy = _.bind(@destroy, @)
+    @__kb.observable.observedValue = _.bind(@observedValue, @)
+    @__kb.observable.setToDefault = _.bind(@setToDefault, @)
+    @__kb.observable.resetToCurrent = _.bind(@resetToCurrent, @)
 
     # start
-    kb.locale_manager.bind('change', @_onLocaleChange)
+    kb.locale_manager.bind('change', @__kb._onLocaleChange)
 
     return kb.unwrapObservable(this)
 
   destroy: ->
-    kb.locale_manager.unbind('change', @_onLocaleChange)
-    @_kb_value_observable = null
-    @_kb_observable.dispose(); @_kb_observable = null
+    kb.locale_manager.unbind('change', @__kb._onLocaleChange)
+    @__kb.value_observable = null
+    @__kb.observable.dispose(); @__kb.observable = null
     @options = {}
     @view_model = null
+    @__kb = null
 
   setToDefault: ->
-    return if not @_kb_default
+    return if not @__kb.default
     default_value = @_getDefaultValue()
-    current_value = @_kb_value_observable()
-    if current_value != default_value then @_onSetValue(default_value) else @_kb_value_observable.valueHasMutated() # trigger the dependable
+    current_value = @__kb.value_observable()
+    if current_value != default_value then @_onSetValue(default_value) else @__kb.value_observable.valueHasMutated() # trigger the dependable
 
   resetToCurrent: ->
-    @_kb_value_observable(null) # force KO to think a change occurred
+    @__kb.value_observable(null) # force KO to think a change occurred
     @_onSetValue(@_getCurrentValue())
 
   # dual purpose set/get
@@ -85,26 +87,26 @@ class Knockback.LocalizedObservable
   # Internal
   ####################################################
   _getDefaultValue: ->
-    return '' if not @_kb_default
-    return if _.isFunction(@_kb_default) then @_kb_default() else @_kb_default
+    return '' if not @__kb.default
+    return if _.isFunction(@__kb.default) then @__kb.default() else @__kb.default
 
   _getCurrentValue: ->
-    return @_getDefaultValue() if not (@value and @_kb_observable)
-    return @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
+    return @_getDefaultValue() if not (@value and @__kb.observable)
+    return @__kb.read.call(this, ko.utils.unwrapObservable(@value), @__kb.observable)
 
   _onGetValue: ->
     ko.utils.unwrapObservable(@value) if @value # create a depdenency
-    return @_kb_value_observable()
+    return @__kb.value_observable()
 
   _onSetValue: (value) ->
-    @_kb_write.call(this, value, ko.utils.unwrapObservable(@value), @_kb_observable)
-    value = @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
-    @_kb_value_observable(value)
+    @__kb.write.call(this, value, ko.utils.unwrapObservable(@value), @__kb.observable)
+    value = @__kb.read.call(this, ko.utils.unwrapObservable(@value), @__kb.observable)
+    @__kb.value_observable(value)
     @options.onChange(value) if @options.onChange
 
   _onLocaleChange: ->
-    value = @_kb_read.call(this, ko.utils.unwrapObservable(@value), @_kb_observable)
-    @_kb_value_observable(value)
+    value = @__kb.read.call(this, ko.utils.unwrapObservable(@value), @__kb.observable)
+    @__kb.value_observable(value)
     @options.onChange(value) if @options.onChange
 
 # factory function

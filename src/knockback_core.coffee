@@ -30,8 +30,8 @@ Knockback.legacyWarning = (identifier, message) ->
 
 # helpers
 Knockback.unwrapObservable = (instance) ->
-  throw new Error('Knockback: instance is not wrapping an observable') unless instance and instance._kb_observable
-  return instance._kb_observable
+  throw new Error('Knockback: instance is not wrapping an observable') unless instance and instance.__kb.observable
+  return instance.__kb.observable
 Knockback.wrappedObservable = (instance) -> # LEGACY
   kb.legacyWarning('kb.wrappedObservable', 'Please use kb.unwrapObservable instead')
   return kb.unwrapObservable(instance)
@@ -59,9 +59,9 @@ Knockback.vmReleaseObservables = (view_model, keys) ->
 
 Knockback.vmReleaseObservable = (observable) ->
   return if not (ko.isObservable(observable) or (observable instanceof kb.Observables) or (observable instanceof kb.ViewModel_RCBase))
-  if observable.destroy
+  if observable.release
+    observable.release()
+  else if observable.destroy
     observable.destroy()
   else if observable.dispose
     observable.dispose()
-  else if observable.release
-    observable.release()

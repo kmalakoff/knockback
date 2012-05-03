@@ -11,61 +11,64 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 # options
 #   * key - required to look up the model's attributes
 #   * read - called to get the value and each time the locale changes
-#   * write - called to set the value (if read_write) or a boolean to indicate write is enabled
+#   * write - called to set the value
 #   * args - arguments passed to the read and write function
 ####################################################
 
 class Knockback.Observable
-  constructor: (@model, @options, @view_model) ->
+  constructor: (@model, @options, @view_model={}) ->
     throw new Error('Observable: model is missing') if not @model
     throw new Error('Observable: options is missing') if not @options
     @options = {key: @options} if _.isString(@options) or ko.isObservable(@options)
     throw new Error('Observable: options.key is missing') if not @options.key
 
-    _.bindAll(this, 'destroy', 'setToDefault', '_onGetValue', '_onSetValue', '_onModelChange', '_onModelLoaded', '_onModelUnloaded')
+    @__kb = {}
+    @__kb._onModelChange = _.bind(@_onModelChange, @)
+    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
+    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
     # determine model or model_ref type
     if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
       @model_ref = @model; @model_ref.retain()
-      @model_ref.bind('loaded', @_onModelLoaded)
-      @model_ref.bind('unloaded', @_onModelUnloaded)
+      @model_ref.bind('loaded', @__kb._onModelLoaded)
+      @model_ref.bind('unloaded', @__kb._onModelUnloaded)
       @model = @model_ref.getModel()
 
     # internal state
-    @_kb_value_observable = ko.observable()
-    @_kb_localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
-
-    if @options.write
-      @view_model = {} if not @view_model   # view model needs to be provided if you need "this" scoped in your view model write function
-      @_kb_observable = ko.dependentObservable({read: @_onGetValue, write: @_onSetValue, owner: @view_model})
-    else
-      @_kb_observable = ko.dependentObservable(@_onGetValue)
+    @__kb.value_observable = ko.observable()
+    @__kb.localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
+    @__kb.observable = ko.dependentObservable({
+      read: _.bind(@_onGetValue, @)
+      write: if @options.write then _.bind(@_onSetValue, @) else (-> throw new Error("Knockback.Observable: #{@options.key} is read only"))
+      owner: @view_model
+    })
 
     # publish public interface on the observable and return instead of this
-    @_kb_observable.destroy = @destroy
-    @_kb_observable.setToDefault = @setToDefault
+    @__kb.observable.destroy = _.bind(@destroy, @)
+    @__kb.observable.setToDefault = _.bind(@setToDefault, @)
 
     # start
-    @model.bind('change', @_onModelChange) if not @model_ref or @model_ref.isLoaded()
+    @model.bind('change', @__kb._onModelChange) if not @model_ref or @model_ref.isLoaded()
 
     return kb.unwrapObservable(this)
 
   destroy: ->
-    @_kb_value_observable = null
-    @_kb_observable.dispose(); @_kb_observable = null
-    @_onModelUnloaded(@model) if @model
+    @__kb.value_observable = null
+    @__kb.observable.dispose(); @__kb.observable = null
+    @__kb._onModelUnloaded(@model) if @model
     if @model_ref
-      @model_ref.unbind('loaded', @_onModelLoaded)
-      @model_ref.unbind('unloaded', @_onModelUnloaded)
+      @model_ref.unbind('loaded', @__kb._onModelLoaded)
+      @model_ref.unbind('unloaded', @__kb._onModelUnloaded)
       @model_ref.release(); @model_ref = null
     @options  = null; @view_model = null
+    @__kb = null
 
   setToDefault: ->
     value = @_getDefaultValue()
-    if @_kb_localizer
-      @_kb_localizer.observedValue(value)
-      value = @_kb_localizer()
-    @_kb_value_observable(value) # trigger the dependable
+    if @__kb.localizer
+      @__kb.localizer.observedValue(value)
+      value = @__kb.localizer()
+    @__kb.value_observable(value) # trigger the dependable
 
   ####################################################
   # Internal
@@ -84,21 +87,21 @@ class Knockback.Observable
 
   _onGetValue: ->
     # trigger all the dependables
-    @_kb_value_observable()
+    @__kb.value_observable()
     ko.utils.unwrapObservable(@options.key)
     if not _.isUndefined(@options.args)
       if _.isArray(@options.args) then (ko.utils.unwrapObservable(arg) for arg in @options.args) else ko.utils.unwrapObservable(@options.args)
     value = @_getCurrentValue()
 
-    if @_kb_localizer
-      @_kb_localizer.observedValue(value)
-      value = @_kb_localizer()
+    if @__kb.localizer
+      @__kb.localizer.observedValue(value)
+      value = @__kb.localizer()
     return value
 
   _onSetValue: (value) ->
-    if @_kb_localizer
-      @_kb_localizer(value)
-      value = @_kb_localizer.observedValue()
+    if @__kb.localizer
+      @__kb.localizer(value)
+      value = @__kb.localizer.observedValue()
 
     if @model
       set_info = {}; set_info[ko.utils.unwrapObservable(@options.key)] = value
@@ -106,16 +109,16 @@ class Knockback.Observable
       if not _.isUndefined(@options.args)
         if _.isArray(@options.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @options.args) else args.push(ko.utils.unwrapObservable(@options.args))
       if _.isFunction(@options.write) then @options.write.apply(@view_model, args) else @model.set.apply(@model, args)
-    if @_kb_localizer then @_kb_value_observable(@_kb_localizer()) else @_kb_value_observable(value) # trigger the dependable and store the correct value
+    if @__kb.localizer then @__kb.value_observable(@__kb.localizer()) else @__kb.value_observable(value) # trigger the dependable and store the correct value
 
   _onModelLoaded: (model) ->
     @model = model
-    @model.bind('change', @_onModelChange) # all attributes if it is manually triggered
+    @model.bind('change', @__kb._onModelChange) # all attributes if it is manually triggered
     @_updateValue()
 
   _onModelUnloaded: (model) ->
-    (@_kb_localizer.destroy(); @_kb_localizer = null) if @_kb_localizer and @_kb_localizer.destroy
-    @model.unbind('change', @_onModelChange) # all attributes if it is manually triggered
+    (@__kb.localizer.destroy(); @__kb.localizer = null) if @__kb.localizer and @__kb.localizer.destroy
+    @model.unbind('change', @__kb._onModelChange) # all attributes if it is manually triggered
     @model = null
 
   _onModelChange: ->
@@ -124,10 +127,10 @@ class Knockback.Observable
 
   _updateValue: ->
     value = @_getCurrentValue()
-    if @_kb_localizer
-      @_kb_localizer.observedValue(value)
-      value = @_kb_localizer()
-    @_kb_value_observable(value) # trigger the dependable
+    if @__kb.localizer
+      @__kb.localizer.observedValue(value)
+      value = @__kb.localizer()
+    @__kb.value_observable(value) # trigger the dependable
 
 # factory function
 Knockback.observable = (model, options, view_model) -> return new Knockback.Observable(model, options, view_model)

@@ -215,7 +215,9 @@ $(document).ready(function() {
       return kb.unwrapObservable({});
     }), Error, "Knockback: instance is not wrapping an observable");
     return kb.wrappedObservable({
-      _kb_observable: ko.observable()
+      __kb: {
+        observable: ko.observable()
+      }
     });
   });
 });
