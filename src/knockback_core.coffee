@@ -36,8 +36,12 @@ Knockback.wrappedObservable = (instance) -> # LEGACY
   kb.legacyWarning('kb.wrappedObservable', 'Please use kb.unwrapObservable instead')
   return kb.unwrapObservable(instance)
 
+Knockback.wrapModel = (instance, model) ->
+  throw new Error('Knockback: no instance for wrapping a model') unless instance
+  instance.__kb or= {}
+  instance.__kb.model = model
 Knockback.unwrapModel = (instance) ->
-  return if (instance and instance.hasOwnProperty('__kb_model')) then instance.__kb_model else instance
+  return if (instance and instance.__kb and instance.__kb.model) then instance.__kb.model else instance
 Knockback.viewModelGetModel = Knockback.vmModel = (instance) ->  # LEGACY
   kb.legacyWarning('kb.vmModel', 'Please use kb.unwrapModel instead')
   return kb.unwrapModel(instance)

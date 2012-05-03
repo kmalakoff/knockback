@@ -186,33 +186,6 @@ $(document).ready(function() {
     equal(view_model._date().getDate(), 10, "day is good");
     return kb.vmRelease(view_model);
   });
-  test("merge into an external view model", function() {
-    var model, view_model, view_model_instance;
-    model = new Contact({
-      name: 'Ringo',
-      number: '555-555-5556'
-    });
-    view_model = {
-      something: ko.observable('foo')
-    };
-    view_model_instance = kb.viewModel(model, {}, view_model);
-    equal(view_model.name(), 'Ringo', "Interesting name");
-    equal(view_model.number(), '555-555-5556', "Not so interesting number");
-    view_model.number('9222-222-222');
-    equal(model.get('number'), '9222-222-222', "Number was changed");
-    equal(view_model.number(), '9222-222-222', "Number was changed");
-    model.set({
-      name: 'Starr',
-      number: 'XXX-XXX-XXXX'
-    });
-    equal(view_model.name(), 'Starr', "Name changed");
-    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
-    kb.vmRelease(view_model_instance);
-    ok(view_model.number === null, "Number removed");
-    ok(view_model.something !== null, "Something remains removed");
-    kb.vmRelease(view_model);
-    return ok(view_model.something === null, "Something removed");
-  });
   test("Using Coffeescript classes", function() {
     var ContactViewModelCustom, model, view_model;
     ContactViewModelCustom = (function() {

@@ -60,18 +60,11 @@ class Knockback.CollectionObservable extends kb.RefCountable
     @__kb._onCollectionResort = _.bind(@_onCollectionResort, @)
     @__kb._onModelAdd = _.bind(@_onModelAdd, @)
     @__kb._onModelRemove = _.bind(@_onModelRemove, @)
-    @__kb._onModelChanged = _.bind(@_onModelChanged, @)
-
-    # store as _kb_collection so that a collection() function can be exposed
-    @__kb.collection = collection
-    @__kb.collection.retain() if @__kb.collection.retain
-    @__kb.collection.bind('reset', @__kb._onCollectionReset)
-    @__kb.collection.bind('resort', @__kb._onCollectionResort) if not @sorted_index
-    @__kb.collection.bind(event, @__kb._onModelAdd) for event in ['new', 'add']
-    @__kb.collection.bind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
-    @__kb.collection.bind('change', @__kb._onModelChanged)
+    @__kb._onModelChange = _.bind(@_onModelChange, @)
 
     # publish public interface on the observable and return instead of this
+    @__kb.observable.retain = _.bind(@retain, @)
+    @__kb.observable.refCount = _.bind(@refCount, @)
     @__kb.observable.release = _.bind(@release, @)
     @__kb.observable.collection = _.bind(@collection, @)
     @__kb.observable.viewModelByModel = _.bind(@viewModelByModel, @)
@@ -84,28 +77,48 @@ class Knockback.CollectionObservable extends kb.RefCountable
     @__kb.observable.unbind = _.bind(@unbind, @)
     @__kb.observable.trigger = _.bind(@trigger, @)
 
-    # start
-    @sortedIndex(@sorted_index, @sort_attribute, {silent: true, defer: options.defer})
+    # start the processing
+    @collection(collection, {silent: true, defer: options.defer})
 
     return kb.unwrapObservable(this)
 
   __destroy: ->
-    @_clear()
-    @__kb.collection.unbind('reset', @__kb._onCollectionReset)
-    @__kb.collection.unbind('resort', @__kb._onCollectionResort) if not @sorted_index
-    @__kb.collection.unbind(event, @__kb._onModelAdd) for event in ['new', 'add']
-    @__kb.collection.unbind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
-    @__kb.collection.unbind('change', @__kb._onModelChanged)
-    @__kb.collection.release() if @__kb.collection.release; @__kb.collection = null
-    @__kb.observable.dispose(); @__kb.observable = null
+    @collection(null)
+    @__kb.observable.destroyAll(); @__kb.observable = null
     @view_model_create_fn = null
     @__kb.store = null
     @__kb.co = null
     super
 
-  collection: ->
-    @__kb.observable() # force a dependency
-    return @__kb.collection
+  collection: (collection, options) ->
+    if (arguments.length == 0)
+      @__kb.observable() # force a dependency
+      return @__kb.collection
+
+    # no change
+    return if (collection == @__kb.collection)
+
+    # clean up
+    if @__kb.collection
+      @_clear()
+      @__kb.collection.unbind('reset', @__kb._onCollectionReset)
+      @__kb.collection.unbind('resort', @__kb._onCollectionResort) if not @sorted_index
+      @__kb.collection.unbind(event, @__kb._onModelAdd) for event in ['new', 'add']
+      @__kb.collection.unbind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
+      @__kb.collection.unbind('change', @__kb._onModelChange)
+      @__kb.collection.release?(); @__kb.collection = null
+
+    @__kb.collection = collection # store as _kb_collection so that a collection() function can be exposed
+    if @__kb.collection
+      @__kb.collection.retain?()
+      @__kb.collection.bind('reset', @__kb._onCollectionReset)
+      @__kb.collection.bind('resort', @__kb._onCollectionResort) if not @sorted_index
+      @__kb.collection.bind(event, @__kb._onModelAdd) for event in ['new', 'add']
+      @__kb.collection.bind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
+      @__kb.collection.bind('change', @__kb._onModelChange)
+
+      # generate
+      @sortedIndex(@sorted_index, @sort_attribute, options)
 
   sortedIndex: (sorted_index, sort_attribute, options={}) ->
     if sorted_index
@@ -132,7 +145,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
   viewModelByModel: (model) ->
     return null unless @hasViewModels()
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(@__kb.observable(), (test) -> return (test.__kb_model[id_attribute] == model[id_attribute]))
+    return _.find(@__kb.observable(), (test) -> return (test.__kb.model[id_attribute] == model[id_attribute]))
 
   hasViewModels: -> return !!@view_model_create_fn
 
@@ -168,9 +181,9 @@ class Knockback.CollectionObservable extends kb.RefCountable
     # clean up view models
     return unless @hasViewModels()
     kb.vmRelease(target)
-    target.__kb_model = null
+    kb.wrapModel(target, null)
 
-  _onModelChanged: (model) ->
+  _onModelChange: (model) ->
     # sorted_index required
     if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
       @_onModelResort(model)
@@ -225,7 +238,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
     return model unless @view_model_create_fn
     return @__kb.store.resolve(model, =>
       view_model = if @view_model_create_with_new then (new @view_model_create_fn(model, {__kb_store: @__kb.store, __kb_store_key: model})) else @view_model_create_fn(model, {__kb_store: @__kb.store})
-      view_model.__kb_model = model
+      kb.wrapModel(view_model, model)
       return view_model
     )
 

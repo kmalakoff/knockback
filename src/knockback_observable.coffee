@@ -111,14 +111,30 @@ class Knockback.Observable
       if _.isFunction(@options.write) then @options.write.apply(@view_model, args) else @model.set.apply(@model, args)
     if @__kb.localizer then @__kb.value_observable(@__kb.localizer()) else @__kb.value_observable(value) # trigger the dependable and store the correct value
 
+  _modelBind: (model) ->
+    return unless model
+    model.bind('change', @__kb._onModelChange)
+    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+      model.bind('add', @__kb._onModelChange)
+      model.bind('remove', @__kb._onModelChange)
+      model.bind('update', @__kb._onModelChange)
+
+  _modelUnbind: (model) ->
+    return unless model
+    model.unbind('change', @__kb._onModelChange)
+    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+      model.unbind('add', @__kb._onModelChange)
+      model.unbind('remove', @__kb._onModelChange)
+      model.unbind('update', @__kb._onModelChange)
+
   _onModelLoaded: (model) ->
     @model = model
-    @model.bind('change', @__kb._onModelChange) # all attributes if it is manually triggered
+    @_modelBind(model)
     @_updateValue()
 
   _onModelUnloaded: (model) ->
     (@__kb.localizer.destroy(); @__kb.localizer = null) if @__kb.localizer and @__kb.localizer.destroy
-    @model.unbind('change', @__kb._onModelChange) # all attributes if it is manually triggered
+    @_modelUnbind(model)
     @model = null
 
   _onModelChange: ->
