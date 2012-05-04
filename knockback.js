@@ -104,7 +104,7 @@ Knockback.utils.release = function(obj) {
       return false;
     }
     return true;
-  } else if (!_.isFunction(obj)) {
+  } else if (_.isObject(obj) && !_.isFunction(obj)) {
     for (key in obj) {
       value = obj[key];
       if (!value || (key === '__kb')) {

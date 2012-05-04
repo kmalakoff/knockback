@@ -95,7 +95,7 @@ Knockback.utils.release = (obj) ->
     return true # was released
 
   # view model
-  else if not _.isFunction(obj)
+  else if _.isObject(obj) and not _.isFunction(obj)
     for key, value of obj
       continue if !value or (key == '__kb')
       obj[key] = null if kb.utils.release(value)
