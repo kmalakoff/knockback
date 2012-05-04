@@ -32,29 +32,29 @@ class Knockback.Observable
       @model_ref = @model; @model_ref.retain()
       @model_ref.bind('loaded', @__kb._onModelLoaded)
       @model_ref.bind('unloaded', @__kb._onModelUnloaded)
-      @model = @model_ref.getModel()
+      @model = @model_ref.wrappedModel()
 
     # internal state
     @__kb.value_observable = ko.observable()
     @__kb.localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
-    @__kb.observable = ko.dependentObservable({
+    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
       write: if @options.write then _.bind(@_onSetValue, @) else (-> throw new Error("Knockback.Observable: #{@options.key} is read only"))
       owner: @view_model
-    })
+    }))
 
     # publish public interface on the observable and return instead of this
-    @__kb.observable.destroy = _.bind(@destroy, @)
-    @__kb.observable.setToDefault = _.bind(@setToDefault, @)
+    observable.destroy = _.bind(@destroy, @)
+    observable.setToDefault = _.bind(@setToDefault, @)
 
     # start
     @model.bind('change', @__kb._onModelChange) if not @model_ref or @model_ref.isLoaded()
 
-    return kb.unwrapObservable(this)
+    return observable
 
   destroy: ->
     @__kb.value_observable = null
-    @__kb.observable.dispose(); @__kb.observable = null
+    kb.utils.wrappedObservable(this).dispose(); kb.utils.wrappedObservable(this, null)
     @__kb._onModelUnloaded(@model) if @model
     if @model_ref
       @model_ref.unbind('loaded', @__kb._onModelLoaded)

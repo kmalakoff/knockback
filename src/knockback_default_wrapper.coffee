@@ -8,30 +8,17 @@
 throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file') if not this.Knockback
 
 ######################################
-# Knockback.defaultWrapper to provide a default value when an observable is null, undefined, or the empty string
-# Provide a observable with observable and/or non observable default argument in the form of:
+# Knockback.defaultWrapper to provide a default value when an target_observable is null, undefined, or the empty string
+# Provide a target_observable with observable and/or non observable default argument in the form of:
 #   kb.defaultWrapper(some_observable, "blue")
 ######################################
-class Knockback.DefaultWrapper
-  constructor: (observable, @default_value) ->
-    @__kb = {}
-    @__kb.observable = ko.dependentObservable({
-      read: =>
-        value = ko.utils.unwrapObservable(observable())
-        return if not value then ko.utils.unwrapObservable(@default_value) else value
-      write: (value) -> observable(value)
-    })
-
-    # publish public interface on the observable and return instead of this
-    @__kb.observable.destroy = _.bind(@destroy, @)
-    @__kb.observable.setToDefault = _.bind(@setToDefault, @)
-
-    return kb.unwrapObservable(this)
-
-  destroy: ->
-    @__kb.observable = null
-    @default_value = null
-
-  setToDefault: -> @__kb.observable(@default_value)
-
-Knockback.defaultWrapper = (observable, default_value) -> return new Knockback.DefaultWrapper(observable, default_value)
+Knockback.defaultWrapper = (target_observable, default_value_observable) ->
+  default_wrapper_observable = ko.dependentObservable({
+    read: =>
+      value = ko.utils.unwrapObservable(target_observable())
+      default_value = ko.utils.unwrapObservable(default_value_observable)
+      return if value then value else default_value
+    write: (value) -> target_observable(value)
+  })
+  default_wrapper_observable.setToDefault = -> default_wrapper_observable(default_value_observable)
+  return default_wrapper_observable

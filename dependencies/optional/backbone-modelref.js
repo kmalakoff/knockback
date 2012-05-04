@@ -89,7 +89,7 @@ Backbone.ModelRef = (function() {
     }
     return this.model_id;
   };
-  ModelRef.prototype.getModel = function() {
+  ModelRef.prototype.wrappedModel = function() {
     if (this.cached_model && !this.cached_model.isNew()) {
       this.model_id = this.cached_model.id;
     }
@@ -100,7 +100,7 @@ Backbone.ModelRef = (function() {
   };
   ModelRef.prototype.isLoaded = function() {
     var model;
-    model = this.getModel();
+    model = this.wrappedModel();
     if (!model) {
       return false;
     }

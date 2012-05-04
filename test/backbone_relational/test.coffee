@@ -47,17 +47,19 @@ $(document).ready( ->
 
     house_view_model = new kb.ViewModel(our_house)
     equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
+    equal(house_view_model.occupants().length, 2, 'Expected occupant count')
     for occupant_observable in house_view_model.occupants()
       ok(_.contains(['John', 'Paul'], occupant_observable.name()), 'Expected name')
-      equal(occupant_observable.occupies.location(), 'in the middle of the street', 'Expected location')
+      equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
 
       # nested check
-      for occupant_observable2 in occupant_observable.occupies.occupants()
+      equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count")
+      for occupant_observable2 in occupant_observable.occupies().occupants()
         ok(_.contains(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
-        equal(occupant_observable2.occupies.location(), 'in the middle of the street', 'Expected location')
+        equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
 
     equal(house_view_model.refCount(), 1, 'Expected references')
-    kb.vmRelease(house_view_model)
+    kb.utils.release(house_view_model)
     equal(house_view_model.refCount(), 0, 'Expected references')
   )
 
@@ -99,12 +101,13 @@ $(document).ready( ->
         equal(place_view_model.occupants().length, 4, "Everyone is here")
         for occupant_observable in place_view_model.occupants()
           ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
-          equal(occupant_observable.occupies.location(), 'one side of the street', 'Expected location')
+          equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
           # nested check
-          for occupant_observable2 in occupant_observable.occupies.occupants()
+          equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here")
+          for occupant_observable2 in occupant_observable.occupies().occupants()
             ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
-            equal(occupant_observable2.occupies.location(), 'one side of the street', 'Expected location')
+            equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
       else
         equal(place_view_model.location(), 'the other side of the street', 'In the right place')
         equal(place_view_model.occupants().length, 0, "No one is here")
@@ -118,26 +121,28 @@ $(document).ready( ->
         equal(place_view_model.occupants().length, 3, "Almost everyone is here")
         for occupant_observable in place_view_model.occupants()
           ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
-          equal(occupant_observable.occupies.location(), 'one side of the street', 'Expected location')
+          equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
           # nested check
-          for occupant_observable2 in occupant_observable.occupies.occupants()
+          equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here")
+          for occupant_observable2 in occupant_observable.occupies().occupants()
             ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
-            equal(occupant_observable2.occupies.location(), 'one side of the street', 'Expected location')
+            equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
       else
         equal(place_view_model.location(), 'the other side of the street', 'In the right place')
         equal(place_view_model.occupants().length, 1, "In the studio")
         for occupant_observable in place_view_model.occupants()
           equal(occupant_observable.name(), 'John', 'Expected name')
-          equal(occupant_observable.occupies.location(), 'the other side of the street', 'Expected location')
+          equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location')
 
           # nested check
-          for occupant_observable2 in occupant_observable.occupies.occupants()
+          equal(occupant_observable.occupies().occupants().length, 1, "In the studio")
+          for occupant_observable2 in occupant_observable.occupies().occupants()
             equal(occupant_observable2.name(), 'John', 'Expected name')
-            equal(occupant_observable2.occupies.location(), 'the other side of the street', 'Expected location')
+            equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location')
 
     equal(places_observable.refCount(), 1, 'Expected references')
-    kb.vmReleaseObservable(places_observable)
+    kb.utils.release(places_observable)
     equal(places_observable.refCount(), 0, 'Expected references')
   )
 
@@ -172,21 +177,21 @@ $(document).ready( ->
     equal(john_view_model.name(), 'John', "Name is correct")
     for friend in john_view_model.friends()
       ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
-    equal(john_view_model.best_friend.name(), 'George', 'Expected name')
+    equal(john_view_model.best_friend().name(), 'George', 'Expected name')
     equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
 
     paul_view_model = new kb.ViewModel(paul)
     equal(paul_view_model.name(), 'Paul', "Name is correct")
     for friend in paul_view_model.friends()
       ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
-    equal(paul_view_model.best_friend.name(), 'George', 'Expected name')
+    equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
     equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
 
     george_view_model = new kb.ViewModel(george)
     equal(george_view_model.name(), 'George', "Name is correct")
     for friend in george_view_model.friends()
       ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
-    equal(george_view_model.best_friend.name(), 'John', 'Expected name')
+    equal(george_view_model.best_friend().name(), 'John', 'Expected name')
     equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
     equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
   )

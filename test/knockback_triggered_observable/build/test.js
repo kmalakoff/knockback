@@ -31,7 +31,7 @@ $(document).ready(function() {
     equal(trigger_count, 2, "2: changed");
     kb.locale_manager.setLocale('fr-FR');
     equal(trigger_count, 3, "3: changed");
-    kb.vmRelease(view_model);
+    kb.utils.release(view_model);
     kb.locale_manager.setLocale('fr-FR');
     return equal(trigger_count, 3, "3: no change");
   });

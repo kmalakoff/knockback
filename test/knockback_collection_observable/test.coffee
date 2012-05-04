@@ -40,7 +40,7 @@ $(document).ready( ->
   test("Basic Usage: collection observable with ko.dependentObservable", ->
     collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model_constructor: ContactViewModel
+      view_model: ContactViewModel
     })
 
     view_model =
@@ -84,7 +84,7 @@ $(document).ready( ->
     equal(collection.length, 1, "one models")
     equal(collection_observable().length, 1, "one view models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
-    model = kb.unwrapModel(collection_observable()[0])
+    model = kb.utils.wrappedModel(collection_observable()[0])
     equal(model.get('name'), 'Ringo', "Ringo is left")
     model = collection_observable()[0]
     equal(model.get('name'), 'Ringo', "Ringo is left")
@@ -114,18 +114,18 @@ $(document).ready( ->
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(collection_observable().length, 2, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is first")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'George', "George is second")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is first")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'George', "George is second")
 
     collection.remove('b2')
     equal(collection.length, 1, "one model")
     equal(collection_observable().length, 1, "one view model")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
-    model = kb.unwrapModel(collection_observable()[0])
+    model = kb.utils.wrappedModel(collection_observable()[0])
     equal(model.get('name'), 'Ringo', "Ringo is left")
 
     view_model = collection_observable.viewModelByModel(model)
-    equal(kb.unwrapModel(view_model).get('name'), 'Ringo', "Ringo is left")
+    equal(kb.utils.wrappedModel(view_model).get('name'), 'Ringo', "Ringo is left")
 
     view_model_count = 0
     _.each(collection_observable(), (view_model)->view_model_count++)
@@ -139,7 +139,7 @@ $(document).ready( ->
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
-      view_model_constructor:   ContactViewModelClass
+      view_model:   ContactViewModelClass
       sort_attribute:           'name'
     })
     collection_observable.bind('add', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
@@ -157,8 +157,8 @@ $(document).ready( ->
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(view_model_count, 2, "two view models")
     equal(collection_observable().length, 2, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
     collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     equal(collection.length, 3, "three models")
@@ -167,16 +167,16 @@ $(document).ready( ->
     equal(collection.models[2].get('name'), 'Paul', "Paul is second")
     equal(view_model_count, 3, "three view models")
     equal(collection_observable().length, 3, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "one model")
     equal(view_model_count, 1, "one view model")
     equal(collection_observable().length, 1, "one view model")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
 
     collection.reset()
     equal(collection.length, 0, "no models")
@@ -215,7 +215,7 @@ $(document).ready( ->
     # with view models
     collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model_constructor:   ContactViewModelClass
+      view_model:   ContactViewModelClass
       sorted_index:             kb.siwa('number', SortWrapper)
     })
     collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
@@ -224,8 +224,8 @@ $(document).ready( ->
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(collection_observable().length, 2, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
   )
 
   test("Collection sorting with callbacks", ->
@@ -233,7 +233,7 @@ $(document).ready( ->
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
-      view_model: ContactViewModel    # view_model is legacy for view_model_constructor, it should be replaced with view_model_constructor or view_model_create
+      view_model: ContactViewModel    # view_model is legacy for view_model, it should be replaced with view_model or view_model_create
     })
     collection_observable.bind('add', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
     collection_observable.bind('resort', (view_model, collection_observable, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
@@ -249,8 +249,8 @@ $(document).ready( ->
     equal(collection.models[1].get('name'), 'Ringo', "Ringo is second")
     equal(view_model_count, 2, "two view models")
     equal(collection_observable().length, 2, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
     collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     equal(collection.length, 3, "three models")
@@ -259,16 +259,16 @@ $(document).ready( ->
     equal(collection.models[2].get('name'), 'Ringo', "Ringo is second")
     equal(view_model_count, 3, "three view models")
     equal(collection_observable().length, 3, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "one models")
     equal(view_model_count, 1, "one view models")
     equal(collection_observable().length, 1, "one view models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
 
     collection.reset()
     equal(collection.length, 0, "no models")
@@ -280,7 +280,7 @@ $(document).ready( ->
   test("Collection sync dynamically changing the sorting function", ->
     collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model_constructor: ContactViewModel
+      view_model: ContactViewModel
     })
 
     equal(collection.length, 0, "no models")
@@ -292,14 +292,14 @@ $(document).ready( ->
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(collection_observable().length, 2, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is first - no sorting")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'George', "George is first - no sorting")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is first - no sorting")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'George', "George is first - no sorting")
 
-    collection_observable.sortedIndex(((view_models, vm) -> _.sortedIndex(view_models, vm, (test) -> kb.unwrapModel(test).get('name'))), 'name')
+    collection_observable.sortedIndex(((view_models, vm) -> _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'))), 'name')
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
     collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5554'}))
     equal(collection.length, 3, "three models")
@@ -307,24 +307,24 @@ $(document).ready( ->
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(collection.models[2].get('name'), 'Paul', "Paul is second")
     equal(collection_observable().length, 3, "two view models")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
     collection_observable.sortAttribute('number')
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(collection.models[2].get('name'), 'Paul', "Paul is second")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'Paul', "Paul is first - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[1]).get('name'), 'George', "Paul is second - sorting worked!")
-    equal(kb.unwrapModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Paul', "Paul is first - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'George', "Paul is second - sorting worked!")
+    equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
     collection_observable.sortAttribute('name')
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "one models")
     equal(collection_observable().length, 1, "one view models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
-    equal(kb.unwrapModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
+    equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
 
     collection.reset()
     equal(collection.length, 0, "no models")
@@ -336,7 +336,7 @@ $(document).ready( ->
     kb.collectionObservable(new ContactsCollection(), ko.observableArray([]))
     # raises((->kb.collectionObservable(new ContactsCollection(), ko.observableArray([]))), Error, "Legacy warning! 'kb.collectionObservable with an external ko.observableArray' has been deprecated. Please use the kb.collectionObservable directly instead of passing a ko.observableArray")
     kb.vmModel(new Contact())
-    # raises((->kb.vmModel(new Contact())), Error, "Legacy warning! 'kb.vmModel' has been deprecated. Please use kb.unwrapObservable instead")
+    # raises((->kb.vmModel(new Contact())), Error, "Legacy warning! 'kb.vmModel' has been deprecated. Please use kb.utils.wrappedObservable instead")
     kb.collectionObservable(new ContactsCollection())
     kb.collectionObservable(new ContactsCollection(), {})
   )

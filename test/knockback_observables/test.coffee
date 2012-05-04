@@ -62,7 +62,7 @@ $(document).ready( ->
     equal(current_date.getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Option to override the default read-only state", ->
@@ -98,7 +98,7 @@ $(document).ready( ->
     equal(view_model.name2(), 'Ringo', "Name changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Option to override the default read-only state {write: true}", ->
@@ -135,7 +135,7 @@ $(document).ready( ->
     equal(view_model.name2(), 'Paul', "Name not changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Supply non-write option state. Should stay read-only", ->
@@ -172,7 +172,7 @@ $(document).ready( ->
     equal(view_model.name2(), 'John', "Name not changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Error cases", ->

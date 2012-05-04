@@ -31,7 +31,7 @@ $(document).ready( ->
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Standard use case: direct attributes with custom read and write", ->
@@ -65,7 +65,7 @@ $(document).ready( ->
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Read args", ->
@@ -80,7 +80,7 @@ $(document).ready( ->
     ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
   )
 
-  test("Standard use case: ko.computed", ->
+  test("Standard use case: ko.dependentObservable", ->
     ContactViewModel = (model) ->
       @name = kb.observable(model, {key: 'name', write: true})
       @formatted_name = ko.dependentObservable({
@@ -103,7 +103,7 @@ $(document).ready( ->
     equal(view_model.formatted_name(), 'John', "Name changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Error cases", ->

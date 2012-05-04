@@ -101,7 +101,7 @@ ko.applyBindings(view_model)
 # ...
 
 # and cleanup after yourself when you are done.
-kb.vmRelease(view_model)
+kb.utils.release(view_model)
 ```
 
 And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
@@ -214,7 +214,7 @@ Knockback.collectionObservable
 This is an ko.observableArray and makes sure it stays in sync and sorted with a collection. You need to at minimum provide a "view_model: MyViewModel" constructor which can return an instance of a class or can be a plain old Javascript object. The important thing is that the view model you provide should be unique per instance of your model or else the "behavior is not guaranteed".
 
 ```coffeescript
-kb.collectionObservable(collection, {view_model_constructor: ContactViewModel})
+kb.collectionObservable(collection, {view_model: ContactViewModel})
 ```
 or
 
@@ -224,13 +224,13 @@ kb.collectionObservable(collection, {
 })
 ```
 
-**Note:** view_model_constructor and view_model_create are optional. If neither is not supplied, then view models will not be created.
+**Note:** view_model and view_model_create are optional. If neither is not supplied, then view models will not be created.
 
 ### Note 1
 
 You may find the following helpers useful:
 
-* **kb.unwrapModel(view_model) -> **: to get the model for a view model
+* **kb.utils.wrappedModel(view_model) -> **: to get the model for a view model
 * **hasViewModels**: returns true if the collectionObservable holds view models and false if it holds models
 
 ### Note 2
@@ -246,15 +246,15 @@ collection_observable = kb.collectionObservable(collection, {
 or
 
 ```coffeescript
-# if the collection contains models (you do not supply view_model_constructor nor view_model_create), an array of models will be supplied
+# if the collection contains models (you do not supply view_model nor view_model_create), an array of models will be supplied
 collection_observable = kb.collectionObservable(collection, {
   sorted_index:    (models, model) -> return _.sortedIndex(models, model, (test) -> return test.get('first_name') + " " + test.get('last_name'))
 })
 
-# if the collection contains view models (you supply view_model_constructor or view_model_create), an array of view models will be supplied
+# if the collection contains view models (you supply view_model or view_model_create), an array of view models will be supplied
 collection_observable = kb.collectionObservable(collection, {
-  sorted_index:    (models, view_model) -> return _.sortedIndex(view_models, view_model, (test) -> return kb.unwrapModel(test).get('first_name') + " " + kb.unwrapModel(test).get('last_name'))
-	view_model_constructor: MyViewModel
+  sorted_index:    (models, view_model) -> return _.sortedIndex(view_models, view_model, (test) -> return kb.utils.wrappedModel(test).get('first_name') + " " + kb.utils.wrappedModel(test).get('last_name'))
+	view_model: MyViewModel
 })
 ```
 
@@ -307,14 +307,14 @@ This is the most tricky to implement (look in the examples_lib/localized_observa
 ```coffeescript
 class LocalizedStringLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
-    super; return kb.unwrapObservable(this)
+    super; return kb.utils.wrappedObservable(this)
   read: (value) ->
     return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
 ```
 
 ### Note 1
 
-This looks like it returns an instance but it actually returns a ko.computed from super (use kb.unwrapObservable() to access it). Don't get caught out!
+This looks like it returns an instance but it actually returns a ko.computed from super (use kb.utils.wrappedObservable() to access it). Don't get caught out!
 
 ### Note 2
 
@@ -331,7 +331,7 @@ Read write observables for each attribute:
 model = new Contact({name: 'Ringo', number: '555-555-5556'})
 view_model = kb.viewModel(model)
 ...
-kb.vmRelease(view_model)
+kb.utils.release(view_model)
 ```
 
 Read only observables for each attribute:
@@ -340,7 +340,7 @@ Read only observables for each attribute:
 model = new Contact({name: 'Ringo', number: '555-555-5556'})
 view_model = kb.viewModel(model, {read_only: true})
 ...
-kb.vmRelease(view_model)
+kb.utils.release(view_model)
 ```
 
 Derive and specialize a view model Coffeescript class:
@@ -356,7 +356,7 @@ class ContactViewModelCustom extends kb.ViewModel
     }, this)
     @formatted_date = new LongDateLocalizer(@date)
 ...
-kb.vmRelease(view_model)
+kb.utils.release(view_model)
 ```
 
 Specialize using a simple function constructor:
@@ -367,7 +367,7 @@ ContactViewModelCustom = (model) ->
   view_model.formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
   return view_model
 ...
-kb.vmRelease(view_model)
+kb.utils.release(view_model)
 ```
 
 Dynamically create the observables in an external view model:
@@ -379,8 +379,8 @@ view_model = {
 }
 view_model_instance = kb.viewModel(model, {}, view_model)
 ...
-kb.vmRelease(view_model_instance)
-kb.vmRelease(view_model)
+kb.utils.release(view_model_instance)
+kb.utils.release(view_model)
 ```
 
 Stub out an observable if you are not sure if specific attributes will be in the model. If/when the attributes do arrive, the observing had already been established reducing conditional checks.
@@ -448,16 +448,16 @@ view_model = new ContactViewModel(model)
 ...
 view_model.email.setToDefault()
 # or
-kb.vmSetToDefault(view_model)
+kb.utils.setToDefault(view_model)
 ```
 
 Final notes
 -----------
 
 * Everything uses a new/destroy lifecycle. You need to destroy everything you create to ensure memory is cleaned up correctly. Some of my examples leave that out rigorous cleanup for understandability, but please don't forget!
-    -> Use the helper function: **kb.vmRelease()** to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
+    -> Use the helper function: **kb.utils.release()** to clean up your view models. It traverses all of your observables and destroys the ones it recognizes.
 
-* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.computed/ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.unwrapObservable() is for)
+* Knockback.observable, Knockback.observables and Knockback.localizedObservable actually return a ko.computed/ko.dependentObservable with a bound destroy method on it. It you want to subclass your class, look at the source files (like Knockback.Observable) because a little bit of a Coffeescript dance is required to return the right thing from your constructor! (that's what the kb.utils.wrappedObservable() is for)
 
 
 In addition to the examples in the test folder (https://github.com/kmalakoff/knockback/blob/master/test), you can look at the examples_lib folder for a sample kb.locale_manager, a localized string, and some examples of localized observables.

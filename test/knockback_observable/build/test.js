@@ -36,7 +36,7 @@ $(document).ready(function() {
     });
     equal(view_model.name(), 'Starr', "Name changed");
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Standard use case: direct attributes with custom read and write", function() {
     var ContactViewModelCustom, model, view_model;
@@ -81,7 +81,7 @@ $(document).ready(function() {
     });
     equal(view_model.name(), 'First: Starr', "Name changed");
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Read args", function() {
     var ContactViewModelCustom, args, model, view_model;
@@ -113,7 +113,7 @@ $(document).ready(function() {
     view_model = new ContactViewModelCustom(model);
     return ok(_.isEqual(args, ['name', 1, 'number']), "got the args");
   });
-  test("Standard use case: ko.computed", function() {
+  test("Standard use case: ko.dependentObservable", function() {
     var ContactViewModel, model, view_model;
     ContactViewModel = function(model) {
       this.name = kb.observable(model, {
@@ -138,7 +138,7 @@ $(document).ready(function() {
     view_model.formatted_name(' John ');
     equal(view_model.name(), 'John', "Name changed");
     equal(view_model.formatted_name(), 'John', "Name changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   return test("Error cases", function() {});
 });

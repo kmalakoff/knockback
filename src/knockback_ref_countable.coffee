@@ -1,6 +1,6 @@
 ###
   knockback_ref_countable.js
-  (c) 2011 Kevin Malakoff.
+  (c) 2012 Kevin Malakoff.
   Knockback.RefCountable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE

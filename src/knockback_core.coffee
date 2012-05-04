@@ -21,51 +21,86 @@ Knockback.VERSION = '0.15.0'
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 Knockback.locale_manager
 
+# utilities
+Knockback.utils = {}
+
 # displays legacy warnings to the Knockback library user
-Knockback.legacyWarning = (identifier, message) ->
+Knockback.utils.legacyWarning = (identifier, message) ->
   kb._legacy_warnings or= {}
   kb._legacy_warnings[identifier] or= 0
   kb._legacy_warnings[identifier]++
   console.warn("Legacy warning! '#{identifier}' has been deprecated. #{message}")
 
-# helpers
-Knockback.unwrapObservable = (instance) ->
-  throw new Error('Knockback: instance is not wrapping an observable') unless instance and instance.__kb.observable
-  return instance.__kb.observable
-Knockback.wrappedObservable = (instance) -> # LEGACY
-  kb.legacyWarning('kb.wrappedObservable', 'Please use kb.unwrapObservable instead')
-  return kb.unwrapObservable(instance)
+Knockback.utils.wrappedObservable = (instance, observable) ->
+  # get
+  if (arguments.length == 1)
+    throw new Error('Knockback: instance is not wrapping an observable') unless instance and instance.__kb and instance.__kb.observable
+    return instance.__kb.observable
 
-Knockback.wrapModel = (instance, model) ->
+  # set
+  throw new Error('Knockback: no instance for wrapping a observable') unless instance
+  instance.__kb or= {}
+  instance.__kb.observable = observable
+  return observable
+
+Knockback.utils.wrappedModel = (instance, model) ->
+  # get
+  if (arguments.length == 1)
+    return if (instance and instance.__kb and instance.__kb.hasOwnProperty('model')) then instance.__kb.model else instance
+
+  # set
   throw new Error('Knockback: no instance for wrapping a model') unless instance
   instance.__kb or= {}
   instance.__kb.model = model
-Knockback.unwrapModel = (instance) ->
-  return if (instance and instance.__kb and instance.__kb.model) then instance.__kb.model else instance
+  return model
+
 Knockback.viewModelGetModel = Knockback.vmModel = (instance) ->  # LEGACY
-  kb.legacyWarning('kb.vmModel', 'Please use kb.unwrapModel instead')
-  return kb.unwrapModel(instance)
+  kb.utils.legacyWarning('kb.vmModel', 'Please use kb.utils.wrappedModel instead')
+  return kb.utils.wrappedModel(instance)
 
-Knockback.setToDefault = (observable) -> observable.setToDefault() if observable and observable.setToDefault
-Knockback.vmSetToDefault = (view_model) -> kb.setToDefault(observable) for key, observable of view_model
+Knockback.utils.setToDefault = (obj) ->
+  return unless obj
 
-Knockback.vmRelease = (view_model) ->
-  (view_model.release(); return) if (view_model instanceof kb.ViewModel_RCBase)
-  Knockback.vmReleaseObservables(view_model)
+  # observable
+  if ko.isObservable(obj)
+    obj.setToDefault() if obj.setToDefault
 
-Knockback.vmReleaseObservables = (view_model, keys) ->
-  for key, value of view_model
-    continue if not value
-    continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel_RCBase))
-    continue if keys and not _.contains(keys, key) # skip
-    view_model[key] = null
-    kb.vmReleaseObservable(value)
+  # view model
+  else if _.isObject(obj)
+    (kb.utils.setToDefault(observable) if observable and observable.setToDefault) for key, observable of obj
 
-Knockback.vmReleaseObservable = (observable) ->
-  return if not (ko.isObservable(observable) or (observable instanceof kb.Observables) or (observable instanceof kb.ViewModel_RCBase))
-  if observable.release
-    observable.release()
-  else if observable.destroy
-    observable.destroy()
-  else if observable.dispose
-    observable.dispose()
+Knockback.vmSetToDefault = (view_model) ->
+  kb.utils.legacyWarning('kb.vmSetToDefault', 'Please use kb.utils.release instead')
+  kb.utils.setToDefault(view_model)
+
+Knockback.utils.release = (obj) ->
+  # known type
+  if ko.isObservable(obj) or (obj instanceof kb.Observables) or (obj instanceof kb.ViewModel_RCBase)
+    if obj.release
+      obj.release()
+    else if obj.destroy
+      obj.destroy()
+    else if obj.dispose
+      obj.dispose()
+
+  # view model
+  else if not _.isFunction(obj)
+    for key, value of obj
+      continue if !value or (key == '__kb')
+      continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel_RCBase))
+      obj[key] = null
+      kb.utils.release(value)
+
+Knockback.utils.vmRelease = (view_model) ->
+  kb.utils.legacyWarning('kb.vmRelease', 'Please use kb.utils.release instead')
+  return kb.utils.release(view_model)
+
+Knockback.utils.vmReleaseObservable = (observable) ->
+  kb.utils.legacyWarning('kb.vmReleaseObservable', 'Please use kb.utils.release instead')
+  return kb.utils.release(observable)
+
+# LEGACY support
+for key, fn of Knockback.utils
+  Knockback[key] = ->
+    kb.utils.legacyWarning("kb.#{key}", "Please use kb.utils.#{key} instead")
+    return kb.utils[key].apply(null, arguments)

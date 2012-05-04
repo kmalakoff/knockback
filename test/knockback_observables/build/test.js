@@ -76,7 +76,7 @@ $(document).ready(function() {
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
     equal(current_date.getDate(), 10, "day is good");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Option to override the default read-only state", function() {
     var ContactViewModel, current_date, model, view_model;
@@ -115,7 +115,7 @@ $(document).ready(function() {
     equal(model.get('name'), 'Ringo', "Name changed");
     equal(view_model.name(), 'Ringo', "Name changed");
     equal(view_model.name2(), 'Ringo', "Name changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Option to override the default read-only state {write: true}", function() {
     var ContactViewModel, current_date, model, view_model;
@@ -161,7 +161,7 @@ $(document).ready(function() {
     equal(model.get('name'), 'Paul', "Name not changed");
     equal(view_model.name(), 'Paul', "Name not changed");
     equal(view_model.name2(), 'Paul', "Name not changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Supply non-write option state. Should stay read-only", function() {
     var ContactViewModel, current_date, model, view_model;
@@ -210,7 +210,7 @@ $(document).ready(function() {
     equal(model.get('name'), 'John', "Name not changed");
     equal(view_model.name(), 'John', "Name not changed");
     equal(view_model.name2(), 'John', "Name not changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   return test("Error cases", function() {});
 });

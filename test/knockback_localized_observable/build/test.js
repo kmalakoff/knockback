@@ -38,7 +38,7 @@ $(document).ready(function() {
     __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
     function LocalizedStringLocalizer(value, options, view_model) {
       LocalizedStringLocalizer.__super__.constructor.apply(this, arguments);
-      return kb.unwrapObservable(this);
+      return kb.utils.wrappedObservable(this);
     }
     LocalizedStringLocalizer.prototype.read = function(value) {
       if (value.string_id) {
@@ -89,13 +89,13 @@ $(document).ready(function() {
     Knockback.locale_manager.setLocale('fr-FR');
     equal(view_model.hello(), 'Bonjour', "fr-FR: Hello");
     equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   LongDateLocalizer = (function() {
     __extends(LongDateLocalizer, kb.LocalizedObservable);
     function LongDateLocalizer(value, options, view_model) {
       LongDateLocalizer.__super__.constructor.apply(this, arguments);
-      return kb.unwrapObservable(this);
+      return kb.utils.wrappedObservable(this);
     }
     LongDateLocalizer.prototype.read = function(value) {
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale());
@@ -143,7 +143,7 @@ $(document).ready(function() {
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
     equal(current_date.getDate(), 10, "day is good");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Knockback.formattedObservable", function() {
     var ContactViewModelFullName, model, view_model;
@@ -209,12 +209,12 @@ $(document).ready(function() {
   });
   return test("Error cases", function() {
     raises((function() {
-      return kb.unwrapObservable(null);
+      return kb.utils.wrappedObservable(null);
     }), Error, "Knockback: instance is not wrapping an observable");
     raises((function() {
-      return kb.unwrapObservable({});
+      return kb.utils.wrappedObservable({});
     }), Error, "Knockback: instance is not wrapping an observable");
-    return kb.wrappedObservable({
+    return kb.utils.wrappedObservable({
       __kb: {
         observable: ko.observable()
       }

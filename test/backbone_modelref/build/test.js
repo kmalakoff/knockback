@@ -108,7 +108,7 @@ $(document).ready(function() {
     equal(view_model.name(), 'Loading sir', "Maybe too formal");
     kb.locale_manager.setLocale('fr-FR');
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   return test("Standard use case with kbViewModels", function() {
     var ContactViewModel, collection, current_date, model, model_ref, view_model;
@@ -174,13 +174,13 @@ $(document).ready(function() {
     equal(current_date.getDate(), 10, "day is good");
     collection.reset();
     equal(view_model.name(), 'Yoko', "Default is to retain the last value");
-    kb.vmSetToDefault(view_model);
+    kb.utils.setToDefault(view_model);
     kb.locale_manager.setLocale('en');
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?");
     kb.locale_manager.setLocale('en-GB');
     equal(view_model.name(), 'Loading sir', "Maybe too formal");
     kb.locale_manager.setLocale('fr-FR');
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
 });

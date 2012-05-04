@@ -81,7 +81,7 @@ $(document).ready( ->
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Standard use case with kbViewModels", ->
@@ -142,7 +142,7 @@ $(document).ready( ->
     # # go back to loading state
     collection.reset()
     equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    kb.vmSetToDefault(view_model)
+    kb.utils.setToDefault(view_model)
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
     kb.locale_manager.setLocale('en-GB')
@@ -151,6 +151,6 @@ $(document).ready( ->
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 )

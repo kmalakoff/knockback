@@ -107,7 +107,7 @@ $(document).ready(function() {
     equal(view_model.name_number_name(), 'Name: Ringo, #: 555-555-5556, Name: Ringo', "combined repeat");
     equal(view_model.favorite_song(), 'Yellow', "combined repeat");
     equal(view_model.name_number_name_song(), 'Name: Ringo, #: 555-555-5556, Name: Ringo, Song: "Yellow"', "combined repeat");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   return test("Error cases", function() {});
 });

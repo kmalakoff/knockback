@@ -1,6 +1,6 @@
 ###
   knockback_store.js
-  (c) 2011 Kevin Malakoff.
+  (c) 2012 Kevin Malakoff.
   Knockback.Store is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -24,6 +24,7 @@ class Knockback.Store
     # use an existing
     index = _.indexOf(@keys, key)
     if (index >= 0)
+      # value is in the store (not still being resolved)
       if @values[index]
         @values[index].retain?()  # retain on a kb.CollectionObservable will not return the wrapped observable
         return @values[index]

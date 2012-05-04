@@ -24,7 +24,7 @@ $(document).ready( ->
 
   class LocalizedStringLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super; return kb.unwrapObservable(this)
+      super; return kb.utils.wrappedObservable(this)
     read: (value) ->
       return if (value.string_id) then Knockback.locale_manager.get(value.string_id) else ''
 
@@ -63,13 +63,13 @@ $(document).ready( ->
     equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   # NOTE: dependency on globalize
   class LongDateLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super; return kb.unwrapObservable(this)
+      super; return kb.utils.wrappedObservable(this)
     read: (value) ->
       return Globalize.format(value, 'dd MMMM yyyy', Knockback.locale_manager.getLocale())
     write: (localized_string, value, observable) ->
@@ -106,7 +106,7 @@ $(document).ready( ->
     equal(current_date.getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Knockback.formattedObservable", ->
@@ -162,8 +162,8 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
-    raises((->kb.unwrapObservable(null)), Error, "Knockback: instance is not wrapping an observable")
-    raises((->kb.unwrapObservable({})), Error, "Knockback: instance is not wrapping an observable")
-    kb.wrappedObservable({__kb: {observable: ko.observable()}})
+    raises((->kb.utils.wrappedObservable(null)), Error, "Knockback: instance is not wrapping an observable")
+    raises((->kb.utils.wrappedObservable({})), Error, "Knockback: instance is not wrapping an observable")
+    kb.utils.wrappedObservable({__kb: {observable: ko.observable()}})
   )
 )

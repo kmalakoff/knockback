@@ -32,7 +32,7 @@ $(document).ready(function() {
     });
     equal(view_model.name(), 'Starr', "Name changed");
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Standard use case: read only", function() {
     var model, view_model;
@@ -61,7 +61,7 @@ $(document).ready(function() {
     });
     equal(view_model.name(), 'Starr', "Name changed");
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("internals test (Coffeescript inheritance)", function() {
     var ContactViewModel, birthdate, current_date, model, view_model;
@@ -123,7 +123,7 @@ $(document).ready(function() {
     equal(view_model._date().getFullYear(), 1940, "year is good");
     equal(view_model._date().getMonth(), 10, "month is good");
     equal(view_model._date().getDate(), 10, "day is good");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("internals test (Javascript inheritance)", function() {
     var ContactViewModel, birthdate, current_date, model, view_model;
@@ -184,7 +184,7 @@ $(document).ready(function() {
     equal(view_model._date().getFullYear(), 1940, "year is good");
     equal(view_model._date().getMonth(), 10, "month is good");
     equal(view_model._date().getDate(), 10, "day is good");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Using Coffeescript classes", function() {
     var ContactViewModelCustom, model, view_model;
@@ -225,7 +225,7 @@ $(document).ready(function() {
     view_model._name('Ringo');
     equal(view_model._name(), 'Ringo', "Interesting name");
     equal(view_model.name(), 'First: Ringo', "Interesting name");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("Using simple Javascript classes", function() {
     var ContactViewModelCustom, model, view_model;
@@ -272,7 +272,7 @@ $(document).ready(function() {
     equal(view_model.formatted_name(), 'First: Starr', "Name changed");
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed");
     equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("requires", function() {
     var ContactViewModelFullName, model, view_model;
@@ -353,7 +353,7 @@ $(document).ready(function() {
     equal(view_model._date().getFullYear(), 1940, "year is good");
     equal(view_model._date().getMonth(), 10, "month is good");
     equal(view_model._date().getDate(), 10, "day is good");
-    return kb.vmRelease(view_model);
+    return kb.utils.release(view_model);
   });
   test("reference counting and custom __destroy (Coffeescript inheritance)", function() {
     var ContactViewModelFullName, model, view_model;

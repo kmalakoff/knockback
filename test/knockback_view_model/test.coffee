@@ -25,7 +25,7 @@ $(document).ready( ->
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Standard use case: read only", ->
@@ -50,7 +50,7 @@ $(document).ready( ->
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("internals test (Coffeescript inheritance)", ->
@@ -114,7 +114,7 @@ $(document).ready( ->
     equal(view_model._date().getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("internals test (Javascript inheritance)", ->
@@ -180,7 +180,7 @@ $(document).ready( ->
     equal(view_model._date().getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Using Coffeescript classes", ->
@@ -218,7 +218,7 @@ $(document).ready( ->
     equal(view_model.name(), 'First: Ringo', "Interesting name")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("Using simple Javascript classes", ->
@@ -255,7 +255,7 @@ $(document).ready( ->
     equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("requires", ->
@@ -327,7 +327,7 @@ $(document).ready( ->
     equal(view_model._date().getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.vmRelease(view_model)
+    kb.utils.release(view_model)
   )
 
   test("reference counting and custom __destroy (Coffeescript inheritance)", ->

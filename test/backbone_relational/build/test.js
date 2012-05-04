@@ -72,20 +72,22 @@ $(document).ready(function() {
     });
     house_view_model = new kb.ViewModel(our_house);
     equal(house_view_model.location(), 'in the middle of the street', 'In the right place');
+    equal(house_view_model.occupants().length, 2, 'Expected occupant count');
     _ref = house_view_model.occupants();
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       occupant_observable = _ref[_i];
       ok(_.contains(['John', 'Paul'], occupant_observable.name()), 'Expected name');
-      equal(occupant_observable.occupies.location(), 'in the middle of the street', 'Expected location');
-      _ref2 = occupant_observable.occupies.occupants();
+      equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location');
+      equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count");
+      _ref2 = occupant_observable.occupies().occupants();
       for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
         occupant_observable2 = _ref2[_j];
         ok(_.contains(['John', 'Paul'], occupant_observable2.name()), 'Expected name');
-        equal(occupant_observable2.occupies.location(), 'in the middle of the street', 'Expected location');
+        equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location');
       }
     }
     equal(house_view_model.refCount(), 1, 'Expected references');
-    kb.vmRelease(house_view_model);
+    kb.utils.release(house_view_model);
     return equal(house_view_model.refCount(), 0, 'Expected references');
   });
   test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", function() {
@@ -130,12 +132,13 @@ $(document).ready(function() {
         for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
           occupant_observable = _ref2[_j];
           ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
-          equal(occupant_observable.occupies.location(), 'one side of the street', 'Expected location');
-          _ref3 = occupant_observable.occupies.occupants();
+          equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location');
+          equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here");
+          _ref3 = occupant_observable.occupies().occupants();
           for (_k = 0, _len3 = _ref3.length; _k < _len3; _k++) {
             occupant_observable2 = _ref3[_k];
             ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
-            equal(occupant_observable2.occupies.location(), 'one side of the street', 'Expected location');
+            equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
           }
         }
       } else {
@@ -154,12 +157,13 @@ $(document).ready(function() {
         for (_m = 0, _len5 = _ref5.length; _m < _len5; _m++) {
           occupant_observable = _ref5[_m];
           ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
-          equal(occupant_observable.occupies.location(), 'one side of the street', 'Expected location');
-          _ref6 = occupant_observable.occupies.occupants();
+          equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location');
+          equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here");
+          _ref6 = occupant_observable.occupies().occupants();
           for (_n = 0, _len6 = _ref6.length; _n < _len6; _n++) {
             occupant_observable2 = _ref6[_n];
             ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
-            equal(occupant_observable2.occupies.location(), 'one side of the street', 'Expected location');
+            equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
           }
         }
       } else {
@@ -169,18 +173,19 @@ $(document).ready(function() {
         for (_o = 0, _len7 = _ref7.length; _o < _len7; _o++) {
           occupant_observable = _ref7[_o];
           equal(occupant_observable.name(), 'John', 'Expected name');
-          equal(occupant_observable.occupies.location(), 'the other side of the street', 'Expected location');
-          _ref8 = occupant_observable.occupies.occupants();
+          equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location');
+          equal(occupant_observable.occupies().occupants().length, 1, "In the studio");
+          _ref8 = occupant_observable.occupies().occupants();
           for (_p = 0, _len8 = _ref8.length; _p < _len8; _p++) {
             occupant_observable2 = _ref8[_p];
             equal(occupant_observable2.name(), 'John', 'Expected name');
-            equal(occupant_observable2.occupies.location(), 'the other side of the street', 'Expected location');
+            equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location');
           }
         }
       }
     }
     equal(places_observable.refCount(), 1, 'Expected references');
-    kb.vmReleaseObservable(places_observable);
+    kb.utils.release(places_observable);
     return equal(places_observable.refCount(), 0, 'Expected references');
   });
   return test("3. Model with recursive HasMany relations: Person with users who are people", function() {
@@ -221,7 +226,7 @@ $(document).ready(function() {
       friend = _ref[_i];
       ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name');
     }
-    equal(john_view_model.best_friend.name(), 'George', 'Expected name');
+    equal(john_view_model.best_friend().name(), 'George', 'Expected name');
     equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name');
     paul_view_model = new kb.ViewModel(paul);
     equal(paul_view_model.name(), 'Paul', "Name is correct");
@@ -230,7 +235,7 @@ $(document).ready(function() {
       friend = _ref2[_j];
       ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name');
     }
-    equal(paul_view_model.best_friend.name(), 'George', 'Expected name');
+    equal(paul_view_model.best_friend().name(), 'George', 'Expected name');
     equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me');
     george_view_model = new kb.ViewModel(george);
     equal(george_view_model.name(), 'George', "Name is correct");
@@ -239,7 +244,7 @@ $(document).ready(function() {
       friend = _ref3[_k];
       ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name');
     }
-    equal(george_view_model.best_friend.name(), 'John', 'Expected name');
+    equal(george_view_model.best_friend().name(), 'John', 'Expected name');
     equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name');
     return equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
   });
