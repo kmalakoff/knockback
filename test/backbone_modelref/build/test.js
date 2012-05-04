@@ -42,7 +42,7 @@ $(document).ready(function() {
           key: 'date',
           write: true,
           "default": this.loading_message,
-          localizer: LongDateLocalizer
+          localizer: ShortDateLocalizer
         }
       }, this);
       return this;
@@ -66,9 +66,9 @@ $(document).ready(function() {
     equal(view_model.name(), 'John', "It is a name");
     equal(view_model.number(), '555-555-5558', "Not so interesting number");
     kb.locale_manager.setLocale('en-GB');
-    equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
+    equal(view_model.date(), '09/11/1940', "John's birthdate in Great Britain format");
     kb.locale_manager.setLocale('fr-FR');
-    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format");
+    equal(view_model.date(), '09/11/1940', "John's birthdate in France format");
     raises((function() {
       return view_model.name('Paul');
     }), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.");
@@ -78,7 +78,7 @@ $(document).ready(function() {
     equal(model.get('number'), '9222-222-222', "Number was changed");
     equal(view_model.number(), '9222-222-222', "Number was changed");
     kb.locale_manager.setLocale('en-GB');
-    view_model.date('10 December 1963');
+    view_model.date('10/12/1963');
     current_date = model.get('date');
     equal(current_date.getFullYear(), 1963, "year is good");
     equal(current_date.getMonth(), 11, "month is good");
@@ -93,8 +93,8 @@ $(document).ready(function() {
       date: new Date(1940, 10, 9)
     });
     kb.locale_manager.setLocale('fr-FR');
-    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format");
-    view_model.date('10 novembre 1940');
+    equal(view_model.date(), '09/11/1940', "John's birthdate in France format");
+    view_model.date('10/11/1940');
     current_date = model.get('date');
     equal(current_date.getFullYear(), 1940, "year is good");
     equal(current_date.getMonth(), 10, "month is good");
@@ -110,7 +110,7 @@ $(document).ready(function() {
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!");
     return kb.utils.release(view_model);
   });
-  return test("Standard use case with kbViewModels", function() {
+  return test("Standard use case with kb.ViewModels", function() {
     var ContactViewModel, collection, current_date, model, model_ref, view_model;
     ContactViewModel = (function() {
       __extends(ContactViewModel, kb.ViewModel);

@@ -69,11 +69,11 @@ Knockback.utils.setToDefault = (obj) ->
 
   # observable
   if ko.isObservable(obj)
-    obj.setToDefault() if obj.setToDefault
+    obj.setToDefault?()
 
   # view model
   else if _.isObject(obj)
-    (kb.utils.setToDefault(observable) if observable and observable.setToDefault) for key, observable of obj
+    (kb.utils.setToDefault(observable) if observable and (key != '__kb')) for key, observable of obj
 
 Knockback.vmSetToDefault = (view_model) ->
   kb.utils.legacyWarning('kb.vmSetToDefault', 'Please use kb.utils.release instead')
@@ -88,14 +88,17 @@ Knockback.utils.release = (obj) ->
       obj.destroy()
     else if obj.dispose
       obj.dispose()
+    else
+      return false
+    return true # was released
 
   # view model
   else if not _.isFunction(obj)
     for key, value of obj
       continue if !value or (key == '__kb')
-      continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel_RCBase))
-      obj[key] = null
-      kb.utils.release(value)
+      obj[key] = null if kb.utils.release(value)
+
+    return true
 
 Knockback.utils.vmRelease = (view_model) ->
   kb.utils.legacyWarning('kb.vmRelease', 'Please use kb.utils.release instead')

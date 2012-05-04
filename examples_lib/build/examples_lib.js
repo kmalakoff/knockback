@@ -124,7 +124,7 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.prototype = new ctor;
   child.__super__ = parent.prototype;
   return child;
-}, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+};
 LocalizedStringLocalizer = (function() {
   __extends(LocalizedStringLocalizer, kb.LocalizedObservable);
   function LocalizedStringLocalizer(value, options, view_model) {
@@ -160,27 +160,21 @@ LongDateLocalizer = (function() {
   };
   return LongDateLocalizer;
 })();
-ShortDateLocalizer = (function() {
-  __extends(ShortDateLocalizer, kb.LocalizedObservable);
-  function ShortDateLocalizer(value, options, view_model) {
-    if (options == null) {
-      options = {};
-    }
-    ShortDateLocalizer.__super__.constructor.call(this, value, _.extend(options, {
-      read: function(value) {
-        return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-      },
-      write: __bind(function(localized_string, value) {
-        var new_value, observable;
-        observable = kb.utils.wrappedObservable(this);
-        new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-        if (!(new_value && _.isDate(new_value))) {
-          return observable.resetToCurrent();
-        }
-        return value.setTime(new_value.valueOf());
-      }, this)
-    }), view_model);
+ShortDateLocalizer = kb.LocalizedObservable.extend({
+  constructor: function(value, options, view_model) {
+    kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
     return kb.utils.wrappedObservable(this);
+  },
+  read: function(value) {
+    return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+  },
+  write: function(localized_string, value) {
+    var new_value, observable;
+    observable = kb.utils.wrappedObservable(this);
+    new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+    if (!(new_value && _.isDate(new_value))) {
+      return observable.resetToCurrent();
+    }
+    return value.setTime(new_value.valueOf());
   }
-  return ShortDateLocalizer;
-})();
+});

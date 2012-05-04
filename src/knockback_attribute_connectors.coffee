@@ -72,6 +72,11 @@ class Knockback.SimpleAttributeConnector extends Knockback.AttributeConnector
     if not _.isEqual(current_value, value)
       @__kb.value_observable(value)
 
+  write: (value) ->
+    model = kb.utils.wrappedModel(this)
+    (@__kb.value_observable(value); return) if not model # CONVENTION: update the observable even if the model isn't loaded
+    super
+
 Knockback.simpleAttributeConnector = (model, key, options) -> new Knockback.SimpleAttributeConnector(model, key, options)
 
 class Knockback.CollectionAttributeConnector extends Knockback.AttributeConnector

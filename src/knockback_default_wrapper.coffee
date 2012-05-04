@@ -14,7 +14,7 @@ throw new Error('Knockback: Dependency alert! knockback_core.js must be included
 ######################################
 Knockback.defaultWrapper = (target_observable, default_value_observable) ->
   default_wrapper_observable = ko.dependentObservable({
-    read: =>
+    read: ->
       value = ko.utils.unwrapObservable(target_observable())
       default_value = ko.utils.unwrapObservable(default_value_observable)
       return if value then value else default_value

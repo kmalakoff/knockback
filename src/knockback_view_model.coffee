@@ -11,9 +11,7 @@ class Knockback.ViewModel_RCBase extends Knockback.RefCountable
   __destroy: ->
     for key, value of this
       continue if !value or (key == '__kb')
-      continue if not (ko.isObservable(value) or (value instanceof kb.Observables) or (value instanceof kb.ViewModel_RCBase))
-      @[key] = null
-      kb.utils.release(value)
+      @[key] = null if kb.utils.release(value)
     super
 
 ####################################################

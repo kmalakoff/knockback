@@ -19,15 +19,16 @@ class Knockback.Observables
         is_string = _.isString(mapping_info)
         if is_string or not mapping_info.hasOwnProperty(write)
           mapping_info = if is_string then {key: mapping_info, write: write} else _.extend({write: write}, mapping_info)
-        (@view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model))
+        @[view_model_property_name] = @view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model)
 
     else
-      (@view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model)) for view_model_property_name, mapping_info of @mappings_info
+      (@[view_model_property_name] = @view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model)) for view_model_property_name, mapping_info of @mappings_info
 
   destroy: ->
     for view_model_property_name, mapping_info of @mappings_info
       @view_model[view_model_property_name].destroy() if @view_model[view_model_property_name]
       @view_model[view_model_property_name] = null
+      @[view_model_property_name] = null
     @view_model = null
     @mappings_info = null
     @model = null
