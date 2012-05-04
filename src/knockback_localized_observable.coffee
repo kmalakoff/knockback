@@ -5,7 +5,6 @@
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
-throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file') if not this.Knockback
 
 ####################################################
 # Note: If you are deriving a class, you need to return the underlying observable rather than your instance since Knockout is expecting observable functions:

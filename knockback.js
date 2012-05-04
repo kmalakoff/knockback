@@ -7,19 +7,16 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
     Optional dependency: Backbone.ModelRef.js.
 */
-var fn, key, _ref;
-if (!this.ko) {
-  throw new Error('Knockback: Dependency alert! Knockout.js must be included before this file');
+var Backbone, Knockback, fn, kb, key, ko, _, _ref;
+if (typeof exports !== 'undefined') {
+  Knockback = kb = exports;
+} else {
+  this.Knockback = this.kb = {};
 }
-if (!this.Backbone) {
-  throw new Error('Knockback: Dependency alert! Backbone.js must be included before this file');
-}
-if (!this._ || !this._.VERSION) {
-  throw new Error('Knockback: Dependency alert! Underscore.js must be included before this file');
-}
-this.Knockback || (this.Knockback = {});
-this.kb || (this.kb = this.Knockback);
 Knockback.VERSION = '0.15.0';
+_ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._;
+Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
+ko = !this.Knockout && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 Knockback.locale_manager;
 Knockback.utils = {};
 Knockback.utils.legacyWarning = function(identifier, message) {
@@ -246,9 +243,6 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.__super__ = parent.prototype;
   return child;
 }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
 Knockback.CollectionObservable = (function() {
   __extends(CollectionObservable, kb.RefCountable);
   function CollectionObservable(collection, options) {
@@ -585,10 +579,7 @@ Knockback.sortedIndexWrapAttr = Knockback.siwa = function(attribute_name, wrappe
   Knockback.DefaultWrapper is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
-Knockback.defaultWrapper = function(target_observable, default_value_observable) {
+*/Knockback.defaultWrapper = function(target_observable, default_value_observable) {
   var default_wrapper_observable;
   default_wrapper_observable = ko.dependentObservable({
     read: function() {
@@ -616,10 +607,7 @@ Knockback.defaultWrapper = function(target_observable, default_value_observable)
   Knockback.FormattedObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
-Knockback.toFormattedString = function(format) {
+*/Knockback.toFormattedString = function(format) {
   var arg, args, index, parameter_index, result, value;
   result = format.slice();
   args = Array.prototype.slice.call(arguments, 1);
@@ -722,10 +710,7 @@ Knockback.formattedObservable = function(format, args) {
   Knockback.LocalizedObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
-Knockback.LocalizedObservable = (function() {
+*/Knockback.LocalizedObservable = (function() {
   LocalizedObservable.extend = Backbone.Model.extend;
   function LocalizedObservable(value, options, view_model) {
     var observable;
@@ -852,10 +837,7 @@ Knockback.localizedObservable = function(value, options, view_model) {
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
-Knockback.Observable = (function() {
+*/Knockback.Observable = (function() {
   function Observable(model, options, view_model) {
     var observable;
     this.model = model;
@@ -1080,10 +1062,7 @@ Knockback.observable = function(model, options, view_model) {
   Knockback.Observables is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
-Knockback.Observables = (function() {
+*/Knockback.Observables = (function() {
   function Observables(model, mappings_info, view_model, options_or_writeable) {
     var is_string, mapping_info, view_model_property_name, write, _ref, _ref2;
     this.model = model;
@@ -1155,10 +1134,7 @@ Knockback.observables = function(model, mappings_info, view_model, options) {
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
-Knockback.TriggeredObservable = (function() {
+*/Knockback.TriggeredObservable = (function() {
   function TriggeredObservable(model, event_name) {
     var observable;
     this.model = model;
@@ -1250,9 +1226,6 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.__super__ = parent.prototype;
   return child;
 }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
 Knockback.AttributeConnector = (function() {
   function AttributeConnector(model, key, options) {
     var observable;
@@ -1516,9 +1489,6 @@ var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, par
   child.__super__ = parent.prototype;
   return child;
 };
-if (!this.Knockback) {
-  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
-}
 Knockback.ViewModel_RCBase = (function() {
   __extends(ViewModel_RCBase, Knockback.RefCountable);
   function ViewModel_RCBase() {

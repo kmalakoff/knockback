@@ -5,7 +5,6 @@
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
-throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file') if not @Knockback
 
 class Knockback.ViewModel_RCBase extends Knockback.RefCountable
   __destroy: ->
