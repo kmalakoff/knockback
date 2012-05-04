@@ -7,17 +7,19 @@
 ###
 
 class Knockback.Observables
-  constructor: (@model, @mappings_info, @view_model, options_or_writeable) ->
+  constructor: (@model, @mappings_info, @view_model, options_or_read_only) ->
     throw new Error('Observables: model is missing') if not @model
     throw new Error('Observables: mappings_info is missing') if not @mappings_info
 
+    options_or_read_only.read_only = !options_or_read_only.write if options_or_read_only and options_or_read_only.hasOwnProperty('write') # LEGACY
+
     # fill in unspecified read attributes with supplied option
-    if !!options_or_writeable and ((_.isBoolean(options_or_writeable) and options_or_writeable) or !!options_or_writeable.write)
-      write = if _.isBoolean(options_or_writeable) then options_or_writeable else !!options_or_writeable.write
+    if !!options_or_read_only and ((_.isBoolean(options_or_read_only) and !options_or_read_only) or !options_or_read_only.read_only)
+      read_only = if _.isBoolean(options_or_read_only) then options_or_read_only else options_or_read_only.read_only
       for view_model_property_name, mapping_info of @mappings_info
         is_string = _.isString(mapping_info)
-        if is_string or not mapping_info.hasOwnProperty(write)
-          mapping_info = if is_string then {key: mapping_info, write: write} else _.extend({write: write}, mapping_info)
+        if is_string or not mapping_info.hasOwnProperty('read_only') or not mapping_info.hasOwnProperty('write') # LEGACY
+          mapping_info = if is_string then {key: mapping_info, read_only: read_only} else _.extend({read_only: read_only}, mapping_info)
         @[view_model_property_name] = @view_model[view_model_property_name] = kb.observable(@model, mapping_info, @view_model)
 
     else

@@ -26,6 +26,9 @@ class Knockback.Observable
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
+    # LEGACY
+    (@options = _.clone(@options); @options.read_only = !@options.write) if @options.hasOwnProperty('write') and _.isBoolean(@options.write)
+
     # determine model or model_ref type
     if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
       @model_ref = @model; @model_ref.retain()
@@ -38,7 +41,7 @@ class Knockback.Observable
     @__kb.localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @options.write then _.bind(@_onSetValue, @) else (-> throw new Error("Knockback.Observable: #{@options.key} is read only"))
+      write: if @options.read_only then (=> throw new Error("Knockback.Observable: #{@options.key} is read only")) else _.bind(@_onSetValue, @)
       owner: @view_model
     }))
 

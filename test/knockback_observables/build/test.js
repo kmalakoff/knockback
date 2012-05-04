@@ -11,18 +11,18 @@ $(document).ready(function() {
     ContactViewModel = function(model) {
       this.attribute_observables = kb.observables(model, {
         name: {
-          key: 'name'
+          key: 'name',
+          read_only: true
         },
-        number: {
-          key: 'number',
-          write: true
-        },
+        number: 'number',
         date: {
           key: 'date',
-          write: true,
           localizer: LongDateLocalizer
         },
-        name2: 'name'
+        name2: {
+          key: 'name',
+          read_only: true
+        }
       }, this);
       return this;
     };
@@ -82,14 +82,20 @@ $(document).ready(function() {
     var ContactViewModel, current_date, model, view_model;
     ContactViewModel = function(model) {
       this.attribute_observables = kb.observables(model, {
-        name: 'name',
-        number: 'number',
+        name: {
+          key: 'name',
+          write: true
+        },
+        number: {
+          key: 'number',
+          read_only: false
+        },
         date: {
           key: 'date',
           localizer: LongDateLocalizer
         },
         name2: 'name'
-      }, this, true);
+      }, this, false);
       return this;
     };
     model = new Contact({
@@ -121,8 +127,14 @@ $(document).ready(function() {
     var ContactViewModel, current_date, model, view_model;
     ContactViewModel = function(model) {
       this.attribute_observables = kb.observables(model, {
-        name: 'name',
-        number: 'number',
+        name: {
+          key: 'name',
+          read_only: false
+        },
+        number: {
+          key: 'number',
+          write: true
+        },
         date: {
           key: 'date',
           localizer: LongDateLocalizer
@@ -132,7 +144,59 @@ $(document).ready(function() {
           write: false
         }
       }, this, {
-        write: true
+        read_only: true
+      });
+      return this;
+    };
+    model = new Contact({
+      name: 'John',
+      number: '555-555-5558',
+      date: new Date(1940, 10, 9)
+    });
+    view_model = new ContactViewModel(model);
+    view_model.name('Paul');
+    equal(model.get('name'), 'Paul', "Name changed");
+    equal(view_model.name(), 'Paul', "Name changed");
+    equal(view_model.name2(), 'Paul', "Name changed");
+    view_model.number('9222-222-222');
+    equal(model.get('number'), '9222-222-222', "Number was changed");
+    equal(view_model.number(), '9222-222-222', "Number was changed");
+    Knockback.locale_manager.setLocale('en-GB');
+    view_model.date('10 December 1963');
+    current_date = model.get('date');
+    equal(current_date.getFullYear(), 1963, "year is good");
+    equal(current_date.getMonth(), 11, "month is good");
+    equal(current_date.getDate(), 10, "day is good");
+    raises((function() {
+      return view_model.name2('Ringo');
+    }), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.");
+    equal(model.get('name'), 'Paul', "Name not changed");
+    equal(view_model.name(), 'Paul', "Name not changed");
+    equal(view_model.name2(), 'Paul', "Name not changed");
+    return kb.utils.release(view_model);
+  });
+  test("Option to override the default read-only state {write: true}", function() {
+    var ContactViewModel, current_date, model, view_model;
+    ContactViewModel = function(model) {
+      this.attribute_observables = kb.observables(model, {
+        name: {
+          key: 'name',
+          write: true
+        },
+        number: {
+          key: 'number',
+          read_only: false
+        },
+        date: {
+          key: 'date',
+          localizer: LongDateLocalizer
+        },
+        name2: {
+          key: 'name',
+          write: false
+        }
+      }, this, {
+        write: false
       });
       return this;
     };
@@ -167,17 +231,20 @@ $(document).ready(function() {
     var ContactViewModel, current_date, model, view_model;
     ContactViewModel = function(model) {
       this.attribute_observables = kb.observables(model, {
-        name: 'name',
-        number: {
-          key: 'number',
-          write: true
+        name: {
+          key: 'name',
+          read_only: true
         },
+        number: 'number',
         date: {
           key: 'date',
-          write: true,
+          read_only: false,
           localizer: LongDateLocalizer
         },
-        name2: 'name'
+        name2: {
+          key: 'name',
+          read_only: true
+        }
       }, this, {
         garbage: true
       });

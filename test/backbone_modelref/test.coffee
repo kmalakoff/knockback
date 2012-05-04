@@ -14,9 +14,9 @@ $(document).ready( ->
     ContactViewModel = (model) ->
       @loading_message = new LocalizedStringLocalizer(new LocalizedString('loading'))
       @attribute_observables = kb.observables(model, {
-        name:     {key:'name', default: @loading_message}
-        number:   {key:'number', write: true, default: @loading_message}
-        date:     {key:'date', write: true, default: @loading_message, localizer: ShortDateLocalizer}
+        name:     {key:'name', read_only: true, default: @loading_message}
+        number:   {key:'number', default: @loading_message}
+        date:     {key:'date', default: @loading_message, localizer: ShortDateLocalizer}
       }, this)
       @
 

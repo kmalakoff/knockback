@@ -7,7 +7,7 @@ $(document).ready( ->
   test("Standard use case: direct attributes with read and write", ->
     ContactViewModel = (model) ->
       @name = kb.observable(model, 'name')
-      @number = kb.observable(model, {key:'number', write: true}, this)
+      @number = kb.observable(model, {key:'number', read_only: true}, this)
       @
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
@@ -18,12 +18,12 @@ $(document).ready( ->
     equal(view_model.number(), '555-555-5556', "Not so interesting number")
 
     # set from the view model
-    raises((->view_model.name('Paul')), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
-    equal(model.get('name'), 'Ringo', "Name not changed")
-    equal(view_model.name(), 'Ringo', "Name not changed")
-    view_model.number('9222-222-222')
-    equal(model.get('number'), '9222-222-222', "Number was changed")
-    equal(view_model.number(), '9222-222-222', "Number was changed")
+    view_model.name('Paul')
+    equal(model.get('name'), 'Paul', "Name changed")
+    equal(view_model.name(), 'Paul', "Name changed")
+    raises((->view_model.number('9222-222-222')), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
+    equal(model.get('number'), '555-555-5556', "Number not changed")
+    equal(view_model.number(), '555-555-5556', "Number not changed")
 
     # set from the model
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
@@ -36,7 +36,7 @@ $(document).ready( ->
 
   test("Standard use case: direct attributes with custom read and write", ->
     ContactViewModelCustom = (model) ->
-      @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+      @name = kb.observable(model, {key:'name', read_only: true, read: -> return "First: #{model.get('name')}" })
       @number = kb.observable(model, {
         key:'number'
         read: -> return "#: #{model.get('number')}"

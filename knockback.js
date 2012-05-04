@@ -837,7 +837,9 @@ Knockback.localizedObservable = function(value, options, view_model) {
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/Knockback.Observable = (function() {
+*/
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+Knockback.Observable = (function() {
   function Observable(model, options, view_model) {
     var observable;
     this.model = model;
@@ -861,6 +863,10 @@ Knockback.localizedObservable = function(value, options, view_model) {
     this.__kb._onModelChange = _.bind(this._onModelChange, this);
     this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
     this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
+    if (this.options.hasOwnProperty('write') && _.isBoolean(this.options.write)) {
+      this.options = _.clone(this.options);
+      this.options.read_only = !this.options.write;
+    }
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
       this.model_ref = this.model;
       this.model_ref.retain();
@@ -874,9 +880,9 @@ Knockback.localizedObservable = function(value, options, view_model) {
     }
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(this._onGetValue, this),
-      write: this.options.write ? _.bind(this._onSetValue, this) : (function() {
+      write: this.options.read_only ? (__bind(function() {
         throw new Error("Knockback.Observable: " + this.options.key + " is read only");
-      }),
+      }, this)) : _.bind(this._onSetValue, this),
       owner: this.view_model
     }));
     observable.destroy = _.bind(this.destroy, this);
@@ -1063,8 +1069,8 @@ Knockback.observable = function(model, options, view_model) {
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */Knockback.Observables = (function() {
-  function Observables(model, mappings_info, view_model, options_or_writeable) {
-    var is_string, mapping_info, view_model_property_name, write, _ref, _ref2;
+  function Observables(model, mappings_info, view_model, options_or_read_only) {
+    var is_string, mapping_info, read_only, view_model_property_name, _ref, _ref2;
     this.model = model;
     this.mappings_info = mappings_info;
     this.view_model = view_model;
@@ -1074,18 +1080,21 @@ Knockback.observable = function(model, options, view_model) {
     if (!this.mappings_info) {
       throw new Error('Observables: mappings_info is missing');
     }
-    if (!!options_or_writeable && ((_.isBoolean(options_or_writeable) && options_or_writeable) || !!options_or_writeable.write)) {
-      write = _.isBoolean(options_or_writeable) ? options_or_writeable : !!options_or_writeable.write;
+    if (options_or_read_only && options_or_read_only.hasOwnProperty('write')) {
+      options_or_read_only.read_only = !options_or_read_only.write;
+    }
+    if (!!options_or_read_only && ((_.isBoolean(options_or_read_only) && !options_or_read_only) || !options_or_read_only.read_only)) {
+      read_only = _.isBoolean(options_or_read_only) ? options_or_read_only : options_or_read_only.read_only;
       _ref = this.mappings_info;
       for (view_model_property_name in _ref) {
         mapping_info = _ref[view_model_property_name];
         is_string = _.isString(mapping_info);
-        if (is_string || !mapping_info.hasOwnProperty(write)) {
+        if (is_string || !mapping_info.hasOwnProperty('read_only') || !mapping_info.hasOwnProperty('write')) {
           mapping_info = is_string ? {
             key: mapping_info,
-            write: write
+            read_only: read_only
           } : _.extend({
-            write: write
+            read_only: read_only
           }, mapping_info);
         }
         this[view_model_property_name] = this.view_model[view_model_property_name] = kb.observable(this.model, mapping_info, this.view_model);

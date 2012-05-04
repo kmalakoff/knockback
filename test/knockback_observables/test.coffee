@@ -9,10 +9,10 @@ $(document).ready( ->
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
-        name:     {key:'name'}
-        number:   {key:'number', write: true}
-        date:     {key:'date', write: true, localizer: LongDateLocalizer}
-        name2:    'name'
+        name:     {key: 'name', read_only: true}
+        number:   'number'
+        date:     {key:'date', localizer: LongDateLocalizer}
+        name2:    {key: 'name', read_only: true}
       }, this)
       @
 
@@ -68,11 +68,11 @@ $(document).ready( ->
   test("Option to override the default read-only state", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
-        name:     'name'
-        number:   'number'
+        name:     {key: 'name', write: true}   # LEGACY
+        number:   {key: 'number', read_only: false}
         date:     {key:'date', localizer: LongDateLocalizer}
         name2:    'name'
-      }, this, true)
+      }, this, false)
       @
 
     model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
@@ -104,11 +104,48 @@ $(document).ready( ->
   test("Option to override the default read-only state {write: true}", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
-        name:     'name'
-        number:   'number'
+        name:     {key: 'name', read_only: false}
+        number:   {key: 'number', write: true}  # LEGACY
         date:     {key: 'date', localizer: LongDateLocalizer}
-        name2:    {key: 'name', write: false}
-      }, this, {write: true})
+        name2:    {key: 'name', write: false}  # LEGACY
+      }, this, {read_only: true})
+      @
+
+    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    view_model = new ContactViewModel(model)
+
+    # set from the view model
+    view_model.name('Paul')
+    equal(model.get('name'), 'Paul', "Name changed")
+    equal(view_model.name(), 'Paul', "Name changed")
+    equal(view_model.name2(), 'Paul', "Name changed")
+    view_model.number('9222-222-222')
+    equal(model.get('number'), '9222-222-222', "Number was changed")
+    equal(view_model.number(), '9222-222-222', "Number was changed")
+    Knockback.locale_manager.setLocale('en-GB')
+    view_model.date('10 December 1963')
+    current_date = model.get('date')
+    equal(current_date.getFullYear(), 1963, "year is good")
+    equal(current_date.getMonth(), 11, "month is good")
+    equal(current_date.getDate(), 10, "day is good")
+
+    raises((->view_model.name2('Ringo')), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
+    equal(model.get('name'), 'Paul', "Name not changed")
+    equal(view_model.name(), 'Paul', "Name not changed")
+    equal(view_model.name2(), 'Paul', "Name not changed")
+
+    # and cleanup after yourself when you are done.
+    kb.utils.release(view_model)
+  )
+
+  test("Option to override the default read-only state {write: true}", ->
+    ContactViewModel = (model) ->
+      @attribute_observables = kb.observables(model, {
+        name:     {key: 'name', write: true} # LEGACY
+        number:   {key: 'number', read_only: false}
+        date:     {key: 'date', localizer: LongDateLocalizer}
+        name2:    {key: 'name', write: false}  # LEGACY
+      }, this, {write: false})  # LEGACY
       @
 
     model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
@@ -141,10 +178,10 @@ $(document).ready( ->
   test("Supply non-write option state. Should stay read-only", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
-        name:     'name'
-        number:   {key: 'number', write: true}
-        date:     {key: 'date', write: true, localizer: LongDateLocalizer}
-        name2:    'name'
+        name:     {key: 'name', read_only: true}
+        number:   'number'
+        date:     {key: 'date', read_only: false, localizer: LongDateLocalizer}
+        name2:    {key: 'name', read_only: true}
       }, this, {garbage: true})
       @
 

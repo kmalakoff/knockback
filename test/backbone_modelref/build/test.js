@@ -31,16 +31,15 @@ $(document).ready(function() {
       this.attribute_observables = kb.observables(model, {
         name: {
           key: 'name',
+          read_only: true,
           "default": this.loading_message
         },
         number: {
           key: 'number',
-          write: true,
           "default": this.loading_message
         },
         date: {
           key: 'date',
-          write: true,
           "default": this.loading_message,
           localizer: ShortDateLocalizer
         }
