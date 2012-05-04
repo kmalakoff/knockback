@@ -37,9 +37,18 @@ class Knockback.Store
 
     # create the value
     value = create_fn.apply(null, Array.prototype.slice.call(arguments, 2))
-    throw new Error("Knockback.Store: no value created") unless value
 
     # update the stored value
-    @values[index] = value if not @values[index]
+    if @keys[index] != key
+      @add(key, value)
+    else if not @values[index]
+      @values[index] = value
 
     return value
+
+  addResolverToOptions: (options, key) ->
+    return _.extend(options, {__kb_store: this, __kb_store_key: key})
+
+  @resolveFromOptions: (options, value) ->
+    return unless options.__kb_store and options.__kb_store_key
+    options.__kb_store.add(options.__kb_store_key, value)

@@ -44,7 +44,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
 
     # register ourselves to handle recursive view models
     @__kb.store = options.__kb_store || new kb.Store()
-    @__kb.store.add(options.__kb_store_key, kb.utils.wrappedObservable(this)) if options.__kb_store_key
+    kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this))
 
     # options
     if options.hasOwnProperty('view_model')
@@ -255,7 +255,8 @@ class Knockback.CollectionObservable extends kb.RefCountable
   _createTarget: (model) ->
     return model unless @view_model_create_fn
     return @__kb.store.resolve(model, =>
-      view_model = if @view_model_create_with_new then (new @view_model_create_fn(model, {__kb_store: @__kb.store, __kb_store_key: model})) else @view_model_create_fn(model, {__kb_store: @__kb.store})
+      options = @__kb.store.addResolverToOptions({}, model)
+      view_model = if @view_model_create_with_new then (new @view_model_create_fn(model, options)) else @view_model_create_fn(model, options)
       kb.utils.wrappedModel(view_model, model)
       return view_model
     )

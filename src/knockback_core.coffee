@@ -40,8 +40,14 @@ Knockback.utils.wrappedObservable = (instance, observable) ->
   # set
   throw new Error('Knockback: no instance for wrapping a observable') unless instance
   instance.__kb or= {}
+  instance.__kb.observable.instance = null if instance.__kb.observable
   instance.__kb.observable = observable
+  instance.__kb.observable.instance = instance if observable
   return observable
+
+Knockback.utils.observableInstanceOf = (observable, type) ->
+  return false unless observable.instance
+  return (observable.instance instanceof type)
 
 Knockback.utils.wrappedModel = (instance, model) ->
   # get

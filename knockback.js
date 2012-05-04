@@ -40,8 +40,20 @@ Knockback.utils.wrappedObservable = function(instance, observable) {
     throw new Error('Knockback: no instance for wrapping a observable');
   }
   instance.__kb || (instance.__kb = {});
+  if (instance.__kb.observable) {
+    instance.__kb.observable.instance = null;
+  }
   instance.__kb.observable = observable;
+  if (observable) {
+    instance.__kb.observable.instance = instance;
+  }
   return observable;
+};
+Knockback.utils.observableInstanceOf = function(observable, type) {
+  if (!observable.instance) {
+    return false;
+  }
+  return observable.instance instanceof type;
 };
 Knockback.utils.wrappedModel = function(instance, model) {
   if (arguments.length === 1) {
@@ -164,13 +176,24 @@ for (key in _ref) {
       this.values.push(void 0);
     }
     value = create_fn.apply(null, Array.prototype.slice.call(arguments, 2));
-    if (!value) {
-      throw new Error("Knockback.Store: no value created");
-    }
-    if (!this.values[index]) {
+    if (this.keys[index] !== key) {
+      this.add(key, value);
+    } else if (!this.values[index]) {
       this.values[index] = value;
     }
     return value;
+  };
+  Store.prototype.addResolverToOptions = function(options, key) {
+    return _.extend(options, {
+      __kb_store: this,
+      __kb_store_key: key
+    });
+  };
+  Store.resolveFromOptions = function(options, value) {
+    if (!(options.__kb_store && options.__kb_store_key)) {
+      return;
+    }
+    return options.__kb_store.add(options.__kb_store_key, value);
   };
   return Store;
 })();
@@ -247,9 +270,7 @@ Knockback.CollectionObservable = (function() {
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
     }
     this.__kb.store = options.__kb_store || new kb.Store();
-    if (options.__kb_store_key) {
-      this.__kb.store.add(options.__kb_store_key, kb.utils.wrappedObservable(this));
-    }
+    kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this));
     if (options.hasOwnProperty('view_model')) {
       this.view_model_create_fn = options.view_model;
       this.view_model_create_with_new = true;
@@ -536,13 +557,9 @@ Knockback.CollectionObservable = (function() {
       return model;
     }
     return this.__kb.store.resolve(model, __bind(function() {
-      var view_model;
-      view_model = this.view_model_create_with_new ? new this.view_model_create_fn(model, {
-        __kb_store: this.__kb.store,
-        __kb_store_key: model
-      }) : this.view_model_create_fn(model, {
-        __kb_store: this.__kb.store
-      });
+      var options, view_model;
+      options = this.__kb.store.addResolverToOptions({}, model);
+      view_model = this.view_model_create_with_new ? new this.view_model_create_fn(model, options) : this.view_model_create_fn(model, options);
       kb.utils.wrappedModel(view_model, model);
       return view_model;
     }, this));
@@ -1423,6 +1440,59 @@ Knockback.ViewModelAttributeConnector = (function() {
 Knockback.viewModelAttributeConnector = function(model, key, options) {
   return new Knockback.ViewModelAttributeConnector(model, key, options);
 };
+Knockback.createOrUpdateAttributeConnector = function(attribute_connector, model, key, options) {
+  var attribute_options, value;
+  if (attribute_connector) {
+    if (kb.utils.observableInstanceOf(attribute_connector, kb.AttributeConnector)) {
+      if (attribute_connector.model() !== model) {
+        attribute_connector.model(model);
+      } else {
+        attribute_connector.update();
+      }
+    }
+  } else {
+    value = model ? model.get(key) : null;
+    if (options.hasOwnProperty('view_model')) {
+      attribute_connector = new options.view_model(value, options.options);
+    } else if (options.hasOwnProperty('view_model_create')) {
+      attribute_connector = options.view_model_create(value, options.options);
+    } else if (options.hasOwnProperty('children')) {
+      if (_.isFunction(options.children)) {
+        attribute_options = {
+          view_model: options.children
+        };
+      } else {
+        attribute_options = options.children;
+      }
+      if (options.__kb_store) {
+        options.__kb_store.addResolverToOptions(attribute_options, value);
+      }
+      attribute_connector = kb.collectionAttributeConnector(model, key, attribute_options);
+    } else if (options.hasOwnProperty('create')) {
+      attribute_connector = options.create(value, options.options);
+    } else if (value instanceof Backbone.Collection) {
+      attribute_options = {
+        view_model: kb.ViewModel
+      };
+      if (options.__kb_store) {
+        options.__kb_store.addResolverToOptions(attribute_options, value);
+      }
+      attribute_connector = kb.collectionAttributeConnector(model, key, attribute_options);
+    } else if ((value instanceof Backbone.Model) || (Backbone.ModelRef && (value instanceof Backbone.ModelRef))) {
+      attribute_options = {
+        view_model: kb.ViewModel,
+        options: options.options || {}
+      };
+      if (options.__kb_store) {
+        options.__kb_store.addResolverToOptions(attribute_options.options, value);
+      }
+      attribute_connector = kb.viewModelAttributeConnector(model, key, attribute_options);
+    } else {
+      attribute_connector = kb.simpleAttributeConnector(model, key, options);
+    }
+  }
+  return attribute_connector;
+};
 /*
   knockback_view_model.js
   (c) 2011 Kevin Malakoff.
@@ -1472,16 +1542,11 @@ Knockback.ViewModel = (function() {
     }
     ViewModel.__super__.constructor.apply(this, arguments);
     this.__kb.store = options.__kb_store || new kb.Store();
-    if (options.__kb_store_key) {
-      this.__kb.store.add(options.__kb_store_key, this);
-    }
+    kb.Store.resolveFromOptions(options, this);
     this.__kb._onModelChange = _.bind(this._onModelChange, this);
     this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
     this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
-    this.__kb.internals = options.internals;
-    this.__kb.requires = options.requires;
-    this.__kb.read_only = options.read_only;
-    this.__kb.children = options.children;
+    this.__kb.options = options ? _.clone(options) : {};
     if (!model) {
       throw new Error('ViewModel: model is missing');
     }
@@ -1496,10 +1561,10 @@ Knockback.ViewModel = (function() {
     if (!this.__kb.model_ref || this.__kb.model_ref.isLoaded()) {
       this._onModelLoaded(this.__kb.model);
     }
-    if (!this.__kb.internals && !this.__kb.requires) {
+    if (!this.__kb.options.internals && !this.__kb.options.requires) {
       return this;
     }
-    missing = _.union((this.__kb.internals ? this.__kb.internals : []), (this.__kb.requires ? this.__kb.requires : []));
+    missing = _.union((this.__kb.options.internals ? this.__kb.options.internals : []), (this.__kb.options.requires ? this.__kb.options.requires : []));
     if (!this.__kb.model_ref || this.__kb.model_ref.isLoaded()) {
       missing = _.difference(missing, _.keys(this.__kb.model.attributes));
     }
@@ -1591,39 +1656,28 @@ Knockback.ViewModel = (function() {
     }
   };
   ViewModel.prototype._updateAttributeConnector = function(model, key) {
-    var attribute_connector, value, vm_key;
-    vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? '_' + key : key;
-    value = model ? model.get(key) : null;
-    if (this.hasOwnProperty(vm_key)) {
-      attribute_connector = this[vm_key];
-      if (!attribute_connector) {
-        throw new Error("Knockback.ViewModel: property '" + vm_key + "' has been unexpectedly removed");
+    var vm_key;
+    vm_key = this.__kb.options.internals && _.contains(this.__kb.options.internals, key) ? '_' + key : key;
+    return this[vm_key] = Knockback.createOrUpdateAttributeConnector(this[vm_key], model, key, this._createOptions(key));
+  };
+  ViewModel.prototype._createOptions = function(key) {
+    var options;
+    if (this.__kb.options.children && this.__kb.options.children.hasOwnProperty(key)) {
+      options = this.__kb.options.children[key];
+      if (_.isFunction(options)) {
+        options = {
+          view_model: options
+        };
       }
-      if (attribute_connector.model() !== model) {
-        return attribute_connector.model(model);
-      } else {
-        return attribute_connector.update();
-      }
+      return _.defaults(options, {
+        read_only: this.__kb.options.read_only,
+        __kb_store: this.__kb.store
+      });
     } else {
-      if (value instanceof Backbone.Collection) {
-        return this[vm_key] = kb.collectionAttributeConnector(model, key, {
-          __kb_store: this.__kb.store,
-          __kb_store_key: value,
-          view_model: this.constructor
-        });
-      } else if ((value instanceof Backbone.Model) || (Backbone.ModelRef && (value instanceof Backbone.ModelRef))) {
-        return this[vm_key] = kb.viewModelAttributeConnector(model, key, {
-          view_model: this.constructor,
-          options: {
-            __kb_store: this.__kb.store,
-            __kb_store_key: value
-          }
-        });
-      } else {
-        return this[vm_key] = kb.simpleAttributeConnector(model, key, {
-          read_only: this.__kb.read_only
-        });
-      }
+      return {
+        read_only: this.__kb.options.read_only,
+        __kb_store: this.__kb.store
+      };
     }
   };
   return ViewModel;

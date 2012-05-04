@@ -31,15 +31,12 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
 
     # register ourselves to handle recursive view models
     @__kb.store = options.__kb_store || new kb.Store()
-    @__kb.store.add(options.__kb_store_key, this) if options.__kb_store_key
+    kb.Store.resolveFromOptions(options, this)
 
     @__kb._onModelChange = _.bind(@_onModelChange, @)
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
-    @__kb.internals = options.internals
-    @__kb.requires = options.requires
-    @__kb.read_only = options.read_only
-    @__kb.children = options.children
+    @__kb.options = if options then _.clone(options) else {}
 
     throw new Error('ViewModel: model is missing') unless model
     kb.utils.wrappedModel(this, model)
@@ -54,8 +51,8 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
     # start
     @_onModelLoaded(@__kb.model) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
 
-    return @ if not @__kb.internals and not @__kb.requires
-    missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
+    return @ if not @__kb.options.internals and not @__kb.options.requires
+    missing = _.union((if @__kb.options.internals then @__kb.options.internals else []), (if @__kb.options.requires then @__kb.options.requires else []))
     missing = _.difference(missing, _.keys(@__kb.model.attributes)) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
     @_updateAttributeConnector(@__kb.model, key) for key in missing
 
@@ -114,28 +111,17 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
       @_updateAttributeConnector(@__kb.model, key) for key of @__kb.model.changed
 
   _updateAttributeConnector: (model, key) ->
-    vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
-    value = if model then model.get(key) else null
+    vm_key = if @__kb.options.internals and _.contains(@__kb.options.internals, key) then '_' + key else key
+    @[vm_key] = Knockback.createOrUpdateAttributeConnector(@[vm_key], model, key, @_createOptions(key))
 
-    # update an existing connector
-    if (@hasOwnProperty(vm_key))
-      attribute_connector = @[vm_key]
-      throw new Error("Knockback.ViewModel: property '#{vm_key}' has been unexpectedly removed") unless attribute_connector
-      if attribute_connector.model() != model
-        attribute_connector.model(model)
-      else
-        attribute_connector.update()
-
-    # create a new connector
+  _createOptions: (key) ->
+    if @__kb.options.children and @__kb.options.children.hasOwnProperty(key)
+      options = @__kb.options.children[key]
+      if _.isFunction(options) # a view model short form for a view model
+        options = {view_model: options}
+      return _.defaults(options, {read_only: @__kb.options.read_only, __kb_store: @__kb.store})
     else
-      if (value instanceof Backbone.Collection)
-        @[vm_key] = kb.collectionAttributeConnector(model, key, {__kb_store: @__kb.store, __kb_store_key: value, view_model: @constructor})
-
-      else if (value instanceof Backbone.Model) or (Backbone.ModelRef and (value instanceof Backbone.ModelRef))
-        @[vm_key] = kb.viewModelAttributeConnector(model, key, {view_model: @constructor, options: {__kb_store: @__kb.store, __kb_store_key: value}})
-
-      else
-        @[vm_key] = kb.simpleAttributeConnector(model, key, {read_only: @__kb.read_only})
+      return {read_only: @__kb.options.read_only, __kb_store: @__kb.store}
 
 # factory function
 Knockback.viewModel = (model, options) -> return new Knockback.ViewModel(model, options)

@@ -129,3 +129,56 @@ class Knockback.ViewModelAttributeConnector extends Knockback.AttributeConnector
         current_value.model(value); @__kb.value_observable.valueHasMutated()
 
 Knockback.viewModelAttributeConnector = (model, key, options) -> new Knockback.ViewModelAttributeConnector(model, key, options)
+
+Knockback.createOrUpdateAttributeConnector = (attribute_connector, model, key, options) ->
+  # update an existing attribute_connector
+  if attribute_connector
+    # an attribute connector so update it
+    if (kb.utils.observableInstanceOf(attribute_connector, kb.AttributeConnector))
+      if attribute_connector.model() != model
+        attribute_connector.model(model)
+      else
+        attribute_connector.update()
+
+  # create a new connector
+  else
+    value = if model then model.get(key) else null
+
+    # use passed view_model function
+    if options.hasOwnProperty('view_model')
+      attribute_connector = new options.view_model(value, options.options)
+
+    # use passed view_model_create function
+    else if options.hasOwnProperty('view_model_create')
+      attribute_connector = options.view_model_create(value, options.options)
+
+    # a collection
+    else if options.hasOwnProperty('children')
+      if _.isFunction(options.children)
+        attribute_options = {view_model: options.children}
+      else
+        attribute_options = options.children
+      options.__kb_store.addResolverToOptions(attribute_options, value) if options.__kb_store
+      attribute_connector = kb.collectionAttributeConnector(model, key, attribute_options)
+
+    # a custom creator function
+    else if options.hasOwnProperty('create')
+      attribute_connector = options.create(value, options.options)
+
+    # INFERRED: kb.CollectionObservable
+    else if (value instanceof Backbone.Collection)
+      attribute_options = {view_model: kb.ViewModel}
+      options.__kb_store.addResolverToOptions(attribute_options, value) if options.__kb_store
+      attribute_connector = kb.collectionAttributeConnector(model, key, attribute_options)
+
+    # INFERRED: kb.ViewModel
+    else if (value instanceof Backbone.Model) or (Backbone.ModelRef and (value instanceof Backbone.ModelRef))
+      attribute_options = {view_model: kb.ViewModel, options: options.options||{}}
+      options.__kb_store.addResolverToOptions(attribute_options.options, value) if options.__kb_store
+      attribute_connector = kb.viewModelAttributeConnector(model, key, attribute_options)
+
+    # INFERRED: simple type
+    else
+      attribute_connector = kb.simpleAttributeConnector(model, key, options)
+
+  return attribute_connector
