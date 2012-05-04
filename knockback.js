@@ -272,6 +272,10 @@ Knockback.CollectionObservable = (function() {
     if (options.hasOwnProperty('view_model')) {
       this.view_model_create_fn = options.view_model;
       this.view_model_create_with_new = true;
+    } else if (options.hasOwnProperty('view_model_constructor')) {
+      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', 'Please use view_model option instead');
+      this.view_model_create_fn = options.view_model_constructor;
+      this.view_model_create_with_new = true;
     } else if (options.hasOwnProperty('view_model_create')) {
       this.view_model_create_fn = options.view_model_create;
     }

@@ -10,6 +10,7 @@ SRC_DIRS = [
 
   'examples_lib/**/*.coffee',
 
+  'test/knockback_core/**/*.coffee',
   'test/backbone_modelref/**/*.coffee',
   'test/backbone_relational/**/*.coffee',
   'test/knockback_collection_observable/**/*.coffee',

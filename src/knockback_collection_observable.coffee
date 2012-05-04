@@ -50,6 +50,10 @@ class Knockback.CollectionObservable extends kb.RefCountable
     if options.hasOwnProperty('view_model')
       @view_model_create_fn = options.view_model
       @view_model_create_with_new = true
+    else if options.hasOwnProperty('view_model_constructor')
+      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', 'Please use view_model option instead')
+      @view_model_create_fn = options.view_model_constructor
+      @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_create')
       @view_model_create_fn = options.view_model_create
     @sort_attribute = options.sort_attribute
