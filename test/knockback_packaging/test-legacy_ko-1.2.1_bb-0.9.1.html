@@ -1,14 +1,35 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-  <title>Knockback Core Test Suite</title>
+  <title>Knockback Packaging Test Suite</title>
   <!-- LIBRARY DEPENDENCIES -->
   <script type="text/javascript" src="../../dependencies/knockout-1.2.1.debug.js"></script>
   <script type="text/javascript" src="../../dependencies/underscore.js"></script>
   <script type="text/javascript" src="../../dependencies/backbone-0.9.1.js"></script>
 
+  <!-- HELPERS -->
+  <script type="text/javascript" src="../../examples_lib/build/examples_lib.js"></script>
+  <script type="text/javascript" src="../vendor/globalize/globalize.js"></script>
+  <script type="text/javascript" src="../vendor/globalize/globalize.culture.en-GB.js"></script>
+  <script type="text/javascript" src="../vendor/globalize/globalize.culture.fr-FR.js"></script>
+
+  <script type="text/javascript">
+    window.mock_requires = {};
+    window.mock_requires['underscore'] = window._; delete window['_'];
+    window.mock_requires['backbone'] = window.Backbone; delete window['Backbone'];
+    window.mock_requires['knockout'] = window.ko; delete window['ko'];
+
+    window.require = function(path) { return window.mock_requires[path]; };
+    window.exports = {};
+  </script>
+
   <!-- LIBRARY -->
   <script type="text/javascript" src="../../knockback.js"></script>
+
+  <script type="text/javascript">
+    window.Knockback = window.kb = window.exports;
+    delete window['exports'];
+  </script>
 
   <!-- HELPERS -->
   <script type="text/javascript" src="../../examples_lib/build/examples_lib.js"></script>
@@ -18,11 +39,12 @@
   <script type="text/javascript" src="../vendor/qunit/jquery.js"></script>
   <script type="text/javascript" src="../vendor/qunit/qunit.js"></script>
   <script type="text/javascript" src="../vendor/qunit/jslitmus.js"></script>
-  <script type="text/javascript" src="build/test.js"></script>
+  <script type="text/javascript" src="../knockback_observable/build/test.js"></script>
+  <script type="text/javascript" src="../knockback_view_model/build/test.js"></script>
 </head>
 <body>
   <div>
-    <h1 id="qunit-header">Knockback Core Test Suite</h1>
+    <h1 id="qunit-header">Knockback Packaging Test Suite</h1>
     <h2 id="qunit-banner"></h2>
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>
