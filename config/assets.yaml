@@ -4,8 +4,8 @@ compress_assets: off
 javascripts:
   'knockback':
     - build/knockback_core.js
-    - build/knockback_store.js
     - build/knockback_ref_countable.js
+    - build/knockback_store.js
     - build/knockback_collection_observable.js
     - build/knockback_default_wrapper.js
     - build/knockback_formatted_observable.js

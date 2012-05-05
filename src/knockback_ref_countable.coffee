@@ -16,21 +16,20 @@ class Knockback.RefCountable
 
   constructor: ->
     @__kb or= {}
-    @__kb.rc = {}
-    @__kb.rc.ref_count = 1
+    @__kb.ref_count = 1
 
   __destroy: -> # NOOP
 
   # reference counting
   retain: ->
-    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.rc.ref_count) if (@__kb.rc.ref_count <= 0)
-    @__kb.rc.ref_count++
+    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.ref_count) if (@__kb.ref_count <= 0)
+    @__kb.ref_count++
     @
 
   release: ->
-    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.rc.ref_count) if (@__kb.rc.ref_count <= 0)
-    @__kb.rc.ref_count--
-    @__destroy() unless @__kb.rc.ref_count
+    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.ref_count) if (@__kb.ref_count <= 0)
+    @__kb.ref_count--
+    @__destroy() unless @__kb.ref_count
     @
 
-  refCount: -> return @__kb.rc.ref_count
+  refCount: -> return @__kb.ref_count

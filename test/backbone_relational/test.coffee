@@ -29,6 +29,8 @@ $(document).ready( ->
     }]
 
   test("1. Model with HasMany relations: A house with multiple people living in it", ->
+    kb.stats_on = true # turn on stats
+
     john = new Person({
       id: 'person-1-1'
       name: 'John'
@@ -44,6 +46,7 @@ $(document).ready( ->
       location: 'in the middle of the street'
       occupants: ['person-1-1', 'person-1-2']
     })
+
 
     house_view_model = new kb.ViewModel(our_house)
     equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
@@ -61,9 +64,17 @@ $(document).ready( ->
     equal(house_view_model.refCount(), 1, 'Expected references')
     kb.utils.release(house_view_model)
     equal(house_view_model.refCount(), 0, 'Expected references')
+
+    # check stats
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+
+    kb.stats_on = false # turn off stats
   )
 
   test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
+    kb.stats_on = true # turn on stats
+
     john = new Person({
       id: 'person-2-1'
       name: 'John'
@@ -144,10 +155,17 @@ $(document).ready( ->
     equal(places_observable.refCount(), 1, 'Expected references')
     kb.utils.release(places_observable)
     equal(places_observable.refCount(), 0, 'Expected references')
+
+    # check stats
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+    kb.stats_on = false # turn off stats
   )
 
   test("3. Model with recursive HasMany relations: Person with users who are people", ->
-    window.john = john = new Person({
+    kb.stats_on = true # turn on stats
+
+    john = new Person({
       id: 'person-3-1'
       name: 'John'
       friends: ['person-3-2', 'person-3-3', 'person-3-4']
@@ -157,7 +175,7 @@ $(document).ready( ->
       name: 'Paul'
       friends: ['person-3-1', 'person-3-3', 'person-3-4']
     })
-    window.george = george = new Person({
+    george = new Person({
       id: 'person-3-3'
       name: 'George'
       friends: ['person-3-1', 'person-3-2', 'person-3-4']
@@ -179,6 +197,7 @@ $(document).ready( ->
       ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
     equal(john_view_model.best_friend().name(), 'George', 'Expected name')
     equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
+    john_view_model.release(); john_view_model = null
 
     paul_view_model = new kb.ViewModel(paul)
     equal(paul_view_model.name(), 'Paul', "Name is correct")
@@ -186,6 +205,7 @@ $(document).ready( ->
       ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
     equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
     equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
+    kb.utils.release(paul_view_model); paul_view_model = null
 
     george_view_model = new kb.ViewModel(george)
     equal(george_view_model.name(), 'George', "Name is correct")
@@ -194,5 +214,11 @@ $(document).ready( ->
     equal(george_view_model.best_friend().name(), 'John', 'Expected name')
     equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
     equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
+    george_view_model.release(); george_view_model = null
+
+    # check stats
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+    kb.stats_on = false # turn off stats
   )
 )

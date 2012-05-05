@@ -25,7 +25,7 @@ class Knockback.TriggeredObservable
       @model_ref = @model; @model_ref.retain()
       @model_ref.bind('loaded', @__kb._onModelLoaded)
       @model_ref.bind('unloaded', @__kb._onModelUnloaded)
-      @model = @model_ref.wrappedModel()
+      @model = @model_ref.getModel()
 
     # internal state
     @__kb.value_observable = ko.observable()

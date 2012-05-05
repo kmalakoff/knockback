@@ -32,29 +32,34 @@ class Knockback.CollectionObservable extends kb.RefCountable
     throw new Error('CollectionObservable: collection is missing') if not collection
 
     super
+    kb.stats.collection_observables++ if Knockback.stats_on     # collect memory management statistics
 
     # LEGACY
     if ko.isObservable(options) and options.hasOwnProperty('indexOf')
-      kb.utils.legacyWarning('kb.collectionObservable with an external ko.observableArray', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray')
+      kb.utils.legacyWarning('kb.collectionObservable with an external ko.observableArray', '0.16.0', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray')
       observable = kb.utils.wrappedObservable(this, options)
       options = arguments[2] || {}
     else
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]))
 
     # register ourselves to handle recursive view models
-    @__kb.store = options.__kb_store || new kb.Store()
     kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this))
+
+    # always use a store to cache view models
+    if options.__kb_store then (@__kb.store = options.__kb_store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
 
     # options
     if options.hasOwnProperty('view_model')
       @view_model_create_fn = options.view_model
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_constructor')
-      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', 'Please use view_model option instead')
+      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', '0.16.0', 'Please use view_model option instead')
       @view_model_create_fn = options.view_model_constructor
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_create')
       @view_model_create_fn = options.view_model_create
+    else if options.hasOwnProperty('create')
+      @view_model_create_fn = options.create
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
 
@@ -89,9 +94,15 @@ class Knockback.CollectionObservable extends kb.RefCountable
     @collection(null)
     kb.utils.wrappedObservable(this).destroyAll(); kb.utils.wrappedObservable(this, null)
     @view_model_create_fn = null
-    @__kb.store = null
+    @__kb.store.destroy() if @__kb.store_is_owned; @__kb.store = null
     @__kb.co = null
     super
+
+    kb.stats.collection_observables-- if Knockback.stats_on       # collect memory management statistics
+
+  # override reference counting return value
+  retain: -> super; return kb.utils.wrappedObservable(this)
+  release: -> observable = kb.utils.wrappedObservable(this); super; return observable
 
   collection: (new_collection, options) ->
     observable = kb.utils.wrappedObservable(this)
@@ -171,7 +182,6 @@ class Knockback.CollectionObservable extends kb.RefCountable
   _onCollectionResort: (model_or_models) ->
     throw new Error("CollectionObservable: collection sorted_index unexpected") if @sorted_index
     if _.isArray(model_or_models)
-      @(true) # TODO: optimize for incremental resorted_index
       observable = kb.utils.wrappedObservable(this)
       @trigger('resort', observable()) # notify
     else

@@ -57,6 +57,7 @@ $(document).ready(function() {
   })();
   test("1. Model with HasMany relations: A house with multiple people living in it", function() {
     var house_view_model, john, occupant_observable, occupant_observable2, our_house, paul, _i, _j, _len, _len2, _ref, _ref2;
+    kb.stats_on = true;
     john = new Person({
       id: 'person-1-1',
       name: 'John'
@@ -88,10 +89,14 @@ $(document).ready(function() {
     }
     equal(house_view_model.refCount(), 1, 'Expected references');
     kb.utils.release(house_view_model);
-    return equal(house_view_model.refCount(), 0, 'Expected references');
+    equal(house_view_model.refCount(), 0, 'Expected references');
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables');
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models');
+    return kb.stats_on = false;
   });
   test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", function() {
     var abbey_flats, abbey_studios, george, john, occupant_observable, occupant_observable2, paul, place_view_model, places, places_observable, ringo, _i, _j, _k, _l, _len, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _ref, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+    kb.stats_on = true;
     john = new Person({
       id: 'person-2-1',
       name: 'John'
@@ -186,11 +191,15 @@ $(document).ready(function() {
     }
     equal(places_observable.refCount(), 1, 'Expected references');
     kb.utils.release(places_observable);
-    return equal(places_observable.refCount(), 0, 'Expected references');
+    equal(places_observable.refCount(), 0, 'Expected references');
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables');
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models');
+    return kb.stats_on = false;
   });
   return test("3. Model with recursive HasMany relations: Person with users who are people", function() {
     var friend, george, george_view_model, john, john_view_model, paul, paul_view_model, ringo, _i, _j, _k, _len, _len2, _len3, _ref, _ref2, _ref3;
-    window.john = john = new Person({
+    kb.stats_on = true;
+    john = new Person({
       id: 'person-3-1',
       name: 'John',
       friends: ['person-3-2', 'person-3-3', 'person-3-4']
@@ -200,7 +209,7 @@ $(document).ready(function() {
       name: 'Paul',
       friends: ['person-3-1', 'person-3-3', 'person-3-4']
     });
-    window.george = george = new Person({
+    george = new Person({
       id: 'person-3-3',
       name: 'George',
       friends: ['person-3-1', 'person-3-2', 'person-3-4']
@@ -228,6 +237,8 @@ $(document).ready(function() {
     }
     equal(john_view_model.best_friend().name(), 'George', 'Expected name');
     equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name');
+    john_view_model.release();
+    john_view_model = null;
     paul_view_model = new kb.ViewModel(paul);
     equal(paul_view_model.name(), 'Paul', "Name is correct");
     _ref2 = paul_view_model.friends();
@@ -237,6 +248,8 @@ $(document).ready(function() {
     }
     equal(paul_view_model.best_friend().name(), 'George', 'Expected name');
     equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me');
+    kb.utils.release(paul_view_model);
+    paul_view_model = null;
     george_view_model = new kb.ViewModel(george);
     equal(george_view_model.name(), 'George', "Name is correct");
     _ref3 = george_view_model.friends();
@@ -246,6 +259,11 @@ $(document).ready(function() {
     }
     equal(george_view_model.best_friend().name(), 'John', 'Expected name');
     equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name');
-    return equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
+    equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
+    george_view_model.release();
+    george_view_model = null;
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables');
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models');
+    return kb.stats_on = false;
   });
 });

@@ -394,6 +394,8 @@ $(document).ready( ->
   )
 
   test("Collection with nested custom view models", ->
+    kb.stats_on = true # turn on stats
+
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
@@ -427,13 +429,13 @@ $(document).ready( ->
       children:
         john: ContactViewModelDate
         paul: {view_model: ContactViewModelDate}
-        george: {view_model_create: (model) -> new ContactViewModelDate(model)}
-        george2: {create: (model) -> new ContactViewModelDate(model)}
+        george: {view_model_create: (model) -> return new ContactViewModelDate(model)}
+        george2: {create: (model) -> return new ContactViewModelDate(model)}
         major_duo: {children: ContactViewModelDate}
         major_duo2: {children: {view_model: ContactViewModelDate}}
-        major_duo3: {children: {view_model_create: (model) -> new ContactViewModelDate(model)}}
+        major_duo3: {children: {view_model_create: (model) -> return new ContactViewModelDate(model)}}
         minor_duo2: {children: {view_model: kb.ViewModel}}
-        minor_duo3: {children: {create: (model) -> new kb.ViewModel(model)}}
+        minor_duo3: {children: {create: (model) -> return new kb.ViewModel(model)}}
     })
 
     validateContactViewModel = (view_model, name, birthdate) ->
@@ -496,6 +498,11 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.utils.release(nested_view_model)
+
+    # check stats
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+    kb.stats_on = false # turn off stats
   )
 
   test("Error cases", ->

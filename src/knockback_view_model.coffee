@@ -11,7 +11,6 @@ class Knockback.ViewModel_RCBase extends Knockback.RefCountable
     for key, value of this
       continue if !value or (key == '__kb')
       @[key] = null if kb.utils.release(value)
-    super
 
 ####################################################
 # options
@@ -20,44 +19,53 @@ class Knockback.ViewModel_RCBase extends Knockback.RefCountable
 #       internals can be used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 #   * requires - an array of atttributes that should be stubbed out if they don't exist on the model
 #       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
+#   * children - use to provide a view_model or view_model_create or create function per model attribute
 ####################################################
 
 class Knockback.ViewModel extends Knockback.ViewModel_RCBase
   constructor: (model, options={}) ->
     super
 
+    kb.stats.view_models++ if Knockback.stats_on        # collect memory management statistics
+
     # register ourselves to handle recursive view models
-    @__kb.store = options.__kb_store || new kb.Store()
     kb.Store.resolveFromOptions(options, this)
+    # always use a store to ensure recursive view models are handled correctly
+    if options.__kb_store then (@__kb.store = options.__kb_store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
 
     @__kb._onModelChange = _.bind(@_onModelChange, @)
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
-    @__kb.options = if options then _.clone(options) else {}
+    @__kb.internals = options.internals
+    @__kb.requires = options.requires
+    @__kb.children = options.children
+    @__kb.read_only = options.read_only
 
-    throw new Error('ViewModel: model is missing') unless model
     kb.utils.wrappedModel(this, model)
 
     # determine model or model_ref type
     if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
       @__kb.model_ref = model; @__kb.model_ref.retain()
-      kb.utils.wrappedModel(this, @__kb.model_ref.wrappedModel())
+      kb.utils.wrappedModel(this, @__kb.model_ref.getModel())
       @__kb.model_ref.bind('loaded', @__kb._onModelLoaded)
       @__kb.model_ref.bind('unloaded', @__kb._onModelUnloaded)
 
     # start
-    @_onModelLoaded(@__kb.model) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
+    @_onModelLoaded(@__kb.model) if @__kb.model
 
-    return @ if not @__kb.options.internals and not @__kb.options.requires
-    missing = _.union((if @__kb.options.internals then @__kb.options.internals else []), (if @__kb.options.requires then @__kb.options.requires else []))
+    return @ if not @__kb.internals and not @__kb.requires
+    missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
     missing = _.difference(missing, _.keys(@__kb.model.attributes)) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
     @_updateAttributeConnector(@__kb.model, key) for key in missing
 
   __destroy: ->
     model = @__kb.model; kb.utils.wrappedModel(this, null)
     @_modelUnbind(model)
-    @__kb.store = null
+
+    @__kb.store.destroy() if @__kb.store_is_owned; @__kb.store = null
     super
+
+    kb.stats.view_models-- if Knockback.stats_on        # collect memory management statistics
 
   model: (new_model) ->
     model = kb.utils.wrappedModel(this)
@@ -108,17 +116,17 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
       @_updateAttributeConnector(@__kb.model, key) for key of @__kb.model.changed
 
   _updateAttributeConnector: (model, key) ->
-    vm_key = if @__kb.options.internals and _.contains(@__kb.options.internals, key) then '_' + key else key
+    vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
     @[vm_key] = Knockback.createOrUpdateAttributeConnector(@[vm_key], model, key, @_createOptions(key))
 
   _createOptions: (key) ->
-    if @__kb.options.children and @__kb.options.children.hasOwnProperty(key)
-      options = @__kb.options.children[key]
-      if _.isFunction(options) # a view model short form for a view model
+    if @__kb.children and @__kb.children.hasOwnProperty(key)
+      options = @__kb.children[key]
+      if (typeof(options) == 'function') # a view model short form for a view model
         options = {view_model: options}
-      return _.defaults(options, {read_only: @__kb.options.read_only, __kb_store: @__kb.store})
+      return _.defaults(options, {read_only: @__kb.read_only, __kb_store: @__kb.store})
     else
-      return {read_only: @__kb.options.read_only, __kb_store: @__kb.store}
+      return {read_only: @__kb.read_only, __kb_store: @__kb.store}
 
 # factory function
 Knockback.viewModel = (model, options) -> return new Knockback.ViewModel(model, options)

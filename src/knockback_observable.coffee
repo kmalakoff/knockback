@@ -34,7 +34,7 @@ class Knockback.Observable
       @model_ref = @model; @model_ref.retain()
       @model_ref.bind('loaded', @__kb._onModelLoaded)
       @model_ref.bind('unloaded', @__kb._onModelUnloaded)
-      @model = @model_ref.wrappedModel()
+      @model = @model_ref.getModel()
 
     # internal state
     @__kb.value_observable = ko.observable()
@@ -77,7 +77,7 @@ class Knockback.Observable
   ####################################################
   _getDefaultValue: ->
     return '' if not @options.hasOwnProperty('default')
-    return if _.isFunction(@options.default) then @options.default() else @options.default
+    return if (typeof(@options.default) == 'function') then @options.default() else @options.default
 
   _getCurrentValue: ->
     return @_getDefaultValue() if not @model
@@ -107,10 +107,10 @@ class Knockback.Observable
 
     if @model
       set_info = {}; set_info[ko.utils.unwrapObservable(@options.key)] = value
-      args = if _.isFunction(@options.write) then [value] else [set_info]
+      args = if (typeof(@options.write) == 'function') then [value] else [set_info]
       if not _.isUndefined(@options.args)
         if _.isArray(@options.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @options.args) else args.push(ko.utils.unwrapObservable(@options.args))
-      if _.isFunction(@options.write) then @options.write.apply(@view_model, args) else @model.set.apply(@model, args)
+      if (typeof(@options.write) == 'function') then @options.write.apply(@view_model, args) else @model.set.apply(@model, args)
     if @__kb.localizer then @__kb.value_observable(@__kb.localizer()) else @__kb.value_observable(value) # trigger the dependable and store the correct value
 
   _modelBind: (model) ->

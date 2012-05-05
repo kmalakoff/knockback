@@ -430,6 +430,7 @@ $(document).ready(function() {
   });
   test("Collection with nested custom view models", function() {
     var ContactViewModelDate, george, george_birthdate, john, john_birthdate, major_duo, minor_duo, nested_model, nested_view_model, paul, paul_birthdate, ringo, ringo_birthdate, validateContactViewModel, validateGenericViewModel;
+    kb.stats_on = true;
     ContactViewModelDate = (function() {
       __extends(ContactViewModelDate, kb.ViewModel);
       function ContactViewModelDate(model) {
@@ -573,7 +574,10 @@ $(document).ready(function() {
     validateGenericViewModel(nested_view_model.minor_duo2()[1], 'Ringo', ringo_birthdate);
     validateGenericViewModel(nested_view_model.minor_duo3()[0], 'George', george_birthdate);
     validateGenericViewModel(nested_view_model.minor_duo3()[1], 'Ringo', ringo_birthdate);
-    return kb.utils.release(nested_view_model);
+    kb.utils.release(nested_view_model);
+    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables');
+    equal(kb.stats.view_models, 0, 'Cleanup: no view models');
+    return kb.stats_on = false;
   });
   return test("Error cases", function() {});
 });

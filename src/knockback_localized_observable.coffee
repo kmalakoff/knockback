@@ -36,7 +36,7 @@ class Knockback.LocalizedObservable
     value = ko.utils.unwrapObservable(@value) if @value
     @__kb.value_observable = ko.observable(if not value then @_getDefaultValue() else @read.call(this, value, null))
 
-    throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if @write and not _.isFunction(@write)
+    throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if @write and not (typeof(@write) == 'function')
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
       write: if @write then _.bind(@_onSetValue, @) else (-> throw new Error("Knockback.LocalizedObservable: value is read only"))
@@ -83,7 +83,7 @@ class Knockback.LocalizedObservable
   ####################################################
   _getDefaultValue: ->
     return '' if not @default
-    return if _.isFunction(@default) then @default() else @default
+    return if (typeof(@default) == 'function') then @default() else @default
 
   _getCurrentValue: ->
     observable = kb.utils.wrappedObservable(this)

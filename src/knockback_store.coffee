@@ -11,6 +11,20 @@ class Knockback.Store
     @keys = []
     @values = []
 
+  destroy: ->
+    @keys = null
+
+    # first break cycles in the collections since relations are the typical source of recursion
+    for value in @values
+      continue unless kb.utils.observableInstanceOf(value, kb.CollectionObservable)
+      value.release() while (value.refCount() > 0)
+
+    # then release the view models
+    for value in @values
+      continue unless (value instanceof kb.ViewModel)
+      value.release() while (value.refCount() > 0)
+    @values = null
+
   add: (key, value) ->
     index = _.indexOf(@keys, key)
     if (index >= 0)
@@ -26,8 +40,11 @@ class Knockback.Store
     if (index >= 0)
       # value is in the store (not still being resolved)
       if @values[index]
-        @values[index].retain?()  # retain on a kb.CollectionObservable will not return the wrapped observable
-        return @values[index]
+        # reference is out-of-date, clear it out
+        if (typeof(@values[index].refCount) == 'function') and (@values[index].refCount() <= 0)
+          @values[index] = null
+        else
+          return if (typeof(@values[index].retain) == 'function') then @values[index].retain() else @values[index]
 
     # stub out a new value
     else

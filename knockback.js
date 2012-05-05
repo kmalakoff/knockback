@@ -18,13 +18,18 @@ _ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._
 Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 ko = !this.Knockout && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 Knockback.locale_manager;
+Knockback.stats = {
+  collection_observables: 0,
+  view_models: 0
+};
+Knockback.stats_on = false;
 Knockback.utils = {};
-Knockback.utils.legacyWarning = function(identifier, message) {
+Knockback.utils.legacyWarning = function(identifier, remove_version, message) {
   var _base;
   kb._legacy_warnings || (kb._legacy_warnings = {});
   (_base = kb._legacy_warnings)[identifier] || (_base[identifier] = 0);
   kb._legacy_warnings[identifier]++;
-  return console.warn("Legacy warning! '" + identifier + "' has been deprecated. " + message);
+  return console.warn("Legacy warning! '" + identifier + "' has been deprecated (will be removed in Knockback " + remove_version + "). " + message + ".");
 };
 Knockback.utils.wrappedObservable = function(instance, observable) {
   if (arguments.length === 1) {
@@ -37,20 +42,24 @@ Knockback.utils.wrappedObservable = function(instance, observable) {
     throw new Error('Knockback: no instance for wrapping a observable');
   }
   instance.__kb || (instance.__kb = {});
-  if (instance.__kb.observable) {
-    instance.__kb.observable.instance = null;
+  if (instance.__kb.observable && instance.__kb.observable.__kb) {
+    instance.__kb.observable.__kb.instance = null;
   }
   instance.__kb.observable = observable;
   if (observable) {
-    instance.__kb.observable.instance = instance;
+    observable.__kb || (observable.__kb = {});
+    observable.__kb.instance = instance;
   }
   return observable;
 };
 Knockback.utils.observableInstanceOf = function(observable, type) {
-  if (!observable.instance) {
+  if (!observable) {
     return false;
   }
-  return observable.instance instanceof type;
+  if (!(observable.__kb && observable.__kb.instance)) {
+    return false;
+  }
+  return observable.__kb.instance instanceof type;
 };
 Knockback.utils.wrappedModel = function(instance, model) {
   if (arguments.length === 1) {
@@ -68,7 +77,7 @@ Knockback.utils.wrappedModel = function(instance, model) {
   return model;
 };
 Knockback.viewModelGetModel = Knockback.vmModel = function(instance) {
-  kb.utils.legacyWarning('kb.vmModel', 'Please use kb.utils.wrappedModel instead');
+  kb.utils.legacyWarning('kb.vmModel', '0.16.0', 'Please use kb.utils.wrappedModel instead');
   return kb.utils.wrappedModel(instance);
 };
 Knockback.utils.setToDefault = function(obj) {
@@ -88,7 +97,7 @@ Knockback.utils.setToDefault = function(obj) {
   }
 };
 Knockback.vmSetToDefault = function(view_model) {
-  kb.utils.legacyWarning('kb.vmSetToDefault', 'Please use kb.utils.release instead');
+  kb.utils.legacyWarning('kb.vmSetToDefault', '0.16.0', 'Please use kb.utils.release instead');
   return kb.utils.setToDefault(view_model);
 };
 Knockback.utils.release = function(obj) {
@@ -104,7 +113,7 @@ Knockback.utils.release = function(obj) {
       return false;
     }
     return true;
-  } else if (_.isObject(obj) && !_.isFunction(obj)) {
+  } else if (_.isObject(obj) && !(typeof obj === 'function')) {
     for (key in obj) {
       value = obj[key];
       if (!value || (key === '__kb')) {
@@ -117,22 +126,57 @@ Knockback.utils.release = function(obj) {
     return true;
   }
 };
-Knockback.utils.vmRelease = function(view_model) {
-  kb.utils.legacyWarning('kb.vmRelease', 'Please use kb.utils.release instead');
+Knockback.vmRelease = function(view_model) {
+  kb.utils.legacyWarning('kb.vmRelease', '0.16.0', 'Please use kb.utils.release instead');
   return kb.utils.release(view_model);
 };
-Knockback.utils.vmReleaseObservable = function(observable) {
-  kb.utils.legacyWarning('kb.vmReleaseObservable', 'Please use kb.utils.release instead');
+Knockback.vmReleaseObservable = function(observable) {
+  kb.utils.legacyWarning('kb.vmReleaseObservable', '0.16.0', 'Please use kb.utils.release instead');
   return kb.utils.release(observable);
 };
 _ref = Knockback.utils;
 for (key in _ref) {
   fn = _ref[key];
   Knockback[key] = function() {
-    kb.utils.legacyWarning("kb." + key, "Please use kb.utils." + key + " instead");
+    kb.utils.legacyWarning("kb." + key, '0.16.0', "Please use kb.utils." + key + " instead");
     return kb.utils[key].apply(null, arguments);
   };
 }
+/*
+  knockback_ref_countable.js
+  (c) 2012 Kevin Malakoff.
+  Knockback.RefCountable is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+*/Knockback.RefCountable = (function() {
+  RefCountable.extend = Backbone.Model.extend;
+  function RefCountable() {
+    this.__kb || (this.__kb = {});
+    this.__kb.ref_count = 1;
+  }
+  RefCountable.prototype.__destroy = function() {};
+  RefCountable.prototype.retain = function() {
+    if (this.__kb.ref_count <= 0) {
+      throw new Error("RefCountable: ref_count is corrupt: " + this.__kb.ref_count);
+    }
+    this.__kb.ref_count++;
+    return this;
+  };
+  RefCountable.prototype.release = function() {
+    if (this.__kb.ref_count <= 0) {
+      throw new Error("RefCountable: ref_count is corrupt: " + this.__kb.ref_count);
+    }
+    this.__kb.ref_count--;
+    if (!this.__kb.ref_count) {
+      this.__destroy();
+    }
+    return this;
+  };
+  RefCountable.prototype.refCount = function() {
+    return this.__kb.ref_count;
+  };
+  return RefCountable;
+})();
 /*
   knockback_store.js
   (c) 2012 Kevin Malakoff.
@@ -144,6 +188,31 @@ for (key in _ref) {
     this.keys = [];
     this.values = [];
   }
+  Store.prototype.destroy = function() {
+    var value, _i, _j, _len, _len2, _ref, _ref2;
+    this.keys = null;
+    _ref = this.values;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      value = _ref[_i];
+      if (!kb.utils.observableInstanceOf(value, kb.CollectionObservable)) {
+        continue;
+      }
+      while (value.refCount() > 0) {
+        value.release();
+      }
+    }
+    _ref2 = this.values;
+    for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+      value = _ref2[_j];
+      if (!(value instanceof kb.ViewModel)) {
+        continue;
+      }
+      while (value.refCount() > 0) {
+        value.release();
+      }
+    }
+    return this.values = null;
+  };
   Store.prototype.add = function(key, value) {
     var index;
     index = _.indexOf(this.keys, key);
@@ -156,14 +225,19 @@ for (key in _ref) {
     return value;
   };
   Store.prototype.resolve = function(key, create_fn, args) {
-    var index, value, _base;
+    var index, value;
     index = _.indexOf(this.keys, key);
     if (index >= 0) {
       if (this.values[index]) {
-        if (typeof (_base = this.values[index]).retain === "function") {
-          _base.retain();
+        if ((typeof this.values[index].refCount === 'function') && (this.values[index].refCount() <= 0)) {
+          this.values[index] = null;
+        } else {
+          if (typeof this.values[index].retain === 'function') {
+            return this.values[index].retain();
+          } else {
+            return this.values[index];
+          }
         }
-        return this.values[index];
       }
     } else {
       index = this.keys.length;
@@ -193,42 +267,6 @@ for (key in _ref) {
   return Store;
 })();
 /*
-  knockback_ref_countable.js
-  (c) 2012 Kevin Malakoff.
-  Knockback.RefCountable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/Knockback.RefCountable = (function() {
-  RefCountable.extend = Backbone.Model.extend;
-  function RefCountable() {
-    this.__kb || (this.__kb = {});
-    this.__kb.rc = {};
-    this.__kb.rc.ref_count = 1;
-  }
-  RefCountable.prototype.__destroy = function() {};
-  RefCountable.prototype.retain = function() {
-    if (this.__kb.rc.ref_count <= 0) {
-      throw new Error("RefCountable: ref_count is corrupt: " + this.__kb.rc.ref_count);
-    }
-    this.__kb.rc.ref_count++;
-    return this;
-  };
-  RefCountable.prototype.release = function() {
-    if (this.__kb.rc.ref_count <= 0) {
-      throw new Error("RefCountable: ref_count is corrupt: " + this.__kb.rc.ref_count);
-    }
-    this.__kb.rc.ref_count--;
-    if (!this.__kb.rc.ref_count) {
-      this.__destroy();
-    }
-    return this;
-  };
-  RefCountable.prototype.refCount = function() {
-    return this.__kb.rc.ref_count;
-  };
-  return RefCountable;
-})();
-/*
   knockback_collection_observable.js
   (c) 2011 Kevin Malakoff.
   Knockback.CollectionObservable is freely distributable under the MIT license.
@@ -254,24 +292,34 @@ Knockback.CollectionObservable = (function() {
       throw new Error('CollectionObservable: collection is missing');
     }
     CollectionObservable.__super__.constructor.apply(this, arguments);
+    if (Knockback.stats_on) {
+      kb.stats.collection_observables++;
+    }
     if (ko.isObservable(options) && options.hasOwnProperty('indexOf')) {
-      kb.utils.legacyWarning('kb.collectionObservable with an external ko.observableArray', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray');
+      kb.utils.legacyWarning('kb.collectionObservable with an external ko.observableArray', '0.16.0', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray');
       observable = kb.utils.wrappedObservable(this, options);
       options = arguments[2] || {};
     } else {
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
     }
-    this.__kb.store = options.__kb_store || new kb.Store();
     kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this));
+    if (options.__kb_store) {
+      this.__kb.store = options.__kb_store;
+    } else {
+      this.__kb.store = new kb.Store();
+      this.__kb.store_is_owned = true;
+    }
     if (options.hasOwnProperty('view_model')) {
       this.view_model_create_fn = options.view_model;
       this.view_model_create_with_new = true;
     } else if (options.hasOwnProperty('view_model_constructor')) {
-      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', 'Please use view_model option instead');
+      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', '0.16.0', 'Please use view_model option instead');
       this.view_model_create_fn = options.view_model_constructor;
       this.view_model_create_with_new = true;
     } else if (options.hasOwnProperty('view_model_create')) {
       this.view_model_create_fn = options.view_model_create;
+    } else if (options.hasOwnProperty('create')) {
+      this.view_model_create_fn = options.create;
     }
     this.sort_attribute = options.sort_attribute;
     this.sorted_index = options.sorted_index;
@@ -302,9 +350,25 @@ Knockback.CollectionObservable = (function() {
     kb.utils.wrappedObservable(this).destroyAll();
     kb.utils.wrappedObservable(this, null);
     this.view_model_create_fn = null;
+    if (this.__kb.store_is_owned) {
+      this.__kb.store.destroy();
+    }
     this.__kb.store = null;
     this.__kb.co = null;
-    return CollectionObservable.__super__.__destroy.apply(this, arguments);
+    CollectionObservable.__super__.__destroy.apply(this, arguments);
+    if (Knockback.stats_on) {
+      return kb.stats.collection_observables--;
+    }
+  };
+  CollectionObservable.prototype.retain = function() {
+    CollectionObservable.__super__.retain.apply(this, arguments);
+    return kb.utils.wrappedObservable(this);
+  };
+  CollectionObservable.prototype.release = function() {
+    var observable;
+    observable = kb.utils.wrappedObservable(this);
+    CollectionObservable.__super__.release.apply(this, arguments);
+    return observable;
   };
   CollectionObservable.prototype.collection = function(new_collection, options) {
     var observable, _base, _base2;
@@ -434,7 +498,6 @@ Knockback.CollectionObservable = (function() {
       throw new Error("CollectionObservable: collection sorted_index unexpected");
     }
     if (_.isArray(model_or_models)) {
-      this(true);
       observable = kb.utils.wrappedObservable(this);
       return this.trigger('resort', observable());
     } else {
@@ -735,7 +798,7 @@ Knockback.formattedObservable = function(format, args) {
       value = ko.utils.unwrapObservable(this.value);
     }
     this.__kb.value_observable = ko.observable(!value ? this._getDefaultValue() : this.read.call(this, value, null));
-    if (this.write && !_.isFunction(this.write)) {
+    if (this.write && !(typeof this.write === 'function')) {
       throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute');
     }
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
@@ -790,7 +853,7 @@ Knockback.formattedObservable = function(format, args) {
     if (!this["default"]) {
       return '';
     }
-    if (_.isFunction(this["default"])) {
+    if (typeof this["default"] === 'function') {
       return this["default"]();
     } else {
       return this["default"];
@@ -872,7 +935,7 @@ Knockback.Observable = (function() {
       this.model_ref.retain();
       this.model_ref.bind('loaded', this.__kb._onModelLoaded);
       this.model_ref.bind('unloaded', this.__kb._onModelUnloaded);
-      this.model = this.model_ref.wrappedModel();
+      this.model = this.model_ref.getModel();
     }
     this.__kb.value_observable = ko.observable();
     if (this.options.localizer) {
@@ -922,7 +985,7 @@ Knockback.Observable = (function() {
     if (!this.options.hasOwnProperty('default')) {
       return '';
     }
-    if (_.isFunction(this.options["default"])) {
+    if (typeof this.options["default"] === 'function') {
       return this.options["default"]();
     } else {
       return this.options["default"];
@@ -983,7 +1046,7 @@ Knockback.Observable = (function() {
     if (this.model) {
       set_info = {};
       set_info[ko.utils.unwrapObservable(this.options.key)] = value;
-      args = _.isFunction(this.options.write) ? [value] : [set_info];
+      args = typeof this.options.write === 'function' ? [value] : [set_info];
       if (!_.isUndefined(this.options.args)) {
         if (_.isArray(this.options.args)) {
           _ref = this.options.args;
@@ -995,7 +1058,7 @@ Knockback.Observable = (function() {
           args.push(ko.utils.unwrapObservable(this.options.args));
         }
       }
-      if (_.isFunction(this.options.write)) {
+      if (typeof this.options.write === 'function') {
         this.options.write.apply(this.view_model, args);
       } else {
         this.model.set.apply(this.model, args);
@@ -1163,7 +1226,7 @@ Knockback.observables = function(model, mappings_info, view_model, options) {
       this.model_ref.retain();
       this.model_ref.bind('loaded', this.__kb._onModelLoaded);
       this.model_ref.bind('unloaded', this.__kb._onModelUnloaded);
-      this.model = this.model_ref.wrappedModel();
+      this.model = this.model_ref.getModel();
     }
     this.__kb.value_observable = ko.observable();
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable(_.bind(this._onGetValue, this)));
@@ -1336,9 +1399,10 @@ Knockback.CollectionAttributeConnector = (function() {
     return kb.utils.wrappedObservable(this);
   }
   CollectionAttributeConnector.prototype.destroy = function() {
-    var _ref;
-    if ((_ref = this.__kb.value_observable()) != null) {
-      _ref.release();
+    var current_value;
+    current_value = this.__kb.value_observable();
+    if (current_value && (typeof current_value.refCount === 'function') && (current_value.refCount() > 0)) {
+      current_value.release();
     }
     return CollectionAttributeConnector.__super__.destroy.apply(this, arguments);
   };
@@ -1386,11 +1450,10 @@ Knockback.ViewModelAttributeConnector = (function() {
     return kb.utils.wrappedObservable(this);
   }
   ViewModelAttributeConnector.prototype.destroy = function() {
-    var _ref;
-    if ((_ref = this.__kb.value_observable()) != null) {
-      if (typeof _ref.release === "function") {
-        _ref.release();
-      }
+    var current_value;
+    current_value = this.__kb.value_observable();
+    if (current_value && (typeof current_value.refCount === 'function') && (current_value.refCount() > 0)) {
+      current_value.release();
     }
     return ViewModelAttributeConnector.__super__.destroy.apply(this, arguments);
   };
@@ -1416,7 +1479,7 @@ Knockback.ViewModelAttributeConnector = (function() {
         return this.__kb.value_observable(this.options.view_model ? new this.options.view_model(value, view_model_options) : this.options.view_model_create(value, view_model_options));
       }
     } else {
-      if (!(current_value.model && _.isFunction(current_value.model))) {
+      if (!(current_value.model && (typeof current_value.model === 'function'))) {
         throw new Error("Knockback.viewModelAttributeConnector: unknown how to model a view model");
       }
       if (current_value.model() !== value) {
@@ -1431,7 +1494,7 @@ Knockback.viewModelAttributeConnector = function(model, key, options) {
   return new Knockback.ViewModelAttributeConnector(model, key, options);
 };
 Knockback.createOrUpdateAttributeConnector = function(attribute_connector, model, key, options) {
-  var attribute_options, value;
+  var attribute_options, relation, type, value;
   if (attribute_connector) {
     if (kb.utils.observableInstanceOf(attribute_connector, kb.AttributeConnector)) {
       if (attribute_connector.model() !== model) {
@@ -1440,48 +1503,63 @@ Knockback.createOrUpdateAttributeConnector = function(attribute_connector, model
         attribute_connector.update();
       }
     }
-  } else {
-    value = model ? model.get(key) : null;
-    if (options.hasOwnProperty('view_model')) {
-      attribute_connector = new options.view_model(value, options.options);
-    } else if (options.hasOwnProperty('view_model_create')) {
-      attribute_connector = options.view_model_create(value, options.options);
-    } else if (options.hasOwnProperty('children')) {
-      if (_.isFunction(options.children)) {
-        attribute_options = {
-          view_model: options.children
-        };
-      } else {
-        attribute_options = options.children;
-      }
-      if (options.__kb_store) {
-        options.__kb_store.addResolverToOptions(attribute_options, value);
-      }
-      attribute_connector = kb.collectionAttributeConnector(model, key, attribute_options);
-    } else if (options.hasOwnProperty('create')) {
-      attribute_connector = options.create(value, options.options);
-    } else if (value instanceof Backbone.Collection) {
-      attribute_options = {
-        view_model: kb.ViewModel
-      };
-      if (options.__kb_store) {
-        options.__kb_store.addResolverToOptions(attribute_options, value);
-      }
-      attribute_connector = kb.collectionAttributeConnector(model, key, attribute_options);
-    } else if ((value instanceof Backbone.Model) || (Backbone.ModelRef && (value instanceof Backbone.ModelRef))) {
-      attribute_options = {
-        view_model: kb.ViewModel,
-        options: options.options || {}
-      };
-      if (options.__kb_store) {
-        options.__kb_store.addResolverToOptions(attribute_options.options, value);
-      }
-      attribute_connector = kb.viewModelAttributeConnector(model, key, attribute_options);
-    } else {
-      attribute_connector = kb.simpleAttributeConnector(model, key, options);
-    }
+    return attribute_connector;
   }
-  return attribute_connector;
+  if (!model) {
+    return kb.simpleAttributeConnector(model, key, options);
+  }
+  value = model.get(key);
+  if (options.hasOwnProperty('view_model')) {
+    return new options.view_model(value, options.options || {});
+  } else if (options.hasOwnProperty('view_model_create')) {
+    return options.view_model_create(value, options.options || {});
+  } else if (options.hasOwnProperty('create')) {
+    return options.create(value, options.options || {});
+  } else if (options.hasOwnProperty('children')) {
+    if (typeof options.children === 'function') {
+      attribute_options = {
+        view_model: options.children
+      };
+    } else {
+      attribute_options = options.children || {};
+    }
+    return kb.collectionAttributeConnector(model, key, attribute_options);
+  }
+  if (!value) {
+    if (Backbone.RelationalModel && (model instanceof Backbone.RelationalModel)) {
+      relation = _.find(model.getRelations(), function(test) {
+        return test.key === key;
+      });
+      if (relation) {
+        type = relation.collectionKey ? 'collection' : 'model';
+      }
+    }
+  } else if (value instanceof Backbone.Collection) {
+    type = 'collection';
+  } else if ((value instanceof Backbone.Model) || (Backbone.ModelRef && (value instanceof Backbone.ModelRef))) {
+    type = 'model';
+  }
+  if (!type) {
+    return kb.simpleAttributeConnector(model, key, options);
+  }
+  if (type === 'collection') {
+    attribute_options = {
+      view_model: kb.ViewModel
+    };
+    if (options.__kb_store) {
+      options.__kb_store.addResolverToOptions(attribute_options, value);
+    }
+    return kb.collectionAttributeConnector(model, key, attribute_options);
+  } else if (type === 'model') {
+    attribute_options = {
+      view_model: kb.ViewModel,
+      options: options.options || {}
+    };
+    if (options.__kb_store) {
+      options.__kb_store.addResolverToOptions(attribute_options.options, value);
+    }
+    return kb.viewModelAttributeConnector(model, key, attribute_options);
+  }
 };
 /*
   knockback_view_model.js
@@ -1504,17 +1582,16 @@ Knockback.ViewModel_RCBase = (function() {
     ViewModel_RCBase.__super__.constructor.apply(this, arguments);
   }
   ViewModel_RCBase.prototype.__destroy = function() {
-    var key, value;
+    var key, value, _results;
+    _results = [];
     for (key in this) {
       value = this[key];
       if (!value || (key === '__kb')) {
         continue;
       }
-      if (kb.utils.release(value)) {
-        this[key] = null;
-      }
+      _results.push(kb.utils.release(value) ? this[key] = null : void 0);
     }
-    return ViewModel_RCBase.__super__.__destroy.apply(this, arguments);
+    return _results;
   };
   return ViewModel_RCBase;
 })();
@@ -1526,30 +1603,38 @@ Knockback.ViewModel = (function() {
       options = {};
     }
     ViewModel.__super__.constructor.apply(this, arguments);
-    this.__kb.store = options.__kb_store || new kb.Store();
+    if (Knockback.stats_on) {
+      kb.stats.view_models++;
+    }
     kb.Store.resolveFromOptions(options, this);
+    if (options.__kb_store) {
+      this.__kb.store = options.__kb_store;
+    } else {
+      this.__kb.store = new kb.Store();
+      this.__kb.store_is_owned = true;
+    }
     this.__kb._onModelChange = _.bind(this._onModelChange, this);
     this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
     this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
-    this.__kb.options = options ? _.clone(options) : {};
-    if (!model) {
-      throw new Error('ViewModel: model is missing');
-    }
+    this.__kb.internals = options.internals;
+    this.__kb.requires = options.requires;
+    this.__kb.children = options.children;
+    this.__kb.read_only = options.read_only;
     kb.utils.wrappedModel(this, model);
     if (Backbone.ModelRef && (model instanceof Backbone.ModelRef)) {
       this.__kb.model_ref = model;
       this.__kb.model_ref.retain();
-      kb.utils.wrappedModel(this, this.__kb.model_ref.wrappedModel());
+      kb.utils.wrappedModel(this, this.__kb.model_ref.getModel());
       this.__kb.model_ref.bind('loaded', this.__kb._onModelLoaded);
       this.__kb.model_ref.bind('unloaded', this.__kb._onModelUnloaded);
     }
-    if (!this.__kb.model_ref || this.__kb.model_ref.isLoaded()) {
+    if (this.__kb.model) {
       this._onModelLoaded(this.__kb.model);
     }
-    if (!this.__kb.options.internals && !this.__kb.options.requires) {
+    if (!this.__kb.internals && !this.__kb.requires) {
       return this;
     }
-    missing = _.union((this.__kb.options.internals ? this.__kb.options.internals : []), (this.__kb.options.requires ? this.__kb.options.requires : []));
+    missing = _.union((this.__kb.internals ? this.__kb.internals : []), (this.__kb.requires ? this.__kb.requires : []));
     if (!this.__kb.model_ref || this.__kb.model_ref.isLoaded()) {
       missing = _.difference(missing, _.keys(this.__kb.model.attributes));
     }
@@ -1563,8 +1648,14 @@ Knockback.ViewModel = (function() {
     model = this.__kb.model;
     kb.utils.wrappedModel(this, null);
     this._modelUnbind(model);
+    if (this.__kb.store_is_owned) {
+      this.__kb.store.destroy();
+    }
     this.__kb.store = null;
-    return ViewModel.__super__.__destroy.apply(this, arguments);
+    ViewModel.__super__.__destroy.apply(this, arguments);
+    if (Knockback.stats_on) {
+      return kb.stats.view_models--;
+    }
   };
   ViewModel.prototype.model = function(new_model) {
     var model;
@@ -1642,25 +1733,25 @@ Knockback.ViewModel = (function() {
   };
   ViewModel.prototype._updateAttributeConnector = function(model, key) {
     var vm_key;
-    vm_key = this.__kb.options.internals && _.contains(this.__kb.options.internals, key) ? '_' + key : key;
+    vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? '_' + key : key;
     return this[vm_key] = Knockback.createOrUpdateAttributeConnector(this[vm_key], model, key, this._createOptions(key));
   };
   ViewModel.prototype._createOptions = function(key) {
     var options;
-    if (this.__kb.options.children && this.__kb.options.children.hasOwnProperty(key)) {
-      options = this.__kb.options.children[key];
-      if (_.isFunction(options)) {
+    if (this.__kb.children && this.__kb.children.hasOwnProperty(key)) {
+      options = this.__kb.children[key];
+      if (typeof options === 'function') {
         options = {
           view_model: options
         };
       }
       return _.defaults(options, {
-        read_only: this.__kb.options.read_only,
+        read_only: this.__kb.read_only,
         __kb_store: this.__kb.store
       });
     } else {
       return {
-        read_only: this.__kb.options.read_only,
+        read_only: this.__kb.read_only,
         __kb_store: this.__kb.store
       };
     }
