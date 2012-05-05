@@ -47,7 +47,6 @@ $(document).ready( ->
       occupants: ['person-1-1', 'person-1-2']
     })
 
-
     house_view_model = new kb.ViewModel(our_house)
     equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
     equal(house_view_model.occupants().length, 2, 'Expected occupant count')

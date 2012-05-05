@@ -39,6 +39,7 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
     @__kb.internals = options.internals
     @__kb.requires = options.requires
     @__kb.children = options.children
+    @__kb.create = options.create
     @__kb.read_only = options.read_only
 
     kb.utils.wrappedModel(this, model)
@@ -117,16 +118,22 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
 
   _updateAttributeConnector: (model, key) ->
     vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
-    @[vm_key] = Knockback.createOrUpdateAttributeConnector(@[vm_key], model, key, @_createOptions(key))
+    @[vm_key] = kb.AttributeConnector.createOrUpdate(@[vm_key], model, key, @_createOptions(key))
 
   _createOptions: (key) ->
-    if @__kb.children and @__kb.children.hasOwnProperty(key)
-      options = @__kb.children[key]
-      if (typeof(options) == 'function') # a view model short form for a view model
-        options = {view_model: options}
-      return _.defaults(options, {read_only: @__kb.read_only, __kb_store: @__kb.store})
-    else
-      return {read_only: @__kb.read_only, __kb_store: @__kb.store}
+    if @__kb.children
+      if @__kb.children.hasOwnProperty(key)
+        options = @__kb.children[key]
+        if (typeof(options) == 'function') # a view model short form for a view model
+          options = {view_model: options}
+        options.options = {read_only: @__kb.read_only, __kb_store: @__kb.store}
+        return options
+      else if @__kb.children.hasOwnProperty('create')
+        return {create: @__kb.children.create, options:{read_only: @__kb.read_only, __kb_store: @__kb.store}}
+    else if @__kb.create
+      return {create: @__kb.create, options:{read_only: @__kb.read_only, __kb_store: @__kb.store}}
+
+    return {read_only: @__kb.read_only, __kb_store: @__kb.store}
 
 # factory function
 Knockback.viewModel = (model, options) -> return new Knockback.ViewModel(model, options)

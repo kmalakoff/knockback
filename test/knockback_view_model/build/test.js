@@ -522,8 +522,8 @@ $(document).ready(function() {
           }
         },
         george2: {
-          create: function(model) {
-            return new ContactViewModelDate(model);
+          create: function(model, key) {
+            return new ContactViewModelDate(model.get(key));
           }
         },
         major_duo: {
