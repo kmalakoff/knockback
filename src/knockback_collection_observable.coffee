@@ -19,6 +19,7 @@
 #   view_model: (model) -> ... view model constructor
 #   view_model_create: (model) -> ... view model create function
 #   defer: if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a cycle.
+#   store
 # Optional: If you wish to create view models, you must supply a target observable array and the view_model_create or view_model option.
 #
 # With view models, the following are triggered the following Backbone.Events
@@ -39,26 +40,31 @@ class Knockback.CollectionObservable extends kb.RefCountable
       kb.utils.legacyWarning('kb.collectionObservable with an external ko.observableArray', '0.16.0', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray')
       observable = kb.utils.wrappedObservable(this, options)
       options = arguments[2] || {}
+      bind_model_changes = true
     else
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]))
 
     # register ourselves to handle recursive view models
-    kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this))
+    kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this)) unless options.store_skip_resolve
 
     # always use a store to cache view models
-    if options.__kb_store then (@__kb.store = options.__kb_store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
+    if options.store then (@__kb.store = options.store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
 
     # options
     if options.hasOwnProperty('view_model')
+      throw new Error('Knockback.CollectionObservable: options.view_model is empty') if not options.view_model
       @view_model_create_fn = options.view_model
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_constructor')
+      throw new Error('Knockback.CollectionObservable: options.view_model_constructor is empty') if not options.view_model_constructor
       kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', '0.16.0', 'Please use view_model option instead')
       @view_model_create_fn = options.view_model_constructor
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_create')
+      throw new Error('Knockback.CollectionObservable: options.view_model_create is empty') if not options.view_model_create
       @view_model_create_fn = options.view_model_create
     else if options.hasOwnProperty('create')
+      throw new Error('Knockback.CollectionObservable: options.create is empty') if not options.create
       @view_model_create_fn = options.create
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
@@ -69,6 +75,9 @@ class Knockback.CollectionObservable extends kb.RefCountable
     @__kb._onModelAdd = _.bind(@_onModelAdd, @)
     @__kb._onModelRemove = _.bind(@_onModelRemove, @)
     @__kb._onModelChange = _.bind(@_onModelChange, @)
+
+    # LEGACY
+    collection.bind('change', => kb.utils.wrappedObservable(this).valueHasMutated()) if bind_model_changes and collection
 
     # publish public interface on the observable and return instead of this
     observable.retain = _.bind(@retain, @)
@@ -92,10 +101,10 @@ class Knockback.CollectionObservable extends kb.RefCountable
 
   __destroy: ->
     @collection(null)
-    kb.utils.wrappedObservable(this).destroyAll(); kb.utils.wrappedObservable(this, null)
+    (@__kb.store.destroy(); @__kb.store = null) if @hasViewModels() and @__kb.store_is_owned
     @view_model_create_fn = null
-    @__kb.store.destroy() if @__kb.store_is_owned; @__kb.store = null
-    @__kb.co = null
+    @__kb.collection = null
+    kb.utils.wrappedObservable(this, null)
     super
 
     kb.stats.collection_observables-- if Knockback.stats_on       # collect memory management statistics
@@ -206,16 +215,12 @@ class Knockback.CollectionObservable extends kb.RefCountable
     observable.remove(target)
     @trigger('remove', target, observable) # notify
 
-    # clean up view models
-    return unless @hasViewModels()
-    kb.utils.release(target)
-    kb.utils.wrappedModel(target, null)
+    # release
+    @__kb.store.release(target) if @hasViewModels()
 
   _onModelChange: (model) ->
-    # sorted_index required
-    if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
-      @_onModelResort(model)
-    kb.utils.wrappedObservable(this).valueHasMutated()
+    # resort if needed
+    @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
 
   _onModelResort: (model) ->
     # either move a view model or a model
@@ -239,9 +244,8 @@ class Knockback.CollectionObservable extends kb.RefCountable
     @trigger('remove', observable()) if not silent # notify
     targets = observable.removeAll() # batch
 
-    # clean up view models
-    return unless @hasViewModels()
-    kb.utils.release(view_model) for view_model in targets
+    # release
+    (@__kb.store.release(target) for target in targets) if @hasViewModels()
 
   _collectionResync: (silent) ->
     @_clear(silent)
@@ -266,13 +270,14 @@ class Knockback.CollectionObservable extends kb.RefCountable
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
   _createTarget: (model) ->
-    return model unless @view_model_create_fn
-    return @__kb.store.resolve(model, =>
+    create_fn = =>
       options = @__kb.store.addResolverToOptions({}, model)
-      view_model = if @view_model_create_with_new then (new @view_model_create_fn(model, options)) else @view_model_create_fn(model, options)
+      observable = kb.utils.wrappedObservable(this)
+      view_model = if @view_model_create_with_new then (new @view_model_create_fn(model, options, observable)) else @view_model_create_fn(model, options, observable)
       kb.utils.wrappedModel(view_model, model)
       return view_model
-    )
+
+    return if @hasViewModels() then @__kb.store.resolve(model, create_fn) else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

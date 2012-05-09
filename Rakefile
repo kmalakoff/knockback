@@ -17,7 +17,7 @@ task :watch do
   begin
     exec "cd #{PROJECT_ROOT}; ruby script/watch.rb"
   rescue LoadError
-    puts "build failed: ensure you have coffee-script ('npm install coffee-script -g') and jammit ('(sudo) gem install jammit') installed"
+    puts "build failed: ensure you have run the initialization scripts 'bundle install' and 'npm install'"
     exit
   end
 end
@@ -48,7 +48,7 @@ task :package do
     config = YAML::load( File.open( 'config/assets_min.yaml' ) )
     config['javascripts'].each{|key, value| transfer_header(key.chomp('.min')+'.js', key+'.js')}
   rescue LoadError
-    puts "build failed: ensure you have coffee-script ('npm install coffee-script -g') and jammit ('(sudo) gem install jammit') installed"
+    puts "build failed: ensure you have run the initialization scripts 'bundle install' and 'npm install'"
     exit
   end
 end

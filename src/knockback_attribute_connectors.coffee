@@ -69,23 +69,22 @@ class Knockback.AttributeConnector
     return 'simple'
 
   @createByType = (type, model, key, options) ->
-    if (type == 'simple')
-      return kb.simpleAttributeConnector(model, key, options)
+    switch type
+      when 'collection'
+        attribute_options = if options then _.clone(options) else {}
+        attribute_options.view_model = kb.ViewModel if not (options.view_model or options.view_model_create or options.children or options.create)
+        options.store.addResolverToOptions(attribute_options, model.get(key)) if options.store
+        return kb.collectionAttributeConnector(model, key, attribute_options)
 
-    # INFER: kb.CollectionObservable
-    else if (type == 'collection')
-      attribute_options = if options then _.clone(options) else {}
-      attribute_options.view_model = kb.ViewModel if not (options.view_model or options.view_model_create or options.children or options.create)
-      options.__kb_store.addResolverToOptions(attribute_options, model.get(key)) if options.__kb_store
-      return kb.collectionAttributeConnector(model, key, attribute_options)
+      when 'model'
+        attribute_options = if options then _.clone(options) else {}
+        attribute_options.options = {} unless attribute_options.options
+        attribute_options.view_model = kb.ViewModel if not (options.view_model or options.view_model_create or options.children or options.create)
+        options.store.addResolverToOptions(attribute_options.options, model.get(key)) if options.store
+        return kb.viewModelAttributeConnector(model, key, attribute_options)
 
-    # INFER: kb.ViewModel
-    else
-      attribute_options = if options then _.clone(options) else {}
-      attribute_options.options = {} unless attribute_options.options
-      attribute_options.view_model = kb.ViewModel if not (options.view_model or options.view_model_create or options.children or options.create)
-      options.__kb_store.addResolverToOptions(attribute_options.options, model.get(key)) if options.__kb_store
-      return kb.viewModelAttributeConnector(model, key, attribute_options)
+      else
+        return kb.simpleAttributeConnector(model, key, options)
 
   @createOrUpdate = (attribute_connector, model, key, options) ->
     # update an existing attribute_connector
@@ -105,20 +104,24 @@ class Knockback.AttributeConnector
 
     # a custom creator function
     if options.hasOwnProperty('create')
+      throw new Error('Knockback.AttributeConnector: options.create is empty') if not options.create
       return options.create(model, key, options.options||{})
 
     value = model.get(key)
 
     # use passed view_model function
     if options.hasOwnProperty('view_model')
+      throw new Error('Knockback.AttributeConnector: options.view_model is empty') if not options.view_model
       return new options.view_model(value, options.options||{})
 
     # use passed view_model_create function
     else if options.hasOwnProperty('view_model_create')
+      throw new Error('Knockback.AttributeConnector: options.view_model_create is empty') if not options.view_model_create
       return options.view_model_create(value, options.options||{})
 
     # a collection
     else if options.hasOwnProperty('children')
+      throw new Error('Knockback.AttributeConnector: options.children is empty') if not options.children
       if (typeof(options.children) == 'function')
         attribute_options = {view_model: options.children}
       else
@@ -168,8 +171,8 @@ class Knockback.CollectionAttributeConnector extends Knockback.AttributeConnecto
     current_value = @__kb.value_observable()
 
     if not current_value
-      if @options.__kb_store
-        @__kb.value_observable(@options.__kb_store.resolve(value, => kb.collectionObservable(value, @options)))
+      if @options.store
+        @__kb.value_observable(@options.store.resolve(value, => kb.collectionObservable(value, @options)))
       else
         @__kb.value_observable(kb.collectionObservable(value, @options))
     else
@@ -199,8 +202,8 @@ class Knockback.ViewModelAttributeConnector extends Knockback.AttributeConnector
 
     if not current_value
       view_model_options = if @options.options then _.clone(@options.options) else {}
-      if view_model_options.__kb_store
-        @__kb.value_observable(view_model_options.__kb_store.resolve(value, => if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options)))
+      if view_model_options.store
+        @__kb.value_observable(view_model_options.store.resolve(value, => if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options)))
       else
         @__kb.value_observable(if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options))
     else

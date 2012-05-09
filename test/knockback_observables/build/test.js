@@ -125,17 +125,15 @@ $(document).ready(function() {
     equal(view_model.name2(), 'Ringo', "Name changed");
     return kb.utils.release(view_model);
   });
-  test("Option to override the default read-only state {write: true}", function() {
+  test("Option to override the default read-only state {read_only: false}", function() {
     var ContactViewModel, current_date, model, view_model;
     ContactViewModel = function(model) {
       this.attribute_observables = kb.observables(model, {
         name: {
-          key: 'name',
-          read_only: false
+          key: 'name'
         },
         number: {
-          key: 'number',
-          write: true
+          key: 'number'
         },
         date: {
           key: 'date',
@@ -143,10 +141,10 @@ $(document).ready(function() {
         },
         name2: {
           key: 'name',
-          write: false
+          read_only: true
         }
       }, this, {
-        read_only: true
+        read_only: false
       });
       return this;
     };
@@ -177,13 +175,13 @@ $(document).ready(function() {
     equal(view_model.name2(), 'Paul', "Name not changed");
     return kb.utils.release(view_model);
   });
-  test("Option to override the default read-only state {write: true}", function() {
+  test("Option to override the default read-only state {read_only: true}", function() {
     var ContactViewModel, current_date, model, view_model;
     ContactViewModel = function(model) {
       this.attribute_observables = kb.observables(model, {
         name: {
           key: 'name',
-          write: true
+          read_only: false
         },
         number: {
           key: 'number',
@@ -191,14 +189,14 @@ $(document).ready(function() {
         },
         date: {
           key: 'date',
-          localizer: LongDateLocalizer
+          localizer: LongDateLocalizer,
+          read_only: false
         },
         name2: {
-          key: 'name',
-          write: false
+          key: 'name'
         }
       }, this, {
-        write: false
+        read_only: true
       });
       return this;
     };
@@ -281,5 +279,11 @@ $(document).ready(function() {
     equal(view_model.name2(), 'John', "Name not changed");
     return kb.utils.release(view_model);
   });
-  return test("Error cases", function() {});
+  return test("Error cases", function() {
+    return raises((function() {
+      return kb.observables(new Backbone.Model({
+        name: 'name1'
+      }), 'name');
+    }), Error, 'Observables: mappings_info is missing');
+  });
 });

@@ -461,3 +461,22 @@ Final notes
 
 
 In addition to the examples in the test folder (https://github.com/kmalakoff/knockback/blob/master/test), you can look at the examples_lib folder for a sample kb.locale_manager, a localized string, and some examples of localized observables.
+
+Building the library
+-----------------------
+
+Installing:
+
+1. install ruby: http://www.ruby-lang.org
+2. install bundler: http://gembundler.com
+3. install gems: (sudo) 'bundle install'
+4. install node.js: http://nodejs.org
+5. install node packages: (sudo) 'npm install'
+
+Commands:
+
+1. 'rake clean' - cleans the project of all compiled files
+2. 'rake build' - performs a single build
+3. 'rake watch' - automatically scans for and builds the project when changes are detected
+4. 'rake package' - cleans the project of all compiled files, builds, and minimizes library
+

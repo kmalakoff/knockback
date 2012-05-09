@@ -101,14 +101,14 @@ $(document).ready( ->
     kb.utils.release(view_model)
   )
 
-  test("Option to override the default read-only state {write: true}", ->
+  test("Option to override the default read-only state {read_only: false}", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
-        name:     {key: 'name', read_only: false}
-        number:   {key: 'number', write: true}  # LEGACY
+        name:     {key: 'name'}
+        number:   {key: 'number'}
         date:     {key: 'date', localizer: LongDateLocalizer}
-        name2:    {key: 'name', write: false}  # LEGACY
-      }, this, {read_only: true})
+        name2:    {key: 'name', read_only: true}
+      }, this, {read_only: false})
       @
 
     model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
@@ -138,14 +138,14 @@ $(document).ready( ->
     kb.utils.release(view_model)
   )
 
-  test("Option to override the default read-only state {write: true}", ->
+  test("Option to override the default read-only state {read_only: true}", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
-        name:     {key: 'name', write: true} # LEGACY
+        name:     {key: 'name', read_only: false}
         number:   {key: 'number', read_only: false}
-        date:     {key: 'date', localizer: LongDateLocalizer}
-        name2:    {key: 'name', write: false}  # LEGACY
-      }, this, {write: false})  # LEGACY
+        date:     {key: 'date', localizer: LongDateLocalizer, read_only: false}
+        name2:    {key: 'name'}
+      }, this, {read_only: true})
       @
 
     model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
@@ -213,6 +213,8 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
+    raises((->kb.observables(new Backbone.Model({name: 'name1'}), 'name')), Error, 'Observables: mappings_info is missing')
+
     # TODO
   )
 )

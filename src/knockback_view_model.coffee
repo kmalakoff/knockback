@@ -29,9 +29,10 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
     kb.stats.view_models++ if Knockback.stats_on        # collect memory management statistics
 
     # register ourselves to handle recursive view models
-    kb.Store.resolveFromOptions(options, this)
+    kb.Store.resolveFromOptions(options, this) unless options.store_skip_resolve
+
     # always use a store to ensure recursive view models are handled correctly
-    if options.__kb_store then (@__kb.store = options.__kb_store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
+    if options.store then (@__kb.store = options.store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
 
     @__kb._onModelChange = _.bind(@_onModelChange, @)
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
@@ -126,14 +127,14 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
         options = @__kb.children[key]
         if (typeof(options) == 'function') # a view model short form for a view model
           options = {view_model: options}
-        options.options = {read_only: @__kb.read_only, __kb_store: @__kb.store}
+        options.options = {read_only: @__kb.read_only, store: @__kb.store}
         return options
       else if @__kb.children.hasOwnProperty('create')
-        return {create: @__kb.children.create, options:{read_only: @__kb.read_only, __kb_store: @__kb.store}}
+        return {create: @__kb.children.create, options:{read_only: @__kb.read_only, store: @__kb.store}}
     else if @__kb.create
-      return {create: @__kb.create, options:{read_only: @__kb.read_only, __kb_store: @__kb.store}}
+      return {create: @__kb.create, options:{read_only: @__kb.read_only, store: @__kb.store}}
 
-    return {read_only: @__kb.read_only, __kb_store: @__kb.store}
+    return {read_only: @__kb.read_only, store: @__kb.store}
 
 # factory function
 Knockback.viewModel = (model, options) -> return new Knockback.ViewModel(model, options)

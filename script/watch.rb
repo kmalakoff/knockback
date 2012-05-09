@@ -9,19 +9,13 @@ SRC_DIRS = [
   'src/**/*.coffee',
 
   'examples_lib/**/*.coffee',
-
-  'test/knockback_core/**/*.coffee',
-  'test/knockback_packaging/**/*.coffee',
-  'test/backbone_modelref/**/*.coffee',
-  'test/backbone_relational/**/*.coffee',
-  'test/knockback_collection_observable/**/*.coffee',
-  'test/knockback_formatted_observable/**/*.coffee',
-  'test/knockback_localized_observable/**/*.coffee',
-  'test/knockback_observable/**/*.coffee',
-  'test/knockback_observables/**/*.coffee',
-  'test/knockback_triggered_observable/**/*.coffee',
-  'test/knockback_view_model/**/*.coffee',
 ]
+
+# add tests
+config = YAML::load( File.open( 'config/config.yaml' ) )
+if config && config['test_dirs']
+  config['test_dirs'].each{|path| SRC_DIRS.push(path+'/**/*.coffee')}
+end
 
 in_build = false
 change_file = nil

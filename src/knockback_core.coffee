@@ -53,6 +53,10 @@ Knockback.utils.wrappedObservable = (instance, observable) ->
     observable.__kb.instance = instance
   return observable
 
+Knockback.wrappedObservable = (instance) ->  # LEGACY
+  kb.utils.legacyWarning('kb.wrappedObservable', '0.16.0', 'Please use kb.utils.wrappedObservable instead')
+  return kb.utils.wrappedObservable(instance)
+
 Knockback.utils.observableInstanceOf = (observable, type) ->
   return false unless observable
   return false unless observable.__kb and observable.__kb.instance
@@ -90,15 +94,14 @@ Knockback.vmSetToDefault = (view_model) ->
 
 Knockback.utils.release = (obj) ->
   # known type
-  if ko.isObservable(obj) or (obj instanceof kb.Observables) or (obj instanceof kb.ViewModel_RCBase)
+  if ko.isObservable(obj) or (obj instanceof kb.Observables) or (typeof(obj.release) == 'function') or (typeof(obj.destroy) == 'function')
     if obj.release
       obj.release()
     else if obj.destroy
       obj.destroy()
     else if obj.dispose
       obj.dispose()
-    else
-      return false
+
     return true # was released
 
   # view model
@@ -107,7 +110,9 @@ Knockback.utils.release = (obj) ->
       continue if !value or (key == '__kb')
       obj[key] = null if kb.utils.release(value)
 
-    return true
+    return true # was released
+
+  return false
 
 Knockback.vmRelease = (view_model) ->
   kb.utils.legacyWarning('kb.vmRelease', '0.16.0', 'Please use kb.utils.release instead')
@@ -117,8 +122,12 @@ Knockback.vmReleaseObservable = (observable) ->
   kb.utils.legacyWarning('kb.vmReleaseObservable', '0.16.0', 'Please use kb.utils.release instead')
   return kb.utils.release(observable)
 
-# LEGACY support
-for key, fn of Knockback.utils
-  Knockback[key] = ->
-    kb.utils.legacyWarning("kb.#{key}", '0.16.0', "Please use kb.utils.#{key} instead")
-    return kb.utils[key].apply(null, arguments)
+kb.utils.optionsCreateClear = (options) ->
+  delete options['create']
+  delete options['children']
+  delete options['view_model']
+  delete options['view_model_create']
+
+kb.utils.optionsCreateOverride = (options, create_options) ->
+  kb.utils.optionsCreateClear(options)
+  return _.extend(options, create_options)
