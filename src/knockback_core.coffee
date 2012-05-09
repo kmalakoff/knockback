@@ -62,20 +62,20 @@ Knockback.utils.observableInstanceOf = (observable, type) ->
   return false unless observable.__kb and observable.__kb.instance
   return (observable.__kb.instance instanceof type)
 
-Knockback.utils.wrappedModel = (instance, model) ->
+Knockback.utils.wrappedModel = (view_model, model) ->
   # get
   if (arguments.length == 1)
-    return if (instance and instance.__kb and instance.__kb.hasOwnProperty('model')) then instance.__kb.model else instance
+    return if (view_model and view_model.__kb and view_model.__kb.hasOwnProperty('model')) then view_model.__kb.model else view_model
 
   # set
-  throw new Error('Knockback: no instance for wrapping a model') unless instance
-  instance.__kb or= {}
-  instance.__kb.model = model
+  throw new Error('Knockback: no view_model for wrapping a model') unless view_model
+  view_model.__kb or= {}
+  view_model.__kb.model = model
   return model
 
-Knockback.viewModelGetModel = Knockback.vmModel = (instance) ->  # LEGACY
+Knockback.viewModelGetModel = Knockback.vmModel = (view_model) ->  # LEGACY
   kb.utils.legacyWarning('kb.vmModel', '0.16.0', 'Please use kb.utils.wrappedModel instead')
-  return kb.utils.wrappedModel(instance)
+  return kb.utils.wrappedModel(view_model)
 
 Knockback.utils.setToDefault = (obj) ->
   return unless obj
@@ -93,6 +93,8 @@ Knockback.vmSetToDefault = (view_model) ->
   kb.utils.setToDefault(view_model)
 
 Knockback.utils.release = (obj) ->
+  return false unless obj
+
   # known type
   if ko.isObservable(obj) or (obj instanceof kb.Observables) or (typeof(obj.release) == 'function') or (typeof(obj.destroy) == 'function')
     if obj.release

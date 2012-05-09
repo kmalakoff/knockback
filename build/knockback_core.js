@@ -81,25 +81,25 @@ Knockback.utils.observableInstanceOf = function(observable, type) {
   return observable.__kb.instance instanceof type;
 };
 
-Knockback.utils.wrappedModel = function(instance, model) {
+Knockback.utils.wrappedModel = function(view_model, model) {
   if (arguments.length === 1) {
-    if (instance && instance.__kb && instance.__kb.hasOwnProperty('model')) {
-      return instance.__kb.model;
+    if (view_model && view_model.__kb && view_model.__kb.hasOwnProperty('model')) {
+      return view_model.__kb.model;
     } else {
-      return instance;
+      return view_model;
     }
   }
-  if (!instance) {
-    throw new Error('Knockback: no instance for wrapping a model');
+  if (!view_model) {
+    throw new Error('Knockback: no view_model for wrapping a model');
   }
-  instance.__kb || (instance.__kb = {});
-  instance.__kb.model = model;
+  view_model.__kb || (view_model.__kb = {});
+  view_model.__kb.model = model;
   return model;
 };
 
-Knockback.viewModelGetModel = Knockback.vmModel = function(instance) {
+Knockback.viewModelGetModel = Knockback.vmModel = function(view_model) {
   kb.utils.legacyWarning('kb.vmModel', '0.16.0', 'Please use kb.utils.wrappedModel instead');
-  return kb.utils.wrappedModel(instance);
+  return kb.utils.wrappedModel(view_model);
 };
 
 Knockback.utils.setToDefault = function(obj) {
@@ -126,6 +126,9 @@ Knockback.vmSetToDefault = function(view_model) {
 
 Knockback.utils.release = function(obj) {
   var key, value;
+  if (!obj) {
+    return false;
+  }
   if (ko.isObservable(obj) || (obj instanceof kb.Observables) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function')) {
     if (obj.release) {
       obj.release();

@@ -19,6 +19,8 @@ You can get the library here:
 [1]: https://github.com/kmalakoff/knockback/raw/master/knockback.js
 [2]: https://github.com/kmalakoff/knockback/raw/master/knockback.min.js
 
+**NOTE: there are breaking changes in 0.15.0** Please see the [release notes][http://kmalakoff.github.com/knockback/release_notes.html] for details.
+
 You can find Knockout [here][3], Backbone.js [here][4], and Underscore.js [here][5].
 
 [3]: https://github.com/SteveSanderson/knockout/downloads/
