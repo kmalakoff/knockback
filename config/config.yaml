@@ -11,5 +11,6 @@ test_dirs: [
   'test/knockback_observables',
   'test/knockback_triggered_observable',
   'test/knockback_view_model',
+  'test/knockback_view_model_min',
   'test/knockback_memory_management'
 ]
