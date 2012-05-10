@@ -36,14 +36,6 @@ Enjoy!
 
 Kevin
 
-Demos and Documentation
------------------------
-
-### Try the live demo: http://kmalakoff.github.com/knockback-todos/
-
-1. Knockback Todo app provides a **comprehesive documentation on Knockback**: https://github.com/kmalakoff/knockback-todos
-2. jsFiddle that demonstrates dynamic localization: http://jsfiddle.net/kmalakoff/QSkpv/
-
 An Example
 ----------
 
@@ -104,7 +96,13 @@ kb.utils.release(view_model)
 
 And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
 
-Of course, this is just a simple example, but hopefully you get the picture. For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
+Of course, this is just a simple example, but hopefully you get the picture. 
+
+Demos and Documentation
+-----------------------
+For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
+
+Try a live demo: http://kmalakoff.github.com/knockback-todos/ or http://jsfiddle.net/kmalakoff/QSkpv/
 
 
 Building the library
