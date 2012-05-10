@@ -85,7 +85,12 @@ Knockback.FormattedObservable = (function() {
   function FormattedObservable(format, args) {
     var observable, observable_args;
     this.__kb = {};
-    observable_args = Array.prototype.slice.call(arguments, 1);
+    if (_.isArray(args)) {
+      format = format;
+      observable_args = args;
+    } else {
+      observable_args = Array.prototype.slice.call(arguments, 1);
+    }
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: function() {
         var arg, _i, _len;
@@ -121,5 +126,5 @@ Knockback.FormattedObservable = (function() {
 })();
 
 Knockback.formattedObservable = function(format, args) {
-  return new Knockback.FormattedObservable(format, args);
+  return new Knockback.FormattedObservable(format, Array.prototype.slice.call(arguments, 1));
 };

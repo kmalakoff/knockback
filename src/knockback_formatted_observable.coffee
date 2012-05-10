@@ -59,7 +59,12 @@ Knockback.parseFormattedString = (string, format) ->
 class Knockback.FormattedObservable
   constructor: (format, args) ->
     @__kb = {}
-    observable_args = Array.prototype.slice.call(arguments, 1)
+    # being called by the factory function
+    if _.isArray(args)
+      format = format
+      observable_args = args
+    else
+      observable_args = Array.prototype.slice.call(arguments, 1)
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: ->
         args = [ko.utils.unwrapObservable(format)]
@@ -78,4 +83,4 @@ class Knockback.FormattedObservable
   destroy: ->
     kb.utils.wrappedObservable(this, null)
 
-Knockback.formattedObservable = (format, args) -> return new Knockback.FormattedObservable(format, args)
+Knockback.formattedObservable = (format, args) -> return new Knockback.FormattedObservable(format, Array.prototype.slice.call(arguments, 1))
