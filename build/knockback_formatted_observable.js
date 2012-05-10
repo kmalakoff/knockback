@@ -78,31 +78,48 @@ Knockback.parseFormattedString = function(string, format) {
   return results;
 };
 
+Knockback.FormattedObservable = (function() {
+
+  FormattedObservable.name = 'FormattedObservable';
+
+  function FormattedObservable(format, args) {
+    var observable, observable_args;
+    this.__kb = {};
+    observable_args = Array.prototype.slice.call(arguments, 1);
+    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+      read: function() {
+        var arg, _i, _len;
+        args = [ko.utils.unwrapObservable(format)];
+        for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
+          arg = observable_args[_i];
+          args.push(ko.utils.unwrapObservable(arg));
+        }
+        return kb.toFormattedString.apply(null, args);
+      },
+      write: function(value) {
+        var index, matches, max_count, _results;
+        matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+        max_count = Math.min(observable_args.length, matches.length);
+        index = 0;
+        _results = [];
+        while (index < max_count) {
+          observable_args[index](matches[index]);
+          _results.push(index++);
+        }
+        return _results;
+      }
+    }));
+    return observable;
+  }
+
+  FormattedObservable.prototype.destroy = function() {
+    return kb.utils.wrappedObservable(this, null);
+  };
+
+  return FormattedObservable;
+
+})();
+
 Knockback.formattedObservable = function(format, args) {
-  var observable_args, result;
-  observable_args = Array.prototype.slice.call(arguments, 1);
-  result = ko.dependentObservable({
-    read: function() {
-      var arg, _i, _len;
-      args = [ko.utils.unwrapObservable(format)];
-      for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
-        arg = observable_args[_i];
-        args.push(ko.utils.unwrapObservable(arg));
-      }
-      return kb.toFormattedString.apply(null, args);
-    },
-    write: function(value) {
-      var index, matches, max_count, _results;
-      matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
-      max_count = Math.min(observable_args.length, matches.length);
-      index = 0;
-      _results = [];
-      while (index < max_count) {
-        observable_args[index](matches[index]);
-        _results.push(index++);
-      }
-      return _results;
-    }
-  });
-  return result;
+  return new Knockback.FormattedObservable(format, args);
 };

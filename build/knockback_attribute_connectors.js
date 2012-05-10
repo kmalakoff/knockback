@@ -261,7 +261,7 @@ Knockback.CollectionAttributeConnector = (function(_super) {
     current_value = this.__kb.value_observable();
     if (!current_value) {
       if (this.options.store) {
-        return this.__kb.value_observable(this.options.store.resolve(value, function() {
+        return this.__kb.value_observable(this.options.store.resolveValue(value, function() {
           return kb.collectionObservable(value, _this.options);
         }));
       } else {
@@ -325,7 +325,7 @@ Knockback.ViewModelAttributeConnector = (function(_super) {
     if (!current_value) {
       view_model_options = this.options.options ? _.clone(this.options.options) : {};
       if (view_model_options.store) {
-        return this.__kb.value_observable(view_model_options.store.resolve(value, function() {
+        return this.__kb.value_observable(view_model_options.store.resolveValue(value, function() {
           if (_this.options.view_model) {
             return new _this.options.view_model(value, view_model_options);
           } else {

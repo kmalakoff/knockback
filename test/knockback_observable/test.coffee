@@ -7,7 +7,7 @@ $(document).ready( ->
   test("Standard use case: direct attributes with read and write", ->
     ContactViewModel = (model) ->
       @name = kb.observable(model, 'name')
-      @number = kb.observable(model, {key:'number', read_only: true}, this)
+      @number = kb.observable(model, {key:'number', read_only: true})
       @
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
@@ -41,7 +41,7 @@ $(document).ready( ->
         key:'number'
         read: -> return "#: #{model.get('number')}"
         write: (value) -> model.set({number: value.substring(3)})
-      }, this)
+      })
       @
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})

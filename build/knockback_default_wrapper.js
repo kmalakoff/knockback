@@ -7,25 +7,54 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
 
-Knockback.defaultWrapper = function(target_observable, default_value_observable) {
-  var default_wrapper_observable;
-  default_wrapper_observable = ko.dependentObservable({
-    read: function() {
-      var default_value, value;
-      value = ko.utils.unwrapObservable(target_observable());
-      default_value = ko.utils.unwrapObservable(default_value_observable);
-      if (value) {
-        return value;
-      } else {
-        return default_value;
+if (!this.Knockback) {
+  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
+}
+
+Knockback.DefaultWrapper = (function() {
+
+  DefaultWrapper.name = 'DefaultWrapper';
+
+  function DefaultWrapper(target_observable, default_value_observable) {
+    var observable,
+      _this = this;
+    this.default_value_observable = default_value_observable;
+    this.__kb = {};
+    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+      read: function() {
+        var current_default, current_target;
+        current_target = ko.utils.unwrapObservable(target_observable());
+        current_default = ko.utils.unwrapObservable(_this.default_value_observable);
+        if (!current_target) {
+          return current_default;
+        } else {
+          return current_target;
+        }
+      },
+      write: function(value) {
+        return target_observable(value);
       }
-    },
-    write: function(value) {
-      return target_observable(value);
-    }
-  });
-  default_wrapper_observable.setToDefault = function() {
-    return default_wrapper_observable(default_value_observable);
+    }));
+    observable.destroy = _.bind(this.destroy, this);
+    observable.setToDefault = _.bind(this.setToDefault, this);
+    return observable;
+  }
+
+  DefaultWrapper.prototype.destroy = function() {
+    kb.utils.wrappedObservable(this, null);
+    return this.default_value = null;
   };
-  return default_wrapper_observable;
+
+  DefaultWrapper.prototype.setToDefault = function() {
+    var observable;
+    observable = kb.utils.wrappedObservable(this);
+    return observable(this.default_value_observable);
+  };
+
+  return DefaultWrapper;
+
+})();
+
+Knockback.defaultWrapper = function(target, default_value) {
+  return new Knockback.DefaultWrapper(target, default_value);
 };

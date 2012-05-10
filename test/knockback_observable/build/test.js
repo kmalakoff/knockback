@@ -14,7 +14,7 @@ $(document).ready(function() {
       this.number = kb.observable(model, {
         key: 'number',
         read_only: true
-      }, this);
+      });
       return this;
     };
     model = new Contact({
@@ -60,7 +60,7 @@ $(document).ready(function() {
             number: value.substring(3)
           });
         }
-      }, this);
+      });
       return this;
     };
     model = new Contact({

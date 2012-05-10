@@ -113,14 +113,14 @@ class Knockback.CollectionObservable extends kb.RefCountable
   retain: -> super; return kb.utils.wrappedObservable(this)
   release: -> observable = kb.utils.wrappedObservable(this); super; return observable
 
-  collection: (new_collection, options) ->
+  collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(this)
     if (arguments.length == 0)
       observable() # force a dependency
       return @__kb.collection
 
     # no change
-    return if (new_collection == @__kb.collection)
+    return if (collection == @__kb.collection)
 
     # clean up
     if @__kb.collection
@@ -129,7 +129,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
       @__kb.collection.release?(); @__kb.collection = null
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
-    @__kb.collection = new_collection
+    @__kb.collection = collection
     if @__kb.collection
       @__kb.collection.retain?()
       @_collectionBind(@__kb.collection)
@@ -216,7 +216,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
     @trigger('remove', target, observable) # notify
 
     # release
-    @__kb.store.release(target) if @hasViewModels()
+    @__kb.store.releaseValue(target) if @hasViewModels()
 
   _onModelChange: (model) ->
     # resort if needed
@@ -245,7 +245,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
     targets = observable.removeAll() # batch
 
     # release
-    (@__kb.store.release(target) for target in targets) if @hasViewModels()
+    (@__kb.store.releaseValue(target) for target in targets) if @hasViewModels()
 
   _collectionResync: (silent) ->
     @_clear(silent)
@@ -277,7 +277,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
       kb.utils.wrappedModel(view_model, model)
       return view_model
 
-    return if @hasViewModels() then @__kb.store.resolve(model, create_fn) else model
+    return if @hasViewModels() then @__kb.store.resolveValue(model, create_fn) else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

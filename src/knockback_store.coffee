@@ -32,7 +32,7 @@ class Knockback.Store
         kb.utils.release(value)
     @values = null
 
-  register: (key, value) ->
+  registerValue: (key, value) ->
     value.retain() if (value instanceof kb.RefCountable)
     index = _.indexOf(@keys, key)
     if (index >= 0)
@@ -42,7 +42,7 @@ class Knockback.Store
       @values.push(value)
     return value
 
-  resolve: (key, create_fn, args) ->
+  resolveValue: (key, create_fn, args) ->
     # use an existing
     index = _.indexOf(@keys, key)
     if (index >= 0)
@@ -65,14 +65,14 @@ class Knockback.Store
 
     # update the stored value
     if @keys[index] != key
-      @register(key, value)
+      @registerValue(key, value)
     else if not @values[index]
       value.retain() if (value instanceof kb.RefCountable)
       @values[index] = value
 
     return value
 
-  release: (value) ->
+  releaseValue: (value) ->
     return unless (value instanceof kb.RefCountable)
     value.release()
     return if (value.refCount() > 0)
@@ -85,4 +85,4 @@ class Knockback.Store
 
   @resolveFromOptions: (options, value) ->
     return unless options.store and options.store_key
-    options.store.register(options.store_key, value)
+    options.store.registerValue(options.store_key, value)

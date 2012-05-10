@@ -7,7 +7,7 @@
 ###
 
 ####################################################
-# options
+# mapping_info
 #   * key - required to look up the model's attributes
 #   * read - called to get the value and each time the locale changes
 #   * write - called to set the value
@@ -15,11 +15,11 @@
 ####################################################
 
 class Knockback.Observable
-  constructor: (@model, @options, @view_model={}) ->
+  constructor: (@model, @mapping_info, @view_model={}) ->
     throw new Error('Observable: model is missing') if not @model
-    throw new Error('Observable: options is missing') if not @options
-    @options = {key: @options} if _.isString(@options) or ko.isObservable(@options)
-    throw new Error('Observable: options.key is missing') if not @options.key
+    throw new Error('Observable: mapping_info is missing') if not @mapping_info
+    @mapping_info = {key: @mapping_info} if _.isString(@mapping_info) or ko.isObservable(@mapping_info)
+    throw new Error('Observable: mapping_info.key is missing') if not @mapping_info.key
 
     @__kb = {}
     @__kb._onModelChange = _.bind(@_onModelChange, @)
@@ -27,7 +27,7 @@ class Knockback.Observable
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
     # LEGACY
-    (@options = _.clone(@options); @options.read_only = !@options.write) if @options.hasOwnProperty('write') and _.isBoolean(@options.write)
+    (@mapping_info = _.clone(@mapping_info); @mapping_info.read_only = !@mapping_info.write) if @mapping_info.hasOwnProperty('write') and _.isBoolean(@mapping_info.write)
 
     # determine model or model_ref type
     if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
@@ -38,10 +38,10 @@ class Knockback.Observable
 
     # internal state
     @__kb.value_observable = ko.observable()
-    @__kb.localizer = new @options.localizer(@_getCurrentValue()) if @options.localizer
+    @__kb.localizer = new @mapping_info.localizer(@_getCurrentValue()) if @mapping_info.localizer
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @options.read_only then (=> throw new Error("Knockback.Observable: #{@options.key} is read only")) else _.bind(@_onSetValue, @)
+      write: if @mapping_info.read_only then (=> throw new Error("Knockback.Observable: #{@mapping_info.key} is read only")) else _.bind(@_onSetValue, @)
       owner: @view_model
     }))
 
@@ -62,7 +62,7 @@ class Knockback.Observable
       @model_ref.unbind('loaded', @__kb._onModelLoaded)
       @model_ref.unbind('unloaded', @__kb._onModelUnloaded)
       @model_ref.release(); @model_ref = null
-    @options  = null; @view_model = null
+    @mapping_info  = null; @view_model = null
     @__kb = null
 
   setToDefault: ->
@@ -76,23 +76,23 @@ class Knockback.Observable
   # Internal
   ####################################################
   _getDefaultValue: ->
-    return '' if not @options.hasOwnProperty('default')
-    return if (typeof(@options.default) == 'function') then @options.default() else @options.default
+    return '' if not @mapping_info.hasOwnProperty('default')
+    return if (typeof(@mapping_info.default) == 'function') then @mapping_info.default() else @mapping_info.default
 
   _getCurrentValue: ->
     return @_getDefaultValue() if not @model
-    key = ko.utils.unwrapObservable(@options.key)
+    key = ko.utils.unwrapObservable(@mapping_info.key)
     args = [key]
-    if not _.isUndefined(@options.args)
-      if _.isArray(@options.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @options.args) else args.push(ko.utils.unwrapObservable(@options.args))
-    return if @options.read then @options.read.apply(@view_model, args) else @model.get.apply(@model, args)
+    if not _.isUndefined(@mapping_info.args)
+      if _.isArray(@mapping_info.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @mapping_info.args) else args.push(ko.utils.unwrapObservable(@mapping_info.args))
+    return if @mapping_info.read then @mapping_info.read.apply(@view_model, args) else @model.get.apply(@model, args)
 
   _onGetValue: ->
     # trigger all the dependables
     @__kb.value_observable()
-    ko.utils.unwrapObservable(@options.key)
-    if not _.isUndefined(@options.args)
-      if _.isArray(@options.args) then (ko.utils.unwrapObservable(arg) for arg in @options.args) else ko.utils.unwrapObservable(@options.args)
+    ko.utils.unwrapObservable(@mapping_info.key)
+    if not _.isUndefined(@mapping_info.args)
+      if _.isArray(@mapping_info.args) then (ko.utils.unwrapObservable(arg) for arg in @mapping_info.args) else ko.utils.unwrapObservable(@mapping_info.args)
     value = @_getCurrentValue()
 
     if @__kb.localizer
@@ -106,11 +106,11 @@ class Knockback.Observable
       value = @__kb.localizer.observedValue()
 
     if @model
-      set_info = {}; set_info[ko.utils.unwrapObservable(@options.key)] = value
-      args = if (typeof(@options.write) == 'function') then [value] else [set_info]
-      if not _.isUndefined(@options.args)
-        if _.isArray(@options.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @options.args) else args.push(ko.utils.unwrapObservable(@options.args))
-      if (typeof(@options.write) == 'function') then @options.write.apply(@view_model, args) else @model.set.apply(@model, args)
+      set_info = {}; set_info[ko.utils.unwrapObservable(@mapping_info.key)] = value
+      args = if (typeof(@mapping_info.write) == 'function') then [value] else [set_info]
+      if not _.isUndefined(@mapping_info.args)
+        if _.isArray(@mapping_info.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @mapping_info.args) else args.push(ko.utils.unwrapObservable(@mapping_info.args))
+      if (typeof(@mapping_info.write) == 'function') then @mapping_info.write.apply(@view_model, args) else @model.set.apply(@model, args)
     if @__kb.localizer then @__kb.value_observable(@__kb.localizer()) else @__kb.value_observable(value) # trigger the dependable and store the correct value
 
   _modelBind: (model) ->
@@ -140,7 +140,7 @@ class Knockback.Observable
     @model = null
 
   _onModelChange: ->
-    return if (@model and @model.hasChanged) and not @model.hasChanged(ko.utils.unwrapObservable(@options.key)) # no change, nothing to do
+    return if (@model and @model.hasChanged) and not @model.hasChanged(ko.utils.unwrapObservable(@mapping_info.key)) # no change, nothing to do
     @_updateValue()
 
   _updateValue: ->
@@ -151,4 +151,4 @@ class Knockback.Observable
     @__kb.value_observable(value) # trigger the dependable
 
 # factory function
-Knockback.observable = (model, options, view_model) -> return new Knockback.Observable(model, options, view_model)
+Knockback.observable = (model, mapping_info, view_model) -> return new Knockback.Observable(model, mapping_info, view_model)

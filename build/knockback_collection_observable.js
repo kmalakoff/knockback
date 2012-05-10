@@ -127,14 +127,14 @@ Knockback.CollectionObservable = (function(_super) {
     return observable;
   };
 
-  CollectionObservable.prototype.collection = function(new_collection, options) {
+  CollectionObservable.prototype.collection = function(collection, options) {
     var observable, _base, _base1;
     observable = kb.utils.wrappedObservable(this);
     if (arguments.length === 0) {
       observable();
       return this.__kb.collection;
     }
-    if (new_collection === this.__kb.collection) {
+    if (collection === this.__kb.collection) {
       return;
     }
     if (this.__kb.collection) {
@@ -145,7 +145,7 @@ Knockback.CollectionObservable = (function(_super) {
       }
       this.__kb.collection = null;
     }
-    this.__kb.collection = new_collection;
+    this.__kb.collection = collection;
     if (this.__kb.collection) {
       if (typeof (_base1 = this.__kb.collection).retain === "function") {
         _base1.retain();
@@ -294,7 +294,7 @@ Knockback.CollectionObservable = (function(_super) {
     observable.remove(target);
     this.trigger('remove', target, observable);
     if (this.hasViewModels()) {
-      return this.__kb.store.release(target);
+      return this.__kb.store.releaseValue(target);
     }
   };
 
@@ -335,7 +335,7 @@ Knockback.CollectionObservable = (function(_super) {
       _results = [];
       for (_i = 0, _len = targets.length; _i < _len; _i++) {
         target = targets[_i];
-        _results.push(this.__kb.store.release(target));
+        _results.push(this.__kb.store.releaseValue(target));
       }
       return _results;
     }
@@ -394,7 +394,7 @@ Knockback.CollectionObservable = (function(_super) {
       return view_model;
     };
     if (this.hasViewModels()) {
-      return this.__kb.store.resolve(model, create_fn);
+      return this.__kb.store.resolveValue(model, create_fn);
     } else {
       return model;
     }

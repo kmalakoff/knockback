@@ -172,7 +172,7 @@ class Knockback.CollectionAttributeConnector extends Knockback.AttributeConnecto
 
     if not current_value
       if @options.store
-        @__kb.value_observable(@options.store.resolve(value, => kb.collectionObservable(value, @options)))
+        @__kb.value_observable(@options.store.resolveValue(value, => kb.collectionObservable(value, @options)))
       else
         @__kb.value_observable(kb.collectionObservable(value, @options))
     else
@@ -203,7 +203,7 @@ class Knockback.ViewModelAttributeConnector extends Knockback.AttributeConnector
     if not current_value
       view_model_options = if @options.options then _.clone(@options.options) else {}
       if view_model_options.store
-        @__kb.value_observable(view_model_options.store.resolve(value, => if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options)))
+        @__kb.value_observable(view_model_options.store.resolveValue(value, => if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options)))
       else
         @__kb.value_observable(if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options))
     else

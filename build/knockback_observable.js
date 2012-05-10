@@ -11,33 +11,33 @@ Knockback.Observable = (function() {
 
   Observable.name = 'Observable';
 
-  function Observable(model, options, view_model) {
+  function Observable(model, mapping_info, view_model) {
     var observable,
       _this = this;
     this.model = model;
-    this.options = options;
+    this.mapping_info = mapping_info;
     this.view_model = view_model != null ? view_model : {};
     if (!this.model) {
       throw new Error('Observable: model is missing');
     }
-    if (!this.options) {
-      throw new Error('Observable: options is missing');
+    if (!this.mapping_info) {
+      throw new Error('Observable: mapping_info is missing');
     }
-    if (_.isString(this.options) || ko.isObservable(this.options)) {
-      this.options = {
-        key: this.options
+    if (_.isString(this.mapping_info) || ko.isObservable(this.mapping_info)) {
+      this.mapping_info = {
+        key: this.mapping_info
       };
     }
-    if (!this.options.key) {
-      throw new Error('Observable: options.key is missing');
+    if (!this.mapping_info.key) {
+      throw new Error('Observable: mapping_info.key is missing');
     }
     this.__kb = {};
     this.__kb._onModelChange = _.bind(this._onModelChange, this);
     this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
     this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
-    if (this.options.hasOwnProperty('write') && _.isBoolean(this.options.write)) {
-      this.options = _.clone(this.options);
-      this.options.read_only = !this.options.write;
+    if (this.mapping_info.hasOwnProperty('write') && _.isBoolean(this.mapping_info.write)) {
+      this.mapping_info = _.clone(this.mapping_info);
+      this.mapping_info.read_only = !this.mapping_info.write;
     }
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
       this.model_ref = this.model;
@@ -47,13 +47,13 @@ Knockback.Observable = (function() {
       this.model = this.model_ref.getModel();
     }
     this.__kb.value_observable = ko.observable();
-    if (this.options.localizer) {
-      this.__kb.localizer = new this.options.localizer(this._getCurrentValue());
+    if (this.mapping_info.localizer) {
+      this.__kb.localizer = new this.mapping_info.localizer(this._getCurrentValue());
     }
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(this._onGetValue, this),
-      write: this.options.read_only ? (function() {
-        throw new Error("Knockback.Observable: " + _this.options.key + " is read only");
+      write: this.mapping_info.read_only ? (function() {
+        throw new Error("Knockback.Observable: " + _this.mapping_info.key + " is read only");
       }) : _.bind(this._onSetValue, this),
       owner: this.view_model
     }));
@@ -78,7 +78,7 @@ Knockback.Observable = (function() {
       this.model_ref.release();
       this.model_ref = null;
     }
-    this.options = null;
+    this.mapping_info = null;
     this.view_model = null;
     return this.__kb = null;
   };
@@ -94,13 +94,13 @@ Knockback.Observable = (function() {
   };
 
   Observable.prototype._getDefaultValue = function() {
-    if (!this.options.hasOwnProperty('default')) {
+    if (!this.mapping_info.hasOwnProperty('default')) {
       return '';
     }
-    if (typeof this.options["default"] === 'function') {
-      return this.options["default"]();
+    if (typeof this.mapping_info["default"] === 'function') {
+      return this.mapping_info["default"]();
     } else {
-      return this.options["default"];
+      return this.mapping_info["default"];
     }
   };
 
@@ -109,21 +109,21 @@ Knockback.Observable = (function() {
     if (!this.model) {
       return this._getDefaultValue();
     }
-    key = ko.utils.unwrapObservable(this.options.key);
+    key = ko.utils.unwrapObservable(this.mapping_info.key);
     args = [key];
-    if (!_.isUndefined(this.options.args)) {
-      if (_.isArray(this.options.args)) {
-        _ref = this.options.args;
+    if (!_.isUndefined(this.mapping_info.args)) {
+      if (_.isArray(this.mapping_info.args)) {
+        _ref = this.mapping_info.args;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           arg = _ref[_i];
           args.push(ko.utils.unwrapObservable(arg));
         }
       } else {
-        args.push(ko.utils.unwrapObservable(this.options.args));
+        args.push(ko.utils.unwrapObservable(this.mapping_info.args));
       }
     }
-    if (this.options.read) {
-      return this.options.read.apply(this.view_model, args);
+    if (this.mapping_info.read) {
+      return this.mapping_info.read.apply(this.view_model, args);
     } else {
       return this.model.get.apply(this.model, args);
     }
@@ -132,16 +132,16 @@ Knockback.Observable = (function() {
   Observable.prototype._onGetValue = function() {
     var arg, value, _i, _len, _ref;
     this.__kb.value_observable();
-    ko.utils.unwrapObservable(this.options.key);
-    if (!_.isUndefined(this.options.args)) {
-      if (_.isArray(this.options.args)) {
-        _ref = this.options.args;
+    ko.utils.unwrapObservable(this.mapping_info.key);
+    if (!_.isUndefined(this.mapping_info.args)) {
+      if (_.isArray(this.mapping_info.args)) {
+        _ref = this.mapping_info.args;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           arg = _ref[_i];
           ko.utils.unwrapObservable(arg);
         }
       } else {
-        ko.utils.unwrapObservable(this.options.args);
+        ko.utils.unwrapObservable(this.mapping_info.args);
       }
     }
     value = this._getCurrentValue();
@@ -160,21 +160,21 @@ Knockback.Observable = (function() {
     }
     if (this.model) {
       set_info = {};
-      set_info[ko.utils.unwrapObservable(this.options.key)] = value;
-      args = typeof this.options.write === 'function' ? [value] : [set_info];
-      if (!_.isUndefined(this.options.args)) {
-        if (_.isArray(this.options.args)) {
-          _ref = this.options.args;
+      set_info[ko.utils.unwrapObservable(this.mapping_info.key)] = value;
+      args = typeof this.mapping_info.write === 'function' ? [value] : [set_info];
+      if (!_.isUndefined(this.mapping_info.args)) {
+        if (_.isArray(this.mapping_info.args)) {
+          _ref = this.mapping_info.args;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             arg = _ref[_i];
             args.push(ko.utils.unwrapObservable(arg));
           }
         } else {
-          args.push(ko.utils.unwrapObservable(this.options.args));
+          args.push(ko.utils.unwrapObservable(this.mapping_info.args));
         }
       }
-      if (typeof this.options.write === 'function') {
-        this.options.write.apply(this.view_model, args);
+      if (typeof this.mapping_info.write === 'function') {
+        this.mapping_info.write.apply(this.view_model, args);
       } else {
         this.model.set.apply(this.model, args);
       }
@@ -226,7 +226,7 @@ Knockback.Observable = (function() {
   };
 
   Observable.prototype._onModelChange = function() {
-    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(ko.utils.unwrapObservable(this.options.key))) {
+    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(ko.utils.unwrapObservable(this.mapping_info.key))) {
       return;
     }
     return this._updateValue();
@@ -246,6 +246,6 @@ Knockback.Observable = (function() {
 
 })();
 
-Knockback.observable = function(model, options, view_model) {
-  return new Knockback.Observable(model, options, view_model);
+Knockback.observable = function(model, mapping_info, view_model) {
+  return new Knockback.Observable(model, mapping_info, view_model);
 };

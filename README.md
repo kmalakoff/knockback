@@ -16,8 +16,8 @@ You can get the library here:
 * [Development version][1]
 * [Production version][2]
 
-[1]: https://github.com/kmalakoff/knockback/raw/master/knockback.js
-[2]: https://github.com/kmalakoff/knockback/raw/master/knockback.min.js
+[1]: https://raw.github.com/kmalakoff/knockback/0.15.0/knockback.js
+[2]: https://raw.github.com/kmalakoff/knockback/0.15.0/knockback.min.js
 
 **NOTE: there are breaking changes in 0.15.0** Please see the [release notes][http://kmalakoff.github.com/knockback/release_notes.html] for details.
 

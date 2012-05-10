@@ -274,7 +274,7 @@ Knockback.Store = (function() {
     return this.values = null;
   };
 
-  Store.prototype.register = function(key, value) {
+  Store.prototype.registerValue = function(key, value) {
     var index;
     if (value instanceof kb.RefCountable) {
       value.retain();
@@ -289,7 +289,7 @@ Knockback.Store = (function() {
     return value;
   };
 
-  Store.prototype.resolve = function(key, create_fn, args) {
+  Store.prototype.resolveValue = function(key, create_fn, args) {
     var index, value;
     index = _.indexOf(this.keys, key);
     if (index >= 0) {
@@ -311,7 +311,7 @@ Knockback.Store = (function() {
     }
     value = create_fn.apply(null, Array.prototype.slice.call(arguments, 2));
     if (this.keys[index] !== key) {
-      this.register(key, value);
+      this.registerValue(key, value);
     } else if (!this.values[index]) {
       if (value instanceof kb.RefCountable) {
         value.retain();
@@ -321,7 +321,7 @@ Knockback.Store = (function() {
     return value;
   };
 
-  Store.prototype.release = function(value) {
+  Store.prototype.releaseValue = function(value) {
     var index;
     if (!(value instanceof kb.RefCountable)) {
       return;
@@ -348,7 +348,7 @@ Knockback.Store = (function() {
     if (!(options.store && options.store_key)) {
       return;
     }
-    return options.store.register(options.store_key, value);
+    return options.store.registerValue(options.store_key, value);
   };
 
   return Store;
@@ -484,14 +484,14 @@ Knockback.CollectionObservable = (function(_super) {
     return observable;
   };
 
-  CollectionObservable.prototype.collection = function(new_collection, options) {
+  CollectionObservable.prototype.collection = function(collection, options) {
     var observable, _base, _base1;
     observable = kb.utils.wrappedObservable(this);
     if (arguments.length === 0) {
       observable();
       return this.__kb.collection;
     }
-    if (new_collection === this.__kb.collection) {
+    if (collection === this.__kb.collection) {
       return;
     }
     if (this.__kb.collection) {
@@ -502,7 +502,7 @@ Knockback.CollectionObservable = (function(_super) {
       }
       this.__kb.collection = null;
     }
-    this.__kb.collection = new_collection;
+    this.__kb.collection = collection;
     if (this.__kb.collection) {
       if (typeof (_base1 = this.__kb.collection).retain === "function") {
         _base1.retain();
@@ -651,7 +651,7 @@ Knockback.CollectionObservable = (function(_super) {
     observable.remove(target);
     this.trigger('remove', target, observable);
     if (this.hasViewModels()) {
-      return this.__kb.store.release(target);
+      return this.__kb.store.releaseValue(target);
     }
   };
 
@@ -692,7 +692,7 @@ Knockback.CollectionObservable = (function(_super) {
       _results = [];
       for (_i = 0, _len = targets.length; _i < _len; _i++) {
         target = targets[_i];
-        _results.push(this.__kb.store.release(target));
+        _results.push(this.__kb.store.releaseValue(target));
       }
       return _results;
     }
@@ -751,7 +751,7 @@ Knockback.CollectionObservable = (function(_super) {
       return view_model;
     };
     if (this.hasViewModels()) {
-      return this.__kb.store.resolve(model, create_fn);
+      return this.__kb.store.resolveValue(model, create_fn);
     } else {
       return model;
     }
@@ -784,27 +784,56 @@ Knockback.sortedIndexWrapAttr = Knockback.siwa = function(attribute_name, wrappe
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 */
 
-Knockback.defaultWrapper = function(target_observable, default_value_observable) {
-  var default_wrapper_observable;
-  default_wrapper_observable = ko.dependentObservable({
-    read: function() {
-      var default_value, value;
-      value = ko.utils.unwrapObservable(target_observable());
-      default_value = ko.utils.unwrapObservable(default_value_observable);
-      if (value) {
-        return value;
-      } else {
-        return default_value;
+if (!this.Knockback) {
+  throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file');
+}
+
+Knockback.DefaultWrapper = (function() {
+
+  DefaultWrapper.name = 'DefaultWrapper';
+
+  function DefaultWrapper(target_observable, default_value_observable) {
+    var observable,
+      _this = this;
+    this.default_value_observable = default_value_observable;
+    this.__kb = {};
+    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+      read: function() {
+        var current_default, current_target;
+        current_target = ko.utils.unwrapObservable(target_observable());
+        current_default = ko.utils.unwrapObservable(_this.default_value_observable);
+        if (!current_target) {
+          return current_default;
+        } else {
+          return current_target;
+        }
+      },
+      write: function(value) {
+        return target_observable(value);
       }
-    },
-    write: function(value) {
-      return target_observable(value);
-    }
-  });
-  default_wrapper_observable.setToDefault = function() {
-    return default_wrapper_observable(default_value_observable);
+    }));
+    observable.destroy = _.bind(this.destroy, this);
+    observable.setToDefault = _.bind(this.setToDefault, this);
+    return observable;
+  }
+
+  DefaultWrapper.prototype.destroy = function() {
+    kb.utils.wrappedObservable(this, null);
+    return this.default_value = null;
   };
-  return default_wrapper_observable;
+
+  DefaultWrapper.prototype.setToDefault = function() {
+    var observable;
+    observable = kb.utils.wrappedObservable(this);
+    return observable(this.default_value_observable);
+  };
+
+  return DefaultWrapper;
+
+})();
+
+Knockback.defaultWrapper = function(target, default_value) {
+  return new Knockback.DefaultWrapper(target, default_value);
 };
 
 // Generated by CoffeeScript 1.3.1
@@ -887,33 +916,50 @@ Knockback.parseFormattedString = function(string, format) {
   return results;
 };
 
+Knockback.FormattedObservable = (function() {
+
+  FormattedObservable.name = 'FormattedObservable';
+
+  function FormattedObservable(format, args) {
+    var observable, observable_args;
+    this.__kb = {};
+    observable_args = Array.prototype.slice.call(arguments, 1);
+    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+      read: function() {
+        var arg, _i, _len;
+        args = [ko.utils.unwrapObservable(format)];
+        for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
+          arg = observable_args[_i];
+          args.push(ko.utils.unwrapObservable(arg));
+        }
+        return kb.toFormattedString.apply(null, args);
+      },
+      write: function(value) {
+        var index, matches, max_count, _results;
+        matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+        max_count = Math.min(observable_args.length, matches.length);
+        index = 0;
+        _results = [];
+        while (index < max_count) {
+          observable_args[index](matches[index]);
+          _results.push(index++);
+        }
+        return _results;
+      }
+    }));
+    return observable;
+  }
+
+  FormattedObservable.prototype.destroy = function() {
+    return kb.utils.wrappedObservable(this, null);
+  };
+
+  return FormattedObservable;
+
+})();
+
 Knockback.formattedObservable = function(format, args) {
-  var observable_args, result;
-  observable_args = Array.prototype.slice.call(arguments, 1);
-  result = ko.dependentObservable({
-    read: function() {
-      var arg, _i, _len;
-      args = [ko.utils.unwrapObservable(format)];
-      for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
-        arg = observable_args[_i];
-        args.push(ko.utils.unwrapObservable(arg));
-      }
-      return kb.toFormattedString.apply(null, args);
-    },
-    write: function(value) {
-      var index, matches, max_count, _results;
-      matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
-      max_count = Math.min(observable_args.length, matches.length);
-      index = 0;
-      _results = [];
-      while (index < max_count) {
-        observable_args[index](matches[index]);
-        _results.push(index++);
-      }
-      return _results;
-    }
-  });
-  return result;
+  return new Knockback.FormattedObservable(format, args);
 };
 
 // Generated by CoffeeScript 1.3.1
@@ -1076,33 +1122,33 @@ Knockback.Observable = (function() {
 
   Observable.name = 'Observable';
 
-  function Observable(model, options, view_model) {
+  function Observable(model, mapping_info, view_model) {
     var observable,
       _this = this;
     this.model = model;
-    this.options = options;
+    this.mapping_info = mapping_info;
     this.view_model = view_model != null ? view_model : {};
     if (!this.model) {
       throw new Error('Observable: model is missing');
     }
-    if (!this.options) {
-      throw new Error('Observable: options is missing');
+    if (!this.mapping_info) {
+      throw new Error('Observable: mapping_info is missing');
     }
-    if (_.isString(this.options) || ko.isObservable(this.options)) {
-      this.options = {
-        key: this.options
+    if (_.isString(this.mapping_info) || ko.isObservable(this.mapping_info)) {
+      this.mapping_info = {
+        key: this.mapping_info
       };
     }
-    if (!this.options.key) {
-      throw new Error('Observable: options.key is missing');
+    if (!this.mapping_info.key) {
+      throw new Error('Observable: mapping_info.key is missing');
     }
     this.__kb = {};
     this.__kb._onModelChange = _.bind(this._onModelChange, this);
     this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
     this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
-    if (this.options.hasOwnProperty('write') && _.isBoolean(this.options.write)) {
-      this.options = _.clone(this.options);
-      this.options.read_only = !this.options.write;
+    if (this.mapping_info.hasOwnProperty('write') && _.isBoolean(this.mapping_info.write)) {
+      this.mapping_info = _.clone(this.mapping_info);
+      this.mapping_info.read_only = !this.mapping_info.write;
     }
     if (Backbone.ModelRef && (this.model instanceof Backbone.ModelRef)) {
       this.model_ref = this.model;
@@ -1112,13 +1158,13 @@ Knockback.Observable = (function() {
       this.model = this.model_ref.getModel();
     }
     this.__kb.value_observable = ko.observable();
-    if (this.options.localizer) {
-      this.__kb.localizer = new this.options.localizer(this._getCurrentValue());
+    if (this.mapping_info.localizer) {
+      this.__kb.localizer = new this.mapping_info.localizer(this._getCurrentValue());
     }
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(this._onGetValue, this),
-      write: this.options.read_only ? (function() {
-        throw new Error("Knockback.Observable: " + _this.options.key + " is read only");
+      write: this.mapping_info.read_only ? (function() {
+        throw new Error("Knockback.Observable: " + _this.mapping_info.key + " is read only");
       }) : _.bind(this._onSetValue, this),
       owner: this.view_model
     }));
@@ -1143,7 +1189,7 @@ Knockback.Observable = (function() {
       this.model_ref.release();
       this.model_ref = null;
     }
-    this.options = null;
+    this.mapping_info = null;
     this.view_model = null;
     return this.__kb = null;
   };
@@ -1159,13 +1205,13 @@ Knockback.Observable = (function() {
   };
 
   Observable.prototype._getDefaultValue = function() {
-    if (!this.options.hasOwnProperty('default')) {
+    if (!this.mapping_info.hasOwnProperty('default')) {
       return '';
     }
-    if (typeof this.options["default"] === 'function') {
-      return this.options["default"]();
+    if (typeof this.mapping_info["default"] === 'function') {
+      return this.mapping_info["default"]();
     } else {
-      return this.options["default"];
+      return this.mapping_info["default"];
     }
   };
 
@@ -1174,21 +1220,21 @@ Knockback.Observable = (function() {
     if (!this.model) {
       return this._getDefaultValue();
     }
-    key = ko.utils.unwrapObservable(this.options.key);
+    key = ko.utils.unwrapObservable(this.mapping_info.key);
     args = [key];
-    if (!_.isUndefined(this.options.args)) {
-      if (_.isArray(this.options.args)) {
-        _ref = this.options.args;
+    if (!_.isUndefined(this.mapping_info.args)) {
+      if (_.isArray(this.mapping_info.args)) {
+        _ref = this.mapping_info.args;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           arg = _ref[_i];
           args.push(ko.utils.unwrapObservable(arg));
         }
       } else {
-        args.push(ko.utils.unwrapObservable(this.options.args));
+        args.push(ko.utils.unwrapObservable(this.mapping_info.args));
       }
     }
-    if (this.options.read) {
-      return this.options.read.apply(this.view_model, args);
+    if (this.mapping_info.read) {
+      return this.mapping_info.read.apply(this.view_model, args);
     } else {
       return this.model.get.apply(this.model, args);
     }
@@ -1197,16 +1243,16 @@ Knockback.Observable = (function() {
   Observable.prototype._onGetValue = function() {
     var arg, value, _i, _len, _ref;
     this.__kb.value_observable();
-    ko.utils.unwrapObservable(this.options.key);
-    if (!_.isUndefined(this.options.args)) {
-      if (_.isArray(this.options.args)) {
-        _ref = this.options.args;
+    ko.utils.unwrapObservable(this.mapping_info.key);
+    if (!_.isUndefined(this.mapping_info.args)) {
+      if (_.isArray(this.mapping_info.args)) {
+        _ref = this.mapping_info.args;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           arg = _ref[_i];
           ko.utils.unwrapObservable(arg);
         }
       } else {
-        ko.utils.unwrapObservable(this.options.args);
+        ko.utils.unwrapObservable(this.mapping_info.args);
       }
     }
     value = this._getCurrentValue();
@@ -1225,21 +1271,21 @@ Knockback.Observable = (function() {
     }
     if (this.model) {
       set_info = {};
-      set_info[ko.utils.unwrapObservable(this.options.key)] = value;
-      args = typeof this.options.write === 'function' ? [value] : [set_info];
-      if (!_.isUndefined(this.options.args)) {
-        if (_.isArray(this.options.args)) {
-          _ref = this.options.args;
+      set_info[ko.utils.unwrapObservable(this.mapping_info.key)] = value;
+      args = typeof this.mapping_info.write === 'function' ? [value] : [set_info];
+      if (!_.isUndefined(this.mapping_info.args)) {
+        if (_.isArray(this.mapping_info.args)) {
+          _ref = this.mapping_info.args;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             arg = _ref[_i];
             args.push(ko.utils.unwrapObservable(arg));
           }
         } else {
-          args.push(ko.utils.unwrapObservable(this.options.args));
+          args.push(ko.utils.unwrapObservable(this.mapping_info.args));
         }
       }
-      if (typeof this.options.write === 'function') {
-        this.options.write.apply(this.view_model, args);
+      if (typeof this.mapping_info.write === 'function') {
+        this.mapping_info.write.apply(this.view_model, args);
       } else {
         this.model.set.apply(this.model, args);
       }
@@ -1291,7 +1337,7 @@ Knockback.Observable = (function() {
   };
 
   Observable.prototype._onModelChange = function() {
-    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(ko.utils.unwrapObservable(this.options.key))) {
+    if ((this.model && this.model.hasChanged) && !this.model.hasChanged(ko.utils.unwrapObservable(this.mapping_info.key))) {
       return;
     }
     return this._updateValue();
@@ -1311,8 +1357,8 @@ Knockback.Observable = (function() {
 
 })();
 
-Knockback.observable = function(model, options, view_model) {
-  return new Knockback.Observable(model, options, view_model);
+Knockback.observable = function(model, mapping_info, view_model) {
+  return new Knockback.Observable(model, mapping_info, view_model);
 };
 
 // Generated by CoffeeScript 1.3.1
@@ -1777,7 +1823,7 @@ Knockback.CollectionAttributeConnector = (function(_super) {
     current_value = this.__kb.value_observable();
     if (!current_value) {
       if (this.options.store) {
-        return this.__kb.value_observable(this.options.store.resolve(value, function() {
+        return this.__kb.value_observable(this.options.store.resolveValue(value, function() {
           return kb.collectionObservable(value, _this.options);
         }));
       } else {
@@ -1841,7 +1887,7 @@ Knockback.ViewModelAttributeConnector = (function(_super) {
     if (!current_value) {
       view_model_options = this.options.options ? _.clone(this.options.options) : {};
       if (view_model_options.store) {
-        return this.__kb.value_observable(view_model_options.store.resolve(value, function() {
+        return this.__kb.value_observable(view_model_options.store.resolveValue(value, function() {
           if (_this.options.view_model) {
             return new _this.options.view_model(value, view_model_options);
           } else {

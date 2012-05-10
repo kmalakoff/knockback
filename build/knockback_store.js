@@ -48,7 +48,7 @@ Knockback.Store = (function() {
     return this.values = null;
   };
 
-  Store.prototype.register = function(key, value) {
+  Store.prototype.registerValue = function(key, value) {
     var index;
     if (value instanceof kb.RefCountable) {
       value.retain();
@@ -63,7 +63,7 @@ Knockback.Store = (function() {
     return value;
   };
 
-  Store.prototype.resolve = function(key, create_fn, args) {
+  Store.prototype.resolveValue = function(key, create_fn, args) {
     var index, value;
     index = _.indexOf(this.keys, key);
     if (index >= 0) {
@@ -85,7 +85,7 @@ Knockback.Store = (function() {
     }
     value = create_fn.apply(null, Array.prototype.slice.call(arguments, 2));
     if (this.keys[index] !== key) {
-      this.register(key, value);
+      this.registerValue(key, value);
     } else if (!this.values[index]) {
       if (value instanceof kb.RefCountable) {
         value.retain();
@@ -95,7 +95,7 @@ Knockback.Store = (function() {
     return value;
   };
 
-  Store.prototype.release = function(value) {
+  Store.prototype.releaseValue = function(value) {
     var index;
     if (!(value instanceof kb.RefCountable)) {
       return;
@@ -122,7 +122,7 @@ Knockback.Store = (function() {
     if (!(options.store && options.store_key)) {
       return;
     }
-    return options.store.register(options.store_key, value);
+    return options.store.registerValue(options.store_key, value);
   };
 
   return Store;
