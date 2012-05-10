@@ -1,0 +1,114 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><title>Knockback.js Release Notes</title><link rel="stylesheet" href="vendor/stylesheets/bootstrap.min.css"><link rel="stylesheet" href="stylesheets/layout.css"><link rel="stylesheet" href="stylesheets/layout_components.css"><script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script><link rel="stylesheet" href="stylesheets/release_notes.css"><link rel="stylesheet" href="vendor/lib/highlight/highlightjs/stylesheets/dark.css"><script type="application/javascript" src="vendor/lib/highlight/highlightjs/highlight.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlightjs/languages/javascript.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlight-coffee.js"></script><script type="application/javascript" src="vendor/javascripts/bootstrap-dropdown.js"></script><script type="application/javascript" src="javascripts/interface.js"></script><script type="application/javascript">hljs.tabReplace = '  ';
+hljs.initHighlightingOnLoad();</script></head><body><div id="wrap"><div class="page navbar"><div class="navbar page"><div class="navbar-inner"><div class="container"><a class="brand">Knockback.js</a><ul class="nav"><li><a href="index.html">Home</a></li><li><a href="tutorial_getting_started.html">Getting Started</a></li><li><a href="docs.html">Docs</a></li><li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a><ul class="dropdown-menu"><li></li><a href="tutorial_getting_started.html">Getting Started</a><a href="tutorial_todos.html">Todos</a></ul></li><li class="active"><a href="release_notes.html">Release Notes</a></li></ul><div id="script_language"><div class="separator"><div class="selection codestyle"><div class="option"><input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"><label for="cs-cs">CoffeeScript</label></div><div class="option"><input id="cs-js" type="radio" name="codestyle" value="js"><label for="cs-js">Javascript</label></div></div></div></div></div></div></div></div></div><div id="wrap"><div class="page container"><header class="page"></header><content class="page"><section><h1>Upgrading to 0.15.0</h1><h2>New Stuff<p></p><ol><li>kb.CollectionObservable is now a ko.observableArray so you no longer need to supply the second parameter<p></p><pre data-for="cs"><code class="coffee"># WAS:
+view_model =
+  property: ko.observableArray()
+  collection_observable: kb.collectionObservable(collection, observable_array, options)
+  
+for model_view_model in view_model.property()
+  ...
+  
+# IS NOW:
+view_model =
+  property: kb.collectionObservable(collection, options)
+  
+for model_view_model in view_model.property()
+  ...</code></pre><pre data-for="js"><code class="javascript">// WAS:
+var view_model = {
+  property: ko.observableArray()
+  collection_observable: kb.collectionObservable(collection, observable_array, options)
+};
+
+var view_model;
+for (var i = 0, len = view_model.property().length; i < len; i++) {
+  view_model = view_model.property()[i];
+  ...
+}
+
+// IS NOW:
+var view_model = {
+  property: kb.collectionObservable(collection, options)
+};
+
+var view_model;
+for (var i = 0, len = view_model.property().length; i < len; i++) {
+  view_model = view_model.property()[i];
+  ...
+}
+</code></pre></li><li>kb.ViewModel now handles nested models (like self-referencing Backbone-Relational.js models)<p></p><pre data-for="cs"><code class="coffee">class Person extends Backbone.RelationalModel
+  relations: [{
+    type: Backbone.HasMany
+    key: 'friends'
+    relatedModel: Person
+  }]
+  
+john = new Person({
+  id: 'person-1'
+  name: 'John'
+  friends: ['person-2']
+})
+paul = new Person({
+  id: 'person-2'
+  name: 'Paul'
+  friends: ['person-1']
+})
+
+john_view_model = kb.viewModel(john)
+...
+kb.utils.release(john_view_model); john_view_model = null     # release when done</code></pre><pre data-for="js"><code class="javascript">var Person = Backbone.RelationalModel.extend({
+  relations: [{
+    type: Backbone.HasMany,
+    key: 'friends',
+    relatedModel: Person
+  }]
+});
+
+var john = new Person({
+  id: 'person-1',
+  name: 'John',
+  friends: ['person-2']
+});
+var paul = new Person({
+  id: 'person-2',
+  name: 'Paul',
+  friends: ['person-1']
+});
+
+var john_view_model = kb.viewModel(john);
+...
+kb.utils.release(john_view_model); john_view_model = null;     // release when done
+});</code></pre><div><span>See </span><a href="tutorial_inspector.html">the Knockback Inspector tutorial</a><span> with 'test' as the url for an example</span></div></li></ol></h2><h2>Required Changes<ol><li>kb.collectionObservable is now a ko.observableArray so you no longer need to supply the second parameter<div class="alert alert-info"><p>This means:</p><ul><li>kb.collectionObservables will hold Models if a view_model-create option is not passed to the constructor (you can call hasViewModels() to check)</li><li>kb.collectionObservables::eachViewModel(callback) has been deprecated since you have direct access to the array of models or view models</li></ul></div><div class="alert alert-error"><p>Required Changes:</p><ul><li>Update custom sort functions to use kb.utils.wrappedModel(model)<pre data-for="cs"><code class="coffee">collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name2'}, {name: 'name1'}]), {
+  view_model:     kb.ViewModel
+  sorted_index:   (models, model) -> return _.sortedIndex(models, model, (test) -> return kb.utils.wrappedModel(test).get('name') )
+})</code></pre><pre data-for="js"><code class="javascript">collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name2'}, {name: 'name1'}]), {
+  view_model: kb.ViewModel,
+  sorted_index: function(models, model) {
+    return _.sortedIndex(models, model, function(test) {
+      return kb.utils.wrappedModel(test).get('name');
+    });
+  }
+});</code></pre></li><li>Replace calls to kb.CollectionObservable::eachViewModel(callback) with direct iterations on the collection itself<pre data-for="cs"><code class="coffee">for view_model in collection_observable()
+  # do something</code></pre>)<pre data-for="js"><code class="javascript">var view_model;
+for (var i = 0, len = collection_observable().length; i < len; i++) {
+  view_model = collection_observable()[i];
+  // do something
+}
+</code></pre></li></ul></div></li><li>kb.collectionObservable no longer triggers changes when model attributes change (only when the list of models is modified)<div class="alert alert-error"><p>Required Changes:</p><ul><li>If you require triggering on model attribute changes, register with the collection and trigger them manually<pre data-for="cs"><code class="coffee">collection.bind('change', -> collection_observable.valueHasMutated())</code></pre><pre data-for="js"><code class="javascript">collection.bind('change', function(){ collection_observable.valueHasMutated(); });
+</code></pre></li></ul></div></li><li>Utility functions have been moved to kb.utils to be more consistent with Knockout<p>You can find all of the utility functions<a href="docs.html#utils"> here</a></p><div class="alert alert-error"><p>Here is a list of the deprecated functions:</p><ul><li>Knockback.wrappedObservable(instance) was replaced by kb.utils.wrappedObservable(instance {, observable})</li><li>Knockback.viewModelGetModel(view_model) and Knockback.vmModel(view_model) was replaced by kb.utils.wrappedObservable(view_model {, observable})</li><li>Knockback.vmRelease(view_model) was replaced by kb.utils.release(obj)</li><li>Knockback.vmReleaseObservable(observable) was replaced by kb.utils.release(obj)</li></ul></div></li><li>kb.LocalizedObservable now uses Backbone.extend for javascript inheritance so read/write options have been deprecated<div class="alert alert-error"><p>Required Changes:</p><ul><li>Use Coffeescript class extends or JavaScript extend() for kb.LocalizedObservable<pre data-for="cs"><code class="coffee">class MyLocalizer extends kb.LocalizedObservable
+  constructor: (value, options, view_model) ->
+    super; return kb.utils.wrappedObservable(this)
+  read: (value) ->
+    # return something
+  write: (localized_string, value) ->
+    # do something</code></pre><pre data-for="js"><code class="javascript">MyLocalizer = kb.LocalizedObservable.extend({
+  constructor: function(value, options, view_model) {
+    kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+    return kb.utils.wrappedObservable(this);
+  },
+  read: function(value) {
+    # return something
+  },
+  write: function(localized_string, value) {
+    # do something
+  }
+});
+</code></pre></li></ul></div></li></ol></h2></section></content><footer class="page"></footer></div></div></body></html>
