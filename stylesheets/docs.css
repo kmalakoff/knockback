@@ -42,9 +42,10 @@ div.api.container div.api.index .content li a:active {
   color: #00f;
 }
 div.api.container div.api.index .content li.type {
-  text-decoration: underline;
-  font-weight: bold;
   padding: 10px 0px 0px 0px;
+}
+div.api.container div.api.index .content li.type.active {
+  font-weight: bold;
 }
 div.api.container div.api.descriptions {
   height: 570px;
@@ -53,6 +54,9 @@ div.api.container div.api.descriptions .content {
   overflow-x: hidden;
   overflow-y: auto;
   height: 100%;
+}
+div.api.container div.api.descriptions .content .wrapper {
+  margin-bottom: 520px;
 }
 div.api.container div.api.descriptions .content h2 {
   font-size: 1.2em;

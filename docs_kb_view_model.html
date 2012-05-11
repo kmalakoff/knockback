@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><title>Knockback.js Docs</title><link rel="stylesheet" href="vendor/stylesheets/bootstrap.min.css"><link rel="stylesheet" href="stylesheets/layout.css"><link rel="stylesheet" href="stylesheets/layout_components.css"><script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script><link rel="stylesheet" href="stylesheets/docs.css"><link rel="stylesheet" href="vendor/lib/highlight/highlightjs/stylesheets/dark.css"><script type="application/javascript" src="vendor/lib/highlight/highlightjs/highlight.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlightjs/languages/javascript.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlight-coffee.js"></script><script type="application/javascript" src="vendor/javascripts/bootstrap-dropdown.js"></script><script type="application/javascript" src="javascripts/interface.js"></script><script type="application/javascript">hljs.tabReplace = '  ';
+hljs.initHighlightingOnLoad();</script></head><body><div id="wrap"><div class="page navbar"><div class="navbar page"><div class="navbar-inner"><div class="container"><a class="brand">Knockback.js</a><ul class="nav"><li><a href="index.html">Home</a></li><li><a href="tutorial_getting_started.html">Getting Started</a></li><li class="active"><a href="docs.html">Docs</a></li><li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a><ul class="dropdown-menu"><li></li><a href="tutorial_getting_started.html">Getting Started</a><a href="tutorial_todos.html">Todos</a></ul></li><li><a href="release_notes.html">Release Notes</a></li></ul><div id="script_language"><div class="separator"><div class="selection codestyle"><div class="option"><input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"><label for="cs-cs">CoffeeScript</label></div><div class="option"><input id="cs-js" type="radio" name="codestyle" value="js"><label for="cs-js">Javascript</label></div></div></div></div></div></div></div></div></div><div id="wrap"><div class="page container"><header class="page"></header><content class="page"><div class="api container"><h1>Knockback.js API and Usage Examples</h1><div class="container-fluid"><div class="row-fluid"><div class="span3 api index"><div class="content"><ul><li class="type active"><a href="docs_kb_view_model.html">kb.ViewModel</a><li>- <a href="#extend">extend</a></li><li>- <a href="#factory">kb.viewModel</a></li><li>- <a href="#constructor">constructor</a></li><li>- <a href="#model">model</a></li></li><li class="type"><a href="docs_kb_observable.html">kb.Observable</a></li><li class="type"><a href="docs_kb_observables.html">kb.Observables</a></li><li class="type"><a href="docs_kb_collection_observable.html">kb.CollectionObservable</a></li><li class="type"><a href="docs_kb_utils.html">kb.utils</a></li><li class="type"><a href="docs_kb_localized_observable.html">kb.LocalizedObservable</a></li><li class="type"><a href="docs_kb_formatted_observable.html">kb.FormattedObservable</a></li><li class="type"><a href="docs_kb_default_wrapper.html">kb.DefaultWrapper</a></li><li class="type"><a href="docs_kb_triggered_observable.html">kb.TriggeredObservable</a></li><li class="type"><a href="docs_kb_ref_countable.html">kb.RefCountable</a></li></ul></div></div><div class="span9 api descriptions"><div class="content"><div class="wrapper"><!--////////////////////////////////--><!-- kb.ViewModel--><!--////////////////////////////////--><h2>kb.ViewModel</h2><div>Used to generate observables automatically for a model's attributes</div><h4>Super class:<a href="#ref_countable"> kb.RefCountable</a></h4><h4>Example:</h4><pre data-for="cs"><code class="coffee">view_model = kb.viewModel(new Backbone.Model({first_name: "Planet", last_name: "Earth"}))
+
+# Do something then clean up
+# kb.utils.release(view_model); view_model = null
+</code></pre><pre data-for="js"><code class="javascript">var view_model = kb.viewModel(new Backbone.Model({first_name: "Planet", last_name: "Earth"}));
+
+// Do something then clean up
+// kb.utils.release(view_model); view_model = null;
+</code></pre><h3 id="extend">kb.ViewModel::extend(properties, [classProperties]) <span class="label label-success">class</span></h3><div>Used to derive a class in JavaScript (when CoffeeScript is not used)</div><h4>Example:</h4><pre data-for="cs"><code class="coffee">ViewModel = kb.ViewModel.extend({
+  constructor: (model) ->
+    kb.ViewModel.prototype.constructor.apply(this, arguments)
+    @full_name = ko.computed(=>{ return @first_name() + " " + @last_name(); })
+    
+var view_model = new ViewModel(model);
+</code></pre><pre data-for="js"><code class="javascript">var ViewModel = kb.ViewModel.extend({
+  constructor: function(model){
+    kb.ViewModel.prototype.constructor.apply(this, arguments);
+    this.full_name = ko.computed(function() { return this.first_name() + " " + this.last_name(); }, this);
+  }
+});
+var view_model = new ViewModel(model);
+</code></pre><h3 id="factory">kb.viewModel(model, [options]) <span class="label label-info">factory</span></h3><div>Used to derive a class in JavaScript (when CoffeeScript is not used)</div><h4>Parameters<ol><li><strong>model: </strong><span class="type">{ Backbone.Model }: </span><span>the model whose attributes will be synchronized</span></li><li><strong>options: </strong><span class="label label-inverse">optional</span><ul><li>internals <span class="type">{ [strings] }: </span></li><li>requires <span class="type">{ [strings] }: </span></li><li>children <span class="type">{ function(model, key, options) | {key: function(model, key, options)} }: </span></li><li>create <span class="type">{ function(model, key, options) }: </span></li><li>read_only <span class="type">{ boolean }: </span></li></ul></li></ol></h4><h4>Example:</h4><pre data-for="cs"><code class="coffee">view_model = kb.viewModel(model)
+</code></pre><pre data-for="js"><code class="javascript">var view_model = kb.viewModel(model);
+</code></pre><h3 id="constructor">constructor(model, [options])</h3><div>Used to derive a class in JavaScript (when CoffeeScript is not used)</div><h4>Parameters<ol><li><strong>model: </strong><span class="type">{ Backbone.Model }: </span><span>the model whose attributes will be synchronized</span></li><li><strong>options: </strong><span class="label label-inverse">optional</span><ul><li>internals <span class="type">{ [strings] }: </span></li><li>requires <span class="type">{ [strings] }: </span></li><li>children <span class="type">{ function(model, key, options) | {key: function(model, key, options)} }: </span></li><li>create <span class="type">{ function(model, key, options) }: </span></li><li>read_only <span class="type">{ boolean }: </span></li></ul></li></ol></h4><h4>Example:</h4><pre data-for="cs"><code class="coffee">view_model = new kb.ViewModel(model)
+</code></pre><pre data-for="js"><code class="javascript">var view_model = new kb.ViewModel(model);
+</code></pre><h3 id="model">model([model]) <span class="label label-important">dual purpose</span></h3><div>Used to get/set the model</div><h4>Parameters<ol><li><strong>model: </strong><span class="type">{ Backbone.Model }: </span><span class="label label-inverse">optional</span><span> the model to set on the view model </span></li></ol></h4><h4>Example:</h4><pre data-for="cs"><code class="coffee">view_model = kb.viewModel(new Backbone.Model({name: 'bob'}))
+
+# get
+the_model = view_model.model()
+
+# set
+view_model.model(new Backbone.Model({name: 'fred'}))
+</code></pre><pre data-for="js"><code class="javascript">var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
+
+// get
+var the_model = view_model.model();
+
+// set
+view_model.model(new Backbone.Model({name: 'fred'}));
+</code></pre></div></div></div></div></div></div></content><footer class="page"></footer></div></div></body></html>

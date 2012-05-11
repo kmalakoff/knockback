@@ -1,0 +1,64 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><title>Knockback.js Docs</title><link rel="stylesheet" href="vendor/stylesheets/bootstrap.min.css"><link rel="stylesheet" href="stylesheets/layout.css"><link rel="stylesheet" href="stylesheets/layout_components.css"><script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script><link rel="stylesheet" href="stylesheets/docs.css"><link rel="stylesheet" href="vendor/lib/highlight/highlightjs/stylesheets/dark.css"><script type="application/javascript" src="vendor/lib/highlight/highlightjs/highlight.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlightjs/languages/javascript.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlight-coffee.js"></script><script type="application/javascript" src="vendor/javascripts/bootstrap-dropdown.js"></script><script type="application/javascript" src="javascripts/interface.js"></script><script type="application/javascript">hljs.tabReplace = '  ';
+hljs.initHighlightingOnLoad();</script></head><body><div id="wrap"><div class="page navbar"><div class="navbar page"><div class="navbar-inner"><div class="container"><a class="brand">Knockback.js</a><ul class="nav"><li><a href="index.html">Home</a></li><li><a href="tutorial_getting_started.html">Getting Started</a></li><li class="active"><a href="docs.html">Docs</a></li><li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a><ul class="dropdown-menu"><li></li><a href="tutorial_getting_started.html">Getting Started</a><a href="tutorial_todos.html">Todos</a></ul></li><li><a href="release_notes.html">Release Notes</a></li></ul><div id="script_language"><div class="separator"><div class="selection codestyle"><div class="option"><input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"><label for="cs-cs">CoffeeScript</label></div><div class="option"><input id="cs-js" type="radio" name="codestyle" value="js"><label for="cs-js">Javascript</label></div></div></div></div></div></div></div></div></div><div id="wrap"><div class="page container"><header class="page"></header><content class="page"><div class="api container"><h1>Knockback.js API and Usage Examples</h1><div class="container-fluid"><div class="row-fluid"><div class="span3 api index"><div class="content"><ul><li class="type"><a href="docs_kb_view_model.html">kb.ViewModel</a></li><li class="type"><a href="docs_kb_observable.html">kb.Observable</a></li><li class="type active"><a href="docs_kb_observables.html">kb.Observables</a><li>- <a href="#factory">kb.observables</a></li><li>- <a href="#constructor">constructor</a></li><li>- <a href="#destroy">destroy</a></li><li>- <a href="#observable_set_to_default">setToDefault</a></li></li><li class="type"><a href="docs_kb_collection_observable.html">kb.CollectionObservable</a></li><li class="type"><a href="docs_kb_utils.html">kb.utils</a></li><li class="type"><a href="docs_kb_localized_observable.html">kb.LocalizedObservable</a></li><li class="type"><a href="docs_kb_formatted_observable.html">kb.FormattedObservable</a></li><li class="type"><a href="docs_kb_default_wrapper.html">kb.DefaultWrapper</a></li><li class="type"><a href="docs_kb_triggered_observable.html">kb.TriggeredObservable</a></li><li class="type"><a href="docs_kb_ref_countable.html">kb.RefCountable</a></li></ul></div></div><div class="span9 api descriptions"><div class="content"><div class="wrapper"><!--////////////////////////////////--><!-- kb.Observables--><!--////////////////////////////////--><h2>kb.Observables</h2><div>Used to generate observables manually for a model's attributes</div><h4>Example:</h4><pre data-for="cs"><code class="coffee">ContactViewModel = (model) ->
+  @attribute_observables = kb.observables(model, {
+    name:     {key: 'name', read_only: true}
+    number:   'number'
+    date:     {key:'date', localizer: LongDateLocalizer}
+    name2:    {key: 'name', read_only: true}
+  }, this)
+  @
+  
+model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+view_model = new ContactViewModel(model)
+</code></pre><pre data-for="js"><code class="javascript">var ContactViewModel = function(model) {
+  this.attribute_observables = kb.observables(model, {
+    name:     {key: 'name', read_only: true}
+    number:   'number'
+    date:     {key:'date', localizer: LongDateLocalizer}
+    name2:    {key: 'name', read_only: true}
+  }, this);
+};
+
+var model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)});
+view_model = new ContactViewModel(model);
+</code></pre><h3 id="factory">kb.observables(model, mappings_info, [view_model], [options]) <span class="label label-info">factory</span></h3><div>Used to create a new instance</div><h4>Parameters<ol><li><strong>model: </strong><span class="type">{ Backbone.Model }: </span><span>the model whose attributes will be synchronized </span></li><li><strong>mappings_info: </strong><span class="type"> { [mapping_info as would be passed to each kb.observable | string for an attribute key] + {key: string}}: </span></li><li><strong>view_model: </strong><span class="label label-inverse">optional</span><span> the view model target to set the properties for each mapped attribute (the kb.Observables instance itself will always have the generated observables set in its properties) </span></li><li><strong>options: </strong><span class="label label-inverse">optional</span><span class="type"> { boolean for read_only | {read_only: boolean} }: </span><span> the view model target to set the properties for each mapped attribute (the kb.Observables instance itself will always have the generated observables set in its properties) </span></li></ol></h4><h4>Example:</h4><pre data-for="cs"><code class="coffee">view_model = {}
+kb.observables(model, {name: 'name', date: 'date'}, view_model)
+</code></pre><pre data-for="js"><code class="javascript">var view_model = {}
+kb.observables(model, {name: 'name', date: 'date'}, view_model);
+</code></pre><h3 id="constructor">constructor(model, mappings_info, [view_model], [options]) </h3><div>Used to create a new instance</div><h4>Parameters<ol><li><strong>model: </strong><span class="type">{ Backbone.Model }: </span><span>the model whose attributes will be synchronized </span></li><li><strong>mappings_info: </strong><span class="type"> { [mapping_info as would be passed to each kb.observable | string for an attribute key] + {key: string}}: </span></li><li><strong>view_model: </strong><span class="label label-inverse">optional</span><span> the view model target to set the properties for each mapped attribute (the kb.Observables instance itself will always have the generated observables set in its properties) </span></li><li><strong>options: </strong><span class="label label-inverse">optional</span><span class="type"> { boolean for read_only | {read_only: boolean} }: </span><span> the view model target to set the properties for each mapped attribute (the kb.Observables instance itself will always have the generated observables set in its properties) </span></li></ol></h4><h4>Example:</h4><pre data-for="cs"><code class="coffee">view_model = {}
+new kb.Observables(model, {name: 'name', date: 'date'}, view_model)
+</code></pre><pre data-for="js"><code class="javascript">var view_model = {}
+new kb.Observables(model, {name: 'name', date: 'date'}, view_model);
+</code></pre><h3 id="destroy">destroy()</h3><div>Used to release the memory of the object</div><h3 id="set_to_default">setToDefault()</h3><div>Used to return all of the owned observables to their default values (if they exist)</div><pre data-for="cs"><code class="coffee">ContactViewModel = (model) ->
+  @loading_message = ko.observable('(none)')
+  @attribute_observables = kb.observables(model, {
+    name:     {key:'name', default: @loading_message}
+    number:   {key:'number', default: @loading_message}
+  }, this)
+  @
+  
+view_model = new ContactViewModel(new Backbone.Model({name: 'Bob'}))
+# name is Bob and number is (none)
+
+view_model.setToDefault()
+# name and number are (none)
+
+view_model.loading_message('(nada)')
+# name and number are (nada)
+</code></pre><pre data-for="js"><code class="javascript">var ContactViewModel = function(model){
+  this.loading_message = ko.observable('(none)');
+  this.attribute_observables = kb.observables(model, {
+    name:     {key:'name', default: @loading_message},
+    number:   {key:'number', default: @loading_message}
+  }, this);
+};
+
+var view_model = new ContactViewModel(new Backbone.Model({name: 'Bob'}));
+// name is Bob and number is (none)
+
+view_model.attribute_observables.setToDefault()
+// name and number are (none)
+
+view_model.loading_message('(nada)')
+// name and number are (nada)
+</code></pre></div></div></div></div></div></div></content><footer class="page"></footer></div></div></body></html>
