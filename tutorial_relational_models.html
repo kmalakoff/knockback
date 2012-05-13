@@ -11,7 +11,7 @@ hljs.initHighlightingOnLoad();</script></head><body><div id="wrap"><div class="p
 &lt;br/&gt;
 
 &lt;div id='br_relational_models'&gt;
-  &lt;p&gt;Location: &lt;span data-bind=&quot;text: location&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;p&gt;Location: &lt;input data-bind=&quot;value: location&quot;/&gt;&lt;/p&gt;
   &lt;p&gt;
     Has these people living there:
     &lt;ul data-bind=&quot;foreach: occupants&quot;&gt;
@@ -88,7 +88,7 @@ ko.applyBindings(view_model, $('br_relational_models')[0]);
 <br/>
 
 <div id='br_relational_models'>
-  <p>Location: <span data-bind="text: location"></span></p>
+  <p>Location: <input data-bind="value: location"/></p>
   <p>
     Has these people living there:
     <ul data-bind="foreach: occupants">
