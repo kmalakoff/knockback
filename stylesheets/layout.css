@@ -99,3 +99,15 @@ section#content {
 section#content .kb {
   font-family: "Numans", 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+.demos_result_box {
+  display: block;
+  padding: 8.5px;
+  margin: 0 0 9px;
+  font-size: 12px;
+  line-height: 18px;
+  background-color: #ebd6ff;
+  border: 1px solid #ccc;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}

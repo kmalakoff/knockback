@@ -4,21 +4,18 @@ header.page {
   padding: 0;
 }
 h1 {
-  font-size: 1.5em;
+  font-size: 18px;
 }
 h2 {
-  font-size: 1.2em;
+  font-size: 16px;
+  text-decoration: underline;
 }
 h3 {
   font-size: 1.1em;
 }
-ol li {
-  font-size: 0.9em;
-}
-ul li {
-  font-size: 0.9em;
-  font-weight: normal;
+li {
+  font-size: 14px;
 }
 p {
-  font-size: 0.8em;
+  font-size: 14px;
 }
