@@ -18,4 +18,4 @@ house = new House({
 
 view_model = kb.viewModel(house);
 
-ko.applyBindings(view_model, $('br_relational_models')[0]);
+ko.applyBindings(view_model, $('#br_relational_models')[0]);

@@ -10,4 +10,4 @@ bob = new Backbone.Model({
 
 view_model = kb.viewModel(bob);
 
-ko.applyBindings(view_model, $('kbvm_bb_model')[0]);
+ko.applyBindings(view_model, $('#kbvm_bb_model')[0]);
