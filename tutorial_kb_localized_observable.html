@@ -21,7 +21,7 @@ kb.locale_manager = new LocaleManager('en-GB', {
   'fr-FR':
     body: 'J\'ai besoin de localiser cette phrase.'
 })
-</pre><pre data-for="js">var LocaleManager = function() {
+</pre><pre data-for="js">var LocaleManager = function(locale_identifier, translations_by_locale) {
   this.translations_by_locale = translations_by_locale;
   this.current_locale = ko.observable(locale_identifier);
 
