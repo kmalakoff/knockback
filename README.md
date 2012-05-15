@@ -85,7 +85,7 @@ var ContactViewModel = kb.ViewModel.extend({
 ### And...engage:
 
 ```coffeescript
-view_model = new ContactViewModel(collection.get('some_id'))
+view_model = new ContactViewModel(new Backbone.Model({name: 'Bob', email: 'bob@bob.com', date: new Date()}))
 ko.applyBindings(view_model)
 
 # ...
