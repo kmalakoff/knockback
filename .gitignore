@@ -7,7 +7,6 @@ test/*/build/*
 examples_lib/build/*
 
 # web site noise
-vendor/*
 tutorials/*
 docs/*
 stylesheets/*
