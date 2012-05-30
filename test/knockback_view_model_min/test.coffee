@@ -4,7 +4,7 @@ $(document).ready( ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
-  Knockback.locale_manager = new LocaleManager('en', {})
+  kb.locale_manager = new LocaleManager('en', {})
 
   test("Standard use case: read and write", ->
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
@@ -77,7 +77,7 @@ $(document).ready( ->
     equal(view_model.email(), 'john@imagine.com', "received email")
 
     # set from the view model
-    Knockback.locale_manager.setLocale('en-GB')
+    kb.locale_manager.setLocale('en-GB')
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
     view_model.date('10 December 1963')
     current_date = model.get('date')
@@ -90,7 +90,7 @@ $(document).ready( ->
 
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
-    Knockback.locale_manager.setLocale('fr-FR')
+    kb.locale_manager.setLocale('fr-FR')
     equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
     view_model.date('10 novembre 1940')
     current_date = model.get('date')
@@ -103,7 +103,7 @@ $(document).ready( ->
 
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
-    Knockback.locale_manager.setLocale('fr-FR')
+    kb.locale_manager.setLocale('fr-FR')
     equal(view_model.date(), '10 novembre 1940', "One past John's birthdate in France format")
     current_date = model.get('date')
     equal(current_date.getFullYear(), 1940, "year is good")
@@ -143,7 +143,7 @@ $(document).ready( ->
     equal(view_model.email(), 'john@imagine.com', "received email")
 
     # set from the view model
-    Knockback.locale_manager.setLocale('en-GB')
+    kb.locale_manager.setLocale('en-GB')
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
     view_model.date('10 December 1963')
     current_date = model.get('date')
@@ -156,7 +156,7 @@ $(document).ready( ->
 
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
-    Knockback.locale_manager.setLocale('fr-FR')
+    kb.locale_manager.setLocale('fr-FR')
     equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
     view_model.date('10 novembre 1940')
     current_date = model.get('date')
@@ -169,7 +169,7 @@ $(document).ready( ->
 
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
-    Knockback.locale_manager.setLocale('fr-FR')
+    kb.locale_manager.setLocale('fr-FR')
     equal(view_model.date(), '10 novembre 1940', "One past John's birthdate in France format")
     current_date = model.get('date')
     equal(current_date.getFullYear(), 1940, "year is good")
@@ -290,7 +290,7 @@ $(document).ready( ->
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
-    Knockback.locale_manager.setLocale('en-GB')
+    kb.locale_manager.setLocale('en-GB')
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
     view_model.date('10 December 1963')
     current_date = model.get('date')
@@ -303,7 +303,7 @@ $(document).ready( ->
 
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
-    Knockback.locale_manager.setLocale('fr-FR')
+    kb.locale_manager.setLocale('fr-FR')
     equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
     view_model.date('10 novembre 1940')
     current_date = model.get('date')
@@ -316,7 +316,7 @@ $(document).ready( ->
 
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
-    Knockback.locale_manager.setLocale('fr-FR')
+    kb.locale_manager.setLocale('fr-FR')
     equal(view_model.date(), '10 novembre 1940', "John's birthdate in France format")
     current_date = model.get('date')
     equal(current_date.getFullYear(), 1940, "year is good")
@@ -443,7 +443,7 @@ $(document).ready( ->
       equal(view_model.name(), name, "#{view_model.name()}: Name matches")
 
       # set from the view model
-      Knockback.locale_manager.setLocale('en-GB')
+      kb.locale_manager.setLocale('en-GB')
       formatted_date = new LongDateLocalizer(birthdate)
       equal(view_model.date(), formatted_date(), "#{view_model.name()}: Birthdate in Great Britain format")
       view_model.date('10 December 1963')
@@ -458,7 +458,7 @@ $(document).ready( ->
       model.set({date: new Date(birthdate.valueOf())}) # restore birthdate
 
       # set from the model
-      Knockback.locale_manager.setLocale('fr-FR')
+      kb.locale_manager.setLocale('fr-FR')
       equal(view_model.date(), formatted_date(), "#{view_model.name()}: Birthdate in France format")
       view_model.date('10 novembre 1940')
       current_date = model.get('date')

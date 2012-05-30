@@ -96,7 +96,7 @@ kb.utils.release(view_model)
 
 And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
 
-Of course, this is just a simple example, but hopefully you get the picture. 
+Of course, this is just a simple example, but hopefully you get the picture.
 
 Demos and Documentation
 -----------------------

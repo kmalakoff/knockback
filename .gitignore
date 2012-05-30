@@ -2,3 +2,13 @@
 .DS_Store
 
 node_modules/*
+build/*
+*/build/*
+
+# web site noise
+vendor/*
+tutorials/*
+docs/*
+stylesheets/*
+javascripts/*
+images/*
