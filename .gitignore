@@ -3,7 +3,8 @@
 
 node_modules/*
 build/*
-*/build/*
+test/*/build/*
+examples_lib/build/*
 
 # web site noise
 vendor/*

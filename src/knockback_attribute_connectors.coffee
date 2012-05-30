@@ -10,7 +10,7 @@
 # overrides
 #   update: ->
 ####################################################
-class Knockback.AttributeConnector
+class kb.AttributeConnector
   constructor: (model, @key, @options={}) ->
     kb.utils.wrappedModel(this, model)
     @options = _.clone(@options)
@@ -104,24 +104,24 @@ class Knockback.AttributeConnector
 
     # a custom creator function
     if options.hasOwnProperty('create')
-      throw new Error('Knockback.AttributeConnector: options.create is empty') if not options.create
+      throw new Error('kb.AttributeConnector: options.create is empty') if not options.create
       return options.create(model, key, options.options||{})
 
     value = model.get(key)
 
     # use passed view_model function
     if options.hasOwnProperty('view_model')
-      throw new Error('Knockback.AttributeConnector: options.view_model is empty') if not options.view_model
+      throw new Error('kb.AttributeConnector: options.view_model is empty') if not options.view_model
       return new options.view_model(value, options.options||{})
 
     # use passed view_model_create function
     else if options.hasOwnProperty('view_model_create')
-      throw new Error('Knockback.AttributeConnector: options.view_model_create is empty') if not options.view_model_create
+      throw new Error('kb.AttributeConnector: options.view_model_create is empty') if not options.view_model_create
       return options.view_model_create(value, options.options||{})
 
     # a collection
     else if options.hasOwnProperty('children')
-      throw new Error('Knockback.AttributeConnector: options.children is empty') if not options.children
+      throw new Error('kb.AttributeConnector: options.children is empty') if not options.children
       if (typeof(options.children) == 'function')
         attribute_options = {view_model: options.children}
       else
@@ -131,9 +131,10 @@ class Knockback.AttributeConnector
     # INFER: choose a type
     @createByType(@inferType(model, key), model, key, options)
 
-class Knockback.SimpleAttributeConnector extends Knockback.AttributeConnector
+class kb.SimpleAttributeConnector extends kb.AttributeConnector
   constructor: ->
-    super; return kb.utils.wrappedObservable(this)
+    super
+    return kb.utils.wrappedObservable(@)
 
   destroy: ->
     @current_value = null
@@ -153,11 +154,12 @@ class Knockback.SimpleAttributeConnector extends Knockback.AttributeConnector
     (@__kb.value_observable(value); return) if not model # CONVENTION: update the observable even if the model isn't loaded
     super
 
-Knockback.simpleAttributeConnector = (model, key, options) -> new Knockback.SimpleAttributeConnector(model, key, options)
+kb.simpleAttributeConnector = (model, key, options) -> new kb.SimpleAttributeConnector(model, key, options)
 
-class Knockback.CollectionAttributeConnector extends Knockback.AttributeConnector
+class kb.CollectionAttributeConnector extends kb.AttributeConnector
   constructor: ->
-    super; return kb.utils.wrappedObservable(this)
+    super
+    return kb.utils.wrappedObservable(@)
 
   destroy: ->
     current_value = @__kb.value_observable()
@@ -183,11 +185,12 @@ class Knockback.CollectionAttributeConnector extends Knockback.AttributeConnecto
     current_value = @__kb.value_observable()
     return if current_value then current_value() else undefined
 
-Knockback.collectionAttributeConnector = (model, key, options) -> new Knockback.CollectionAttributeConnector(model, key, options)
+kb.collectionAttributeConnector = (model, key, options) -> new kb.CollectionAttributeConnector(model, key, options)
 
-class Knockback.ViewModelAttributeConnector extends Knockback.AttributeConnector
+class kb.ViewModelAttributeConnector extends kb.AttributeConnector
   constructor: ->
-    super; return kb.utils.wrappedObservable(this)
+    super
+    return kb.utils.wrappedObservable(@)
 
   destroy: ->
     current_value = @__kb.value_observable()
@@ -207,8 +210,8 @@ class Knockback.ViewModelAttributeConnector extends Knockback.AttributeConnector
       else
         @__kb.value_observable(if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options))
     else
-      throw new Error("Knockback.viewModelAttributeConnector: unknown how to model a view model") unless current_value.model and (typeof(current_value.model) == 'function')
+      throw new Error("kb.viewModelAttributeConnector: unknown how to model a view model") unless current_value.model and (typeof(current_value.model) == 'function')
       if (current_value.model() != value)
         current_value.model(value); @__kb.value_observable.valueHasMutated()
 
-Knockback.viewModelAttributeConnector = (model, key, options) -> new Knockback.ViewModelAttributeConnector(model, key, options)
+kb.viewModelAttributeConnector = (model, key, options) -> new kb.ViewModelAttributeConnector(model, key, options)

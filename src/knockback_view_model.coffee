@@ -6,12 +6,6 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-class Knockback.ViewModel_RCBase extends Knockback.RefCountable
-  __destroy: ->
-    for key, value of this
-      continue if !value or (key == '__kb')
-      @[key] = null if kb.utils.release(value)
-
 ####################################################
 # options
 #   * read_only - default is read_write
@@ -22,11 +16,11 @@ class Knockback.ViewModel_RCBase extends Knockback.RefCountable
 #   * children - use to provide a view_model or view_model_create or create function per model attribute
 ####################################################
 
-class Knockback.ViewModel extends Knockback.ViewModel_RCBase
+class kb.ViewModel extends kb.RefCountable
   constructor: (model, options={}) ->
     super
 
-    kb.stats.view_models++ if Knockback.stats_on        # collect memory management statistics
+    kb.stats.view_models++ if kb.stats_on        # collect memory management statistics
 
     # register ourselves to handle recursive view models
     kb.Store.resolveFromOptions(options, this) unless options.store_skip_resolve
@@ -65,9 +59,10 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
     @_modelUnbind(model)
 
     @__kb.store.destroy() if @__kb.store_is_owned; @__kb.store = null
+    kb.utils.release(this, true)
     super
 
-    kb.stats.view_models-- if Knockback.stats_on        # collect memory management statistics
+    kb.stats.view_models-- if kb.stats_on        # collect memory management statistics
 
   model: (new_model) ->
     model = kb.utils.wrappedModel(this)
@@ -137,4 +132,4 @@ class Knockback.ViewModel extends Knockback.ViewModel_RCBase
     return {read_only: @__kb.read_only, store: @__kb.store}
 
 # factory function
-Knockback.viewModel = (model, options) -> return new Knockback.ViewModel(model, options)
+kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

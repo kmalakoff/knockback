@@ -1,12 +1,15 @@
-class Contact extends Backbone.Model
+Contact = Backbone.Model.extend({
   defaults:
     name: ''
     number: 0
     date: new Date()
+})
 
-class ContactsCollection extends Backbone.Collection
+ContactsCollection = Backbone.Collection.extend({
   model: Contact
+})
 
-class NameSortedContactsCollection extends Backbone.Collection
+NameSortedContactsCollection = Backbone.Collection.extend({
   model: Contact
   comparator: (model) -> return model.get('name')
+})
