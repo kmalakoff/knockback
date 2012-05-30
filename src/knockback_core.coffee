@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.15.1
+  knockback.js 0.15.2
   (c) 2011 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -12,7 +12,7 @@
 if typeof(exports) != 'undefined' then (Knockback = kb = exports) else (@Knockback = @kb = {})
 
 # Current version.
-Knockback.VERSION = '0.15.1'
+Knockback.VERSION = '0.15.2'
 
 # import Underscore, Backbone, and Knockout
 _ = if not @_ and (typeof(require) != 'undefined') then require('underscore') else @_
