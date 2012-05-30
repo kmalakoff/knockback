@@ -4,7 +4,7 @@ $(document).ready( ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
-  test("Knockback.utils.wrappedObservable", ->
+  test("kb.utils.wrappedObservable", ->
     observable = ko.observable()
     instance = {}
     raises((->kb.utils.wrappedObservable(instance)), Error, "Knockback: instance is not wrapping an observable") # get
@@ -13,7 +13,7 @@ $(document).ready( ->
     equal(kb.utils.wrappedObservable(instance), observable, "observable was wrapped") # get
   )
 
-  test("Knockback.utils.observableInstanceOf", ->
+  test("kb.utils.observableInstanceOf", ->
     equal(kb.utils.observableInstanceOf(kb.simpleAttributeConnector(new Backbone.Model({name: 'name1'}), 'name'), kb.AttributeConnector), true, "Instance is kb.AttributeConnector") # get
     equal(kb.utils.observableInstanceOf(kb.simpleAttributeConnector(new Backbone.Model({name: 'name1'}), 'name'), kb.SimpleAttributeConnector), true, "Instance is kb.SimpleAttributeConnector") # get
 
@@ -33,7 +33,7 @@ $(document).ready( ->
     equal(kb.utils.observableInstanceOf(kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name'), kb.TriggeredObservable), true, "Instance is kb.TriggeredObservable") # get
   )
 
-  test("Knockback.utils.wrappedModel", ->
+  test("kb.utils.wrappedModel", ->
     model = new Backbone.Model()
     instance = {}
     equal(kb.utils.wrappedModel(instance), instance, "no model was wrapped so return the instance") # get
@@ -42,19 +42,19 @@ $(document).ready( ->
     equal(kb.utils.wrappedModel(instance), model, "model was wrapped") # get
   )
 
-  test("Knockback.utils.setToDefault", ->
+  test("kb.utils.setToDefault", ->
     # TODO
   )
 
-  test("Knockback.utils.release", ->
+  test("kb.utils.release", ->
     # TODO
   )
 
-  test("Knockback.utils.optionsCreateClear", ->
+  test("kb.utils.optionsCreateClear", ->
     # TODO
   )
 
-  test("Knockback.utils.optionsCreateOverride", ->
+  test("kb.utils.optionsCreateOverride", ->
     # TODO
   )
 

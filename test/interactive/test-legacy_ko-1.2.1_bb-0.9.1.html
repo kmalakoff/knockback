@@ -125,9 +125,9 @@
           label_date:     { key: 'label_date' }
         }, this);
         kb.observables(model, {
-          name:           { key: 'name', write: true },
-          email:          { key: 'email', write: true },
-          date:           { key: 'date', write: true, localizer: LongDateLocalizer }
+          name:           { key: 'name' },
+          email:          { key: 'email' },
+          date:           { key: 'date', localizer: LongDateLocalizer }
         }, this);
       };
       view_model.contacts = Knockback.collectionObservable(collection, {
