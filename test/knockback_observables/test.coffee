@@ -212,6 +212,35 @@ $(document).ready( ->
     kb.utils.release(view_model)
   )
 
+  test("Bulk mode (array of keys)", ->
+    model = new Contact({name: 'John', number: '555-555-5558'})
+    view_model = kb.observables(model, ['name', 'number'])
+
+    # get
+    equal(view_model.name(), 'John', "It is a name")
+    equal(view_model.number(), '555-555-5558', "Not so interesting number")
+    kb.locale_manager.setLocale('en-GB')
+    kb.locale_manager.setLocale('fr-FR')
+
+    # set from the view model
+    view_model.name('Paul')
+    equal(model.get('name'), 'Paul', "Name changed")
+    equal(view_model.name(), 'Paul', "Name changed")
+    view_model.number('9222-222-222')
+    equal(model.get('number'), '9222-222-222', "Number was changed")
+    equal(view_model.number(), '9222-222-222', "Number was changed")
+    kb.locale_manager.setLocale('en-GB')
+
+    # set from the model
+    model.set({name: 'Yoko', number: '818-818-8181'})
+    equal(view_model.name(), 'Yoko', "Name changed")
+    equal(view_model.number(), '818-818-8181', "Number was changed")
+    kb.locale_manager.setLocale('fr-FR')
+
+    # and cleanup after yourself when you are done.
+    kb.utils.release(view_model)
+  )
+
   test("Error cases", ->
     raises((->kb.observables(new Backbone.Model({name: 'name1'}), 'name')), Error, 'Observables: mappings_info is missing')
 

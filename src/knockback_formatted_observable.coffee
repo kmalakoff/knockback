@@ -6,7 +6,7 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-Knockback.toFormattedString = (format) ->
+kb.toFormattedString = (format) ->
   result = format.slice()
   args = Array.prototype.slice.call(arguments, 1)
   for index, arg of args
@@ -19,7 +19,7 @@ Knockback.toFormattedString = (format) ->
       parameter_index = format.indexOf("\{#{index}\}", parameter_index+1)
   return result
 
-Knockback.parseFormattedString = (string, format) ->
+kb.parseFormattedString = (string, format) ->
   regex_string = format.slice(); index = 0; parameter_count = 0; positions = {}
   while(regex_string.search("\\{#{index}\\}")>=0)
     # store the positions of the replacements
@@ -52,11 +52,11 @@ Knockback.parseFormattedString = (string, format) ->
   return results
 
 ######################################
-# Knockback.formattedObservable to provide two-way formtted string convertions
+# kb.formattedObservable to provide two-way formtted string convertions
 # Provide a format string with observable and/or non observable arguments in the form of:
 #   kb.formattedObservable("Something {0} and {1} and you know", arg1, arg2)
 ######################################
-class Knockback.FormattedObservable
+class kb.FormattedObservable
   constructor: (format, args) ->
     @__kb = {}
     # being called by the factory function
@@ -83,4 +83,4 @@ class Knockback.FormattedObservable
   destroy: ->
     kb.utils.wrappedObservable(this, null)
 
-Knockback.formattedObservable = (format, args) -> return new Knockback.FormattedObservable(format, Array.prototype.slice.call(arguments, 1))
+kb.formattedObservable = (format, args) -> return new kb.FormattedObservable(format, Array.prototype.slice.call(arguments, 1))
