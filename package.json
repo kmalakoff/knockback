@@ -17,7 +17,9 @@
   },
   "devDependencies": {
     "coffee-script": ">=1.3.0",
-    "uglify-js": ">=1.2.6"
+    "yaml": ">=0.2.3",
+    "js-yaml": ">=0.3.7",
+    "walk": ">=2.1.1"
   },
 
   "lib" : ".",

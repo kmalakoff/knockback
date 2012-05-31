@@ -1,31 +1,29 @@
-library: [
-  'src/knockback_core.coffee',
-  'src/knockback_ref_countable.coffee',
-  'src/knockback_store.coffee',
-  'src/knockback_collection_observable.coffee',
-  'src/knockback_default_wrapper.coffee',
-  'src/knockback_formatted_observable.coffee',
-  'src/knockback_localized_observable.coffee',
-  'src/knockback_observable.coffee',
-  'src/knockback_observables.coffee',
-  'src/knockback_triggered_observable.coffee',
-  'src/knockback_attribute_connectors.coffee',
-  'src/knockback_view_model.coffee'
-]
+library:
+  - src/knockback_core.coffee
+  - src/knockback_ref_countable.coffee
+  - src/knockback_store.coffee
+  - src/knockback_collection_observable.coffee
+  - src/knockback_default_wrapper.coffee
+  - src/knockback_formatted_observable.coffee
+  - src/knockback_localized_observable.coffee
+  - src/knockback_observable.coffee
+  - src/knockback_observables.coffee
+  - src/knockback_triggered_observable.coffee
+  - src/knockback_attribute_connectors.coffee
+  - src/knockback_view_model.coffee
 
-test_dirs: [
-  'test/knockback_legacy',
-  'test/knockback_utils',
-  'test/knockback_packaging',
-  'test/backbone_modelref',
-  'test/backbone_relational',
-  'test/knockback_collection_observable',
-  'test/knockback_formatted_observable',
-  'test/knockback_localized_observable',
-  'test/knockback_observable',
-  'test/knockback_observables',
-  'test/knockback_triggered_observable',
-  'test/knockback_view_model',
-  'test/knockback_view_model_min',
-  'test/knockback_memory_management'
-]
+test_dirs:
+  - test/knockback_legacy
+  - test/knockback_utils
+  - test/knockback_packaging
+  - test/backbone_modelref
+  - test/backbone_relational
+  - test/knockback_collection_observable
+  - test/knockback_formatted_observable
+  - test/knockback_localized_observable
+  - test/knockback_observable
+  - test/knockback_observables
+  - test/knockback_triggered_observable
+  - test/knockback_view_model
+  - test/knockback_view_model_min
+  - test/knockback_memory_management
