@@ -16,7 +16,8 @@
     "knockout"  : ">=1.2.1"
   },
   "devDependencies": {
-    "coffee-script": ">=1.3.0"
+    "coffee-script": ">=1.3.0",
+    "uglify-js": ">=1.2.6"
   },
 
   "lib" : ".",

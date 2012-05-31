@@ -7,12 +7,11 @@ PROJECT_ROOT = File.expand_path('../..', __FILE__)
 CLEAN_PATTERNS = [
   '**.js',
   'build/**.js',
-
-  'examples_lib/build/**.js',
+  'test/_examples/build/**.js',
 ]
 
 # add tests
-config = YAML::load( File.open( 'config/config.yaml' ) )
+config = YAML::load( File.open( 'config.yaml' ) )
 if config && config['test_dirs']
   config['test_dirs'].each{|path| CLEAN_PATTERNS.push(path+'/build/**.js')}
 end

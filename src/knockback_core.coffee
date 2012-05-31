@@ -9,7 +9,7 @@
 ###
 
 # export or create Knockback namespace and kb alias
-if typeof(exports) != 'undefined' then (Knockback = kb = exports) else (@Knockback = @kb = {})
+Knockback = kb = @Knockback = @kb = if (typeof(exports) != 'undefined') then exports else {}
 
 # Current version.
 kb.VERSION = '0.15.3'
@@ -40,11 +40,11 @@ kb.utils.legacyWarning = (identifier, remove_version, message) ->
 kb.utils.wrappedObservable = (instance, observable) ->
   # get
   if (arguments.length == 1)
-    throw new Error('Knockback: instance is not wrapping an observable') unless instance and instance.__kb and instance.__kb.observable
+    throw 'Knockback: instance is not wrapping an observable' unless instance and instance.__kb and instance.__kb.observable
     return instance.__kb.observable
 
   # set
-  throw new Error('Knockback: no instance for wrapping a observable') unless instance
+  throw 'Knockback: no instance for wrapping a observable' unless instance
   instance.__kb or= {}
   instance.__kb.observable.__kb.instance = null if instance.__kb.observable and instance.__kb.observable.__kb
   instance.__kb.observable = observable
@@ -68,7 +68,7 @@ kb.utils.wrappedModel = (view_model, model) ->
     return if (view_model and view_model.__kb and view_model.__kb.hasOwnProperty('model')) then view_model.__kb.model else view_model
 
   # set
-  throw new Error('Knockback: no view_model for wrapping a model') unless view_model
+  throw 'Knockback: no view_model for wrapping a model' unless view_model
   view_model.__kb or= {}
   view_model.__kb.model = model
   return model

@@ -7,7 +7,7 @@ task :build do
   begin
     exec "cd #{PROJECT_ROOT}; ruby script/build.rb"
   rescue LoadError
-    puts "build failed: ensure you have coffee-script ('npm install coffee-script -g') and jammit ('(sudo) gem install jammit') installed"
+    puts "build failed: ensure you have run the initialization scripts 'bundle install' and 'npm install'"
     exit
   end
 end
@@ -29,24 +29,12 @@ task :clean do
   end
 end
 
-def transfer_header(source_filename, destination_filename)
-  source      = File.read(source_filename)
-  comment_block = source.split('*/')
-  return if not comment_block
-  destination = File.read(destination_filename)
-  header = (comment_block[0] + "*/\n").squeeze(' ')
-  File.open(destination_filename, 'w+') do |file|
-    file.write header + destination
-  end
-end
-
 desc "clean, build, and minimize"
 task :package do
   begin
-    fork { exec "cd #{PROJECT_ROOT} ruby script/clean.rb; ruby script/build.rb; jammit -c config/assets_min.yaml -o #{PROJECT_ROOT}" }
+    fork { exec "cd #{PROJECT_ROOT} ruby script/clean.rb; ruby script/build.rb" }
     Process.waitall
-    config = YAML::load( File.open( 'config/assets_min.yaml' ) )
-    config['javascripts'].each{|key, value| transfer_header(key.chomp('.min')+'.js', key+'.js')}
+    fork { exec "cd #{PROJECT_ROOT}; node_modules/.bin/uglifyjs -o knockback.min.js knockback.js" }
   rescue LoadError
     puts "build failed: ensure you have run the initialization scripts 'bundle install' and 'npm install'"
     exit

@@ -104,24 +104,24 @@ class kb.AttributeConnector
 
     # a custom creator function
     if options.hasOwnProperty('create')
-      throw new Error('kb.AttributeConnector: options.create is empty') if not options.create
+      throw 'kb.AttributeConnector: options.create is empty' if not options.create
       return options.create(model, key, options.options||{})
 
     value = model.get(key)
 
     # use passed view_model function
     if options.hasOwnProperty('view_model')
-      throw new Error('kb.AttributeConnector: options.view_model is empty') if not options.view_model
+      throw 'kb.AttributeConnector: options.view_model is empty' if not options.view_model
       return new options.view_model(value, options.options||{})
 
     # use passed view_model_create function
     else if options.hasOwnProperty('view_model_create')
-      throw new Error('kb.AttributeConnector: options.view_model_create is empty') if not options.view_model_create
+      throw 'kb.AttributeConnector: options.view_model_create is empty' if not options.view_model_create
       return options.view_model_create(value, options.options||{})
 
     # a collection
     else if options.hasOwnProperty('children')
-      throw new Error('kb.AttributeConnector: options.children is empty') if not options.children
+      throw 'kb.AttributeConnector: options.children is empty' if not options.children
       if (typeof(options.children) == 'function')
         attribute_options = {view_model: options.children}
       else
@@ -210,7 +210,7 @@ class kb.ViewModelAttributeConnector extends kb.AttributeConnector
       else
         @__kb.value_observable(if @options.view_model then (new @options.view_model(value, view_model_options)) else @options.view_model_create(value, view_model_options))
     else
-      throw new Error("kb.viewModelAttributeConnector: unknown how to model a view model") unless current_value.model and (typeof(current_value.model) == 'function')
+      throw "kb.viewModelAttributeConnector: unknown how to model a view model" unless current_value.model and (typeof(current_value.model) == 'function')
       if (current_value.model() != value)
         current_value.model(value); @__kb.value_observable.valueHasMutated()
 

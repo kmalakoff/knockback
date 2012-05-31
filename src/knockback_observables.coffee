@@ -8,8 +8,8 @@
 
 class kb.Observables
   constructor: (model, mappings_info, view_model, options_or_read_only) ->
-    throw new Error('Observables: model is missing') if not model
-    throw new Error('Observables: mappings_info is missing') unless mappings_info and (_.isObject(mappings_info) or _.isArray(mappings_info))
+    throw 'Observables: model is missing' if not model
+    throw 'Observables: mappings_info is missing' unless mappings_info and (_.isObject(mappings_info) or _.isArray(mappings_info))
 
     @__kb or= {}
     @__kb.model = model

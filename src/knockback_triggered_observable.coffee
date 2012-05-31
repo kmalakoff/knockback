@@ -8,8 +8,8 @@
 
 class kb.TriggeredObservable
   constructor: (@model, @event_name) ->
-    throw new Error('Observable: model is missing') if not @model
-    throw new Error('Observable: event_name is missing') if not @event_name
+    throw 'Observable: model is missing' if not @model
+    throw 'Observable: event_name is missing' if not @event_name
 
     @__kb = {}
     @__kb._onValueChange = _.bind(@_onValueChange, @)

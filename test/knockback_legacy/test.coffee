@@ -1,5 +1,10 @@
 $(document).ready( ->
   module("knockback legacy.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
@@ -22,7 +27,7 @@ $(document).ready( ->
 
     model = new Backbone.Model({name: 'name1'})
     observable = kb.observable(model, {key: 'name', write: false})
-    raises((->observable('name2')), Error, "kb.Observable: name is read only")
+    raises((->observable('name2')), null, "kb.Observable: name is read only")
     equal(observable(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
 
@@ -41,7 +46,7 @@ $(document).ready( ->
 
     model = new Backbone.Model({name: 'name1'})
     observable = kb.observable(model, {key: 'name', read_only: true})
-    raises((->observable('name2')), Error, "kb.Observable: name is read only")
+    raises((->observable('name2')), null, "kb.Observable: name is read only")
     equal(observable(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
   )
@@ -60,7 +65,7 @@ $(document).ready( ->
     observables = kb.observables(model,
       name: {key: 'name', write: false}
     )
-    raises((->observables.name('name2')), Error, "kb.Observable: name is read only")
+    raises((->observables.name('name2')), null, "kb.Observable: name is read only")
     equal(observables.name(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
 
@@ -76,7 +81,7 @@ $(document).ready( ->
     observables = kb.observables(model,{
       name: {key: 'name'}
     }, {}, {write: false})
-    raises((->observables.name('name2')), Error, "kb.Observable: name is read only")
+    raises((->observables.name('name2')), null, "kb.Observable: name is read only")
     equal(observables.name(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
 
@@ -104,7 +109,7 @@ $(document).ready( ->
     observables = kb.observables(model,
       name: {key: 'name', read_only: true}
     )
-    raises((->observables.name('name2')), Error, "kb.Observable: name is read only")
+    raises((->observables.name('name2')), null, "kb.Observable: name is read only")
     equal(observables.name(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
 
@@ -112,7 +117,7 @@ $(document).ready( ->
     observables = kb.observables(model,
       name: {read_only: true}
     )
-    raises((->observables.name('name2')), Error, "kb.Observable: name is read only")
+    raises((->observables.name('name2')), null, "kb.Observable: name is read only")
     equal(observables.name(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
 
@@ -121,7 +126,7 @@ $(document).ready( ->
     observables = kb.observables(model,{
       name: {key: 'name'}
     }, {}, true)
-    raises((->observables.name('name2')), Error, "kb.Observable: name is read only")
+    raises((->observables.name('name2')), null, "kb.Observable: name is read only")
     equal(observables.name(), 'name1', "Name was not written")
     equal(model.get('name'), 'name1', "Name not was written")
   )

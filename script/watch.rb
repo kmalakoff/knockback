@@ -7,12 +7,11 @@ require 'fileutils'
 PROJECT_ROOT = File.expand_path('../..', __FILE__)
 SRC_DIRS = [
   'src/**/*.coffee',
-
-  'examples_lib/**/*.coffee',
+  'test/_examples/**/*.coffee',
 ]
 
 # add tests
-config = YAML::load( File.open( 'config/config.yaml' ) )
+config = YAML::load( File.open( 'config.yaml' ) )
 if config && config['test_dirs']
   config['test_dirs'].each{|path| SRC_DIRS.push(path+'/**/*.coffee')}
 end

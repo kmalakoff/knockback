@@ -30,7 +30,7 @@
 
 class kb.CollectionObservable extends kb.RefCountable
   constructor: (collection, options={}) ->
-    throw new Error('CollectionObservable: collection is missing') if not collection
+    throw 'CollectionObservable: collection is missing' if not collection
 
     super
     kb.stats.collection_observables++ if kb.stats_on     # collect memory management statistics
@@ -52,19 +52,19 @@ class kb.CollectionObservable extends kb.RefCountable
 
     # options
     if options.hasOwnProperty('view_model')
-      throw new Error('kb.CollectionObservable: options.view_model is empty') if not options.view_model
+      throw 'kb.CollectionObservable: options.view_model is empty' if not options.view_model
       @view_model_create_fn = options.view_model
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_constructor')
-      throw new Error('kb.CollectionObservable: options.view_model_constructor is empty') if not options.view_model_constructor
+      throw 'kb.CollectionObservable: options.view_model_constructor is empty' if not options.view_model_constructor
       kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', '0.16.0', 'Please use view_model option instead')
       @view_model_create_fn = options.view_model_constructor
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_create')
-      throw new Error('kb.CollectionObservable: options.view_model_create is empty') if not options.view_model_create
+      throw 'kb.CollectionObservable: options.view_model_create is empty' if not options.view_model_create
       @view_model_create_fn = options.view_model_create
     else if options.hasOwnProperty('create')
-      throw new Error('kb.CollectionObservable: options.create is empty') if not options.create
+      throw 'kb.CollectionObservable: options.create is empty' if not options.create
       @view_model_create_fn = options.create
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
@@ -189,7 +189,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
   _onCollectionReset: -> @_collectionResync()
   _onCollectionResort: (model_or_models) ->
-    throw new Error("CollectionObservable: collection sorted_index unexpected") if @sorted_index
+    throw 'CollectionObservable: collection sorted_index unexpected' if @sorted_index
     if _.isArray(model_or_models)
       observable = kb.utils.wrappedObservable(this)
       @trigger('resort', observable()) # notify

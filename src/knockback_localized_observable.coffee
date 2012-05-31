@@ -25,10 +25,10 @@ class kb.LocalizedObservable
   @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
   constructor: (@value, @options={}, @view_model={}) ->
-    throw new Error('LocalizedObservable: options.read is missing') if not (@options.read or @read)
-    throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.read and @read
-    throw new Error('LocalizedObservable: options.write and write class function exist. You need to choose one.') if @options.write and @write
-    throw new Error('LocalizedObservable: kb.locale_manager is not defined') if not kb.locale_manager
+    throw 'LocalizedObservable: options.read is missing' if not (@options.read or @read)
+    throw 'LocalizedObservable: options.read and read class function exist. You need to choose one.' if @options.read and @read
+    throw 'LocalizedObservable: options.write and write class function exist. You need to choose one.' if @options.write and @write
+    throw 'LocalizedObservable: kb.locale_manager is not defined' if not kb.locale_manager
 
     @__kb = {}
     @__kb._onLocaleChange = _.bind(@_onLocaleChange, @)
@@ -37,10 +37,10 @@ class kb.LocalizedObservable
     value = ko.utils.unwrapObservable(@value) if @value
     @__kb.value_observable = ko.observable(if not value then @_getDefaultValue() else @read.call(this, value, null))
 
-    throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if @write and not (typeof(@write) == 'function')
+    throw 'LocalizedObservable: options.write is not a function for read_write model attribute' if @write and not (typeof(@write) == 'function')
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @write then _.bind(@_onSetValue, @) else (-> throw new Error("kb.LocalizedObservable: value is read only"))
+      write: if @write then _.bind(@_onSetValue, @) else (-> throw 'kb.LocalizedObservable: value is read only')
       owner:@view_model
     }))
 

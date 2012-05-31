@@ -4,24 +4,22 @@ require 'yaml'
 
 PROJECT_ROOT = File.expand_path('../..', __FILE__)
 
+config = YAML::load( File.open( 'config.yaml' ) )
+
 ####################################################
 # Knockback Library
 ####################################################
-`cd #{PROJECT_ROOT}; node_modules/.bin/coffee -b -o build -c #{PROJECT_ROOT}/src`
-`cd #{PROJECT_ROOT}; jammit -c config/assets.yaml -o .`
+coffee_files = config['library'].select {|file| file.end_with?('.coffee')}
+`cd #{PROJECT_ROOT}; node_modules/.bin/coffee -j knockback.js -c #{coffee_files.join(' ')}`
 
 ####################################################
 # Library for examples
 ####################################################
-`cd #{PROJECT_ROOT}; node_modules/.bin/coffee -b -o examples_lib/build -c #{PROJECT_ROOT}/examples_lib`
-`cd #{PROJECT_ROOT}; jammit -c config/assets_examples_lib.yaml -o #{PROJECT_ROOT}/examples_lib/build`
+`cd #{PROJECT_ROOT}; node_modules/.bin/coffee -j test/_examples/build/_examples.js -c #{PROJECT_ROOT}/test/_examples`
 
 ####################################################
 # Tests
 ####################################################
-config = YAML::load( File.open( 'config/config.yaml' ) )
-if config && config['test_dirs']
-  config['test_dirs'].each do |path|
-    `cd #{PROJECT_ROOT}; node_modules/.bin/coffee -b -o #{path}/build -c #{path}`
-  end
+config['test_dirs'].each do |path|
+  `cd #{PROJECT_ROOT}; node_modules/.bin/coffee -b -o #{path}/build -c #{path}`
 end

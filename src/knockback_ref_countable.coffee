@@ -22,12 +22,12 @@ class kb.RefCountable
 
   # reference counting
   retain: ->
-    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.ref_count) if (@__kb.ref_count <= 0)
+    throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
     @__kb.ref_count++
     @
 
   release: ->
-    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.ref_count) if (@__kb.ref_count <= 0)
+    throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
     @__kb.ref_count--
     @__destroy() unless @__kb.ref_count
     @
