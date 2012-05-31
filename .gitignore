@@ -2,7 +2,6 @@
 .DS_Store
 
 node_modules/*
-build/*
 test/*/build/*
 examples_lib/build/*
 

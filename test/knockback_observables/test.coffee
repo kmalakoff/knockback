@@ -1,22 +1,27 @@
 $(document).ready( ->
   module("knockback_observables.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
-  kb.locale_manager = new LocaleManager('en', {})
+  kb.locale_manager = new kb._.LocaleManager('en', {})
 
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', read_only: true}
         number:   'number'
-        date:     {key:'date', localizer: LongDateLocalizer}
+        date:     {key:'date', localizer: kb._.LongDateLocalizer}
         name2:    {key: 'name', read_only: true}
       }, this)
       @
 
-    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # get
@@ -70,12 +75,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', write: true}   # LEGACY
         number:   {key: 'number', read_only: false}
-        date:     {key:'date', localizer: LongDateLocalizer}
+        date:     {key:'date', localizer: kb._.LongDateLocalizer}
         name2:    'name'
       }, this, false)
       @
 
-    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -106,12 +111,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name'}
         number:   {key: 'number'}
-        date:     {key: 'date', localizer: LongDateLocalizer}
+        date:     {key: 'date', localizer: kb._.LongDateLocalizer}
         name2:    {key: 'name', read_only: true}
       }, this, {read_only: false})
       @
 
-    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -143,12 +148,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', read_only: false}
         number:   {key: 'number', read_only: false}
-        date:     {key: 'date', localizer: LongDateLocalizer, read_only: false}
+        date:     {key: 'date', localizer: kb._.LongDateLocalizer, read_only: false}
         name2:    {key: 'name'}
       }, this, {read_only: true})
       @
 
-    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -180,12 +185,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', read_only: true}
         number:   'number'
-        date:     {key: 'date', read_only: false, localizer: LongDateLocalizer}
+        date:     {key: 'date', read_only: false, localizer: kb._.LongDateLocalizer}
         name2:    {key: 'name', read_only: true}
       }, this, {garbage: true})
       @
 
-    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -212,8 +217,37 @@ $(document).ready( ->
     kb.utils.release(view_model)
   )
 
+  test("Bulk mode (array of keys)", ->
+    model = new kb._.Contact({name: 'John', number: '555-555-5558'})
+    view_model = kb.observables(model, ['name', 'number'])
+
+    # get
+    equal(view_model.name(), 'John', "It is a name")
+    equal(view_model.number(), '555-555-5558', "Not so interesting number")
+    kb.locale_manager.setLocale('en-GB')
+    kb.locale_manager.setLocale('fr-FR')
+
+    # set from the view model
+    view_model.name('Paul')
+    equal(model.get('name'), 'Paul', "Name changed")
+    equal(view_model.name(), 'Paul', "Name changed")
+    view_model.number('9222-222-222')
+    equal(model.get('number'), '9222-222-222', "Number was changed")
+    equal(view_model.number(), '9222-222-222', "Number was changed")
+    kb.locale_manager.setLocale('en-GB')
+
+    # set from the model
+    model.set({name: 'Yoko', number: '818-818-8181'})
+    equal(view_model.name(), 'Yoko', "Name changed")
+    equal(view_model.number(), '818-818-8181', "Number was changed")
+    kb.locale_manager.setLocale('fr-FR')
+
+    # and cleanup after yourself when you are done.
+    kb.utils.release(view_model)
+  )
+
   test("Error cases", ->
-    raises((->kb.observables(new Backbone.Model({name: 'name1'}), 'name')), Error, 'Observables: mappings_info is missing')
+    raises((->kb.observables(new Backbone.Model({name: 'name1'}), 'name')), null, 'Observables: mappings_info is missing')
 
     # TODO
   )

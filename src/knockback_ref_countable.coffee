@@ -11,8 +11,8 @@
 #   * __destroy() - override for custom cleanup when all references are released. Note: this function is __destroy instead of _destroy due to an incompatibility with a Knockout convention (https://github.com/kmalakoff/knockback/pull/17)
 ####################################################
 
-class Knockback.RefCountable
-  @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "Knockback.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends Knockback.RefCountable")
+class kb.RefCountable
+  @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
   constructor: ->
     @__kb or= {}
@@ -22,12 +22,12 @@ class Knockback.RefCountable
 
   # reference counting
   retain: ->
-    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.ref_count) if (@__kb.ref_count <= 0)
+    throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
     @__kb.ref_count++
     @
 
   release: ->
-    throw new Error("RefCountable: ref_count is corrupt: " + @__kb.ref_count) if (@__kb.ref_count <= 0)
+    throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
     @__kb.ref_count--
     @__destroy() unless @__kb.ref_count
     @

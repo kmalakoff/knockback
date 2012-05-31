@@ -1,5 +1,10 @@
 $(document).ready( ->
   module("knockback_core utils")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
@@ -7,7 +12,7 @@ $(document).ready( ->
   test("kb.utils.wrappedObservable", ->
     observable = ko.observable()
     instance = {}
-    raises((->kb.utils.wrappedObservable(instance)), Error, "Knockback: instance is not wrapping an observable") # get
+    raises((->kb.utils.wrappedObservable(instance)), null, "Knockback: instance is not wrapping an observable") # get
 
     kb.utils.wrappedObservable(instance, observable) # set
     equal(kb.utils.wrappedObservable(instance), observable, "observable was wrapped") # get

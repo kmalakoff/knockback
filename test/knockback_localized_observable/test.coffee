@@ -1,10 +1,15 @@
 $(document).ready( ->
   module("knockback_localized_observable.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
-  kb.locale_manager = new LocaleManager('en', {
+  kb.locale_manager = new kb._.LocaleManager('en', {
     'en':
       formal_hello: 'Hello'
       formal_goodbye: 'Goodbye'
@@ -31,11 +36,11 @@ $(document).ready( ->
 
   test("Localized greeting", ->
     ContactViewModelGreeting = (model) ->
-      @hello = kb.observable(model, {key:'hello_greeting', localizer: LocalizedStringLocalizer})
-      @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: LocalizedStringLocalizer})
+      @hello = kb.observable(model, {key:'hello_greeting', localizer: kb._.LocalizedStringLocalizer})
+      @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: kb._.LocalizedStringLocalizer})
       @
 
-    model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
+    model = new kb._.Contact({hello_greeting: new kb._.LocalizedString('formal_hello'), goodbye_greeting: new kb._.LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
 
     kb.locale_manager.setLocale('en')
@@ -50,7 +55,7 @@ $(document).ready( ->
     equal(view_model.hello(), 'Bonjour', "fr-FR: Hello")
     equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye")
 
-    model.set({hello_greeting: new LocalizedString('informal_hello'), goodbye_greeting: new LocalizedString('informal_goodbye')})
+    model.set({hello_greeting: new kb._.LocalizedString('informal_hello'), goodbye_greeting: new kb._.LocalizedString('informal_goodbye')})
     kb.locale_manager.setLocale('en')
     equal(view_model.hello(), 'Hi', "en: Hello")
     equal(view_model.goodbye(), 'Bye', "en: Goobye")
@@ -81,11 +86,11 @@ $(document).ready( ->
 
   test("Date and time with jquery.globalize", ->
     ContactViewModelDate = (model) ->
-      @date = kb.observable(model, {key:'date', write: true, localizer: LongDateLocalizer}, this)
+      @date = kb.observable(model, {key:'date', write: true, localizer: kb._.LongDateLocalizer}, this)
       @
 
     birthdate = new Date(1940, 10, 9)
-    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
@@ -147,10 +152,10 @@ $(document).ready( ->
 
     ContactViewModelGreeting = (model) ->
       @greeting_key = ko.observable('hello_greeting')
-      @greeting = kb.observable(model, {key:@greeting_key, localizer: LocalizedStringLocalizer})
+      @greeting = kb.observable(model, {key:@greeting_key, localizer: kb._.LocalizedStringLocalizer})
       @
 
-    model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
+    model = new kb._.Contact({hello_greeting: new kb._.LocalizedString('formal_hello'), goodbye_greeting: new kb._.LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
 
     equal(view_model.greeting(), 'Hello', "en: Hello")
@@ -164,8 +169,8 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
-    raises((->kb.utils.wrappedObservable(null)), Error, "Knockback: instance is not wrapping an observable")
-    raises((->kb.utils.wrappedObservable({})), Error, "Knockback: instance is not wrapping an observable")
+    raises((->kb.utils.wrappedObservable(null)), null, "Knockback: instance is not wrapping an observable")
+    raises((->kb.utils.wrappedObservable({})), null, "Knockback: instance is not wrapping an observable")
     kb.utils.wrappedObservable({__kb: {observable: ko.observable()}})
   )
 )

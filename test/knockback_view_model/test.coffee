@@ -1,13 +1,18 @@
 $(document).ready( ->
   module("knockback_view_model.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
 
-  kb.locale_manager = new LocaleManager('en', {})
+  kb.locale_manager = new kb._.LocaleManager('en', {})
 
   test("Standard use case: read and write", ->
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model)
 
     # get
@@ -29,7 +34,7 @@ $(document).ready( ->
   )
 
   test("Standard use case: read only", ->
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model, {read_only: true})
 
     # get
@@ -58,10 +63,10 @@ $(document).ready( ->
       constructor: (model) ->
         super(model, {internals: ['email', 'date']})
         @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
-        @date = new LongDateLocalizer(@_date)
+        @date = new kb._.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email
@@ -122,12 +127,12 @@ $(document).ready( ->
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']})
         @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
-        @date = new LongDateLocalizer(@_date)
+        @date = new kb._.LongDateLocalizer(@_date)
         @
     })
 
     birthdate = new Date(1940, 10, 9)
-    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email
@@ -190,7 +195,7 @@ $(document).ready( ->
         @name = ko.dependentObservable(=> return "First: #{@_name()}")
         @number = kb.formattedObservable('#: {0}', @_number)
 
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -232,7 +237,7 @@ $(document).ready( ->
       }, view_model)
       return view_model
 
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -283,10 +288,10 @@ $(document).ready( ->
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
-        @date = new LongDateLocalizer(@_date)
+        @date = new kb._.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
@@ -357,7 +362,7 @@ $(document).ready( ->
     equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
 
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
-    raises((->view_model.release()), Error, "ViewModel: ref_count is corrupt: 1")
+    raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
   )
 
   test("reference counting and custom __destroy (Javascript inheritance)", ->
@@ -390,7 +395,7 @@ $(document).ready( ->
     equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
 
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
-    raises((->view_model.release()), Error, "ViewModel: ref_count is corrupt: 1")
+    raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
   )
 
   test("Collection with nested custom view models", ->
@@ -399,16 +404,16 @@ $(document).ready( ->
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
-        @date = new LongDateLocalizer(@_date)
+        @date = new kb._.LongDateLocalizer(@_date)
 
     john_birthdate = new Date(1940, 10, 9)
-    john = new Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
+    john = new kb._.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
     paul_birthdate = new Date(1942, 6, 18)
-    paul = new Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
+    paul = new kb._.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
     george_birthdate = new Date(1943, 2, 25)
-    george = new Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
+    george = new kb._.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
-    ringo = new Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
+    ringo = new kb._.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
     major_duo = new Backbone.Collection([john, paul])
     minor_duo = new Backbone.Collection([george, ringo])
     nested_model = new Backbone.Model({
@@ -444,7 +449,7 @@ $(document).ready( ->
 
       # set from the view model
       kb.locale_manager.setLocale('en-GB')
-      formatted_date = new LongDateLocalizer(birthdate)
+      formatted_date = new kb._.LongDateLocalizer(birthdate)
       equal(view_model.date(), formatted_date(), "#{view_model.name()}: Birthdate in Great Britain format")
       view_model.date('10 December 1963')
       current_date = model.get('date')

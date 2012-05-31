@@ -6,7 +6,7 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-class Knockback.Store
+class kb.Store
   constructor: ->
     @keys = []
     @values = []

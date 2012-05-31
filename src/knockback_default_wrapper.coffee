@@ -5,14 +5,13 @@
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
-throw new Error('Knockback: Dependency alert! knockback_core.js must be included before this file') if not this.Knockback
 
 ######################################
-# Knockback.defaultWrapper to provide a default value when an observable is null, undefined, or the empty string
+# kb.defaultWrapper to provide a default value when an observable is null, undefined, or the empty string
 # Provide a observable with observable and/or non observable default argument in the form of:
 #   kb.defaultWrapper(some_observable, "blue")
 ######################################
-class Knockback.DefaultWrapper
+class kb.DefaultWrapper
   constructor: (target_observable, @default_value_observable) ->
     @__kb = {}
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
@@ -37,4 +36,4 @@ class Knockback.DefaultWrapper
     observable = kb.utils.wrappedObservable(this)
     observable(@default_value_observable)
 
-Knockback.defaultWrapper = (target, default_value) -> return new Knockback.DefaultWrapper(target, default_value)
+kb.defaultWrapper = (target, default_value) -> return new kb.DefaultWrapper(target, default_value)

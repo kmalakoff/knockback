@@ -1,5 +1,10 @@
 $(document).ready( ->
   module("knockback.js with Backbone-Relational.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION; Backbone.Relational.Semaphore
   )

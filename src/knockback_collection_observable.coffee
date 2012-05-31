@@ -28,12 +28,12 @@
 #   remove: (view_model, collection_observable) or if batch: (collection_observable)
 ####################################################
 
-class Knockback.CollectionObservable extends kb.RefCountable
+class kb.CollectionObservable extends kb.RefCountable
   constructor: (collection, options={}) ->
-    throw new Error('CollectionObservable: collection is missing') if not collection
+    throw 'CollectionObservable: collection is missing' if not collection
 
     super
-    kb.stats.collection_observables++ if Knockback.stats_on     # collect memory management statistics
+    kb.stats.collection_observables++ if kb.stats_on     # collect memory management statistics
 
     # LEGACY
     if ko.isObservable(options) and options.hasOwnProperty('indexOf')
@@ -52,19 +52,19 @@ class Knockback.CollectionObservable extends kb.RefCountable
 
     # options
     if options.hasOwnProperty('view_model')
-      throw new Error('Knockback.CollectionObservable: options.view_model is empty') if not options.view_model
+      throw 'kb.CollectionObservable: options.view_model is empty' if not options.view_model
       @view_model_create_fn = options.view_model
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_constructor')
-      throw new Error('Knockback.CollectionObservable: options.view_model_constructor is empty') if not options.view_model_constructor
+      throw 'kb.CollectionObservable: options.view_model_constructor is empty' if not options.view_model_constructor
       kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', '0.16.0', 'Please use view_model option instead')
       @view_model_create_fn = options.view_model_constructor
       @view_model_create_with_new = true
     else if options.hasOwnProperty('view_model_create')
-      throw new Error('Knockback.CollectionObservable: options.view_model_create is empty') if not options.view_model_create
+      throw 'kb.CollectionObservable: options.view_model_create is empty' if not options.view_model_create
       @view_model_create_fn = options.view_model_create
     else if options.hasOwnProperty('create')
-      throw new Error('Knockback.CollectionObservable: options.create is empty') if not options.create
+      throw 'kb.CollectionObservable: options.create is empty' if not options.create
       @view_model_create_fn = options.create
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
@@ -107,11 +107,11 @@ class Knockback.CollectionObservable extends kb.RefCountable
     kb.utils.wrappedObservable(this, null)
     super
 
-    kb.stats.collection_observables-- if Knockback.stats_on       # collect memory management statistics
+    kb.stats.collection_observables-- if kb.stats_on       # collect memory management statistics
 
   # override reference counting return value
-  retain: -> super; return kb.utils.wrappedObservable(this)
-  release: -> observable = kb.utils.wrappedObservable(this); super; return observable
+  retain: -> super; return kb.utils.wrappedObservable(@)
+  release: -> observable = kb.utils.wrappedObservable(@); super; return observable
 
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(this)
@@ -189,7 +189,7 @@ class Knockback.CollectionObservable extends kb.RefCountable
 
   _onCollectionReset: -> @_collectionResync()
   _onCollectionResort: (model_or_models) ->
-    throw new Error("CollectionObservable: collection sorted_index unexpected") if @sorted_index
+    throw 'CollectionObservable: collection sorted_index unexpected' if @sorted_index
     if _.isArray(model_or_models)
       observable = kb.utils.wrappedObservable(this)
       @trigger('resort', observable()) # notify
@@ -282,11 +282,11 @@ class Knockback.CollectionObservable extends kb.RefCountable
 #######################################
 # Mix in Backbone.Events so callers can subscribe
 #######################################
-Knockback.CollectionObservable.prototype extends Backbone.Events
+kb.CollectionObservable.prototype extends Backbone.Events
 
 # factory function
-Knockback.collectionObservable = (collection, options, legacy) -> return new Knockback.CollectionObservable(collection, options, legacy)
+kb.collectionObservable = (collection, options, legacy) -> return new kb.CollectionObservable(collection, options, legacy)
 
 # helpers
-Knockback.sortedIndexWrapAttr = Knockback.siwa = (attribute_name, wrapper_constructor) ->
+kb.sortedIndexWrapAttr = kb.siwa = (attribute_name, wrapper_constructor) ->
   return (models, model) -> return _.sortedIndex(models, model, (test) -> return new wrapper_constructor(kb.utils.wrappedModel(test).get(attribute_name)))

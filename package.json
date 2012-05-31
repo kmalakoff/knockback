@@ -16,10 +16,13 @@
     "knockout"  : ">=1.2.1"
   },
   "devDependencies": {
-    "coffee-script": ">=1.3.0"
+    "coffee-script": ">=1.3.0",
+    "yaml": ">=0.2.3",
+    "js-yaml": ">=0.3.7",
+    "walk": ">=2.1.1"
   },
 
   "lib" : ".",
   "main" : "knockback.js",
-  "version": "0.15.2"
+  "version": "0.15.3"
 }

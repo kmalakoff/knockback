@@ -10,7 +10,8 @@
 # Note: If you are deriving a class, you need to return the underlying observable rather than your instance since Knockout is expecting observable functions:
 #   For example:
 #     constructor: ->
-#       super; return kb.utils.wrappedObservable(this)
+#       super
+#       return kb.utils.wrappedObservable(@)
 #
 # You can either provide a read or a read and write function in the options or on the class itself.
 # Options (all optional)
@@ -20,14 +21,14 @@
 #   * onChange: (localized_string, value, observable) -> called when the value changes
 ####################################################
 
-class Knockback.LocalizedObservable
-  @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "Knockback.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends Knockback.RefCountable")
+class kb.LocalizedObservable
+  @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
   constructor: (@value, @options={}, @view_model={}) ->
-    throw new Error('LocalizedObservable: options.read is missing') if not (@options.read or @read)
-    throw new Error('LocalizedObservable: options.read and read class function exist. You need to choose one.') if @options.read and @read
-    throw new Error('LocalizedObservable: options.write and write class function exist. You need to choose one.') if @options.write and @write
-    throw new Error('LocalizedObservable: Knockback.locale_manager is not defined') if not kb.locale_manager
+    throw 'LocalizedObservable: options.read is missing' if not (@options.read or @read)
+    throw 'LocalizedObservable: options.read and read class function exist. You need to choose one.' if @options.read and @read
+    throw 'LocalizedObservable: options.write and write class function exist. You need to choose one.' if @options.write and @write
+    throw 'LocalizedObservable: kb.locale_manager is not defined' if not kb.locale_manager
 
     @__kb = {}
     @__kb._onLocaleChange = _.bind(@_onLocaleChange, @)
@@ -36,10 +37,10 @@ class Knockback.LocalizedObservable
     value = ko.utils.unwrapObservable(@value) if @value
     @__kb.value_observable = ko.observable(if not value then @_getDefaultValue() else @read.call(this, value, null))
 
-    throw new Error('LocalizedObservable: options.write is not a function for read_write model attribute') if @write and not (typeof(@write) == 'function')
+    throw 'LocalizedObservable: options.write is not a function for read_write model attribute' if @write and not (typeof(@write) == 'function')
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @write then _.bind(@_onSetValue, @) else (-> throw new Error("Knockback.LocalizedObservable: value is read only"))
+      write: if @write then _.bind(@_onSetValue, @) else (-> throw 'kb.LocalizedObservable: value is read only')
       owner:@view_model
     }))
 
@@ -106,4 +107,4 @@ class Knockback.LocalizedObservable
     @options.onChange(value) if @options.onChange
 
 # factory function
-Knockback.localizedObservable = (value, options, view_model) -> return new Knockback.LocalizedObservable(value, options, view_model)
+kb.localizedObservable = (value, options, view_model) -> return new kb.LocalizedObservable(value, options, view_model)

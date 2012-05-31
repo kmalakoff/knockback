@@ -1,5 +1,10 @@
 $(document).ready( ->
   module("knockback_observable.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
@@ -10,7 +15,7 @@ $(document).ready( ->
       @number = kb.observable(model, {key:'number', read_only: true})
       @
 
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModel(model)
 
     # get
@@ -44,7 +49,7 @@ $(document).ready( ->
       })
       @
 
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -75,7 +80,7 @@ $(document).ready( ->
       @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
       @
 
-    model = new Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
     ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
   )
@@ -90,7 +95,7 @@ $(document).ready( ->
       })
       @           # must return this or Coffeescript will return the last statement which is not what we want!
 
-    model = new Contact({name: 'Ringo'})
+    model = new kb._.Contact({name: 'Ringo'})
     view_model = new ContactViewModel(model)
 
     # get

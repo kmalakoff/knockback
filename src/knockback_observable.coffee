@@ -14,12 +14,12 @@
 #   * args - arguments passed to the read and write function
 ####################################################
 
-class Knockback.Observable
+class kb.Observable
   constructor: (@model, @mapping_info, @view_model={}) ->
-    throw new Error('Observable: model is missing') if not @model
-    throw new Error('Observable: mapping_info is missing') if not @mapping_info
+    throw 'Observable: model is missing' if not @model
+    throw 'Observable: mapping_info is missing' if not @mapping_info
     @mapping_info = {key: @mapping_info} if _.isString(@mapping_info) or ko.isObservable(@mapping_info)
-    throw new Error('Observable: mapping_info.key is missing') if not @mapping_info.key
+    throw 'Observable: mapping_info.key is missing' if not @mapping_info.key
 
     @__kb = {}
     @__kb._onModelChange = _.bind(@_onModelChange, @)
@@ -41,7 +41,7 @@ class Knockback.Observable
     @__kb.localizer = new @mapping_info.localizer(@_getCurrentValue()) if @mapping_info.localizer
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @mapping_info.read_only then (=> throw new Error("Knockback.Observable: #{@mapping_info.key} is read only")) else _.bind(@_onSetValue, @)
+      write: if @mapping_info.read_only then (=> throw "kb.Observable: #{@mapping_info.key} is read only") else _.bind(@_onSetValue, @)
       owner: @view_model
     }))
 
@@ -151,4 +151,4 @@ class Knockback.Observable
     @__kb.value_observable(value) # trigger the dependable
 
 # factory function
-Knockback.observable = (model, mapping_info, view_model) -> return new Knockback.Observable(model, mapping_info, view_model)
+kb.observable = (model, mapping_info, view_model) -> return new kb.Observable(model, mapping_info, view_model)

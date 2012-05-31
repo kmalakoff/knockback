@@ -6,14 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-####################################################
-# Triggers when the given event is triggered using
-####################################################
-
-class Knockback.TriggeredObservable
+class kb.TriggeredObservable
   constructor: (@model, @event_name) ->
-    throw new Error('Observable: model is missing') if not @model
-    throw new Error('Observable: event_name is missing') if not @event_name
+    throw 'Observable: model is missing' if not @model
+    throw 'Observable: event_name is missing' if not @event_name
 
     @__kb = {}
     @__kb._onValueChange = _.bind(@_onValueChange, @)
@@ -70,4 +66,4 @@ class Knockback.TriggeredObservable
     if current_value != @model then @__kb.value_observable(@model) else @__kb.value_observable.valueHasMutated() # trigger the dependable
 
 # factory function
-Knockback.triggeredObservable = (model, event_name) -> return new Knockback.TriggeredObservable(model, event_name)
+kb.triggeredObservable = (model, event_name) -> return new kb.TriggeredObservable(model, event_name)

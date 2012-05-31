@@ -1,5 +1,10 @@
 $(document).ready( ->
   module("knockback_formatted_observable.js")
+
+  # import Underscore, Backbone, and Knockout
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
     ko.utils; _.VERSION; Backbone.VERSION
   )
@@ -15,7 +20,7 @@ $(document).ready( ->
         @name_number_name = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}', @_name, @_number)
         @name_number_name_song = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}, Song: "{2}"', @_name, @_number, @favorite_song)
 
-    model = new Contact({name: 'Ringo', number: '555-555-5556', favorite_song: 'Yellow Submarine'})
+    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556', favorite_song: 'Yellow Submarine'})
     view_model = new ContactViewModelCustom(model)
 
     # get

@@ -6,19 +6,23 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-class Knockback.Observables
+class kb.Observables
   constructor: (model, mappings_info, view_model, options_or_read_only) ->
-    throw new Error('Observables: model is missing') if not model
-    throw new Error('Observables: mappings_info is missing') if not mappings_info or not _.isObject(mappings_info)
+    throw 'Observables: model is missing' if not model
+    throw 'Observables: mappings_info is missing' unless mappings_info and (_.isObject(mappings_info) or _.isArray(mappings_info))
 
     @__kb or= {}
     @__kb.model = model
-    @__kb.mappings_info = mappings_info
+    if _.isArray(mappings_info)
+      @__kb.mappings_info = {}
+      @__kb.mappings_info[key] = {} for key in mappings_info
+    else
+      @__kb.mappings_info = mappings_info
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
 
     # LEGACY
     if not _.isUndefined(options_or_read_only) and options_or_read_only.hasOwnProperty('write')
-      kb.utils.legacyWarning('Knockback.Observables option.write', '0.16.0', 'Now default is writable so only supply read_only as required')
+      kb.utils.legacyWarning('kb.Observables option.write', '0.16.0', 'Now default is writable so only supply read_only as required')
       options_or_read_only.read_only = !options_or_read_only.write
       delete options_or_read_only['write']
 
@@ -40,7 +44,7 @@ class Knockback.Observables
       for property_name, mapping_info of @__kb.mappings_info
 
         if mapping_info.hasOwnProperty('write') # LEGACY
-          kb.utils.legacyWarning('Knockback.Observables option.write', '0.16.0', 'Now default is writable so only supply read_only as required')
+          kb.utils.legacyWarning('kb.Observables option.write', '0.16.0', 'Now default is writable so only supply read_only as required')
 
         mapping_info.key = property_name unless mapping_info.hasOwnProperty('key') # infer the key
         @[property_name] = @__kb.view_model[property_name] = kb.observable(@__kb.model, mapping_info, @__kb.view_model)
@@ -58,4 +62,4 @@ class Knockback.Observables
     @__kb.view_model[property_name].setToDefault() for property_name, mapping_info of @__kb.mappings_info
 
 # factory function
-Knockback.observables = (model, mappings_info, view_model, options) -> return new Knockback.Observables(model, mappings_info, view_model, options)
+kb.observables = (model, mappings_info, view_model, options) -> return new kb.Observables(model, mappings_info, view_model, options)
