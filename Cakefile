@@ -9,6 +9,7 @@ _ = require 'underscore'
 # CONFIG
 CONFIG = yaml.load(fs.readFileSync('config.yaml', 'utf8'))
 JS_DIRS = ['test/_examples/build'].concat(CONFIG['test_dirs'])
+WEBSITE_DIRS = ['tutorials', 'docs', 'stylesheets', 'javascripts', 'images']
 LIBRARY_NAMES = {development: 'knockback.js', production: 'knockback.min.js'}
 
 build = (watch) ->
@@ -33,18 +34,25 @@ build = (watch) ->
     coffee.stderr.on 'data', (data) -> process.stderr.write data.toString()
     coffee.stdout.on 'data', (data) -> print data.toString()
 
-task 'clean', 'Remove generated JavaScript files', ->
+clean = ->
   # Knockback Library
-  for key, name of LIBRARY_NAMES
-    fs.unlink(name) if path.existsSync(name)
+  fs.unlink(name) for key, name of LIBRARY_NAMES
 
   # traverse and delete the library for examples and test files
-  for index, pattern of JS_DIRS
-    walk.walk(pattern, { followLinks: false }).on('file', (root, stat, next) ->
+  for dir in JS_DIRS
+    walk.walk(dir, { followLinks: false }).on('file', (root, stat, next) ->
       fs.unlink("#{root}/#{stat.name}") if stat.name.match(/.js$/)
       next()
     )
 
-task 'build', 'Build library and tests', -> build(false) # just build
+  # remove website directories
+  fs.unlink(dir) for dir in WEBSITE_DIRS
 
-task 'watch', 'Watch library and tests', -> build(true) # build with watch
+##############################
+# COMMANDS
+##############################
+task 'clean', 'Remove generated JavaScript files', -> clean()
+
+task 'build', 'Build library and tests', -> clean(); build(false) # just build
+
+task 'watch', 'Watch library and tests', -> clean(); build(true) # build with watch
