@@ -28,3 +28,9 @@ test_dirs:
   - test/knockback_view_model
   - test/knockback_view_model_min
   - test/knockback_memory_management
+
+_examples:
+  - test/_examples/contact.coffee
+  - test/_examples/locale_manager.coffee
+  - test/_examples/localized_observables.coffee
+  - test/_examples/localized_string.coffee

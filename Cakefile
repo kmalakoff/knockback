@@ -51,7 +51,7 @@ build = (options={}) ->
   callback_count++; compileCoffee(['-j', LIBRARY_NAME, '-o', '.'], CONFIG['library'], options)
 
   # examples
-  callback_count++; compileCoffee(['-j', '_examples.js', '-o', 'test/_examples/build'], 'test/_examples', options)
+  callback_count++; compileCoffee(['-j', '_examples.js', '-o', 'test/_examples/build'], CONFIG['_examples'], options)
 
   # tests
   for file in _.select(_.map(CONFIG['test_dirs'], (path)-> return (path + '/test.coffee')), (file)-> path.existsSync(file))
