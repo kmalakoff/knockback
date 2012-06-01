@@ -26,26 +26,26 @@ compileCoffee = (args, files_or_dir, options={}) ->
   if options.watch
     spawned.stdout.on 'data', (data) ->
       print data.toString() unless options.silent
-      options.callback() if options.callback and options.watch
+      options.callback?(0) if options.callback
   else
     output_name = if ((index = _.indexOf(args, '-j')) < 0) then files_or_dir else args[index+1]
     filenames = _.clone(output_name) if _.isArray(output_name)
     spawned.on 'exit', (code) ->
       (if filenames then timeLog("compiled #{filenames.pop()}") else timeLog("compiled #{output_name}")) unless options.silent
-      options.callback() if options.callback and code is 0
+      options.callback?(code) if options.callback
 
 minify = (src, options={}) ->
   spawned = spawn 'minifyjs', [src]
   spawned.on 'exit', (code) ->
-    timeLog("#{code}")
-    # return unless code is 0
     timeLog("minified #{src}") unless options.silent
-    options.callback?()
+    options.callback?(code) if options.callback
 
 build = (options={}) ->
   callback_count=0; original_callback = options.callback; options = _.clone(options)
-  options.callback = ->
-    minify(LIBRARY_NAME, {silent: options.silent, callback: original_callback}) if --callback_count<=0
+  options.callback = (code) ->
+    options.callback?(code) if options.callback and not code is 0
+    return if --callback_count>0
+    minify(LIBRARY_NAME, {silent: options.silent, callback: original_callback})
 
   # library
   callback_count++; compileCoffee(['-j', LIBRARY_NAME, '-o', '.'], CONFIG['library'], options)
@@ -77,7 +77,7 @@ runHeadlessTest = (filename, options) ->
       timeLog("tests passed #{filename}") unless options.silent
     else
       timeLog("tests failed #{filename}")
-    options.callback?()
+    options.callback?(code)
 
 ##############################
 # COMMANDS
@@ -103,8 +103,12 @@ task 'test', 'Test library', (options) ->
     # add headers
     timeLog("************tests started*************")
     callback_count=0; original_callback = options.callback; options = _.clone(options)
-    options.callback = ->
-      timeLog("************tests finished************") if --callback_count<=0
+    result = 0    # collect test results
+    options.callback = (code) ->
+      result |= code
+      return if --callback_count>0
+      if result then timeLog("************tests failed**************") else timeLog("************tests succeeded***********")
+      process.exit(result) unless options.watch
 
     # run the tests
     for file in _.select(_.map(CONFIG['test_dirs'], (path)-> return (path + '/test-latest.html')), (file)-> path.existsSync(file))
