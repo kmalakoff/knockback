@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/[kmalakoff]/[knockback].png)](http://travis-ci.org/[kmalakoff]/[knockback])
+[![Build Status](https://secure.travis-ci.org/kmalakoff/knockback.png)](http://travis-ci.org/kmalakoff/knockback)
 
 ````
     __ __                  __   __               __       _
