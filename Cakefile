@@ -5,7 +5,6 @@ path = require 'path'
 yaml = require 'js-yaml'
 wrench = require 'wrench'
 _ = require 'underscore'
-qunit = require 'qunit'
 
 # CONFIG
 LIBRARY_NAME = 'Knockback.js'
