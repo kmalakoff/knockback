@@ -101,9 +101,9 @@ kb.vmRelease = (view_model) ->
   kb.utils.legacyWarning('kb.vmRelease', '0.16.0', 'Please use kb.utils.release instead')
   return kb.utils.release(view_model)
 
-# kb.vmReleaseObservable = (observable) ->
-#   kb.utils.legacyWarning('kb.vmReleaseObservable', '0.16.0', 'Please use kb.utils.release instead')
-#   return kb.utils.release(observable)
+kb.vmReleaseObservable = (observable) ->
+  kb.utils.legacyWarning('kb.vmReleaseObservable', '0.16.0', 'Please use kb.utils.release instead')
+  return kb.utils.release(observable)
 
 kb.utils.optionsCreateClear = (options) ->
   delete options['create']
