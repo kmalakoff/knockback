@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - 0.7 # development version of 0.8, may be unstable
+
+notifications:
+  email:
+    on_success: always # [always|never|change] default: change
+    on_failure: always # [always|never|change] default: always
+
+before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"

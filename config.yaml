@@ -1,5 +1,6 @@
 library:
   - src/knockback_core.coffee
+  - src/knockback_utils.coffee
   - src/knockback_ref_countable.coffee
   - src/knockback_store.coffee
   - src/knockback_collection_observable.coffee
@@ -27,3 +28,9 @@ test_dirs:
   - test/knockback_view_model
   - test/knockback_view_model_min
   - test/knockback_memory_management
+
+_examples:
+  - test/_examples/contact.coffee
+  - test/_examples/locale_manager.coffee
+  - test/_examples/localized_observables.coffee
+  - test/_examples/localized_string.coffee

@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/kmalakoff/knockback.png)](http://travis-ci.org/kmalakoff/knockback)
+
 ````
     __ __                  __   __               __       _
    / //_/____  ____  _____/ /__/ /_  ____ ______/ /__    (_)____
@@ -108,18 +110,20 @@ Try a live demo: http://kmalakoff.github.com/knockback-todos/ or http://jsfiddle
 Building the library
 -----------------------
 
-Installing:
+###Installing:
 
-1. install ruby: http://www.ruby-lang.org
-2. install bundler: http://gembundler.com
-3. install gems: (sudo) 'bundle install'
-4. install node.js: http://nodejs.org
-5. install node packages: (sudo) 'npm install'
+1. install node.js: http://nodejs.org
+2. install node packages: (sudo) 'npm install'
 
-Commands:
+###Commands:
 
-1. 'rake clean' - cleans the project of all compiled files
-2. 'rake build' - performs a single build
-3. 'rake watch' - automatically scans for and builds the project when changes are detected
-4. 'rake package' - cleans the project of all compiled files, builds, and minimizes library
+1. 'cake clean' - cleans the project of all compiled files
+2. 'cake build' - performs a single build
+3. 'cake watch' - automatically scans for and builds the project when changes are detected
+3. 'cake test' - cleans, builds, and runs tests. Note: the tests require installing phantomjs: ('brew install phantomjs' or http://phantomjs.org/)
 
+Options:
+
+1. '-c' or '--clean'  - cleans the project before running a new command
+2. '-w' or '--watch'  - watches for changes
+3. '-s' or '--silent' - does not output messages to the console (unless errors occur)

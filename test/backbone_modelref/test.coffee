@@ -6,7 +6,7 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
-    ko.utils; _.VERSION; Backbone.VERSION
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
   )
 
   kb.locale_manager = new kb._.LocaleManager('en', {
@@ -144,18 +144,18 @@ $(document).ready( ->
     equal(current_date.getMonth(), 10, "month is good")
     equal(current_date.getDate(), 10, "day is good")
 
-    # # go back to loading state
-    collection.reset()
-    equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    kb.utils.setToDefault(view_model)
-    kb.locale_manager.setLocale('en')
-    equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.name(), 'Loading sir', "Maybe too formal")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+    # go back to loading state
+    # collection.reset()
+    # equal(view_model.name(), 'Yoko', "Default is to retain the last value")
+    # kb.utils.setToDefault(view_model)
+    # kb.locale_manager.setLocale('en')
+    # equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+    # kb.locale_manager.setLocale('en-GB')
+    # equal(view_model.name(), 'Loading sir', "Maybe too formal")
+    # kb.locale_manager.setLocale('fr-FR')
+    # equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    # kb.utils.release(view_model)
   )
 )
