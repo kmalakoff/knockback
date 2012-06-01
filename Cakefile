@@ -11,7 +11,7 @@ LIBRARY_NAME = 'Knockback.js'
 CONFIG = yaml.load(fs.readFileSync('config.yaml', 'utf8'))
 JS_DIRS = ['test/_examples/build'].concat(_.map(CONFIG['test_dirs'], (dir)-> return "#{dir}/build"))
 WEBSITE_DIRS = ['tutorials', 'docs', 'stylesheets', 'javascripts', 'images']
-LIBRARY_NAMES = {development: 'knockback.js', production: 'knockback.min.js'}
+LIBRARY_NAME = 'knockback.js'
 TEST_TIMEOUT = 10000
 
 timeLog = (message) ->
@@ -20,36 +20,38 @@ timeLog = (message) ->
 compileCoffee = (args, files_or_dir, options={}) ->
   args = if options.watch then _.flatten(['-w', args, '-c', files_or_dir]) else _.flatten([args, '-c', files_or_dir])
 
-  coffee = spawn 'coffee', args
-  coffee.stderr.on 'data', (data) ->
+  spawned = spawn 'coffee', args
+  spawned.stderr.on 'data', (data) ->
     process.stderr.write data.toString()
   if options.watch
-    coffee.stdout.on 'data', (data) ->
+    spawned.stdout.on 'data', (data) ->
       print data.toString() unless options.silent
       options.callback() if options.callback and options.watch
   else
     output_name = if ((index = _.indexOf(args, '-j')) < 0) then files_or_dir else args[index+1]
     filenames = _.clone(output_name) if _.isArray(output_name)
-    coffee.on 'exit', (code) ->
+    spawned.on 'exit', (code) ->
       (if filenames then timeLog("compiled #{filenames.pop()}") else timeLog("compiled #{output_name}")) unless options.silent
       options.callback() if options.callback and code is 0
 
-minify = (src, dest, options={}) ->
-  uglifyjs = spawn 'uglifyjs', ['-o', dest, src]
-  uglifyjs.on 'exit', (code) ->
-    return unless code is 0
+minify = (src, options={}) ->
+  spawned = spawn 'minifyjs', [src]
+  spawned.on 'exit', (code) ->
+    timeLog("#{code}")
+    # return unless code is 0
     timeLog("minified #{src}") unless options.silent
     options.callback?()
 
 build = (options={}) ->
-  callback_count=2; original_callback = options.callback; options = _.clone(options)
-  options.callback = -> minify(LIBRARY_NAMES.development, LIBRARY_NAMES.production, {silent: options.silent, callback: original_callback}) if --callback_count<=0
+  callback_count=0; original_callback = options.callback; options = _.clone(options)
+  options.callback = ->
+    minify(LIBRARY_NAME, {silent: options.silent, callback: original_callback}) if --callback_count<=0
 
   # library
-  compileCoffee(['-j', LIBRARY_NAMES.development, '-o', '.'], CONFIG['library'], options)
+  callback_count++; compileCoffee(['-j', LIBRARY_NAME, '-o', '.'], CONFIG['library'], options)
 
   # examples
-  compileCoffee(['-j', '_examples.js', '-o', 'test/_examples/build'], 'test/_examples', options)
+  callback_count++; compileCoffee(['-j', '_examples.js', '-o', 'test/_examples/build'], 'test/_examples', options)
 
   # tests
   for file in _.select(_.map(CONFIG['test_dirs'], (path)-> return (path + '/test.coffee')), (file)-> path.existsSync(file))
@@ -57,7 +59,7 @@ build = (options={}) ->
 
 clean = (options={}) ->
   # Library
-  fs.unlink(name) for key, name of LIBRARY_NAMES
+  fs.unlink(LIBRARY_NAME)
 
   # traverse and delete the library for examples and test files
   wrench.rmdirSyncRecursive(dir, true) for dir in JS_DIRS
@@ -67,10 +69,10 @@ clean = (options={}) ->
   timeLog("cleaned library #{LIBRARY_NAME}") unless options.silent
 
 runHeadlessTest = (filename, options) ->
-  phantomjs = spawn 'phantomjs', ['test/vendor/qunit/run-qunit.js', "file://#{fs.realpathSync(filename)}", TEST_TIMEOUT]
-  phantomjs.stdout.on 'data', (data) ->
+  spawned = spawn 'phantomjs', ['test/vendor/qunit/run-qunit.js', "file://#{fs.realpathSync(filename)}", TEST_TIMEOUT]
+  spawned.stdout.on 'data', (data) ->
     process.stderr.write data.toString()
-  phantomjs.on 'exit', (code) ->
+  spawned.on 'exit', (code) ->
     if code is 0
       timeLog("tests passed #{filename}") unless options.silent
     else
@@ -101,7 +103,8 @@ task 'test', 'Test library', (options) ->
     # add headers
     timeLog("************tests started*************")
     callback_count=0; original_callback = options.callback; options = _.clone(options)
-    options.callback = -> timeLog("************tests finished************") if --callback_count<=0
+    options.callback = ->
+      timeLog("************tests finished************") if --callback_count<=0
 
     # run the tests
     for file in _.select(_.map(CONFIG['test_dirs'], (path)-> return (path + '/test-latest.html')), (file)-> path.existsSync(file))

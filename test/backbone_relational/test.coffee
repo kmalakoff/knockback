@@ -6,7 +6,7 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   test("TEST DEPENDENCY MISSING", ->
-    ko.utils; _.VERSION; Backbone.VERSION; Backbone.Relational.Semaphore
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); Backbone.Relational.Semaphore
   )
 
   class Person extends Backbone.RelationalModel
