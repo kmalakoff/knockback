@@ -12,7 +12,7 @@ CONFIG = yaml.load(fs.readFileSync('config.yaml', 'utf8'))
 JS_DIRS = ['test/_examples/build'].concat(_.map(CONFIG['test_dirs'], (dir)-> return "#{dir}/build"))
 WEBSITE_DIRS = ['tutorials', 'docs', 'stylesheets', 'javascripts', 'images']
 LIBRARY_NAME = 'knockback.js'
-TEST_TIMEOUT = 10000
+TEST_TIMEOUT = 60000
 
 timeLog = (message) ->
   console.log("#{(new Date).toLocaleTimeString()} - #{message}")
