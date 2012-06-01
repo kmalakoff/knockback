@@ -1,5 +1,6 @@
 library:
   - src/knockback_core.coffee
+  - src/knockback_utils.coffee
   - src/knockback_ref_countable.coffee
   - src/knockback_store.coffee
   - src/knockback_collection_observable.coffee

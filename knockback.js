@@ -26,7 +26,7 @@
 
   ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 
-  kb.locale_manager;
+  kb.locale_manager = void 0;
 
   kb.stats = {
     collection_observables: 0,
@@ -35,6 +35,17 @@
 
   kb.stats_on = false;
 
+  /*
+    knockback_utils.js 0.15.3
+    (c) 2011 Kevin Malakoff.
+    Knockback.js is freely distributable under the MIT license.
+    See the following for full license details:
+      https://github.com/kmalakoff/knockback/blob/master/LICENSE
+    Dependencies: Knockout.js, Backbone.js, and Underscore.js.
+      Optional dependency: Backbone.ModelRef.js.
+  */
+
+
   kb.utils = {};
 
   kb.utils.legacyWarning = function(identifier, remove_version, message) {
@@ -42,7 +53,7 @@
     kb._legacy_warnings || (kb._legacy_warnings = {});
     (_base = kb._legacy_warnings)[identifier] || (_base[identifier] = 0);
     kb._legacy_warnings[identifier]++;
-    return console.warn("Legacy warning! '" + identifier + "' has been deprecated (will be removed in Knockback " + remove_version + "). " + message + ".");
+    return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback " + remove_version + "). " + message + ".");
   };
 
   kb.utils.wrappedObservable = function(instance, observable) {

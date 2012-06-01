@@ -338,10 +338,6 @@ $(document).ready( ->
 
   test("Error cases", ->
     raises((->kb.collectionObservable()), null, "CollectionObservable: collection is missing")
-    kb.collectionObservable(new kb._.ContactsCollection(), ko.observableArray([]))
-    # raises((->kb.collectionObservable(new kb._.ContactsCollection(), ko.observableArray([]))), null, "Legacy warning! 'kb.collectionObservable with an external ko.observableArray' has been deprecated. Please use the kb.collectionObservable directly instead of passing a ko.observableArray")
-    kb.vmModel(new kb._.Contact())
-    # raises((->kb.vmModel(new kb._.Contact())), null, "Legacy warning! 'kb.vmModel' has been deprecated. Please use kb.utils.wrappedObservable instead")
     kb.collectionObservable(new kb._.ContactsCollection())
     kb.collectionObservable(new kb._.ContactsCollection(), {})
   )
