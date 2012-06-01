@@ -170,6 +170,11 @@
     return kb.utils.release(view_model);
   };
 
+  kb.vmReleaseObservable = function(observable) {
+    kb.utils.legacyWarning('kb.vmReleaseObservable', '0.16.0', 'Please use kb.utils.release instead');
+    return kb.utils.release(observable);
+  };
+
   kb.utils.optionsCreateClear = function(options) {
     delete options['create'];
     delete options['children'];

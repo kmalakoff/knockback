@@ -35,7 +35,7 @@ compileCoffee = (args, files_or_dir, options={}) ->
       options.callback?(code) if options.callback
 
 minify = (src, options={}) ->
-  spawned = spawn 'minifyjs', [src]
+  spawned = spawn 'node_modules/.bin/uglifyjs', ['-o', "#{src.substr(0, src.lastIndexOf('.js'))}.min.js", src]
   spawned.on 'exit', (code) ->
     timeLog("minified #{src}") unless options.silent
     options.callback?(code) if options.callback
