@@ -12,6 +12,7 @@
   <script type="text/javascript" src="../vendor/globalize/globalize.culture.en-GB.js"></script>
   <script type="text/javascript" src="../vendor/globalize/globalize.culture.fr-FR.js"></script>
 
+  <!-- LIBRARY -->
   <script type="text/javascript">
     window.mock_requires = {};
     window.mock_requires['underscore'] = window._; delete window['_'];
@@ -21,13 +22,9 @@
     window.require = function(path) { return window.mock_requires[path]; };
     window.exports = {};
   </script>
-
-  <!-- LIBRARY -->
   <script type="text/javascript" src="../../knockback.min.js"></script>
-
   <script type="text/javascript">
-    window.mock_requires['knockback'] = window.Knockback = window.kb = kb;
-    delete window['exports'];
+    window.mock_requires['knockback'] = window['exports']; delete window['exports']
   </script>
 
   <!-- HELPERS -->
