@@ -107,7 +107,7 @@ For comprehensive tutorials, take a look at the website: http://kmalakoff.github
 Try a live demo: http://kmalakoff.github.com/knockback-todos/ or http://jsfiddle.net/kmalakoff/QSkpv/
 
 
-Building the library
+Building, Running and Testing the library
 -----------------------
 
 ###Installing:
@@ -117,13 +117,4 @@ Building the library
 
 ###Commands:
 
-1. 'cake clean' - cleans the project of all compiled files
-2. 'cake build' - performs a single build
-3. 'cake watch' - automatically scans for and builds the project when changes are detected
-3. 'cake test' - cleans, builds, and runs tests. Note: the tests require installing phantomjs: ('brew install phantomjs' or http://phantomjs.org/)
-
-Options:
-
-1. '-c' or '--clean'  - cleans the project before running a new command
-2. '-w' or '--watch'  - watches for changes
-3. '-s' or '--silent' - does not output messages to the console (unless errors occur)
+Look at: https://github.com/kmalakoff/easy-bake
