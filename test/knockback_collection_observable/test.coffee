@@ -6,9 +6,10 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
   ContactViewModel = (model) ->
@@ -22,7 +23,7 @@ $(document).ready( ->
       @number = kb.observable(model, 'number')
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection)
     view_model =
       count: ko.dependentObservable(->return collection_observable().length )
@@ -30,12 +31,12 @@ $(document).ready( ->
     equal(collection.length, 0, "no models")
     equal(view_model.count(), 0, "no count")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "2 models")
     equal(view_model.count(), 2, "2 count")
 
-    collection.add(new kb._.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new _kbe.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     equal(collection.length, 3, "3 models")
     equal(view_model.count(), 3, "3 count")
 
@@ -45,7 +46,7 @@ $(document).ready( ->
   )
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model: ContactViewModel
     })
@@ -56,12 +57,12 @@ $(document).ready( ->
     equal(collection.length, 0, "no models")
     equal(view_model.count(), 0, "no count")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "2 models")
     equal(view_model.count(), 2, "2 count")
 
-    collection.add(new kb._.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new _kbe.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     equal(collection.length, 3, "3 models")
     equal(view_model.count(), 3, "3 count")
 
@@ -71,15 +72,15 @@ $(document).ready( ->
   )
 
   test("Basic Usage: no view models", ->
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
 
     collection_observable = kb.collectionObservable(collection)
 
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -107,7 +108,7 @@ $(document).ready( ->
   )
 
   test("Basic Usage: no sorting and no callbacks", ->
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model_create: (model) -> return new ContactViewModel(model)
     })
@@ -115,8 +116,8 @@ $(document).ready( ->
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -142,7 +143,7 @@ $(document).ready( ->
   )
 
   test("Collection sync sorting with sort_attribute", ->
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
@@ -157,8 +158,8 @@ $(document).ready( ->
     equal(view_model_count, 0, "no view models")
     equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -167,7 +168,7 @@ $(document).ready( ->
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
-    collection.add(new kb._.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new _kbe.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     equal(collection.length, 3, "three models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -206,12 +207,12 @@ $(document).ready( ->
         return 0
 
     # without view models
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       sorted_index:             kb.siwa('number', SortWrapper)
     })
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -220,13 +221,13 @@ $(document).ready( ->
     equal(collection_observable()[1].get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
     # with view models
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model:   ContactViewModelClass
       sorted_index:             kb.siwa('number', SortWrapper)
     })
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -236,7 +237,7 @@ $(document).ready( ->
   )
 
   test("Collection sorting with callbacks", ->
-    collection = new kb._.NameSortedContactsCollection()
+    collection = new _kbe.NameSortedContactsCollection()
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
@@ -249,8 +250,8 @@ $(document).ready( ->
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'George', "George is first")
     equal(collection.models[1].get('name'), 'Ringo', "Ringo is second")
@@ -259,7 +260,7 @@ $(document).ready( ->
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
-    collection.add(new kb._.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new _kbe.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     equal(collection.length, 3, "three models")
     equal(collection.models[0].get('name'), 'George', "George is first")
     equal(collection.models[1].get('name'), 'Paul', "Paul is second")
@@ -285,7 +286,7 @@ $(document).ready( ->
   )
 
   test("Collection sync dynamically changing the sorting function", ->
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model: ContactViewModel
     })
@@ -293,8 +294,8 @@ $(document).ready( ->
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb._.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb._.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -308,7 +309,7 @@ $(document).ready( ->
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
-    collection.add(new kb._.Contact({id: 'b3', name: 'Paul', number: '555-555-5554'}))
+    collection.add(new _kbe.Contact({id: 'b3', name: 'Paul', number: '555-555-5554'}))
     equal(collection.length, 3, "three models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
@@ -340,7 +341,7 @@ $(document).ready( ->
 
   test("Error cases", ->
     raises((->kb.collectionObservable()), null, "CollectionObservable: collection is missing")
-    kb.collectionObservable(new kb._.ContactsCollection())
-    kb.collectionObservable(new kb._.ContactsCollection(), {})
+    kb.collectionObservable(new _kbe.ContactsCollection())
+    kb.collectionObservable(new _kbe.ContactsCollection(), {})
   )
 )

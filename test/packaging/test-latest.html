@@ -28,7 +28,13 @@
   </script>
 
   <!-- HELPERS -->
+  <script type="text/javascript">
+    window.exports = {};
+  </script>
   <script type="text/javascript" src="../../test/_examples/build/_examples.js"></script>
+  <script type="text/javascript">
+    window.mock_requires['knockback-examples'] = window['exports']; delete window['exports']
+  </script>
 
   <!-- TESTS -->
   <link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen" />

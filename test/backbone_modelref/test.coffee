@@ -6,12 +6,13 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
-  kb.locale_manager = new kb._.LocaleManager('en', {
+  kb.locale_manager = new _kbe.LocaleManager('en', {
     'en': {loading: "Loading dude"}
     'en-GB': {loading: "Loading sir"}
     'fr-FR': {loading: "Chargement"}
@@ -19,15 +20,15 @@ $(document).ready( ->
 
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
-      @loading_message = new kb._.LocalizedStringLocalizer(new kb._.LocalizedString('loading'))
+      @loading_message = new _kbe.LocalizedStringLocalizer(new _kbe.LocalizedString('loading'))
       @attribute_observables = kb.observables(model, {
         name:     {key:'name', read_only: true, default: @loading_message}
         number:   {key:'number', default: @loading_message}
-        date:     {key:'date', default: @loading_message, localizer: kb._.ShortDateLocalizer}
+        date:     {key:'date', default: @loading_message, localizer: _kbe.ShortDateLocalizer}
       }, this)
       @
 
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     model_ref = new Backbone.ModelRef(collection, 'b4')
     view_model = new ContactViewModel(model_ref)
 
@@ -95,12 +96,12 @@ $(document).ready( ->
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number', 'date']})
-        @loading_message = new kb._.LocalizedStringLocalizer(new kb._.LocalizedString('loading'))
+        @loading_message = new _kbe.LocalizedStringLocalizer(new _kbe.LocalizedString('loading'))
         @name = kb.defaultWrapper(@_name, @loading_message)
         @number = kb.defaultWrapper(@_number, @loading_message)
-        @date = kb.defaultWrapper(new kb._.LongDateLocalizer(@_date), @loading_message)
+        @date = kb.defaultWrapper(new _kbe.LongDateLocalizer(@_date), @loading_message)
 
-    collection = new kb._.ContactsCollection()
+    collection = new _kbe.ContactsCollection()
     model_ref = new Backbone.ModelRef(collection, 'b4')
     view_model = new ContactViewModel(model_ref)
 

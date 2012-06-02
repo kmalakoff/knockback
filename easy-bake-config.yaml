@@ -18,7 +18,7 @@ library:
 
 _examples:
   join: _examples.js
-  output: .build
+  output: test/_examples/build
   files:
     - test/_examples/contact.coffee
     - test/_examples/locale_manager.coffee

@@ -6,24 +6,25 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
-  kb.locale_manager = new kb._.LocaleManager('en', {})
+  kb.locale_manager = new _kbe.LocaleManager('en', {})
 
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', read_only: true}
         number:   'number'
-        date:     {key:'date', localizer: kb._.LongDateLocalizer}
+        date:     {key:'date', localizer: _kbe.LongDateLocalizer}
         name2:    {key: 'name', read_only: true}
       }, this)
       @
 
-    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new _kbe.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # get
@@ -77,12 +78,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', write: true}   # LEGACY
         number:   {key: 'number', read_only: false}
-        date:     {key:'date', localizer: kb._.LongDateLocalizer}
+        date:     {key:'date', localizer: _kbe.LongDateLocalizer}
         name2:    'name'
       }, this, false)
       @
 
-    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new _kbe.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -113,12 +114,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name'}
         number:   {key: 'number'}
-        date:     {key: 'date', localizer: kb._.LongDateLocalizer}
+        date:     {key: 'date', localizer: _kbe.LongDateLocalizer}
         name2:    {key: 'name', read_only: true}
       }, this, {read_only: false})
       @
 
-    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new _kbe.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -150,12 +151,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', read_only: false}
         number:   {key: 'number', read_only: false}
-        date:     {key: 'date', localizer: kb._.LongDateLocalizer, read_only: false}
+        date:     {key: 'date', localizer: _kbe.LongDateLocalizer, read_only: false}
         name2:    {key: 'name'}
       }, this, {read_only: true})
       @
 
-    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new _kbe.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -187,12 +188,12 @@ $(document).ready( ->
       @attribute_observables = kb.observables(model, {
         name:     {key: 'name', read_only: true}
         number:   'number'
-        date:     {key: 'date', read_only: false, localizer: kb._.LongDateLocalizer}
+        date:     {key: 'date', read_only: false, localizer: _kbe.LongDateLocalizer}
         name2:    {key: 'name', read_only: true}
       }, this, {garbage: true})
       @
 
-    model = new kb._.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new _kbe.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # set from the view model
@@ -220,7 +221,7 @@ $(document).ready( ->
   )
 
   test("Bulk mode (array of keys)", ->
-    model = new kb._.Contact({name: 'John', number: '555-555-5558'})
+    model = new _kbe.Contact({name: 'John', number: '555-555-5558'})
     view_model = kb.observables(model, ['name', 'number'])
 
     # get
