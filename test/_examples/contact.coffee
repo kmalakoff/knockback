@@ -4,21 +4,21 @@ Backbone = if not @Backbone and (typeof(require) != 'undefined') then require('b
 ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') else @ko
 kb = if not @kb and (typeof(require) != 'undefined') then require('knockback') else @kb
 
-# examples namespace
-kb._ || kb._ = {};
+# export or create _kbe namespace
+_kbe = @_kbe = if (typeof(exports) != 'undefined') then exports else {}
 
-kb._.Contact = Backbone.Model.extend({
+_kbe.Contact = Backbone.Model.extend({
   defaults:
     name: ''
     number: 0
     date: new Date()
 })
 
-kb._.ContactsCollection = Backbone.Collection.extend({
-  model: kb._.Contact
+_kbe.ContactsCollection = Backbone.Collection.extend({
+  model: _kbe.Contact
 })
 
-kb._.NameSortedContactsCollection = Backbone.Collection.extend({
-  model: kb._.Contact
+_kbe.NameSortedContactsCollection = Backbone.Collection.extend({
+  model: _kbe.Contact
   comparator: (model) -> return model.get('name')
 })

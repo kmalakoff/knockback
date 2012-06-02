@@ -10,7 +10,7 @@
 
     <!-- LIBRARY DEPENDENCIES -->
     <script type="text/javascript" src="../../vendor/knockout-1.2.1.debug.js"></script>
-    <script type="text/javascript" src="../../vendor/underscore.js"></script>
+    <script type="text/javascript" src="../../vendor/underscore-1.3.3.js"></script>
     <script type="text/javascript" src="../../vendor/backbone-0.9.1.js"></script>
     <script type="text/javascript" src="../../vendor/optional/backbone-modelref.min.js"></script>
 
@@ -73,7 +73,7 @@
     <script type='text/javascript'>
       <!-- SEE _examples for LocaleManager, Contact, ContactsCollection, and LongDateLocalizer -->
 
-      kb.locale_manager = new kb._.LocaleManager('en', {
+      kb.locale_manager = new _kbe.LocaleManager('en', {
         'en': {
           label_title_new: "New Contact",
           label_button_new: "Add",
@@ -90,7 +90,7 @@
           label_date: "Date de Naissance:"
         }
       });
-      var collection = new kb._.ContactsCollection([
+      var collection = new _kbe.ContactsCollection([
         {name: 'Moe',   email: 'moe@3s.com',    date: new Date(1897, 6, 19)},
         {name: 'Larry', email: 'larry@3s.com',  date: new Date(1902, 10, 5)},
         {name: 'Curly', email: 'curly@3s.com',  date: new Date(1903, 10, 22)}
@@ -99,7 +99,7 @@
         available_languages:    ko.observableArray(['en', 'fr-FR']),
         new_name:               ko.observable(''),
         new_email:              ko.observable(''),
-        new_date:               new kb._.LongDateLocalizer(new Date()),
+        new_date:               new _kbe.LongDateLocalizer(new Date()),
         onAdd:  function()      {
           collection.add({name: this.new_name(), email: this.new_email(), date: this.new_date.observedValue()});
           this.new_name(''); this.new_email(''); this.new_date(new Date());
@@ -127,7 +127,7 @@
         kb.observables(model, {
           name:           { key: 'name' },
           email:          { key: 'email' },
-          date:           { key: 'date', localizer: kb._.LongDateLocalizer }
+          date:           { key: 'date', localizer: _kbe.LongDateLocalizer }
         }, this);
       };
       view_model.contacts = Knockback.collectionObservable(collection, {

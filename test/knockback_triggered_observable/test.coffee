@@ -1,15 +1,18 @@
 $(document).ready( ->
   module("knockback_triggered_observable.js")
 
-  # import Underscore, Backbone, and Knockout
+  # import Underscore, Backbone, Knockout, and Knockback
   _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
+  kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
+
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
-  kb.locale_manager = new kb._.LocaleManager('en', {
+  kb.locale_manager = new _kbe.LocaleManager('en', {
     'en':
       formal_hello: 'Hello'
     'en-GB':

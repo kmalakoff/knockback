@@ -1,4 +1,4 @@
-class kb._.LocaleManager
+class _kbe.LocaleManager
   constructor: (locale_identifier, @translations_by_locale) ->
     @setLocale(locale_identifier) if locale_identifier
 
@@ -26,4 +26,4 @@ class kb._.LocaleManager
 #######################################
 # Mix in Backbone.Events so callers can subscribe
 #######################################
-kb._.LocaleManager.prototype extends Backbone.Events
+_kbe.LocaleManager.prototype extends Backbone.Events

@@ -1,10 +1,12 @@
 $(document).ready( ->
   module("knockback_core utils")
 
-  # import Underscore, Backbone, and Knockout
+  # import Underscore, Backbone, Knockout, and Knockback
   _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
+  kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
   )

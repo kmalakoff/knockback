@@ -1,12 +1,15 @@
 $(document).ready( ->
   module("knockback_formatted_observable.js")
 
-  # import Underscore, Backbone, and Knockout
+  # import Underscore, Backbone, Knockout, and Knockback
   _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
+  kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
+
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
   test("Various scenarios", ->
@@ -20,7 +23,7 @@ $(document).ready( ->
         @name_number_name = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}', @_name, @_number)
         @name_number_name_song = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}, Song: "{2}"', @_name, @_number, @favorite_song)
 
-    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556', favorite_song: 'Yellow Submarine'})
+    model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556', favorite_song: 'Yellow Submarine'})
     view_model = new ContactViewModelCustom(model)
 
     # get

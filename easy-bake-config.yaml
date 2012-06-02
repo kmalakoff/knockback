@@ -1,0 +1,49 @@
+library:
+  join: knockback.js
+  minimize: true
+  files:
+    - src/knockback_core.coffee
+    - src/knockback_utils.coffee
+    - src/knockback_ref_countable.coffee
+    - src/knockback_store.coffee
+    - src/knockback_collection_observable.coffee
+    - src/knockback_default_wrapper.coffee
+    - src/knockback_formatted_observable.coffee
+    - src/knockback_localized_observable.coffee
+    - src/knockback_observable.coffee
+    - src/knockback_observables.coffee
+    - src/knockback_triggered_observable.coffee
+    - src/knockback_attribute_connectors.coffee
+    - src/knockback_view_model.coffee
+
+_examples:
+  join: _examples.js
+  output: test/_examples/build
+  files:
+    - test/_examples/contact.coffee
+    - test/_examples/locale_manager.coffee
+    - test/_examples/localized_observables.coffee
+    - test/_examples/localized_string.coffee
+
+tests:
+  output: ./build
+  directories:
+    - test/knockback_legacy
+    - test/knockback_utils
+    - test/backbone_modelref
+    - test/backbone_relational
+    - test/knockback_collection_observable
+    - test/knockback_formatted_observable
+    - test/knockback_localized_observable
+    - test/knockback_observable
+    - test/knockback_observables
+    - test/knockback_triggered_observable
+    - test/knockback_view_model
+    - test/knockback_memory_management
+    - test/packaging
+  options:
+    test:
+      timeout: 60000
+      runner: phantomjs-qunit-runner.js
+    build:
+      no_files_ok: ['test/packaging']

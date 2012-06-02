@@ -4,7 +4,7 @@
   <title>Knockback Packaging Test Suite</title>
   <!-- LIBRARY DEPENDENCIES -->
   <script type="text/javascript" src="../../vendor/knockout-2.1.0.debug.js"></script>
-  <script type="text/javascript" src="../../vendor/underscore.js"></script>
+  <script type="text/javascript" src="../../vendor/underscore-1.3.3.js"></script>
   <script type="text/javascript" src="../../vendor/backbone-0.9.2.js"></script>
 
   <!-- HELPERS -->
@@ -12,6 +12,7 @@
   <script type="text/javascript" src="../vendor/globalize/globalize.culture.en-GB.js"></script>
   <script type="text/javascript" src="../vendor/globalize/globalize.culture.fr-FR.js"></script>
 
+  <!-- LIBRARY -->
   <script type="text/javascript">
     window.mock_requires = {};
     window.mock_requires['underscore'] = window._; delete window['_'];
@@ -21,17 +22,19 @@
     window.require = function(path) { return window.mock_requires[path]; };
     window.exports = {};
   </script>
-
-  <!-- LIBRARY -->
   <script type="text/javascript" src="../../knockback.js"></script>
-
   <script type="text/javascript">
-    window.mock_requires['knockback'] = window.Knockback = window.kb = kb;
-    delete window['exports'];
+    window.mock_requires['knockback'] = window['exports']; delete window['exports']
   </script>
 
   <!-- HELPERS -->
+  <script type="text/javascript">
+    window.exports = {};
+  </script>
   <script type="text/javascript" src="../../test/_examples/build/_examples.js"></script>
+  <script type="text/javascript">
+    window.mock_requires['knockback-examples'] = window['exports']; delete window['exports']
+  </script>
 
   <!-- TESTS -->
   <link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen" />

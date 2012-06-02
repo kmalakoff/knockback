@@ -1,18 +1,21 @@
 $(document).ready( ->
   module("knockback_view_model.js")
 
-  # import Underscore, Backbone, and Knockout
+  # import Underscore, Backbone, Knockout, and Knockback
   _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
+  kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
+
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
-  kb.locale_manager = new kb._.LocaleManager('en', {})
+  kb.locale_manager = new _kbe.LocaleManager('en', {})
 
   test("Standard use case: read and write", ->
-    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model)
 
     # get
@@ -34,7 +37,7 @@ $(document).ready( ->
   )
 
   test("Standard use case: read only", ->
-    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model, {read_only: true})
 
     # get
@@ -63,10 +66,10 @@ $(document).ready( ->
       constructor: (model) ->
         super(model, {internals: ['email', 'date']})
         @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
-        @date = new kb._.LongDateLocalizer(@_date)
+        @date = new _kbe.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new _kbe.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email
@@ -127,12 +130,12 @@ $(document).ready( ->
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']})
         @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
-        @date = new kb._.LongDateLocalizer(@_date)
+        @date = new _kbe.LongDateLocalizer(@_date)
         @
     })
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new _kbe.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email
@@ -195,7 +198,7 @@ $(document).ready( ->
         @name = ko.dependentObservable(=> return "First: #{@_name()}")
         @number = kb.formattedObservable('#: {0}', @_number)
 
-    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -237,7 +240,7 @@ $(document).ready( ->
       }, view_model)
       return view_model
 
-    model = new kb._.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -288,10 +291,10 @@ $(document).ready( ->
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
-        @date = new kb._.LongDateLocalizer(@_date)
+        @date = new _kbe.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb._.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new _kbe.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
@@ -404,16 +407,16 @@ $(document).ready( ->
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
-        @date = new kb._.LongDateLocalizer(@_date)
+        @date = new _kbe.LongDateLocalizer(@_date)
 
     john_birthdate = new Date(1940, 10, 9)
-    john = new kb._.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
+    john = new _kbe.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
     paul_birthdate = new Date(1942, 6, 18)
-    paul = new kb._.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
+    paul = new _kbe.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
     george_birthdate = new Date(1943, 2, 25)
-    george = new kb._.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
+    george = new _kbe.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
-    ringo = new kb._.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
+    ringo = new _kbe.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
     major_duo = new Backbone.Collection([john, paul])
     minor_duo = new Backbone.Collection([george, ringo])
     nested_model = new Backbone.Model({
@@ -449,7 +452,7 @@ $(document).ready( ->
 
       # set from the view model
       kb.locale_manager.setLocale('en-GB')
-      formatted_date = new kb._.LongDateLocalizer(birthdate)
+      formatted_date = new _kbe.LongDateLocalizer(birthdate)
       equal(view_model.date(), formatted_date(), "#{view_model.name()}: Birthdate in Great Britain format")
       view_model.date('10 December 1963')
       current_date = model.get('date')

@@ -16,15 +16,15 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  Knockback = kb = this.Knockback = this.kb = typeof exports !== 'undefined' ? exports : {};
-
-  kb.VERSION = '0.15.3';
-
   _ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._;
 
   Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
   ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
+
+  Knockback = kb = this.Knockback = this.kb = typeof exports !== 'undefined' ? exports : {};
+
+  kb.VERSION = '0.15.3';
 
   kb.locale_manager = void 0;
 
