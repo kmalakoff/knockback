@@ -11,16 +11,19 @@
   },
 
   "scripts": {
+    "postinstall": "node_modules/.bin/cake -c postinstall",
     "test": "node_modules/.bin/cake -c test"
   },
-  "dependencies"  : {
-    "underscore"  : ">=1.3.3",
-    "backbone"  : ">=0.9.1",
-    "knockout"  : ">=1.2.1"
+  "dependencies" : {
+    "underscore" : ">=1.3.3",
+    "backbone" : ">=0.9.1",
+    "backbone-rel" : ">=0.3.0",
+    "backbone-modelref" : ">=0.1.2",
+    "knockout" : ">=1.2.1"
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",
-    "easy-bake": ">=0.1.0"
+    "easy-bake": "0.1.1"
   },
 
   "lib" : ".",

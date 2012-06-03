@@ -1,1 +1,2 @@
-require('easy-bake')('easy-bake-config.yaml')
+easybake = require('easy-bake')
+new easybake.Baker('easy-bake-config.yaml')

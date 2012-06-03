@@ -43,7 +43,17 @@ tests:
     - test/packaging
   options:
     test:
-      timeout: 60000
+      command: phantomjs
       runner: phantomjs-qunit-runner.js
     build:
       no_files_ok: ['test/packaging']
+
+postinstall:
+  options:
+    vendor:
+      files:
+        - node_modules/underscore/underscore.js
+        - node_modules/backbone/backbone.js
+        # - node_modules/backbone-rel/backbone-relational.js  - the npm version is too old
+        - node_modules/backbone-modelref/backbone-modelref.js
+        # - node_modules/knockout/lib/knockout.js             - the npm version is functionally different
