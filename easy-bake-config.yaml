@@ -1,6 +1,6 @@
 library:
   join: knockback.js
-  minimize: true
+  compress: true
   files:
     - src/knockback_core.coffee
     - src/knockback_utils.coffee
@@ -49,11 +49,22 @@ tests:
       no_files_ok: ['test/packaging']
 
 postinstall:
-  options:
-    vendor:
-      files:
-        - node_modules/underscore/underscore.js
-        - node_modules/backbone/backbone.js
-        # - node_modules/backbone-rel/backbone-relational.js  - the npm version is too old
-        - node_modules/backbone-modelref/backbone-modelref.js
-        # - node_modules/knockout/lib/knockout.js             - the npm version is functionally different
+  copy_latest_underscore:
+    command: 'cp'
+    args: ['node_modules/underscore/underscore.js', 'vendor/underscore-latest.js']
+  copy_latest_backbone:
+    command: 'cp'
+    args: ['node_modules/backbone/backbone.js', 'vendor/backbone-latest.js']
+  copy_latest_backbone_modelref:
+    command: 'cp'
+    args: ['node_modules/backbone-modelref/backbone-modelref.js', 'vendor/backbone-modelref-latest.js']
+
+  # npm version of backbone_relational too old
+  # copy_latest_backbone_relational:
+  #   command: 'cp'
+  #   args: ['node_modules/backbone-rel/backbone-relational.js', 'vendor/backbone-relational-latest.js']
+
+  # npm version of knockout is not a general-purpose library
+  # copy_latest_knockout:
+  #   command: 'cp'
+  #   args: ['node_modules/knockout/lib/knockout.js', 'vendor/knockout-latest.js']

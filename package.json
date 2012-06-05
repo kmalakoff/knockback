@@ -1,32 +1,32 @@
 {
-  "author": "Kevin Malakoff <https://github.com/kmalakoff>",
-  "name": "knockback",
-  "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
+  "author"        : "Kevin Malakoff <https://github.com/kmalakoff>",
+  "name"          : "knockback",
+  "description"   : "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
+  "keywords"      : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
 
-  "url": "http://kmalakoff.github.com/knockback/",
-  "homepage": "http://kmalakoff.github.com/knockback/",
+  "url"           : "http://kmalakoff.github.com/knockback/",
+  "homepage"      : "http://kmalakoff.github.com/knockback/",
   "repository": {
     "type": "git",
     "url": "http://github.com/kmalakoff/knockback.git"
   },
 
   "scripts": {
-    "postinstall": "node_modules/.bin/cake -c postinstall",
-    "test": "node_modules/.bin/cake -c test"
+    "postinstall": "node_modules/.bin/cake postinstall",
+    "test": "node_modules/.bin/cake -c -b test"
   },
   "dependencies" : {
-    "underscore" : ">=1.3.3",
-    "backbone" : ">=0.9.1",
-    "backbone-rel" : ">=0.3.0",
-    "backbone-modelref" : ">=0.1.2",
-    "knockout" : ">=1.2.1"
+    "underscore": "latest",
+    "backbone": "latest",
+    "backbone-rel": "latest",
+    "backbone-modelref" : "latest",
+    "knockout" : "latest"
   },
   "devDependencies": {
-    "coffee-script": ">=1.3.3",
-    "easy-bake": "0.1.1"
+    "coffee-script": "latest",
+    "easy-bake": "0.1.2"
   },
 
-  "lib" : ".",
-  "main" : "knockback.js",
-  "version": "0.15.3"
+  "main"          : "knockback.js",
+  "version"       : "0.15.3"
 }

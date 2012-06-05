@@ -4,7 +4,6 @@ node_js:
 
 notifications:
   email:
-    on_success: always # [always|never|change] default: change
     on_failure: always # [always|never|change] default: always
 
 before_script:
