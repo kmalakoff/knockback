@@ -2,7 +2,7 @@
 
 /*
   backbone-modelref.js 0.1.2
-  (c) 2011 Kevin Malakoff.
+  (c) 2011, 2012 Kevin Malakoff.
   Backbone-ModelRef.js is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/backbone-modelref/blob/master/LICENSE
@@ -11,11 +11,13 @@
 
 
 (function() {
-  var Backbone, _,
+  var Backbone, root, _,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  _ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._;
+  root = this;
+
+  _ = !this._ && (typeof require !== 'undefined') ? require('underscore')._ : this._;
 
   Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
@@ -286,5 +288,9 @@
     }
     return this.model();
   };
+
+  if (typeof root.exports !== 'undefined') {
+    root.exports = Backbone.ModelRef;
+  }
 
 }).call(this);

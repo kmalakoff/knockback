@@ -16,8 +16,6 @@
     "test": "node_modules/.bin/cake -c -b test"
   },
   "dependencies" : {
-    "underscore": "latest",
-    "backbone": "latest",
     "backbone-rel": "latest",
     "backbone-modelref" : "latest",
     "knockout" : "latest"
