@@ -11,26 +11,27 @@
 
 Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
-### Website: http://kmalakoff.github.com/knockback/
+### Website: [kmalakoff.github.com/knockback][1]
 
 You can get the library here:
 
-* [Development version][1]
-* [Production version][2]
+* [Development version][2]
+* [Production version][3]
 
 **NOTE: there are breaking changes in 0.15.+** Please see the [release notes][http://kmalakoff.github.com/knockback/release_notes.html] for details.
 
 ### Dependencies
 
-* [Backbone.js][3]
-* [Underscore.js][4]
-* [Knockout.js][5]
+* [Backbone.js][4]
+* [Underscore.js][5]
+* [Knockout.js][6]
 
-[1]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.js
-[2]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.min.js
-[3]: http://backbonejs.org/
-[4]: http://underscorejs.org/
-[5]: http://knockoutjs.com/
+[1]: http://kmalakoff.github.com/knockback/
+[2]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.js
+[3]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.min.js
+[4]: http://backbonejs.org/
+[5]: http://underscorejs.org/
+[6]: http://knockoutjs.com/
 
 Why Write Knockback.js?
 -----------------------
