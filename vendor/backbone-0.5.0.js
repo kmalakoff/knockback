@@ -29,7 +29,7 @@
 
   // Require Underscore, if we're on the server, and it's not already present.
   var _ = root._;
-  if (!_ && (typeof require !== 'undefined')) _ = require('underscore')._;
+  if (!_ && (typeof require !== 'undefined')) _ = require('underscore')._._;
 
   // For Backbone's purposes, jQuery or Zepto owns the `$` variable.
   var $ = root.jQuery || root.Zepto;

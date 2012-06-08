@@ -2,7 +2,7 @@
 
 /*
   knockback.js 0.15.3
-  (c) 2011 Kevin Malakoff.
+  (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -16,7 +16,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  _ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._;
+  _ = !this._ && (typeof require !== 'undefined') ? require('underscore')._ : this._;
 
   Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
@@ -37,7 +37,7 @@
 
   /*
     knockback_utils.js 0.15.3
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.js is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -365,7 +365,7 @@
 
   /*
     knockback_collection_observable.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.CollectionObservable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -780,7 +780,7 @@
 
   /*
     knockback_default_wrapper.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.DefaultWrapper is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -835,7 +835,7 @@
 
   /*
     knockback_formatted_observable.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.FormattedObservable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -964,7 +964,7 @@
 
   /*
     knockback_localized_observable.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.LocalizedObservable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -1109,7 +1109,7 @@
 
   /*
     knockback_observable.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.Observable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -1359,7 +1359,7 @@
 
   /*
     knockback_observables.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.Observables is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -1466,7 +1466,7 @@
 
   /*
     knockback_triggered_observable.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.Observable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -1907,7 +1907,7 @@
 
   /*
     knockback_view_model.js
-    (c) 2011 Kevin Malakoff.
+    (c) 2011, 2012 Kevin Malakoff.
     Knockback.Observable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE

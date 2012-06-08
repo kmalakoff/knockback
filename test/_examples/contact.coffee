@@ -1,5 +1,5 @@
 # import Underscore, Backbone, Knockout, and Knockback
-_ = if not @_ and (typeof(require) != 'undefined') then require('underscore') else @_
+_ = if not @_ and (typeof(require) != 'undefined') then require('underscore')._ else @_
 Backbone = if not @Backbone and (typeof(require) != 'undefined') then require('backbone') else @Backbone
 ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') else @ko
 kb = if not @kb and (typeof(require) != 'undefined') then require('knockback') else @kb

@@ -18,10 +18,19 @@ You can get the library here:
 * [Development version][1]
 * [Production version][2]
 
+**NOTE: there are breaking changes in 0.15.+** Please see the [release notes][http://kmalakoff.github.com/knockback/release_notes.html] for details.
+
+### Dependencies
+
+* [Backbone.js][3]
+* [Underscore.js][4]
+* [Knockout.js][5]
+
 [1]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.js
 [2]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.min.js
-
-**NOTE: there are breaking changes in 0.15.+** Please see the [release notes][http://kmalakoff.github.com/knockback/release_notes.html] for details.
+[3]: http://backbonejs.org/
+[4]: http://underscorejs.org/
+[5]: http://knockoutjs.com/
 
 Why Write Knockback.js?
 -----------------------
@@ -113,7 +122,7 @@ Building, Running and Testing the library
 ###Installing:
 
 1. install node.js: http://nodejs.org
-2. install node packages: (sudo) 'npm install'
+2. install node packages: 'npm install'
 
 ###Commands:
 
