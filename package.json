@@ -12,17 +12,19 @@
   },
 
   "scripts": {
-    "postinstall": "node_modules/.bin/cake postinstall",
-    "test": "node_modules/.bin/cake -c -b test"
+    "preinstall": "npm install easy-bake@0.1.2",
+    "postinstall": "cake postinstall",
+    "test": "cake -c -b test"
   },
-  "dependencies" : {
+  "devDependencies": {
+    "coffee-script": "latest"
+  },
+  "optionalDependencies": {
+    "underscore": "latest",
+    "backbone": "latest",
     "backbone-rel": "latest",
     "backbone-modelref" : "latest",
     "knockout" : "latest"
-  },
-  "devDependencies": {
-    "coffee-script": "latest",
-    "easy-bake": "0.1.2"
   },
 
   "main"          : "knockback.js",
