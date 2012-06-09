@@ -1,9 +1,6 @@
-# osx noise
 .DS_Store
-
 node_modules/*
-test/*/build/*
-examples_lib/build/*
+build/
 
 # web site noise
 tutorials/*
