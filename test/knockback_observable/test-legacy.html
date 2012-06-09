@@ -26,7 +26,7 @@
     <h2 id="qunit-banner"></h2>
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>
-    <br />
   </div>
+  <script type="text/javascript">QUnit.done = function(failures, total) {if (!total) { $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail'); throw 'Warning: no tests run'}}</script>
 </body>
 </html>
