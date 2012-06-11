@@ -26,7 +26,7 @@ _examples:
     - test/_examples/localized_string.coffee
 
 tests:
-  output: ./build
+  output: build
   directories:
     - test/knockback_legacy
     - test/knockback_utils
@@ -45,6 +45,8 @@ tests:
     test:
       command: phantomjs
       runner: phantomjs-qunit-runner.js
+      files:
+        - '**/*.html'
     build:
       no_files_ok: ['test/packaging']
 
