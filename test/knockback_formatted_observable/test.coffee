@@ -2,7 +2,8 @@ $(document).ready( ->
   module("knockback_formatted_observable.js")
 
   # import Underscore, Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore')?._ else window._
+  _ = if not window._ and (typeof(require) != 'undefined') then require('underscore') else window._
+  _ = _._ if _ and not _.VERSION # LEGACY
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb

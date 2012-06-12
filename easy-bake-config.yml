@@ -41,25 +41,28 @@ tests:
     - test/knockback_view_model
     - test/knockback_memory_management
     - test/packaging
-  options:
+  modes:
+    build:
+      bundles:
+        test/packaging/build/bundle-latest.js:
+          underscore: underscore
+          backbone: backbone
+          backbone-modelref: backbone-modelref
+          knockout: vendor/knockout-latest.js
+          knockback: knockback.js
+          knockback-examples: test/_examples/build/_examples.js
+      no_files_ok: ['test/packaging']
     test:
       command: phantomjs
       runner: phantomjs-qunit-runner.js
       files:
         - '**/*.html'
-    build:
-      no_files_ok: ['test/packaging']
 
 postinstall:
-  copy_latest_underscore:
-    command: 'cp'
-    args: ['underscore', 'vendor/underscore-latest.js']
-  copy_latest_backbone:
-    command: 'cp'
-    args: ['backbone', 'vendor/backbone-latest.js']
-  copy_latest_backbone_modelref:
-    command: 'cp'
-    args: ['backbone-modelref', 'vendor/backbone-modelref-latest.js']
+  commands:
+    - 'cp underscore vendor/underscore-latest.js'
+    - 'cp backbone vendor/backbone-latest.js'
+    - 'cp backbone-modelref vendor/backbone-modelref-latest.js'
 
   # npm version of backbone_relational too old
   # copy_latest_backbone_relational:
