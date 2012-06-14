@@ -15,6 +15,13 @@ library:
     - src/knockback_triggered_observable.coffee
     - src/knockback_attribute_connectors.coffee
     - src/knockback_view_model.coffee
+  modes:
+    build:
+      commands:
+        - 'cp knockback.js packages/npm/knockback.js'
+        - 'cp knockback.min.js packages/npm/knockback.min.js'
+        - 'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
+        - 'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
 
 _examples:
   join: _examples.js
@@ -63,13 +70,5 @@ postinstall:
     - 'cp underscore vendor/underscore-latest.js'
     - 'cp backbone vendor/backbone-latest.js'
     - 'cp backbone-modelref vendor/backbone-modelref-latest.js'
-
-  # npm version of backbone_relational too old
-  # copy_latest_backbone_relational:
-  #   command: 'cp'
-  #   args: ['backbone-relational', 'vendor/backbone-relational-latest.js']
-
-  # npm version of knockout is not a general-purpose library
-  # copy_latest_knockout:
-  #   command: 'cp'
-  #   args: ['knockout', 'vendor/knockout-latest.js']
+    - 'cp backbone-relational vendor/backbone-relational-latest.js'
+    - 'cp knockout-client/knockout.debug.js vendor/knockout-latest.js'

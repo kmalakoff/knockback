@@ -11,13 +11,15 @@
 
 
 (function() {
-  var Backbone, root, _,
+  var Backbone, _,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  root = this;
+  _ = !this._ && (typeof require !== 'undefined') ? require('underscore') : this._;
 
-  _ = !this._ && (typeof require !== 'undefined') ? require('underscore')._ : this._;
+  if (_ && !_.VERSION) {
+    _ = _._;
+  }
 
   Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
@@ -289,8 +291,14 @@
     return this.model();
   };
 
-  if (typeof root.exports !== 'undefined') {
-    root.exports = Backbone.ModelRef;
+  if (typeof exports !== 'undefined') {
+    module.exports = Backbone.ModelRef;
   }
+
+  if (this.Backbone) {
+    this.Backbone.ModelRef = Backbone.ModelRef;
+  }
+
+  Backbone.ModelRef.VERSION = '0.1.2';
 
 }).call(this);
