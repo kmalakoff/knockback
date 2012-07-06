@@ -251,7 +251,6 @@ $(document).ready( ->
       location: 'In the middle of our street'
       occupants: new Backbone.Collection()
     })
-    house.get('occupants') # force creation of the collection
 
     # confirm no occupants
     view_model = kb.viewModel(house)
