@@ -12,21 +12,22 @@ $(document).ready( ->
     ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); Backbone.Relational.Semaphore
   )
 
-  class Person extends Backbone.RelationalModel
+  window.Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany
       key: 'friends'
-      relatedModel: Person
+      relatedModel: 'Person'
     }, {
       type: Backbone.HasOne
       key: 'best_friend'
-      relatedModel: Person
+      relatedModel: 'Person'
       reverseRelation:
         type: Backbone.HasMany
         key: 'best_friends_with_me'
     }]
+  })
 
-  class Building extends Backbone.RelationalModel
+  window.Building = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany
       key: 'occupants'
@@ -35,6 +36,7 @@ $(document).ready( ->
         type: Backbone.HasOne
         key: 'occupies'
     }]
+  })
 
   test("1. Model with HasMany relations: A house with multiple people living in it", ->
     kb.stats_on = true # turn on stats
@@ -227,5 +229,39 @@ $(document).ready( ->
     equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
     equal(kb.stats.view_models, 0, 'Cleanup: no view models')
     kb.stats_on = false # turn off stats
+  )
+
+  test("4. After view model create, add models", ->
+    Person = Backbone.RelationalModel.extend({})
+
+    House = Backbone.RelationalModel.extend({
+      relations: [{
+        type: Backbone.HasMany
+        key: 'occupants'
+        relatedModel: 'Person'
+        reverseRelation:
+          key: 'livesIn'
+      }]
+    })
+
+    bob = new Person({id: 'person-1', name: 'Bob'})
+    fred = new Person({id: 'person-2', name: 'Fred'})
+
+    house = new House({
+      location: 'In the middle of our street'
+      occupants: new Backbone.Collection()
+    })
+    house.get('occupants') # force creation of the collection
+
+    # confirm no occupants
+    view_model = kb.viewModel(house)
+    equal(view_model.occupants().length, 0, "no occupants")
+
+    occupants_relationship = house.get('occupants')
+    occupants_relationship.add(bob)
+    occupants_relationship.add(fred)
+    equal(view_model.occupants().length, 2, 'two occupants')
+    equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship')
+    equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship')
   )
 )
