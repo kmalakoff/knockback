@@ -27,8 +27,8 @@ You can get the library here:
 * [Knockout.js][6]
 
 [1]: http://kmalakoff.github.com/knockback/
-[2]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.js
-[3]: https://raw.github.com/kmalakoff/knockback/0.15.3/knockback.min.js
+[2]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.js
+[3]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.min.js
 [4]: http://backbonejs.org/
 [5]: http://underscorejs.org/
 [6]: http://knockoutjs.com/
