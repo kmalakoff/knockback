@@ -26,13 +26,6 @@ You can get the library here:
 * [Underscore.js][5]
 * [Knockout.js][6]
 
-[1]: http://kmalakoff.github.com/knockback/
-[2]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.js
-[3]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.min.js
-[4]: http://backbonejs.org/
-[5]: http://underscorejs.org/
-[6]: http://knockoutjs.com/
-
 Why Write Knockback.js?
 -----------------------
 
@@ -128,3 +121,10 @@ Building, Running and Testing the library
 ###Commands:
 
 Look at: https://github.com/kmalakoff/easy-bake
+
+[1]: http://kmalakoff.github.com/knockback/
+[2]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.js
+[3]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.min.js
+[4]: http://backbonejs.org/
+[5]: http://underscorejs.org/
+[6]: http://knockoutjs.com/
