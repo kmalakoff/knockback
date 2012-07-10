@@ -16,7 +16,7 @@
     "clean": "cake clean",
     "build": "cake build",
     "watch": "cake watch",
-    "test": "cake -c -b test"
+    "test": "cake -c test"
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",

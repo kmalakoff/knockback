@@ -36,22 +36,22 @@ module.exports =
     ]
 
   tests:
-    output: 'build'
-    directories: [
-      'test/knockback_legacy'
-      'test/knockback_utils'
-      'test/backbone_modelref'
-      'test/backbone_relational'
-      'test/knockback_collection_observable'
-      'test/knockback_formatted_observable'
-      'test/knockback_localized_observable'
-      'test/knockback_observable'
-      'test/knockback_observables'
-      'test/knockback_triggered_observable'
-      'test/knockback_view_model'
-      'test/knockback_memory_management'
-    ]
     _build:
+      output: 'build'
+      directories: [
+        'test/knockback_legacy'
+        'test/knockback_utils'
+        'test/backbone_modelref'
+        'test/backbone_relational'
+        'test/knockback_collection_observable'
+        'test/knockback_formatted_observable'
+        'test/knockback_localized_observable'
+        'test/knockback_observable'
+        'test/knockback_observables'
+        'test/knockback_triggered_observable'
+        'test/knockback_view_model'
+        'test/knockback_memory_management'
+      ]
       commands: [
         'mbundle test/packaging/bundle-config.coffee'
         'mbundle test/lodash/bundle-config.coffee'
