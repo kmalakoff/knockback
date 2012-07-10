@@ -17,14 +17,13 @@ module.exports =
       'src/knockback_attribute_connectors.coffee'
       'src/knockback_view_model.coffee'
     ]
-    modes:
-      build:
-        commands: [
-          'cp knockback.js packages/npm/knockback.js'
-          'cp knockback.min.js packages/npm/knockback.min.js'
-          'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
-          'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
-        ]
+    _build:
+      commands: [
+        'cp knockback.js packages/npm/knockback.js'
+        'cp knockback.min.js packages/npm/knockback.min.js'
+        'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
+        'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
+      ]
 
   _examples:
     join: '_examples.js'
@@ -51,35 +50,34 @@ module.exports =
       'test/knockback_triggered_observable'
       'test/knockback_view_model'
       'test/knockback_memory_management'
-      'test/packaging'
-      'test/lodash'
     ]
-    modes:
-      build:
-        bundles:
-          'test/packaging/build/bundle-latest.js':
-            underscore: 'underscore'
-            backbone: 'backbone'
-            'backbone-modelref': 'backbone-modelref'
-            knockout: 'vendor/knockout-latest.js'
-            knockback: 'knockback.js'
-            'knockback-examples': 'test/_examples/build/_examples.js'
-          'test/lodash/build/bundle-lodash.js':
-            lodash: 'vendor/lodash-0.3.2.js'
-            backbone: 'backbone'
-            'backbone-modelref': 'backbone-modelref'
-            knockout: 'vendor/knockout-latest.js'
-            knockback: 'knockback.js'
-            'knockback-examples': 'test/_examples/build/_examples.js'
-            _alias:
-              underscore: 'lodash'
-        no_files_ok: 'test/packaging'
-      test:
-        command: 'phantomjs'
-        runner: 'phantomjs-qunit-runner.js'
-        files: '**/*.html'
+    _build:
+      commands: [
+        'mbundle test/packaging/bundle-config.coffee'
+        'mbundle test/lodash/bundle-config.coffee'
+      ]
+    _test:
+      command: 'phantomjs'
+      runner: 'phantomjs-qunit-runner.js'
+      files: '**/*.html'
+      directories: [
+        'test/knockback_legacy'
+        'test/knockback_utils'
+        'test/backbone_modelref'
+        'test/backbone_relational'
+        'test/knockback_collection_observable'
+        'test/knockback_formatted_observable'
+        'test/knockback_localized_observable'
+        'test/knockback_observable'
+        'test/knockback_observables'
+        'test/knockback_triggered_observable'
+        'test/knockback_view_model'
+        'test/knockback_memory_management'
+        'test/packaging'
+        'test/lodash'
+      ]
 
-  postinstall:
+  _postinstall:
     commands: [
       'cp underscore vendor/underscore-latest.js'
       'cp backbone vendor/backbone-latest.js'

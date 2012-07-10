@@ -13,11 +13,14 @@
 
   "scripts": {
     "postinstall": "cake postinstall",
+    "clean": "cake clean",
+    "build": "cake build",
+    "watch": "cake watch",
     "test": "cake -c -b test"
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",
-    "easy-bake": "0.1.3"
+    "easy-bake": "0.1.4"
   },
   "optionalDependencies": {
     "underscore": ">=1.3.3",
