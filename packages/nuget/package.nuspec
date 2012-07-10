@@ -19,7 +19,7 @@
     <tags>Kockout KnockoutJS Knockout.js Knockback Backbone BackboneJS Bakcbone.js Javascript</tags>
   </metadata>
   <files>
-    <file src="content\Scripts\knockback.js" target="content\Scripts\knockback.js" />
-    <file src="content\Scripts\knockback.min.js" target="content\Scripts\knockback.min.js" />
+    <file src="content/Scripts/knockback.js" target="content/Scripts/knockback.js" />
+    <file src="content/Scripts/knockback.min.js" target="content/Scripts/knockback.min.js" />
   </files>
 </package>
