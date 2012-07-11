@@ -25,7 +25,7 @@ module.exports =
         'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
       ]
 
-  _examples:
+  test_examples:
     join: '_examples.js'
     output: 'test/_examples/build'
     files: [
