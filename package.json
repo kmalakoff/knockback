@@ -12,15 +12,15 @@
   },
 
   "scripts": {
-    "postinstall": "cake postinstall",
-    "clean": "cake clean",
-    "build": "cake build",
-    "watch": "cake watch",
-    "test": "cake -c test"
+    "postinstall": "bake postinstall",
+    "clean": "bake clean",
+    "build": "bake build",
+    "watch": "bake watch",
+    "test": "bake test -c"
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",
-    "easy-bake": "0.1.5"
+    "easy-bake": "0.1.6"
   },
   "optionalDependencies": {
     "underscore": ">=1.3.3",
