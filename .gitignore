@@ -1,6 +1,2 @@
-node_modules/*
-
-// library
-knockback.js
-knockback.min.js
-test/*
+node_modules/
+build/
