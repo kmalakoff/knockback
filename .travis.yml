@@ -7,5 +7,6 @@ notifications:
     on_failure: always # [always|never|change] default: always
 
 before_script:
+  - "export PATH=node_modules/.bin:node_modules/easy-bake/node_modules/.bin:$PATH"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
