@@ -120,7 +120,7 @@ class kb.ViewModel extends kb.RefCountable
     observable = @[vm_key]
     if observable
       return unless kb.utils.observableInstanceOf(observable, kb.AttributeObservable) # not something we created, skip
-      if observable isnt model
+      if observable.model() isnt model
         observable.model(model)
       else
         observable.update()

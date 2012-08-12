@@ -35,6 +35,7 @@ class kb.Store
   registerObservable: (obj, observable) ->
     @objects.push(obj)
     observable.retain() if observable and _.isFunction(observable.refCount)
+    kb.utils.wrappedModel(observable, obj)
     @observables.push(observable)
 
   resolveObservable: (obj, path, factory) ->
@@ -45,7 +46,7 @@ class kb.Store
     for test, index in @objects
       observable = @observables[index]
       # TODO: look for the best way to ensure the creators is known: pass as an option? (will it propagate?)
-      if (test is obj) and ((observable.__kb_creator is creator) or (observable.constructor is creator) or kb.utils.observableInstanceOf(observable, creator))
+      if (test is obj) and ((observable.__kb.creator is creator) or (_.isFunction(creator) and (observable.constructor is creator or kb.utils.observableInstanceOf(observable, creator))))
         observable.retain() if _.isFunction(observable.refCount)
         return observable
 
