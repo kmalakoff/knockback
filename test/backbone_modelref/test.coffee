@@ -23,7 +23,7 @@ $(document).ready( ->
     ContactViewModel = (model) ->
       @loading_message = new _kbe.LocalizedStringLocalizer(new _kbe.LocalizedString('loading'))
       @attribute_observables = kb.observables(model, {
-        name:     {key:'name', read_only: true, default: @loading_message}
+        name:     {key:'name', default: @loading_message}
         number:   {key:'number', default: @loading_message}
         date:     {key:'date', default: @loading_message, localizer: _kbe.ShortDateLocalizer}
       }, this)
@@ -52,7 +52,6 @@ $(document).ready( ->
     equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
 
     # set from the view model
-    raises((->view_model.name('Paul')), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
     equal(model.get('name'), 'John', "Name not changed")
     equal(view_model.name(), 'John', "Name not changed")
     view_model.number('9222-222-222')

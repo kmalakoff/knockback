@@ -90,7 +90,7 @@ $(document).ready( ->
 
   test("Date and time with jquery.globalize", ->
     ContactViewModelDate = (model) ->
-      @date = kb.observable(model, {key:'date', write: true, localizer: _kbe.LongDateLocalizer}, this)
+      @date = kb.observable(model, {key:'date', localizer: _kbe.LongDateLocalizer}, this)
       @
 
     birthdate = new Date(1940, 10, 9)

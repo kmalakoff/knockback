@@ -60,19 +60,16 @@ $(document).ready( ->
       @prop5 = kb.observables(new Backbone.Model({name: 'name1'}), {name: {}}, @)
       @prop5 = kb.collectionObservable(new Backbone.Collection())
       @prop6 = nested_view_model
-      @prop7 = kb.simpleAttributeConnector(new Backbone.Model({name: 'name1'}), 'name')
-      @prop8 = kb.collectionAttributeConnector(new Backbone.Model({name: new Backbone.Collection()}), 'name')
-      @prop9 = kb.viewModelAttributeConnector(new Backbone.Model({name: new Backbone.Model()}), 'name', {view_model: ->})
-      @prop10 = kb.collectionObservable(new Backbone.Collection())
-      @prop11 = kb.localizedObservable(ko.observable(), {read: ->})
-      @prop12 = kb.localizedObservable(ko.observable(), {read: ->})
-      @prop13 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
+      @prop7 = kb.collectionObservable(new Backbone.Collection())
+      @prop8 = kb.localizedObservable(ko.observable(), {read: ->})
+      @prop9 = kb.localizedObservable(ko.observable(), {read: ->})
+      @prop10 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
       @
 
     view_model = new ViewModel()
     kb.utils.release(view_model)
 
-    ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..13]
+    ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..10]
     ok(!view_model.name, "Property released: view_model.name") # kb.observables(new Backbone.Model({name: 'name1'}), 'name', @)
     ok(!nested_view_model.name, "Property released: nested_view_model.name") # nested_view_model
   )

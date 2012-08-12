@@ -26,9 +26,6 @@ class kb.Observable
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
-    # LEGACY
-    (@mapping_info = _.clone(@mapping_info); @mapping_info.read_only = !@mapping_info.write) if @mapping_info.hasOwnProperty('write') and _.isBoolean(@mapping_info.write)
-
     # determine model or model_ref type
     if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
       @model_ref = @model; @model_ref.retain()
@@ -41,7 +38,7 @@ class kb.Observable
     @__kb.localizer = new @mapping_info.localizer(@_getCurrentValue()) if @mapping_info.localizer
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @mapping_info.read_only then (=> throw "kb.Observable: #{@mapping_info.key} is read only") else _.bind(@_onSetValue, @)
+      write: _.bind(@_onSetValue, @)
       owner: @view_model
     }))
 

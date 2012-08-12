@@ -9,7 +9,7 @@ $(document).ready( ->
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); Backbone.Relational.Semaphore
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!Backbone.Relational)
   )
 
   window.Person = Backbone.RelationalModel.extend({
@@ -262,5 +262,97 @@ $(document).ready( ->
     equal(view_model.occupants().length, 2, 'two occupants')
     equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship')
     equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship')
+  )
+
+  test("5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34", ->
+    Book = Backbone.RelationalModel.extend({
+      defaults:
+        name: 'untitled'
+      idAttribute: "_id"
+    })
+    Author = Backbone.RelationalModel.extend({
+      defaults:
+        name: 'untitled'
+      idAttribute: "_id"
+      relations:[{
+        type: 'HasMany'
+        key: 'books'
+        relatedModel: Book
+        includeInJSON: "_id"
+        reverseRelation:
+          key: 'author'
+          includeInJSON: "_id"
+      }]
+    })
+    BookStore = Backbone.RelationalModel.extend({
+      relations:[{
+        type: 'HasMany'
+        key: 'books'
+        relatedModel: Book
+      },{
+        type: 'HasMany'
+        key: 'authors'
+        relatedModel: Author
+      }]
+    })
+
+    Author.setup()
+    BookStore.setup()
+
+    bs = new BookStore({
+      books:[{
+        _id:"b1"
+        name: "Book One"
+        author: "a1"
+      },{
+        _id:"b2",
+        name: "Book Two"
+        author: "a1"
+      }],
+      authors:[{
+        name: 'fred'
+        _id: "a1"
+        books: []
+      },{
+        name: 'ted'
+        _id: "a2"
+        books: []
+      }]
+    })
+
+    BookViewModel = kb.ViewModel.extend({
+      constructor: (model) ->
+        kb.ViewModel.prototype.constructor.apply(this, arguments)
+        this.editMode = ko.observable()
+
+        @author = ko.computed(->
+          a = model.get('author')
+          return if a then a.get('name') else null
+        )
+
+        @edit = =>
+          model._save = model.toJSON()
+          @editMode(true)
+
+        @confirm = =>
+          model._save = null
+          @editMode(false)
+
+        @cancel = =>
+          model.set(model._save)
+          @editMode(false)
+    })
+
+    view_model = {
+      books: kb.collectionObservable(bs.get('books'), {
+        view_model: BookViewModel
+        mappings:
+          'author.books.models': BookViewModel
+      })
+    }
+
+    for book in view_model.books()
+      book_vm = book()
+      author = book_vm.author()
   )
 )

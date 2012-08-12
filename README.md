@@ -50,8 +50,8 @@ An Example
 ContactViewModel = (model) ->
   kb.observables(model, {
     name:     'name'
-    email:    {key:'email', write: true, default: 'your.name@yourplace.com'}
-    date:     {key:'date', write: true, localizer: LongDateLocalizer}
+    email:    {key:'email', default: 'your.name@yourplace.com'}
+    date:     {key:'date', localizer: LongDateLocalizer}
   }, this)
   @           # must return this or Coffeescript will return the last statement which is not what we want!
 ```

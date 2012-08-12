@@ -37,31 +37,6 @@ $(document).ready( ->
     kb.utils.release(view_model)
   )
 
-  test("Standard use case: read only", ->
-    model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
-    view_model = kb.viewModel(model, {read_only: true})
-
-    # get
-    equal(view_model.name(), 'Ringo', "Interesting name")
-    equal(view_model.number(), '555-555-5556', "Not so interesting number")
-
-    # set from the view model
-    raises((->view_model.name('Paul')), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
-    equal(model.get('name'), 'Ringo', "Name not changed")
-    equal(view_model.name(), 'Ringo', "Name not changed")
-    raises((->view_model.number('9222-222-222')), null, "Cannot write a value to a dependentObservable unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.")
-    equal(model.get('number'), '555-555-5556', "Number was not changed")
-    equal(view_model.number(), '555-555-5556', "Number was not changed")
-
-    # set from the model
-    model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
-    equal(view_model.name(), 'Starr', "Name changed")
-    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
-
-    # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
-  )
-
   test("internals test (Coffeescript inheritance)", ->
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
@@ -435,16 +410,16 @@ $(document).ready( ->
     })
 
     nested_view_model = kb.viewModel(nested_model, {
-      children:
+      mappings:
         john: ContactViewModelDate
-        paul: {view_model: ContactViewModelDate}
-        george: {view_model_create: (model) -> return new ContactViewModelDate(model)}
+        paul: ContactViewModelDate
+        george: {create: (model) -> return new ContactViewModelDate(model)}
         george2: {create: (model, key) -> return new ContactViewModelDate(model.get(key))}
-        major_duo: {children: ContactViewModelDate}
-        major_duo2: {children: {view_model: ContactViewModelDate}}
-        major_duo3: {children: {view_model_create: (model) -> return new ContactViewModelDate(model)}}
-        minor_duo2: {children: {view_model: kb.ViewModel}}
-        minor_duo3: {children: {create: (model) -> return new kb.ViewModel(model)}}
+        'major_duo.models': ContactViewModelDate
+        'major_duo2.models': ContactViewModelDate
+        'major_duo3.models': {create: (model) -> return new ContactViewModelDate(model)}
+        'minor_duo2.models': kb.ViewModel
+        'minor_duo3.models': {create: (model) -> return new kb.ViewModel(model)}
     })
 
     validateContactViewModel = (view_model, name, birthdate) ->

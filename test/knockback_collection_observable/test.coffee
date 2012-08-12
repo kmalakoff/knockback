@@ -49,7 +49,7 @@ $(document).ready( ->
   test("Basic Usage: collection observable with ko.dependentObservable", ->
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model: ContactViewModel
+      models: ContactViewModel
     })
 
     view_model =
@@ -111,7 +111,8 @@ $(document).ready( ->
   test("Basic Usage: no sorting and no callbacks", ->
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model_create: (model) -> return new ContactViewModel(model)
+      mappings:
+        models: {create: (model) -> return new ContactViewModel(model)}
     })
 
     equal(collection.length, 0, "no models")
@@ -148,8 +149,8 @@ $(document).ready( ->
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
-      view_model:   ContactViewModelClass
-      sort_attribute:           'name'
+      view_model:           ContactViewModelClass
+      sort_attribute:       'name'
     })
     collection_observable.bind('add', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
     collection_observable.bind('resort', (view_model, collection_observable, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
@@ -224,8 +225,8 @@ $(document).ready( ->
     # with view models
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model:   ContactViewModelClass
-      sorted_index:             kb.siwa('number', SortWrapper)
+      view_model:         ContactViewModelClass
+      sorted_index:       kb.siwa('number', SortWrapper)
     })
     collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
     collection.add(new _kbe.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
@@ -242,7 +243,7 @@ $(document).ready( ->
     view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
-      view_model: ContactViewModel    # view_model is legacy for view_model, it should be replaced with view_model or view_model_create
+      view_model:       ContactViewModel    # view_model is legacy for view_model, it should be replaced with view_model or create
     })
     collection_observable.bind('add', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
     collection_observable.bind('resort', (view_model, collection_observable, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
@@ -289,7 +290,7 @@ $(document).ready( ->
   test("Collection sync dynamically changing the sorting function", ->
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model: ContactViewModel
+      view_model:       ContactViewModel
     })
 
     equal(collection.length, 0, "no models")

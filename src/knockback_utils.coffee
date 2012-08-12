@@ -1,5 +1,5 @@
 ###
-  knockback_utils.js 0.15.4
+  knockback_utils.js 0.16.0.beta1
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -34,10 +34,6 @@ kb.utils.wrappedObservable = (instance, observable) ->
     observable.__kb.instance = instance
   return observable
 
-kb.wrappedObservable = (instance) ->  # LEGACY
-  kb.utils.legacyWarning('kb.wrappedObservable', '0.16.0', 'Please use kb.utils.wrappedObservable instead')
-  return kb.utils.wrappedObservable(instance)
-
 kb.utils.observableInstanceOf = (observable, type) ->
   return false unless observable
   return false unless observable.__kb and observable.__kb.instance
@@ -54,10 +50,6 @@ kb.utils.wrappedModel = (view_model, model) ->
   view_model.__kb.model = model
   return model
 
-kb.viewModelGetModel = kb.vmModel = (view_model) ->  # LEGACY
-  kb.utils.legacyWarning('kb.vmModel', '0.16.0', 'Please use kb.utils.wrappedModel instead')
-  return kb.utils.wrappedModel(view_model)
-
 kb.utils.setToDefault = (obj) ->
   return unless obj
 
@@ -68,10 +60,6 @@ kb.utils.setToDefault = (obj) ->
   # view model
   else if _.isObject(obj)
     (kb.utils.setToDefault(observable) if observable and (key != '__kb')) for key, observable of obj
-
-kb.vmSetToDefault = (view_model) ->
-  kb.utils.legacyWarning('kb.vmSetToDefault', '0.16.0', 'Please use kb.utils.release instead')
-  kb.utils.setToDefault(view_model)
 
 kb.utils.release = (obj, keys_only) ->
   return false unless obj
@@ -97,19 +85,11 @@ kb.utils.release = (obj, keys_only) ->
 
   return false
 
-kb.vmRelease = (view_model) ->
-  kb.utils.legacyWarning('kb.vmRelease', '0.16.0', 'Please use kb.utils.release instead')
-  return kb.utils.release(view_model)
-
-kb.vmReleaseObservable = (observable) ->
-  kb.utils.legacyWarning('kb.vmReleaseObservable', '0.16.0', 'Please use kb.utils.release instead')
-  return kb.utils.release(observable)
-
 kb.utils.optionsCreateClear = (options) ->
   delete options['create']
   delete options['children']
   delete options['view_model']
-  delete options['view_model_create']
+  delete options['create']
 
 kb.utils.optionsCreateOverride = (options, create_options) ->
   kb.utils.optionsCreateClear(options)

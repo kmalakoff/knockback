@@ -22,15 +22,6 @@ $(document).ready( ->
   )
 
   test("kb.utils.observableInstanceOf", ->
-    equal(kb.utils.observableInstanceOf(kb.simpleAttributeConnector(new Backbone.Model({name: 'name1'}), 'name'), kb.AttributeConnector), true, "Instance is kb.AttributeConnector") # get
-    equal(kb.utils.observableInstanceOf(kb.simpleAttributeConnector(new Backbone.Model({name: 'name1'}), 'name'), kb.SimpleAttributeConnector), true, "Instance is kb.SimpleAttributeConnector") # get
-
-    equal(kb.utils.observableInstanceOf(kb.collectionAttributeConnector(new Backbone.Model({name: new Backbone.Collection()}), 'name'), kb.AttributeConnector), true, "Instance is kb.AttributeConnector") # get
-    equal(kb.utils.observableInstanceOf(kb.collectionAttributeConnector(new Backbone.Model({name: new Backbone.Collection()}), 'name'), kb.CollectionAttributeConnector), true, "Instance is kb.CollectionAttributeConnector") # get
-
-    equal(kb.utils.observableInstanceOf(kb.viewModelAttributeConnector(new Backbone.Model({name: new Backbone.Model()}), 'name', {view_model: ->}), kb.AttributeConnector), true, "Instance is kb.AttributeConnector") # get
-    equal(kb.utils.observableInstanceOf(kb.viewModelAttributeConnector(new Backbone.Model({name: new Backbone.Model()}), 'name', {view_model: ->}), kb.ViewModelAttributeConnector), true, "Instance is kb.ViewModelAttributeConnector") # get
-
     equal(kb.utils.observableInstanceOf(kb.collectionObservable(new Backbone.Collection()), kb.CollectionObservable), true, "Instance is kb.CollectionObservable") # get
 
     kb.locale_manager = new Backbone.Model()

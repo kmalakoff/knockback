@@ -17,10 +17,10 @@
 #
 # Options:
 #   view_model: (model) -> ... view model constructor
-#   view_model_create: (model) -> ... view model create function
+#   create: (model) -> ... view model create function
 #   defer: if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a cycle.
 #   store
-# Optional: If you wish to create view models, you must supply a target observable array and the view_model_create or view_model option.
+# Optional: If you wish to create view models, you must supply a target observable array and the create or view_model option.
 #
 # With view models, the following are triggered the following Backbone.Events
 #   add: (view_model, collection_observable) or if batch: (collection_observable)
@@ -34,15 +34,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
     super
     kb.stats.collection_observables++ if kb.stats_on     # collect memory management statistics
-
-    # LEGACY
-    if ko.isObservable(options) and options.hasOwnProperty('indexOf')
-      kb.utils.legacyWarning('kb.collectionObservable with an external ko.observableArray', '0.16.0', 'Please use the kb.collectionObservable directly instead of passing a ko.observableArray')
-      observable = kb.utils.wrappedObservable(this, options)
-      options = arguments[2] || {}
-      bind_model_changes = true
-    else
-      observable = kb.utils.wrappedObservable(this, ko.observableArray([]))
+    observable = kb.utils.wrappedObservable(this, ko.observableArray([]))
 
     # register ourselves to handle recursive view models
     kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this)) unless options.store_skip_resolve
@@ -50,22 +42,17 @@ class kb.CollectionObservable extends kb.RefCountable
     # always use a store to cache view models
     if options.store then (@__kb.store = options.store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
 
+    # view model factory
+    @__kb.factory = new kb.Factory(options.path, options.factory)
+    @__kb.factory.addPathMappings(options.mappings) if options.mappings
+    if options.view_model
+      @__kb.factory.addPathMapping('models', options.view_model)
+    else if options.create
+      @__kb.factory.addPathMapping('models', {create: options.create})
+    else if options.create
+      @__kb.factory.addPathMapping('models', {create: options.create})
+
     # options
-    if options.hasOwnProperty('view_model')
-      throw 'kb.CollectionObservable: options.view_model is empty' if not options.view_model
-      @view_model_create_fn = options.view_model
-      @view_model_create_with_new = true
-    else if options.hasOwnProperty('view_model_constructor')
-      throw 'kb.CollectionObservable: options.view_model_constructor is empty' if not options.view_model_constructor
-      kb.utils.legacyWarning('kb.collectionObservable option view_model_constructor', '0.16.0', 'Please use view_model option instead')
-      @view_model_create_fn = options.view_model_constructor
-      @view_model_create_with_new = true
-    else if options.hasOwnProperty('view_model_create')
-      throw 'kb.CollectionObservable: options.view_model_create is empty' if not options.view_model_create
-      @view_model_create_fn = options.view_model_create
-    else if options.hasOwnProperty('create')
-      throw 'kb.CollectionObservable: options.create is empty' if not options.create
-      @view_model_create_fn = options.create
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
 
@@ -75,9 +62,6 @@ class kb.CollectionObservable extends kb.RefCountable
     @__kb._onModelAdd = _.bind(@_onModelAdd, @)
     @__kb._onModelRemove = _.bind(@_onModelRemove, @)
     @__kb._onModelChange = _.bind(@_onModelChange, @)
-
-    # LEGACY
-    collection.bind('change', => kb.utils.wrappedObservable(this).valueHasMutated()) if bind_model_changes and collection
 
     # publish public interface on the observable and return instead of this
     observable.retain = _.bind(@retain, @)
@@ -102,7 +86,7 @@ class kb.CollectionObservable extends kb.RefCountable
   __destroy: ->
     @collection(null)
     (@__kb.store.destroy(); @__kb.store = null) if @hasViewModels() and @__kb.store_is_owned
-    @view_model_create_fn = null
+    @__kb.factory = null
     @__kb.collection = null
     kb.utils.wrappedObservable(this, null)
     super
@@ -166,7 +150,7 @@ class kb.CollectionObservable extends kb.RefCountable
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(observable(), (test) -> return (test.__kb.model[id_attribute] == model[id_attribute]))
 
-  hasViewModels: -> return !!@view_model_create_fn
+  hasViewModels: -> return !@__kb.factory.isEmpty()
 
   ####################################################
   # Internal
@@ -270,14 +254,7 @@ class kb.CollectionObservable extends kb.RefCountable
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
   _createTarget: (model) ->
-    create_fn = =>
-      options = @__kb.store.addResolverToOptions({}, model)
-      observable = kb.utils.wrappedObservable(this)
-      view_model = if @view_model_create_with_new then (new @view_model_create_fn(model, options, observable)) else @view_model_create_fn(model, options, observable)
-      kb.utils.wrappedModel(view_model, model)
-      return view_model
-
-    return if @hasViewModels() then @__kb.store.resolveValue(model, create_fn) else model
+    return if @hasViewModels() then @__kb.store.resolveValue(model, @__kb.factory, 'models') else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

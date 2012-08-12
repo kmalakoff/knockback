@@ -8,81 +8,82 @@
 
 class kb.Store
   constructor: ->
-    @keys = []
-    @values = []
+    @objects = []
+    @view_models = []
 
   destroy: ->
-    @keys = null
+    @objects = null
 
     # first break cycles in the collections since relations are the typical source of recursion
-    for index, value of @values
-      continue unless kb.utils.observableInstanceOf(value, kb.CollectionObservable)
+    for index, view_model of @view_models
+      continue unless kb.utils.observableInstanceOf(view_model, kb.CollectionObservable)
 
-      @values[index] = null # releasing
-      value.release() while (value.refCount() > 0)
+      @view_models[index] = null # releasing
+      view_model.release() while (view_model.refCount() > 0)
 
     # then release the view models
-    for index, value of @values
-      continue unless value
+    for index, view_model of @view_models
+      continue unless view_model
 
-      @values[index] = null # releasing
-      if (value instanceof kb.RefCountable)
-        value.release() while (value.refCount() > 0)
+      @view_models[index] = null # releasing
+      if (view_model instanceof kb.RefCountable)
+        view_model.release() while (view_model.refCount() > 0)
       else
-        kb.utils.release(value)
-    @values = null
+        kb.utils.release(view_model)
+    @view_models = null
 
-  registerValue: (key, value) ->
-    value.retain() if (value instanceof kb.RefCountable)
-    index = _.indexOf(@keys, key)
+  registerValue: (obj, view_model) ->
+    view_model.retain() if (view_model instanceof kb.RefCountable)
+    index = _.indexOf(@objects, obj)
     if (index >= 0)
-      @values[index] = value
+      @view_models[index] = view_model
     else
-      @keys.push(key)
-      @values.push(value)
-    return value
+      @objects.push(obj)
+      @view_models.push(view_model)
+    return view_model
 
-  resolveValue: (key, create_fn, args) ->
+  resolveValue: (obj, factory, path) ->
     # use an existing
-    index = _.indexOf(@keys, key)
+    index = _.indexOf(@objects, obj)
     if (index >= 0)
-      # value is in the store (not still being resolved)
-      if @values[index]
+      # view_model is in the store (not still being resolved)
+      if @view_models[index]
         # reference is out-of-date, clear it out
-        if (@values[index] instanceof kb.RefCountable) and (@values[index].refCount() <= 0)
-          @values[index] = null
+        if (@view_models[index] instanceof kb.RefCountable) and (@view_models[index].refCount() <= 0)
+          @view_models[index] = null
         else
-          return if (@values[index] instanceof kb.RefCountable) then @values[index].retain() else @values[index]
+          return if (@view_models[index] instanceof kb.RefCountable) then @view_models[index].retain() else @view_models[index]
 
-    # stub out a new value
+    # stub out a new view_model
     else
-      index = @keys.length
-      @keys.push(key)
-      @values.push(undefined)
+      index = @objects.length
+      @objects.push(obj)
+      @view_models.push(undefined)
 
-    # create the value
-    value = create_fn.apply(null, Array.prototype.slice.call(arguments, 2))
+    # create and wrap the view_model
+    view_model = factory.createForPath(obj, path, this)
+    kb.utils.wrappedModel(view_model, obj)
 
-    # update the stored value
-    if @keys[index] != key
-      @registerValue(key, value)
-    else if not @values[index]
-      value.retain() if (value instanceof kb.RefCountable)
-      @values[index] = value
+    # update the stored view_model
+    if @objects[index] != obj
+      @registerValue(obj, view_model)
+    else if not @view_models[index]
+      view_model.retain() if (view_model instanceof kb.RefCountable)
+      @view_models[index] = view_model
 
-    return value
+    return view_model
 
-  releaseValue: (value) ->
-    return unless (value instanceof kb.RefCountable)
-    value.release()
-    return if (value.refCount() > 0)
-    index = _.indexOf(@values, value)
+  releaseValue: (view_model) ->
+    return unless (view_model instanceof kb.RefCountable)
+    view_model.release()
+    return if (view_model.refCount() > 0)
+    index = _.indexOf(@view_models, view_model)
     return unless index >= 0
-    @values[index] = 0
+    @view_models[index] = 0
 
-  addResolverToOptions: (options, key) ->
-    return _.extend(options, {store: this, store_key: key})
+  addResolverToOptions: (options, obj) ->
+    return _.extend(options, {store: this, store_obj: obj})
 
-  @resolveFromOptions: (options, value) ->
-    return unless options.store and options.store_key
-    options.store.registerValue(options.store_key, value)
+  @resolveFromOptions: (options, view_model) ->
+    return unless options.store and options.store_obj
+    options.store.registerValue(options.store_obj, view_model)
