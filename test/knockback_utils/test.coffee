@@ -49,14 +49,6 @@ $(document).ready( ->
     # TODO
   )
 
-  test("kb.utils.optionsCreateClear", ->
-    # TODO
-  )
-
-  test("kb.utils.optionsCreateOverride", ->
-    # TODO
-  )
-
   test("Error cases", ->
     # TODO
   )

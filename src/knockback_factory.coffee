@@ -7,25 +7,36 @@
 ###
 
 class kb.Factory
-  constructor: (path, factory) ->
+  constructor: (@path, @parent_factory) ->
+    @path = '' unless @path
     @paths = {}
 
-  isEmpty: -> return _.isEmpty(@paths)
+  pathJoin: (path) -> return kb.utils.pathJoin(@path, path)
+  hasPath: (path) -> return @paths.hasOwnProperty(path) or (@parent_factory and @parent_factory.hasPath(path))
 
-  addPathMapping: (path, create_fn) ->
-    @paths[path] = create_fn
+  addPathMapping: (path, create_info) ->
+    @paths[path] = create_info
 
   addPathMappings: (mappings) ->
     for path, create_info of mappings
       @paths[path] = create_info
 
-  createForPath: (obj, path, store) ->
-    options = {store: store, factory: this, path: path}
-    create_info = @paths[path]
+  creatorForPath: (obj, path) ->
+    creator = @paths[path]; return creator if creator
+    if @parent_factory
+      creator = @parent_factory.creatorForPath(obj, path); return creator if creator
 
-    return kb.Factory.createDefault(obj, options)   if not create_info            # no create, use default
-    return new create_info(obj, options)            if _.isFunction(create_info)  # a constructor
-    return create_info.create(obj, options)         if create_info.create         # a function
+    # use defaults
+    return kb.ViewModel                   if obj instanceof Backbone.Model
+    return kb.CollectionObservable        if obj instanceof Backbone.Collection
+    return null
+
+  createForPath: (obj, path, store, creator) ->
+    creator = @creatorForPath(obj, path)   if not creator # hasn't been looked up yet
+    return ko.observable(obj)              if not creator # an observable
+    return new creator(obj, {store: store, factory: this, path: path})            if _.isFunction(creator)  # a constructor
+    return creator.create(obj, {store: store, factory: this, path: path})         if creator.create         # a function
+    throw "unrecognized creator for #{path}"
 
   @createDefault: (obj, options) ->
     return kb.viewModel(obj, options)                   if obj instanceof Backbone.Model

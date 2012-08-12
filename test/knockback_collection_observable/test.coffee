@@ -75,7 +75,7 @@ $(document).ready( ->
   test("Basic Usage: no view models", ->
     collection = new _kbe.ContactsCollection()
 
-    collection_observable = kb.collectionObservable(collection)
+    collection_observable = kb.collectionObservable(collection, {models_only: true})
 
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
@@ -211,6 +211,7 @@ $(document).ready( ->
     # without view models
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
+      models_only:              true
       sorted_index:             kb.siwa('number', SortWrapper)
     })
     collection.add(new _kbe.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))

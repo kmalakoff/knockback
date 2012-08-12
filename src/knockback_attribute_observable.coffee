@@ -9,8 +9,9 @@
 class kb.AttributeObservable
   constructor: (model, key, options={}) ->
     kb.utils.wrappedModel(this, model)
-    @__kb.options = _.clone(options)
-    @__kb.options.path = key
+    @__kb.store = options.store
+    @__kb.factory = options.factory
+    @__kb.path = key
 
     # update to create
     @update()
@@ -28,6 +29,7 @@ class kb.AttributeObservable
     return observable
 
   destroy: ->
+    @__kb.store.releaseObservable(@__kb.value_observable) if @__kb.value_observable
     kb.utils.wrappedObservable(@).dispose(); kb.utils.wrappedObservable(@, null)
     @__kb = null
 
@@ -37,8 +39,8 @@ class kb.AttributeObservable
   write: (new_value) ->
     # update the model
     model = kb.utils.wrappedModel(this)
-    if model and model.get(@__kb.options.path) isnt new_value
-      set_info = {}; set_info[@__kb.options.path] = new_value
+    if model and model.get(@__kb.path) isnt new_value
+      set_info = {}; set_info[@__kb.path] = new_value
       model.set(set_info)
 
     # update the observable
@@ -53,7 +55,7 @@ class kb.AttributeObservable
 
   update: (new_value) ->
     model = kb.utils.wrappedModel(this)
-    new_value = model.get(@__kb.options.path) if model and not arguments.length
+    new_value = model.get(@__kb.path) if model and not arguments.length
 
     # set up a new value obseravble, store separately from the attribute observable so it can be referred to even if the model is not yet loaded
     if not @__kb.value_observable
@@ -94,7 +96,8 @@ class kb.AttributeObservable
         @__kb.value_observable(new_value) if @__kb.value_observable() isnt new_value
 
   _createValueObservable: (new_value, notify) ->
-    @__kb.value_observable = if @__kb.options.factory then @__kb.options.factory.createForPath(new_value, @__kb.options.path, @__kb.options.store) else kb.Factory.createDefault(new_value, @__kb.options)
+    @__kb.store.releaseObservable(@__kb.value_observable) if @__kb.value_observable # release previous
+    @__kb.value_observable = @__kb.store.resolveObservable(new_value, @__kb.path, @__kb.factory)
     kb.utils.wrappedObservable(@).notifySubscribers(ko.utils.unwrapObservable(@__kb.value_observable)) if notify
 
 kb.attributeObservable = (model, key, options) -> new kb.AttributeObservable(model, key, options)

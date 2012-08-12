@@ -20,7 +20,7 @@
 #   create: (model) -> ... view model create function
 #   defer: if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a cycle.
 #   store
-# Optional: If you wish to create view models, you must supply a target observable array and the create or view_model option.
+#   models_only: flags for skipping the creation of view models
 #
 # With view models, the following are triggered the following Backbone.Events
 #   add: (view_model, collection_observable) or if batch: (collection_observable)
@@ -34,23 +34,28 @@ class kb.CollectionObservable extends kb.RefCountable
 
     super
     kb.stats.collection_observables++ if kb.stats_on     # collect memory management statistics
-    observable = kb.utils.wrappedObservable(this, ko.observableArray([]))
-
-    # register ourselves to handle recursive view models
-    kb.Store.resolveFromOptions(options, kb.utils.wrappedObservable(this)) unless options.store_skip_resolve
+    observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
 
     # always use a store to cache view models
-    if options.store then (@__kb.store = options.store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
+    if options.store
+      @__kb.store = options.store
+      @__kb.store.registerObservable(collection, kb.utils.wrappedObservable(@))
+    else
+      @__kb.store = new kb.Store(); @__kb.store_is_owned = true
 
     # view model factory
     @__kb.factory = new kb.Factory(options.path, options.factory)
-    @__kb.factory.addPathMappings(options.mappings) if options.mappings
+    @__kb.models_path = kb.utils.pathJoin(options.path, 'models')
     if options.view_model
-      @__kb.factory.addPathMapping('models', options.view_model)
+      @__kb.factory.addPathMapping(@__kb.models_path, options.view_model)
     else if options.create
-      @__kb.factory.addPathMapping('models', {create: options.create})
-    else if options.create
-      @__kb.factory.addPathMapping('models', {create: options.create})
+      @__kb.factory.addPathMapping(@__kb.models_path, {create: options.create})
+    @__kb.factory.addPathMappings(options.mappings) if options.mappings
+
+    # add default view model unless models only flag
+    @models_only = options.models_only
+    if not @models_only and not @__kb.factory.hasPath(@__kb.models_path)
+      @__kb.factory.addPathMapping(@__kb.models_path, kb.ViewModel)
 
     # options
     @sort_attribute = options.sort_attribute
@@ -88,7 +93,7 @@ class kb.CollectionObservable extends kb.RefCountable
     (@__kb.store.destroy(); @__kb.store = null) if @hasViewModels() and @__kb.store_is_owned
     @__kb.factory = null
     @__kb.collection = null
-    kb.utils.wrappedObservable(this, null)
+    kb.utils.wrappedObservable(@, null)
     super
 
     kb.stats.collection_observables-- if kb.stats_on       # collect memory management statistics
@@ -98,7 +103,7 @@ class kb.CollectionObservable extends kb.RefCountable
   release: -> observable = kb.utils.wrappedObservable(@); super; return observable
 
   collection: (collection, options) ->
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
     if (arguments.length == 0)
       observable() # force a dependency
       return @__kb.collection
@@ -133,7 +138,7 @@ class kb.CollectionObservable extends kb.RefCountable
       @sorted_index = null
 
     _resync = =>
-      observable = kb.utils.wrappedObservable(this)
+      observable = kb.utils.wrappedObservable(@)
       return if (@__kb.collection.models.length == 0) and (observable().length == 0) # don't do anything
       @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
       @trigger('resort', observable()) unless options.silent # notify
@@ -146,11 +151,11 @@ class kb.CollectionObservable extends kb.RefCountable
 
   viewModelByModel: (model) ->
     return null unless @hasViewModels()
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(observable(), (test) -> return (test.__kb.model[id_attribute] == model[id_attribute]))
 
-  hasViewModels: -> return !@__kb.factory.isEmpty()
+  hasViewModels: -> return !@models_only
 
   ####################################################
   # Internal
@@ -175,14 +180,14 @@ class kb.CollectionObservable extends kb.RefCountable
   _onCollectionResort: (model_or_models) ->
     throw 'CollectionObservable: collection sorted_index unexpected' if @sorted_index
     if _.isArray(model_or_models)
-      observable = kb.utils.wrappedObservable(this)
+      observable = kb.utils.wrappedObservable(@)
       @trigger('resort', observable()) # notify
     else
       @_onModelResort(model_or_models)
 
   _onModelAdd: (model) ->
     target = if @hasViewModels() then @_createTarget(model) else model
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
     if @sorted_index
       add_index = @sorted_index(observable(), target)
     else
@@ -195,12 +200,12 @@ class kb.CollectionObservable extends kb.RefCountable
     # either remove a view model or a model
     target = if @hasViewModels() then @viewModelByModel(model) else model
     return unless target  # it may have already been removed
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
     observable.remove(target)
     @trigger('remove', target, observable) # notify
 
     # release
-    @__kb.store.releaseValue(target) if @hasViewModels()
+    @__kb.store.releaseObservable(target) if @hasViewModels()
 
   _onModelChange: (model) ->
     # resort if needed
@@ -208,7 +213,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
   _onModelResort: (model) ->
     # either move a view model or a model
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
     target = if @hasViewModels() then @viewModelByModel(model) else model
     previous_index = observable.indexOf(target)
     if @sorted_index
@@ -224,16 +229,16 @@ class kb.CollectionObservable extends kb.RefCountable
     @trigger('resort', target, observable(), new_index) # notify
 
   _clear: (silent) ->
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
     @trigger('remove', observable()) if not silent # notify
     targets = observable.removeAll() # batch
 
     # release
-    (@__kb.store.releaseValue(target) for target in targets) if @hasViewModels()
+    (@__kb.store.releaseObservable(target) for target in targets) if @hasViewModels()
 
   _collectionResync: (silent) ->
     @_clear(silent)
-    observable = kb.utils.wrappedObservable(this)
+    observable = kb.utils.wrappedObservable(@)
 
     if @sorted_index
       targets = []
@@ -254,7 +259,7 @@ class kb.CollectionObservable extends kb.RefCountable
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
   _createTarget: (model) ->
-    return if @hasViewModels() then @__kb.store.resolveValue(model, @__kb.factory, 'models') else model
+    return if @hasViewModels() then @__kb.store.resolveObservable(model, @__kb.models_path, @__kb.factory) else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe
@@ -262,7 +267,7 @@ class kb.CollectionObservable extends kb.RefCountable
 kb.CollectionObservable.prototype extends Backbone.Events
 
 # factory function
-kb.collectionObservable = (collection, options, legacy) -> return new kb.CollectionObservable(collection, options, legacy)
+kb.collectionObservable = (collection, options) -> return new kb.CollectionObservable(collection, options)
 
 # helpers
 kb.sortedIndexWrapAttr = kb.siwa = (attribute_name, wrapper_constructor) ->

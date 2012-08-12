@@ -12,7 +12,7 @@
 #       internals can be used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 #   * requires - an array of atttributes that should be stubbed out if they don't exist on the model
 #       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
-#   * children - use to provide a view_model or create or create function per model attribute
+#   * TODO: update documentation....children - use to provide a view_model or create or create function per model attribute
 ####################################################
 
 class kb.ViewModel extends kb.RefCountable
@@ -21,11 +21,12 @@ class kb.ViewModel extends kb.RefCountable
 
     kb.stats.view_models++ if kb.stats_on        # collect memory management statistics
 
-    # register ourselves to handle recursive view models
-    kb.Store.resolveFromOptions(options, this) unless options.store_skip_resolve
-
     # always use a store to ensure recursive view models are handled correctly
-    if options.store then (@__kb.store = options.store) else (@__kb.store = new kb.Store(); @__kb.store_is_owned = true)
+    if options.store
+      @__kb.store = options.store
+      @__kb.store.registerObservable(model, this)
+    else
+      @__kb.store = new kb.Store(); @__kb.store_is_owned = true
 
     # view model factory
     @__kb.factory = new kb.Factory(options.path, options.factory)
@@ -98,7 +99,7 @@ class kb.ViewModel extends kb.RefCountable
   _onModelLoaded: (model) ->
     kb.utils.wrappedModel(this, model)
     @_modelBind(model)
-    @_updateAttributeObservable(@__kb.model, key) for key of @__kb.model.attributes
+    @_updateAttributeObservable(@__kb.model, key) for key of model.attributes
 
   _onModelUnloaded: (model) ->
     @_modelUnbind(model)
@@ -117,9 +118,12 @@ class kb.ViewModel extends kb.RefCountable
   _updateAttributeObservable: (model, key) ->
     vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
     if @[vm_key]
-      @[vm_key].update()
+      if @[vm_key].model() isnt model
+        @[vm_key].model(model)
+      else
+        @[vm_key].update()
     else
-      @[vm_key] = kb.attributeObservable(model, key, {store: @__kb.store, factory: @__kb.factory})
+      @[vm_key] = kb.attributeObservable(model, key, {store: @__kb.store, factory: @__kb.factory, path: @__kb.factory.pathJoin(key)})
 
 # factory function
 kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

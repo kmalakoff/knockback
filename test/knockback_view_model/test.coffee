@@ -381,8 +381,8 @@ $(document).ready( ->
     kb.stats_on = true # turn on stats
 
     class ContactViewModelDate extends kb.ViewModel
-      constructor: (model) ->
-        super(model, {internals: ['date']})
+      constructor: (model, options) ->
+        super(model, _.extend({internals: ['date']}, options))
         @date = new _kbe.LongDateLocalizer(@_date)
 
     john_birthdate = new Date(1940, 10, 9)
@@ -413,13 +413,14 @@ $(document).ready( ->
       mappings:
         john: ContactViewModelDate
         paul: ContactViewModelDate
-        george: {create: (model) -> return new ContactViewModelDate(model)}
-        george2: {create: (model, key) -> return new ContactViewModelDate(model.get(key))}
+        george: {create: (model, options) -> return new ContactViewModelDate(model, options)}
+        george2: {create: (model, options) -> return new ContactViewModelDate(model, options)}
         'major_duo.models': ContactViewModelDate
         'major_duo2.models': ContactViewModelDate
-        'major_duo3.models': {create: (model) -> return new ContactViewModelDate(model)}
+        'major_duo3.models': {create: (model, options) -> return new ContactViewModelDate(model, options)}
+        'minor_duo.models': kb.ViewModel
         'minor_duo2.models': kb.ViewModel
-        'minor_duo3.models': {create: (model) -> return new kb.ViewModel(model)}
+        'minor_duo3.models': {create: (model, options) -> return new kb.ViewModel(model, options)}
     })
 
     validateContactViewModel = (view_model, name, birthdate) ->
@@ -460,10 +461,10 @@ $(document).ready( ->
       equal(view_model.date().valueOf(), birthdate.valueOf(), "#{view_model.name()}: Birthdate matches")
 
     # models
-    validateContactViewModel(nested_view_model.john, 'John', john_birthdate)
-    validateContactViewModel(nested_view_model.paul, 'Paul', paul_birthdate)
-    validateContactViewModel(nested_view_model.george, 'George', george_birthdate)
-    validateContactViewModel(nested_view_model.george2, 'George', george_birthdate)
+    validateContactViewModel(nested_view_model.john(), 'John', john_birthdate)
+    validateContactViewModel(nested_view_model.paul(), 'Paul', paul_birthdate)
+    validateContactViewModel(nested_view_model.george(), 'George', george_birthdate)
+    validateContactViewModel(nested_view_model.george2(), 'George', george_birthdate)
     validateGenericViewModel(nested_view_model.ringo(), 'Ringo', ringo_birthdate)
 
     # colllections

@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.16.0.beta1
+  knockback.js 0.16.0
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -16,7 +16,7 @@ ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') el
 
 # export or create Knockback namespace and kb alias
 Knockback = kb = @Knockback = @kb = if (typeof(exports) != 'undefined') then exports else {}
-kb.VERSION = '0.16.0.beta1'
+kb.VERSION = '0.16.0'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing

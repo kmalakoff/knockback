@@ -1,5 +1,5 @@
 ###
-  knockback_utils.js 0.16.0.beta1
+  knockback_utils.js 0.16.0
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -85,12 +85,10 @@ kb.utils.release = (obj, keys_only) ->
 
   return false
 
-kb.utils.optionsCreateClear = (options) ->
-  delete options['create']
-  delete options['children']
-  delete options['view_model']
-  delete options['create']
-
-kb.utils.optionsCreateOverride = (options, create_options) ->
-  kb.utils.optionsCreateClear(options)
-  return _.extend(options, create_options)
+kb.utils.pathJoin = (path1, path2) ->
+  if not path1
+    path = ''
+  else
+    path = if path1[path1.length-1] isnt '.' then "#{path1}." else path1
+  path += path2
+  return path
