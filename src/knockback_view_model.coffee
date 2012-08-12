@@ -117,11 +117,13 @@ class kb.ViewModel extends kb.RefCountable
 
   _updateAttributeObservable: (model, key) ->
     vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
-    if @[vm_key]
-      if @[vm_key].model() isnt model
-        @[vm_key].model(model)
+    observable = @[vm_key]
+    if observable
+      return unless kb.utils.observableInstanceOf(observable, kb.AttributeObservable) # not something we created, skip
+      if observable isnt model
+        observable.model(model)
       else
-        @[vm_key].update()
+        observable.update()
     else
       @[vm_key] = kb.attributeObservable(model, key, {store: @__kb.store, factory: @__kb.factory, path: @__kb.factory.pathJoin(key)})
 

@@ -45,7 +45,7 @@ class kb.Store
     for test, index in @objects
       observable = @observables[index]
       # TODO: look for the best way to ensure the creators is known: pass as an option? (will it propagate?)
-      if (test is obj) and ((observable.__kb_creator is creator) or (observable.constructor is creator) or kb.utils.observableInstanceOf(creator))
+      if (test is obj) and ((observable.__kb_creator is creator) or (observable.constructor is creator) or kb.utils.observableInstanceOf(observable, creator))
         observable.retain() if _.isFunction(observable.refCount)
         return observable
 

@@ -86,6 +86,9 @@ class kb.CollectionObservable extends kb.RefCountable
     # start the processing
     @collection(collection, {silent: true, defer: options.defer})
 
+    # start subscribing
+    observable.subscribe(_.bind(@_onObservableArrayChange, @))
+
     return observable
 
   __destroy: ->
@@ -228,6 +231,9 @@ class kb.CollectionObservable extends kb.RefCountable
     # either remove a view model or a model
     observable.splice(previous_index, 1); observable.splice(new_index, 0, target) # move
     @trigger('resort', target, observable(), new_index) # notify
+
+  _onObservableArrayChange: (val1, val2) ->
+    # TODO: resolve design with: https://github.com/kmalakoff/knockback/issues/37
 
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)

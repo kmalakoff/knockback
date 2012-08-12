@@ -1,5 +1,5 @@
 ###
-  knockback_utils.js 0.16.0
+  knockback_utils.js 0.16.0.pre
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -35,6 +35,7 @@ kb.utils.wrappedObservable = (instance, observable) ->
   return observable
 
 kb.utils.observableInstanceOf = (observable, type) ->
+  return true if (observable instanceof type)
   return false unless observable
   return false unless observable.__kb and observable.__kb.instance
   return (observable.__kb.instance instanceof type)
