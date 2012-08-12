@@ -26,9 +26,9 @@ class kb.RefCountable
     @__kb.ref_count++
     @
 
-  release: ->
+  release: (all) ->
     throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
-    @__kb.ref_count--
+    if all then @__kb.ref_count = 0 else @__kb.ref_count--
     @__destroy() unless @__kb.ref_count
     @
 

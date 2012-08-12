@@ -34,8 +34,8 @@ class kb.Factory
   createForPath: (obj, path, store, creator) ->
     creator = @creatorForPath(obj, path)   if not creator # hasn't been looked up yet
     return ko.observable(obj)              if not creator # an observable
-    return new creator(obj, {store: store, factory: this, path: path})            if _.isFunction(creator)  # a constructor
-    return creator.create(obj, {store: store, factory: this, path: path})         if creator.create         # a function
+    return new creator(obj, {store: store, factory: this, path: path, creator: creator})            if _.isFunction(creator)  # a constructor
+    return creator.create(obj, {store: store, factory: this, path: path, creator: creator})         if creator.create         # a function
     throw "unrecognized creator for #{path}"
 
   @createDefault: (obj, options) ->

@@ -19,7 +19,7 @@ class kb.Store
       continue unless kb.utils.observableInstanceOf(observable, kb.CollectionObservable)
 
       @observables[index] = null # releasing
-      observable.release() while (observable.refCount() > 0)
+      observable.release(true)
 
     # then release the view models
     for index, observable of @observables
@@ -27,7 +27,7 @@ class kb.Store
 
       @observables[index] = null # releasing
       if observable and _.isFunction(observable.refCount)
-        observable.release() while (observable.refCount() > 0)
+        observable.release(true)
       else
         kb.utils.release(observable)
     @observables = null
@@ -37,31 +37,31 @@ class kb.Store
     observable.retain() if observable and _.isFunction(observable.refCount)
     @observables.push(observable)
 
-  findObservable: (obj, path, factory) ->
+  resolveObservable: (obj, path, factory) ->
     creator = factory.creatorForPath(obj, path)
-    test_type = if creator then creator else ko.observable
+    return ko.observable(obj) unless creator
 
     # check for an existing one of the correct type
     for test, index in @objects
-      return index if (test is obj) and (@observables[index] instanceof test_type)
-    return -1
-
-  resolveObservable: (obj, path, factory) ->
-    index = @findObservable(obj, path, factory)
-    if index >= 0
       observable = @observables[index]
-      observable.retain() if _.isFunction(observable.refCount)
-      return observable
+      # TODO: look for the best way to ensure the creators is known: pass as an option? (will it propagate?)
+      if (test is obj) and ((observable.__kb_creator is creator) or (observable.constructor is creator) or kb.utils.observableInstanceOf(creator))
+        observable.retain() if _.isFunction(observable.refCount)
+        return observable
 
     # create and wrap model
-    observable = factory.createForPath(obj, path, this)
+    observable = factory.createForPath(obj, path, this, creator)
     throw "Factory counldn't create observable for #{path}" unless observable
-    kb.utils.wrappedModel(observable, obj) unless observable instanceof ko.observable
+    kb.utils.wrappedModel(observable, obj)
+    observable.__kb.creator = creator  # save the creator to mark the source of the observable
 
-    # register if needed
-    index = @findObservable(obj, path, factory)
-    @registerObservable(obj, observable) if index < 0
+    # check if already registered
+    for test, index in @objects
+      if (test is obj) and (@observables[index] == observable)
+        return observable
 
+    # not registered yet, register now
+    @registerObservable(obj, observable)
     return observable
 
   releaseObservable: (observable) ->
@@ -70,4 +70,5 @@ class kb.Store
     return if (observable.refCount() > 0)
     index = _.indexOf(@observables, observable)
     return unless index >= 0
-    @observables[index] = 0
+    @objects[index] = null
+    @observables[index] = null

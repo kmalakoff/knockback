@@ -201,11 +201,15 @@
       return this;
     };
 
-    RefCountable.prototype.release = function() {
+    RefCountable.prototype.release = function(all) {
       if (this.__kb.ref_count <= 0) {
         throw "RefCountable: ref_count is corrupt: " + this.__kb.ref_count;
       }
-      this.__kb.ref_count--;
+      if (all) {
+        this.__kb.ref_count = 0;
+      } else {
+        this.__kb.ref_count--;
+      }
       if (!this.__kb.ref_count) {
         this.__destroy();
       }
@@ -294,14 +298,16 @@
         return new creator(obj, {
           store: store,
           factory: this,
-          path: path
+          path: path,
+          creator: creator
         });
       }
       if (creator.create) {
         return creator.create(obj, {
           store: store,
           factory: this,
-          path: path
+          path: path,
+          creator: creator
         });
       }
       throw "unrecognized creator for " + path;
@@ -347,9 +353,7 @@
           continue;
         }
         this.observables[index] = null;
-        while (observable.refCount() > 0) {
-          observable.release();
-        }
+        observable.release(true);
       }
       _ref1 = this.observables;
       for (index in _ref1) {
@@ -359,9 +363,7 @@
         }
         this.observables[index] = null;
         if (observable && _.isFunction(observable.refCount)) {
-          while (observable.refCount() > 0) {
-            observable.release();
-          }
+          observable.release(true);
         } else {
           kb.utils.release(observable);
         }
@@ -377,41 +379,37 @@
       return this.observables.push(observable);
     };
 
-    Store.prototype.findObservable = function(obj, path, factory) {
-      var creator, index, test, test_type, _i, _len, _ref;
+    Store.prototype.resolveObservable = function(obj, path, factory) {
+      var creator, index, observable, test, _i, _j, _len, _len1, _ref, _ref1;
       creator = factory.creatorForPath(obj, path);
-      test_type = creator ? creator : ko.observable;
+      if (!creator) {
+        return ko.observable(obj);
+      }
       _ref = this.objects;
       for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
         test = _ref[index];
-        if ((test === obj) && (this.observables[index] instanceof test_type)) {
-          return index;
-        }
-      }
-      return -1;
-    };
-
-    Store.prototype.resolveObservable = function(obj, path, factory) {
-      var index, observable;
-      index = this.findObservable(obj, path, factory);
-      if (index >= 0) {
         observable = this.observables[index];
-        if (_.isFunction(observable.refCount)) {
-          observable.retain();
+        if ((test === obj) && ((observable.__kb_creator === creator) || (observable.constructor === creator) || kb.utils.observableInstanceOf(creator))) {
+          if (_.isFunction(observable.refCount)) {
+            observable.retain();
+          }
+          return observable;
         }
-        return observable;
       }
-      observable = factory.createForPath(obj, path, this);
+      observable = factory.createForPath(obj, path, this, creator);
       if (!observable) {
         throw "Factory counldn't create observable for " + path;
       }
-      if (!(observable instanceof ko.observable)) {
-        kb.utils.wrappedModel(observable, obj);
+      kb.utils.wrappedModel(observable, obj);
+      observable.__kb.creator = creator;
+      _ref1 = this.objects;
+      for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
+        test = _ref1[index];
+        if ((test === obj) && (this.observables[index] === observable)) {
+          return observable;
+        }
       }
-      index = this.findObservable(obj, path, factory);
-      if (index < 0) {
-        this.registerObservable(obj, observable);
-      }
+      this.registerObservable(obj, observable);
       return observable;
     };
 
@@ -428,7 +426,8 @@
       if (!(index >= 0)) {
         return;
       }
-      return this.observables[index] = 0;
+      this.objects[index] = null;
+      return this.observables[index] = null;
     };
 
     return Store;
@@ -518,6 +517,7 @@
       this.__kb.factory = null;
       this.__kb.collection = null;
       kb.utils.wrappedObservable(this, null);
+      kb.utils.wrappedModel(this, null);
       CollectionObservable.__super__.__destroy.apply(this, arguments);
       if (kb.stats_on) {
         return kb.stats.collection_observables--;
@@ -1597,7 +1597,8 @@
       kb.utils.wrappedModel(this, model);
       this.__kb.store = options.store;
       this.__kb.factory = options.factory;
-      this.__kb.path = key;
+      this.__kb.path = options.path;
+      this.__kb.key = key;
       this.update();
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: _.bind(this.read, this),
@@ -1625,9 +1626,9 @@
     AttributeObservable.prototype.write = function(new_value) {
       var model, set_info;
       model = kb.utils.wrappedModel(this);
-      if (model && model.get(this.__kb.path) !== new_value) {
+      if (model && model.get(this.__kb.key) !== new_value) {
         set_info = {};
-        set_info[this.__kb.path] = new_value;
+        set_info[this.__kb.key] = new_value;
         model.set(set_info);
       }
       return this.update(new_value);
@@ -1650,7 +1651,7 @@
       var model;
       model = kb.utils.wrappedModel(this);
       if (model && !arguments.length) {
-        new_value = model.get(this.__kb.path);
+        new_value = model.get(this.__kb.key);
       }
       if (!this.__kb.value_observable) {
         this._createValueObservable(new_value, false);
@@ -1660,7 +1661,9 @@
         if (new_value && !new_value instanceof Backbone.Model) {
           return this._createValueObservable(new_value, true);
         } else {
-          return this.__kb.value_observable.model(new_value)(this.__kb.value_observable.model() !== new_value);
+          if (this.__kb.value_observable.model() !== new_value) {
+            return this.__kb.value_observable.model(new_value);
+          }
         }
       } else if (kb.utils.observableInstanceOf(this.__kb.value_observable, kb.CollectionObservable)) {
         if (new_value && !new_value instanceof Backbone.Collection) {

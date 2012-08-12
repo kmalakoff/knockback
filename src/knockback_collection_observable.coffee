@@ -94,6 +94,7 @@ class kb.CollectionObservable extends kb.RefCountable
     @__kb.factory = null
     @__kb.collection = null
     kb.utils.wrappedObservable(@, null)
+    kb.utils.wrappedModel(@, null)
     super
 
     kb.stats.collection_observables-- if kb.stats_on       # collect memory management statistics

@@ -135,7 +135,7 @@ $(document).ready( ->
 
     instance = collection()[0].retain()
 
-    kb.utils.release(collection)
+    store.releaseObservable(collection)
     equal(RefCountableViewModel.view_models.length, 2, "Remaining: 2")
 
     equal(instance.refCount(), 2, "One instance retained and one in the store")
@@ -152,7 +152,7 @@ $(document).ready( ->
     collection = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: DestroyableViewModel, store: store})
     equal(DestroyableViewModel.view_models.length, 2, "Created: 2")
 
-    kb.utils.release(collection)
+    store.releaseObservable(collection)
     equal(DestroyableViewModel.view_models.length, 2, "All destroyed")
 
     store.destroy(); store = null
@@ -166,7 +166,7 @@ $(document).ready( ->
     collection = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: SimpleViewModel, store: store})
     equal(SimpleViewModel.view_models.length, 2, "Created: 2")
 
-    kb.utils.release(collection)
+    store.releaseObservable(collection)
     equal(SimpleViewModel.view_models.length, 2, "Remaining: 2")
     ok(view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
@@ -264,7 +264,7 @@ $(document).ready( ->
 
     instance = collection()[0].retain()
 
-    kb.utils.release(collection)
+    store.releaseObservable(collection)
     equal(RefCountableViewModel.view_models.length, 4, "Remaining: 4")
 
     equal(instance.refCount(), 2, "One instance retained and one in the store")
@@ -281,7 +281,7 @@ $(document).ready( ->
     collection = kb.collectionObservable(band, {view_model: DestroyableViewModel, store: store})
     equal(DestroyableViewModel.view_models.length, 4, "Created: 4")
 
-    kb.utils.release(collection)
+    store.releaseObservable(collection)
     equal(DestroyableViewModel.view_models.length, 4, "All destroyed")
 
     store.destroy(); store = null
@@ -295,7 +295,7 @@ $(document).ready( ->
     collection = kb.collectionObservable(band, {view_model: SimpleViewModel, store: store})
     equal(SimpleViewModel.view_models.length, 4, "Created: 4")
 
-    kb.utils.release(collection)
+    store.releaseObservable(collection)
     equal(SimpleViewModel.view_models.length, 4, "Remaining: 4")
     ok(view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
