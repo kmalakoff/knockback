@@ -371,13 +371,37 @@
       return this.observables = null;
     };
 
-    Store.prototype.registerObservable = function(obj, observable) {
+    Store.prototype.registerObservable = function(obj, observable, options) {
+      if (options == null) {
+        options = {};
+      }
       this.objects.push(obj);
       if (observable && _.isFunction(observable.refCount)) {
         observable.retain();
       }
       kb.utils.wrappedModel(observable, obj);
-      return this.observables.push(observable);
+      this.observables.push(observable);
+      if (options.creator) {
+        return observable.__kb.creator = options.creator;
+      } else if (options.path && options.factory) {
+        return observable.__kb.creator = options.factory.creatorForPath(obj, options.path);
+      }
+    };
+
+    Store.prototype.updateObservable = function(obj, observable) {
+      var creator, index, test, _i, _len, _ref;
+      creator = observable.__kb ? observable.__kb.creator : null;
+      if (creator) {
+        _ref = this.objects;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          test = _ref[index];
+          observable = this.observables[index];
+          if ((test === obj) && (observable.__kb.creator === creator)) {
+            return;
+          }
+        }
+      }
+      return this.registerObservable(obj, observable);
     };
 
     Store.prototype.resolveObservable = function(obj, path, factory) {
@@ -390,7 +414,7 @@
       for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
         test = _ref[index];
         observable = this.observables[index];
-        if ((test === obj) && ((observable.__kb.creator === creator) || (_.isFunction(creator) && (observable.constructor === creator || kb.utils.observableInstanceOf(observable, creator))))) {
+        if ((test === obj) && (observable.__kb.creator === creator)) {
           if (_.isFunction(observable.refCount)) {
             observable.retain();
           }
@@ -401,8 +425,6 @@
       if (!observable) {
         throw "Factory counldn't create observable for " + path;
       }
-      kb.utils.wrappedModel(observable, obj);
-      observable.__kb.creator = creator;
       _ref1 = this.objects;
       for (index = _j = 0, _len1 = _ref1.length; _j < _len1; index = ++_j) {
         test = _ref1[index];
@@ -410,7 +432,9 @@
           return observable;
         }
       }
-      this.registerObservable(obj, observable);
+      this.registerObservable(obj, observable, {
+        creator: creator
+      });
       return observable;
     };
 
@@ -463,7 +487,7 @@
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       if (options.store) {
         this.__kb.store = options.store;
-        this.__kb.store.registerObservable(collection, kb.utils.wrappedObservable(this));
+        this.__kb.store.registerObservable(collection, kb.utils.wrappedObservable(this), options);
       } else {
         this.__kb.store = new kb.Store();
         this.__kb.store_is_owned = true;
@@ -666,6 +690,9 @@
     };
 
     CollectionObservable.prototype._onCollectionReset = function() {
+      if (this.in_edit) {
+        return;
+      }
       return this._collectionResync();
     };
 
@@ -691,7 +718,9 @@
       } else {
         add_index = this.__kb.collection.indexOf(model);
       }
+      this.in_edit = true;
       observable.splice(add_index, 0, target);
+      this.in_edit = false;
       return this.trigger('add', target, observable());
     };
 
@@ -702,7 +731,9 @@
         return;
       }
       observable = kb.utils.wrappedObservable(this);
+      this.in_edit = true;
       observable.remove(target);
+      this.in_edit = false;
       this.trigger('remove', target, observable);
       if (this.hasViewModels()) {
         return this.__kb.store.releaseObservable(target);
@@ -730,12 +761,27 @@
       if (previous_index === new_index) {
         return;
       }
+      this.in_edit = true;
       observable.splice(previous_index, 1);
       observable.splice(new_index, 0, target);
+      this.in_edit = false;
       return this.trigger('resort', target, observable(), new_index);
     };
 
-    CollectionObservable.prototype._onObservableArrayChange = function(val1, val2) {};
+    CollectionObservable.prototype._onObservableArrayChange = function(values) {
+      if (this.in_edit) {
+        return;
+      }
+      this.in_edit = true;
+      if (this.hasViewModels()) {
+        this.__kb.collection.reset(_.map(values, function(test) {
+          return kb.utils.wrappedModel(test);
+        }));
+      } else {
+        this.__kb.collection.reset(values);
+      }
+      return this.in_edit = false;
+    };
 
     CollectionObservable.prototype._clear = function(silent) {
       var observable, target, targets, _i, _len, _results;
@@ -743,7 +789,9 @@
       if (!silent) {
         this.trigger('remove', observable());
       }
+      this.in_edit = true;
       targets = observable.removeAll();
+      this.in_edit = false;
       if (this.hasViewModels()) {
         _results = [];
         for (_i = 0, _len = targets.length; _i < _len; _i++) {
@@ -773,7 +821,9 @@
           return _this._createTarget(model);
         }) : _.clone(this.__kb.collection.models);
       }
+      this.in_edit = true;
       observable(targets);
+      this.in_edit = false;
       if (!silent) {
         return this.trigger('add', observable());
       }
@@ -1730,7 +1780,7 @@
       }
       if (options.store) {
         this.__kb.store = options.store;
-        this.__kb.store.registerObservable(model, this);
+        this.__kb.store.registerObservable(model, this, options);
       } else {
         this.__kb.store = new kb.Store();
         this.__kb.store_is_owned = true;

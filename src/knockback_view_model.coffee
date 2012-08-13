@@ -24,7 +24,7 @@ class kb.ViewModel extends kb.RefCountable
     # always use a store to ensure recursive view models are handled correctly
     if options.store
       @__kb.store = options.store
-      @__kb.store.registerObservable(model, this)
+      @__kb.store.registerObservable(model, this, options)
     else
       @__kb.store = new kb.Store(); @__kb.store_is_owned = true
 

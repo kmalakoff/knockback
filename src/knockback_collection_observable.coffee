@@ -39,7 +39,7 @@ class kb.CollectionObservable extends kb.RefCountable
     # always use a store to cache view models
     if options.store
       @__kb.store = options.store
-      @__kb.store.registerObservable(collection, kb.utils.wrappedObservable(@))
+      @__kb.store.registerObservable(collection, kb.utils.wrappedObservable(@), options)
     else
       @__kb.store = new kb.Store(); @__kb.store_is_owned = true
 
@@ -180,7 +180,10 @@ class kb.CollectionObservable extends kb.RefCountable
     collection.unbind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
     collection.unbind('change', @__kb._onModelChange)
 
-  _onCollectionReset: -> @_collectionResync()
+  _onCollectionReset: ->
+    return if @in_edit # we are doing the editing
+    @_collectionResync()
+
   _onCollectionResort: (model_or_models) ->
     throw 'CollectionObservable: collection sorted_index unexpected' if @sorted_index
     if _.isArray(model_or_models)
@@ -197,7 +200,9 @@ class kb.CollectionObservable extends kb.RefCountable
     else
       add_index = @__kb.collection.indexOf(model)
 
+    @in_edit = true
     observable.splice(add_index, 0, target)
+    @in_edit = false
     @trigger('add', target, observable()) # notify
 
   _onModelRemove: (model) ->
@@ -205,7 +210,9 @@ class kb.CollectionObservable extends kb.RefCountable
     target = if @hasViewModels() then @viewModelByModel(model) else model
     return unless target  # it may have already been removed
     observable = kb.utils.wrappedObservable(@)
+    @in_edit = true
     observable.remove(target)
+    @in_edit = false
     @trigger('remove', target, observable) # notify
 
     # release
@@ -229,16 +236,28 @@ class kb.CollectionObservable extends kb.RefCountable
     return if previous_index == new_index # no change
 
     # either remove a view model or a model
+    @in_edit = true
     observable.splice(previous_index, 1); observable.splice(new_index, 0, target) # move
+    @in_edit = false
     @trigger('resort', target, observable(), new_index) # notify
 
-  _onObservableArrayChange: (val1, val2) ->
-    # TODO: resolve design with: https://github.com/kmalakoff/knockback/issues/37
+  _onObservableArrayChange: (values) ->
+    return if @in_edit # we are doing the editing
+
+    # allow dual-sync for options: https://github.com/kmalakoff/knockback/issues/37
+    @in_edit = true
+    if @hasViewModels()
+      @__kb.collection.reset(_.map(values, (test)-> return kb.utils.wrappedModel(test)))
+    else
+      @__kb.collection.reset(values)
+    @in_edit = false
 
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)
     @trigger('remove', observable()) if not silent # notify
+    @in_edit = true
     targets = observable.removeAll() # batch
+    @in_edit = false
 
     # release
     (@__kb.store.releaseObservable(target) for target in targets) if @hasViewModels()
@@ -256,7 +275,9 @@ class kb.CollectionObservable extends kb.RefCountable
     else
       targets = if @hasViewModels() then _.map(@__kb.collection.models, (model) => @_createTarget(model)) else _.clone(@__kb.collection.models)
 
+    @in_edit = true
     observable(targets)
+    @in_edit = false
     @trigger('add', observable()) if not silent # notify
 
   _sortAttributeFn: (sort_attribute) ->

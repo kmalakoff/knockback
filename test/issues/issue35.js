@@ -98,28 +98,28 @@ function bookVmcreate(model){
     return vm;
 };
 
-
 function authorVMcreate(model){
     return {
         name: kb.observable(model,'name'),
-        books: kb.observable(model,{
-            key: 'books',
-            read: function(){
-                return model.get('books').models;
-            },
-            write: function(val){
-                model.get('books').reset(val);
-            }
-        }),
+        books: kb.collectionObservable(model.get('books'), {models_only: true}),
+        // books: kb.observable(model,{
+        //     key: 'books',
+        //     read: function(){
+        //         return model.get('books').models;
+        //     },
+        //     write: function(val){
+        //         model.get('books').reset(val);
+        //     }
+        // }),
         model: model
 
     }
 }
 
 view_model = {   books: kb.collectionObservable(bs.get('books'), {
-                        view_model_create: bookVmcreate}) ,
+                        create: bookVmcreate}) ,
                  authors: kb.collectionObservable(bs.get('authors'), {
-                        view_model_create: authorVMcreate}),
+                        create: authorVMcreate}),
         showBS:  function(){
           alert(JSON.stringify(bs.toJSON()));
         },
