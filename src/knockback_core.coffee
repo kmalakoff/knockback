@@ -21,7 +21,3 @@ kb.VERSION = '0.16.0beta1'
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 kb.locale_manager = undefined
-
-# stats
-kb.stats = {collection_observables: 0, view_models: 0}
-kb.stats_on = false

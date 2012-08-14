@@ -39,7 +39,7 @@ $(document).ready( ->
   })
 
   test("1. Model with HasMany relations: A house with multiple people living in it", ->
-      kb.stats_on = true # turn on stats
+      kb.statistics = new kb.Statistics() # turn on stats
 
       john = new Person({
         id: 'person-1-1'
@@ -75,14 +75,14 @@ $(document).ready( ->
       equal(house_view_model.refCount(), 0, 'Expected references')
 
       # check stats
-      equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
-      equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+      equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+      equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
 
       kb.stats_on = false # turn off stats
     )
 
     test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
-      kb.stats_on = true # turn on stats
+      kb.statistics = new kb.Statistics() # turn on stats
 
       john = new Person({
         id: 'person-2-1'
@@ -166,13 +166,13 @@ $(document).ready( ->
       equal(places_observable.refCount(), 0, 'Expected references')
 
       # check stats
-      equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
-      equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+      equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+      equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
       kb.stats_on = false # turn off stats
     )
 
     test("3. Model with recursive HasMany relations: Person with users who are people", ->
-      kb.stats_on = true # turn on stats
+      kb.statistics = new kb.Statistics() # turn on stats
 
       john = new Person({
         id: 'person-3-1'
@@ -226,8 +226,8 @@ $(document).ready( ->
       george_view_model.release(); george_view_model = null
 
       # check stats
-      equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
-      equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+      equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+      equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
       kb.stats_on = false # turn off stats
     )
 

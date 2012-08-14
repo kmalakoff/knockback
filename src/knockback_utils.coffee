@@ -12,26 +12,40 @@
 kb.utils = {}
 
 # displays legacy warnings to the Knockback library user
-kb.utils.legacyWarning = (identifier, remove_version, message) ->
+kb.utils.legacyWarning = (identifier, last_version, message) ->
   kb._legacy_warnings or= {}
   kb._legacy_warnings[identifier] or= 0
   kb._legacy_warnings[identifier]++
-  console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback #{remove_version}). #{message}.")
+  console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
+
+kb.utils.wrappedDestroy = (owner) ->
+  return unless owner.__kb
+  __kb = owner.__kb; owner.__kb = null # clear now to break cycles
+  kb.utils.release(__kb.value_observable) if __kb.value_observable and not __kb.store
+  __kb.observable.dispose() if __kb.observable and __kb.observable.dispose
+  __kb.store.destroy() if __kb.store_is_owned
+
+kb.utils.wrappedByKey = (owner, key, value) ->
+  # get
+  if arguments.length is 2
+    return if (owner and owner.__kb and owner.__kb.hasOwnProperty(key)) then owner.__kb[key] else undefined
+
+  # set
+  throw "Knockback: no owner for wrapping #{key}" unless owner
+  owner.__kb or= {}
+  owner.__kb[key] = value
+  return value
 
 kb.utils.wrappedObservable = (instance, observable) ->
   # get
-  if (arguments.length == 1)
-    throw 'Knockback: instance is not wrapping an observable' unless instance and instance.__kb and instance.__kb.observable
-    return instance.__kb.observable
+  if arguments.length is 1
+    observable = kb.utils.wrappedByKey(instance, 'observable')
+    throw "Knockback: instance is not wrapping an observable" unless observable
+    return observable
 
   # set
-  throw 'Knockback: no instance for wrapping a observable' unless instance
-  instance.__kb or= {}
-  instance.__kb.observable.__kb.instance = null if instance.__kb.observable and instance.__kb.observable.__kb
-  instance.__kb.observable = observable
-  if observable
-    observable.__kb or= {}
-    observable.__kb.instance = instance
+  kb.utils.wrappedByKey(instance, 'observable', observable)
+  kb.utils.wrappedByKey(observable, 'instance', instance) if observable
   return observable
 
 kb.utils.observableInstanceOf = (observable, type) ->
@@ -39,16 +53,20 @@ kb.utils.observableInstanceOf = (observable, type) ->
   return false unless observable.__kb and observable.__kb.instance
   return (observable.__kb.instance instanceof type)
 
-kb.utils.wrappedModel = (view_model, model) ->
+kb.utils.wrappedModel = (observable, value) ->
   # get
-  if (arguments.length == 1)
-    return if (view_model and view_model.__kb and view_model.__kb.hasOwnProperty('model')) then view_model.__kb.model else view_model
+  if (arguments.length is 1)
+    obj = kb.utils.wrappedByKey(observable, 'obj')
+    return if _.isUndefined(obj) then observable else obj
+  else
+    return kb.utils.wrappedByKey(observable, 'obj', value)
 
-  # set
-  throw 'Knockback: no view_model for wrapping a model' unless view_model
-  view_model.__kb or= {}
-  view_model.__kb.model = model
-  return model
+kb.utils.wrappedObject = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
+kb.utils.wrappedValueObservable = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'value_observable') else kb.utils.wrappedByKey(observable, 'value_observable', value)
+kb.utils.wrappedStore = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
+kb.utils.wrappedStoreIsOwned = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
+kb.utils.wrappedFactory = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
+kb.utils.wrappedPath = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
 
 kb.utils.setToDefault = (obj) ->
   return unless obj
@@ -65,7 +83,7 @@ kb.utils.release = (obj, keys_only) ->
   return false unless obj
 
   # known type
-  if not keys_only and (ko.isObservable(obj) or (obj instanceof kb.Observables) or (typeof(obj.release) == 'function') or (typeof(obj.destroy) == 'function'))
+  if not keys_only and (ko.isObservable(obj) or (obj instanceof kb.Observables) or (typeof(obj.release) is 'function') or (typeof(obj.destroy) is 'function'))
     if obj.release
       obj.release()
     else if obj.destroy
@@ -76,9 +94,9 @@ kb.utils.release = (obj, keys_only) ->
     return true # was released
 
   # view model
-  else if _.isObject(obj) and not (typeof(obj) == 'function')
+  else if _.isObject(obj) and not (typeof(obj) is 'function')
     for key, value of obj
-      continue if !value or (key == '__kb')
+      continue if !value or (key is '__kb') or ((typeof(value) is 'function') and not ko.isObservable(value))
       obj[key] = null if kb.utils.release(value)
 
     return true # was released

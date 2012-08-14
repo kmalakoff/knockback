@@ -26,17 +26,18 @@ class kb.Store
       continue unless observable
 
       @observables[index] = null # releasing
-      if observable and _.isFunction(observable.refCount)
+      if observable and typeof(observable.release) is 'function'
         observable.release(true)
       else
         kb.utils.release(observable)
     @observables = null
 
   registerObservable: (obj, observable, options={}) ->
+    return unless obj # nothing to register
     @objects.push(obj)
-    observable.retain() if observable and _.isFunction(observable.refCount)
-    kb.utils.wrappedModel(observable, obj)
+    kb.utils.wrappedObject(observable, obj)
     @observables.push(observable)
+    observable.retain() if typeof(observable.retain) is 'function'
 
     # set the creator
     if (options.creator)
@@ -48,7 +49,7 @@ class kb.Store
     creator = if observable.__kb then observable.__kb.creator else null
 
     # check for an existing one of the correct type
-    if creator 
+    if creator
       for test, index in @objects
         observable = @observables[index]
         if (test is obj) and (observable.__kb.creator is creator)
@@ -65,7 +66,7 @@ class kb.Store
     for test, index in @objects
       observable = @observables[index]
       if (test is obj) and (observable.__kb.creator is creator)
-        observable.retain() if _.isFunction(observable.refCount)
+        observable.retain() if typeof(observable.retain) is 'function'
         return observable
 
     # create and wrap model
@@ -81,11 +82,17 @@ class kb.Store
     @registerObservable(obj, observable, {creator: creator})
     return observable
 
-  releaseObservable: (observable) ->
-    return unless observable and _.isFunction(observable.refCount) and observable.refCount() > 0
-    observable.release()
-    return if (observable.refCount() > 0)
+  releaseObservable: (observable, owns_store) ->
+    return unless observable
     index = _.indexOf(@observables, observable)
     return unless index >= 0
+
+    # cares about ownership -> do not clear out observables unless owned or ref count is 0
+    return if arguments.length is 2 and not owns_store and typeof(observable.release) isnt 'function'
+
+    # just release
+    kb.utils.release(observable)
+    return if typeof(observable.refCount) is 'function' and observable.refCount() > 0
+    kb.utils.wrappedObject(observable, null)
     @objects[index] = null
     @observables[index] = null

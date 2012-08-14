@@ -35,9 +35,8 @@ class kb.LocalizedObservable
 
     # internal state
     value = ko.utils.unwrapObservable(@value) if @value
-    @__kb.value_observable = ko.observable(if not value then @_getDefaultValue() else @read.call(this, value, null))
-
-    throw 'LocalizedObservable: options.write is not a function for read_write model attribute' if @write and not (typeof(@write) == 'function')
+    kb.utils.wrappedValueObservable(@, ko.observable(if not value then @_getDefaultValue() else @read.call(this, value, null)))
+    throw 'LocalizedObservable: options.write is not a function for read_write model attribute' if @write and (typeof(@write) isnt 'function')
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
       write: if @write then _.bind(@_onSetValue, @) else (-> throw 'kb.LocalizedObservable: value is read only')
@@ -57,20 +56,20 @@ class kb.LocalizedObservable
 
   destroy: ->
     kb.locale_manager.unbind('change', @__kb._onLocaleChange)
-    @__kb.value_observable = null
-    kb.utils.wrappedObservable(this).dispose(); kb.utils.wrappedObservable(this, null)
     @options = {}
     @view_model = null
-    @__kb = null
+    kb.utils.wrappedDestroy(@)
 
   setToDefault: ->
     return if not @default
     default_value = @_getDefaultValue()
-    current_value = @__kb.value_observable()
-    if current_value != default_value then @_onSetValue(default_value) else @__kb.value_observable.valueHasMutated() # trigger the dependable
+    value_observable = kb.utils.wrappedValueObservable(@)
+    current_value = value_observable()
+    if current_value != default_value then @_onSetValue(default_value) else value_observable.valueHasMutated() # trigger the dependable
 
   resetToCurrent: ->
-    @__kb.value_observable(null) # force KO to think a change occurred
+    value_observable = kb.utils.wrappedValueObservable(@)
+    value_observable(null) # force KO to think a change occurred
     @_onSetValue(@_getCurrentValue())
 
   # dual purpose set/get
@@ -84,7 +83,7 @@ class kb.LocalizedObservable
   ####################################################
   _getDefaultValue: ->
     return '' if not @default
-    return if (typeof(@default) == 'function') then @default() else @default
+    return if (typeof(@default) is 'function') then @default() else @default
 
   _getCurrentValue: ->
     observable = kb.utils.wrappedObservable(this)
@@ -93,17 +92,20 @@ class kb.LocalizedObservable
 
   _onGetValue: ->
     ko.utils.unwrapObservable(@value) if @value # create a depdenency
-    return @__kb.value_observable()
+    value_observable = kb.utils.wrappedValueObservable(@)
+    return value_observable()
 
   _onSetValue: (value) ->
     @write.call(this, value, ko.utils.unwrapObservable(@value))
     value = @read.call(this, ko.utils.unwrapObservable(@value))
-    @__kb.value_observable(value)
+    value_observable = kb.utils.wrappedValueObservable(@)
+    value_observable(value)
     @options.onChange(value) if @options.onChange
 
   _onLocaleChange: ->
     value = @read.call(this, ko.utils.unwrapObservable(@value))
-    @__kb.value_observable(value)
+    value_observable = kb.utils.wrappedValueObservable(@)
+    value_observable(value)
     @options.onChange(value) if @options.onChange
 
 # factory function

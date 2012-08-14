@@ -378,7 +378,7 @@ $(document).ready( ->
   # )
 
   test("Collection with nested custom view models", ->
-    kb.stats_on = true # turn on stats
+    kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model, options) ->
@@ -485,8 +485,8 @@ $(document).ready( ->
     kb.utils.release(nested_view_model)
 
     # check stats
-    equal(kb.stats.collection_observables, 0, 'Cleanup: no collection observables')
-    equal(kb.stats.view_models, 0, 'Cleanup: no view models')
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
     kb.stats_on = false # turn off stats
   )
 

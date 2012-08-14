@@ -11,8 +11,7 @@ class kb.Observables
     throw 'Observables: model is missing' if not model
     throw 'Observables: mappings_info is missing' unless mappings_info and (_.isObject(mappings_info) or _.isArray(mappings_info))
 
-    @__kb or= {}
-    @__kb.model = model
+    @__kb = {}
     if _.isArray(mappings_info)
       @__kb.mappings_info = {}
       @__kb.mappings_info[key] = {} for key in mappings_info
@@ -27,21 +26,19 @@ class kb.Observables
 
         mapping_info = {key: mapping_info} if is_string
         mapping_info.key = property_name unless mapping_info.hasOwnProperty('key') # infer the key
-        @[property_name] = @__kb.view_model[property_name] = kb.observable(@__kb.model, mapping_info, @__kb.view_model)
+        @[property_name] = @__kb.view_model[property_name] = kb.observable(model, mapping_info, @__kb.view_model)
 
     else
       for property_name, mapping_info of @__kb.mappings_info
         mapping_info.key = property_name unless mapping_info.hasOwnProperty('key') # infer the key
-        @[property_name] = @__kb.view_model[property_name] = kb.observable(@__kb.model, mapping_info, @__kb.view_model)
+        @[property_name] = @__kb.view_model[property_name] = kb.observable(model, mapping_info, @__kb.view_model)
 
   destroy: ->
     for property_name, mapping_info of @__kb.mappings_info
       @__kb.view_model[property_name].destroy() if @__kb.view_model[property_name]
       @__kb.view_model[property_name] = null
       @[property_name] = null
-    @__kb.view_model = null
-    @__kb.mappings_info = null
-    @__kb.model = null
+    kb.utils.wrappedDestroy(@)
 
   setToDefault: ->
     @__kb.view_model[property_name].setToDefault() for property_name, mapping_info of @__kb.mappings_info

@@ -8,11 +8,11 @@
 
 class kb.AttributeObservable
   constructor: (model, key, options={}) ->
-    kb.utils.wrappedModel(this, model)
-    @__kb.store = options.store
-    @__kb.factory = options.factory
-    @__kb.path = options.path
-    @__kb.key = key
+    kb.utils.wrappedObject(@, model)
+    kb.utils.wrappedStore(@, options.store)
+    kb.utils.wrappedFactory(@, options.factory)
+    kb.utils.wrappedPath(@, options.path)
+    @key = key
 
     # update to create
     @update()
@@ -30,41 +30,40 @@ class kb.AttributeObservable
     return observable
 
   destroy: ->
-    @__kb.store.releaseObservable(@__kb.value_observable) if @__kb.value_observable
-    kb.utils.wrappedObservable(@).dispose(); kb.utils.wrappedObservable(@, null)
-    @__kb = null
+    kb.utils.wrappedDestroy(@)
 
   read: ->
-    return ko.utils.unwrapObservable(@__kb.value_observable)
+    return ko.utils.unwrapObservable(kb.utils.wrappedValueObservable(@))
 
   write: (new_value) ->
     # update the model
-    model = kb.utils.wrappedModel(this)
-    if model and model.get(@__kb.key) isnt new_value
-      set_info = {}; set_info[@__kb.key] = new_value
+    model = kb.utils.wrappedObject(@)
+    if model and model.get(@key) isnt new_value
+      set_info = {}; set_info[@key] = new_value
       model.set(set_info)
 
     # update the observable
     @update(new_value)
 
   model: (new_model) ->
-    model = kb.utils.wrappedModel(this)
+    model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0) # get
     return if model is new_model # no change
-    kb.utils.wrappedModel(this, new_model)
+    kb.utils.wrappedObject(@, new_model)
     @update()
 
   update: (new_value) ->
-    model = kb.utils.wrappedModel(this)
-    new_value = model.get(@__kb.key) if model and not arguments.length
+    model = kb.utils.wrappedObject(@)
+    new_value = model.get(@key) if model and not arguments.length
 
     # set up a new value obseravble, store separately from the attribute observable so it can be referred to even if the model is not yet loaded
-    if not @__kb.value_observable
+    value_observable = kb.utils.wrappedValueObservable(@)
+    unless value_observable
       @_createValueObservable(new_value, false)
       return
 
     # a view model, recognizes view_models as non-observable
-    if not ko.isObservable(@__kb.value_observable)
+    if not ko.isObservable(value_observable)
 
       # no longer a model -> switch types
       if new_value and not new_value instanceof Backbone.Model
@@ -72,10 +71,10 @@ class kb.AttributeObservable
 
       # update if needed
       else
-        @__kb.value_observable.model(new_value) if @__kb.value_observable.model() isnt new_value
+        value_observable.model(new_value) if value_observable.model() isnt new_value
 
     # a collection observable
-    else if kb.utils.observableInstanceOf(@__kb.value_observable, kb.CollectionObservable)
+    else if kb.utils.observableInstanceOf(value_observable, kb.CollectionObservable)
 
       # no longer a collection -> switch types
       if new_value and not new_value instanceof Backbone.Collection
@@ -83,7 +82,7 @@ class kb.AttributeObservable
 
       # update if needed
       else
-        @__kb.value_observable.collection(new_value) if @__kb.value_observable.collection() isnt new_value
+        value_observable.collection(new_value) if value_observable.collection() isnt new_value
 
     # a simple observable
     else
@@ -94,11 +93,12 @@ class kb.AttributeObservable
 
       # update if needed
       else
-        @__kb.value_observable(new_value) if @__kb.value_observable() isnt new_value
+        value_observable(new_value) if value_observable() isnt new_value
 
   _createValueObservable: (new_value, notify) ->
-    @__kb.store.releaseObservable(@__kb.value_observable) if @__kb.value_observable # release previous
-    @__kb.value_observable = @__kb.store.resolveObservable(new_value, @__kb.path, @__kb.factory)
-    kb.utils.wrappedObservable(@).notifySubscribers(ko.utils.unwrapObservable(@__kb.value_observable)) if notify
+    store = kb.utils.wrappedStore(@)
+    store.releaseObservable(kb.utils.wrappedValueObservable(@)) # release previous
+    value_observable = kb.utils.wrappedValueObservable(@, store.resolveObservable(new_value, kb.utils.wrappedPath(@), kb.utils.wrappedFactory(@)))
+    kb.utils.wrappedObservable(@).notifySubscribers(ko.utils.unwrapObservable(value_observable)) if notify
 
 kb.attributeObservable = (model, key, options) -> new kb.AttributeObservable(model, key, options)

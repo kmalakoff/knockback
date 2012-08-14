@@ -15,21 +15,20 @@ class kb.RefCountable
   @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
   constructor: ->
-    @__kb or= {}
-    @__kb.ref_count = 1
+    @__kb_ref_count = 1
 
   __destroy: -> # NOOP
 
   # reference counting
   retain: ->
-    throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
-    @__kb.ref_count++
+    throw "RefCountable: ref_count is corrupt: #{@__kb_ref_count}" if (@__kb_ref_count <= 0)
+    @__kb_ref_count++
     @
 
   release: (all) ->
-    throw "RefCountable: ref_count is corrupt: #{@__kb.ref_count}" if (@__kb.ref_count <= 0)
-    if all then @__kb.ref_count = 0 else @__kb.ref_count--
-    @__destroy() unless @__kb.ref_count
+    throw "RefCountable: ref_count is corrupt: #{@__kb_ref_count}" if (@__kb_ref_count <= 0)
+    if all then @__kb_ref_count = 0 else @__kb_ref_count--
+    @__destroy() unless @__kb_ref_count
     @
 
-  refCount: -> return @__kb.ref_count
+  refCount: -> return @__kb_ref_count

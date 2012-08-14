@@ -24,7 +24,7 @@ class kb.TriggeredObservable
       @model = @model_ref.getModel()
 
     # internal state
-    @__kb.value_observable = ko.observable()
+    kb.utils.wrappedValueObservable(@, ko.observable())
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable(_.bind(@_onGetValue, @)))
 
     # publish public interface on the observable and return instead of this
@@ -36,20 +36,20 @@ class kb.TriggeredObservable
     return observable
 
   destroy: ->
-    kb.utils.wrappedObservable(this).dispose(); kb.utils.wrappedObservable(this, null)
-    @__kb.value_observable = null
     @_onModelUnloaded(@model) if @model
     if @model_ref
       @model_ref.unbind('loaded', @__kb._onModelLoaded)
       @model_ref.unbind('unloaded', @__kb._onModelUnloaded)
       @model_ref.release(); @model_ref = null
     @options  = null; @view_model = null
-    @__kb = null
+    kb.utils.wrappedDestroy(@)
 
   ####################################################
   # Internal
   ####################################################
-  _onGetValue: -> return @__kb.value_observable()
+  _onGetValue: ->
+    value_observable = kb.utils.wrappedValueObservable(@)
+    return value_observable()
 
   _onModelLoaded:   (model) ->
     @model = model
@@ -62,8 +62,9 @@ class kb.TriggeredObservable
     @model = null
 
   _onValueChange: ->
-    current_value = @__kb.value_observable()
-    if current_value != @model then @__kb.value_observable(@model) else @__kb.value_observable.valueHasMutated() # trigger the dependable
+    value_observable = kb.utils.wrappedValueObservable(@)
+    current_value = value_observable()
+    if current_value != @model then value_observable(@model) else value_observable.valueHasMutated() # trigger the dependable
 
 # factory function
 kb.triggeredObservable = (model, event_name) -> return new kb.TriggeredObservable(model, event_name)

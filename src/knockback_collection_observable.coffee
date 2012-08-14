@@ -33,29 +33,32 @@ class kb.CollectionObservable extends kb.RefCountable
     throw 'CollectionObservable: collection is missing' if not collection
 
     super
-    kb.stats.collection_observables++ if kb.stats_on     # collect memory management statistics
+    kb.statistics.register('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
+    @in_edit = 0
 
     # always use a store to cache view models
     if options.store
-      @__kb.store = options.store
-      @__kb.store.registerObservable(collection, kb.utils.wrappedObservable(@), options)
+      kb.utils.wrappedStore(@, options.store)
+      options.store.registerObservable(collection, kb.utils.wrappedObservable(@), options)
     else
-      @__kb.store = new kb.Store(); @__kb.store_is_owned = true
+      kb.utils.wrappedStore(@, new kb.Store())
+      kb.utils.wrappedStoreIsOwned(@, true)
 
     # view model factory
-    @__kb.factory = new kb.Factory(options.path, options.factory)
-    @__kb.models_path = kb.utils.pathJoin(options.path, 'models')
+    factory = kb.utils.wrappedFactory(@, new kb.Factory(options.factory))
+    kb.utils.wrappedPath(@, options.path)
+    @models_path = kb.utils.pathJoin(options.path, 'models')
     if options.view_model
-      @__kb.factory.addPathMapping(@__kb.models_path, options.view_model)
+      factory.addPathMapping(@models_path, options.view_model)
     else if options.create
-      @__kb.factory.addPathMapping(@__kb.models_path, {create: options.create})
-    @__kb.factory.addPathMappings(options.mappings) if options.mappings
+      factory.addPathMapping(@models_path, {create: options.create})
+    factory.addPathMappings(options.mappings) if options.mappings
 
     # add default view model unless models only flag
     @models_only = options.models_only
-    if not @models_only and not @__kb.factory.hasPath(@__kb.models_path)
-      @__kb.factory.addPathMapping(@__kb.models_path, kb.ViewModel)
+    if not @models_only and not factory.hasPath(@models_path)
+      factory.addPathMapping(@models_path, kb.ViewModel)
 
     # options
     @sort_attribute = options.sort_attribute
@@ -93,14 +96,10 @@ class kb.CollectionObservable extends kb.RefCountable
 
   __destroy: ->
     @collection(null)
-    (@__kb.store.destroy(); @__kb.store = null) if @hasViewModels() and @__kb.store_is_owned
-    @__kb.factory = null
-    @__kb.collection = null
-    kb.utils.wrappedObservable(@, null)
-    kb.utils.wrappedModel(@, null)
     super
+    kb.utils.wrappedDestroy(@)
 
-    kb.stats.collection_observables-- if kb.stats_on       # collect memory management statistics
+    kb.statistics.unregister('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
 
   # override reference counting return value
   retain: -> super; return kb.utils.wrappedObservable(@)
@@ -157,7 +156,7 @@ class kb.CollectionObservable extends kb.RefCountable
     return null unless @hasViewModels()
     observable = kb.utils.wrappedObservable(@)
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(observable(), (test) -> return (test.__kb.model[id_attribute] == model[id_attribute]))
+    return _.find(observable(), (test) -> return (test.__kb.obj[id_attribute] == model[id_attribute]))
 
   hasViewModels: -> return !@models_only
 
@@ -193,30 +192,30 @@ class kb.CollectionObservable extends kb.RefCountable
       @_onModelResort(model_or_models)
 
   _onModelAdd: (model) ->
-    target = if @hasViewModels() then @_createTarget(model) else model
+    model_observable = @_createModelObervable(model)
     observable = kb.utils.wrappedObservable(@)
     if @sorted_index
-      add_index = @sorted_index(observable(), target)
+      add_index = @sorted_index(observable(), model_observable)
     else
       add_index = @__kb.collection.indexOf(model)
 
-    @in_edit = true
-    observable.splice(add_index, 0, target)
-    @in_edit = false
-    @trigger('add', target, observable()) # notify
+    @in_edit++
+    observable.splice(add_index, 0, model_observable)
+    @in_edit--
+    @trigger('add', model_observable, observable()) # notify
 
   _onModelRemove: (model) ->
     # either remove a view model or a model
-    target = if @hasViewModels() then @viewModelByModel(model) else model
-    return unless target  # it may have already been removed
+    model_observable = if @hasViewModels() then @viewModelByModel(model) else model
+    return unless model_observable  # it may have already been removed
     observable = kb.utils.wrappedObservable(@)
-    @in_edit = true
-    observable.remove(target)
-    @in_edit = false
-    @trigger('remove', target, observable) # notify
+    @in_edit++
+    observable.remove(model_observable)
+    @in_edit--
+    @trigger('remove', model_observable, observable) # notify
 
     # release
-    @__kb.store.releaseObservable(target) if @hasViewModels()
+    kb.utils.wrappedStore(@).releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(@)) if @hasViewModels()
 
   _onModelChange: (model) ->
     # resort if needed
@@ -225,59 +224,57 @@ class kb.CollectionObservable extends kb.RefCountable
   _onModelResort: (model) ->
     # either move a view model or a model
     observable = kb.utils.wrappedObservable(@)
-    target = if @hasViewModels() then @viewModelByModel(model) else model
-    previous_index = observable.indexOf(target)
+    model_observable = if @hasViewModels() then @viewModelByModel(model) else model
+    previous_index = observable.indexOf(model_observable)
     if @sorted_index
-      sorted_targets = _.clone(observable())
-      sorted_targets.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
-      new_index = @sorted_index(sorted_targets, target)
+      sorted_model_observables = _.clone(observable())
+      sorted_model_observables.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
+      new_index = @sorted_index(sorted_model_observables, model_observable)
     else
       new_index = @__kb.collection.indexOf(model)
     return if previous_index == new_index # no change
 
     # either remove a view model or a model
-    @in_edit = true
-    observable.splice(previous_index, 1); observable.splice(new_index, 0, target) # move
-    @in_edit = false
-    @trigger('resort', target, observable(), new_index) # notify
+    @in_edit++
+    observable.splice(previous_index, 1); observable.splice(new_index, 0, model_observable) # move
+    @in_edit--
+    @trigger('resort', model_observable, observable(), new_index) # notify
 
   _onObservableArrayChange: (values) ->
     return if @in_edit # we are doing the editing
 
     # allow dual-sync for options: https://github.com/kmalakoff/knockback/issues/37
-    @in_edit = true
-    if @hasViewModels()
-      @__kb.collection.reset(_.map(values, (test)-> return kb.utils.wrappedModel(test)))
-    else
-      @__kb.collection.reset(values)
-    @in_edit = false
+    @in_edit++
+    @__kb.collection.reset(_.map(values, (test) -> return kb.utils.wrappedModel(test)))
+    @in_edit--
 
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)
     @trigger('remove', observable()) if not silent # notify
-    @in_edit = true
-    targets = observable.removeAll() # batch
-    @in_edit = false
+    @in_edit++
+    model_observables = observable.removeAll() # batch
+    @in_edit--
 
     # release
-    (@__kb.store.releaseObservable(target) for target in targets) if @hasViewModels()
+    store = kb.utils.wrappedStore(@)
+    (store.releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(@)) for model_observable in model_observables) if @hasViewModels()
 
   _collectionResync: (silent) ->
     @_clear(silent)
     observable = kb.utils.wrappedObservable(@)
 
     if @sorted_index
-      targets = []
+      model_observables = []
       for model in @__kb.collection.models
-        target = @_createTarget(model)
-        add_index = @sorted_index(targets, target)
-        targets.splice(add_index, 0, target)
+        model_observable = @_createModelObervable(model)
+        add_index = @sorted_index(model_observables, model_observable)
+        model_observables.splice(add_index, 0, model_observable)
     else
-      targets = if @hasViewModels() then _.map(@__kb.collection.models, (model) => @_createTarget(model)) else _.clone(@__kb.collection.models)
+      model_observables = if @hasViewModels() then _.map(@__kb.collection.models, (model) => @_createModelObervable(model)) else _.clone(@__kb.collection.models)
 
-    @in_edit = true
-    observable(targets)
-    @in_edit = false
+    @in_edit++
+    observable(model_observables)
+    @in_edit--
     @trigger('add', observable()) if not silent # notify
 
   _sortAttributeFn: (sort_attribute) ->
@@ -286,8 +283,8 @@ class kb.CollectionObservable extends kb.RefCountable
     else
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
-  _createTarget: (model) ->
-    return if @hasViewModels() then @__kb.store.resolveObservable(model, @__kb.models_path, @__kb.factory) else model
+  _createModelObervable: (model) ->
+    return if @hasViewModels() then kb.utils.wrappedStore(@).resolveObservable(model, @models_path, kb.utils.wrappedFactory(@)) else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

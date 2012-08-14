@@ -19,56 +19,60 @@ class kb.ViewModel extends kb.RefCountable
   constructor: (model, options={}) ->
     super
 
-    kb.stats.view_models++ if kb.stats_on        # collect memory management statistics
+    kb.statistics.register('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
 
     # always use a store to ensure recursive view models are handled correctly
     if options.store
-      @__kb.store = options.store
-      @__kb.store.registerObservable(model, this, options)
+      kb.utils.wrappedStore(@, options.store)
+      options.store.registerObservable(model, @, options)
     else
-      @__kb.store = new kb.Store(); @__kb.store_is_owned = true
+      kb.utils.wrappedStore(@, new kb.Store())
+      kb.utils.wrappedStoreIsOwned(@, true)
 
     # view model factory
-    @__kb.factory = new kb.Factory(options.path, options.factory)
-    @__kb.factory.addPathMappings(options.mappings) if options.mappings
+    factory = kb.utils.wrappedFactory(@, new kb.Factory(options.factory))
+    kb.utils.wrappedPath(@, options.path)
+    factory.addPathMappings(options.mappings) if options.mappings
 
+    # bind and extract options
     @__kb._onModelChange = _.bind(@_onModelChange, @)
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
     @__kb.internals = options.internals
     @__kb.requires = options.requires
 
-    # wrap the model
-    kb.utils.wrappedModel(this, model)
-
     # determine model or model_ref type
     if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
-      @__kb.model_ref = model; @__kb.model_ref.retain()
-      kb.utils.wrappedModel(this, @__kb.model_ref.getModel())
-      @__kb.model_ref.bind('loaded', @__kb._onModelLoaded)
-      @__kb.model_ref.bind('unloaded', @__kb._onModelUnloaded)
+      model_ref = model
+      kb.utils.wrappedByKey(@, 'model_ref', model_ref); model_ref.retain()
+      model_ref.bind('loaded', @__kb._onModelLoaded)
+      model_ref.bind('unloaded', @__kb._onModelUnloaded)
+      model = model_ref.getModel()
+    kb.utils.wrappedObject(@, model)
 
     # start
-    @_onModelLoaded(@__kb.model) if @__kb.model
+    @_onModelLoaded(model) if model
 
     return @ if not @__kb.internals and not @__kb.requires
     missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
-    missing = _.difference(missing, _.keys(@__kb.model.attributes)) if not @__kb.model_ref or @__kb.model_ref.isLoaded()
-    @_updateAttributeObservable(@__kb.model, key) for key in missing
+    missing = _.difference(missing, _.keys(model.attributes)) if not model_ref or model_ref.isLoaded()
+    @_updateAttributeObservable(model, key) for key in missing
 
   __destroy: ->
-    model = @__kb.model; kb.utils.wrappedModel(this, null)
-    @_modelUnbind(model)
-
-    @__kb.store.destroy() if @__kb.store_is_owned; @__kb.store = null
-    @__kb.factory = null
+    @_modelUnbind(kb.utils.wrappedObject(@))
+    model_ref = kb.utils.wrappedByKey(@, 'model_ref')
+    if model_ref
+      model_ref.unbind('loaded', @__kb._onModelLoaded)
+      model_ref.unbind('unloaded', @__kb._onModelUnloaded)
+      model_ref.release()
     kb.utils.release(this, true)
     super
+    kb.utils.wrappedDestroy(@)
 
-    kb.stats.view_models-- if kb.stats_on        # collect memory management statistics
+    kb.statistics.unregister('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
 
   model: (new_model) ->
-    model = kb.utils.wrappedModel(this)
+    model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0)
 
     # no change
@@ -97,23 +101,25 @@ class kb.ViewModel extends kb.RefCountable
       model.unbind('update', @__kb._onModelChange)
 
   _onModelLoaded: (model) ->
-    kb.utils.wrappedModel(this, model)
+    kb.utils.wrappedObject(@, model)
     @_modelBind(model)
-    @_updateAttributeObservable(@__kb.model, key) for key of model.attributes
+    @_updateAttributeObservable(model, key) for key of model.attributes
 
   _onModelUnloaded: (model) ->
     @_modelUnbind(model)
-    kb.utils.wrappedModel(this, null)
+    kb.utils.wrappedObject(@, null)
     @_updateAttributeObservable(null, key) for key of model.attributes
 
   _onModelChange: ->
+    model = kb.utils.wrappedObject(@)
+
     # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
-    if @__kb.model._changed
-      (@_updateAttributeObservable(@__kb.model, key) if @__kb.model.hasChanged(key)) for key of @__kb.model.attributes
+    if model._changed
+      (@_updateAttributeObservable(model, key) if model.hasChanged(key)) for key of model.attributes
 
     # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
-    else if @__kb.model.changed
-      @_updateAttributeObservable(@__kb.model, key) for key of @__kb.model.changed
+    else if model.changed
+      @_updateAttributeObservable(model, key) for key of model.changed
 
   _updateAttributeObservable: (model, key) ->
     vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
@@ -125,7 +131,7 @@ class kb.ViewModel extends kb.RefCountable
       else
         observable.update()
     else
-      @[vm_key] = kb.attributeObservable(model, key, {store: @__kb.store, factory: @__kb.factory, path: @__kb.factory.pathJoin(key)})
+      @[vm_key] = kb.attributeObservable(model, key, {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.pathJoin(kb.utils.wrappedPath(@), key)})
 
 # factory function
 kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

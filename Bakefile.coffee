@@ -4,6 +4,7 @@ module.exports =
     compress: true
     files: [
       'src/knockback_core.coffee'
+      'src/knockback_statistics.coffee'
       'src/knockback_utils.coffee'
       'src/knockback_ref_countable.coffee'
       'src/knockback_factory.coffee'
