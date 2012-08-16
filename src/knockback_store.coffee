@@ -7,6 +7,14 @@
 ###
 
 class kb.Store
+  @registerOrCreateStoreFromOptions: (obj, observable, options) ->
+    if options.store
+      kb.utils.wrappedStore(observable, options.store)
+      options.store.registerObservable(obj, observable, options)
+    else
+      kb.utils.wrappedStore(observable, new kb.Store())
+      kb.utils.wrappedStoreIsOwned(observable, true)
+
   constructor: ->
     @objects = []
     @observables = []
@@ -26,7 +34,7 @@ class kb.Store
       continue unless observable
 
       @observables[index] = null # releasing
-      if observable and typeof(observable.release) is 'function'
+      if observable and observable.release
         observable.release(true)
       else
         kb.utils.release(observable)
@@ -37,7 +45,7 @@ class kb.Store
     @objects.push(obj)
     kb.utils.wrappedObject(observable, obj)
     @observables.push(observable)
-    observable.retain() if typeof(observable.retain) is 'function'
+    observable.retain?()
 
     # set the creator
     if (options.creator)
@@ -66,7 +74,7 @@ class kb.Store
     for test, index in @objects
       observable = @observables[index]
       if (test is obj) and (observable.__kb.creator is creator)
-        observable.retain() if typeof(observable.retain) is 'function'
+        observable.retain?()
         return observable
 
     # create and wrap model
@@ -88,11 +96,12 @@ class kb.Store
     return unless index >= 0
 
     # cares about ownership -> do not clear out observables unless owned or ref count is 0
-    return if arguments.length is 2 and not owns_store and typeof(observable.release) isnt 'function'
+    return if arguments.length is 2 and not owns_store and not observable.release
 
     # just release
     kb.utils.release(observable)
-    return if typeof(observable.refCount) is 'function' and observable.refCount() > 0
+    return if observable.refCount and observable.refCount() > 0
     kb.utils.wrappedObject(observable, null)
+    index = _.indexOf(@observables, observable) unless @observables[index] == observable
     @objects[index] = null
     @observables[index] = null

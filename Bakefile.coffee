@@ -23,6 +23,7 @@ module.exports =
       commands: [
         'cp knockback.js packages/npm/knockback.js'
         'cp knockback.min.js packages/npm/knockback.min.js'
+        'cp README.md packages/npm/README.md'
         'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
         'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
       ]

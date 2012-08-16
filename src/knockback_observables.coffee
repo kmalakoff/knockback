@@ -11,7 +11,8 @@ class kb.Observables
     throw 'Observables: model is missing' if not model
     throw 'Observables: mappings_info is missing' unless mappings_info and (_.isObject(mappings_info) or _.isArray(mappings_info))
 
-    @__kb = {}
+    # wrap information
+    @__kb or= {}
     if _.isArray(mappings_info)
       @__kb.mappings_info = {}
       @__kb.mappings_info[key] = {} for key in mappings_info

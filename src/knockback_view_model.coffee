@@ -22,12 +22,7 @@ class kb.ViewModel extends kb.RefCountable
     kb.statistics.register('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
 
     # always use a store to ensure recursive view models are handled correctly
-    if options.store
-      kb.utils.wrappedStore(@, options.store)
-      options.store.registerObservable(model, @, options)
-    else
-      kb.utils.wrappedStore(@, new kb.Store())
-      kb.utils.wrappedStoreIsOwned(@, true)
+    kb.Store.registerOrCreateStoreFromOptions(model, @, options)
 
     # view model factory
     factory = kb.utils.wrappedFactory(@, new kb.Factory(options.factory))
@@ -43,12 +38,10 @@ class kb.ViewModel extends kb.RefCountable
 
     # determine model or model_ref type
     if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
-      model_ref = model
-      kb.utils.wrappedByKey(@, 'model_ref', model_ref); model_ref.retain()
-      model_ref.bind('loaded', @__kb._onModelLoaded)
-      model_ref.bind('unloaded', @__kb._onModelUnloaded)
-      model = model_ref.getModel()
-    kb.utils.wrappedObject(@, model)
+      kb.utils.wrappedModelRef(@, model, {loaded: @__kb._onModelLoaded, unloaded: @__kb._onModelUnloaded})
+      model_ref = model; model =  model_ref.model()
+    else
+      kb.utils.wrappedObject(@, model)
 
     # start
     @_onModelLoaded(model) if model
@@ -60,14 +53,9 @@ class kb.ViewModel extends kb.RefCountable
 
   __destroy: ->
     @_modelUnbind(kb.utils.wrappedObject(@))
-    model_ref = kb.utils.wrappedByKey(@, 'model_ref')
-    if model_ref
-      model_ref.unbind('loaded', @__kb._onModelLoaded)
-      model_ref.unbind('unloaded', @__kb._onModelUnloaded)
-      model_ref.release()
-    kb.utils.release(this, true)
-    super
+    kb.utils.release(this, true) # release the observables
     kb.utils.wrappedDestroy(@)
+    super
 
     kb.statistics.unregister('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
 

@@ -15,107 +15,85 @@
 ####################################################
 
 class kb.Observable
-  constructor: (model, @mapping_info, @view_model={}) ->
+  constructor: (model, mapping_info, @view_model={}) ->
     throw 'Observable: model is missing' if not model
-    throw 'Observable: mapping_info is missing' if not @mapping_info
-    @mapping_info = {key: @mapping_info} if _.isString(@mapping_info) or ko.isObservable(@mapping_info)
-    throw 'Observable: mapping_info.key is missing' if not @mapping_info.key
+    throw 'Observable: mapping_info is missing' if not mapping_info
 
-    # bind
+    # bind callbacks
     @__kb or= {}
     @__kb._onModelChange = _.bind(@_onModelChange, @)
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
-    # determine model or model_ref type
-    if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
-      model_ref = model
-      kb.utils.wrappedByKey(@, 'model_ref', model_ref); model_ref.retain()
-      model_ref.bind('loaded', @__kb._onModelLoaded)
-      model_ref.bind('unloaded', @__kb._onModelUnloaded)
-      model = model_ref.getModel()
-    kb.utils.wrappedObject(@, model)
+    # extract options
+    @key = if _.isString(mapping_info) or ko.isObservable(mapping_info) then mapping_info else mapping_info.key
+    throw 'Observable: key is missing' unless @key
+    @args = mapping_info.args
+    @read = mapping_info.read
+    @write = mapping_info.write
 
     # internal state
-    kb.utils.wrappedValueObservable(@, ko.observable())
-    @__kb.localizer = new @mapping_info.localizer(@_getCurrentValue()) if @mapping_info.localizer
+    value_observable = kb.utils.wrappedByKey(@, 'vo', ko.observable())
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
       write: _.bind(@_onSetValue, @)
       owner: @view_model
     }))
 
+    # determine model or model_ref type
+    if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
+      kb.utils.wrappedModelRef(observable, model, {loaded: @__kb._onModelLoaded, unloaded: @__kb._onModelUnloaded})
+      model_ref = model; model =  model_ref.model()
+    else
+      kb.utils.wrappedObject(observable, model)
+
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
-    observable.setToDefault = _.bind(@setToDefault, @)
 
-    # start
-    model.bind('change', @__kb._onModelChange) if not model_ref or model_ref.isLoaded()
+    # set up initial values
+    if not model_ref or model_ref.isLoaded()
+      model.bind('change', @__kb._onModelChange) 
+      value_observable.notifySubscribers(value_observable())
+
+    # wrap ourselves with a localizer
+    if mapping_info.localizer
+      observable = new mapping_info.localizer(observable)
+
+    # wrap ourselves with a default value
+    if mapping_info.hasOwnProperty('default')
+      observable = kb.defaultWrapper(observable, mapping_info.default)
 
     return observable
 
   destroy: ->
-    @_modelUnbind(kb.utils.wrappedObject(@))
-    model_ref = kb.utils.wrappedByKey(@, 'model_ref')
-    if model_ref
-      model_ref.unbind('loaded', @__kb._onModelLoaded)
-      model_ref.unbind('unloaded', @__kb._onModelUnloaded)
-      model_ref.release()
-    @mapping_info  = null; @view_model = null
+    @_modelUnbind(kb.utils.wrappedObject(kb.utils.wrappedObservable(@)))
+    @key = null; @args = null; @read = null; @write = null; @view_model = null
     kb.utils.wrappedDestroy(@)
-
-  setToDefault: ->
-    value = @_getDefaultValue()
-    if @__kb.localizer
-      @__kb.localizer.observedValue(value)
-      value = @__kb.localizer()
-    value_observable = kb.utils.wrappedValueObservable(@)
-    value_observable(value) # trigger the dependable
 
   ####################################################
   # Internal
   ####################################################
-  _getDefaultValue: ->
-    return '' if not @mapping_info.hasOwnProperty('default')
-    return if (typeof(@mapping_info.default) is 'function') then @mapping_info.default() else @mapping_info.default
-
-  _getCurrentValue: ->
-    model = kb.utils.wrappedObject(@)
-    return @_getDefaultValue() if not model
-    key = ko.utils.unwrapObservable(@mapping_info.key)
-    args = [key]
-    if not _.isUndefined(@mapping_info.args)
-      if _.isArray(@mapping_info.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @mapping_info.args) else args.push(ko.utils.unwrapObservable(@mapping_info.args))
-    return if @mapping_info.read then @mapping_info.read.apply(@view_model, args) else model.get.apply(model, args)
-
   _onGetValue: ->
-    # trigger all the dependables
-    value_observable = kb.utils.wrappedValueObservable(@)
-    value_observable()
-    ko.utils.unwrapObservable(@mapping_info.key)
-    if not _.isUndefined(@mapping_info.args)
-      if _.isArray(@mapping_info.args) then (ko.utils.unwrapObservable(arg) for arg in @mapping_info.args) else ko.utils.unwrapObservable(@mapping_info.args)
-    value = @_getCurrentValue()
-
-    if @__kb.localizer
-      @__kb.localizer.observedValue(value)
-      value = @__kb.localizer()
-    return value
+    value_observable = kb.utils.wrappedByKey(@, 'vo'); value_observable() # create dependency 
+    args = [ko.utils.unwrapObservable(@key)] # create dependency if needed
+    observable = kb.utils.wrappedObservable(@)
+    return null unless observable
+    model = kb.utils.wrappedObject(observable)
+    return null unless model
+    if not _.isUndefined(@args)
+      if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
+    return if @read then @read.apply(@view_model, args) else model.get.apply(model, args)
 
   _onSetValue: (value) ->
-    if @__kb.localizer
-      @__kb.localizer(value)
-      value = @__kb.localizer.observedValue()
-
-    model = kb.utils.wrappedObject(@)
+    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
     if model
-      set_info = {}; set_info[ko.utils.unwrapObservable(@mapping_info.key)] = value
-      args = if (typeof(@mapping_info.write) is 'function') then [value] else [set_info]
-      if not _.isUndefined(@mapping_info.args)
-        if _.isArray(@mapping_info.args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @mapping_info.args) else args.push(ko.utils.unwrapObservable(@mapping_info.args))
-      if (typeof(@mapping_info.write) is 'function') then @mapping_info.write.apply(@view_model, args) else model.set.apply(model, args)
-    value_observable = kb.utils.wrappedValueObservable(@)
-    if @__kb.localizer then value_observable(@__kb.localizer()) else value_observable(value) # trigger the dependable and store the correct value
+      set_info = {}; set_info[ko.utils.unwrapObservable(@key)] = value
+      args = if @write then [value] else [set_info]
+      if not _.isUndefined(@args)
+        if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
+      if @write then @write.apply(@view_model, args) else model.set.apply(model, args)
+    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable(value)
 
   _modelBind: (model) ->
     return unless model
@@ -134,27 +112,21 @@ class kb.Observable
       model.unbind('update', @__kb._onModelChange)
 
   _onModelLoaded: (model) ->
-    kb.utils.wrappedObject(@, model)
+    kb.utils.wrappedObject(kb.utils.wrappedObservable(@), model)
     @_modelBind(model)
-    @_updateValue()
+    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable(@_onGetValue())
 
   _onModelUnloaded: (model) ->
     (@__kb.localizer.destroy(); @__kb.localizer = null) if @__kb.localizer and @__kb.localizer.destroy
     @_modelUnbind(model)
-    kb.utils.wrappedObject(@, null)
+    kb.utils.wrappedObject(kb.utils.wrappedObservable(@), null)
 
   _onModelChange: ->
-    model = kb.utils.wrappedObject(@)
-    return if (model and model.hasChanged) and not model.hasChanged(ko.utils.unwrapObservable(@mapping_info.key)) # no change, nothing to do
-    @_updateValue()
-
-  _updateValue: ->
-    value = @_getCurrentValue()
-    if @__kb.localizer
-      @__kb.localizer.observedValue(value)
-      value = @__kb.localizer()
-    value_observable = kb.utils.wrappedValueObservable(@)
-    value_observable(value) # trigger the dependable
+    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
+    return if (model and model.hasChanged) and not model.hasChanged(ko.utils.unwrapObservable(@key)) # no change, nothing to do
+    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable(@_onGetValue())
 
 # factory function
 kb.observable = (model, mapping_info, view_model) -> return new kb.Observable(model, mapping_info, view_model)

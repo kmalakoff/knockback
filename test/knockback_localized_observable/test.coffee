@@ -173,8 +173,5 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
-    raises((->kb.utils.wrappedObservable(null)), null, "Knockback: instance is not wrapping an observable")
-    raises((->kb.utils.wrappedObservable({})), null, "Knockback: instance is not wrapping an observable")
-    kb.utils.wrappedObservable({__kb: {observable: ko.observable()}})
   )
 )

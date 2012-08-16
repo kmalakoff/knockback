@@ -37,17 +37,20 @@ class kb.CollectionObservable extends kb.RefCountable
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
     @in_edit = 0
 
-    # always use a store to cache view models
-    if options.store
-      kb.utils.wrappedStore(@, options.store)
-      options.store.registerObservable(collection, kb.utils.wrappedObservable(@), options)
-    else
-      kb.utils.wrappedStore(@, new kb.Store())
-      kb.utils.wrappedStoreIsOwned(@, true)
+    # bind callbacks
+    @__kb or= {}
+    @__kb._onCollectionReset = _.bind(@_onCollectionReset, @)
+    @__kb._onCollectionResort = _.bind(@_onCollectionResort, @)
+    @__kb._onModelAdd = _.bind(@_onModelAdd, @)
+    @__kb._onModelRemove = _.bind(@_onModelRemove, @)
+    @__kb._onModelChange = _.bind(@_onModelChange, @)
 
-    # view model factory
-    factory = kb.utils.wrappedFactory(@, new kb.Factory(options.factory))
-    kb.utils.wrappedPath(@, options.path)
+    # always use a store to cache view models
+    kb.Store.registerOrCreateStoreFromOptions(collection, observable, options)
+
+    # view model factory create mappings
+    factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
+    kb.utils.wrappedPath(observable, options.path)
     @models_path = kb.utils.pathJoin(options.path, 'models')
     if options.view_model
       factory.addPathMapping(@models_path, options.view_model)
@@ -63,13 +66,6 @@ class kb.CollectionObservable extends kb.RefCountable
     # options
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
-
-    # bind callbacks
-    @__kb._onCollectionReset = _.bind(@_onCollectionReset, @)
-    @__kb._onCollectionResort = _.bind(@_onCollectionResort, @)
-    @__kb._onModelAdd = _.bind(@_onModelAdd, @)
-    @__kb._onModelRemove = _.bind(@_onModelRemove, @)
-    @__kb._onModelChange = _.bind(@_onModelChange, @)
 
     # publish public interface on the observable and return instead of this
     observable.retain = _.bind(@retain, @)
@@ -87,7 +83,8 @@ class kb.CollectionObservable extends kb.RefCountable
     observable.trigger = _.bind(@trigger, @)
 
     # start the processing
-    @collection(collection, {silent: true, defer: options.defer})
+    kb.utils.wrappedObject(observable, null) # clear the collection so it is updated
+    @collection(collection, {silent: true, 'defer': options['defer']})
 
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))
@@ -96,8 +93,8 @@ class kb.CollectionObservable extends kb.RefCountable
 
   __destroy: ->
     @collection(null)
-    super
     kb.utils.wrappedDestroy(@)
+    super
 
     kb.statistics.unregister('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
 
@@ -107,27 +104,28 @@ class kb.CollectionObservable extends kb.RefCountable
 
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)
+    previous_collection = kb.utils.wrappedObject(observable)
     if (arguments.length == 0)
       observable() # force a dependency
-      return @__kb.collection
+      return previous_collection
 
     # no change
-    return if (collection == @__kb.collection)
+    return if (collection == previous_collection)
 
     # clean up
-    if @__kb.collection
+    if previous_collection
       @_clear()
-      @_collectionUnbind(@__kb.collection)
-      @__kb.collection.release?(); @__kb.collection = null
+      @_collectionUnbind(previous_collection)
+      previous_collection.release?()
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
-    @__kb.collection = collection
-    if @__kb.collection
-      @__kb.collection.retain?()
-      @_collectionBind(@__kb.collection)
-
-      # generate
+    kb.utils.wrappedObject(observable, collection)
+    if collection
+      collection.retain?()
+      @_collectionBind(collection)
       @sortedIndex(@sorted_index, @sort_attribute, options)
+
+    return collection
 
   sortedIndex: (sorted_index, sort_attribute, options={}) ->
     if sorted_index
@@ -142,12 +140,13 @@ class kb.CollectionObservable extends kb.RefCountable
 
     _resync = =>
       observable = kb.utils.wrappedObservable(@)
-      return if (@__kb.collection.models.length == 0) and (observable().length == 0) # don't do anything
+      collection = kb.utils.wrappedObject(observable)
+      return if (collection.models.length == 0) and (observable().length == 0) # don't do anything
       @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
       @trigger('resort', observable()) unless options.silent # notify
 
     # resync now or later
-    if options.defer then _.defer(_resync) else _resync()
+    if options['defer'] then _.defer(_resync) else _resync()
     @
 
   sortAttribute: (sort_attribute, sorted_index, silent) -> return @sortedIndex(sorted_index, sort_attribute, silent)
@@ -194,10 +193,11 @@ class kb.CollectionObservable extends kb.RefCountable
   _onModelAdd: (model) ->
     model_observable = @_createModelObervable(model)
     observable = kb.utils.wrappedObservable(@)
+    collection = kb.utils.wrappedObject(observable)
     if @sorted_index
       add_index = @sorted_index(observable(), model_observable)
     else
-      add_index = @__kb.collection.indexOf(model)
+      add_index = collection.indexOf(model)
 
     @in_edit++
     observable.splice(add_index, 0, model_observable)
@@ -215,7 +215,7 @@ class kb.CollectionObservable extends kb.RefCountable
     @trigger('remove', model_observable, observable) # notify
 
     # release
-    kb.utils.wrappedStore(@).releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(@)) if @hasViewModels()
+    kb.utils.wrappedStore(observable).releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(observable)) if @hasViewModels()
 
   _onModelChange: (model) ->
     # resort if needed
@@ -224,6 +224,7 @@ class kb.CollectionObservable extends kb.RefCountable
   _onModelResort: (model) ->
     # either move a view model or a model
     observable = kb.utils.wrappedObservable(@)
+    collection = kb.utils.wrappedObject(observable)
     model_observable = if @hasViewModels() then @viewModelByModel(model) else model
     previous_index = observable.indexOf(model_observable)
     if @sorted_index
@@ -231,7 +232,7 @@ class kb.CollectionObservable extends kb.RefCountable
       sorted_model_observables.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
       new_index = @sorted_index(sorted_model_observables, model_observable)
     else
-      new_index = @__kb.collection.indexOf(model)
+      new_index = collection.indexOf(model)
     return if previous_index == new_index # no change
 
     # either remove a view model or a model
@@ -242,10 +243,12 @@ class kb.CollectionObservable extends kb.RefCountable
 
   _onObservableArrayChange: (values) ->
     return if @in_edit # we are doing the editing
+    observable = kb.utils.wrappedObservable(@)
+    collection = kb.utils.wrappedObject(observable)
 
     # allow dual-sync for options: https://github.com/kmalakoff/knockback/issues/37
     @in_edit++
-    @__kb.collection.reset(_.map(values, (test) -> return kb.utils.wrappedModel(test)))
+    collection.reset(_.map(values, (test) -> return kb.utils.wrappedModel(test)))
     @in_edit--
 
   _clear: (silent) ->
@@ -256,21 +259,22 @@ class kb.CollectionObservable extends kb.RefCountable
     @in_edit--
 
     # release
-    store = kb.utils.wrappedStore(@)
-    (store.releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(@)) for model_observable in model_observables) if @hasViewModels()
+    store = kb.utils.wrappedStore(observable)
+    (store.releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(observable)) for model_observable in model_observables) if @hasViewModels()
 
   _collectionResync: (silent) ->
     @_clear(silent)
     observable = kb.utils.wrappedObservable(@)
+    collection = kb.utils.wrappedObject(observable)
 
     if @sorted_index
       model_observables = []
-      for model in @__kb.collection.models
+      for model in collection.models
         model_observable = @_createModelObervable(model)
         add_index = @sorted_index(model_observables, model_observable)
         model_observables.splice(add_index, 0, model_observable)
     else
-      model_observables = if @hasViewModels() then _.map(@__kb.collection.models, (model) => @_createModelObervable(model)) else _.clone(@__kb.collection.models)
+      model_observables = if @hasViewModels() then _.map(collection.models, (model) => @_createModelObervable(model)) else _.clone(collection.models)
 
     @in_edit++
     observable(model_observables)
@@ -284,7 +288,8 @@ class kb.CollectionObservable extends kb.RefCountable
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
   _createModelObervable: (model) ->
-    return if @hasViewModels() then kb.utils.wrappedStore(@).resolveObservable(model, @models_path, kb.utils.wrappedFactory(@)) else model
+    observable = kb.utils.wrappedObservable(@)
+    return if @hasViewModels() then kb.utils.wrappedStore(observable).resolveObservable(model, @models_path, kb.utils.wrappedFactory(observable)) else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

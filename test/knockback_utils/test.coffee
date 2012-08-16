@@ -15,8 +15,6 @@ $(document).ready( ->
   test("kb.utils.wrappedObservable", ->
     observable = ko.observable()
     instance = {}
-    raises((->kb.utils.wrappedObservable(instance)), null, "Knockback: instance is not wrapping an observable") # get
-
     kb.utils.wrappedObservable(instance, observable) # set
     equal(kb.utils.wrappedObservable(instance), observable, "observable was wrapped") # get
   )
