@@ -22,16 +22,6 @@ $(document).ready( ->
     equal(kb.utils.wrappedObservable(instance), observable, "observable was wrapped") # get
   )
 
-  test("kb.utils.observableInstanceOf", ->
-    equal(kb.utils.observableInstanceOf(kb.collectionObservable(new Backbone.Collection()), kb.CollectionObservable), true, "Instance is kb.CollectionObservable")
-
-    equal(kb.utils.observableInstanceOf(new _kbe.LongDateLocalizer(ko.observable(new Date)), kb.LocalizedObservable), true, "Instance is kb.LocalizedObservable")
-
-    equal(kb.utils.observableInstanceOf(kb.observable(new Backbone.Model({name: 'name1'}), 'name'), kb.Observable), true, "Instance is kb.Observable")
-
-    equal(kb.utils.observableInstanceOf(kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name'), kb.TriggeredObservable), true, "Instance is kb.TriggeredObservable")
-  )
-
   test("kb.utils.wrappedModel", ->
     model = new Backbone.Model({name: 'Bob'})
     instance = {}
@@ -55,6 +45,43 @@ $(document).ready( ->
     # can get and share store
     collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), {store: kb.utils.wrappedStore(view_model)})
     equal(kb.utils.wrappedStore(view_model), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observable and view model')
+  )
+
+  test("kb.utils.valueType", ->
+    equal(kb.utils.valueType(kb.collectionObservable(new Backbone.Collection()), kb.CollectionObservable), kb.TYPE_COLLECTION, "kb.CollectionObservable is a collection type")
+
+    equal(kb.utils.valueType(kb.observable(new Backbone.Model({name: 'name1'}), 'name'), kb.Observable), kb.TYPE_SIMPLE, "kb.Observable is a kb.TYPE_SIMPLE")
+
+    model = new Backbone.Model({simple_type: 3, model_type: new Backbone.Model(), collection_type: new Backbone.Collection})
+    view_model = kb.viewModel(model)
+
+    equal(kb.utils.valueType(view_model.simple_type), kb.TYPE_SIMPLE, "simple is kb.TYPE_SIMPLE")
+    equal(kb.utils.valueType(view_model.model_type), kb.TYPE_MODEL, "model is kb.TYPE_MODEL")
+    equal(kb.utils.valueType(view_model.collection_type), kb.TYPE_COLLECTION, "collection is kb.TYPE_COLLECTION")
+  )
+
+  test("kb.utils.observableInstanceOf", ->
+    equal(kb.utils.observableInstanceOf(kb.collectionObservable(new Backbone.Collection()), kb.CollectionObservable), true, "Instance is kb.CollectionObservable")
+
+    equal(kb.utils.observableInstanceOf(new _kbe.LongDateLocalizer(ko.observable(new Date)), kb.LocalizedObservable), true, "Instance is kb.LocalizedObservable")
+
+    equal(kb.utils.observableInstanceOf(kb.observable(new Backbone.Model({name: 'name1'}), 'name'), kb.Observable), true, "Instance is kb.Observable")
+
+    equal(kb.utils.observableInstanceOf(kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name'), kb.TriggeredObservable), true, "Instance is kb.TriggeredObservable")
+  )
+
+  test("kb.utils.path", ->
+    equal(kb.utils.pathJoin(null, 'key'), 'key', "key path joined")
+    equal(kb.utils.pathJoin('bob', 'key'), 'bob.key', "bob.key path joined")
+    equal(kb.utils.pathJoin('bob.', 'key'), 'bob.key', "bob.key path joined")
+    equal(kb.utils.pathJoin('bob.harry', 'key'), 'bob.harry.key', "bob.harry.key path joined")
+    equal(kb.utils.pathJoin('bob.harry.', 'key'), 'bob.harry.key', "bob.harry.key path joined")
+
+    equal(kb.utils.optionsPathJoin({}, 'key').path, 'key', "key path joined")
+    equal(kb.utils.optionsPathJoin({path: 'bob'}, 'key').path, 'bob.key', "bob.key path joined")
+    equal(kb.utils.optionsPathJoin({path: 'bob.'}, 'key').path, 'bob.key', "bob.key path joined")
+    equal(kb.utils.optionsPathJoin({path: 'bob.harry'}, 'key').path, 'bob.harry.key', "bob.harry.key path joined")
+    equal(kb.utils.optionsPathJoin({path: 'bob.harry.'}, 'key').path, 'bob.harry.key', "bob.harry.key path joined")
   )
 
   test("Error cases", ->

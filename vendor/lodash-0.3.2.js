@@ -74,7 +74,7 @@
   };
 
   /** Used to determine if values are of the language type Object */
-  var objectTypes = {
+  var valueTypes = {
     'boolean': false,
     'function': true,
     'object': true,
@@ -450,13 +450,13 @@
     }
     // create the function factory
     var factory = Function(
-        'arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, objectTypes, ' +
+        'arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes, ' +
         'slice, stringClass, toString, undefined',
       '"use strict"; return function(' + args + ') {\n' + iteratorTemplate(data) + '\n}'
     );
     // return the compiled function
     return factory(
-      arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, objectTypes,
+      arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes,
       slice, stringClass, toString
     );
   }
@@ -530,7 +530,7 @@
    */
   var shimKeys = createIterator({
     'args': 'object',
-    'exit': 'if (!objectTypes[typeof object] || object === null) throw TypeError()',
+    'exit': 'if (!valueTypes[typeof object] || object === null) throw TypeError()',
     'init': '[]',
     'inLoop': 'result.push(index)'
   });
@@ -1886,7 +1886,7 @@
         // mimic the constructor's `return` behavior
         // http://es5.github.com/#x13.2.2
         var result = func.apply(thisBinding, args);
-        return objectTypes[typeof result] && result !== null
+        return valueTypes[typeof result] && result !== null
           ? result
           : thisBinding
       }
@@ -2246,7 +2246,7 @@
    * // => { 'name': 'moe' };
    */
   function clone(value) {
-    return objectTypes[typeof value] && value !== null
+    return valueTypes[typeof value] && value !== null
       ? (isArray(value) ? value.slice() : extend({}, value))
       : value;
   }
@@ -2733,7 +2733,7 @@
   function isObject(value) {
     // check if the value is the ECMAScript language type of Object
     // http://es5.github.com/#x8
-    return objectTypes[typeof value] && value !== null;
+    return valueTypes[typeof value] && value !== null;
   }
 
   /**

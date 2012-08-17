@@ -295,7 +295,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
   _createModelObervable: (model) ->
     observable = kb.utils.wrappedObservable(@)
-    return if @hasViewModels() then kb.utils.wrappedStore(observable).resolveObservable(model, @models_path, kb.utils.wrappedFactory(observable)) else model
+    return if @hasViewModels() then kb.utils.wrappedStore(observable).findOrCreateObservable(model, @models_path, kb.utils.wrappedFactory(observable)) else model
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

@@ -53,20 +53,7 @@ class kb.Store
     else if (options.path and options.factory)
       observable.__kb.creator = options.factory.creatorForPath(obj, options.path)  # save the creator to mark the source of the observable
 
-  updateObservable: (obj, observable) ->
-    creator = if observable.__kb then observable.__kb.creator else null
-
-    # check for an existing one of the correct type
-    if creator
-      for test, index in @objects
-        observable = @observables[index]
-        if (test is obj) and (observable.__kb.creator is creator)
-          return # found it
-
-    # register
-    @registerObservable(obj, observable)
-
-  resolveObservable: (obj, path, factory) ->
+  findOrCreateObservable: (obj, path, factory) ->
     creator = factory.creatorForPath(obj, path)
     return ko.observable(obj) unless creator
     return obj if creator.models_only  # do not create an observable
@@ -84,12 +71,8 @@ class kb.Store
     throw "Factory counldn't create observable for #{path}" unless observable
 
     # check if already registered
-    for test, index in @objects
-      if (test is obj) and (@observables[index] == observable)
-        return observable
-
-    # not registered yet, register now
-    @registerObservable(obj, observable, {creator: creator})
+    index = _.indexOf(@observables, observable)
+    @registerObservable(obj, observable, {creator: creator}) if index < 0 # not registered yet, register now
     return observable
 
   releaseObservable: (observable, owns_store) ->

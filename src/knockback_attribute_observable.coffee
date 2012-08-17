@@ -17,10 +17,11 @@ class kb.AttributeObservable
     kb.utils.wrappedObject(observable, model)
     kb.utils.wrappedStore(observable, options.store)
     kb.utils.wrappedFactory(observable, options.factory)
-    kb.utils.wrappedPath(observable, options.path)
+    kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, key))
     @key = key
 
     # publish public interface on the observable and return instead of this
+    observable.valueType = _.bind(@valueType, @)
     observable.destroy = _.bind(@destroy, @)
     observable.model = _.bind(@model, @)
     observable.update = _.bind(@update, @)
@@ -61,12 +62,10 @@ class kb.AttributeObservable
 
     # set up a new value observable, store separately from the attribute observable so it can be referred to even if the model is not yet loaded
     value_observable = kb.utils.wrappedByKey(@, 'vo')
-    if not value_observable
-      @_createValueObservable(new_value)
+    (@_createValueObservable(new_value); return) unless value_observable
+    type = @valueType()
 
-    # a view model, recognizes view_models as non-observable
-    else if not ko.isObservable(value_observable)
-
+    if type == kb.TYPE_MODEL
       # no longer a model -> switch types
       if new_value and not new_value instanceof Backbone.Model
         @_createValueObservable(new_value)
@@ -75,9 +74,7 @@ class kb.AttributeObservable
       else
         value_observable.model(new_value) if value_observable.model() isnt new_value
 
-    # a collection observable
-    else if kb.utils.observableInstanceOf(value_observable, kb.CollectionObservable)
-
+    else if type == kb.TYPE_COLLECTION
       # no longer a collection -> switch types
       if new_value and not new_value instanceof Backbone.Collection
         @_createValueObservable(new_value)
@@ -86,9 +83,7 @@ class kb.AttributeObservable
       else
         value_observable.collection(new_value) if value_observable.collection() isnt new_value
 
-    # a simple observable
-    else
-
+    else # a simple observable
       # now a model or collection -> switch types
       if new_value and (new_value instanceof Backbone.Model or new_value instanceof Backbone.Collection)
         @_createValueObservable(new_value)
@@ -97,11 +92,19 @@ class kb.AttributeObservable
       else
         value_observable(new_value) if value_observable() isnt new_value
 
+  valueType: ->
+    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable = @_createValueObservable(new_value) unless value_observable # create so we can check the type
+
+    return kb.TYPE_MODEL        unless ko.isObservable(value_observable) # a view model, recognizes view_models as non-observable
+    return kb.TYPE_COLLECTION   if kb.utils.observableInstanceOf(value_observable, kb.CollectionObservable)
+    return kb.TYPE_SIMPLE
+
   _createValueObservable: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
     store = kb.utils.wrappedStore(observable)
     previous_value_observable = kb.utils.wrappedByKey(@, 'vo')
-    value_observable = kb.utils.wrappedByKey(@, 'vo', store.resolveObservable(new_value, kb.utils.wrappedPath(observable), kb.utils.wrappedFactory(observable)))
+    value_observable = kb.utils.wrappedByKey(@, 'vo', store.findOrCreateObservable(new_value, kb.utils.wrappedPath(observable), kb.utils.wrappedFactory(observable)))
 
     # notify of the change and release the previous
     previous_value_observable.notifySubscribers(ko.utils.unwrapObservable(value_observable))

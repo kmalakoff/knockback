@@ -119,7 +119,7 @@ class kb.ViewModel extends kb.RefCountable
       else
         observable.update()
     else
-      @[vm_key] = kb.attributeObservable(model, key, {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.pathJoin(kb.utils.wrappedPath(@), key)})
+      @[vm_key] = kb.attributeObservable(model, key, {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@)})
 
 # factory function
 kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

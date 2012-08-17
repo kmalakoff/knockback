@@ -7,10 +7,13 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!Backbone.Relational)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!Backbone.Relational); ok(!!_kbe)
   )
+
+  kb.locale_manager = new _kbe.LocaleManager('en', {})
 
   window.Person = Backbone.RelationalModel.extend({
     relations: [{
@@ -174,31 +177,29 @@ $(document).ready( ->
     test("3. Model with recursive HasMany relations: Person with users who are people", ->
       kb.statistics = new kb.Statistics() # turn on stats
 
-      john = new Person({
-        id: 'person-3-1'
-        name: 'John'
-        friends: ['person-3-2', 'person-3-3', 'person-3-4']
-      })
-      paul = new Person({
-        id: 'person-3-2'
-        name: 'Paul'
-        friends: ['person-3-1', 'person-3-3', 'person-3-4']
-      })
       george = new Person({
         id: 'person-3-3'
         name: 'George'
         friends: ['person-3-1', 'person-3-2', 'person-3-4']
+      })
+      john = new Person({
+        id: 'person-3-1'
+        name: 'John'
+        friends: ['person-3-2', 'person-3-3', 'person-3-4']
+        best_friend: george
+      })
+      george.set(best_friend: john)
+      paul = new Person({
+        id: 'person-3-2'
+        name: 'Paul'
+        friends: ['person-3-1', 'person-3-3', 'person-3-4']
+        best_friend: george
       })
       ringo = new Person({
         id: 'person-3-4'
         name: 'Ringo'
         friends: ['person-3-1', 'person-3-2', 'person-3-3']
       })
-
-      # set up best friends
-      john.set(best_friend: george)
-      paul.set(best_friend: george)
-      george.set(best_friend: john)
 
       john_view_model = new kb.ViewModel(john)
       equal(john_view_model.name(), 'John', "Name is correct")
@@ -325,11 +326,6 @@ $(document).ready( ->
         kb.ViewModel.prototype.constructor.apply(this, arguments)
         this.editMode = ko.observable()
 
-        # @author = ko.computed(->
-        #   a = model.get('author')
-        #   return if a then a.get('name') else null
-        # )
-
         @edit = =>
           model._save = model.toJSON()
           @editMode(true)
@@ -356,5 +352,94 @@ $(document).ready( ->
       author = book.author()
       for authored_book in author.books()
         authored_book.editMode(true)
+        equal(authored_book.editMode(), true, 'edit mode set')
+  )
+
+  test("Nested custom view models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    george = new Person({
+      id: 'person-3-3'
+      name: 'George'
+      friends: ['person-3-1', 'person-3-2', 'person-3-4']
+    })
+    john = new Person({
+      id: 'person-3-1'
+      name: 'John'
+      friends: ['person-3-2', 'person-3-3', 'person-3-4']
+      best_friend: george
+    })
+    george.set(best_friend: john)
+    paul = new Person({
+      id: 'person-3-2'
+      name: 'Paul'
+      friends: ['person-3-1', 'person-3-3', 'person-3-4']
+      best_friend: george
+    })
+    ringo = new Person({
+      id: 'person-3-4'
+      name: 'Ringo'
+      friends: ['person-3-1', 'person-3-2', 'person-3-3']
+    })
+
+    FriendViewModel = (model) ->
+      @name = kb.observable(model, 'name')
+      @type = ko.observable('friend')
+      @
+    BestFriendViewModel = (model) ->
+      @name = kb.observable(model, 'name')
+      @type = ko.observable('best_friend')
+      @
+    class BandMemberViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super
+        @type = ko.observable('band_member')
+
+    collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
+      mappings:
+        models: BandMemberViewModel
+        'models.best_friend': {create: (model, options) -> return new BestFriendViewModel(model)}
+        'models.friends.models': FriendViewModel
+    })
+
+    validateFriend = (vm, name) ->
+      equal(vm.type(), 'friend', "friend type matches for #{name}")
+      equal(vm.name(), name, "band member name matches for #{name}")
+    validateBestFriend = (vm, name) ->
+      equal(vm.type(), 'best_friend', "best friend type matches for #{name}")
+      equal(vm.name(), name, "band member name matches for #{name}")
+    validateBandMember = (vm, name) ->
+      equal(vm.type(), 'band_member', "band member type matches for #{name}")
+      ok(vm instanceof BandMemberViewModel, "band member type matches for #{name}")
+      equal(vm.name(), name, "band member name matches for #{name}")
+
+    validateBandMember(collection_observable()[0], 'John')
+    validateBestFriend(collection_observable()[0].best_friend(), 'George')
+    validateFriend(collection_observable()[0].friends()[0], 'Paul')
+    validateFriend(collection_observable()[0].friends()[1], 'George')
+    validateFriend(collection_observable()[0].friends()[2], 'Ringo')
+    validateBandMember(collection_observable()[1], 'Paul')
+    validateBestFriend(collection_observable()[1].best_friend(), 'George')
+    validateFriend(collection_observable()[1].friends()[0], 'John')
+    validateFriend(collection_observable()[1].friends()[1], 'George')
+    validateFriend(collection_observable()[1].friends()[2], 'Ringo')
+    validateBandMember(collection_observable()[2], 'George')
+    validateBestFriend(collection_observable()[2].best_friend(), 'John')
+    validateFriend(collection_observable()[2].friends()[0], 'John')
+    validateFriend(collection_observable()[2].friends()[1], 'Paul')
+    validateFriend(collection_observable()[2].friends()[2], 'Ringo')
+    validateBandMember(collection_observable()[3], 'Ringo')
+    equal(collection_observable()[3].best_friend(), null, 'No best friend')
+    validateFriend(collection_observable()[3].friends()[0], 'John')
+    validateFriend(collection_observable()[3].friends()[1], 'Paul')
+    validateFriend(collection_observable()[3].friends()[2], 'George')
+
+    # and cleanup after yourself when you are done.
+    kb.utils.release(collection_observable)
+
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.stats_on = false # turn off stats
   )
 )

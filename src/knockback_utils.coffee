@@ -1,5 +1,5 @@
 ###
-  knockback_utils.js 0.16.0beta1
+  knockback_utils.js
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -47,11 +47,6 @@ kb.utils.wrappedObservable = (instance, observable) ->
   kb.utils.wrappedByKey(instance, 'observable', observable)
   kb.utils.wrappedByKey(observable, 'instance', instance) if observable
   return observable
-
-kb.utils.observableInstanceOf = (observable, type) ->
-  return false unless observable
-  return false unless observable.__kb and observable.__kb.instance
-  return (observable.__kb.instance instanceof type)
 
 kb.utils.wrappedModel = (observable, value) ->
   # get
@@ -125,6 +120,20 @@ kb.utils.release = (obj, keys_only) ->
 
   return false
 
+kb.utils.valueType = (observable) ->
+  return kb.TYPE_UNKNOWN unless observable 
+  return kb.TYPE_MODEL if observable instanceof kb.ViewModel
+  return kb.TYPE_SIMPLE unless (observable.__kb and observable.__kb.instance)
+  instance = observable.__kb.instance
+  return observable.valueType() if instance instanceof kb.AttributeObservable
+  return kb.TYPE_COLLECTION if instance instanceof kb.CollectionObservable
+  return kb.TYPE_SIMPLE
+
+kb.utils.observableInstanceOf = (observable, type) ->
+  return false unless observable
+  return false unless observable.__kb and observable.__kb.instance
+  return (observable.__kb.instance instanceof type)
+
 kb.utils.pathJoin = (path1, path2) ->
   if not path1
     path = ''
@@ -132,3 +141,6 @@ kb.utils.pathJoin = (path1, path2) ->
     path = if path1[path1.length-1] isnt '.' then "#{path1}." else path1
   path += path2
   return path
+
+kb.utils.optionsPathJoin = (options, path) ->
+  return _.defaults({path: kb.utils.pathJoin(options.path, path)}, options)
