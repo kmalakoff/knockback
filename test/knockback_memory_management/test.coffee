@@ -7,10 +7,13 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
+    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
+
+  kb.locale_manager = new _kbe.LocaleManager('en', {})
 
   # ref counted view model
   class RefCountableViewModel extends kb.RefCountable
@@ -48,8 +51,6 @@ $(document).ready( ->
       relatedModel: Person
     }]
 
-  kb.locale_manager = new Backbone.Model()
-
   test("Basic view model properties", ->
     nested_view_model = kb.viewModel(new Backbone.Model({name: 'name1'}))
     ViewModel = ->
@@ -61,8 +62,8 @@ $(document).ready( ->
       @prop5 = kb.collectionObservable(new Backbone.Collection())
       @prop6 = nested_view_model
       @prop7 = kb.collectionObservable(new Backbone.Collection())
-      @prop8 = kb.localizedObservable(ko.observable(), {read: ->})
-      @prop9 = kb.localizedObservable(ko.observable(), {read: ->})
+      @prop8 = new _kbe.LongDateLocalizer(ko.observable(new Date))
+      @prop9 = new _kbe.LongDateLocalizer(ko.observable(new Date))
       @prop10 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
       @
 

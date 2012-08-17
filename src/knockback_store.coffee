@@ -69,13 +69,15 @@ class kb.Store
   resolveObservable: (obj, path, factory) ->
     creator = factory.creatorForPath(obj, path)
     return ko.observable(obj) unless creator
+    return obj if creator.models_only  # do not create an observable
 
     # check for an existing one of the correct type
-    for test, index in @objects
-      observable = @observables[index]
-      if (test is obj) and (observable.__kb.creator is creator)
-        observable.retain?()
-        return observable
+    unless obj instanceof Backbone.Collection # don't share collection observables
+      for test, index in @objects
+        observable = @observables[index]
+        if (test is obj) and (observable.__kb.creator is creator)
+          observable.retain?()
+          return observable
 
     # create and wrap model
     observable = factory.createForPath(obj, path, this, creator)

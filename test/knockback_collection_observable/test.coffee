@@ -13,6 +13,8 @@ $(document).ready( ->
     ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
   )
 
+  kb.locale_manager = new _kbe.LocaleManager('en', {})
+
   ContactViewModel = (model) ->
     @name = kb.observable(model, 'name')
     @number = kb.observable(model, 'number')
@@ -340,6 +342,117 @@ $(document).ready( ->
     collection.reset()
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
+  )
+
+  test("Nested custom view models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class ContactViewModelDate extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, _.extend({internals: ['date']}, options))
+        @date = new _kbe.LongDateLocalizer(@_date)
+
+    john_birthdate = new Date(1940, 10, 9)
+    john = new _kbe.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
+    paul_birthdate = new Date(1942, 6, 18)
+    paul = new _kbe.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
+    george_birthdate = new Date(1943, 2, 25)
+    george = new _kbe.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
+    ringo_birthdate = new Date(1940, 7, 7)
+    ringo = new _kbe.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
+    major_duo = new Backbone.Collection([john, paul])
+    minor_duo = new Backbone.Collection([george, ringo])
+
+    nested_view_model = {
+      major_duo1: kb.collectionObservable(major_duo)
+      major_duo2: kb.collectionObservable(major_duo, {models_only: true})
+      major_duo3: kb.collectionObservable(major_duo, {view_model: kb.ViewModel})
+      major_duo4: kb.collectionObservable(major_duo, {view_model: ContactViewModelDate})
+      major_duo5: kb.collectionObservable(major_duo, {create: (model, options) -> return new ContactViewModelDate(model, options)})
+      major_duo6: kb.collectionObservable(major_duo, {create: (model, options) -> return if model.get('name') is 'John' then new ContactViewModelDate(model, options) else kb.viewModel(model, options)}) # mixed
+      minor_duo1: kb.collectionObservable(minor_duo, {mappings: {}})
+      minor_duo2: kb.collectionObservable(minor_duo, {mappings: models: {models_only: true}})
+      minor_duo3: kb.collectionObservable(minor_duo, {mappings: models: {view_model: kb.ViewModel}})
+      minor_duo4: kb.collectionObservable(minor_duo, {mappings: models: {view_model: ContactViewModelDate}})
+      minor_duo5: kb.collectionObservable(minor_duo, {mappings: models: {create: (model, options) -> return new ContactViewModelDate(model, options)}})
+      minor_duo6: kb.collectionObservable(minor_duo, {mappings: models: {create: (model, options) -> return if model.get('name') is 'George' then new ContactViewModelDate(model, options) else kb.viewModel(model, options)}}) # mixed
+    }
+
+    validateContactViewModel = (view_model, name, birthdate) ->
+      model = kb.utils.wrappedModel(view_model)
+      equal(view_model.name(), name, "#{name}: Name matches")
+
+      # set from the view model
+      kb.locale_manager.setLocale('en-GB')
+      formatted_date = new _kbe.LongDateLocalizer(birthdate)
+      equal(view_model.date(), formatted_date(), "#{name}: Birthdate in Great Britain format")
+      view_model.date('10 December 1963')
+      current_date = model.get('date')
+      equal(current_date.getFullYear(), 1963, "#{name}: year is good")
+      equal(current_date.getMonth(), 11, "#{name}: month is good")
+      equal(current_date.getDate(), 10, "#{name}: day is good")
+      equal(view_model._date().getFullYear(), 1963, "#{name}: year is good")
+      equal(view_model._date().getMonth(), 11, "#{name}: month is good")
+      equal(view_model._date().getDate(), 10, "#{name}: day is good")
+
+      model.set({date: new Date(birthdate.valueOf())}) # restore birthdate
+
+      # set from the model
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.date(), formatted_date(), "#{name}: Birthdate in France format")
+      view_model.date('10 novembre 1940')
+      current_date = model.get('date')
+      equal(current_date.getFullYear(), 1940, "#{name}: year is good")
+      equal(current_date.getMonth(), 10, "#{name}: month is good")
+      equal(current_date.getDate(), 10, "#{name}: day is good")
+      equal(view_model._date().getFullYear(), 1940, "#{name}: year is good")
+      equal(view_model._date().getMonth(), 10, "#{name}: month is good")
+      equal(view_model._date().getDate(), 10, "#{name}: day is good")
+
+      model.set({date: new Date(birthdate.valueOf())}) # restore birthdate
+
+    validateGenericViewModel = (view_model, name, birthdate) ->
+      equal(view_model.name(), name, "#{name}: Name matches")
+      equal(view_model.date().valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
+
+    validateModel = (model, name, birthdate) ->
+      equal(model.get('name'), name, "#{name}: Name matches")
+      equal(model.get('date').valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
+
+    # colllections
+    validateGenericViewModel(nested_view_model.major_duo1()[0], 'John', john_birthdate)
+    validateGenericViewModel(nested_view_model.major_duo1()[1], 'Paul', paul_birthdate)
+    validateModel(nested_view_model.major_duo2()[0], 'John', john_birthdate)
+    validateModel(nested_view_model.major_duo2()[1], 'Paul', paul_birthdate)
+    validateGenericViewModel(nested_view_model.major_duo3()[0], 'John', john_birthdate)
+    validateGenericViewModel(nested_view_model.major_duo3()[1], 'Paul', paul_birthdate)
+    validateContactViewModel(nested_view_model.major_duo4()[0], 'John', john_birthdate)
+    validateContactViewModel(nested_view_model.major_duo4()[1], 'Paul', paul_birthdate)
+    validateContactViewModel(nested_view_model.major_duo5()[0], 'John', john_birthdate)
+    validateContactViewModel(nested_view_model.major_duo5()[1], 'Paul', paul_birthdate)
+    validateContactViewModel(nested_view_model.major_duo6()[0], 'John', john_birthdate) # mixed
+    validateGenericViewModel(nested_view_model.major_duo6()[1], 'Paul', paul_birthdate) # mixed
+
+    validateGenericViewModel(nested_view_model.minor_duo1()[0], 'George', george_birthdate)
+    validateGenericViewModel(nested_view_model.minor_duo1()[1], 'Ringo', ringo_birthdate)
+    validateModel(nested_view_model.minor_duo2()[0], 'George', george_birthdate)
+    validateModel(nested_view_model.minor_duo2()[1], 'Ringo', ringo_birthdate)
+    validateGenericViewModel(nested_view_model.minor_duo3()[0], 'George', george_birthdate)
+    validateGenericViewModel(nested_view_model.minor_duo3()[1], 'Ringo', ringo_birthdate)
+    validateContactViewModel(nested_view_model.minor_duo4()[0], 'George', george_birthdate)
+    validateContactViewModel(nested_view_model.minor_duo4()[1], 'Ringo', ringo_birthdate)
+    validateContactViewModel(nested_view_model.minor_duo5()[0], 'George', george_birthdate)
+    validateContactViewModel(nested_view_model.minor_duo5()[1], 'Ringo', ringo_birthdate)
+    validateContactViewModel(nested_view_model.minor_duo6()[0], 'George', george_birthdate) # mixed
+    validateGenericViewModel(nested_view_model.minor_duo6()[1], 'Ringo', ringo_birthdate) # mixed
+
+    # and cleanup after yourself when you are done.
+    kb.utils.release(nested_view_model)
+
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.stats_on = false # turn off stats
   )
 
   test("Error cases", ->

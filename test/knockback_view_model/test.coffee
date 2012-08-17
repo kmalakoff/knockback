@@ -377,7 +377,7 @@ $(document).ready( ->
     raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
   )
 
-  test("Collection with nested custom view models", ->
+  test("Nested custom view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelDate extends kb.ViewModel
@@ -399,12 +399,11 @@ $(document).ready( ->
       john: john
       paul: paul
       george: george
-      george2: george
       ringo: ringo
-      major_duo: major_duo
+      major_duo1: major_duo
       major_duo2: major_duo
       major_duo3: major_duo
-      minor_duo: minor_duo
+      minor_duo1: minor_duo
       minor_duo2: minor_duo
       minor_duo3: minor_duo
     })
@@ -412,70 +411,70 @@ $(document).ready( ->
     nested_view_model = kb.viewModel(nested_model, {
       mappings:
         john: ContactViewModelDate
-        paul: ContactViewModelDate
         george: {create: (model, options) -> return new ContactViewModelDate(model, options)}
-        george2: {create: (model, options) -> return new ContactViewModelDate(model, options)}
-        'major_duo.models': ContactViewModelDate
-        'major_duo2.models': ContactViewModelDate
-        'major_duo3.models': {create: (model, options) -> return new ContactViewModelDate(model, options)}
-        'minor_duo.models': kb.ViewModel
-        'minor_duo2.models': kb.ViewModel
-        'minor_duo3.models': {create: (model, options) -> return new kb.ViewModel(model, options)}
+        'major_duo1.models': ContactViewModelDate
+        'major_duo2.models': {create: (model, options) -> return new ContactViewModelDate(model, options)}
+        'major_duo3.models': {models_only: true}
+        'minor_duo1.models': kb.ViewModel
+        'minor_duo2.models': {create: (model, options) -> return new kb.ViewModel(model, options)}
     })
 
     validateContactViewModel = (view_model, name, birthdate) ->
       model = kb.utils.wrappedModel(view_model)
-      equal(view_model.name(), name, "#{view_model.name()}: Name matches")
+      equal(view_model.name(), name, "#{name}: Name matches")
 
       # set from the view model
       kb.locale_manager.setLocale('en-GB')
       formatted_date = new _kbe.LongDateLocalizer(birthdate)
-      equal(view_model.date(), formatted_date(), "#{view_model.name()}: Birthdate in Great Britain format")
+      equal(view_model.date(), formatted_date(), "#{name}: Birthdate in Great Britain format")
       view_model.date('10 December 1963')
       current_date = model.get('date')
-      equal(current_date.getFullYear(), 1963, "#{view_model.name()}: year is good")
-      equal(current_date.getMonth(), 11, "#{view_model.name()}: month is good")
-      equal(current_date.getDate(), 10, "#{view_model.name()}: day is good")
-      equal(view_model._date().getFullYear(), 1963, "#{view_model.name()}: year is good")
-      equal(view_model._date().getMonth(), 11, "#{view_model.name()}: month is good")
-      equal(view_model._date().getDate(), 10, "#{view_model.name()}: day is good")
+      equal(current_date.getFullYear(), 1963, "#{name}: year is good")
+      equal(current_date.getMonth(), 11, "#{name}: month is good")
+      equal(current_date.getDate(), 10, "#{name}: day is good")
+      equal(view_model._date().getFullYear(), 1963, "#{name}: year is good")
+      equal(view_model._date().getMonth(), 11, "#{name}: month is good")
+      equal(view_model._date().getDate(), 10, "#{name}: day is good")
 
       model.set({date: new Date(birthdate.valueOf())}) # restore birthdate
 
       # set from the model
       kb.locale_manager.setLocale('fr-FR')
-      equal(view_model.date(), formatted_date(), "#{view_model.name()}: Birthdate in France format")
+      equal(view_model.date(), formatted_date(), "#{name}: Birthdate in France format")
       view_model.date('10 novembre 1940')
       current_date = model.get('date')
-      equal(current_date.getFullYear(), 1940, "#{view_model.name()}: year is good")
-      equal(current_date.getMonth(), 10, "#{view_model.name()}: month is good")
-      equal(current_date.getDate(), 10, "#{view_model.name()}: day is good")
-      equal(view_model._date().getFullYear(), 1940, "#{view_model.name()}: year is good")
-      equal(view_model._date().getMonth(), 10, "#{view_model.name()}: month is good")
-      equal(view_model._date().getDate(), 10, "#{view_model.name()}: day is good")
+      equal(current_date.getFullYear(), 1940, "#{name}: year is good")
+      equal(current_date.getMonth(), 10, "#{name}: month is good")
+      equal(current_date.getDate(), 10, "#{name}: day is good")
+      equal(view_model._date().getFullYear(), 1940, "#{name}: year is good")
+      equal(view_model._date().getMonth(), 10, "#{name}: month is good")
+      equal(view_model._date().getDate(), 10, "#{name}: day is good")
 
       model.set({date: new Date(birthdate.valueOf())}) # restore birthdate
 
     validateGenericViewModel = (view_model, name, birthdate) ->
-      equal(view_model.name(), name, "#{view_model.name()}: Name matches")
-      equal(view_model.date().valueOf(), birthdate.valueOf(), "#{view_model.name()}: Birthdate matches")
+      equal(view_model.name(), name, "#{name}: Name matches")
+      equal(view_model.date().valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
+
+    validateModel = (model, name, birthdate) ->
+      equal(model.get('name'), name, "#{name}: Name matches")
+      equal(model.get('date').valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
 
     # models
     validateContactViewModel(nested_view_model.john(), 'John', john_birthdate)
-    validateContactViewModel(nested_view_model.paul(), 'Paul', paul_birthdate)
+    validateGenericViewModel(nested_view_model.paul(), 'Paul', paul_birthdate)
     validateContactViewModel(nested_view_model.george(), 'George', george_birthdate)
-    validateContactViewModel(nested_view_model.george2(), 'George', george_birthdate)
     validateGenericViewModel(nested_view_model.ringo(), 'Ringo', ringo_birthdate)
 
     # colllections
-    validateContactViewModel(nested_view_model.major_duo()[0], 'John', john_birthdate)
-    validateContactViewModel(nested_view_model.major_duo()[1], 'Paul', paul_birthdate)
+    validateContactViewModel(nested_view_model.major_duo1()[0], 'John', john_birthdate)
+    validateContactViewModel(nested_view_model.major_duo1()[1], 'Paul', paul_birthdate)
     validateContactViewModel(nested_view_model.major_duo2()[0], 'John', john_birthdate)
     validateContactViewModel(nested_view_model.major_duo2()[1], 'Paul', paul_birthdate)
-    validateContactViewModel(nested_view_model.major_duo3()[0], 'John', john_birthdate)
-    validateContactViewModel(nested_view_model.major_duo3()[1], 'Paul', paul_birthdate)
-    validateGenericViewModel(nested_view_model.minor_duo()[0], 'George', george_birthdate)
-    validateGenericViewModel(nested_view_model.minor_duo()[1], 'Ringo', ringo_birthdate)
+    validateModel(nested_view_model.major_duo3()[0], 'John', john_birthdate)
+    validateModel(nested_view_model.major_duo3()[1], 'Paul', paul_birthdate)
+    validateGenericViewModel(nested_view_model.minor_duo1()[0], 'George', george_birthdate)
+    validateGenericViewModel(nested_view_model.minor_duo1()[1], 'Ringo', ringo_birthdate)
     validateGenericViewModel(nested_view_model.minor_duo2()[0], 'George', george_birthdate)
     validateGenericViewModel(nested_view_model.minor_duo2()[1], 'Ringo', ringo_birthdate)
     validateGenericViewModel(nested_view_model.minor_duo3()[0], 'George', george_birthdate)

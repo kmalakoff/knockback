@@ -50,18 +50,24 @@ class kb.CollectionObservable extends kb.RefCountable
 
     # view model factory create mappings
     factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
+    factory.addPathMappings(options.mappings) if options.mappings
     kb.utils.wrappedPath(observable, options.path)
     @models_path = kb.utils.pathJoin(options.path, 'models')
-    if options.view_model
-      factory.addPathMapping(@models_path, options.view_model)
-    else if options.create
-      factory.addPathMapping(@models_path, {create: options.create})
-    factory.addPathMappings(options.mappings) if options.mappings
 
-    # add default view model unless models only flag
-    @models_only = options.models_only
-    if not @models_only and not factory.hasPath(@models_path)
-      factory.addPathMapping(@models_path, kb.ViewModel)
+    # add or deduce models create information
+    unless factory.hasPath(@models_path)
+      if options.hasOwnProperty('models_only')
+        if options.models_only
+          factory.addPathMapping(@models_path, {models_only: options.models_only})
+          @models_only = options.models_only
+        else
+          factory.addPathMapping(@models_path, kb.ViewModel)
+      else if options.view_model
+        factory.addPathMapping(@models_path, options.view_model)
+      else if options.create
+        factory.addPathMapping(@models_path, {create: options.create})
+      else
+        factory.addPathMapping(@models_path, kb.ViewModel)
 
     # options
     @sort_attribute = options.sort_attribute

@@ -399,7 +399,11 @@
       var creator;
       creator = this.paths[path];
       if (creator) {
-        return creator;
+        if (creator.view_model) {
+          return creator.view_model;
+        } else {
+          return creator;
+        }
       }
       if (this.parent_factory) {
         creator = this.parent_factory.creatorForPath(obj, path);
@@ -422,6 +426,14 @@
       }
       if (!creator) {
         return ko.observable(obj);
+      }
+      if (creator.hasOwnProperty('models_only')) {
+        return obj(creator.models_only);
+        return kb.Factory.createDefault(obj, {
+          store: store,
+          factory: this,
+          path: path
+        });
       }
       if (typeof creator === 'function') {
         return new creator(obj, {
@@ -552,15 +564,20 @@
       if (!creator) {
         return ko.observable(obj);
       }
-      _ref = this.objects;
-      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-        test = _ref[index];
-        observable = this.observables[index];
-        if ((test === obj) && (observable.__kb.creator === creator)) {
-          if (typeof observable.retain === "function") {
-            observable.retain();
+      if (creator.models_only) {
+        return obj;
+      }
+      if (!(obj instanceof Backbone.Collection)) {
+        _ref = this.objects;
+        for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+          test = _ref[index];
+          observable = this.observables[index];
+          if ((test === obj) && (observable.__kb.creator === creator)) {
+            if (typeof observable.retain === "function") {
+              observable.retain();
+            }
+            return observable;
           }
-          return observable;
         }
       }
       observable = factory.createForPath(obj, path, this, creator);
@@ -643,21 +660,30 @@
       this.__kb._onModelChange = _.bind(this._onModelChange, this);
       kb.Store.registerOrCreateStoreFromOptions(collection, observable, options);
       factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
-      kb.utils.wrappedPath(observable, options.path);
-      this.models_path = kb.utils.pathJoin(options.path, 'models');
-      if (options.view_model) {
-        factory.addPathMapping(this.models_path, options.view_model);
-      } else if (options.create) {
-        factory.addPathMapping(this.models_path, {
-          create: options.create
-        });
-      }
       if (options.mappings) {
         factory.addPathMappings(options.mappings);
       }
-      this.models_only = options.models_only;
-      if (!this.models_only && !factory.hasPath(this.models_path)) {
-        factory.addPathMapping(this.models_path, kb.ViewModel);
+      kb.utils.wrappedPath(observable, options.path);
+      this.models_path = kb.utils.pathJoin(options.path, 'models');
+      if (!factory.hasPath(this.models_path)) {
+        if (options.hasOwnProperty('models_only')) {
+          if (options.models_only) {
+            factory.addPathMapping(this.models_path, {
+              models_only: options.models_only
+            });
+            this.models_only = options.models_only;
+          } else {
+            factory.addPathMapping(this.models_path, kb.ViewModel);
+          }
+        } else if (options.view_model) {
+          factory.addPathMapping(this.models_path, options.view_model);
+        } else if (options.create) {
+          factory.addPathMapping(this.models_path, {
+            create: options.create
+          });
+        } else {
+          factory.addPathMapping(this.models_path, kb.ViewModel);
+        }
       }
       this.sort_attribute = options.sort_attribute;
       this.sorted_index = options.sorted_index;
@@ -1222,26 +1248,23 @@
     function LocalizedObservable(value_holder, options, view_model) {
       var observable, value;
       this.value_holder = value_holder;
-      this.options = options != null ? options : {};
+      if (options == null) {
+        options = {};
+      }
       this.view_model = view_model != null ? view_model : {};
-      if (!(this.options.read || this.read)) {
+      if (!this.read) {
         throw 'LocalizedObservable: options.read is missing';
-      }
-      if (this.options.read && this.read) {
-        throw 'LocalizedObservable: options.read and read class function exist. You need to choose one.';
-      }
-      if (this.options.write && this.write) {
-        throw 'LocalizedObservable: options.write and write class function exist. You need to choose one.';
       }
       if (!kb.locale_manager) {
         throw 'LocalizedObservable: kb.locale_manager is not defined';
       }
       this.__kb || (this.__kb = {});
       this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
+      this.__kb._onChange = options.onChange;
       if (this.value_holder) {
         value = ko.utils.unwrapObservable(this.value_holder);
       }
-      kb.utils.wrappedByKey(this, 'vo', ko.observable(!value ? null : this.read.call(this, value, null)));
+      kb.utils.wrappedByKey(this, 'vo', ko.observable(!value ? null : this.read(value, null)));
       if (this.write && (typeof this.write !== 'function')) {
         throw 'LocalizedObservable: options.write is not a function for read_write model attribute';
       }
@@ -1256,15 +1279,14 @@
       observable.observedValue = _.bind(this.observedValue, this);
       observable.resetToCurrent = _.bind(this.resetToCurrent, this);
       kb.locale_manager.bind('change', this.__kb._onLocaleChange);
-      if (this.options.hasOwnProperty('default')) {
-        observable = ko.defaultWrapper(observable, this.options["default"]);
+      if (options.hasOwnProperty('default')) {
+        observable = ko.defaultWrapper(observable, options["default"]);
       }
       return observable;
     }
 
     LocalizedObservable.prototype.destroy = function() {
       kb.locale_manager.unbind('change', this.__kb._onLocaleChange);
-      this.options = null;
       this.view_model = null;
       return kb.utils.wrappedDestroy(this);
     };
@@ -1274,7 +1296,7 @@
       value_observable = kb.utils.wrappedByKey(this, 'vo');
       value_observable(null);
       observable = kb.utils.wrappedObservable(this);
-      current_value = this.value_holder && observable ? this.read.call(this, ko.utils.unwrapObservable(this.value_holder)) : null;
+      current_value = this.value_holder && observable ? this.read(ko.utils.unwrapObservable(this.value_holder)) : null;
       return this._onSetValue(current_value);
     };
 
@@ -1288,35 +1310,32 @@
     };
 
     LocalizedObservable.prototype._onGetValue = function() {
-      var read, value_observable;
+      var value_observable;
       if (this.value_holder) {
         ko.utils.unwrapObservable(this.value_holder);
       }
       value_observable = kb.utils.wrappedByKey(this, 'vo');
       value_observable();
-      read = this.read ? this.read : this.options.read;
-      return read.call(this, ko.utils.unwrapObservable(this.value_holder));
+      return this.read(ko.utils.unwrapObservable(this.value_holder));
     };
 
     LocalizedObservable.prototype._onSetValue = function(value) {
-      var value_observable, write;
-      write = this.write ? this.write : this.options.write;
-      write.call(this, value, ko.utils.unwrapObservable(this.value_holder));
+      var value_observable;
+      this.write(value, ko.utils.unwrapObservable(this.value_holder));
       value_observable = kb.utils.wrappedByKey(this, 'vo');
       value_observable(value);
-      if (this.options.onChange) {
-        return this.options.onChange(value);
+      if (this.__kb._onChange) {
+        return this.__kb._onChange(value);
       }
     };
 
     LocalizedObservable.prototype._onLocaleChange = function() {
-      var read, value, value_observable;
-      read = this.read ? this.read : this.options.read;
-      value = read.call(this, ko.utils.unwrapObservable(this.value_holder));
+      var value, value_observable;
+      value = this.read(ko.utils.unwrapObservable(this.value_holder));
       value_observable = kb.utils.wrappedByKey(this, 'vo');
       value_observable(value);
-      if (this.options.onChange) {
-        return this.options.onChange(value);
+      if (this.__kb._onChange) {
+        return this.__kb._onChange.onChange(value);
       }
     };
 
