@@ -17,7 +17,7 @@ $(document).ready( ->
 
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
-      @attribute_observables = kb.observables(model, {
+      @dynamic_observables = kb.observables(model, {
         name:     {key: 'name'}
         number:   'number'
         date:     {key:'date', localizer: _kbe.LongDateLocalizer}

@@ -49,7 +49,7 @@ class kb.ViewModel extends kb.RefCountable
     return @ if not @__kb.internals and not @__kb.requires
     missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
     missing = _.difference(missing, _.keys(model.attributes)) if not model_ref or model_ref.isLoaded()
-    @_updateAttributeObservable(model, key) for key in missing
+    @_updateDynamicObservable(model, key) for key in missing
 
   __destroy: ->
     @_modelUnbind(kb.utils.wrappedObject(@))
@@ -91,35 +91,34 @@ class kb.ViewModel extends kb.RefCountable
   _onModelLoaded: (model) ->
     kb.utils.wrappedObject(@, model)
     @_modelBind(model)
-    @_updateAttributeObservable(model, key) for key of model.attributes
+    @_updateDynamicObservable(model, key) for key of model.attributes
 
   _onModelUnloaded: (model) ->
     @_modelUnbind(model)
     kb.utils.wrappedObject(@, null)
-    @_updateAttributeObservable(null, key) for key of model.attributes
+    @_updateDynamicObservable(null, key) for key of model.attributes
 
   _onModelChange: ->
     model = kb.utils.wrappedObject(@)
 
     # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
     if model._changed
-      (@_updateAttributeObservable(model, key) if model.hasChanged(key)) for key of model.attributes
+      (@_updateDynamicObservable(model, key) if model.hasChanged(key)) for key of model.attributes
 
     # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
     else if model.changed
-      @_updateAttributeObservable(model, key) for key of model.changed
+      @_updateDynamicObservable(model, key) for key of model.changed
 
-  _updateAttributeObservable: (model, key) ->
+  _updateDynamicObservable: (model, key) ->
     vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
     observable = @[vm_key]
     if observable
-      return unless kb.utils.observableInstanceOf(observable, kb.AttributeObservable) # not something we created, skip
       if observable.model() isnt model
         observable.model(model)
       else
         observable.update()
     else
-      @[vm_key] = kb.attributeObservable(model, key, {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@)})
+      @[vm_key] = kb.dynamicObservable(model, {key: key, store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@)})
 
 # factory function
 kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

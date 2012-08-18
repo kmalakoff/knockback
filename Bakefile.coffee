@@ -9,6 +9,7 @@ module.exports =
       'src/knockback_ref_countable.coffee'
       'src/knockback_factory.coffee'
       'src/knockback_store.coffee'
+      'src/knockback_model_observable.coffee'
       'src/knockback_collection_observable.coffee'
       'src/knockback_default_wrapper.coffee'
       'src/knockback_formatted_observable.coffee'
@@ -16,7 +17,7 @@ module.exports =
       'src/knockback_observable.coffee'
       'src/knockback_observables.coffee'
       'src/knockback_triggered_observable.coffee'
-      'src/knockback_attribute_observable.coffee'
+      'src/knockback_dynamic_observable.coffee'
       'src/knockback_view_model.coffee'
     ]
     _build:

@@ -486,7 +486,37 @@ $(document).ready( ->
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
     equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-    kb.stats_on = false # turn off stats
+    kb.statistics = null # turn off stats
+  )
+
+  test("Changing attribute types", ->
+    model = new Backbone.Model({reused: null})
+    view_model = kb.viewModel(model)
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_SIMPLE, 'reused is kb.TYPE_SIMPLE')
+
+    model.set({reused: new Backbone.Model()})
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
+
+    model.set({reused: new Backbone.Collection()})
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
+
+    model.set({reused: null})
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_SIMPLE, 'reused is kb.TYPE_SIMPLE')
+
+    # add custom mapping
+    view_model = kb.viewModel(model, {mappings: 
+      reused: (obj, options) -> return if obj instanceof Backbone.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
+    })
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
+
+    model.set({reused: new Backbone.Model()})
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
+
+    model.set({reused: new Backbone.Collection()})
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
+
+    model.set({reused: null})
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
   )
 
   test("Error cases", ->

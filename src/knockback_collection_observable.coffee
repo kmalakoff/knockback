@@ -30,7 +30,7 @@
 
 class kb.CollectionObservable extends kb.RefCountable
   constructor: (collection, options={}) ->
-    throw 'CollectionObservable: collection is missing' if not collection
+    kb.utils.throwMissing(this, 'collection') unless collection
 
     super
     kb.statistics.register('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
@@ -189,7 +189,7 @@ class kb.CollectionObservable extends kb.RefCountable
     @_collectionResync()
 
   _onCollectionResort: (model_or_models) ->
-    throw 'CollectionObservable: collection sorted_index unexpected' if @sorted_index
+    kb.utils.throwUnexpected(this, 'sorted_index') if @sorted_index
     if _.isArray(model_or_models)
       observable = kb.utils.wrappedObservable(@)
       @trigger('resort', observable()) # notify

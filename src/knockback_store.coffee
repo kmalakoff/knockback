@@ -48,27 +48,33 @@ class kb.Store
     observable.retain?()
 
     # set the creator
+    observable.__kb or= {}
     if (options.creator)
       observable.__kb.creator = options.creator  # save the creator to mark the source of the observable
     else if (options.path and options.factory)
       observable.__kb.creator = options.factory.creatorForPath(obj, options.path)  # save the creator to mark the source of the observable
+    else
+      observable.__kb.creator = null
 
   findOrCreateObservable: (obj, path, factory) ->
-    creator = factory.creatorForPath(obj, path)
-    return ko.observable(obj) unless creator
-    return obj if creator.models_only  # do not create an observable
+    if not factory
+      observable = kb.Factory.createDefault(obj, {path: path})
+    else
+      creator = factory.creatorForPath(obj, path)
+      return ko.observable(obj) unless creator
+      return obj if creator.models_only  # do not create an observable
 
-    # check for an existing one of the correct type
-    unless obj instanceof Backbone.Collection # don't share collection observables
-      for test, index in @objects
-        observable = @observables[index]
-        if (test is obj) and (observable.__kb.creator is creator)
-          observable.retain?()
-          return observable
+      # check for an existing one of the correct type
+      unless obj instanceof Backbone.Collection # don't share collection observables
+        for test, index in @objects
+          observable = @observables[index]
+          if (test is obj) and (observable.__kb.creator is creator)
+            observable.retain?()
+            return observable
 
-    # create and wrap model
-    observable = factory.createForPath(obj, path, this, creator)
-    throw "Factory counldn't create observable for #{path}" unless observable
+      # create
+      observable = factory.createForPath(obj, path, this, creator)
+      observable = ko.observable(null) unless observable # default to null
 
     # check if already registered
     index = _.indexOf(@observables, observable)

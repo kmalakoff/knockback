@@ -7,7 +7,7 @@
 ###
 
 ####################################################
-# mapping_info
+# options
 #   * key - required to look up the model's attributes
 #   * read - called to get the value and each time the locale changes
 #   * write - called to set the value
@@ -15,9 +15,9 @@
 ####################################################
 
 class kb.Observable
-  constructor: (model, mapping_info, @view_model={}) ->
-    throw 'Observable: model is missing' if not model
-    throw 'Observable: mapping_info is missing' if not mapping_info
+  constructor: (model, options, @view_model={}) ->
+    kb.utils.throwMissing(this, 'model') unless model
+    kb.utils.throwMissing(this, 'options') unless options
 
     # bind callbacks
     @__kb or= {}
@@ -26,11 +26,11 @@ class kb.Observable
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
     # extract options
-    @key = if _.isString(mapping_info) or ko.isObservable(mapping_info) then mapping_info else mapping_info.key
-    throw 'Observable: key is missing' unless @key
-    @args = mapping_info.args
-    @read = mapping_info.read
-    @write = mapping_info.write
+    @key = if _.isString(options) or ko.isObservable(options) then options else options.key
+    kb.utils.throwMissing(this, 'key') unless @key
+    @args = options.args
+    @read = options.read
+    @write = options.write
 
     # internal state
     value_observable = kb.utils.wrappedByKey(@, 'vo', ko.observable())
@@ -56,12 +56,12 @@ class kb.Observable
       value_observable.notifySubscribers(value_observable())
 
     # wrap ourselves with a localizer
-    if mapping_info.localizer
-      observable = new mapping_info.localizer(observable)
+    if options.localizer
+      observable = new options.localizer(observable)
 
     # wrap ourselves with a default value
-    if mapping_info.hasOwnProperty('default')
-      observable = kb.defaultWrapper(observable, mapping_info.default)
+    if options.hasOwnProperty('default')
+      observable = kb.defaultWrapper(observable, options.default)
 
     return observable
 
@@ -118,7 +118,6 @@ class kb.Observable
     value_observable(@_onGetValue())
 
   _onModelUnloaded: (model) ->
-    (@__kb.localizer.destroy(); @__kb.localizer = null) if @__kb.localizer and @__kb.localizer.destroy
     @_modelUnbind(model)
     kb.utils.wrappedObject(kb.utils.wrappedObservable(@), null)
 
@@ -129,4 +128,4 @@ class kb.Observable
     value_observable(@_onGetValue())
 
 # factory function
-kb.observable = (model, mapping_info, view_model) -> return new kb.Observable(model, mapping_info, view_model)
+kb.observable = (model, options, view_model) -> return new kb.Observable(model, options, view_model)

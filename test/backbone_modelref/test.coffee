@@ -22,7 +22,7 @@ $(document).ready( ->
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
       @loading_message = new _kbe.LocalizedStringLocalizer(new _kbe.LocalizedString('loading'))
-      @attribute_observables = kb.observables(model, {
+      @dynamic_observables = kb.observables(model, {
         name:     {key:'name', default: @loading_message}
         number:   {key:'number', default: @loading_message}
         date:     {key:'date', default: @loading_message, localizer: _kbe.ShortDateLocalizer}
@@ -80,7 +80,7 @@ $(document).ready( ->
     # go back to loading state
     collection.reset()
     equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    view_model.attribute_observables.setToDefault() # override default behavior and go back to loading state
+    view_model.dynamic_observables.setToDefault() # override default behavior and go back to loading state
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
     kb.locale_manager.setLocale('en-GB')

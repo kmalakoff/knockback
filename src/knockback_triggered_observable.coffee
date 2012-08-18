@@ -8,8 +8,8 @@
 
 class kb.TriggeredObservable
   constructor: (model, @event_name) ->
-    throw 'Observable: model is missing' if not model
-    throw 'Observable: event_name is missing' if not @event_name
+    kb.utils.throwMissing(this, 'model') unless model
+    kb.utils.throwMissing(this, 'event_name') unless @event_name
 
     # bind callbacks
     @__kb or= {}

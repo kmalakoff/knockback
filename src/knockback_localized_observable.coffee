@@ -25,8 +25,8 @@ class kb.LocalizedObservable
   @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
   constructor: (@value_holder, options={}, @view_model={}) ->
-    throw 'LocalizedObservable: options.read is missing' unless @read
-    throw 'LocalizedObservable: kb.locale_manager is not defined' if not kb.locale_manager
+    kb.utils.throwMissing(this, 'read') unless @read
+    kb.utils.throwMissing(this, 'kb.locale_manager') unless kb.locale_manager
 
     # bind callbacks
     @__kb or= {}
@@ -36,10 +36,9 @@ class kb.LocalizedObservable
     # internal state
     value = ko.utils.unwrapObservable(@value_holder) if @value_holder
     kb.utils.wrappedByKey(@, 'vo', ko.observable(if not value then null else @read(value, null)))
-    throw 'LocalizedObservable: options.write is not a function for read_write model attribute' if @write and (typeof(@write) isnt 'function')
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: _.bind(@_onGetValue, @)
-      write: if @write then _.bind(@_onSetValue, @) else (-> throw 'kb.LocalizedObservable: value is read only')
+      write: if @write then _.bind(@_onSetValue, @) else (-> kb.utils.throwUnexpected(this, 'writing to read-only'))
       owner: @view_model
     }))
 

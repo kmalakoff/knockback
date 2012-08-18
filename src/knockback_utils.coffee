@@ -18,6 +18,12 @@ kb.utils.legacyWarning = (identifier, last_version, message) ->
   kb._legacy_warnings[identifier]++
   console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
 
+kb.utils.throwMissing = (instance, message) ->
+  throw "#{instance.constructor.name}: #{message} is missing"
+
+kb.utils.throwUnexpected = (instance, message) ->
+  throw "#{instance.constructor.name}: #{message} is unexpected"
+
 kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
@@ -123,9 +129,12 @@ kb.utils.release = (obj, keys_only) ->
 kb.utils.valueType = (observable) ->
   return kb.TYPE_UNKNOWN unless observable 
   return kb.TYPE_MODEL if observable instanceof kb.ViewModel
-  return kb.TYPE_SIMPLE unless (observable.__kb and observable.__kb.instance)
+  unless (observable.__kb and observable.__kb.instance)
+    return kb.TYPE_MODEL if observable instanceof Backbone.Model
+    return kb.TYPE_COLLECTION if observable instanceof Backbone.Collection
+    return kb.TYPE_SIMPLE 
   instance = observable.__kb.instance
-  return observable.valueType() if instance instanceof kb.AttributeObservable
+  return observable.valueType() if instance instanceof kb.DynamicObservable
   return kb.TYPE_COLLECTION if instance instanceof kb.CollectionObservable
   return kb.TYPE_SIMPLE
 

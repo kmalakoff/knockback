@@ -81,7 +81,7 @@ $(document).ready( ->
       equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
       equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
 
-      kb.stats_on = false # turn off stats
+      kb.statistics = null # turn off stats
     )
 
     test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
@@ -171,7 +171,7 @@ $(document).ready( ->
       # check stats
       equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
       equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-      kb.stats_on = false # turn off stats
+      kb.statistics = null # turn off stats
     )
 
     test("3. Model with recursive HasMany relations: Person with users who are people", ->
@@ -229,7 +229,7 @@ $(document).ready( ->
       # check stats
       equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
       equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-      kb.stats_on = false # turn off stats
+      kb.statistics = null # turn off stats
     )
 
     test("4. After view model create, add models", ->
@@ -398,7 +398,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
       mappings:
         models: BandMemberViewModel
-        'models.best_friend': {create: (model, options) -> return new BestFriendViewModel(model)}
+        'models.best_friend': {create: (model, options) -> return if model then new BestFriendViewModel(model) else null}
         'models.friends.models': FriendViewModel
     })
 
@@ -440,6 +440,6 @@ $(document).ready( ->
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
     equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-    kb.stats_on = false # turn off stats
+    kb.statistics = null # turn off stats
   )
 )
