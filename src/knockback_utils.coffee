@@ -139,4 +139,6 @@ kb.utils.attributeHasChanged = (model, key) ->
   return model.hasChanged(key) if model._changed
 
   # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
-  return model.changed.hasOwnProperty(key)
+  return model.changed.hasOwnProperty(key) if model.changed
+
+  return true # convervative

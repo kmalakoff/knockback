@@ -38,8 +38,18 @@ class kb.LocalizedObservable
     value = ko.utils.unwrapObservable(@value_holder) if @value_holder
     kb.utils.wrappedByKey(@, 'vo', ko.observable(if not value then null else @read(value, null)))
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
-      read: _.bind(@_onGetValue, @)
-      write: if @write then _.bind(@_onSetValue, @) else (-> kb.utils.throwUnexpected(this, 'writing to read-only'))
+      read: =>
+        ko.utils.unwrapObservable(@value_holder) if @value_holder 
+        value_observable = kb.utils.wrappedByKey(@, 'vo'); value_observable() # create a depdenency
+        return @read(ko.utils.unwrapObservable(@value_holder))
+
+      write: (value) =>
+        kb.utils.throwUnexpected(this, 'writing to read-only') unless @write
+        @write(value, ko.utils.unwrapObservable(@value_holder))
+        value_observable = kb.utils.wrappedByKey(@, 'vo')
+        value_observable(value)
+        @__kb._onChange(value) if @__kb._onChange
+      
       owner: @view_model
     }))
 
@@ -65,9 +75,8 @@ class kb.LocalizedObservable
   resetToCurrent: ->
     value_observable = kb.utils.wrappedByKey(@, 'vo')
     value_observable(null) # force KO to think a change occurred
-    observable = kb.utils.wrappedObservable(this)
-    current_value = if (@value_holder and observable) then @read(ko.utils.unwrapObservable(@value_holder)) else null
-    @_onSetValue(current_value)
+    current_value = if @value_holder then @read(ko.utils.unwrapObservable(@value_holder)) else null
+    kb.utils.wrappedObservable(@)(current_value)
 
   # dual purpose set/get
   observedValue: (value) ->
@@ -78,22 +87,12 @@ class kb.LocalizedObservable
   ####################################################
   # Internal
   ####################################################
-  _onGetValue: ->
-    ko.utils.unwrapObservable(@value_holder) if @value_holder 
-    value_observable = kb.utils.wrappedByKey(@, 'vo'); value_observable() # create a depdenency
-    return @read(ko.utils.unwrapObservable(@value_holder))
-
-  _onSetValue: (value) ->
-    @write(value, ko.utils.unwrapObservable(@value_holder))
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
-    value_observable(value)
-    @__kb._onChange(value) if @__kb._onChange
 
   _onLocaleChange: ->
     value = @read(ko.utils.unwrapObservable(@value_holder))
     value_observable = kb.utils.wrappedByKey(@, 'vo')
     value_observable(value)
-    @__kb._onChange.onChange(value) if @__kb._onChange
+    @__kb._onChange(value) if @__kb._onChange
 
 # factory function
 kb.localizedObservable = (value, options, view_model) -> return new kb.LocalizedObservable(value, options, view_model)

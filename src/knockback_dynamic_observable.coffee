@@ -60,6 +60,7 @@ class kb.DynamicObservable
     # get or no change
     return model if (arguments.length == 0) or (model is new_model)
     kb.utils.wrappedObject(observable, new_model)
+    return unless new_model # no model
     @update()
 
   update: (new_value) ->

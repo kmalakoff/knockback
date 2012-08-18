@@ -344,7 +344,10 @@
     if (model._changed) {
       return model.hasChanged(key);
     }
-    return model.changed.hasOwnProperty(key);
+    if (model.changed) {
+      return model.changed.hasOwnProperty(key);
+    }
+    return true;
   };
 
   /*
@@ -1381,7 +1384,8 @@
     LocalizedObservable.extend = Backbone.Model.extend;
 
     function LocalizedObservable(value_holder, options, view_model) {
-      var observable, value;
+      var observable, value,
+        _this = this;
       this.value_holder = value_holder;
       if (options == null) {
         options = {};
@@ -1401,10 +1405,27 @@
       }
       kb.utils.wrappedByKey(this, 'vo', ko.observable(!value ? null : this.read(value, null)));
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
-        read: _.bind(this._onGetValue, this),
-        write: this.write ? _.bind(this._onSetValue, this) : (function() {
-          return kb.utils.throwUnexpected(this, 'writing to read-only');
-        }),
+        read: function() {
+          var value_observable;
+          if (_this.value_holder) {
+            ko.utils.unwrapObservable(_this.value_holder);
+          }
+          value_observable = kb.utils.wrappedByKey(_this, 'vo');
+          value_observable();
+          return _this.read(ko.utils.unwrapObservable(_this.value_holder));
+        },
+        write: function(value) {
+          var value_observable;
+          if (!_this.write) {
+            kb.utils.throwUnexpected(_this, 'writing to read-only');
+          }
+          _this.write(value, ko.utils.unwrapObservable(_this.value_holder));
+          value_observable = kb.utils.wrappedByKey(_this, 'vo');
+          value_observable(value);
+          if (_this.__kb._onChange) {
+            return _this.__kb._onChange(value);
+          }
+        },
         owner: this.view_model
       }));
       observable.destroy = _.bind(this.destroy, this);
@@ -1424,12 +1445,11 @@
     };
 
     LocalizedObservable.prototype.resetToCurrent = function() {
-      var current_value, observable, value_observable;
+      var current_value, value_observable;
       value_observable = kb.utils.wrappedByKey(this, 'vo');
       value_observable(null);
-      observable = kb.utils.wrappedObservable(this);
-      current_value = this.value_holder && observable ? this.read(ko.utils.unwrapObservable(this.value_holder)) : null;
-      return this._onSetValue(current_value);
+      current_value = this.value_holder ? this.read(ko.utils.unwrapObservable(this.value_holder)) : null;
+      return kb.utils.wrappedObservable(this)(current_value);
     };
 
     LocalizedObservable.prototype.observedValue = function(value) {
@@ -1441,33 +1461,13 @@
       return this;
     };
 
-    LocalizedObservable.prototype._onGetValue = function() {
-      var value_observable;
-      if (this.value_holder) {
-        ko.utils.unwrapObservable(this.value_holder);
-      }
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
-      value_observable();
-      return this.read(ko.utils.unwrapObservable(this.value_holder));
-    };
-
-    LocalizedObservable.prototype._onSetValue = function(value) {
-      var value_observable;
-      this.write(value, ko.utils.unwrapObservable(this.value_holder));
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
-      value_observable(value);
-      if (this.__kb._onChange) {
-        return this.__kb._onChange(value);
-      }
-    };
-
     LocalizedObservable.prototype._onLocaleChange = function() {
       var value, value_observable;
       value = this.read(ko.utils.unwrapObservable(this.value_holder));
       value_observable = kb.utils.wrappedByKey(this, 'vo');
       value_observable(value);
       if (this.__kb._onChange) {
-        return this.__kb._onChange.onChange(value);
+        return this.__kb._onChange(value);
       }
     };
 
@@ -1491,7 +1491,8 @@
   kb.Observable = (function() {
 
     function Observable(model, options, view_model) {
-      var observable, value_observable;
+      var observable, value_observable,
+        _this = this;
       this.view_model = view_model != null ? view_model : {};
       if (!model) {
         kb.utils.throwMissing(this, 'model');
@@ -1508,22 +1509,77 @@
       this.write = options.write;
       value_observable = kb.utils.wrappedByKey(this, 'vo', ko.observable());
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
-        read: _.bind(this._onGetValue, this),
-        write: _.bind(this._onSetValue, this),
+        read: function() {
+          var arg, args, _i, _len, _ref;
+          value_observable = kb.utils.wrappedByKey(_this, 'vo');
+          value_observable();
+          args = [ko.utils.unwrapObservable(_this.key)];
+          observable = kb.utils.wrappedObservable(_this);
+          if (!observable) {
+            return null;
+          }
+          model = kb.utils.wrappedObject(observable);
+          if (!model) {
+            return null;
+          }
+          if (!_.isUndefined(_this.args)) {
+            if (_.isArray(_this.args)) {
+              _ref = _this.args;
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                arg = _ref[_i];
+                args.push(ko.utils.unwrapObservable(arg));
+              }
+            } else {
+              args.push(ko.utils.unwrapObservable(_this.args));
+            }
+          }
+          if (_this.read) {
+            return _this.read.apply(_this.view_model, args);
+          } else {
+            return model.get.apply(model, args);
+          }
+        },
+        write: function(value) {
+          var arg, args, set_info, _i, _len, _ref;
+          model = kb.utils.wrappedObject(kb.utils.wrappedObservable(_this));
+          if (model) {
+            set_info = {};
+            set_info[ko.utils.unwrapObservable(_this.key)] = value;
+            args = _this.write ? [value] : [set_info];
+            if (!_.isUndefined(_this.args)) {
+              if (_.isArray(_this.args)) {
+                _ref = _this.args;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  arg = _ref[_i];
+                  args.push(ko.utils.unwrapObservable(arg));
+                }
+              } else {
+                args.push(ko.utils.unwrapObservable(_this.args));
+              }
+            }
+            if (_this.write) {
+              _this.write.apply(_this.view_model, args);
+            } else {
+              model.set.apply(model, args);
+            }
+          }
+          value_observable = kb.utils.wrappedByKey(_this, 'vo');
+          return value_observable(value);
+        },
         owner: this.view_model
       }));
       observable.destroy = _.bind(this.destroy, this);
+      kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, {
+        model: _.bind(this.model, this),
+        update: _.bind(this.update, this),
+        key: this.key
+      }));
       if (options.localizer) {
         observable = new options.localizer(observable);
       }
       if (options.hasOwnProperty('default')) {
         observable = kb.defaultWrapper(observable, options["default"]);
       }
-      kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, {
-        model: _.bind(this.model, this),
-        update: _.bind(this.update, this),
-        key: this.key
-      }));
       return observable;
     }
 
@@ -1544,70 +1600,19 @@
         return model;
       }
       kb.utils.wrappedObject(observable, new_model);
+      if (!new_model) {
+        return;
+      }
       return this.update();
     };
 
     Observable.prototype.update = function() {
-      return kb.utils.wrappedByKey(this, 'vo').valueHasMutated();
-    };
-
-    Observable.prototype._onGetValue = function() {
-      var arg, args, model, observable, value_observable, _i, _len, _ref;
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
-      value_observable();
-      args = [ko.utils.unwrapObservable(this.key)];
-      observable = kb.utils.wrappedObservable(this);
-      if (!observable) {
-        return null;
-      }
-      model = kb.utils.wrappedObject(observable);
-      if (!model) {
-        return null;
-      }
-      if (!_.isUndefined(this.args)) {
-        if (_.isArray(this.args)) {
-          _ref = this.args;
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            arg = _ref[_i];
-            args.push(ko.utils.unwrapObservable(arg));
-          }
-        } else {
-          args.push(ko.utils.unwrapObservable(this.args));
-        }
-      }
-      if (this.read) {
-        return this.read.apply(this.view_model, args);
-      } else {
-        return model.get.apply(model, args);
-      }
-    };
-
-    Observable.prototype._onSetValue = function(value) {
-      var arg, args, model, set_info, value_observable, _i, _len, _ref;
+      var model;
       model = kb.utils.wrappedObject(kb.utils.wrappedObservable(this));
-      if (model) {
-        set_info = {};
-        set_info[ko.utils.unwrapObservable(this.key)] = value;
-        args = this.write ? [value] : [set_info];
-        if (!_.isUndefined(this.args)) {
-          if (_.isArray(this.args)) {
-            _ref = this.args;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              arg = _ref[_i];
-              args.push(ko.utils.unwrapObservable(arg));
-            }
-          } else {
-            args.push(ko.utils.unwrapObservable(this.args));
-          }
-        }
-        if (this.write) {
-          this.write.apply(this.view_model, args);
-        } else {
-          model.set.apply(model, args);
-        }
+      if (!model) {
+        return;
       }
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
-      return value_observable(value);
+      return kb.utils.wrappedByKey(this, 'vo').valueHasMutated();
     };
 
     return Observable;
@@ -1760,6 +1765,9 @@
         return model;
       }
       kb.utils.wrappedObject(observable, new_model);
+      if (!new_model) {
+        return;
+      }
       return this.update();
     };
 
@@ -1856,6 +1864,9 @@
         return model;
       }
       kb.utils.wrappedObject(observable, new_model);
+      if (!new_model) {
+        return;
+      }
       return this.update();
     };
 
@@ -1958,15 +1969,11 @@
         model: _.bind(this.model, this),
         update: _.bind(this.update, this)
       }));
-      model = model_observable.model();
-      if (model) {
-        for (key in model.attributes) {
-          this._updateDynamicObservable(model, key);
-        }
-      }
+      this.update(true);
       if (!this.__kb.internals && !this.__kb.requires) {
         return this;
       }
+      model = model_observable.model();
       missing = _.union((this.__kb.internals ? this.__kb.internals : []), (this.__kb.requires ? this.__kb.requires : []));
       if (model) {
         missing = _.difference(missing, _.keys(model.attributes));
@@ -1993,27 +2000,38 @@
         return model;
       }
       kb.utils.wrappedObject(this, new_model);
-      return this.update();
+      if (!new_model) {
+        return;
+      }
+      return this.update(true);
     };
 
-    ViewModel.prototype.update = function() {
-      var key, model, _results, _results1;
+    ViewModel.prototype.update = function(all) {
+      var key, model, _results, _results1, _results2;
       model = kb.utils.wrappedObject(this);
       if (!model) {
         return;
       }
-      if (model._changed) {
+      if (all) {
         _results = [];
         for (key in model.attributes) {
-          _results.push(model.hasChanged(key) ? this._updateDynamicObservable(model, key) : void 0);
+          _results.push(this._updateDynamicObservable(model, key));
         }
         return _results;
-      } else if (model.changed) {
-        _results1 = [];
-        for (key in model.changed) {
-          _results1.push(this._updateDynamicObservable(model, key));
+      } else {
+        if (model._changed) {
+          _results1 = [];
+          for (key in model.attributes) {
+            _results1.push(model.hasChanged(key) ? this._updateDynamicObservable(model, key) : void 0);
+          }
+          return _results1;
+        } else if (model.changed) {
+          _results2 = [];
+          for (key in model.changed) {
+            _results2.push(this._updateDynamicObservable(model, key));
+          }
+          return _results2;
         }
-        return _results1;
       }
     };
 

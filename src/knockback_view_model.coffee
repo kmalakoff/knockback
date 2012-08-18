@@ -35,11 +35,10 @@ class kb.ViewModel extends kb.RefCountable
 
     # update to set up first values observable
     model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @)}))
-    model = model_observable.model()
-    if model
-      @_updateDynamicObservable(model, key) for key of model.attributes # set up the attributes
+    @update(true)
 
     return @ if not @__kb.internals and not @__kb.requires
+    model = model_observable.model()
     missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
     missing = _.difference(missing, _.keys(model.attributes)) if model
     @_updateDynamicObservable(model, key) for key in missing
@@ -55,19 +54,26 @@ class kb.ViewModel extends kb.RefCountable
     model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0) or (model is new_model) # get or no change
     kb.utils.wrappedObject(@, new_model)
-    @update()
+    return unless new_model # no model
+    @update(true)
 
-  update: ->
+  update: (all) ->
     model = kb.utils.wrappedObject(@)
     return unless model # nothing can be updated
 
-    # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
-    if model._changed
-      (@_updateDynamicObservable(model, key) if model.hasChanged(key)) for key of model.attributes
+    # update everything
+    if all
+      @_updateDynamicObservable(model, key) for key of model.attributes # set up the attributes
 
-    # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
-    else if model.changed
-      @_updateDynamicObservable(model, key) for key of model.changed
+    # update changed
+    else
+      # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
+      if model._changed
+        (@_updateDynamicObservable(model, key) if model.hasChanged(key)) for key of model.attributes
+
+      # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
+      else if model.changed
+        @_updateDynamicObservable(model, key) for key of model.changed
 
   ####################################################
   # Internal

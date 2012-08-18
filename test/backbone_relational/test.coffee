@@ -402,37 +402,37 @@ $(document).ready( ->
         'models.friends.models': FriendViewModel
     })
 
+    validateFriends = (co, names) ->
+      for name in names
+        found = false
+        for vm in co()
+          if vm.name and vm.name() == name
+            found = true
+            validateFriend(vm, name)
+        ok(found, "#{name} was found")
     validateFriend = (vm, name) ->
       equal(vm.type(), 'friend', "friend type matches for #{name}")
-      equal(vm.name(), name, "band member name matches for #{name}")
+      equal(vm.name(), name, "friend name matches for #{name}")
     validateBestFriend = (vm, name) ->
       equal(vm.type(), 'best_friend', "best friend type matches for #{name}")
-      equal(vm.name(), name, "band member name matches for #{name}")
+      equal(vm.name(), name, "best friend name matches for #{name}")
     validateBandMember = (vm, name) ->
       equal(vm.type(), 'band_member', "band member type matches for #{name}")
       ok(vm instanceof BandMemberViewModel, "band member type matches for #{name}")
       equal(vm.name(), name, "band member name matches for #{name}")
 
     validateBandMember(collection_observable()[0], 'John')
-    validateBestFriend(collection_observable()[0].best_friend(), 'George')
-    validateFriend(collection_observable()[0].friends()[0], 'Paul')
-    validateFriend(collection_observable()[0].friends()[1], 'George')
-    validateFriend(collection_observable()[0].friends()[2], 'Ringo')
+    validateBestFriend(collection_observable()[0].best_friend(), 'George')   
+    validateFriends(collection_observable()[0].friends, ['Paul', 'George', 'Ringo'])
     validateBandMember(collection_observable()[1], 'Paul')
     validateBestFriend(collection_observable()[1].best_friend(), 'George')
-    validateFriend(collection_observable()[1].friends()[0], 'John')
-    validateFriend(collection_observable()[1].friends()[1], 'George')
-    validateFriend(collection_observable()[1].friends()[2], 'Ringo')
+    validateFriends(collection_observable()[1].friends, ['John', 'George', 'Ringo'])
     validateBandMember(collection_observable()[2], 'George')
     validateBestFriend(collection_observable()[2].best_friend(), 'John')
-    validateFriend(collection_observable()[2].friends()[0], 'John')
-    validateFriend(collection_observable()[2].friends()[1], 'Paul')
-    validateFriend(collection_observable()[2].friends()[2], 'Ringo')
+    validateFriends(collection_observable()[2].friends, ['John', 'Paul', 'Ringo'])
     validateBandMember(collection_observable()[3], 'Ringo')
     equal(collection_observable()[3].best_friend(), null, 'No best friend')
-    validateFriend(collection_observable()[3].friends()[0], 'John')
-    validateFriend(collection_observable()[3].friends()[1], 'Paul')
-    validateFriend(collection_observable()[3].friends()[2], 'George')
+    validateFriends(collection_observable()[3].friends, ['John', 'Paul', 'George'])
 
     # and cleanup after yourself when you are done.
     kb.utils.release(collection_observable)
