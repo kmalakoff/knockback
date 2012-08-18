@@ -17,7 +17,6 @@ module.exports =
       'src/knockback_observable.coffee'
       'src/knockback_observables.coffee'
       'src/knockback_triggered_observable.coffee'
-      'src/knockback_dynamic_observable.coffee'
       'src/knockback_view_model.coffee'
     ]
     _build:

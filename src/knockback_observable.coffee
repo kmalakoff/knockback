@@ -1,22 +1,13 @@
 ###
   knockback_observable.js
-  (c) 2011, 2012 Kevin Malakoff.
+  (c) 2012 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-####################################################
-# options
-#   * key - required to look up the model's attributes
-#   * read - called to get the value and each time the locale changes
-#   * write - called to set the value
-#   * args - arguments passed to the read and write function
-####################################################
-
 class kb.Observable
   constructor: (model, options, @view_model={}) ->
-    kb.utils.throwMissing(this, 'model') unless model
     kb.utils.throwMissing(this, 'options') unless options
 
     # extract options
@@ -26,39 +17,54 @@ class kb.Observable
     @read = options.read
     @write = options.write
 
-    # internal state
-    value_observable = kb.utils.wrappedByKey(@, 'vo', ko.observable())
-    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+    # set up basics
+    kb.utils.wrappedByKey(@, 'vo', ko.observable(null)) # create a value observable for the first dependency
+    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
-        value_observable = kb.utils.wrappedByKey(@, 'vo'); value_observable() # create dependency 
-        args = [ko.utils.unwrapObservable(@key)] # create dependency if needed
-        observable = kb.utils.wrappedObservable(@)
-        return null unless observable
-        model = kb.utils.wrappedObject(observable)
-        return null unless model
-        if not _.isUndefined(@args)
+        # create dependencies if needed
+        args = [ko.utils.unwrapObservable(@key)] 
+        if @args
           if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
-        return if @read then @read.apply(@view_model, args) else model.get.apply(model, args)
 
-      write: (value) =>
-        model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
-        if model
-          set_info = {}; set_info[ko.utils.unwrapObservable(@key)] = value
-          args = if @write then [value] else [set_info]
-          if not _.isUndefined(@args)
-            if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
-          if @write then @write.apply(@view_model, args) else model.set.apply(model, args)
-        value_observable = kb.utils.wrappedByKey(@, 'vo')
-        value_observable(value)
+        # read and update
+        observable = kb.utils.wrappedObservable(@)
+        current_model = if observable then kb.utils.wrappedObject(observable) else null
+        if current_model
+          new_value = if @read then @read.apply(@view_model, args) else current_model.get.apply(current_model, args)
+          @update(new_value)
+
+        # get the observable
+        return ko.utils.unwrapObservable(kb.utils.wrappedByKey(@, 'vo')())
+
+      write: (new_value) =>
+        # set on model
+        set_info = {}; set_info[ko.utils.unwrapObservable(@key)] = new_value
+        args = if @write then [new_value] else [set_info]
+        if @args
+          if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
+
+        # write
+        current_model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
+        if current_model
+          if @write then @write.apply(@view_model, args) else current_model.set.apply(current_model, args)
+
+        # update the observable
+        @update(new_value)
 
       owner: @view_model
-    }))
+    ))
+    kb.utils.wrappedStore(observable, options.store)
+    kb.utils.wrappedFactory(observable, options.factory)
+    kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
 
     # publish public interface on the observable and return instead of this
+    observable.valueType = _.bind(@valueType, @)
+    observable.model = _.bind(@model, @)
+    observable.update = _.bind(@update, @)
     observable.destroy = _.bind(@destroy, @)
 
-    # update to set up first values observable
-    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key}))
+    # use external model observable or create
+    kb.ModelObservable.useOptionsOrCreate(options, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key})
 
     # wrap ourselves with a localizer
     if options.localizer
@@ -71,7 +77,12 @@ class kb.Observable
     return observable
 
   destroy: ->
-    @key = null; @args = null; @read = null; @write = null; @view_model = null
+    # manually release the observable since we own it but not the store
+    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    store = kb.utils.wrappedStore(kb.utils.wrappedObservable(@))
+    if store then store.releaseObservable(value_observable()) else kb.utils.release(value_observable()) # release previous
+    kb.utils.wrappedByKey(@, 'vo', null)
+
     kb.utils.wrappedDestroy(@)
 
   model: (new_model) ->
@@ -84,10 +95,60 @@ class kb.Observable
     return unless new_model # no model
     @update()
 
-  update: ->
-    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
-    return unless model # do not notify if no model
-    kb.utils.wrappedByKey(@, 'vo').valueHasMutated() # trigger an update
+  update: (new_value) ->
+    observable = kb.utils.wrappedObservable(@)
+    model = kb.utils.wrappedObject(observable)
+    value = kb.utils.wrappedByKey(@, 'vo')()
+    new_value = model.get(ko.utils.unwrapObservable(@key)) if model and not arguments.length
+    new_type = kb.utils.valueType(new_value)
 
-# factory function
-kb.observable = (model, options, view_model) -> return new kb.Observable(model, options, view_model)
+    # create or change in type
+    if _.isUndefined(@value_type) or (@value_type isnt new_type and new_type isnt kb.TYPE_UNKNOWN)
+      @_updateValueObservable(new_value) # create new
+
+    else if @value_type == kb.TYPE_MODEL
+      # use the get/set methods
+      if typeof(value.model) == 'function'
+        value.model(new_value) if value.model() isnt new_value # different so update
+
+      # different so create a new one (no way to update)
+      else if kb.utils.wrappedObject(value) isnt new_value
+        @_updateValueObservable(new_value) # create new
+
+    else if @value_type == kb.TYPE_COLLECTION
+      value.collection(new_value) if value.collection() isnt new_value # different so update
+
+    else # a simple observable
+      value(new_value) if value() isnt new_value # different so update
+
+  valueType: ->
+    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
+    new_value = if model then model.get(@key) else null
+    @_updateValueObservable(new_value) unless @value_type # create so we can check the type
+    return @value_type
+
+  ####################################################
+  # Internal
+  ####################################################
+  _updateValueObservable: (new_value) ->
+    observable = kb.utils.wrappedObservable(@)
+    store = kb.utils.wrappedStore(observable)
+    if store
+      value = store.findOrCreateObservable(new_value, kb.utils.wrappedPath(observable), kb.utils.wrappedFactory(observable))
+    else
+      value = kb.Factory.createDefault(new_value, {path: kb.utils.wrappedPath(observable)})
+
+    # cache the type
+    if not ko.isObservable(value) # a view model, recognize view_models as non-observable
+      @value_type = kb.TYPE_MODEL
+    else if kb.utils.observableInstanceOf(value, kb.CollectionObservable)
+      @value_type = kb.TYPE_COLLECTION
+    else
+      @value_type = kb.TYPE_SIMPLE
+
+    # set the value
+    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    if store then store.releaseObservable(value_observable()) else kb.utils.release(value_observable()) # release previous
+    value_observable(value)
+
+kb.observable = (model, key, options) -> new kb.Observable(model, key, options)

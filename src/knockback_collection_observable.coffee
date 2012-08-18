@@ -46,7 +46,7 @@ class kb.CollectionObservable extends kb.RefCountable
     @__kb._onModelChange = _.bind(@_onModelChange, @)
 
     # always use a store to cache view models
-    kb.Store.registerOrCreateStoreFromOptions(collection, observable, options)
+    kb.Store.useOptionsOrCreate(options, collection, observable)
 
     # view model factory create mappings
     factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
@@ -117,6 +117,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
     # no change
     return if (collection == previous_collection)
+    kb.utils.wrappedObject(observable, collection)
 
     # clean up
     if previous_collection
@@ -125,7 +126,6 @@ class kb.CollectionObservable extends kb.RefCountable
       previous_collection.release?()
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
-    kb.utils.wrappedObject(observable, collection)
     if collection
       collection.retain?()
       @_collectionBind(collection)

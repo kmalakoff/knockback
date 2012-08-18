@@ -7,7 +7,7 @@
 ###
 
 class kb.Store
-  @registerOrCreateStoreFromOptions: (obj, observable, options) ->
+  @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
       kb.utils.wrappedStore(observable, options.store)
       options.store.registerObservable(obj, observable, options)

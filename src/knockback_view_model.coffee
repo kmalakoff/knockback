@@ -22,7 +22,7 @@ class kb.ViewModel extends kb.RefCountable
     kb.statistics.register('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
 
     # always use a store to ensure recursive view models are handled correctly
-    kb.Store.registerOrCreateStoreFromOptions(model, @, options)
+    kb.Store.useOptionsOrCreate(options, model, @)
 
     # view model factory
     factory = kb.utils.wrappedFactory(@, new kb.Factory(options.factory))
@@ -34,14 +34,25 @@ class kb.ViewModel extends kb.RefCountable
     @__kb.requires = options.requires
 
     # update to set up first values observable
-    model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @)}))
-    @update(true)
-
-    return @ if not @__kb.internals and not @__kb.requires
+    model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @)}))
     model = model_observable.model()
-    missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
-    missing = _.difference(missing, _.keys(model.attributes)) if model
-    @_updateDynamicObservable(model, key) for key in missing
+    keys = _.keys(model.attributes) if model
+    if @__kb.internals
+      keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals
+    if @__kb.requires
+      keys = if keys then _.union(keys, @__kb.requires) else @__kb.requires
+    @__kb.keys = keys || []
+
+    # set up
+    for key in @__kb.keys
+      vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
+      @[vm_key] = kb.observable(model, {
+        key: key
+        store: kb.utils.wrappedStore(@)
+        factory: kb.utils.wrappedFactory(@)
+        path: kb.utils.wrappedPath(@)
+        model_observable: kb.utils.wrappedModelObservable(@)
+      })
 
   __destroy: ->
     kb.utils.release(this, true) # release the observables
@@ -53,42 +64,21 @@ class kb.ViewModel extends kb.RefCountable
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0) or (model is new_model) # get or no change
-    kb.utils.wrappedObject(@, new_model)
-    return unless new_model # no model
-    @update(true)
+    model = kb.utils.wrappedObject(@, new_model)
+    return unless model # no model
 
-  update: (all) ->
-    model = kb.utils.wrappedObject(@)
-    return unless model # nothing can be updated
-
-    # update everything
-    if all
-      @_updateDynamicObservable(model, key) for key of model.attributes # set up the attributes
-
-    # update changed
-    else
-      # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
-      if model._changed
-        (@_updateDynamicObservable(model, key) if model.hasChanged(key)) for key of model.attributes
-
-      # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
-      else if model.changed
-        @_updateDynamicObservable(model, key) for key of model.changed
-
-  ####################################################
-  # Internal
-  ####################################################
-
-  _updateDynamicObservable: (model, key) ->
-    vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
-    observable = @[vm_key]
-    if observable
-      if observable.model() isnt model
-        observable.model(model)
-      else
-        observable.update()
-    else
-      @[vm_key] = kb.dynamicObservable(model, {key: key, store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@)})
+    # add all the missing keys
+    missing = _.difference(@__kb.keys, _.keys(model.attributes))
+    for key in missing
+      @__kb.keys.push(key) # add to the keys list
+      vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
+      @[vm_key] = kb.observable(model, {
+        key: key
+        store: kb.utils.wrappedStore(@)
+        factory: kb.utils.wrappedFactory(@)
+        path: kb.utils.wrappedPath(@)
+        model_observable: kb.utils.wrappedModelObservable(@)
+      })
 
 # factory function
 kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

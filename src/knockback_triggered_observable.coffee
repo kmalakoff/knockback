@@ -18,8 +18,8 @@ class kb.TriggeredObservable
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
 
-    # update to set up first values observable
-    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @), event_name: @event_name}))
+    # create model observable
+    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @), update: _.bind(@update, @), event_name: @event_name}))
 
     return observable
 

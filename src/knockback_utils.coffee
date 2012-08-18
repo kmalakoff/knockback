@@ -26,12 +26,16 @@ kb.utils.throwUnexpected = (instance, message) ->
 
 kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
-  owner.__kb.model_observable.destroy() if owner.__kb.model_observable
+  owner.__kb.model_observable.unregisterCallbacks(owner) if owner.__kb.model_observable
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
-  kb.utils.release(__kb.value_observable) if __kb.value_observable and not __kb.store # release the value observable
+  # release the value observable
+  if __kb.value_observable
+    if __kb.store then __kb.store.releaseObservable(__kb.value_observable(), __kb.store_is_owned) else kb.utils.release(__kb.value_observable()) # release the stored value
+    kb.utils.release(__kb.value_observable) # release the observable itself
   if __kb.observable
     kb.utils.wrappedDestroy(__kb.observable)
     __kb.observable.dispose() if __kb.observable.dispose # dispose
+  __kb.model_observable.destroy() if __kb.model_observable_is_owned # release the model_observable
   __kb.store.destroy() if __kb.store_is_owned # release the store
 
 kb.utils.wrappedByKey = (owner, key, value) ->
@@ -62,12 +66,13 @@ kb.utils.wrappedModel = (observable, value) ->
   else
     return kb.utils.wrappedByKey(observable, 'obj', value)
 
-kb.utils.wrappedObject = (observable, value)          -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
-kb.utils.wrappedStore = (observable, value)           -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
-kb.utils.wrappedStoreIsOwned = (observable, value)    -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
-kb.utils.wrappedFactory = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
-kb.utils.wrappedPath = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
-kb.utils.wrappedModelObservable = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_observable') else kb.utils.wrappedByKey(observable, 'model_observable', value)
+kb.utils.wrappedObject = (observable, value)                  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
+kb.utils.wrappedStore = (observable, value)                   -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
+kb.utils.wrappedStoreIsOwned = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
+kb.utils.wrappedFactory = (observable, value)                 -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
+kb.utils.wrappedPath = (observable, value)                    -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
+kb.utils.wrappedModelObservable = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_observable') else kb.utils.wrappedByKey(observable, 'model_observable', value)
+kb.utils.wrappedModelObservableIsOwned = (observable, value)  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_observable_is_owned') else kb.utils.wrappedByKey(observable, 'model_observable_is_owned', value)
 
 kb.utils.setToDefault = (obj) ->
   return unless obj
@@ -112,7 +117,7 @@ kb.utils.valueType = (observable) ->
     return kb.TYPE_COLLECTION if observable instanceof Backbone.Collection
     return kb.TYPE_SIMPLE 
   instance = observable.__kb.instance
-  return observable.valueType() if instance instanceof kb.DynamicObservable
+  return observable.valueType() if instance instanceof kb.Observable
   return kb.TYPE_COLLECTION if instance instanceof kb.CollectionObservable
   return kb.TYPE_SIMPLE
 

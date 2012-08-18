@@ -7,7 +7,7 @@
 ###
 
 class kb.Observables
-  constructor: (model, mappings_info, view_model, options) ->
+  constructor: (model, mappings_info, view_model) ->
     throw 'Observables: model is missing' if not model
     throw 'Observables: mappings_info is missing' unless mappings_info and (_.isObject(mappings_info) or _.isArray(mappings_info))
 
@@ -20,30 +20,25 @@ class kb.Observables
       @__kb.mappings_info = mappings_info
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
 
-    # fill in unspecified read attributes with supplied option
-    if not _.isUndefined(options)
-      for property_name, mapping_info of @__kb.mappings_info
-        is_string = _.isString(mapping_info)
+    # set up
+    model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @))
 
-        mapping_info = {key: mapping_info} if is_string
-        mapping_info.key = property_name unless mapping_info.hasOwnProperty('key') # infer the key
-        @[property_name] = @__kb.view_model[property_name] = kb.observable(model, mapping_info, @__kb.view_model)
-
-    else
-      for property_name, mapping_info of @__kb.mappings_info
-        mapping_info.key = property_name unless mapping_info.hasOwnProperty('key') # infer the key
-        @[property_name] = @__kb.view_model[property_name] = kb.observable(model, mapping_info, @__kb.view_model)
+    # fill in unspecified read attributes with supplied options
+    for key, mapping_info of @__kb.mappings_info
+      mapping_info.key = key unless mapping_info.hasOwnProperty('key') # infer the key
+      mapping_info.model_observable = model_observable
+      @[key] = @__kb.view_model[key] = kb.observable(model, mapping_info, @__kb.view_model)
 
   destroy: ->
-    for property_name, mapping_info of @__kb.mappings_info
-      @__kb.view_model[property_name].destroy() if @__kb.view_model[property_name]
-      @__kb.view_model[property_name] = null
-      @[property_name] = null
+    for key, mapping_info of @__kb.mappings_info
+      @[key].destroy() if @[key] and @[key].__kb # not yet released
+      @[key] = null
+      @__kb.view_model[key] = null
     kb.utils.wrappedDestroy(@)
 
   setToDefault: ->
-    for property_name, mapping_info of @__kb.mappings_info
-      @__kb.view_model[property_name].setToDefault() if typeof(@__kb.view_model[property_name].setToDefault) == 'function'
+    for key, mapping_info of @__kb.mappings_info
+      @[key].setToDefault() if typeof(@[key].setToDefault) == 'function'
 
 # factory function
-kb.observables = (model, mappings_info, view_model, options) -> return new kb.Observables(model, mappings_info, view_model, options)
+kb.observables = (model, mappings_info, view_model) -> return new kb.Observables(model, mappings_info, view_model)
