@@ -11,57 +11,37 @@ class kb.TriggeredObservable
     kb.utils.throwMissing(this, 'model') unless model
     kb.utils.throwMissing(this, 'event_name') unless @event_name
 
-    # bind callbacks
-    @__kb or= {}
-    @__kb._onValueChange = _.bind(@_onValueChange, @)
-    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
-    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
-
     # internal state
     kb.utils.wrappedByKey(@, 'vo', ko.observable())
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(_.bind(@_onGetValue, @)))
-
-    # determine model or model_ref type
-    if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
-      kb.utils.wrappedModelRef(observable, model, {loaded: @__kb._onModelLoaded, unloaded: @__kb._onModelUnloaded})
-      model_ref = model; model =  model_ref.model()
-    else
-      kb.utils.wrappedObject(observable, model)
+    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> kb.utils.wrappedByKey(@, 'vo')()))
 
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
 
-    # start
-    @_onModelLoaded(model) if not model_ref or model_ref.isLoaded()
+    # update to set up first values observable
+    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @), event_name: @event_name}))
 
     return observable
 
   destroy: ->
-    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
-    @_onModelUnloaded(model) if model
     @options  = null; @view_model = null
     kb.utils.wrappedDestroy(@)
 
-  ####################################################
-  # Internal
-  ####################################################
-  _onGetValue: -> return kb.utils.wrappedByKey(@, 'vo')()
-
-  _onModelLoaded:   (model) ->
-    kb.utils.wrappedObject(kb.utils.wrappedObservable(@), model)
-    model.bind(@event_name, @__kb._onValueChange) # all attributes
-    @_onValueChange()
-
-  _onModelUnloaded: (model) ->
+  model: (new_model) ->
     observable = kb.utils.wrappedObservable(@)
-    model.unbind(@event_name, @__kb._onValueChange) # all attributes
-    kb.utils.wrappedObject(observable, null)
+    model = kb.utils.wrappedObject(observable)
 
-  _onValueChange: ->
+    # get or no change
+    return model if (arguments.length == 0) or (model is new_model)
+    kb.utils.wrappedObject(observable, new_model)
+    @update()
+
+  update: ->
     observable = kb.utils.wrappedObservable(@)
     value_observable = kb.utils.wrappedByKey(@, 'vo')
     current_value = value_observable()
     model = kb.utils.wrappedObject(observable)
+    return unless model # do not trigger if there is no model
     if current_value != model then value_observable(model) else value_observable.valueHasMutated() # trigger the dependable
 
 # factory function

@@ -42,6 +42,7 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.utils.release(view_model)
+    equal(trigger_count, 3, "3: no change")
 
     # KO doesn't have a dispose for ko.observable
     kb.locale_manager.setLocale('fr-FR')

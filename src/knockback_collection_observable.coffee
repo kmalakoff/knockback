@@ -197,31 +197,31 @@ class kb.CollectionObservable extends kb.RefCountable
       @_onModelResort(model_or_models)
 
   _onModelAdd: (model) ->
-    model_observable = @_createModelObervable(model)
+    view_model = @_createViewModel(model)
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
     if @sorted_index
-      add_index = @sorted_index(observable(), model_observable)
+      add_index = @sorted_index(observable(), view_model)
     else
       add_index = collection.indexOf(model)
 
     @in_edit++
-    observable.splice(add_index, 0, model_observable)
+    observable.splice(add_index, 0, view_model)
     @in_edit--
-    @trigger('add', model_observable, observable()) # notify
+    @trigger('add', view_model, observable()) # notify
 
   _onModelRemove: (model) ->
     # either remove a view model or a model
-    model_observable = if @hasViewModels() then @viewModelByModel(model) else model
-    return unless model_observable  # it may have already been removed
+    view_model = if @hasViewModels() then @viewModelByModel(model) else model
+    return unless view_model  # it may have already been removed
     observable = kb.utils.wrappedObservable(@)
     @in_edit++
-    observable.remove(model_observable)
+    observable.remove(view_model)
     @in_edit--
-    @trigger('remove', model_observable, observable) # notify
+    @trigger('remove', view_model, observable) # notify
 
     # release
-    kb.utils.wrappedStore(observable).releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(observable)) if @hasViewModels()
+    kb.utils.wrappedStore(observable).releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) if @hasViewModels()
 
   _onModelChange: (model) ->
     # resort if needed
@@ -231,21 +231,21 @@ class kb.CollectionObservable extends kb.RefCountable
     # either move a view model or a model
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
-    model_observable = if @hasViewModels() then @viewModelByModel(model) else model
-    previous_index = observable.indexOf(model_observable)
+    view_model = if @hasViewModels() then @viewModelByModel(model) else model
+    previous_index = observable.indexOf(view_model)
     if @sorted_index
-      sorted_model_observables = _.clone(observable())
-      sorted_model_observables.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
-      new_index = @sorted_index(sorted_model_observables, model_observable)
+      sorted_view_models = _.clone(observable())
+      sorted_view_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
+      new_index = @sorted_index(sorted_view_models, view_model)
     else
       new_index = collection.indexOf(model)
     return if previous_index == new_index # no change
 
     # either remove a view model or a model
     @in_edit++
-    observable.splice(previous_index, 1); observable.splice(new_index, 0, model_observable) # move
+    observable.splice(previous_index, 1); observable.splice(new_index, 0, view_model) # move
     @in_edit--
-    @trigger('resort', model_observable, observable(), new_index) # notify
+    @trigger('resort', view_model, observable(), new_index) # notify
 
   _onObservableArrayChange: (values) ->
     return if @in_edit # we are doing the editing
@@ -261,12 +261,12 @@ class kb.CollectionObservable extends kb.RefCountable
     observable = kb.utils.wrappedObservable(@)
     @trigger('remove', observable()) if not silent # notify
     @in_edit++
-    model_observables = observable.removeAll() # batch
+    view_models = observable.removeAll() # batch
     @in_edit--
 
     # release
     store = kb.utils.wrappedStore(observable)
-    (store.releaseObservable(model_observable, kb.utils.wrappedStoreIsOwned(observable)) for model_observable in model_observables) if @hasViewModels()
+    (store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) for view_model in view_models) if @hasViewModels()
 
   _collectionResync: (silent) ->
     @_clear(silent)
@@ -274,16 +274,16 @@ class kb.CollectionObservable extends kb.RefCountable
     collection = kb.utils.wrappedObject(observable)
 
     if @sorted_index
-      model_observables = []
+      view_models = []
       for model in collection.models
-        model_observable = @_createModelObervable(model)
-        add_index = @sorted_index(model_observables, model_observable)
-        model_observables.splice(add_index, 0, model_observable)
+        view_model = @_createViewModel(model)
+        add_index = @sorted_index(view_models, view_model)
+        view_models.splice(add_index, 0, view_model)
     else
-      model_observables = if @hasViewModels() then _.map(collection.models, (model) => @_createModelObervable(model)) else _.clone(collection.models)
+      view_models = if @hasViewModels() then _.map(collection.models, (model) => @_createViewModel(model)) else _.clone(collection.models)
 
     @in_edit++
-    observable(model_observables)
+    observable(view_models)
     @in_edit--
     @trigger('add', observable()) if not silent # notify
 
@@ -293,7 +293,7 @@ class kb.CollectionObservable extends kb.RefCountable
     else
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
 
-  _createModelObervable: (model) ->
+  _createViewModel: (model) ->
     observable = kb.utils.wrappedObservable(@)
     return if @hasViewModels() then kb.utils.wrappedStore(observable).findOrCreateObservable(model, @models_path, kb.utils.wrappedFactory(observable)) else model
 

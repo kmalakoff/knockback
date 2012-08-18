@@ -42,7 +42,8 @@ class kb.Observables
     kb.utils.wrappedDestroy(@)
 
   setToDefault: ->
-    @__kb.view_model[property_name].setToDefault() for property_name, mapping_info of @__kb.mappings_info
+    for property_name, mapping_info of @__kb.mappings_info
+      @__kb.view_model[property_name].setToDefault() if typeof(@__kb.view_model[property_name].setToDefault) == 'function'
 
 # factory function
 kb.observables = (model, mappings_info, view_model, options) -> return new kb.Observables(model, mappings_info, view_model, options)

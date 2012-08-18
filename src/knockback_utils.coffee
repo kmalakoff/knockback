@@ -26,8 +26,8 @@ kb.utils.throwUnexpected = (instance, message) ->
 
 kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
+  owner.__kb.model_observable.destroy() if owner.__kb.model_observable
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
-  kb.utils.wrappedModelRef(owner, null) if __kb.model_ref # clear the model ref (including unbinding)
   kb.utils.release(__kb.value_observable) if __kb.value_observable and not __kb.store # release the value observable
   if __kb.observable
     kb.utils.wrappedDestroy(__kb.observable)
@@ -62,34 +62,12 @@ kb.utils.wrappedModel = (observable, value) ->
   else
     return kb.utils.wrappedByKey(observable, 'obj', value)
 
-kb.utils.wrappedModelRef = (observable, value, options) ->
-  # get
-  previous_value = kb.utils.wrappedByKey(observable, 'model_ref')
-  if (arguments.length is 1)
-    return previous_value
-
-  # set, no change
-  return value if value == previous_value
-
-  value.retain() if value # retain now so not released from under us
-  if previous_value
-    previous_options = kb.utils.wrappedByKey(observable, 'model_ref_options')
-    previous_value.unbind('loaded', previous_options.loaded) previous_options.loaded
-    previous_value.unbind('unloaded', previous_options.unloaded) previous_options.unloaded
-    previous_value.release()
-
-  kb.utils.wrappedByKey(observable, 'model_ref', value)
-  if value
-    options = kb.utils.wrappedByKey(observable, 'model_ref_options', if options then options else {})
-    value.bind('loaded', options.loaded) if options.loaded
-    value.bind('unloaded', options.unloaded) if options.unloaded
-  return value
-
-kb.utils.wrappedObject = (observable, value)        -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
-kb.utils.wrappedStore = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
-kb.utils.wrappedStoreIsOwned = (observable, value)  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
-kb.utils.wrappedFactory = (observable, value)       -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
-kb.utils.wrappedPath = (observable, value)          -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
+kb.utils.wrappedObject = (observable, value)          -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
+kb.utils.wrappedStore = (observable, value)           -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
+kb.utils.wrappedStoreIsOwned = (observable, value)    -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
+kb.utils.wrappedFactory = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
+kb.utils.wrappedPath = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
+kb.utils.wrappedModelObservable = (observable, value) -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_observable') else kb.utils.wrappedByKey(observable, 'model_observable', value)
 
 kb.utils.setToDefault = (obj) ->
   return unless obj
@@ -153,3 +131,12 @@ kb.utils.pathJoin = (path1, path2) ->
 
 kb.utils.optionsPathJoin = (options, path) ->
   return _.defaults({path: kb.utils.pathJoin(options.path, path)}, options)
+
+kb.utils.attributeHasChanged = (model, key) ->
+  return false unless model
+
+  # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
+  return model.hasChanged(key) if model._changed
+
+  # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
+  return model.changed.hasOwnProperty(key)

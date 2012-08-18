@@ -30,29 +30,21 @@ class kb.ViewModel extends kb.RefCountable
     factory.addPathMappings(options.mappings) if options.mappings
 
     # bind and extract options
-    @__kb._onModelChange = _.bind(@_onModelChange, @)
-    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
-    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
     @__kb.internals = options.internals
     @__kb.requires = options.requires
 
-    # determine model or model_ref type
-    if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
-      kb.utils.wrappedModelRef(@, model, {loaded: @__kb._onModelLoaded, unloaded: @__kb._onModelUnloaded})
-      model_ref = model; model =  model_ref.model()
-    else
-      kb.utils.wrappedObject(@, model)
-
-    # start
-    @_onModelLoaded(model) if model
+    # update to set up first values observable
+    model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @)}))
+    model = model_observable.model()
+    if model
+      @_updateDynamicObservable(model, key) for key of model.attributes # set up the attributes
 
     return @ if not @__kb.internals and not @__kb.requires
     missing = _.union((if @__kb.internals then @__kb.internals else []), (if @__kb.requires then @__kb.requires else []))
-    missing = _.difference(missing, _.keys(model.attributes)) if not model_ref or model_ref.isLoaded()
+    missing = _.difference(missing, _.keys(model.attributes)) if model
     @_updateDynamicObservable(model, key) for key in missing
 
   __destroy: ->
-    @_modelUnbind(kb.utils.wrappedObject(@))
     kb.utils.release(this, true) # release the observables
     kb.utils.wrappedDestroy(@)
     super
@@ -61,45 +53,13 @@ class kb.ViewModel extends kb.RefCountable
 
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)
-    return model if (arguments.length == 0)
+    return model if (arguments.length == 0) or (model is new_model) # get or no change
+    kb.utils.wrappedObject(@, new_model)
+    @update()
 
-    # no change
-    return if (new_model == model)
-
-    @_onModelUnloaded(model) if model
-    @_onModelLoaded(new_model) if new_model
-
-  ####################################################
-  # Internal
-  ####################################################
-  _modelBind: (model) ->
-    return unless model
-    model.bind('change', @__kb._onModelChange)
-    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
-      model.bind('add', @__kb._onModelChange)
-      model.bind('remove', @__kb._onModelChange)
-      model.bind('update', @__kb._onModelChange)
-
-  _modelUnbind: (model) ->
-    return unless model
-    model.unbind('change', @__kb._onModelChange)
-    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
-      model.unbind('add', @__kb._onModelChange)
-      model.unbind('remove', @__kb._onModelChange)
-      model.unbind('update', @__kb._onModelChange)
-
-  _onModelLoaded: (model) ->
-    kb.utils.wrappedObject(@, model)
-    @_modelBind(model)
-    @_updateDynamicObservable(model, key) for key of model.attributes
-
-  _onModelUnloaded: (model) ->
-    @_modelUnbind(model)
-    kb.utils.wrappedObject(@, null)
-    @_updateDynamicObservable(null, key) for key of model.attributes
-
-  _onModelChange: ->
+  update: ->
     model = kb.utils.wrappedObject(@)
+    return unless model # nothing can be updated
 
     # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
     if model._changed
@@ -108,6 +68,10 @@ class kb.ViewModel extends kb.RefCountable
     # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
     else if model.changed
       @_updateDynamicObservable(model, key) for key of model.changed
+
+  ####################################################
+  # Internal
+  ####################################################
 
   _updateDynamicObservable: (model, key) ->
     vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key

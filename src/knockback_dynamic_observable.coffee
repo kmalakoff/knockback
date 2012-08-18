@@ -20,7 +20,6 @@ class kb.DynamicObservable
       read: _.bind(@read, @)
       write: _.bind(@write, @)
     ))
-    kb.utils.wrappedObject(observable, model)
     kb.utils.wrappedStore(observable, options.store)
     kb.utils.wrappedFactory(observable, options.factory)
     kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
@@ -32,7 +31,7 @@ class kb.DynamicObservable
     observable.update = _.bind(@update, @)
 
     # update to set up first values observable
-    @update()
+    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key}))
 
     return observable
 
@@ -57,16 +56,16 @@ class kb.DynamicObservable
   model: (new_model) ->
     observable = kb.utils.wrappedObservable(@)
     model = kb.utils.wrappedObject(observable)
-    return model if (arguments.length == 0) # get
-    return if model is new_model # no change
+
+    # get or no change
+    return model if (arguments.length == 0) or (model is new_model)
     kb.utils.wrappedObject(observable, new_model)
     @update()
 
   update: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
-    value = kb.utils.wrappedByKey(@, 'vo')()
-
     model = kb.utils.wrappedObject(observable)
+    value = kb.utils.wrappedByKey(@, 'vo')()
     new_value = model.get(@key) if model and not arguments.length
     new_type = kb.utils.valueType(new_value)
 
@@ -86,6 +85,8 @@ class kb.DynamicObservable
       value(new_value) if value() isnt new_value
 
   valueType: ->
+    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
+    new_value = if model then model.get(@key) else null
     @_updateValueObservable(new_value) unless @value_type # create so we can check the type
     return @value_type
 

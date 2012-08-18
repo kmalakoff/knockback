@@ -31,5 +31,5 @@
     "knockout-client": ">=2.1.0"
   },
 
-  "version"       : "0.16.0beta1"
+  "version"       : "0.16.0beta2"
 }

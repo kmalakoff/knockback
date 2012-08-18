@@ -8,73 +8,86 @@
 
 ####################################################
 # options
-#   * key - required to look up the model's attributes
-#   * read - called to get the value and each time the locale changes
-#   * write - called to set the value
-#   * args - arguments passed to the read and write function
+#   * model() - called to set and clear the model
+#   * update() - called when the event is triggered
+#   * event_name - optional name of the event to register for on the model (default is update)
 ####################################################
 
 class kb.ModelObservable
-  constructor: (@model, @observable) ->
-    kb.utils.throwMissing(this, 'model') unless @model
-    kb.utils.throwMissing(this, 'observable') unless @observable
-    kb.utils.throwMissing(this, 'model()') unless typeof(@observable.model) == 'function'
-    kb.utils.throwMissing(this, 'update()') unless typeof(@observable.update) == 'function'
+  constructor: (model, options) ->
+    kb.utils.throwMissing(this, 'options') unless options
+    kb.utils.throwMissing(this, 'model()') unless typeof(options.model) == 'function'
+    kb.utils.throwMissing(this, 'update()') unless typeof(options.update) == 'function'
 
     # bind callbacks
     @__kb or= {}
-    @__kb._onModelChange = _.bind(@_onModelChange, @)
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
-
-    # a model ref
-    if Backbone.ModelRef and (@model instanceof Backbone.ModelRef)
-      @model_ref = @model; @model_ref.retain()
-      @model_ref.bind('loaded', @_onModelLoaded)
-      @model_ref.bind('unloaded', @_onModelUnloaded)
-      @model = @model_ref.model()
+    @__kb._onModelChange = _.bind(@_onModelChange, @)
+    @__kb.model_callback = options.model
+    @__kb.update_callback = options.update
+    @__kb.event_name = if options.event_name then options.event_name else 'change'
+    @__kb.key = options.key
   
-    # publish public interface on the observable and return instead of this
-    observable.destroy = _.bind(@destroy, @)
-
-    # start now
-    @_onModelLoaded(@model) if not @model_ref or @model_ref.isLoaded()
+    @model(model) if model # set up
 
   destroy: ->
-    # end now
-    @_onModelUnloaded() if not @model_ref or @model_ref.isLoaded()
-
-    # unbind
-    if @model_ref
-      @model_ref.unbind('loaded', @_onModelLoaded)
-      @model_ref.unbind('unloaded', @_onModelUnloaded)
-      @model_ref.release(); @model_ref = null
+    @model(null)
     kb.utils.wrappedDestroy(@)
+
+  model: (new_model) ->
+    model = kb.utils.wrappedObject(@)
+
+    # get or no change
+    return model if (arguments.length is 0) or (model == new_model)
+
+    # clear and unbind previous
+    @_onModelUnloaded(model) if model
+    if @model_ref
+      @model_ref.unbind('loaded', @__kb._onModelLoaded)
+      @model_ref.unbind('unloaded', @__kb._onModelUnloaded)
+      @model_ref.release(); @model_ref = null
+
+    # a model ref
+    if Backbone.ModelRef and (new_model instanceof Backbone.ModelRef)
+      @model_ref = new_model; @model_ref.retain()
+      @model_ref.bind('loaded', @__kb._onModelLoaded)
+      @model_ref.bind('unloaded', @__kb._onModelUnloaded)
+      new_model = @model_ref.model()
+    else
+      @model_ref = null
+    kb.utils.wrappedObject(@, new_model)
+
+    # start now
+    @_onModelLoaded(new_model) if new_model
+
+  isLoaded: -> return !!kb.utils.wrappedObject(@)
 
   ####################################################
   # Internal
   ####################################################
   _onModelLoaded: (model) ->
-    @model = model
-    model.bind('change', @__kb._onModelChange)
-    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+    kb.utils.wrappedObject(@, model)
+    model.bind(@__kb.event_name, @__kb._onModelChange)
+    if (@__kb.event_name is 'update') and Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
       model.bind('add', @__kb._onModelChange)
       model.bind('remove', @__kb._onModelChange)
       model.bind('update', @__kb._onModelChange)
-    @observable.model(model)
+    @__kb.model_callback(model)
 
   _onModelUnloaded: (model) ->
-    @model = null
-    model.unbind('change', @__kb._onModelChange)
-    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+    kb.utils.wrappedObject(@, null)
+    model.unbind(@__kb.event_name, @__kb._onModelChange)
+
+    if (@__kb.event_name is 'update') and Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
       model.unbind('add', @__kb._onModelChange)
       model.unbind('remove', @__kb._onModelChange)
       model.unbind('update', @__kb._onModelChange)
-    @observable.model(null)
+    @__kb.model_callback(null)
 
-  _onModelChange: ->
-    return if (@model and @model.hasChanged) and not @model.hasChanged(ko.utils.unwrapObservable(@key)) # no change, nothing to do
-    @observable.update()
+  _onModelChange: (model) ->     
+    return if @__kb.key and not kb.utils.attributeHasChanged(model, ko.utils.unwrapObservable(@__kb.key)) # filter changes by attribute key
+    @__kb.update_callback()
 
 # factory function
 kb.modelObservable = (model, observable) -> return new kb.ModelObservable(model, observable)

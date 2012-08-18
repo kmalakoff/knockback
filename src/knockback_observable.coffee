@@ -19,12 +19,6 @@ class kb.Observable
     kb.utils.throwMissing(this, 'model') unless model
     kb.utils.throwMissing(this, 'options') unless options
 
-    # bind callbacks
-    @__kb or= {}
-    @__kb._onModelChange = _.bind(@_onModelChange, @)
-    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
-    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
-
     # extract options
     @key = if _.isString(options) or ko.isObservable(options) then options else options.key
     kb.utils.throwMissing(this, 'key') unless @key
@@ -40,20 +34,8 @@ class kb.Observable
       owner: @view_model
     }))
 
-    # determine model or model_ref type
-    if Backbone.ModelRef and (model instanceof Backbone.ModelRef)
-      kb.utils.wrappedModelRef(observable, model, {loaded: @__kb._onModelLoaded, unloaded: @__kb._onModelUnloaded})
-      model_ref = model; model =  model_ref.model()
-    else
-      kb.utils.wrappedObject(observable, model)
-
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
-
-    # set up initial values
-    if not model_ref or model_ref.isLoaded()
-      model.bind('change', @__kb._onModelChange) 
-      value_observable.notifySubscribers(value_observable())
 
     # wrap ourselves with a localizer
     if options.localizer
@@ -63,12 +45,26 @@ class kb.Observable
     if options.hasOwnProperty('default')
       observable = kb.defaultWrapper(observable, options.default)
 
+    # update to set up first values observable
+    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key}))
+
     return observable
 
   destroy: ->
-    @_modelUnbind(kb.utils.wrappedObject(kb.utils.wrappedObservable(@)))
     @key = null; @args = null; @read = null; @write = null; @view_model = null
     kb.utils.wrappedDestroy(@)
+
+  model: (new_model) ->
+    observable = kb.utils.wrappedObservable(@)
+    model = kb.utils.wrappedObject(observable)
+
+    # get or no change
+    return model if (arguments.length == 0) or (model is new_model)
+    kb.utils.wrappedObject(observable, new_model)
+    @update()
+
+  update: ->
+    kb.utils.wrappedByKey(@, 'vo').valueHasMutated() # trigger an update
 
   ####################################################
   # Internal
@@ -94,38 +90,6 @@ class kb.Observable
       if @write then @write.apply(@view_model, args) else model.set.apply(model, args)
     value_observable = kb.utils.wrappedByKey(@, 'vo')
     value_observable(value)
-
-  _modelBind: (model) ->
-    return unless model
-    model.bind('change', @__kb._onModelChange)
-    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
-      model.bind('add', @__kb._onModelChange)
-      model.bind('remove', @__kb._onModelChange)
-      model.bind('update', @__kb._onModelChange)
-
-  _modelUnbind: (model) ->
-    return unless model
-    model.unbind('change', @__kb._onModelChange)
-    if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
-      model.unbind('add', @__kb._onModelChange)
-      model.unbind('remove', @__kb._onModelChange)
-      model.unbind('update', @__kb._onModelChange)
-
-  _onModelLoaded: (model) ->
-    kb.utils.wrappedObject(kb.utils.wrappedObservable(@), model)
-    @_modelBind(model)
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
-    value_observable(@_onGetValue())
-
-  _onModelUnloaded: (model) ->
-    @_modelUnbind(model)
-    kb.utils.wrappedObject(kb.utils.wrappedObservable(@), null)
-
-  _onModelChange: ->
-    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
-    return if (model and model.hasChanged) and not model.hasChanged(ko.utils.unwrapObservable(@key)) # no change, nothing to do
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
-    value_observable(@_onGetValue())
 
 # factory function
 kb.observable = (model, options, view_model) -> return new kb.Observable(model, options, view_model)
