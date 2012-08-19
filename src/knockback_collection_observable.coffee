@@ -98,7 +98,13 @@ class kb.CollectionObservable extends kb.RefCountable
     return observable
 
   __destroy: ->
-    @collection(null)
+    observable = kb.utils.wrappedObservable(@)
+    collection = kb.utils.wrappedObject(observable)
+    if collection
+      @_collectionUnbind(collection)
+      @_clear(true)
+      collection = kb.utils.wrappedObject(observable, null)
+
     kb.utils.wrappedDestroy(@)
     super
 
@@ -117,19 +123,20 @@ class kb.CollectionObservable extends kb.RefCountable
 
     # no change
     return if (collection == previous_collection)
-    kb.utils.wrappedObject(observable, collection)
+    collection?.retain?()
 
     # clean up
     if previous_collection
-      @_clear()
       @_collectionUnbind(previous_collection)
       previous_collection.release?()
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
+    kb.utils.wrappedObject(observable, collection)
     if collection
-      collection.retain?()
       @_collectionBind(collection)
       @sortedIndex(@sorted_index, @sort_attribute, options)
+    else
+      @_clear()
 
     return collection
 
@@ -169,7 +176,6 @@ class kb.CollectionObservable extends kb.RefCountable
   # Internal
   ####################################################
   _collectionBind: (collection) ->
-    return unless collection
     collection.bind('reset', @__kb._onCollectionReset)
     collection.bind('resort', @__kb._onCollectionResort) if not @sorted_index
     collection.bind(event, @__kb._onModelAdd) for event in ['new', 'add']
@@ -177,7 +183,6 @@ class kb.CollectionObservable extends kb.RefCountable
     collection.bind('change', @__kb._onModelChange)
 
   _collectionUnbind: (collection) ->
-    return unless collection
     collection.unbind('reset', @__kb._onCollectionReset)
     collection.unbind('resort', @__kb._onCollectionResort) if not @sorted_index
     collection.unbind(event, @__kb._onModelAdd) for event in ['new', 'add']
@@ -260,13 +265,22 @@ class kb.CollectionObservable extends kb.RefCountable
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)
     @trigger('remove', observable()) if not silent # notify
+
+    # don't notify if destroying
     @in_edit++
-    view_models = observable.removeAll() # batch
+    if silent
+      array = observable()
+      view_models = if @hasViewModels() then array.slice(0) else null
+      array.splice(0, array.length)
+    else
+      view_models = observable.removeAll()
+      view_models = null unless @hasViewModels()
     @in_edit--
 
-    # release
+    # release view models
+    return unless view_models
     store = kb.utils.wrappedStore(observable)
-    (store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) for view_model in view_models) if @hasViewModels()
+    (store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) for view_model in view_models) 
 
   _collectionResync: (silent) ->
     @_clear(silent)

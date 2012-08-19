@@ -26,7 +26,7 @@ kb.utils.throwUnexpected = (instance, message) ->
 
 kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
-  owner.__kb.model_observable.unregisterCallbacks(owner) if owner.__kb.model_observable
+  owner.__kb.model_observable.releaseCallbacks(owner) if owner.__kb.model_observable
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
   # release the value observable
   if __kb.value_observable
@@ -136,14 +136,3 @@ kb.utils.pathJoin = (path1, path2) ->
 
 kb.utils.optionsPathJoin = (options, path) ->
   return _.defaults({path: kb.utils.pathJoin(options.path, path)}, options)
-
-kb.utils.attributeHasChanged = (model, key) ->
-  return false unless model
-
-  # COMPATIBILITY: pre-Backbone-0.9.2 changed attributes hash
-  return model.hasChanged(key) if model._changed
-
-  # COMPATIBILITY: post-Backbone-0.9.2 changed attributes hash
-  return model.changed.hasOwnProperty(key) if model.changed
-
-  return true # convervative

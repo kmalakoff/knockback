@@ -9,11 +9,12 @@
 class kb.Store
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
-      kb.utils.wrappedStore(observable, options.store)
+      store = kb.utils.wrappedStore(observable, options.store)
       options.store.registerObservable(obj, observable, options)
     else
-      kb.utils.wrappedStore(observable, new kb.Store())
+      store = kb.utils.wrappedStore(observable, new kb.Store())
       kb.utils.wrappedStoreIsOwned(observable, true)
+    return store
 
   constructor: ->
     @objects = []
@@ -82,6 +83,8 @@ class kb.Store
     return observable
 
   releaseObservable: (observable, owns_store) ->
+    return unless @objects # already destroyed
+
     return unless observable
     index = _.indexOf(@observables, observable)
     return unless index >= 0
@@ -93,6 +96,9 @@ class kb.Store
     kb.utils.release(observable)
     return if observable.refCount and observable.refCount() > 0
     kb.utils.wrappedObject(observable, null)
+
+    return unless @objects # already destroyed
+
     index = _.indexOf(@observables, observable) unless @observables[index] == observable
     @objects[index] = null
     @observables[index] = null

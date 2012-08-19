@@ -21,7 +21,7 @@ class kb.Observables
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
 
     # set up
-    model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @))
+    model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @)}))
 
     # fill in unspecified read attributes with supplied options
     for key, mapping_info of @__kb.mappings_info
@@ -32,13 +32,21 @@ class kb.Observables
   destroy: ->
     for key, mapping_info of @__kb.mappings_info
       @[key].destroy() if @[key] and @[key].__kb # not yet released
-      @[key] = null
-      @__kb.view_model[key] = null
+      @[key] = @__kb.view_model[key] = null
     kb.utils.wrappedDestroy(@)
 
   setToDefault: ->
     for key, mapping_info of @__kb.mappings_info
       @[key].setToDefault() if typeof(@[key].setToDefault) == 'function'
+
+  model: (new_model) ->
+    model = kb.utils.wrappedObject(@)
+    return model if (arguments.length == 0) or (model is new_model) # get or no change
+    model = kb.utils.wrappedObject(@, new_model)
+    return unless model # no model
+    model_observable = kb.utils.wrappedModelObservable(@)
+    return new_model unless model_observable # not yet initialized
+    model_observable.model(model) # sync with model_observable
 
 # factory function
 kb.observables = (model, mappings_info, view_model) -> return new kb.Observables(model, mappings_info, view_model)
