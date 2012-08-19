@@ -54,7 +54,7 @@ class kb.Observable
       owner: @view_model
     ))
     kb.utils.wrappedStore(observable, options.store)
-    kb.utils.wrappedFactory(observable, options.factory)
+    kb.Factory.useOptionsOrCreate(options, observable)
     kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
 
     # publish public interface on the observable and return instead of this
@@ -100,6 +100,7 @@ class kb.Observable
     model = kb.utils.wrappedObject(observable)
     value = kb.utils.wrappedByKey(@, 'vo')()
     new_value = model.get(ko.utils.unwrapObservable(@key)) if model and not arguments.length
+    new_value = null unless new_value # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
     # create or change in type
@@ -133,10 +134,12 @@ class kb.Observable
   _updateValueObservable: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
     store = kb.utils.wrappedStore(observable)
+    factory = kb.utils.wrappedFactory(observable)
+    path = kb.utils.wrappedPath(observable)
     if store
-      value = store.findOrCreateObservable(new_value, kb.utils.wrappedPath(observable), kb.utils.wrappedFactory(observable))
+      value = store.findOrCreateObservable(new_value, path, factory)
     else
-      value = kb.Factory.createDefault(new_value, {path: kb.utils.wrappedPath(observable)})
+      value = factory.createForPath(new_value, path)
 
     # cache the type
     if not ko.isObservable(value) # a view model, recognize view_models as non-observable

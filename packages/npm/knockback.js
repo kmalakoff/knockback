@@ -418,6 +418,19 @@
 
   kb.Factory = (function() {
 
+    Factory.useOptionsOrCreate = function(options, obj) {
+      var factory;
+      if (options.factory && !options.mappings) {
+        factory = kb.utils.wrappedFactory(obj, options.factory);
+      } else {
+        factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
+      }
+      if (options.mappings) {
+        factory.addPathMappings(options.mappings);
+      }
+      return factory;
+    };
+
     function Factory(parent_factory) {
       this.parent_factory = parent_factory;
       this.paths = {};
@@ -433,9 +446,13 @@
 
     Factory.prototype.addPathMappings = function(mappings) {
       var create_info, path;
-      for (path in mappings) {
-        create_info = mappings[path];
-        this.paths[path] = create_info;
+      if (typeof mappings === 'function' || mappings.create) {
+        this.default_creator = mappings;
+      } else {
+        for (path in mappings) {
+          create_info = mappings[path];
+          this.paths[path] = create_info;
+        }
       }
       return this;
     };
@@ -455,6 +472,9 @@
         if (creator) {
           return creator;
         }
+      }
+      if (this.default_creator) {
+        return this.default_creator;
       }
       if (obj instanceof Backbone.Model) {
         return kb.ViewModel;
@@ -938,9 +958,6 @@
       if (options == null) {
         options = {};
       }
-      if (!collection) {
-        kb.utils.throwMissing(this, 'collection');
-      }
       CollectionObservable.__super__.constructor.apply(this, arguments);
       if (kb.statistics) {
         kb.statistics.register('kb.CollectionObservable', this);
@@ -994,10 +1011,12 @@
       observable.unbind = _.bind(this.unbind, this);
       observable.trigger = _.bind(this.trigger, this);
       kb.utils.wrappedObject(observable, null);
-      this.collection(collection, {
-        silent: true,
-        'defer': options['defer']
-      });
+      if (collection) {
+        this.collection(collection, {
+          silent: true,
+          'defer': options['defer']
+        });
+      }
       observable.subscribe(_.bind(this._onObservableArrayChange, this));
       return observable;
     }
@@ -1722,7 +1741,7 @@
         owner: this.view_model
       }));
       kb.utils.wrappedStore(observable, options.store);
-      kb.utils.wrappedFactory(observable, options.factory);
+      kb.Factory.useOptionsOrCreate(options, observable);
       kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, this.key));
       observable.valueType = _.bind(this.valueType, this);
       observable.model = _.bind(this.model, this);
@@ -1777,6 +1796,9 @@
       if (model && !arguments.length) {
         new_value = model.get(ko.utils.unwrapObservable(this.key));
       }
+      if (!new_value) {
+        new_value = null;
+      }
       new_type = kb.utils.valueType(new_value);
       if (_.isUndefined(this.value_type) || (this.value_type !== new_type && new_type !== kb.TYPE_UNKNOWN)) {
         return this._updateValueObservable(new_value);
@@ -1810,15 +1832,15 @@
     };
 
     Observable.prototype._updateValueObservable = function(new_value) {
-      var observable, store, value, value_observable;
+      var factory, observable, path, store, value, value_observable;
       observable = kb.utils.wrappedObservable(this);
       store = kb.utils.wrappedStore(observable);
+      factory = kb.utils.wrappedFactory(observable);
+      path = kb.utils.wrappedPath(observable);
       if (store) {
-        value = store.findOrCreateObservable(new_value, kb.utils.wrappedPath(observable), kb.utils.wrappedFactory(observable));
+        value = store.findOrCreateObservable(new_value, path, factory);
       } else {
-        value = kb.Factory.createDefault(new_value, {
-          path: kb.utils.wrappedPath(observable)
-        });
+        value = factory.createForPath(new_value, path);
       }
       if (!ko.isObservable(value)) {
         this.value_type = kb.TYPE_MODEL;
@@ -1857,9 +1879,6 @@
 
     function Observables(model, mappings_info, view_model) {
       var key, mapping_info, model_observable, _i, _len, _ref;
-      if (!model) {
-        throw 'Observables: model is missing';
-      }
       if (!(mappings_info && (_.isObject(mappings_info) || _.isArray(mappings_info)))) {
         throw 'Observables: mappings_info is missing';
       }
@@ -2039,11 +2058,8 @@
         kb.statistics.register('kb.ViewModel', this);
       }
       store = kb.Store.useOptionsOrCreate(options, model, this);
-      factory = kb.utils.wrappedFactory(this, new kb.Factory(options.factory));
+      factory = kb.Factory.useOptionsOrCreate(options, this);
       path = kb.utils.wrappedPath(this, options.path);
-      if (options.mappings) {
-        factory.addPathMappings(options.mappings);
-      }
       this.__kb.internals = options.internals;
       this.__kb.requires = options.requires;
       model_observable = kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {

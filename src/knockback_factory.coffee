@@ -7,6 +7,14 @@
 ###
 
 class kb.Factory
+  @useOptionsOrCreate: (options, obj) ->
+    if options.factory and not options.mappings # reuse
+      factory = kb.utils.wrappedFactory(obj, options.factory)
+    else
+      factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory))
+    factory.addPathMappings(options.mappings) if options.mappings
+    return factory
+
   constructor: (@parent_factory) ->
     @paths = {}
 
@@ -16,8 +24,11 @@ class kb.Factory
     @paths[path] = create_info
 
   addPathMappings: (mappings) ->
-    for path, create_info of mappings
-      @paths[path] = create_info
+    if typeof(mappings) == 'function' or mappings.create
+      @default_creator = mappings
+    else
+      for path, create_info of mappings
+        @paths[path] = create_info
     @
 
   creatorForPath: (obj, path) ->
@@ -28,6 +39,7 @@ class kb.Factory
       creator = @parent_factory.creatorForPath(obj, path); return creator if creator
 
     # use defaults
+    return @default_creator               if @default_creator
     return kb.ViewModel                   if obj instanceof Backbone.Model
     return kb.CollectionObservable        if obj instanceof Backbone.Collection
     return null

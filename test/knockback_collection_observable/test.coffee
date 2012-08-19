@@ -456,7 +456,6 @@ $(document).ready( ->
   )
 
   test("Error cases", ->
-    raises((->kb.collectionObservable()), null, "CollectionObservable: collection is missing")
     kb.collectionObservable(new _kbe.ContactsCollection())
     kb.collectionObservable(new _kbe.ContactsCollection(), {})
   )

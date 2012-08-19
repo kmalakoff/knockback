@@ -30,8 +30,6 @@
 
 class kb.CollectionObservable extends kb.RefCountable
   constructor: (collection, options={}) ->
-    kb.utils.throwMissing(this, 'collection') unless collection
-
     super
     kb.statistics.register('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
@@ -90,7 +88,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
     # start the processing
     kb.utils.wrappedObject(observable, null) # clear the collection so it is updated
-    @collection(collection, {silent: true, 'defer': options['defer']})
+    @collection(collection, {silent: true, 'defer': options['defer']}) if collection
 
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))

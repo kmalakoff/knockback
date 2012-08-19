@@ -25,9 +25,8 @@ class kb.ViewModel extends kb.RefCountable
     store = kb.Store.useOptionsOrCreate(options, model, @)
 
     # view model factory
-    factory = kb.utils.wrappedFactory(@, new kb.Factory(options.factory))
+    factory = kb.Factory.useOptionsOrCreate(options, @)
     path = kb.utils.wrappedPath(@, options.path)
-    factory.addPathMappings(options.mappings) if options.mappings
 
     # bind and extract options
     @__kb.internals = options.internals
@@ -36,6 +35,8 @@ class kb.ViewModel extends kb.RefCountable
     # update to set up first values observable
     model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @)}))
     bb_model = model_observable.model()
+
+    # collect the important keys
     keys = _.keys(bb_model.attributes) if bb_model
     if @__kb.internals
       keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals
