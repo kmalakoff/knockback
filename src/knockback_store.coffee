@@ -26,7 +26,7 @@ class kb.Store
       continue unless observable
 
       @observables[index] = null # releasing
-      if observable and observable.release
+      if observable.release
         observable.release(true)
       else
         kb.utils.release(observable)

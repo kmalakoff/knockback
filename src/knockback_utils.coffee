@@ -29,7 +29,7 @@ kb.utils.wrappedDestroy = (owner) ->
   owner.__kb.model_observable.releaseCallbacks(owner) if owner.__kb.model_observable
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
   # release the value and observable
-  if __kb.value and (not __kb.value.hasOwnProperty('__kb_ref_count') or (__kb.value.__kb_ref_count > 0))
+  if __kb.value and (not __kb.value.refCount or (__kb.value.refCount() > 0))
     if __kb.store then __kb.store.releaseObservable(__kb.value, __kb.store_is_owned) else kb.utils.release(__kb.value) # release the stored value
   __kb.value_observable.dispose() if __kb.value_observable and __kb.value_observable.dispose # dispose
   if __kb.observable
@@ -93,7 +93,7 @@ kb.utils.release = (obj, keys_only) ->
   # known type
   if not keys_only and (ko.isObservable(obj) or (typeof(obj.release) is 'function') or (typeof(obj.destroy) is 'function'))
     if obj.release
-      obj.release() if not obj.hasOwnProperty('__kb') or obj.__kb # not yet released
+      obj.release() if not obj.refCount or obj.refCount() > 0 # not yet released
     else if obj.destroy
       obj.destroy() if not obj.hasOwnProperty('__kb') or obj.__kb # not yet released
     else if obj.dispose

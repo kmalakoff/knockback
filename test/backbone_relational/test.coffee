@@ -166,9 +166,7 @@ $(document).ready( ->
               equal(occupant_observable2.name(), 'John', 'Expected name')
               equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location')
 
-      equal(places_observable.refCount(), 1, 'Expected references')
       kb.utils.release(places_observable)
-      equal(places_observable.refCount(), 0, 'Expected references')
 
       # check stats
       equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
@@ -457,6 +455,10 @@ $(document).ready( ->
     equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+
+    # release
+    kb.utils.release(view_model_person1)
+    kb.utils.release(view_model_house1)
 
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')

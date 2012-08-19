@@ -88,7 +88,7 @@
     }
     __kb = owner.__kb;
     owner.__kb = null;
-    if (__kb.value && (!__kb.value.hasOwnProperty('__kb_ref_count') || (__kb.value.__kb_ref_count > 0))) {
+    if (__kb.value && (!__kb.value.refCount || (__kb.value.refCount() > 0))) {
       if (__kb.store) {
         __kb.store.releaseObservable(__kb.value, __kb.store_is_owned);
       } else {
@@ -244,7 +244,7 @@
     }
     if (!keys_only && (ko.isObservable(obj) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function'))) {
       if (obj.release) {
-        if (!obj.hasOwnProperty('__kb') || obj.__kb) {
+        if (!obj.refCount || obj.refCount() > 0) {
           obj.release();
         }
       } else if (obj.destroy) {
@@ -530,7 +530,7 @@
           continue;
         }
         this.observables[index] = null;
-        if (observable && observable.release) {
+        if (observable.release) {
           observable.release(true);
         } else {
           kb.utils.release(observable);
