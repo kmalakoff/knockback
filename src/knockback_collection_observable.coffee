@@ -28,9 +28,8 @@
 #   remove: (view_model, collection_observable) or if batch: (collection_observable)
 ####################################################
 
-class kb.CollectionObservable extends kb.RefCountable
+class kb.CollectionObservable
   constructor: (collection, options={}) ->
-    super
     kb.statistics.register('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
     @in_edit = 0
@@ -73,9 +72,7 @@ class kb.CollectionObservable extends kb.RefCountable
     @sorted_index = options.sorted_index
 
     # publish public interface on the observable and return instead of this
-    observable.retain = _.bind(@retain, @)
-    observable.refCount = _.bind(@refCount, @)
-    observable.release = _.bind(@release, @)
+    observable.destroy = _.bind(@destroy, @)
     observable.collection = _.bind(@collection, @)
     observable.viewModelByModel = _.bind(@viewModelByModel, @)
     observable.sortedIndex = _.bind(@sortedIndex, @)
@@ -96,7 +93,7 @@ class kb.CollectionObservable extends kb.RefCountable
 
     return observable
 
-  __destroy: ->
+  destroy: ->
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
     if collection
@@ -105,13 +102,8 @@ class kb.CollectionObservable extends kb.RefCountable
       collection = kb.utils.wrappedObject(observable, null)
 
     kb.utils.wrappedDestroy(@)
-    super
 
     kb.statistics.unregister('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
-
-  # override reference counting return value
-  retain: -> super; return kb.utils.wrappedObservable(@)
-  release: -> observable = kb.utils.wrappedObservable(@); super; return observable
 
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)

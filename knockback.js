@@ -88,13 +88,15 @@
     }
     __kb = owner.__kb;
     owner.__kb = null;
-    if (__kb.value_observable) {
+    if (__kb.value && (!__kb.value.hasOwnProperty('__kb_ref_count') || (__kb.value.__kb_ref_count > 0))) {
       if (__kb.store) {
-        __kb.store.releaseObservable(__kb.value_observable(), __kb.store_is_owned);
+        __kb.store.releaseObservable(__kb.value, __kb.store_is_owned);
       } else {
-        kb.utils.release(__kb.value_observable());
+        kb.utils.release(__kb.value);
       }
-      kb.utils.release(__kb.value_observable);
+    }
+    if (__kb.value_observable && __kb.value_observable.dispose) {
+      __kb.value_observable.dispose();
     }
     if (__kb.observable) {
       kb.utils.wrappedDestroy(__kb.observable);
@@ -156,6 +158,14 @@
       return kb.utils.wrappedByKey(observable, 'obj');
     } else {
       return kb.utils.wrappedByKey(observable, 'obj', value);
+    }
+  };
+
+  kb.utils.wrappedValue = function(observable, value) {
+    if (arguments.length === 1) {
+      return kb.utils.wrappedByKey(observable, 'value');
+    } else {
+      return kb.utils.wrappedByKey(observable, 'value', value);
     }
   };
 
@@ -335,7 +345,7 @@
 
     RefCountable.prototype.retain = function() {
       if (this.__kb_ref_count <= 0) {
-        throw "RefCountable: ref_count is corrupt: " + this.__kb_ref_count;
+        throw "RefCountable: ref count is corrupt: " + this.__kb_ref_count;
       }
       this.__kb_ref_count++;
       return this;
@@ -343,7 +353,7 @@
 
     RefCountable.prototype.release = function(all) {
       if (this.__kb_ref_count <= 0) {
-        throw "RefCountable: ref_count is corrupt: " + this.__kb_ref_count;
+        throw "RefCountable: ref count is corrupt: " + this.__kb_ref_count;
       }
       if (all) {
         this.__kb_ref_count = 0;
@@ -512,20 +522,10 @@
     }
 
     Store.prototype.destroy = function() {
-      var index, observable, _ref, _ref1;
-      this.objects = null;
+      var index, observable, _ref;
       _ref = this.observables;
       for (index in _ref) {
         observable = _ref[index];
-        if (!kb.utils.observableInstanceOf(observable, kb.CollectionObservable)) {
-          continue;
-        }
-        this.observables[index] = null;
-        observable.release(true);
-      }
-      _ref1 = this.observables;
-      for (index in _ref1) {
-        observable = _ref1[index];
         if (!observable) {
           continue;
         }
@@ -536,6 +536,7 @@
           kb.utils.release(observable);
         }
       }
+      this.objects = null;
       return this.observables = null;
     };
 
@@ -543,7 +544,10 @@
       if (options == null) {
         options = {};
       }
-      if (!obj) {
+      if (!(obj && observable)) {
+        return;
+      }
+      if (kb.utils.observableInstanceOf(observable, kb.CollectionObservable) || ko.isObservable(observable)) {
         return;
       }
       this.objects.push(obj);
@@ -588,6 +592,9 @@
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             test = _ref[index];
             observable = this.observables[index];
+            if (!(observable && observable.__kb)) {
+              continue;
+            }
             if ((test === obj) && (observable.__kb.creator === creator)) {
               if (typeof observable.retain === "function") {
                 observable.retain();
@@ -612,14 +619,7 @@
 
     Store.prototype.releaseObservable = function(observable, owns_store) {
       var index;
-      if (!this.objects) {
-        return;
-      }
       if (!observable) {
-        return;
-      }
-      index = _.indexOf(this.observables, observable);
-      if (!(index >= 0)) {
         return;
       }
       if (arguments.length === 2 && !owns_store && !observable.release) {
@@ -630,13 +630,13 @@
         return;
       }
       kb.utils.wrappedObject(observable, null);
-      if (!this.objects) {
+      index = _.indexOf(this.observables, observable);
+      if (index < 0) {
         return;
       }
-      if (this.observables[index] !== observable) {
-        index = _.indexOf(this.observables, observable);
+      if (!this.objects) {
+        this.objects[index] = null;
       }
-      this.objects[index] = null;
       return this.observables[index] = null;
     };
 
@@ -801,7 +801,7 @@
           info = _ref1[index];
           if (info.obj === obj) {
             callbacks.list.splice(index, 1);
-            if (Backbone.RelationalModel && (model instanceof Backbone.RelationalModel)) {
+            if (info.rel_fn) {
               this._modelUnbindRelatationalInfo(model, event_name, info);
             }
             if (info.model) {
@@ -836,8 +836,7 @@
     };
 
     ModelObservable.prototype._onModelUnloaded = function(model) {
-      var callbacks, event_name, info, is_relational, list, _i, _len, _ref;
-      is_relational = Backbone.RelationalModel && (model instanceof Backbone.RelationalModel);
+      var callbacks, event_name, info, list, _i, _len, _ref;
       kb.utils.wrappedObject(this, null);
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
@@ -846,7 +845,7 @@
         list = callbacks.list;
         for (_i = 0, _len = list.length; _i < _len; _i++) {
           info = list[_i];
-          if (is_relational) {
+          if (info.rel_fn) {
             this._modelUnbindRelatationalInfo(model, event_name, info);
           }
           if (info.model) {
@@ -858,24 +857,40 @@
     };
 
     ModelObservable.prototype._modelBindRelatationalInfo = function(model, event_name, info) {
+      var key, relation;
       if ((event_name === 'change') && info.key && info.update) {
+        key = ko.utils.unwrapObservable(info.key);
+        relation = _.find(model.getRelations(), function(test) {
+          return test.key === key;
+        });
+        if (!relation) {
+          return;
+        }
         info.rel_fn = function() {
           return info.update();
         };
-        model.bind("add:" + info.key, info.rel_fn);
-        model.bind("remove:" + info.key, info.rel_fn);
-        model.bind("update:" + info.key, info.rel_fn);
+        if (relation.collectionKey) {
+          info.is_collection = true;
+          model.bind("add:" + info.key, info.rel_fn);
+          model.bind("remove:" + info.key, info.rel_fn);
+        } else {
+          model.bind("update:" + info.key, info.rel_fn);
+        }
       }
       return this;
     };
 
     ModelObservable.prototype._modelUnbindRelatationalInfo = function(model, event_name, info) {
-      if ((event_name === 'change') && info.key && info.update) {
+      if (!info.rel_fn) {
+        return;
+      }
+      if (info.is_collection) {
         model.unbind("add:" + info.key, info.rel_fn);
         model.unbind("remove:" + info.key, info.rel_fn);
+      } else {
         model.unbind("update:" + info.key, info.rel_fn);
-        info.rel_fn = null;
       }
+      info.rel_fn = null;
       return this;
     };
 
@@ -896,16 +911,13 @@
   */
 
 
-  kb.CollectionObservable = (function(_super) {
-
-    __extends(CollectionObservable, _super);
+  kb.CollectionObservable = (function() {
 
     function CollectionObservable(collection, options) {
       var factory, observable;
       if (options == null) {
         options = {};
       }
-      CollectionObservable.__super__.constructor.apply(this, arguments);
       if (kb.statistics) {
         kb.statistics.register('kb.CollectionObservable', this);
       }
@@ -949,9 +961,7 @@
       }
       this.sort_attribute = options.sort_attribute;
       this.sorted_index = options.sorted_index;
-      observable.retain = _.bind(this.retain, this);
-      observable.refCount = _.bind(this.refCount, this);
-      observable.release = _.bind(this.release, this);
+      observable.destroy = _.bind(this.destroy, this);
       observable.collection = _.bind(this.collection, this);
       observable.viewModelByModel = _.bind(this.viewModelByModel, this);
       observable.sortedIndex = _.bind(this.sortedIndex, this);
@@ -971,7 +981,7 @@
       return observable;
     }
 
-    CollectionObservable.prototype.__destroy = function() {
+    CollectionObservable.prototype.destroy = function() {
       var collection, observable;
       observable = kb.utils.wrappedObservable(this);
       collection = kb.utils.wrappedObject(observable);
@@ -981,22 +991,9 @@
         collection = kb.utils.wrappedObject(observable, null);
       }
       kb.utils.wrappedDestroy(this);
-      CollectionObservable.__super__.__destroy.apply(this, arguments);
       if (kb.statistics) {
         return kb.statistics.unregister('kb.CollectionObservable', this);
       }
-    };
-
-    CollectionObservable.prototype.retain = function() {
-      CollectionObservable.__super__.retain.apply(this, arguments);
-      return kb.utils.wrappedObservable(this);
-    };
-
-    CollectionObservable.prototype.release = function() {
-      var observable;
-      observable = kb.utils.wrappedObservable(this);
-      CollectionObservable.__super__.release.apply(this, arguments);
-      return observable;
     };
 
     CollectionObservable.prototype.collection = function(collection, options) {
@@ -1305,7 +1302,7 @@
 
     return CollectionObservable;
 
-  })(kb.RefCountable);
+  })();
 
   __extends(kb.CollectionObservable.prototype, Backbone.Events);
 
@@ -1721,15 +1718,6 @@
     }
 
     Observable.prototype.destroy = function() {
-      var store, value_observable;
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
-      store = kb.utils.wrappedStore(kb.utils.wrappedObservable(this));
-      if (store) {
-        store.releaseObservable(value_observable());
-      } else {
-        kb.utils.release(value_observable());
-      }
-      kb.utils.wrappedByKey(this, 'vo', null);
       return kb.utils.wrappedDestroy(this);
     };
 
@@ -1791,7 +1779,7 @@
     };
 
     Observable.prototype._updateValueObservable = function(new_value) {
-      var creator, factory, key, model, observable, path, relation, store, value, value_observable;
+      var creator, factory, key, model, observable, path, previous_value, relation, store, value, value_observable;
       observable = kb.utils.wrappedObservable(this);
       model = kb.utils.wrappedObject(observable);
       store = kb.utils.wrappedStore(observable);
@@ -1825,11 +1813,15 @@
         this.value_type = kb.TYPE_SIMPLE;
       }
       value_observable = kb.utils.wrappedByKey(this, 'vo');
-      if (store) {
-        store.releaseObservable(value_observable());
-      } else {
-        kb.utils.release(value_observable());
+      previous_value = kb.utils.wrappedValue(this);
+      if (previous_value) {
+        if (store) {
+          store.releaseObservable(previous_value);
+        } else {
+          kb.utils.release(previous_value);
+        }
       }
+      kb.utils.wrappedValue(this, value);
       return value_observable(value);
     };
 

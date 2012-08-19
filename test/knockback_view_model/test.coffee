@@ -521,7 +521,7 @@ $(document).ready( ->
 
   test("Prior kb.Observables functionality", ->
     ContactViewModel = (model) ->
-      @dynamic_observables = kb.observables(model, {keys: {
+      @dynamic_observables = kb.viewModel(model, {keys: {
         name:     {key: 'name'}
         number:   'number'
         date:     {key:'date', localizer: _kbe.LongDateLocalizer}

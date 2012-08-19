@@ -28,10 +28,10 @@ kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
   owner.__kb.model_observable.releaseCallbacks(owner) if owner.__kb.model_observable
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
-  # release the value observable
-  if __kb.value_observable
-    if __kb.store then __kb.store.releaseObservable(__kb.value_observable(), __kb.store_is_owned) else kb.utils.release(__kb.value_observable()) # release the stored value
-    kb.utils.release(__kb.value_observable) # release the observable itself
+  # release the value and observable
+  if __kb.value and (not __kb.value.hasOwnProperty('__kb_ref_count') or (__kb.value.__kb_ref_count > 0))
+    if __kb.store then __kb.store.releaseObservable(__kb.value, __kb.store_is_owned) else kb.utils.release(__kb.value) # release the stored value
+  __kb.value_observable.dispose() if __kb.value_observable and __kb.value_observable.dispose # dispose
   if __kb.observable
     kb.utils.wrappedDestroy(__kb.observable)
     __kb.observable.dispose() if __kb.observable.dispose # dispose
@@ -67,6 +67,7 @@ kb.utils.wrappedModel = (observable, value) ->
     return kb.utils.wrappedByKey(observable, 'obj', value)
 
 kb.utils.wrappedObject = (observable, value)                  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
+kb.utils.wrappedValue = (observable, value)                   -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'value') else kb.utils.wrappedByKey(observable, 'value', value)
 kb.utils.wrappedStore = (observable, value)                   -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
 kb.utils.wrappedStoreIsOwned = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
 kb.utils.wrappedFactory = (observable, value)                 -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)

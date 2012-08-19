@@ -21,15 +21,6 @@ class kb.Store
     @observables = []
 
   destroy: ->
-    @objects = null
-
-    # first break cycles in the collections since relations are the typical source of recursion
-    for index, observable of @observables
-      continue unless kb.utils.observableInstanceOf(observable, kb.CollectionObservable)
-
-      @observables[index] = null # releasing
-      observable.release(true)
-
     # then release the view models
     for index, observable of @observables
       continue unless observable
@@ -39,10 +30,15 @@ class kb.Store
         observable.release(true)
       else
         kb.utils.release(observable)
+    @objects = null
     @observables = null
 
   registerObservable: (obj, observable, options={}) ->
-    return unless obj # nothing to register
+    return unless (obj and observable) # nothing to register
+
+    # only store view models
+    return if kb.utils.observableInstanceOf(observable, kb.CollectionObservable) or ko.isObservable(observable) 
+
     @objects.push(obj)
     kb.utils.wrappedObject(observable, obj)
     @observables.push(observable)
@@ -69,6 +65,7 @@ class kb.Store
       if obj and not (obj instanceof Backbone.Collection) # don't share collection observables
         for test, index in @objects
           observable = @observables[index]
+          continue unless observable and observable.__kb
           if (test is obj) and (observable.__kb.creator is creator)
             observable.retain?()
             return observable
@@ -83,22 +80,16 @@ class kb.Store
     return observable
 
   releaseObservable: (observable, owns_store) ->
-    return unless @objects # already destroyed
-
     return unless observable
-    index = _.indexOf(@observables, observable)
-    return unless index >= 0
+    return if arguments.length is 2 and not owns_store and not observable.release # cares about ownership -> do not clear out observables unless owned or ref count is 0
 
-    # cares about ownership -> do not clear out observables unless owned or ref count is 0
-    return if arguments.length is 2 and not owns_store and not observable.release
-
-    # just release
+    # release and exit if references still exist
     kb.utils.release(observable)
     return if observable.refCount and observable.refCount() > 0
+
+    # clear our references
     kb.utils.wrappedObject(observable, null)
-
-    return unless @objects # already destroyed
-
-    index = _.indexOf(@observables, observable) unless @observables[index] == observable
-    @objects[index] = null
+    index = _.indexOf(@observables, observable)
+    return if index < 0
+    @objects[index] = null unless @objects # already destroyed
     @observables[index] = null

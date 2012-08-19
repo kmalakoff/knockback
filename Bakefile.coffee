@@ -28,7 +28,7 @@ module.exports =
 
   statistics:
     output: 'lib'
-    files: 'src/knockback_statistics.coffee'
+    files: 'src/lib/knockback_statistics.coffee'
     _build:
       commands: [
         'cp lib/knockback_statistics.js packages/npm/lib/knockback_statistics.js'

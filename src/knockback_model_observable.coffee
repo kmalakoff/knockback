@@ -124,8 +124,7 @@ class kb.ModelObservable
           callbacks.list.splice(index, 1)
 
           # unbind relational updates
-          @_modelUnbindRelatationalInfo(model, event_name, info) if Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
- 
+          @_modelUnbindRelatationalInfo(model, event_name, info) if info.rel_fn 
           info.model(null) if info.model
           return
 
@@ -148,7 +147,6 @@ class kb.ModelObservable
     @
 
   _onModelUnloaded: (model) => 
-    is_relational = Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
     kb.utils.wrappedObject(@, null)
 
     # unbind all events
@@ -158,24 +156,32 @@ class kb.ModelObservable
       # notify
       list = callbacks.list
       for info in list
-        @_modelUnbindRelatationalInfo(model, event_name, info) if is_relational
+        @_modelUnbindRelatationalInfo(model, event_name, info) if info.rel_fn
         (info.model(null) if info.model) 
     @
 
   _modelBindRelatationalInfo: (model, event_name, info) ->
     if (event_name is 'change') and info.key and info.update
+      key = ko.utils.unwrapObservable(info.key)
+      relation = _.find(model.getRelations(), (test) -> return test.key is key)
+      return unless relation
       info.rel_fn = -> info.update()
-      model.bind("add:#{info.key}", info.rel_fn) 
-      model.bind("remove:#{info.key}", info.rel_fn) 
-      model.bind("update:#{info.key}", info.rel_fn) 
+      if relation.collectionKey
+        info.is_collection = true
+        model.bind("add:#{info.key}", info.rel_fn) 
+        model.bind("remove:#{info.key}", info.rel_fn) 
+      else
+        model.bind("update:#{info.key}", info.rel_fn) 
     @
 
   _modelUnbindRelatationalInfo: (model, event_name, info) ->
-    if (event_name is 'change') and info.key and info.update
+    return unless info.rel_fn
+    if info.is_collection
       model.unbind("add:#{info.key}", info.rel_fn) 
       model.unbind("remove:#{info.key}", info.rel_fn) 
+    else
       model.unbind("update:#{info.key}", info.rel_fn)
-      info.rel_fn = null 
+    info.rel_fn = null 
     @
 
 # factory function

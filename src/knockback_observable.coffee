@@ -82,12 +82,6 @@ class kb.Observable
     return observable
 
   destroy: ->
-    # manually release the observable since we own it but not the store
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
-    store = kb.utils.wrappedStore(kb.utils.wrappedObservable(@))
-    if store then store.releaseObservable(value_observable()) else kb.utils.release(value_observable()) # release previous
-    kb.utils.wrappedByKey(@, 'vo', null)
-
     kb.utils.wrappedDestroy(@)
 
   model: (new_model) ->
@@ -170,7 +164,9 @@ class kb.Observable
 
     # set the value
     value_observable = kb.utils.wrappedByKey(@, 'vo')
-    if store then store.releaseObservable(value_observable()) else kb.utils.release(value_observable()) # release previous
+    previous_value = kb.utils.wrappedValue(@)
+    (if store then store.releaseObservable(previous_value) else kb.utils.release(previous_value)) if previous_value # release previous
+    kb.utils.wrappedValue(@, value)
     value_observable(value)
 
 kb.observable = (model, key, options) -> new kb.Observable(model, key, options)
