@@ -18,6 +18,7 @@ class kb.Factory
   addPathMappings: (mappings) ->
     for path, create_info of mappings
       @paths[path] = create_info
+    @
 
   creatorForPath: (obj, path) ->
     creator = @paths[path]

@@ -79,6 +79,7 @@ class kb.ViewModel extends kb.RefCountable
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then '_' + key else key
       observable_options.key = key
       @[vm_key] = kb.observable(model, observable_options, @)
+    return new_model
 
 # factory function
 kb.viewModel = (model, options) -> return new kb.ViewModel(model, options)

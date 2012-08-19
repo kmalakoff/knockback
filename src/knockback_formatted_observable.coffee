@@ -35,7 +35,7 @@ kb.parseFormattedString = (string, format) ->
   matches = regex.exec(string)
   matches.shift() if (matches)
   # return fake empty data
-  return _.map([1..count], -> return '') if not matches or (matches.length!=parameter_count)
+  return _.range(count).map(-> '') if not matches or (matches.length isnt parameter_count)
 
   # sort the matches since the parameters could be requested unordered
   sorted_positions = _.sortBy(_.keys(positions), (parameter_index, format_index)->return parseInt(parameter_index,10))
@@ -76,6 +76,7 @@ class kb.FormattedObservable
         while (index<max_count)
           observable_args[index](matches[index])
           index++
+        @
     }))
 
     return observable

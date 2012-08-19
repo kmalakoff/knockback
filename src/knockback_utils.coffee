@@ -84,6 +84,7 @@ kb.utils.setToDefault = (obj) ->
   # view model
   else if _.isObject(obj)
     (kb.utils.setToDefault(observable) if observable and (key != '__kb')) for key, observable of obj
+  return obj
 
 kb.utils.release = (obj, keys_only) ->
   return false unless obj

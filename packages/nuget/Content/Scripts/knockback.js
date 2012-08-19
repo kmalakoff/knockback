@@ -255,20 +255,23 @@
   };
 
   kb.utils.setToDefault = function(obj) {
-    var key, observable, _results;
+    var key, observable;
     if (!obj) {
       return;
     }
     if (ko.isObservable(obj)) {
-      return typeof obj.setToDefault === "function" ? obj.setToDefault() : void 0;
+      if (typeof obj.setToDefault === "function") {
+        obj.setToDefault();
+      }
     } else if (_.isObject(obj)) {
-      _results = [];
       for (key in obj) {
         observable = obj[key];
-        _results.push(observable && (key !== '__kb') ? kb.utils.setToDefault(observable) : void 0);
+        if (observable && (key !== '__kb')) {
+          kb.utils.setToDefault(observable);
+        }
       }
-      return _results;
     }
+    return obj;
   };
 
   kb.utils.release = function(obj, keys_only) {
@@ -429,13 +432,12 @@
     };
 
     Factory.prototype.addPathMappings = function(mappings) {
-      var create_info, path, _results;
-      _results = [];
+      var create_info, path;
       for (path in mappings) {
         create_info = mappings[path];
-        _results.push(this.paths[path] = create_info);
+        this.paths[path] = create_info;
       }
-      return _results;
+      return this;
     };
 
     Factory.prototype.creatorForPath = function(obj, path) {
@@ -1250,7 +1252,7 @@
     };
 
     CollectionObservable.prototype._clear = function(silent) {
-      var array, observable, store, view_model, view_models, _i, _len, _results;
+      var array, observable, store, view_model, view_models, _i, _len;
       observable = kb.utils.wrappedObservable(this);
       if (!silent) {
         this.trigger('remove', observable());
@@ -1271,12 +1273,11 @@
         return;
       }
       store = kb.utils.wrappedStore(observable);
-      _results = [];
       for (_i = 0, _len = view_models.length; _i < _len; _i++) {
         view_model = view_models[_i];
-        _results.push(store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)));
+        store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable));
       }
-      return _results;
+      return this;
     };
 
     CollectionObservable.prototype._collectionResync = function(silent) {
@@ -1440,7 +1441,7 @@
   };
 
   kb.parseFormattedString = function(string, format) {
-    var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, results, sorted_positions, _i, _results;
+    var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, results, sorted_positions;
     regex_string = format.slice();
     index = 0;
     parameter_count = 0;
@@ -1462,11 +1463,7 @@
       matches.shift();
     }
     if (!matches || (matches.length !== parameter_count)) {
-      return _.map((function() {
-        _results = [];
-        for (var _i = 1; 1 <= count ? _i <= count : _i >= count; 1 <= count ? _i++ : _i--){ _results.push(_i); }
-        return _results;
-      }).apply(this), function() {
+      return _.range(count).map(function() {
         return '';
       });
     }
@@ -1512,16 +1509,15 @@
           return kb.toFormattedString.apply(null, args);
         },
         write: function(value) {
-          var index, matches, max_count, _results;
+          var index, matches, max_count;
           matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
           max_count = Math.min(observable_args.length, matches.length);
           index = 0;
-          _results = [];
           while (index < max_count) {
             observable_args[index](matches[index]);
-            _results.push(index++);
+            index++;
           }
-          return _results;
+          return this;
         }
       }));
       return observable;
@@ -1906,18 +1902,15 @@
     };
 
     Observables.prototype.setToDefault = function() {
-      var key, mapping_info, _ref, _results;
+      var key, mapping_info, _ref;
       _ref = this.__kb.mappings_info;
-      _results = [];
       for (key in _ref) {
         mapping_info = _ref[key];
         if (typeof this[key].setToDefault === 'function') {
-          _results.push(this[key].setToDefault());
-        } else {
-          _results.push(void 0);
+          this[key].setToDefault();
         }
       }
-      return _results;
+      return this;
     };
 
     Observables.prototype.model = function(new_model) {
@@ -2092,7 +2085,7 @@
     };
 
     ViewModel.prototype.model = function(new_model) {
-      var key, missing, model, model_observable, observable_options, vm_key, _i, _len, _results;
+      var key, missing, model, model_observable, observable_options, vm_key, _i, _len;
       model = kb.utils.wrappedObject(this);
       if ((arguments.length === 0) || (model === new_model)) {
         return model;
@@ -2116,15 +2109,14 @@
         path: kb.utils.wrappedPath(this),
         model_observable: kb.utils.wrappedModelObservable(this)
       };
-      _results = [];
       for (_i = 0, _len = missing.length; _i < _len; _i++) {
         key = missing[_i];
         this.__kb.keys.push(key);
         vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? '_' + key : key;
         observable_options.key = key;
-        _results.push(this[vm_key] = kb.observable(model, observable_options, this));
+        this[vm_key] = kb.observable(model, observable_options, this);
       }
-      return _results;
+      return new_model;
     };
 
     return ViewModel;

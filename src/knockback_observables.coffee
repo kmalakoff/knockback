@@ -38,6 +38,7 @@ class kb.Observables
   setToDefault: ->
     for key, mapping_info of @__kb.mappings_info
       @[key].setToDefault() if typeof(@[key].setToDefault) == 'function'
+    @
 
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)

@@ -281,6 +281,7 @@ class kb.CollectionObservable extends kb.RefCountable
     return unless view_models
     store = kb.utils.wrappedStore(observable)
     (store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) for view_model in view_models) 
+    @
 
   _collectionResync: (silent) ->
     @_clear(silent)
