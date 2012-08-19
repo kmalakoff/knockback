@@ -12,6 +12,10 @@ $(document).ready( ->
     ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb)
   )
 
+  test("0.16.0 deprecations", ->
+    kb.observables(new Backbone.Model(), ['hello'], {})
+  )
+
   test("Error cases", ->
     # TODO
   )

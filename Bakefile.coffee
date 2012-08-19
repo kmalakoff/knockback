@@ -15,7 +15,6 @@ module.exports =
       'src/knockback_formatted_observable.coffee'
       'src/knockback_localized_observable.coffee'
       'src/knockback_observable.coffee'
-      'src/knockback_observables.coffee'
       'src/knockback_triggered_observable.coffee'
       'src/knockback_view_model.coffee'
     ]
@@ -50,7 +49,6 @@ module.exports =
         'test/knockback_formatted_observable'
         'test/knockback_localized_observable'
         'test/knockback_observable'
-        'test/knockback_observables'
         'test/knockback_triggered_observable'
         'test/knockback_view_model'
         'test/knockback_memory_management'
@@ -72,7 +70,6 @@ module.exports =
         'test/knockback_formatted_observable'
         'test/knockback_localized_observable'
         'test/knockback_observable'
-        'test/knockback_observables'
         'test/knockback_triggered_observable'
         'test/knockback_view_model'
         'test/knockback_memory_management'

@@ -90,11 +90,11 @@ kb.utils.release = (obj, keys_only) ->
   return false unless obj
 
   # known type
-  if not keys_only and (ko.isObservable(obj) or (obj instanceof kb.Observables) or (typeof(obj.release) is 'function') or (typeof(obj.destroy) is 'function'))
+  if not keys_only and (ko.isObservable(obj) or (typeof(obj.release) is 'function') or (typeof(obj.destroy) is 'function'))
     if obj.release
-      obj.release()
+      obj.release() if not obj.hasOwnProperty('__kb') or obj.__kb # not yet released
     else if obj.destroy
-      obj.destroy()
+      obj.destroy() if not obj.hasOwnProperty('__kb') or obj.__kb # not yet released
     else if obj.dispose
       obj.dispose()
 

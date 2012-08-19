@@ -279,11 +279,15 @@
     if (!obj) {
       return false;
     }
-    if (!keys_only && (ko.isObservable(obj) || (obj instanceof kb.Observables) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function'))) {
+    if (!keys_only && (ko.isObservable(obj) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function'))) {
       if (obj.release) {
-        obj.release();
+        if (!obj.hasOwnProperty('__kb') || obj.__kb) {
+          obj.release();
+        }
       } else if (obj.destroy) {
-        obj.destroy();
+        if (!obj.hasOwnProperty('__kb') || obj.__kb) {
+          obj.destroy();
+        }
       } else if (obj.dispose) {
         obj.dispose();
       }
@@ -1867,97 +1871,6 @@
   };
 
   /*
-    knockback_observables.js
-    (c) 2011, 2012 Kevin Malakoff.
-    Knockback.Observables is freely distributable under the MIT license.
-    See the following for full license details:
-      https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  */
-
-
-  kb.Observables = (function() {
-
-    function Observables(model, mappings_info, view_model) {
-      var key, mapping_info, model_observable, _i, _len, _ref;
-      if (!(mappings_info && (_.isObject(mappings_info) || _.isArray(mappings_info)))) {
-        throw 'Observables: mappings_info is missing';
-      }
-      this.__kb || (this.__kb = {});
-      if (_.isArray(mappings_info)) {
-        this.__kb.mappings_info = {};
-        for (_i = 0, _len = mappings_info.length; _i < _len; _i++) {
-          key = mappings_info[_i];
-          this.__kb.mappings_info[key] = {};
-        }
-      } else {
-        this.__kb.mappings_info = mappings_info;
-      }
-      this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
-      model_observable = kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {
-        model: _.bind(this.model, this)
-      }));
-      _ref = this.__kb.mappings_info;
-      for (key in _ref) {
-        mapping_info = _ref[key];
-        if (!mapping_info.hasOwnProperty('key')) {
-          mapping_info.key = key;
-        }
-        mapping_info.model_observable = model_observable;
-        this[key] = this.__kb.view_model[key] = kb.observable(model, mapping_info, this.__kb.view_model);
-      }
-    }
-
-    Observables.prototype.destroy = function() {
-      var key, mapping_info, _ref;
-      _ref = this.__kb.mappings_info;
-      for (key in _ref) {
-        mapping_info = _ref[key];
-        if (this[key] && this[key].__kb) {
-          this[key].destroy();
-        }
-        this[key] = this.__kb.view_model[key] = null;
-      }
-      return kb.utils.wrappedDestroy(this);
-    };
-
-    Observables.prototype.setToDefault = function() {
-      var key, mapping_info, _ref;
-      _ref = this.__kb.mappings_info;
-      for (key in _ref) {
-        mapping_info = _ref[key];
-        if (typeof this[key].setToDefault === 'function') {
-          this[key].setToDefault();
-        }
-      }
-      return this;
-    };
-
-    Observables.prototype.model = function(new_model) {
-      var model, model_observable;
-      model = kb.utils.wrappedObject(this);
-      if ((arguments.length === 0) || (model === new_model)) {
-        return model;
-      }
-      model = kb.utils.wrappedObject(this, new_model);
-      if (!model) {
-        return;
-      }
-      model_observable = kb.utils.wrappedModelObservable(this);
-      if (!model_observable) {
-        return new_model;
-      }
-      return model_observable.model(model);
-    };
-
-    return Observables;
-
-  })();
-
-  kb.observables = function(model, mappings_info, view_model) {
-    return new kb.Observables(model, mappings_info, view_model);
-  };
-
-  /*
     knockback_triggered_observable.js
     (c) 2011, 2012 Kevin Malakoff.
     Knockback.Observable is freely distributable under the MIT license.
@@ -2048,8 +1961,8 @@
 
     __extends(ViewModel, _super);
 
-    function ViewModel(model, options) {
-      var bb_model, factory, key, keys, model_observable, observable_options, path, store, vm_key, _i, _len, _ref;
+    function ViewModel(model, options, view_model) {
+      var bb_model, keys, model_observable;
       if (options == null) {
         options = {};
       }
@@ -2057,11 +1970,19 @@
       if (kb.statistics) {
         kb.statistics.register('kb.ViewModel', this);
       }
-      store = kb.Store.useOptionsOrCreate(options, model, this);
-      factory = kb.Factory.useOptionsOrCreate(options, this);
-      path = kb.utils.wrappedPath(this, options.path);
+      if (_.isArray(options)) {
+        options = {
+          requires: options
+        };
+      }
+      this.__kb || (this.__kb = {});
+      this.__kb.vm_keys = {};
+      this.__kb.model_keys = {};
+      this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
       this.__kb.internals = options.internals;
-      this.__kb.requires = options.requires;
+      kb.Store.useOptionsOrCreate(options, model, this);
+      kb.Factory.useOptionsOrCreate(options, this);
+      kb.utils.wrappedPath(this, options.path);
       model_observable = kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {
         model: _.bind(this.model, this)
       }));
@@ -2072,27 +1993,25 @@
       if (this.__kb.internals) {
         keys = keys ? _.union(keys, this.__kb.internals) : this.__kb.internals;
       }
-      if (this.__kb.requires) {
-        keys = keys ? _.union(keys, this.__kb.requires) : this.__kb.requires;
+      if (options.requires && _.isArray(options.requires)) {
+        keys = keys ? _.union(keys, options.requires) : options.requires;
       }
-      this.__kb.keys = keys || [];
-      observable_options = {
-        store: store,
-        factory: factory,
-        path: path,
-        model_observable: model_observable
-      };
-      _ref = this.__kb.keys;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        key = _ref[_i];
-        vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? '_' + key : key;
-        observable_options.key = key;
-        this[vm_key] = kb.observable(model, observable_options, this);
+      if (options.requires && _.isObject(options.requires)) {
+        this._mapObservables(model, options.requires);
+      }
+      if (keys) {
+        this._createObservables(model, keys);
       }
     }
 
     ViewModel.prototype.__destroy = function() {
+      var vm_key;
       kb.utils.release(this, true);
+      if (this.__kb.view_model !== this) {
+        for (vm_key in this.__kb.vm_keys) {
+          this.__kb.view_model[vm_key] = null;
+        }
+      }
       kb.utils.wrappedDestroy(this);
       ViewModel.__super__.__destroy.apply(this, arguments);
       if (kb.statistics) {
@@ -2101,7 +2020,7 @@
     };
 
     ViewModel.prototype.model = function(new_model) {
-      var key, missing, model, model_observable, observable_options, vm_key, _i, _len;
+      var missing, model, model_observable;
       model = kb.utils.wrappedObject(this);
       if ((arguments.length === 0) || (model === new_model)) {
         return model;
@@ -2115,32 +2034,81 @@
         return new_model;
       }
       model_observable.model(model);
-      missing = _.difference(this.__kb.keys, _.keys(model.attributes));
-      if (!missing) {
-        return;
+      missing = _.difference(_.keys(this.__kb.model_keys), _.keys(model.attributes));
+      if (missing) {
+        return this._createObservables(new_model, missing);
       }
+    };
+
+    ViewModel.prototype.setToDefault = function() {
+      var vm_key;
+      for (vm_key in this.__kb.vm_keys) {
+        if (typeof this[vm_key].setToDefault === 'function') {
+          this[vm_key].setToDefault();
+        }
+      }
+      return this;
+    };
+
+    ViewModel.prototype._createObservables = function(model, keys) {
+      var key, observable_options, vm_key, _i, _len;
       observable_options = {
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
         path: kb.utils.wrappedPath(this),
         model_observable: kb.utils.wrappedModelObservable(this)
       };
-      for (_i = 0, _len = missing.length; _i < _len; _i++) {
-        key = missing[_i];
-        this.__kb.keys.push(key);
-        vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? '_' + key : key;
+      for (_i = 0, _len = keys.length; _i < _len; _i++) {
+        key = keys[_i];
+        vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
+        if (this[vm_key]) {
+          continue;
+        }
+        this.__kb.vm_keys[vm_key] = true;
+        this.__kb.model_keys[key] = true;
         observable_options.key = key;
-        this[vm_key] = kb.observable(model, observable_options, this);
+        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, observable_options, this);
       }
-      return new_model;
+      return this;
+    };
+
+    ViewModel.prototype._mapObservables = function(model, mapping_info) {
+      var observable_options, options, vm_key;
+      observable_options = {
+        store: kb.utils.wrappedStore(this),
+        factory: kb.utils.wrappedFactory(this),
+        path: kb.utils.wrappedPath(this),
+        model_observable: kb.utils.wrappedModelObservable(this)
+      };
+      for (vm_key in mapping_info) {
+        options = mapping_info[vm_key];
+        if (this[vm_key]) {
+          continue;
+        }
+        options = _.isString(options) ? {
+          key: options
+        } : _.clone(options);
+        if (!options.key) {
+          options.key = vm_key;
+        }
+        this.__kb.vm_keys[vm_key] = true;
+        this.__kb.model_keys[options.key] = true;
+        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(options, observable_options), this);
+      }
+      return this;
     };
 
     return ViewModel;
 
   })(kb.RefCountable);
 
-  kb.viewModel = function(model, options) {
-    return new kb.ViewModel(model, options);
+  kb.viewModel = function(model, options, view_model) {
+    return new kb.ViewModel(model, options, view_model);
+  };
+
+  kb.observables = function(model, mappings_info, view_model) {
+    kb.utils.legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead');
+    return new kb.ViewModel(model, mappings_info, view_model);
   };
 
 }).call(this);
