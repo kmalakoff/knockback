@@ -6,6 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+if (typeof(require) != 'undefined') then _ = require('underscore') else _ = window._
+_ = _._ if _ and (_.hasOwnProperty('_')) # LEGACY
+kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+
 class kb.Statistics
   constructor: ->
     @type_trackers = {}

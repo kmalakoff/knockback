@@ -4,7 +4,6 @@ module.exports =
     compress: true
     files: [
       'src/knockback_core.coffee'
-      'src/knockback_statistics.coffee'
       'src/knockback_utils.coffee'
       'src/knockback_ref_countable.coffee'
       'src/knockback_factory.coffee'
@@ -25,6 +24,15 @@ module.exports =
         'cp README.md packages/npm/README.md'
         'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
         'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
+      ]
+
+  statistics:
+    output: 'lib'
+    files: 'src/knockback_statistics.coffee'
+    _build:
+      commands: [
+        'cp lib/knockback_statistics.js packages/npm/lib/knockback_statistics.js'
+        'cp lib/knockback_statistics.js packages/nuget/Content/Scripts/lib/knockback_statistics.js'
       ]
 
   test_examples:

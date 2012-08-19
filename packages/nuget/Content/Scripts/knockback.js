@@ -50,53 +50,6 @@
   kb.TYPE_COLLECTION = 3;
 
   /*
-    knockback_statistics.js
-    (c) 2012 Kevin Malakoff.
-    Knockback.Stats is freely distributable under the MIT license.
-    See the following for full license details:
-      https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  */
-
-
-  kb.Statistics = (function() {
-
-    function Statistics() {
-      this.type_trackers = {};
-    }
-
-    Statistics.prototype.typeTracker = function(type) {
-      var type_tracker;
-      if (this.type_trackers.hasOwnProperty(type)) {
-        return this.type_trackers[type];
-      }
-      type_tracker = [];
-      this.type_trackers[type] = type_tracker;
-      return type_tracker;
-    };
-
-    Statistics.prototype.register = function(type, obj) {
-      return this.typeTracker(type).push(obj);
-    };
-
-    Statistics.prototype.unregister = function(type, obj) {
-      var index, type_tracker;
-      type_tracker = this.typeTracker(type);
-      index = _.indexOf(type_tracker, obj);
-      if (index < 0) {
-        throw "failed to unregister type: " + type;
-      }
-      return type_tracker.splice(index, 1);
-    };
-
-    Statistics.prototype.registeredCount = function(type) {
-      return this.typeTracker(type).length;
-    };
-
-    return Statistics;
-
-  })();
-
-  /*
     knockback_utils.js
     (c) 2011, 2012 Kevin Malakoff.
     Knockback.js is freely distributable under the MIT license.
@@ -422,7 +375,7 @@
 
   kb.Factory = (function() {
 
-    Factory.useOptionsOrCreate = function(options, obj) {
+    Factory.useOptionsOrCreate = function(options, obj, owner_path) {
       var factory;
       if (options.factory && !options.mappings) {
         factory = kb.utils.wrappedFactory(obj, options.factory);
@@ -430,7 +383,7 @@
         factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
       }
       if (options.mappings) {
-        factory.addPathMappings(options.mappings);
+        factory.addPathMappings(options.mappings, owner_path);
       }
       return factory;
     };
@@ -448,15 +401,11 @@
       return this.paths[path] = create_info;
     };
 
-    Factory.prototype.addPathMappings = function(mappings) {
+    Factory.prototype.addPathMappings = function(mappings, owner_path) {
       var create_info, path;
-      if (typeof mappings === 'function' || mappings.create) {
-        this.default_creator = mappings;
-      } else {
-        for (path in mappings) {
-          create_info = mappings[path];
-          this.paths[path] = create_info;
-        }
+      for (path in mappings) {
+        create_info = mappings[path];
+        this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
       }
       return this;
     };
@@ -476,9 +425,6 @@
         if (creator) {
           return creator;
         }
-      }
-      if (this.default_creator) {
-        return this.default_creator;
       }
       if (obj instanceof Backbone.Model) {
         return kb.ViewModel;
@@ -630,7 +576,7 @@
         if (creator.models_only) {
           return obj;
         }
-        if (!(obj instanceof Backbone.Collection)) {
+        if (obj && !(obj instanceof Backbone.Collection)) {
           _ref = this.objects;
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             test = _ref[index];
@@ -974,12 +920,15 @@
       this.__kb._onModelAdd = _.bind(this._onModelAdd, this);
       this.__kb._onModelRemove = _.bind(this._onModelRemove, this);
       this.__kb._onModelChange = _.bind(this._onModelChange, this);
+      if (options.options) {
+        options = _.defaults(_.clone(options), options.options);
+      }
       kb.Store.useOptionsOrCreate(options, collection, observable);
+      kb.utils.wrappedPath(observable, options.path);
       factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
       if (options.mappings) {
-        factory.addPathMappings(options.mappings);
+        factory.addPathMappings(options.mappings, options.path);
       }
-      kb.utils.wrappedPath(observable, options.path);
       this.models_path = kb.utils.pathJoin(options.path, 'models');
       if (!factory.hasPath(this.models_path)) {
         if (options.hasOwnProperty('models_only')) {
@@ -1679,11 +1628,15 @@
   kb.Observable = (function() {
 
     function Observable(model, options, view_model) {
-      var observable,
+      var factory, observable,
         _this = this;
       this.view_model = view_model != null ? view_model : {};
       if (!options) {
         kb.utils.throwMissing(this, 'options');
+      }
+      if (options.options) {
+        options = _.defaults(_.clone(options), options.options);
+        delete options.options;
       }
       this.key = _.isString(options) || ko.isObservable(options) ? options : options.key;
       if (!this.key) {
@@ -1745,8 +1698,13 @@
         owner: this.view_model
       }));
       kb.utils.wrappedStore(observable, options.store);
-      kb.Factory.useOptionsOrCreate(options, observable);
       kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, this.key));
+      if (options.mappings && ((typeof options.mappings === 'function') || options.mappings.create)) {
+        factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
+        factory.addPathMapping(kb.utils.wrappedPath(observable), options.mappings);
+      } else {
+        kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable));
+      }
       observable.valueType = _.bind(this.valueType, this);
       observable.model = _.bind(this.model, this);
       observable.update = _.bind(this.update, this);
@@ -1848,6 +1806,9 @@
       }
       if (!ko.isObservable(value)) {
         this.value_type = kb.TYPE_MODEL;
+        if (typeof value.model !== 'function') {
+          kb.utils.wrappedObject(value, new_value);
+        }
       } else if (kb.utils.observableInstanceOf(value, kb.CollectionObservable)) {
         this.value_type = kb.TYPE_COLLECTION;
       } else {
@@ -1970,6 +1931,9 @@
       if (kb.statistics) {
         kb.statistics.register('kb.ViewModel', this);
       }
+      if (options.options) {
+        options = _.defaults(_.clone(options), options.options);
+      }
       if (_.isArray(options)) {
         options = {
           requires: options
@@ -1981,8 +1945,8 @@
       this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
       this.__kb.internals = options.internals;
       kb.Store.useOptionsOrCreate(options, model, this);
-      kb.Factory.useOptionsOrCreate(options, this);
       kb.utils.wrappedPath(this, options.path);
+      kb.Factory.useOptionsOrCreate(options, this, options.path);
       model_observable = kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {
         model: _.bind(this.model, this)
       }));

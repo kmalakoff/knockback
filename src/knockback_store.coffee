@@ -66,7 +66,7 @@ class kb.Store
       return obj if creator.models_only  # do not create an observable
 
       # check for an existing one of the correct type
-      unless obj instanceof Backbone.Collection # don't share collection observables
+      if obj and not (obj instanceof Backbone.Collection) # don't share collection observables
         for test, index in @objects
           observable = @observables[index]
           if (test is obj) and (observable.__kb.creator is creator)

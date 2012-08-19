@@ -11,6 +11,7 @@ class kb.Observable
     kb.utils.throwMissing(this, 'options') unless options
 
     # extract options
+    (options = _.defaults(_.clone(options), options.options); delete options.options) if options.options
     @key = if _.isString(options) or ko.isObservable(options) then options else options.key
     kb.utils.throwMissing(this, 'key') unless @key
     @args = options.args
@@ -54,8 +55,12 @@ class kb.Observable
       owner: @view_model
     ))
     kb.utils.wrappedStore(observable, options.store)
-    kb.Factory.useOptionsOrCreate(options, observable)
     kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
+    if options.mappings and ((typeof(options.mappings) == 'function') or options.mappings.create)
+      factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
+      factory.addPathMapping(kb.utils.wrappedPath(observable), options.mappings)
+    else
+      kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable))
 
     # publish public interface on the observable and return instead of this
     observable.valueType = _.bind(@valueType, @)
@@ -109,7 +114,7 @@ class kb.Observable
 
     else if @value_type == kb.TYPE_MODEL
       # use the get/set methods
-      if typeof(value.model) == 'function'
+      if typeof(value.model) is 'function'
         value.model(new_value) if value.model() isnt new_value # different so update
 
       # different so create a new one (no way to update)
@@ -144,6 +149,8 @@ class kb.Observable
     # cache the type
     if not ko.isObservable(value) # a view model, recognize view_models as non-observable
       @value_type = kb.TYPE_MODEL
+      if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
+        kb.utils.wrappedObject(value, new_value)
     else if kb.utils.observableInstanceOf(value, kb.CollectionObservable)
       @value_type = kb.TYPE_COLLECTION
     else

@@ -44,12 +44,13 @@ class kb.CollectionObservable extends kb.RefCountable
     @__kb._onModelChange = _.bind(@_onModelChange, @)
 
     # always use a store to cache view models
+    options = _.defaults(_.clone(options), options.options) if options.options
     kb.Store.useOptionsOrCreate(options, collection, observable)
 
     # view model factory create mappings
-    factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
-    factory.addPathMappings(options.mappings) if options.mappings
     kb.utils.wrappedPath(observable, options.path)
+    factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
+    factory.addPathMappings(options.mappings, options.path) if options.mappings
     @models_path = kb.utils.pathJoin(options.path, 'models')
 
     # add or deduce models create information

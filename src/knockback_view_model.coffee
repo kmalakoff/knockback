@@ -21,6 +21,7 @@ class kb.ViewModel extends kb.RefCountable
     kb.statistics.register('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
 
     # bind and extract options
+    options = _.defaults(_.clone(options), options.options) if options.options
     options = {requires: options} if _.isArray(options) 
     @__kb or= {}
     @__kb.vm_keys = {}
@@ -32,8 +33,8 @@ class kb.ViewModel extends kb.RefCountable
     kb.Store.useOptionsOrCreate(options, model, @)
 
     # view model factory
-    kb.Factory.useOptionsOrCreate(options, @)
     kb.utils.wrappedPath(@, options.path)
+    kb.Factory.useOptionsOrCreate(options, @, options.path)
 
     # update to set up first values observable
     model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @)}))

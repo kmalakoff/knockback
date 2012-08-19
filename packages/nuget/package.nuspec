@@ -21,5 +21,6 @@
   <files>
     <file src="content/Scripts/knockback.js" target="content/Scripts/knockback.js" />
     <file src="content/Scripts/knockback.min.js" target="content/Scripts/knockback.min.js" />
+    <file src="content/Scripts/lib/knockback_statistics.js" target="content/Scripts/lib/knockback_statistics.js" />
   </files>
 </package>
