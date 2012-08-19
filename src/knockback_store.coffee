@@ -57,11 +57,11 @@ class kb.Store
     else
       observable.__kb.creator = null
 
-  findOrCreateObservable: (obj, path, factory) ->
+  findOrCreateObservable: (obj, path, factory, creator) ->
     if not factory
-      observable = kb.Factory.createDefault(obj, {path: path})
+      observable = if creator then creator(obj, {path: path, store: this, creator: creator}) else kb.Factory.createDefault(obj, {path: path, store: this})
     else
-      creator = factory.creatorForPath(obj, path)
+      creator = factory.creatorForPath(obj, path) if not creator
       return ko.observable(obj) unless creator
       return obj if creator.models_only  # do not create an observable
 

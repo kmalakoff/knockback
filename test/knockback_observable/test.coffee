@@ -118,7 +118,7 @@ $(document).ready( ->
       return kb.collectionObservable(obj, {view_model: InferingViewModel, options: options})
 
     InferingViewModel = (model, options) ->
-      kb.viewModel(model, {requires: ['name', 'parent', 'children', 'anything'], options: options}, @)
+      kb.viewModel(model, {keys: ['name', 'parent', 'children', 'anything'], options: options}, @)
       @maybe_null_name = kb.observable(model, 'maybe_null_name')
       @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', mappings: InferingViewModel, options: options})
       @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', mappings: {create: createCollection}, options: options})

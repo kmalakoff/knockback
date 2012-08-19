@@ -40,6 +40,8 @@ $(document).ready( ->
         key: 'occupies'
     }]
   })
+  Person.setup()
+  Building.setup()
 
   test("1. Model with HasMany relations: A house with multiple people living in it", ->
       kb.statistics = new kb.Statistics() # turn on stats
@@ -301,24 +303,8 @@ $(document).ready( ->
     BookStore.setup()
 
     bs = new BookStore({
-      books:[{
-        _id:"b1"
-        name: "Book One"
-        author: "a1"
-      },{
-        _id:"b2",
-        name: "Book Two"
-        author: "a1"
-      }],
-      authors:[{
-        name: 'fred'
-        _id: "a1"
-        books: []
-      },{
-        name: 'ted'
-        _id: "a2"
-        books: []
-      }]
+      books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],
+      authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
     })
 
     BookViewModel = kb.ViewModel.extend({
@@ -436,6 +422,41 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.utils.release(collection_observable)
+
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.statistics = null # turn off stats
+  )
+
+  test("6. Infering observable types", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    person1 = new Person({id: 'person-6-1', name: 'Daddy'})
+    person2 = new Person({id: 'person-6-2', name: 'Mommy'})
+    house = new Building({id: 'house-6-1', name: 'Home Sweet Home'})
+
+    view_model_person1 = kb.viewModel(person1)
+    view_model_house1 = kb.viewModel(house)
+
+    # inferred the relationship types
+    equal(view_model_person1.name(), 'Daddy', 'person1 name is Daddy')
+    equal(view_model_person1.friends().length, 0, 'person1 has no friends')
+    equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has not best_friends')
+    ok(view_model_person1.occupies() instanceof kb.ViewModel, 'person1 occupies is kb.ViewModel')
+    equal(view_model_house1.occupants().length, 0, 'house has no occupants')
+
+    # add some friends
+    person1.get('friends').add(person2); person2.set({best_friend: person1})
+    equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+    equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+    equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+
+    # add some occupants
+    house.get('occupants').add(person1).add(person2)
+    equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+    equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+    equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
 
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')

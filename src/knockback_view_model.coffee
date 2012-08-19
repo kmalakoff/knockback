@@ -22,7 +22,7 @@ class kb.ViewModel extends kb.RefCountable
 
     # bind and extract options
     options = _.defaults(_.clone(options), options.options) if options.options
-    options = {requires: options} if _.isArray(options) 
+    options = {keys: options} if _.isArray(options) 
     @__kb or= {}
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
@@ -40,19 +40,23 @@ class kb.ViewModel extends kb.RefCountable
     model_observable = kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @)}))
 
     # collect the important keys
-    bb_model = model_observable.model(); keys = _.keys(bb_model.attributes) if bb_model
+    if options.keys # don't merge all the keys if keys are specified
+      keys = options.keys if _.isArray(options.keys)
+    else
+      bb_model = model_observable.model(); keys = _.keys(bb_model.attributes) if bb_model
     (keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals) if @__kb.internals
     (keys = if keys then _.union(keys, options.requires) else options.requires) if options.requires and _.isArray(options.requires)
 
     # initialize
-    @_mapObservables(model, options.requires) if options.requires and _.isObject(options.requires)
+    @_mapObservables(model, options.keys) if _.isObject(options.keys)
+    @_mapObservables(model, options.requires) if _.isObject(options.requires)
     @_createObservables(model, keys) if keys
 
   __destroy: ->
-    kb.utils.release(this, true) # release the observables
     if @__kb.view_model isnt @ # clear the external references
       for vm_key of @__kb.vm_keys
         @__kb.view_model[vm_key] = null
+    kb.utils.release(this, true) # release the observables
     kb.utils.wrappedDestroy(@)
     super
 
@@ -69,7 +73,7 @@ class kb.ViewModel extends kb.RefCountable
 
     # add all the missing keys
     # NOTE: this does not remove keys that are different between the models
-    missing = _.difference(_.keys(@__kb.model_keys), _.keys(model.attributes))
+    missing = _.difference(_.keys(model.attributes), _.keys(@__kb.model_keys))
     @_createObservables(new_model, missing) if missing    
 
   setToDefault: ->

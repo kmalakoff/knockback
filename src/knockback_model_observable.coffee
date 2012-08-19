@@ -62,8 +62,8 @@ class kb.ModelObservable
 
     # switch bindings
     for event_name, callbacks of @__kb.callbacks
-      @_modelUnbindEvent(model, event_name, callbacks) if model
-      @_modelBindEvent(new_model, event_name, callbacks) if new_model
+      model.unbind(event_name, callbacks.fn) if model
+      new_model.bind(event_name, callbacks.fn) if new_model
 
       # notify
       list = callbacks.list
@@ -96,7 +96,7 @@ class kb.ModelObservable
           return null
       }
       @__kb.callbacks[event_name] = callbacks
-      @_modelBindEvent(model, event_name, callbacks) if model # register for the new event type
+      model.bind(event_name, callbacks.fn) if model # register for the new event type
 
     # add the callback information
     info = {}
@@ -138,8 +138,7 @@ class kb.ModelObservable
 
     # bind all events
     for event_name, callbacks of @__kb.callbacks
-      @_modelBindEvent(model, event_name, callbacks)
-
+      model.bind(event_name, callbacks.fn)
 
       # bind and notify
       list = callbacks.list
@@ -154,27 +153,13 @@ class kb.ModelObservable
 
     # unbind all events
     for event_name, callbacks of @__kb.callbacks
-      @_modelUnbindEvent(model, event_name, callbacks)
+      model.unbind(event_name, callbacks.fn)
 
       # notify
       list = callbacks.list
       for info in list
         @_modelUnbindRelatationalInfo(model, event_name, info) if is_relational
         (info.model(null) if info.model) 
-    @
-
-  _modelBindEvent: (model, event_name, callbacks) ->
-    model.bind(event_name, callbacks.fn)
-    # if Backbone.RelationalModel and (event_name is 'change') and (model instanceof Backbone.RelationalModel)
-    #   model.bind('add', callbacks.fn)
-    #   model.bind('remove', callbacks.fn)
-    @
-
-  _modelUnbindEvent: (model, event_name, callbacks) ->
-    model.unbind(event_name, callbacks.fn)
-    # if Backbone.RelationalModel and (event_name is 'change') and (model instanceof Backbone.RelationalModel)
-    #   model.unbind('add', callbacks.fn)
-    #   model.unbind('remove', callbacks.fn)
     @
 
   _modelBindRelatationalInfo: (model, event_name, info) ->

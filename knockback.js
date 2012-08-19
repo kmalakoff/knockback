@@ -562,14 +562,21 @@
       }
     };
 
-    Store.prototype.findOrCreateObservable = function(obj, path, factory) {
-      var creator, index, observable, test, _i, _len, _ref;
+    Store.prototype.findOrCreateObservable = function(obj, path, factory, creator) {
+      var index, observable, test, _i, _len, _ref;
       if (!factory) {
-        observable = kb.Factory.createDefault(obj, {
-          path: path
+        observable = creator ? creator(obj, {
+          path: path,
+          store: this,
+          creator: creator
+        }) : kb.Factory.createDefault(obj, {
+          path: path,
+          store: this
         });
       } else {
-        creator = factory.creatorForPath(obj, path);
+        if (!creator) {
+          creator = factory.creatorForPath(obj, path);
+        }
         if (!creator) {
           return ko.observable(obj);
         }
@@ -708,10 +715,10 @@
       for (event_name in _ref) {
         callbacks = _ref[event_name];
         if (model) {
-          this._modelUnbindEvent(model, event_name, callbacks);
+          model.unbind(event_name, callbacks.fn);
         }
         if (new_model) {
-          this._modelBindEvent(new_model, event_name, callbacks);
+          new_model.bind(event_name, callbacks.fn);
         }
         list = callbacks.list;
         for (_i = 0, _len = list.length; _i < _len; _i++) {
@@ -756,7 +763,7 @@
         };
         this.__kb.callbacks[event_name] = callbacks;
         if (model) {
-          this._modelBindEvent(model, event_name, callbacks);
+          model.bind(event_name, callbacks.fn);
         }
       }
       info = {};
@@ -813,7 +820,7 @@
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
         callbacks = _ref[event_name];
-        this._modelBindEvent(model, event_name, callbacks);
+        model.bind(event_name, callbacks.fn);
         list = callbacks.list;
         for (_i = 0, _len = list.length; _i < _len; _i++) {
           info = list[_i];
@@ -835,7 +842,7 @@
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
         callbacks = _ref[event_name];
-        this._modelUnbindEvent(model, event_name, callbacks);
+        model.unbind(event_name, callbacks.fn);
         list = callbacks.list;
         for (_i = 0, _len = list.length; _i < _len; _i++) {
           info = list[_i];
@@ -847,16 +854,6 @@
           }
         }
       }
-      return this;
-    };
-
-    ModelObservable.prototype._modelBindEvent = function(model, event_name, callbacks) {
-      model.bind(event_name, callbacks.fn);
-      return this;
-    };
-
-    ModelObservable.prototype._modelUnbindEvent = function(model, event_name, callbacks) {
-      model.unbind(event_name, callbacks.fn);
       return this;
     };
 
@@ -1794,15 +1791,28 @@
     };
 
     Observable.prototype._updateValueObservable = function(new_value) {
-      var factory, observable, path, store, value, value_observable;
+      var creator, factory, key, model, observable, path, relation, store, value, value_observable;
       observable = kb.utils.wrappedObservable(this);
+      model = kb.utils.wrappedObject(observable);
       store = kb.utils.wrappedStore(observable);
       factory = kb.utils.wrappedFactory(observable);
       path = kb.utils.wrappedPath(observable);
+      creator = factory.creatorForPath(new_value, path);
+      if (!creator && model && Backbone.RelationalModel && (model instanceof Backbone.RelationalModel)) {
+        key = ko.utils.unwrapObservable(this.key);
+        relation = _.find(model.getRelations(), function(test) {
+          return test.key === key;
+        });
+        if (relation) {
+          creator = relation.collectionKey ? kb.CollectionObservable : kb.ViewModel;
+        }
+      }
       if (store) {
-        value = store.findOrCreateObservable(new_value, path, factory);
+        value = store.findOrCreateObservable(new_value, path, factory, creator);
+      } else if (creator) {
+        value = factory.createForPath(new_value, path, store, creator);
       } else {
-        value = factory.createForPath(new_value, path);
+        value = ko.observable(new_value);
       }
       if (!ko.isObservable(value)) {
         this.value_type = kb.TYPE_MODEL;
@@ -1936,7 +1946,7 @@
       }
       if (_.isArray(options)) {
         options = {
-          requires: options
+          keys: options
         };
       }
       this.__kb || (this.__kb = {});
@@ -1950,9 +1960,15 @@
       model_observable = kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {
         model: _.bind(this.model, this)
       }));
-      bb_model = model_observable.model();
-      if (bb_model) {
-        keys = _.keys(bb_model.attributes);
+      if (options.keys) {
+        if (_.isArray(options.keys)) {
+          keys = options.keys;
+        }
+      } else {
+        bb_model = model_observable.model();
+        if (bb_model) {
+          keys = _.keys(bb_model.attributes);
+        }
       }
       if (this.__kb.internals) {
         keys = keys ? _.union(keys, this.__kb.internals) : this.__kb.internals;
@@ -1960,7 +1976,10 @@
       if (options.requires && _.isArray(options.requires)) {
         keys = keys ? _.union(keys, options.requires) : options.requires;
       }
-      if (options.requires && _.isObject(options.requires)) {
+      if (_.isObject(options.keys)) {
+        this._mapObservables(model, options.keys);
+      }
+      if (_.isObject(options.requires)) {
         this._mapObservables(model, options.requires);
       }
       if (keys) {
@@ -1970,12 +1989,12 @@
 
     ViewModel.prototype.__destroy = function() {
       var vm_key;
-      kb.utils.release(this, true);
       if (this.__kb.view_model !== this) {
         for (vm_key in this.__kb.vm_keys) {
           this.__kb.view_model[vm_key] = null;
         }
       }
+      kb.utils.release(this, true);
       kb.utils.wrappedDestroy(this);
       ViewModel.__super__.__destroy.apply(this, arguments);
       if (kb.statistics) {
@@ -1998,7 +2017,7 @@
         return new_model;
       }
       model_observable.model(model);
-      missing = _.difference(_.keys(this.__kb.model_keys), _.keys(model.attributes));
+      missing = _.difference(_.keys(model.attributes), _.keys(this.__kb.model_keys));
       if (missing) {
         return this._createObservables(new_model, missing);
       }

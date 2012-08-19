@@ -138,13 +138,25 @@ class kb.Observable
   ####################################################
   _updateValueObservable: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
+    model = kb.utils.wrappedObject(observable)
     store = kb.utils.wrappedStore(observable)
     factory = kb.utils.wrappedFactory(observable)
     path = kb.utils.wrappedPath(observable)
+    creator = factory.creatorForPath(new_value, path)
+
+    # infer Backbone.Relational types
+    if not creator and model and Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+      key = ko.utils.unwrapObservable(@key)
+      relation = _.find(model.getRelations(), (test) -> return test.key is key)
+      (creator = if relation.collectionKey then kb.CollectionObservable else kb.ViewModel) if relation
+
+    # create and store
     if store
-      value = store.findOrCreateObservable(new_value, path, factory)
+      value = store.findOrCreateObservable(new_value, path, factory, creator)
+    else if creator
+      value = factory.createForPath(new_value, path, store, creator)
     else
-      value = factory.createForPath(new_value, path)
+      value = ko.observable(new_value)
 
     # cache the type
     if not ko.isObservable(value) # a view model, recognize view_models as non-observable
