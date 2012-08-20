@@ -33,7 +33,7 @@ class kb.ViewModel extends kb.RefCountable
     kb.Store.useOptionsOrCreate(options, model, @)
 
     # view model factory
-    kb.utils.wrappedPath(@, options.path)
+    @__kb.path = options.path
     kb.Factory.useOptionsOrCreate(options, @, options.path)
 
     # update to set up first values observable
@@ -49,7 +49,7 @@ class kb.ViewModel extends kb.RefCountable
           mapped_keys[if _.isString(mapping_info) then mapping_info else (if mapping_info.key then mapping_info.key else vm_key)] = true
         @__kb.keys = _.keys(mapped_keys)
     else
-      bb_model = model_watcher.model(); keys = _.keys(bb_model.attributes) if bb_model
+      bb_model = model_watcher.model(); keys = _.keys(bb_model.attributes) if bb_model and bb_model.attributes
     (keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals) if @__kb.internals
     (keys = if keys then _.union(keys, options.requires) else options.requires) if options.requires and _.isArray(options.requires)
 
@@ -95,7 +95,7 @@ class kb.ViewModel extends kb.RefCountable
     @
 
   _createObservables: (model, keys) ->
-    observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@), model_watcher: kb.utils.wrappedModelWatcher(@)}
+    observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for key in keys
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
       continue if @[vm_key] # already exists, skip
@@ -109,7 +109,7 @@ class kb.ViewModel extends kb.RefCountable
     @
 
   _mapObservables: (model, mappings) ->
-    observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@), model_watcher: kb.utils.wrappedModelWatcher(@)}
+    observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)

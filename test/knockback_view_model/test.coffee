@@ -577,7 +577,7 @@ $(document).ready( ->
 
   test("Bulk mode (array of keys)", ->
     model = new _kbe.Contact({name: 'John', number: '555-555-5558'})
-    view_model = kb.observables(model, ['name', 'number'])
+    view_model = kb.viewModel(model, ['name', 'number'])
 
     # get
     equal(view_model.name(), 'John', "It is a name")

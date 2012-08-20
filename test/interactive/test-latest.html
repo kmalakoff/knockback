@@ -109,25 +109,25 @@
         write:  function(value) { return kb.locale_manager.setLocale(value); },
         owner: view_model
       });
-      kb.observables(kb.locale_manager, {
+      kb.viewModel(kb.locale_manager, { mappings: {
         label_title_new:    { key: 'label_title_new' },
         label_button_new:   { key: 'label_button_new' },
         label_name:         { key: 'label_name' },
         label_email:        { key: 'label_email' },
         label_date:         { key: 'label_date' }
-      }, view_model);
+      }}, view_model);
 
       var ContactViewModel = function(model) {
-        kb.observables(kb.locale_manager, {
+        kb.viewModel(kb.locale_manager, { mappings: {
           label_name:     { key: 'label_name' },
           label_email:    { key: 'label_email' },
           label_date:     { key: 'label_date' }
-        }, this);
-        kb.observables(model, {
+        }}, this);
+        kb.viewModel(model, { mappings: {
           name:           { key: 'name' },
           email:          { key: 'email' },
           date:           { key: 'date', localizer: _kbe.LongDateLocalizer }
-        }, this);
+        }}, this);
       };
       view_model.contacts = Knockback.collectionObservable(collection, {
         view_model:       ContactViewModel,

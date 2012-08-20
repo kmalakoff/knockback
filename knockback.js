@@ -56,7 +56,9 @@
     }
     if (!keys_only && (ko.isObservable(obj) || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
       if (obj.destroy) {
-        obj.destroy();
+        if (obj.collection || !(obj.destroyAll && obj.indexOf)) {
+          obj.destroy();
+        }
       } else if (obj.release) {
         obj.release();
       } else if (obj.dispose) {
@@ -73,7 +75,9 @@
         }
         obj[key] = null;
         if (value.destroy) {
-          value.destroy();
+          if (value.collection || !(value.destroyAll && value.indexOf)) {
+            value.destroy();
+          }
         } else if (value.release) {
           value.release();
         } else if (value.dispose) {
@@ -191,11 +195,6 @@
 
   kb.utils.wrappedFactory = function(obj, value) {
     splice.call(arguments, 1, 0, 'factory');
-    return kb.utils.wrappedKey.apply(this, arguments);
-  };
-
-  kb.utils.wrappedPath = function(obj, value) {
-    splice.call(arguments, 1, 0, 'path');
     return kb.utils.wrappedKey.apply(this, arguments);
   };
 
@@ -858,7 +857,7 @@
   kb.CollectionObservable = (function() {
 
     function CollectionObservable(collection, options) {
-      var factory, observable;
+      var creator, factory, observable;
       if (options == null) {
         options = {};
       }
@@ -878,13 +877,15 @@
         options = _.defaults(_.clone(options), options.options);
       }
       kb.Store.useOptionsOrCreate(options, collection, observable);
-      kb.utils.wrappedPath(observable, options.path);
       factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
       if (options.factories) {
         factory.addPathMappings(options.factories, options.path);
       }
       this.models_path = kb.utils.pathJoin(options.path, 'models');
-      if (!factory.hasPath(this.models_path)) {
+      creator = factory.creatorForPath(null, this.models_path);
+      if (creator) {
+        this.models_only = creator.models_only;
+      } else {
         if (options.hasOwnProperty('models_only')) {
           if (options.models_only) {
             factory.addPathMapping(this.models_path, {
@@ -1622,12 +1623,12 @@
       }));
       observable.__kb_is_o = true;
       kb.utils.wrappedStore(observable, options.store);
-      kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, this.key));
+      this.path = kb.utils.pathJoin(options.path, this.key);
       if (options.factories && ((typeof options.factories === 'function') || options.factories.create)) {
         factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
-        factory.addPathMapping(kb.utils.wrappedPath(observable), options.factories);
+        factory.addPathMapping(this.path, options.factories);
       } else {
-        kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable));
+        kb.Factory.useOptionsOrCreate(options, observable, this.path);
       }
       observable.valueType = _.bind(this.valueType, this);
       observable.destroy = _.bind(this.destroy, this);
@@ -1661,8 +1662,7 @@
     };
 
     Observable.prototype.update = function(new_value) {
-      var new_type, observable, value;
-      observable = kb.utils.wrappedObservable(this);
+      var new_type, value;
       value = this.vo();
       if (this.m && !arguments.length) {
         new_value = this.m.get(ko.utils.unwrapObservable(this.key));
@@ -1702,12 +1702,11 @@
     };
 
     Observable.prototype._updateValueObservable = function(new_value) {
-      var creator, factory, key, observable, path, previous_value, relation, store, value;
+      var creator, factory, key, observable, previous_value, relation, store, value;
       observable = kb.utils.wrappedObservable(this);
       store = kb.utils.wrappedStore(observable);
       factory = kb.utils.wrappedFactory(observable);
-      path = kb.utils.wrappedPath(observable);
-      creator = factory.creatorForPath(new_value, path);
+      creator = factory.creatorForPath(new_value, this.path);
       if (!creator && this.m && Backbone.RelationalModel && (this.m instanceof Backbone.RelationalModel)) {
         key = ko.utils.unwrapObservable(this.key);
         relation = _.find(this.m.getRelations(), function(test) {
@@ -1718,9 +1717,9 @@
         }
       }
       if (store) {
-        value = store.findOrCreateObservable(new_value, path, factory, creator);
+        value = store.findOrCreateObservable(new_value, this.path, factory, creator);
       } else if (creator) {
-        value = factory.createForPath(new_value, path, store, creator);
+        value = factory.createForPath(new_value, this.path, store, creator);
       } else {
         value = ko.observable(new_value);
       }
@@ -1856,7 +1855,7 @@
       this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
       this.__kb.internals = options.internals;
       kb.Store.useOptionsOrCreate(options, model, this);
-      kb.utils.wrappedPath(this, options.path);
+      this.__kb.path = options.path;
       kb.Factory.useOptionsOrCreate(options, this, options.path);
       model_watcher = kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
         model: _.bind(this.model, this)
@@ -1875,7 +1874,7 @@
         }
       } else {
         bb_model = model_watcher.model();
-        if (bb_model) {
+        if (bb_model && bb_model.attributes) {
           keys = _.keys(bb_model.attributes);
         }
       }
@@ -1961,7 +1960,7 @@
       observable_options = {
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
-        path: kb.utils.wrappedPath(this),
+        path: this.__kb.path,
         model_watcher: kb.utils.wrappedModelWatcher(this)
       };
       for (_i = 0, _len = keys.length; _i < _len; _i++) {
@@ -1983,7 +1982,7 @@
       observable_options = {
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
-        path: kb.utils.wrappedPath(this),
+        path: this.__kb.path,
         model_watcher: kb.utils.wrappedModelWatcher(this)
       };
       for (vm_key in mappings) {

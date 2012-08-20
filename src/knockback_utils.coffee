@@ -50,7 +50,6 @@ kb.utils.wrappedObject = (obj, value)               -> splice.call(arguments, 1,
 kb.utils.wrappedStore = (obj, value)                -> splice.call(arguments, 1, 0, 'store');                  return kb.utils.wrappedKey.apply(@, arguments)
 kb.utils.wrappedStoreIsOwned = (obj, value)         -> splice.call(arguments, 1, 0, 'store_is_owned');         return kb.utils.wrappedKey.apply(@, arguments)
 kb.utils.wrappedFactory = (obj, value)              -> splice.call(arguments, 1, 0, 'factory');                return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedPath = (obj, value)                 -> splice.call(arguments, 1, 0, 'path');                   return kb.utils.wrappedKey.apply(@, arguments)
 kb.utils.wrappedModelWatcher = (obj, value)         -> splice.call(arguments, 1, 0, 'model_watcher');          return kb.utils.wrappedKey.apply(@, arguments)
 kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> splice.call(arguments, 1, 0, 'model_watcher_is_owned'); return kb.utils.wrappedKey.apply(@, arguments)
 
@@ -63,7 +62,8 @@ kb.utils.setToDefault = (obj) ->
 
   # view model
   else if _.isObject(obj)
-    (kb.utils.setToDefault(observable) if observable and (key != '__kb')) for key, observable of obj
+    for key, observable of obj
+      (kb.utils.setToDefault(observable) if observable and (key != '__kb'))
   return obj
 
 kb.utils.release = (obj, keys_only) ->

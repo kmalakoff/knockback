@@ -14,6 +14,11 @@
 #       super
 #       return kb.utils.wrappedObservable(@)
 #
+#   OR
+#
+#     constructor: ->
+#       return super
+#
 # You can either provide a read or a read and write function in the options or on the class itself.
 # Options (all optional)
 #   * default - the value automatically returned when there is no value present. If there is no default, it will return ''

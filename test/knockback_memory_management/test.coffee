@@ -72,7 +72,7 @@ $(document).ready( ->
     kb.release(view_model)
 
     ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..11]
-    ok(!view_model.name, "Property released: view_model.name") # kb.observables(new Backbone.Model({name: 'name1'}), 'name', @)
+    ok(!view_model.name, "Property released: view_model.name") # kb.viewModel(new Backbone.Model({name: 'name1'}), 'name', @)
     ok(!nested_view_model.name, "Property released: nested_view_model.name") # nested_view_model
 
     # check stats

@@ -55,12 +55,12 @@ class kb.Observable
     ))
     observable.__kb_is_o = true # mark as a kb.Observable
     kb.utils.wrappedStore(observable, options.store)
-    kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
+    @path = kb.utils.pathJoin(options.path, @key)
     if options.factories and ((typeof(options.factories) == 'function') or options.factories.create)
       factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
-      factory.addPathMapping(kb.utils.wrappedPath(observable), options.factories)
+      factory.addPathMapping(@path, options.factories)
     else
-      kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable))
+      kb.Factory.useOptionsOrCreate(options, observable, @path)
 
     # publish public interface on the observable and return instead of this
     observable.valueType = _.bind(@valueType, @)
@@ -89,7 +89,6 @@ class kb.Observable
     @update() if (@m = new_model)
 
   update: (new_value) ->
-    observable = kb.utils.wrappedObservable(@)
     value = @vo()
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
     new_value = null unless new_value # ensure null instead of undefined
@@ -126,8 +125,7 @@ class kb.Observable
     observable = kb.utils.wrappedObservable(@)
     store = kb.utils.wrappedStore(observable)
     factory = kb.utils.wrappedFactory(observable)
-    path = kb.utils.wrappedPath(observable)
-    creator = factory.creatorForPath(new_value, path)
+    creator = factory.creatorForPath(new_value, @path)
 
     # infer Backbone.Relational types
     if not creator and @m and Backbone.RelationalModel and (@m instanceof Backbone.RelationalModel)
@@ -137,9 +135,9 @@ class kb.Observable
 
     # create and store
     if store
-      value = store.findOrCreateObservable(new_value, path, factory, creator)
+      value = store.findOrCreateObservable(new_value, @path, factory, creator)
     else if creator
-      value = factory.createForPath(new_value, path, store, creator)
+      value = factory.createForPath(new_value, @path, store, creator)
     else
       value = ko.observable(new_value)
 

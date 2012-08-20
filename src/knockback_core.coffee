@@ -35,7 +35,7 @@ kb.release = (obj, keys_only) ->
   # known type
   if not keys_only and (ko.isObservable(obj) or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
     if obj.destroy
-      obj.destroy()
+      obj.destroy() if obj.collection or not (obj.destroyAll and obj.indexOf) # special case for ko.observableArray (do not notify nor tag objects)
     else if obj.release
       obj.release()
     else if obj.dispose
@@ -48,11 +48,12 @@ kb.release = (obj, keys_only) ->
       continue unless ko.isObservable(value) or (typeof(value.destroy) is 'function') or (typeof(value.release) is 'function')
       obj[key] = null
       if value.destroy
-        value.destroy()
+        value.destroy() if value.collection or not (value.destroyAll and value.indexOf) # special case for ko.observableArray (do not notify nor tag objects)
       else if value.release
         value.release()
       else if value.dispose
         value.dispose()
+
   return
 
 # displays legacy warnings to the Knockback library user

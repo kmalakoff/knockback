@@ -22,7 +22,7 @@ $(document).ready( ->
   test("Standard use case: just enough to get the picture", ->
     ContactViewModel = (model) ->
       @loading_message = new _kbe.LocalizedStringLocalizer(new _kbe.LocalizedString('loading'))
-      @dynamic_observables = kb.observables(model, {keys: {
+      @dynamic_observables = kb.viewModel(model, {keys: {
         name:     {key:'name', default: @loading_message}
         number:   {key:'number', default: @loading_message}
         date:     {key:'date', default: @loading_message, localizer: _kbe.ShortDateLocalizer}

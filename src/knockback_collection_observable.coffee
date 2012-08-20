@@ -48,13 +48,15 @@ class kb.CollectionObservable
     kb.Store.useOptionsOrCreate(options, collection, observable)
 
     # view model factory create factories
-    kb.utils.wrappedPath(observable, options.path)
     factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
     factory.addPathMappings(options.factories, options.path) if options.factories
     @models_path = kb.utils.pathJoin(options.path, 'models')
 
     # add or deduce models create information
-    unless factory.hasPath(@models_path)
+    creator = factory.creatorForPath(null, @models_path)
+    if creator
+      @models_only = creator.models_only
+    else
       if options.hasOwnProperty('models_only')
         if options.models_only
           factory.addPathMapping(@models_path, {models_only: options.models_only})
