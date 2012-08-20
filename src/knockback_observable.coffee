@@ -6,8 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+# @m is @model
+
 class kb.Observable
-  constructor: (model, options, @view_model={}) ->
+  constructor: (model, options, @vm={}) -> # vm is view_model
     kb.throwMissing(this, 'options') unless options
 
     # extract options
@@ -19,7 +21,7 @@ class kb.Observable
     @write = options.write
 
     # set up basics
-    kb.utils.wrappedKey(@, 'vo', ko.observable(null)) # create a value observable for the first dependency
+    @vo = ko.observable(null) # create a value observable for the first dependency
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
         # create dependencies if needed
@@ -28,14 +30,12 @@ class kb.Observable
           if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
 
         # read and update
-        observable = kb.utils.wrappedObservable(@)
-        current_model = if observable then kb.utils.wrappedObject(observable) else null
-        if current_model
-          new_value = if @read then @read.apply(@view_model, args) else current_model.get.apply(current_model, args)
+        if @m
+          new_value = if @read then @read.apply(@vm, args) else @m.get.apply(@m, args)
           @update(new_value)
 
         # get the observable
-        return ko.utils.unwrapObservable(kb.utils.wrappedKey(@, 'vo')())
+        return ko.utils.unwrapObservable(@vo())
 
       write: (new_value) =>
         # set on model
@@ -45,14 +45,13 @@ class kb.Observable
           if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
 
         # write
-        current_model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
-        if current_model
-          if @write then @write.apply(@view_model, args) else current_model.set.apply(current_model, args)
+        if @m
+          if @write then @write.apply(@vm, args) else @m.set.apply(@m, args)
 
         # update the observable
         @update(new_value)
 
-      owner: @view_model
+      owner: @vm
     ))
     observable.__kb_is_o = true # mark as a kb.Observable
     kb.utils.wrappedStore(observable, options.store)
@@ -65,8 +64,6 @@ class kb.Observable
 
     # publish public interface on the observable and return instead of this
     observable.valueType = _.bind(@valueType, @)
-    observable.model = _.bind(@model, @)
-    observable.update = _.bind(@update, @)
     observable.destroy = _.bind(@destroy, @)
 
     # use external model observable or create
@@ -87,20 +84,14 @@ class kb.Observable
     kb.utils.wrappedDestroy(@)
 
   model: (new_model) ->
-    observable = kb.utils.wrappedObservable(@)
-    model = kb.utils.wrappedObject(observable)
-
     # get or no change
-    return model if (arguments.length == 0) or (model is new_model)
-    kb.utils.wrappedObject(observable, new_model)
-    return unless new_model # no model
-    @update()
+    return @m if (arguments.length == 0) or (@m is new_model)
+    @update() if (@m = new_model)
 
   update: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
-    model = kb.utils.wrappedObject(observable)
-    value = kb.utils.wrappedKey(@, 'vo')()
-    new_value = model.get(ko.utils.unwrapObservable(@key)) if model and not arguments.length
+    value = @vo()
+    new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
     new_value = null unless new_value # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
@@ -124,8 +115,7 @@ class kb.Observable
       value(new_value) if value() isnt new_value # different so update
 
   valueType: ->
-    model = kb.utils.wrappedObject(kb.utils.wrappedObservable(@))
-    new_value = if model then model.get(@key) else null
+    new_value = if @m then @m.get(@key) else null
     @_updateValueObservable(new_value) unless @value_type # create so we can check the type
     return @value_type
 
@@ -134,16 +124,15 @@ class kb.Observable
   ####################################################
   _updateValueObservable: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
-    model = kb.utils.wrappedObject(observable)
     store = kb.utils.wrappedStore(observable)
     factory = kb.utils.wrappedFactory(observable)
     path = kb.utils.wrappedPath(observable)
     creator = factory.creatorForPath(new_value, path)
 
     # infer Backbone.Relational types
-    if not creator and model and Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+    if not creator and @m and Backbone.RelationalModel and (@m instanceof Backbone.RelationalModel)
       key = ko.utils.unwrapObservable(@key)
-      relation = _.find(model.getRelations(), (test) -> return test.key is key)
+      relation = _.find(@m.getRelations(), (test) -> return test.key is key)
       (creator = if relation.collectionKey then kb.CollectionObservable else kb.ViewModel) if relation
 
     # create and store
@@ -165,9 +154,8 @@ class kb.Observable
       @value_type = kb.TYPE_SIMPLE
 
     # set the value
-    value_observable = kb.utils.wrappedKey(@, 'vo')
     previous_value = @value; @value = value
     (if store then store.releaseObservable(previous_value) else kb.release(previous_value)) if previous_value # release previous
-    value_observable(value)
+    @vo(value)
 
 kb.observable = (model, key, options) -> new kb.Observable(model, key, options)

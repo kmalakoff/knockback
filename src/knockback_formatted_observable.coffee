@@ -6,9 +6,11 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+slice = Array.prototype.slice
+
 kb.toFormattedString = (format) ->
   result = format.slice()
-  args = Array.prototype.slice.call(arguments, 1)
+  args = slice.call(arguments, 1)
   for index, arg of args
     value = ko.utils.unwrapObservable(arg)
     value = '' if not value
@@ -63,7 +65,7 @@ class kb.FormattedObservable
       format = format
       observable_args = args
     else
-      observable_args = Array.prototype.slice.call(arguments, 1)
+      observable_args = slice.call(arguments, 1)
 
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: ->
@@ -81,7 +83,6 @@ class kb.FormattedObservable
 
     return observable
 
-  destroy: ->
-    kb.utils.wrappedDestroy(@)
+  destroy: -> kb.utils.wrappedDestroy(@)
 
-kb.formattedObservable = (format, args) -> return new kb.FormattedObservable(format, Array.prototype.slice.call(arguments, 1))
+kb.formattedObservable = (format, args) -> return new kb.FormattedObservable(format, slice.call(arguments, 1))

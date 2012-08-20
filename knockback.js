@@ -12,7 +12,7 @@
 
 
 (function() {
-  var Backbone, Knockback, kb, ko, splice, _,
+  var Backbone, Knockback, kb, ko, slice, splice, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -625,7 +625,7 @@
       if (model) {
         this.model(model);
       } else {
-        kb.utils.wrappedObject(this, null);
+        this.m = null;
       }
     }
 
@@ -636,10 +636,9 @@
     };
 
     ModelWatcher.prototype.model = function(new_model) {
-      var callbacks, event_name, info, list, model, _i, _len, _ref;
-      model = kb.utils.wrappedObject(this);
-      if ((arguments.length === 0) || (model === new_model)) {
-        return model;
+      var callbacks, event_name, info, list, previous_model, _i, _len, _ref;
+      if ((arguments.length === 0) || (this.m === new_model)) {
+        return this.m;
       }
       if (this.model_ref) {
         this.model_ref.unbind('loaded', this.__kb._onModelLoaded);
@@ -656,12 +655,13 @@
       } else {
         delete this.model_ref;
       }
-      kb.utils.wrappedObject(this, new_model);
+      previous_model = this.m;
+      this.m = new_model;
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
         callbacks = _ref[event_name];
-        if (model) {
-          model.unbind(event_name, callbacks.fn);
+        if (previous_model) {
+          previous_model.unbind(event_name, callbacks.fn);
         }
         if (new_model) {
           new_model.bind(event_name, callbacks.fn);
@@ -678,14 +678,13 @@
     };
 
     ModelWatcher.prototype.registerCallbacks = function(obj, options) {
-      var callbacks, event_name, info, list, model;
+      var callbacks, event_name, info, list;
       if (!obj) {
         kb.throwMissing(this, 'obj');
       }
       if (!options) {
         kb.throwMissing(this, 'options');
       }
-      model = kb.utils.wrappedObject(this);
       event_name = options.event_name ? options.event_name : 'change';
       callbacks = this.__kb.callbacks[event_name];
       if (!callbacks) {
@@ -708,8 +707,8 @@
           }
         };
         this.__kb.callbacks[event_name] = callbacks;
-        if (model) {
-          model.bind(event_name, callbacks.fn);
+        if (this.m) {
+          this.m.bind(event_name, callbacks.fn);
         }
       }
       info = {};
@@ -724,21 +723,20 @@
         info.key = options.key;
       }
       callbacks.list.push(info);
-      if (!model) {
+      if (!this.m) {
         return;
       }
-      if (Backbone.RelationalModel && (model instanceof Backbone.RelationalModel)) {
-        this._modelBindRelatationalInfo(model, event_name, info);
+      if (Backbone.RelationalModel && (this.m instanceof Backbone.RelationalModel)) {
+        this._modelBindRelatationalInfo(event_name, info);
       }
-      return info.model(model) && info.model;
+      return info.model(this.m) && info.model;
     };
 
     ModelWatcher.prototype.releaseCallbacks = function(obj) {
-      var callbacks, event_name, index, info, model, _ref, _ref1;
+      var callbacks, event_name, index, info, _ref, _ref1;
       if (!this.__kb.callbacks) {
         return;
       }
-      model = kb.utils.wrappedObject(this);
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
         callbacks = _ref[event_name];
@@ -748,7 +746,7 @@
           if (info.obj === obj) {
             callbacks.list.splice(index, 1);
             if (info.rel_fn) {
-              this._modelUnbindRelatationalInfo(model, event_name, info);
+              this._modelUnbindRelatationalInfo(event_name, info);
             }
             if (info.model) {
               info.model(null);
@@ -762,7 +760,7 @@
     ModelWatcher.prototype._onModelLoaded = function(model) {
       var callbacks, event_name, info, is_relational, list, _i, _len, _ref;
       is_relational = Backbone.RelationalModel && (model instanceof Backbone.RelationalModel);
-      kb.utils.wrappedObject(this, model);
+      this.m = model;
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
         callbacks = _ref[event_name];
@@ -771,7 +769,7 @@
         for (_i = 0, _len = list.length; _i < _len; _i++) {
           info = list[_i];
           if (is_relational) {
-            this._modelBindRelatationalInfo(model, event_name, info);
+            this._modelBindRelatationalInfo(event_name, info);
           }
           if (info.model) {
             info.model(model);
@@ -783,7 +781,7 @@
 
     ModelWatcher.prototype._onModelUnloaded = function(model) {
       var callbacks, event_name, info, list, _i, _len, _ref;
-      kb.utils.wrappedObject(this, null);
+      this.m = null;
       _ref = this.__kb.callbacks;
       for (event_name in _ref) {
         callbacks = _ref[event_name];
@@ -792,7 +790,7 @@
         for (_i = 0, _len = list.length; _i < _len; _i++) {
           info = list[_i];
           if (info.rel_fn) {
-            this._modelUnbindRelatationalInfo(model, event_name, info);
+            this._modelUnbindRelatationalInfo(event_name, info);
           }
           if (info.model) {
             info.model(null);
@@ -802,11 +800,11 @@
       return this;
     };
 
-    ModelWatcher.prototype._modelBindRelatationalInfo = function(model, event_name, info) {
+    ModelWatcher.prototype._modelBindRelatationalInfo = function(event_name, info) {
       var key, relation;
       if ((event_name === 'change') && info.key && info.update) {
         key = ko.utils.unwrapObservable(info.key);
-        relation = _.find(model.getRelations(), function(test) {
+        relation = _.find(this.m.getRelations(), function(test) {
           return test.key === key;
         });
         if (!relation) {
@@ -817,24 +815,24 @@
         };
         if (relation.collectionKey) {
           info.is_collection = true;
-          model.bind("add:" + info.key, info.rel_fn);
-          model.bind("remove:" + info.key, info.rel_fn);
+          this.m.bind("add:" + info.key, info.rel_fn);
+          this.m.bind("remove:" + info.key, info.rel_fn);
         } else {
-          model.bind("update:" + info.key, info.rel_fn);
+          this.m.bind("update:" + info.key, info.rel_fn);
         }
       }
       return this;
     };
 
-    ModelWatcher.prototype._modelUnbindRelatationalInfo = function(model, event_name, info) {
+    ModelWatcher.prototype._modelUnbindRelatationalInfo = function(event_name, info) {
       if (!info.rel_fn) {
         return;
       }
       if (info.is_collection) {
-        model.unbind("add:" + info.key, info.rel_fn);
-        model.unbind("remove:" + info.key, info.rel_fn);
+        this.m.unbind("add:" + info.key, info.rel_fn);
+        this.m.unbind("remove:" + info.key, info.rel_fn);
       } else {
-        model.unbind("update:" + info.key, info.rel_fn);
+        this.m.unbind("update:" + info.key, info.rel_fn);
       }
       info.rel_fn = null;
       return this;
@@ -1276,15 +1274,15 @@
 
   kb.DefaultWrapper = (function() {
 
-    function DefaultWrapper(target_observable, default_value) {
+    function DefaultWrapper(target_observable, dv) {
       var observable,
         _this = this;
-      this.default_value = default_value;
+      this.dv = dv;
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
           var current_default, current_target;
           current_target = ko.utils.unwrapObservable(target_observable());
-          current_default = ko.utils.unwrapObservable(_this.default_value);
+          current_default = ko.utils.unwrapObservable(_this.dv);
           if (!current_target) {
             return current_default;
           } else {
@@ -1301,20 +1299,11 @@
     }
 
     DefaultWrapper.prototype.destroy = function() {
-      var _base;
-      if (this.default_value) {
-        if (typeof (_base = this.default_value).dispose === "function") {
-          _base.dispose();
-        }
-        this.default_value = null;
-      }
       return kb.utils.wrappedDestroy(this);
     };
 
     DefaultWrapper.prototype.setToDefault = function() {
-      var observable;
-      observable = kb.utils.wrappedObservable(this);
-      return observable(this.default_value);
+      return kb.utils.wrappedObservable(this)(this.dv);
     };
 
     return DefaultWrapper;
@@ -1334,10 +1323,12 @@
   */
 
 
+  slice = Array.prototype.slice;
+
   kb.toFormattedString = function(format) {
     var arg, args, index, parameter_index, result, value;
     result = format.slice();
-    args = Array.prototype.slice.call(arguments, 1);
+    args = slice.call(arguments, 1);
     for (index in args) {
       arg = args[index];
       value = ko.utils.unwrapObservable(arg);
@@ -1409,7 +1400,7 @@
         format = format;
         observable_args = args;
       } else {
-        observable_args = Array.prototype.slice.call(arguments, 1);
+        observable_args = slice.call(arguments, 1);
       }
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
@@ -1445,7 +1436,7 @@
   })();
 
   kb.formattedObservable = function(format, args) {
-    return new kb.FormattedObservable(format, Array.prototype.slice.call(arguments, 1));
+    return new kb.FormattedObservable(format, slice.call(arguments, 1));
   };
 
   /*
@@ -1461,14 +1452,14 @@
 
     LocalizedObservable.extend = Backbone.Model.extend;
 
-    function LocalizedObservable(value_holder, options, view_model) {
-      var observable, value,
+    function LocalizedObservable(value, options, vm) {
+      var observable,
         _this = this;
-      this.value_holder = value_holder;
+      this.value = value;
       if (options == null) {
         options = {};
       }
-      this.view_model = view_model != null ? view_model : {};
+      this.vm = vm != null ? vm : {};
       if (!this.read) {
         kb.throwMissing(this, 'read');
       }
@@ -1478,33 +1469,29 @@
       this.__kb || (this.__kb = {});
       this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
       this.__kb._onChange = options.onChange;
-      if (this.value_holder) {
-        value = ko.utils.unwrapObservable(this.value_holder);
+      if (this.value) {
+        value = ko.utils.unwrapObservable(this.value);
       }
-      kb.utils.wrappedKey(this, 'vo', ko.observable(!value ? null : this.read(value, null)));
+      this.vo = ko.observable(!value ? null : this.read(value, null));
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
-          var value_observable;
-          if (_this.value_holder) {
-            ko.utils.unwrapObservable(_this.value_holder);
+          if (_this.value) {
+            ko.utils.unwrapObservable(_this.value);
           }
-          value_observable = kb.utils.wrappedKey(_this, 'vo');
-          value_observable();
-          return _this.read(ko.utils.unwrapObservable(_this.value_holder));
+          _this.vo();
+          return _this.read(ko.utils.unwrapObservable(_this.value));
         },
         write: function(value) {
-          var value_observable;
           if (!_this.write) {
             kb.throwUnexpected(_this, 'writing to read-only');
           }
-          _this.write(value, ko.utils.unwrapObservable(_this.value_holder));
-          value_observable = kb.utils.wrappedKey(_this, 'vo');
-          value_observable(value);
+          _this.write(value, ko.utils.unwrapObservable(_this.value));
+          _this.vo(value);
           if (_this.__kb._onChange) {
             return _this.__kb._onChange(value);
           }
         },
-        owner: this.view_model
+        owner: this.vm
       }));
       observable.destroy = _.bind(this.destroy, this);
       observable.observedValue = _.bind(this.observedValue, this);
@@ -1518,32 +1505,30 @@
 
     LocalizedObservable.prototype.destroy = function() {
       kb.locale_manager.unbind('change', this.__kb._onLocaleChange);
-      this.view_model = null;
+      this.vm = null;
       return kb.utils.wrappedDestroy(this);
     };
 
     LocalizedObservable.prototype.resetToCurrent = function() {
-      var current_value, value_observable;
-      value_observable = kb.utils.wrappedKey(this, 'vo');
-      value_observable(null);
-      current_value = this.value_holder ? this.read(ko.utils.unwrapObservable(this.value_holder)) : null;
+      var current_value;
+      this.vo(null);
+      current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
       return kb.utils.wrappedObservable(this)(current_value);
     };
 
     LocalizedObservable.prototype.observedValue = function(value) {
       if (arguments.length === 0) {
-        return this.value_holder;
+        return this.value;
       }
-      this.value_holder = value;
+      this.value = value;
       this._onLocaleChange();
       return this;
     };
 
     LocalizedObservable.prototype._onLocaleChange = function() {
-      var value, value_observable;
-      value = this.read(ko.utils.unwrapObservable(this.value_holder));
-      value_observable = kb.utils.wrappedKey(this, 'vo');
-      value_observable(value);
+      var value;
+      value = this.read(ko.utils.unwrapObservable(this.value));
+      this.vo(value);
       if (this.__kb._onChange) {
         return this.__kb._onChange(value);
       }
@@ -1568,10 +1553,10 @@
 
   kb.Observable = (function() {
 
-    function Observable(model, options, view_model) {
+    function Observable(model, options, vm) {
       var factory, observable,
         _this = this;
-      this.view_model = view_model != null ? view_model : {};
+      this.vm = vm != null ? vm : {};
       if (!options) {
         kb.throwMissing(this, 'options');
       }
@@ -1586,10 +1571,10 @@
       this.args = options.args;
       this.read = options.read;
       this.write = options.write;
-      kb.utils.wrappedKey(this, 'vo', ko.observable(null));
+      this.vo = ko.observable(null);
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
-          var arg, args, current_model, new_value, _i, _len, _ref;
+          var arg, args, new_value, _i, _len, _ref;
           args = [ko.utils.unwrapObservable(_this.key)];
           if (_this.args) {
             if (_.isArray(_this.args)) {
@@ -1602,16 +1587,14 @@
               args.push(ko.utils.unwrapObservable(_this.args));
             }
           }
-          observable = kb.utils.wrappedObservable(_this);
-          current_model = observable ? kb.utils.wrappedObject(observable) : null;
-          if (current_model) {
-            new_value = _this.read ? _this.read.apply(_this.view_model, args) : current_model.get.apply(current_model, args);
+          if (_this.m) {
+            new_value = _this.read ? _this.read.apply(_this.vm, args) : _this.m.get.apply(_this.m, args);
             _this.update(new_value);
           }
-          return ko.utils.unwrapObservable(kb.utils.wrappedKey(_this, 'vo')());
+          return ko.utils.unwrapObservable(_this.vo());
         },
         write: function(new_value) {
-          var arg, args, current_model, set_info, _i, _len, _ref;
+          var arg, args, set_info, _i, _len, _ref;
           set_info = {};
           set_info[ko.utils.unwrapObservable(_this.key)] = new_value;
           args = _this.write ? [new_value] : [set_info];
@@ -1626,17 +1609,16 @@
               args.push(ko.utils.unwrapObservable(_this.args));
             }
           }
-          current_model = kb.utils.wrappedObject(kb.utils.wrappedObservable(_this));
-          if (current_model) {
+          if (_this.m) {
             if (_this.write) {
-              _this.write.apply(_this.view_model, args);
+              _this.write.apply(_this.vm, args);
             } else {
-              current_model.set.apply(current_model, args);
+              _this.m.set.apply(_this.m, args);
             }
           }
           return _this.update(new_value);
         },
-        owner: this.view_model
+        owner: this.vm
       }));
       observable.__kb_is_o = true;
       kb.utils.wrappedStore(observable, options.store);
@@ -1648,8 +1630,6 @@
         kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable));
       }
       observable.valueType = _.bind(this.valueType, this);
-      observable.model = _.bind(this.model, this);
-      observable.update = _.bind(this.update, this);
       observable.destroy = _.bind(this.destroy, this);
       kb.ModelWatcher.useOptionsOrCreate(options, model, this, {
         model: _.bind(this.model, this),
@@ -1672,26 +1652,20 @@
     };
 
     Observable.prototype.model = function(new_model) {
-      var model, observable;
-      observable = kb.utils.wrappedObservable(this);
-      model = kb.utils.wrappedObject(observable);
-      if ((arguments.length === 0) || (model === new_model)) {
-        return model;
+      if ((arguments.length === 0) || (this.m === new_model)) {
+        return this.m;
       }
-      kb.utils.wrappedObject(observable, new_model);
-      if (!new_model) {
-        return;
+      if ((this.m = new_model)) {
+        return this.update();
       }
-      return this.update();
     };
 
     Observable.prototype.update = function(new_value) {
-      var model, new_type, observable, value;
+      var new_type, observable, value;
       observable = kb.utils.wrappedObservable(this);
-      model = kb.utils.wrappedObject(observable);
-      value = kb.utils.wrappedKey(this, 'vo')();
-      if (model && !arguments.length) {
-        new_value = model.get(ko.utils.unwrapObservable(this.key));
+      value = this.vo();
+      if (this.m && !arguments.length) {
+        new_value = this.m.get(ko.utils.unwrapObservable(this.key));
       }
       if (!new_value) {
         new_value = null;
@@ -1719,9 +1693,8 @@
     };
 
     Observable.prototype.valueType = function() {
-      var model, new_value;
-      model = kb.utils.wrappedObject(kb.utils.wrappedObservable(this));
-      new_value = model ? model.get(this.key) : null;
+      var new_value;
+      new_value = this.m ? this.m.get(this.key) : null;
       if (!this.value_type) {
         this._updateValueObservable(new_value);
       }
@@ -1729,16 +1702,15 @@
     };
 
     Observable.prototype._updateValueObservable = function(new_value) {
-      var creator, factory, key, model, observable, path, previous_value, relation, store, value, value_observable;
+      var creator, factory, key, observable, path, previous_value, relation, store, value;
       observable = kb.utils.wrappedObservable(this);
-      model = kb.utils.wrappedObject(observable);
       store = kb.utils.wrappedStore(observable);
       factory = kb.utils.wrappedFactory(observable);
       path = kb.utils.wrappedPath(observable);
       creator = factory.creatorForPath(new_value, path);
-      if (!creator && model && Backbone.RelationalModel && (model instanceof Backbone.RelationalModel)) {
+      if (!creator && this.m && Backbone.RelationalModel && (this.m instanceof Backbone.RelationalModel)) {
         key = ko.utils.unwrapObservable(this.key);
-        relation = _.find(model.getRelations(), function(test) {
+        relation = _.find(this.m.getRelations(), function(test) {
           return test.key === key;
         });
         if (relation) {
@@ -1762,7 +1734,6 @@
       } else {
         this.value_type = kb.TYPE_SIMPLE;
       }
-      value_observable = kb.utils.wrappedKey(this, 'vo');
       previous_value = this.value;
       this.value = value;
       if (previous_value) {
@@ -1772,7 +1743,7 @@
           kb.release(previous_value);
         }
       }
-      return value_observable(value);
+      return this.vo(value);
     };
 
     return Observable;
@@ -1804,9 +1775,9 @@
       if (!this.event_name) {
         kb.throwMissing(this, 'event_name');
       }
-      kb.utils.wrappedKey(this, 'vo', ko.observable());
+      this.vo = ko.observable();
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable(function() {
-        return kb.utils.wrappedKey(_this, 'vo')();
+        return _this.vo();
       }));
       observable.destroy = _.bind(this.destroy, this);
       kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
@@ -1818,38 +1789,26 @@
     }
 
     TriggeredObservable.prototype.destroy = function() {
-      this.options = null;
-      this.view_model = null;
       return kb.utils.wrappedDestroy(this);
     };
 
     TriggeredObservable.prototype.model = function(new_model) {
-      var model, observable;
-      observable = kb.utils.wrappedObservable(this);
-      model = kb.utils.wrappedObject(observable);
-      if ((arguments.length === 0) || (model === new_model)) {
-        return model;
+      if ((arguments.length === 0) || (this.m === new_model)) {
+        return this.m;
       }
-      kb.utils.wrappedObject(observable, new_model);
-      if (!new_model) {
-        return;
+      if ((this.m = new_model)) {
+        return this.update();
       }
-      return this.update();
     };
 
     TriggeredObservable.prototype.update = function() {
-      var current_value, model, observable, value_observable;
-      observable = kb.utils.wrappedObservable(this);
-      value_observable = kb.utils.wrappedKey(this, 'vo');
-      current_value = value_observable();
-      model = kb.utils.wrappedObject(observable);
-      if (!model) {
+      if (!this.m) {
         return;
       }
-      if (current_value !== model) {
-        return value_observable(model);
+      if (this.vo() !== this.m) {
+        return this.vo(this.m);
       } else {
-        return value_observable.valueHasMutated();
+        return this.vo.valueHasMutated();
       }
     };
 

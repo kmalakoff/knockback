@@ -6,14 +6,16 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+# @m is @model
+
 class kb.TriggeredObservable
   constructor: (model, @event_name) ->
     kb.throwMissing(this, 'model') unless model
     kb.throwMissing(this, 'event_name') unless @event_name
 
     # internal state
-    kb.utils.wrappedKey(@, 'vo', ko.observable())
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> kb.utils.wrappedKey(@, 'vo')()))
+    @vo = ko.observable()
+    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> @vo()))
 
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
@@ -23,27 +25,16 @@ class kb.TriggeredObservable
 
     return observable
 
-  destroy: ->
-    @options  = null; @view_model = null
-    kb.utils.wrappedDestroy(@)
+  destroy: -> kb.utils.wrappedDestroy(@)
 
   model: (new_model) ->
-    observable = kb.utils.wrappedObservable(@)
-    model = kb.utils.wrappedObject(observable)
-
     # get or no change
-    return model if (arguments.length == 0) or (model is new_model)
-    kb.utils.wrappedObject(observable, new_model)
-    return unless new_model # no model
-    @update()
+    return @m if (arguments.length == 0) or (@m is new_model)
+    @update() if (@m = new_model)
 
   update: ->
-    observable = kb.utils.wrappedObservable(@)
-    value_observable = kb.utils.wrappedKey(@, 'vo')
-    current_value = value_observable()
-    model = kb.utils.wrappedObject(observable)
-    return unless model # do not trigger if there is no model
-    if current_value != model then value_observable(model) else value_observable.valueHasMutated() # trigger the dependable
+    return unless @m # do not trigger if there is no model
+    if @vo() isnt @m then @vo(@m) else @vo.valueHasMutated() # manually trigger the dependable
 
 # factory function
 kb.triggeredObservable = (model, event_name) -> return new kb.TriggeredObservable(model, event_name)

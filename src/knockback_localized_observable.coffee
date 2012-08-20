@@ -25,7 +25,7 @@
 class kb.LocalizedObservable
   @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
-  constructor: (@value_holder, options={}, @view_model={}) ->
+  constructor: (@value, options={}, @vm={}) -> # @vm is view_model
     kb.throwMissing(this, 'read') unless @read
     kb.throwMissing(this, 'kb.locale_manager') unless kb.locale_manager
 
@@ -35,22 +35,21 @@ class kb.LocalizedObservable
     @__kb._onChange = options.onChange
 
     # internal state
-    value = ko.utils.unwrapObservable(@value_holder) if @value_holder
-    kb.utils.wrappedKey(@, 'vo', ko.observable(if not value then null else @read(value, null)))
+    value = ko.utils.unwrapObservable(@value) if @value
+    @vo = ko.observable(if not value then null else @read(value, null))
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        ko.utils.unwrapObservable(@value_holder) if @value_holder 
-        value_observable = kb.utils.wrappedKey(@, 'vo'); value_observable() # create a depdenency
-        return @read(ko.utils.unwrapObservable(@value_holder))
+        ko.utils.unwrapObservable(@value) if @value 
+        @vo() # create a depdenency
+        return @read(ko.utils.unwrapObservable(@value))
 
       write: (value) =>
         kb.throwUnexpected(this, 'writing to read-only') unless @write
-        @write(value, ko.utils.unwrapObservable(@value_holder))
-        value_observable = kb.utils.wrappedKey(@, 'vo')
-        value_observable(value)
+        @write(value, ko.utils.unwrapObservable(@value))
+        @vo(value)
         @__kb._onChange(value) if @__kb._onChange
       
-      owner: @view_model
+      owner: @vm
     }))
 
     # publish public interface on the observable and return instead of this
@@ -62,26 +61,24 @@ class kb.LocalizedObservable
     kb.locale_manager.bind('change', @__kb._onLocaleChange)
 
     # wrap ourselves with a default value
-    if options.hasOwnProperty('default')
-      observable = ko.defaultWrapper(observable, options.default)
+    observable = ko.defaultWrapper(observable, options.default) if options.hasOwnProperty('default')
 
     return observable
 
   destroy: ->
     kb.locale_manager.unbind('change', @__kb._onLocaleChange)
-    @view_model = null
+    @vm = null
     kb.utils.wrappedDestroy(@)
 
   resetToCurrent: ->
-    value_observable = kb.utils.wrappedKey(@, 'vo')
-    value_observable(null) # force KO to think a change occurred
-    current_value = if @value_holder then @read(ko.utils.unwrapObservable(@value_holder)) else null
+    @vo(null) # force KO to think a change occurred
+    current_value = if @value then @read(ko.utils.unwrapObservable(@value)) else null
     kb.utils.wrappedObservable(@)(current_value)
 
   # dual purpose set/get
   observedValue: (value) ->
-    return @value_holder if arguments.length == 0
-    @value_holder = value; @_onLocaleChange()
+    return @value if arguments.length == 0
+    @value = value; @_onLocaleChange()
     @
 
   ####################################################
@@ -89,9 +86,8 @@ class kb.LocalizedObservable
   ####################################################
 
   _onLocaleChange: ->
-    value = @read(ko.utils.unwrapObservable(@value_holder))
-    value_observable = kb.utils.wrappedKey(@, 'vo')
-    value_observable(value)
+    value = @read(ko.utils.unwrapObservable(@value))
+    @vo(value)
     @__kb._onChange(value) if @__kb._onChange
 
 # factory function

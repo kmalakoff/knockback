@@ -12,11 +12,11 @@
 #   kb.defaultWrapper(some_observable, "blue")
 ######################################
 class kb.DefaultWrapper
-  constructor: (target_observable, @default_value) ->
+  constructor: (target_observable, @dv) -> # @dv is default value
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
         current_target = ko.utils.unwrapObservable(target_observable())
-        current_default = ko.utils.unwrapObservable(@default_value)
+        current_default = ko.utils.unwrapObservable(@dv)
         return if not current_target then current_default else current_target
       write: (value) -> target_observable(value)
     }))
@@ -27,12 +27,8 @@ class kb.DefaultWrapper
 
     return observable
 
-  destroy: ->
-    (@default_value.dispose?(); @default_value = null) if @default_value
-    kb.utils.wrappedDestroy(@)
+  destroy: -> kb.utils.wrappedDestroy(@)
 
-  setToDefault: ->
-    observable = kb.utils.wrappedObservable(@)
-    observable(@default_value)
+  setToDefault: -> kb.utils.wrappedObservable(@)(@dv)
 
 kb.defaultWrapper = (target, default_value) -> return new kb.DefaultWrapper(target, default_value)
