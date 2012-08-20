@@ -9,13 +9,14 @@
 # @m is @model
 
 class kb.Observable
-  constructor: (model, options, @vm={}) -> # vm is view_model
-    kb.throwMissing(this, 'options') unless options
+  constructor: (model, options, @vm) -> # vm is view_model
+    options or throwMissing(this, 'options')
+    @vm or = {}
 
     # extract options
     (options = _.defaults(_.clone(options), options.options); delete options.options) if options.options
     @key = if _.isString(options) or ko.isObservable(options) then options else options.key
-    kb.throwMissing(this, 'key') unless @key
+    @key or throwMissing(this, 'key')
     @args = options.args
     @read = options.read
     @write = options.write
@@ -91,7 +92,7 @@ class kb.Observable
   update: (new_value) ->
     value = @vo()
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
-    new_value = null unless new_value # ensure null instead of undefined
+    new_value or= null # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
     # create or change in type
@@ -115,7 +116,7 @@ class kb.Observable
 
   valueType: ->
     new_value = if @m then @m.get(@key) else null
-    @_updateValueObservable(new_value) unless @value_type # create so we can check the type
+    @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
   ####################################################

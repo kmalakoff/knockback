@@ -9,12 +9,11 @@
 class kb.Store
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
-      store = kb.utils.wrappedStore(observable, options.store)
       options.store.registerObservable(obj, observable, options)
+      return kb.utils.wrappedStore(observable, options.store)
     else
-      store = kb.utils.wrappedStore(observable, new kb.Store())
       kb.utils.wrappedStoreIsOwned(observable, true)
-    return store
+      return kb.utils.wrappedStore(observable, new kb.Store())
 
   constructor: ->
     @objects = []
@@ -29,20 +28,18 @@ class kb.Store
       observable.releaseReferences?() # release all references to break cycles
 
       # release
-      if observable.release
-        observable.release()
-      else
-        kb.release(observable)
+      if observable.release then observable.release() else kb.release(observable)
 
     @objects = null
     @observables = null
 
-  registerObservable: (obj, observable, options={}) ->
+  registerObservable: (obj, observable, options) ->
     return unless (obj and observable) # nothing to register
 
     # only store view models not basic ko.observables nor kb.CollectionObservables
     return if ko.isObservable(observable) or observable.__kb_is_co
 
+    options or= {}
     @objects.push(obj)
     kb.utils.wrappedObject(observable, obj)
     @observables.push(observable)
@@ -54,14 +51,12 @@ class kb.Store
       observable.__kb.creator = options.creator  # save the creator to mark the source of the observable
     else if (options.path and options.factory)
       observable.__kb.creator = options.factory.creatorForPath(obj, options.path)  # save the creator to mark the source of the observable
-    else
-      observable.__kb.creator = null
 
   findOrCreateObservable: (obj, path, factory, creator) ->
     if not factory
-      observable = if creator then creator(obj, {path: path, store: this, creator: creator}) else kb.Factory.createDefault(obj, {path: path, store: this})
+      observable = (if creator then creator else kb.Factory.createDefault)(obj, {path: path, store: this, creator: creator})
     else
-      creator = factory.creatorForPath(obj, path) if not creator
+      creator or= factory.creatorForPath(obj, path)
       return ko.observable(obj) unless creator
       return obj if creator.models_only  # do not create an observable
 
@@ -76,11 +71,10 @@ class kb.Store
 
       # create
       observable = factory.createForPath(obj, path, this, creator)
-      observable = ko.observable(null) unless observable # default to null
+      observable or= ko.observable(null) # default to null
 
     # check if already registered
-    index = _.indexOf(@observables, observable)
-    @registerObservable(obj, observable, {creator: creator}) if index < 0 # not registered yet, register now
+    @registerObservable(obj, observable, {creator: creator}) if _.indexOf(@observables, observable) < 0 # not registered yet, register now
     return observable
 
   releaseObservable: (observable, owns_store) ->
@@ -93,7 +87,6 @@ class kb.Store
 
     # clear our references
     kb.utils.wrappedObject(observable, null)
-    index = _.indexOf(@observables, observable)
-    return if index < 0
+    return if (index = _.indexOf(@observables, observable)) < 0
     @objects[index] = null
     @observables[index] = null

@@ -56,16 +56,18 @@ kb.release = (obj, keys_only) ->
 
   return
 
-# displays legacy warnings to the Knockback library user
-kb.legacyWarning = (identifier, last_version, message) ->
+####################################
+# HELPERS
+####################################
+arraySlice = Array.prototype.slice
+arraySplice = Array.prototype.splice
+throwMissing = (instance, message) -> throw "#{instance.constructor.name}: #{message} is missing"
+throwUnexpected = (instance, message) -> throw "#{instance.constructor.name}: #{message} is unexpected"
+
+legacyWarning = (identifier, last_version, message) ->
   kb._legacy_warnings or= {}
   kb._legacy_warnings[identifier] or= 0
   kb._legacy_warnings[identifier]++
   console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
 
-kb.throwMissing = (instance, message) ->
-  throw "#{instance.constructor.name}: #{message} is missing"
-
-kb.throwUnexpected = (instance, message) ->
-  throw "#{instance.constructor.name}: #{message} is unexpected"
 

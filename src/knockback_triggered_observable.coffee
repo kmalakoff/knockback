@@ -10,8 +10,8 @@
 
 class kb.TriggeredObservable
   constructor: (model, @event_name) ->
-    kb.throwMissing(this, 'model') unless model
-    kb.throwMissing(this, 'event_name') unless @event_name
+    model or throwMissing(this, 'model')
+    @event_name or throwMissing(this, 'event_name')
 
     # internal state
     @vo = ko.observable()

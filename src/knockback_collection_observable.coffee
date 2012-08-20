@@ -29,8 +29,9 @@
 ####################################################
 
 class kb.CollectionObservable
-  constructor: (collection, options={}) ->
-    kb.statistics.register(@) if kb.statistics     # collect memory management statistics
+  constructor: (collection, options) ->
+    options or= {}
+    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
     observable.__kb_is_co = true # mark as a kb.CollectionObservable
     @in_edit = 0
@@ -105,23 +106,22 @@ class kb.CollectionObservable
       kb.utils.wrappedObject(observable, null)
     kb.utils.wrappedDestroy(@)
 
-    kb.statistics.unregister(@) if kb.statistics     # collect memory management statistics
+    not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
 
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)
     previous_collection = kb.utils.wrappedObject(observable)
-    if (arguments.length == 0)
+    if (arguments.length is 0) or (collection == previous_collection)
       observable() # force a dependency
       return previous_collection
 
     # no change
-    return if (collection == previous_collection)
-    collection?.retain?()
+    collection.retain() if collection and collection.retain
 
     # clean up
     if previous_collection
       @_collectionUnbind(previous_collection)
-      previous_collection.release?()
+      previous_collection.release() if previous_collection.release
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
     kb.utils.wrappedObject(observable, collection)
@@ -133,7 +133,8 @@ class kb.CollectionObservable
 
     return collection
 
-  sortedIndex: (sorted_index, sort_attribute, options={}) ->
+  sortedIndex: (sorted_index, sort_attribute, options) ->
+    options or= {}
     if sorted_index
       @sorted_index = sorted_index
       @sort_attribute = sort_attribute
@@ -159,9 +160,8 @@ class kb.CollectionObservable
 
   viewModelByModel: (model) ->
     return null unless @hasViewModels()
-    observable = kb.utils.wrappedObservable(@)
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(observable(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
+    return _.find(kb.utils.wrappedObservable(@)(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
 
   hasViewModels: -> return !@models_only
 
@@ -187,21 +187,18 @@ class kb.CollectionObservable
     @_collectionResync()
 
   _onCollectionResort: (model_or_models) ->
-    kb.throwUnexpected(this, 'sorted_index') if @sorted_index
+    not @sorted_index or throwUnexpected(this, 'sorted_index')
     if _.isArray(model_or_models)
-      observable = kb.utils.wrappedObservable(@)
-      @trigger('resort', observable()) # notify
+      @trigger('resort', kb.utils.wrappedObservable(@)()) # notify
     else
       @_onModelResort(model_or_models)
+    @
 
   _onModelAdd: (model) ->
     view_model = @_createViewModel(model)
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
-    if @sorted_index
-      add_index = @sorted_index(observable(), view_model)
-    else
-      add_index = collection.indexOf(model)
+    add_index = if @sorted_index then @sorted_index(observable(), view_model) else collection.indexOf(model)
 
     @in_edit++
     observable.splice(add_index, 0, view_model)
@@ -263,15 +260,14 @@ class kb.CollectionObservable
     @in_edit++
     if silent
       array = observable()
-      view_models = if @hasViewModels() then array.slice(0) else null
+      view_models = array.slice(0)
       array.splice(0, array.length)
     else
       view_models = observable.removeAll()
-      view_models = null unless @hasViewModels()
     @in_edit--
 
     # release view models
-    return unless view_models
+    return unless @hasViewModels()
     store = kb.utils.wrappedStore(observable)
     (store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) for view_model in view_models) 
     @

@@ -31,7 +31,7 @@ kb.utils.wrappedKey = (obj, key, value) ->
     return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
 
   # set
-  throw "Knockback: no obj for wrapping #{key}" unless obj
+  obj or throwUnexpected(this, "no obj for wrapping #{key}")
   obj.__kb or= {}
   obj.__kb[key] = value
   return value
@@ -44,14 +44,13 @@ kb.utils.wrappedModel = (obj, value) ->
   else
     return kb.utils.wrappedKey(obj, 'object', value)
 
-splice = Array.prototype.splice
-kb.utils.wrappedObservable = (obj, value)           -> splice.call(arguments, 1, 0, 'observable');             return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedObject = (obj, value)               -> splice.call(arguments, 1, 0, 'object');                 return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedStore = (obj, value)                -> splice.call(arguments, 1, 0, 'store');                  return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedStoreIsOwned = (obj, value)         -> splice.call(arguments, 1, 0, 'store_is_owned');         return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedFactory = (obj, value)              -> splice.call(arguments, 1, 0, 'factory');                return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedModelWatcher = (obj, value)         -> splice.call(arguments, 1, 0, 'model_watcher');          return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> splice.call(arguments, 1, 0, 'model_watcher_is_owned'); return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedObservable = (obj, value)           -> arraySplice.call(arguments, 1, 0, 'observable');             return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedObject = (obj, value)               -> arraySplice.call(arguments, 1, 0, 'object');                 return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedStore = (obj, value)                -> arraySplice.call(arguments, 1, 0, 'store');                  return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedStoreIsOwned = (obj, value)         -> arraySplice.call(arguments, 1, 0, 'store_is_owned');         return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedFactory = (obj, value)              -> arraySplice.call(arguments, 1, 0, 'factory');                return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedModelWatcher = (obj, value)         -> arraySplice.call(arguments, 1, 0, 'model_watcher');          return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> arraySplice.call(arguments, 1, 0, 'model_watcher_is_owned'); return kb.utils.wrappedKey.apply(@, arguments)
 
 kb.utils.setToDefault = (obj) ->
   return unless obj
@@ -67,7 +66,7 @@ kb.utils.setToDefault = (obj) ->
   return obj
 
 kb.utils.release = (obj, keys_only) ->
-  kb.legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
+  legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
   return kb.release(obj, keys_only)
 
 kb.utils.valueType = (observable) ->
@@ -78,12 +77,7 @@ kb.utils.valueType = (observable) ->
   return kb.TYPE_SIMPLE
 
 kb.utils.pathJoin = (path1, path2) ->
-  if not path1
-    path = ''
-  else
-    path = if path1[path1.length-1] isnt '.' then "#{path1}." else path1
-  path += path2
-  return path
+  return (if path1 then (if path1[path1.length-1] isnt '.' then "#{path1}." else path1) else '') + path2
 
 kb.utils.optionsPathJoin = (options, path) ->
   return _.defaults({path: kb.utils.pathJoin(options.path, path)}, options)

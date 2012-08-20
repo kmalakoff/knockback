@@ -15,10 +15,12 @@
 ####################################################
 
 class kb.ViewModel extends kb.RefCountable
-  constructor: (model, options={}, view_model) ->
+  constructor: (model, options, view_model) ->
+    options or= {}
+    view_model or= {}
     super
 
-    kb.statistics.register(@) if kb.statistics     # collect memory management statistics
+    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
 
     # bind and extract options
     options = _.defaults(_.clone(options), options.options) if options.options
@@ -56,8 +58,8 @@ class kb.ViewModel extends kb.RefCountable
     # initialize
     @_mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)
     @_mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
-    @_mapObservables(model, options.mappings) if options.mappings
-    @_createObservables(model, keys) if keys
+    not options.mappings or @_mapObservables(model, options.mappings)
+    not keys or @_createObservables(model, keys)
 
   releaseReferences: ->
     @__kb.references_released = true
@@ -68,25 +70,23 @@ class kb.ViewModel extends kb.RefCountable
     kb.release(this, true) # release the observables
 
   __destroy: ->
-    @releaseReferences() unless @__kb.references_released
+    @__kb.references_released or @releaseReferences()
     kb.utils.wrappedDestroy(@)
     super
 
-    kb.statistics.unregister(@) if kb.statistics     # collect memory management statistics
+    not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
 
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0) or (model is new_model) # get or no change
-    model = kb.utils.wrappedObject(@, new_model)
-    return unless model # no model
+    kb.utils.wrappedObject(@, new_model)
     model_watcher = kb.utils.wrappedModelWatcher(@)
-    return new_model unless model_watcher # not yet initialized
-    model_watcher.model(model) # sync with model_watcher
-
-    # add all the missing keys
-    return if @__kb.keys # only allow specific keys
+    return unless model_watcher # not yet initialized
+    model_watcher.model(new_model) # sync with model_watcher
+  
+    return if @__kb.keys or not new_model or not new_model.attributes # only allow specific keys or nothing to add
     # NOTE: this does not remove keys that are different between the models
-    missing = _.difference(_.keys(model.attributes), _.keys(@__kb.model_keys))
+    missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
     @_createObservables(new_model, missing) if missing    
 
   setToDefault: ->
@@ -113,7 +113,7 @@ class kb.ViewModel extends kb.RefCountable
     for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)
-      mapping_info.key = vm_key unless mapping_info.key
+      mapping_info.key or= vm_key
 
       # add to the keys list
       @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true 
@@ -125,5 +125,5 @@ class kb.ViewModel extends kb.RefCountable
 # factory function
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
 kb.observables = (model, factories_info, view_model) -> 
-  kb.legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead')
+  legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead')
   return new kb.ViewModel(model, factories_info, view_model)

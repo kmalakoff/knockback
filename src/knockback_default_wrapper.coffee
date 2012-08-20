@@ -15,9 +15,7 @@ class kb.DefaultWrapper
   constructor: (target_observable, @dv) -> # @dv is default value
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        current_target = ko.utils.unwrapObservable(target_observable())
-        current_default = ko.utils.unwrapObservable(@dv)
-        return if not current_target then current_default else current_target
+        return if (current_target = ko.utils.unwrapObservable(target_observable())) then current_target else ko.utils.unwrapObservable(@dv)
       write: (value) -> target_observable(value)
     }))
 

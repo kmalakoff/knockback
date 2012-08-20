@@ -21,7 +21,7 @@ class kb.RefCountable
 
   # reference counting
   retain: ->
-    throw "RefCountable: ref count is corrupt: #{@__kb_ref_count}" if (@__kb_ref_count <= 0)
+    (@__kb_ref_count > 0) or throwUnexpected(this, 'ref count is corrupt')
     @__kb_ref_count++
     @
 
@@ -29,7 +29,7 @@ class kb.RefCountable
     # used to free all references so an object can be released
 
   release: ->
-    throw "RefCountable: ref count is corrupt: #{@__kb_ref_count}" if (@__kb_ref_count <= 0)
+    (@__kb_ref_count > 0) or throwUnexpected(this, 'ref count is corrupt')
     @__kb_ref_count--
     @__destroy() unless @__kb_ref_count
     @

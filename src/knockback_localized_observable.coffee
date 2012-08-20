@@ -30,9 +30,10 @@
 class kb.LocalizedObservable
   @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
 
-  constructor: (@value, options={}, @vm={}) -> # @vm is view_model
-    kb.throwMissing(this, 'read') unless @read
-    kb.throwMissing(this, 'kb.locale_manager') unless kb.locale_manager
+  constructor: (@value, options, @vm) -> # @vm is view_model
+    options or= {}; @vm or= {}
+    @read or throwMissing(this, 'read')
+    kb.locale_manager or throwMissing(this, 'kb.locale_manager')
 
     # bind callbacks
     @__kb or= {}
@@ -49,7 +50,7 @@ class kb.LocalizedObservable
         return @read(ko.utils.unwrapObservable(@value))
 
       write: (value) =>
-        kb.throwUnexpected(this, 'writing to read-only') unless @write
+        @write or throwUnexpected(this, 'writing to read-only')
         @write(value, ko.utils.unwrapObservable(@value))
         @vo(value)
         @__kb._onChange(value) if @__kb._onChange

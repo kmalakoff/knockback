@@ -19,13 +19,11 @@
 class kb.ModelWatcher
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
     if options.model_watcher
-      kb.throwUnexpected(this, 'model not matching') unless (options.model_watcher.model() is model or (options.model_watcher.model_ref is model))
-      model_watcher = kb.utils.wrappedModelWatcher(obj, options.model_watcher)
+      throwUnexpected(this, 'model not matching') unless (options.model_watcher.model() is model or (options.model_watcher.model_ref is model))
+      return kb.utils.wrappedModelWatcher(obj, options.model_watcher).registerCallbacks(obj, callback_options)
     else
-      model_watcher = kb.utils.wrappedModelWatcher(obj, new kb.ModelWatcher(model))
       kb.utils.wrappedModelWatcherIsOwned(obj, true)
-    model_watcher.registerCallbacks(obj, callback_options)
-    return model_watcher
+      return kb.utils.wrappedModelWatcher(obj, new kb.ModelWatcher(model)).registerCallbacks(obj, callback_options)
 
   constructor: (model, obj, callback_options) ->
     @__kb or= {}
@@ -35,10 +33,7 @@ class kb.ModelWatcher
 
     @registerCallbacks(obj, callback_options) if callback_options 
 
-    if model # set up
-      @model(model) 
-    else
-      @m = null
+    if model then @model(model) else (@m = null)
 
   destroy: ->
     @model(null); @__kb.callbacks = null
@@ -76,8 +71,8 @@ class kb.ModelWatcher
     return new_model
   
   registerCallbacks: (obj, options) ->
-    kb.throwMissing(this, 'obj') unless obj
-    kb.throwMissing(this, 'options') unless options
+    obj or throwMissing(this, 'obj')
+    options or throwMissing(this, 'options')
     event_name = if options.event_name then options.event_name else 'change'
     callbacks = @__kb.callbacks[event_name]
 
@@ -88,13 +83,13 @@ class kb.ModelWatcher
         list: list
         fn: (model) -> 
           for info in list
-            continue unless info.update
+            if info.update
             
-            # key doesn't match
-            continue if model and info.key and (model.hasChanged and not model.hasChanged(ko.utils.unwrapObservable(info.key)))
+              # key doesn't match
+              continue if model and info.key and (model.hasChanged and not model.hasChanged(ko.utils.unwrapObservable(info.key)))
 
-            # trigger update
-            info.update() 
+              # trigger update
+              info.update() 
 
           return null
       }
@@ -104,18 +99,18 @@ class kb.ModelWatcher
     # add the callback information
     info = {}
     info.obj = obj
-    info.model = options.model if options.model
-    info.update = options.update if options.update
-    info.key = options.key if options.key
+    info.model = options.model
+    info.update = options.update
+    info.key = options.key
     callbacks.list.push(info)
 
-    return unless @m # not loaded
+    if @m # loaded
+      # bind relational updates
+      @_modelBindRelatationalInfo(event_name, info) if Backbone.RelationalModel and (@m instanceof Backbone.RelationalModel)
 
-    # bind relational updates
-    @_modelBindRelatationalInfo(event_name, info) if Backbone.RelationalModel and (@m instanceof Backbone.RelationalModel)
-
-    # trigger now
-    info.model(@m) and info.model
+      # trigger now
+      info.model(@m) and info.model
+    @
 
   releaseCallbacks: (obj) ->
     return unless @__kb.callbacks # already destroyed

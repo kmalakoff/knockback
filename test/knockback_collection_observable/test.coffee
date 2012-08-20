@@ -207,7 +207,7 @@ $(document).ready( ->
         return (that.parts.length-@parts.length) if @parts.length != that.parts.length
         for index, part of @parts
           diff = that.parts[index] - Math.parseInt(part, 10)
-          return diff unless diff == 0
+          return diff unless diff is 0
         return 0
 
     # without view models

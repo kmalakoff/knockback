@@ -29,11 +29,10 @@ class kb.Factory
     @
 
   creatorForPath: (obj, path) ->
-    creator = @paths[path]
-    if creator
+    if (creator = @paths[path])
       return if creator.view_model then creator.view_model else creator
     if @parent_factory
-      creator = @parent_factory.creatorForPath(obj, path); return creator if creator
+      return creator if (creator = @parent_factory.creatorForPath(obj, path))
 
     # use defaults
     return kb.ViewModel                   if obj instanceof Backbone.Model
@@ -41,7 +40,7 @@ class kb.Factory
     return null
 
   createForPath: (obj, path, store, creator) ->
-    creator = @creatorForPath(obj, path)   if not creator # hasn't been looked up yet
+    creator or= @creatorForPath(obj, path) # hasn't been looked up yet
     return ko.observable(obj)              if not creator # an observable
     if creator.hasOwnProperty('models_only')
       return obj creator.models_only
@@ -49,7 +48,7 @@ class kb.Factory
 
     return new creator(obj, {store: store, factory: this, path: path, creator: creator})            if typeof(creator) == 'function'  # a constructor
     return creator.create(obj, {store: store, factory: this, path: path, creator: creator})         if creator.create                 # a function
-    throw "unrecognized creator for #{path}"
+    throwUnexpected(this, "unrecognized creator for #{path}")
 
   @createDefault: (obj, options) ->
     return kb.viewModel(obj, options)                   if obj instanceof Backbone.Model
