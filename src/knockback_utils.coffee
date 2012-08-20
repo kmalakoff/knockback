@@ -25,7 +25,7 @@ kb.utils.wrappedDestroy = (obj) ->
   __kb.store = null
   kb.release(__kb, true) # release everything that remains
 
-kb.utils.wrappedKey = (obj, key, value) ->
+wrappedKey = (obj, key, value) ->
   # get
   if arguments.length is 2
     return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
@@ -36,21 +36,25 @@ kb.utils.wrappedKey = (obj, key, value) ->
   obj.__kb[key] = value
   return value
 
+argumentsAddKey = (args, key) ->
+  arraySplice.call(args, 1, 0, key)
+  return args
+
 kb.utils.wrappedModel = (obj, value) ->
   # get
   if (arguments.length is 1)
-    value = kb.utils.wrappedKey(obj, 'object')
+    value = wrappedKey(obj, 'object')
     return if _.isUndefined(value) then obj else value
   else
-    return kb.utils.wrappedKey(obj, 'object', value)
+    return wrappedKey(obj, 'object', value)
 
-kb.utils.wrappedObservable = (obj, value)           -> arraySplice.call(arguments, 1, 0, 'observable');             return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedObject = (obj, value)               -> arraySplice.call(arguments, 1, 0, 'object');                 return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedStore = (obj, value)                -> arraySplice.call(arguments, 1, 0, 'store');                  return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedStoreIsOwned = (obj, value)         -> arraySplice.call(arguments, 1, 0, 'store_is_owned');         return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedFactory = (obj, value)              -> arraySplice.call(arguments, 1, 0, 'factory');                return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedModelWatcher = (obj, value)         -> arraySplice.call(arguments, 1, 0, 'model_watcher');          return kb.utils.wrappedKey.apply(@, arguments)
-kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> arraySplice.call(arguments, 1, 0, 'model_watcher_is_owned'); return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedObservable = (obj, value)           -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'observable'))
+kb.utils.wrappedObject = (obj, value)               -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'object'))
+kb.utils.wrappedStore = (obj, value)                -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'store'))
+kb.utils.wrappedStoreIsOwned = (obj, value)         -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'store_is_owned'))
+kb.utils.wrappedFactory = (obj, value)              -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'factory'))
+kb.utils.wrappedModelWatcher = (obj, value)         -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'model_watcher'))
+kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'model_watcher_is_owned'))
 
 kb.utils.setToDefault = (obj) ->
   return unless obj

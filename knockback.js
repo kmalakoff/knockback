@@ -12,7 +12,7 @@
 
 
 (function() {
-  var Backbone, Knockback, arraySlice, arraySplice, kb, ko, legacyWarning, throwMissing, throwUnexpected, _,
+  var Backbone, Knockback, argumentsAddKey, arraySlice, arraySplice, kb, ko, legacyWarning, throwMissing, throwUnexpected, wrappedKey, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -50,13 +50,28 @@
   kb.TYPE_COLLECTION = 3;
 
   kb.release = function(obj, keys_only) {
-    var key, value;
+    var key, releaseObject, releaseObservableArray, value;
     if (!obj) {
       return false;
     }
-    if (!keys_only && (ko.isObservable(obj) || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
+    releaseObservableArray = function(obj) {
+      var array, view_model, view_models, _i, _len;
+      if (obj.collection || !(ko.isObservable(obj) && obj.indexOf && _.isArray(array = obj()))) {
+        return false;
+      }
+      if (array.length) {
+        view_models = array.slice(0);
+        array.splice(0, array.length);
+        for (_i = 0, _len = view_models.length; _i < _len; _i++) {
+          view_model = view_models[_i];
+          kb.release(view_model);
+        }
+      }
+      return true;
+    };
+    releaseObject = function(obj) {
       if (obj.destroy) {
-        if (obj.collection || !(obj.destroyAll && obj.indexOf)) {
+        if (!releaseObservableArray(obj)) {
           obj.destroy();
         }
       } else if (obj.release) {
@@ -64,6 +79,10 @@
       } else if (obj.dispose) {
         obj.dispose();
       }
+      return obj;
+    };
+    if (!keys_only && (ko.isObservable(obj) || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
+      releaseObject(obj);
     } else if (_.isObject(obj) && !(typeof obj === 'function')) {
       for (key in obj) {
         value = obj[key];
@@ -74,15 +93,7 @@
           continue;
         }
         obj[key] = null;
-        if (value.destroy) {
-          if (value.collection || !(value.destroyAll && value.indexOf)) {
-            value.destroy();
-          }
-        } else if (value.release) {
-          value.release();
-        } else if (value.dispose) {
-          value.dispose();
-        }
+        releaseObject(value);
       }
     }
   };
@@ -146,7 +157,7 @@
     return kb.release(__kb, true);
   };
 
-  kb.utils.wrappedKey = function(obj, key, value) {
+  wrappedKey = function(obj, key, value) {
     if (arguments.length === 2) {
       if (obj && obj.__kb && obj.__kb.hasOwnProperty(key)) {
         return obj.__kb[key];
@@ -160,52 +171,50 @@
     return value;
   };
 
+  argumentsAddKey = function(args, key) {
+    arraySplice.call(args, 1, 0, key);
+    return args;
+  };
+
   kb.utils.wrappedModel = function(obj, value) {
     if (arguments.length === 1) {
-      value = kb.utils.wrappedKey(obj, 'object');
+      value = wrappedKey(obj, 'object');
       if (_.isUndefined(value)) {
         return obj;
       } else {
         return value;
       }
     } else {
-      return kb.utils.wrappedKey(obj, 'object', value);
+      return wrappedKey(obj, 'object', value);
     }
   };
 
   kb.utils.wrappedObservable = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'observable');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'observable'));
   };
 
   kb.utils.wrappedObject = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'object');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'object'));
   };
 
   kb.utils.wrappedStore = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'store');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'store'));
   };
 
   kb.utils.wrappedStoreIsOwned = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'store_is_owned');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'store_is_owned'));
   };
 
   kb.utils.wrappedFactory = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'factory');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'factory'));
   };
 
   kb.utils.wrappedModelWatcher = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'model_watcher');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'model_watcher'));
   };
 
   kb.utils.wrappedModelWatcherIsOwned = function(obj, value) {
-    arraySplice.call(arguments, 1, 0, 'model_watcher_is_owned');
-    return kb.utils.wrappedKey.apply(this, arguments);
+    return wrappedKey.apply(this, argumentsAddKey(arguments, 'model_watcher_is_owned'));
   };
 
   kb.utils.setToDefault = function(obj) {

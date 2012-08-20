@@ -56,7 +56,7 @@ $(document).ready( ->
 
     ViewModel = ->
       @prop1 = ko.observable()
-      @prop2 = ko.observableArray([])
+      @prop2 = ko.observableArray(['test', 1, null, kb.viewModel(new Backbone.Model({name: 'name1'}))])
       @prop3 = ko.dependentObservable(-> return true)
       @prop4 = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
       @prop5 = kb.viewModel(new Backbone.Model({name: 'name1'}), {name: {}}, @)

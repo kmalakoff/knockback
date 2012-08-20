@@ -28,31 +28,37 @@ kb.TYPE_SIMPLE = 1
 kb.TYPE_MODEL = 2
 kb.TYPE_COLLECTION = 3
 
-# release
 kb.release = (obj, keys_only) ->
   return false unless obj
 
-  # known type
-  if not keys_only and (ko.isObservable(obj) or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
+  # special case for ko.observableArray (do not notify nor tag objects)
+  releaseObservableArray = (obj) -> 
+    return false if obj.collection or not (ko.isObservable(obj) and obj.indexOf and _.isArray(array = obj()))
+    if array.length
+      view_models = array.slice(0)
+      array.splice(0, array.length)
+      kb.release(view_model) for view_model in view_models
+    return true
+
+  releaseObject = (obj) -> 
     if obj.destroy
-      obj.destroy() if obj.collection or not (obj.destroyAll and obj.indexOf) # special case for ko.observableArray (do not notify nor tag objects)
+      obj.destroy() unless releaseObservableArray(obj)
     else if obj.release
       obj.release()
     else if obj.dispose
       obj.dispose()
+    return obj
+
+  # known type
+  if not keys_only and (ko.isObservable(obj) or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
+    releaseObject(obj)
 
   # view model
   else if _.isObject(obj) and not (typeof(obj) is 'function')
     for key, value of obj
       continue if not value or (key is '__kb')
       continue unless ko.isObservable(value) or (typeof(value.destroy) is 'function') or (typeof(value.release) is 'function')
-      obj[key] = null
-      if value.destroy
-        value.destroy() if value.collection or not (value.destroyAll and value.indexOf) # special case for ko.observableArray (do not notify nor tag objects)
-      else if value.release
-        value.release()
-      else if value.dispose
-        value.dispose()
+      obj[key] = null; releaseObject(value)
 
   return
 
