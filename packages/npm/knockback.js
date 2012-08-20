@@ -49,6 +49,55 @@
 
   kb.TYPE_COLLECTION = 3;
 
+  kb.release = function(obj, keys_only) {
+    var key, value;
+    if (!obj) {
+      return false;
+    }
+    if (!keys_only && (ko.isObservable(obj) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function'))) {
+      if (obj.release) {
+        if (!obj.refCount || obj.refCount() > 0) {
+          obj.release();
+        }
+      } else if (obj.destroy) {
+        if (!obj.hasOwnProperty('__kb') || obj.__kb) {
+          obj.destroy();
+        }
+      } else if (obj.dispose) {
+        obj.dispose();
+      }
+      return true;
+    } else if (_.isObject(obj) && !(typeof obj === 'function')) {
+      for (key in obj) {
+        value = obj[key];
+        if (!value || (key === '__kb') || ((typeof value === 'function') && !ko.isObservable(value))) {
+          continue;
+        }
+        if (kb.release(value)) {
+          obj[key] = null;
+        }
+      }
+      return true;
+    }
+    return false;
+  };
+
+  kb.legacyWarning = function(identifier, last_version, message) {
+    var _base;
+    kb._legacy_warnings || (kb._legacy_warnings = {});
+    (_base = kb._legacy_warnings)[identifier] || (_base[identifier] = 0);
+    kb._legacy_warnings[identifier]++;
+    return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".");
+  };
+
+  kb.throwMissing = function(instance, message) {
+    throw "" + instance.constructor.name + ": " + message + " is missing";
+  };
+
+  kb.throwUnexpected = function(instance, message) {
+    throw "" + instance.constructor.name + ": " + message + " is unexpected";
+  };
+
   /*
     knockback_utils.js
     (c) 2011, 2012 Kevin Malakoff.
@@ -62,22 +111,6 @@
 
   kb.utils = {};
 
-  kb.utils.legacyWarning = function(identifier, last_version, message) {
-    var _base;
-    kb._legacy_warnings || (kb._legacy_warnings = {});
-    (_base = kb._legacy_warnings)[identifier] || (_base[identifier] = 0);
-    kb._legacy_warnings[identifier]++;
-    return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".");
-  };
-
-  kb.utils.throwMissing = function(instance, message) {
-    throw "" + instance.constructor.name + ": " + message + " is missing";
-  };
-
-  kb.utils.throwUnexpected = function(instance, message) {
-    throw "" + instance.constructor.name + ": " + message + " is unexpected";
-  };
-
   kb.utils.wrappedDestroy = function(owner) {
     var __kb;
     if (!owner.__kb) {
@@ -88,28 +121,19 @@
     }
     __kb = owner.__kb;
     owner.__kb = null;
-    if (__kb.value && (!__kb.value.refCount || (__kb.value.refCount() > 0))) {
-      if (__kb.store) {
-        __kb.store.releaseObservable(__kb.value, __kb.store_is_owned);
-      } else {
-        kb.utils.release(__kb.value);
-      }
-    }
-    if (__kb.value_observable && __kb.value_observable.dispose) {
-      __kb.value_observable.dispose();
-    }
     if (__kb.observable) {
       kb.utils.wrappedDestroy(__kb.observable);
-      if (__kb.observable.dispose) {
-        __kb.observable.dispose();
-      }
     }
+    __kb.factory = null;
     if (__kb.model_observable_is_owned) {
       __kb.model_observable.destroy();
     }
+    __kb.model_observable = null;
     if (__kb.store_is_owned) {
-      return __kb.store.destroy();
+      __kb.store.destroy();
     }
+    __kb.store = null;
+    return kb.release(__kb, true);
   };
 
   kb.utils.wrappedByKey = function(owner, key, value) {
@@ -142,30 +166,22 @@
   kb.utils.wrappedModel = function(observable, value) {
     var obj;
     if (arguments.length === 1) {
-      obj = kb.utils.wrappedByKey(observable, 'obj');
+      obj = kb.utils.wrappedByKey(observable, 'object');
       if (_.isUndefined(obj)) {
         return observable;
       } else {
         return obj;
       }
     } else {
-      return kb.utils.wrappedByKey(observable, 'obj', value);
+      return kb.utils.wrappedByKey(observable, 'object', value);
     }
   };
 
   kb.utils.wrappedObject = function(observable, value) {
     if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'obj');
+      return kb.utils.wrappedByKey(observable, 'object');
     } else {
-      return kb.utils.wrappedByKey(observable, 'obj', value);
-    }
-  };
-
-  kb.utils.wrappedValue = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'value');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'value', value);
+      return kb.utils.wrappedByKey(observable, 'object', value);
     }
   };
 
@@ -238,36 +254,8 @@
   };
 
   kb.utils.release = function(obj, keys_only) {
-    var key, value;
-    if (!obj) {
-      return false;
-    }
-    if (!keys_only && (ko.isObservable(obj) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function'))) {
-      if (obj.release) {
-        if (!obj.refCount || obj.refCount() > 0) {
-          obj.release();
-        }
-      } else if (obj.destroy) {
-        if (!obj.hasOwnProperty('__kb') || obj.__kb) {
-          obj.destroy();
-        }
-      } else if (obj.dispose) {
-        obj.dispose();
-      }
-      return true;
-    } else if (_.isObject(obj) && !(typeof obj === 'function')) {
-      for (key in obj) {
-        value = obj[key];
-        if (!value || (key === '__kb') || ((typeof value === 'function') && !ko.isObservable(value))) {
-          continue;
-        }
-        if (kb.utils.release(value)) {
-          obj[key] = null;
-        }
-      }
-      return true;
-    }
-    return false;
+    kb.legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead');
+    return kb.release(obj, keys_only);
   };
 
   kb.utils.valueType = function(observable) {
@@ -387,13 +375,13 @@
 
     Factory.useOptionsOrCreate = function(options, obj, owner_path) {
       var factory;
-      if (options.factory && !options.mappings) {
+      if (options.factory && !options.factories) {
         factory = kb.utils.wrappedFactory(obj, options.factory);
       } else {
         factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
       }
-      if (options.mappings) {
-        factory.addPathMappings(options.mappings, owner_path);
+      if (options.factories) {
+        factory.addPathMappings(options.factories, owner_path);
       }
       return factory;
     };
@@ -411,10 +399,10 @@
       return this.paths[path] = create_info;
     };
 
-    Factory.prototype.addPathMappings = function(mappings, owner_path) {
+    Factory.prototype.addPathMappings = function(factories, owner_path) {
       var create_info, path;
-      for (path in mappings) {
-        create_info = mappings[path];
+      for (path in factories) {
+        create_info = factories[path];
         this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
       }
       return this;
@@ -533,7 +521,7 @@
         if (observable.release) {
           observable.release(true);
         } else {
-          kb.utils.release(observable);
+          kb.release(observable);
         }
       }
       this.objects = null;
@@ -625,7 +613,7 @@
       if (arguments.length === 2 && !owns_store && !observable.release) {
         return;
       }
-      kb.utils.release(observable);
+      kb.release(observable);
       if (observable.refCount && observable.refCount() > 0) {
         return;
       }
@@ -657,7 +645,10 @@
 
     ModelObservable.useOptionsOrCreate = function(options, model, obj, callback_options) {
       var model_observable;
-      if (options.model_observable && options.model_observable.model() === model) {
+      if (options.model_observable) {
+        if (!(options.model_observable.model() === model || (options.model_observable.model_ref === model))) {
+          kb.throwUnexpected(this, 'model not matching');
+        }
         model_observable = kb.utils.wrappedModelObservable(obj, options.model_observable);
       } else {
         model_observable = kb.utils.wrappedModelObservable(obj, new kb.ModelObservable(model));
@@ -680,6 +671,8 @@
       }
       if (model) {
         this.model(model);
+      } else {
+        kb.utils.wrappedObject(this, null);
       }
     }
 
@@ -734,10 +727,10 @@
     ModelObservable.prototype.registerCallbacks = function(obj, options) {
       var callbacks, event_name, info, list, model;
       if (!obj) {
-        kb.utils.throwMissing(this, 'obj');
+        kb.throwMissing(this, 'obj');
       }
       if (!options) {
-        kb.utils.throwMissing(this, 'options');
+        kb.throwMissing(this, 'options');
       }
       model = kb.utils.wrappedObject(this);
       event_name = options.event_name ? options.event_name : 'change';
@@ -935,8 +928,8 @@
       kb.Store.useOptionsOrCreate(options, collection, observable);
       kb.utils.wrappedPath(observable, options.path);
       factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
-      if (options.mappings) {
-        factory.addPathMappings(options.mappings, options.path);
+      if (options.factories) {
+        factory.addPathMappings(options.factories, options.path);
       }
       this.models_path = kb.utils.pathJoin(options.path, 'models');
       if (!factory.hasPath(this.models_path)) {
@@ -1076,7 +1069,7 @@
       observable = kb.utils.wrappedObservable(this);
       id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
       return _.find(observable(), function(test) {
-        return test.__kb.obj[id_attribute] === model[id_attribute];
+        return test.__kb.object[id_attribute] === model[id_attribute];
       });
     };
 
@@ -1132,7 +1125,7 @@
     CollectionObservable.prototype._onCollectionResort = function(model_or_models) {
       var observable;
       if (this.sorted_index) {
-        kb.utils.throwUnexpected(this, 'sorted_index');
+        kb.throwUnexpected(this, 'sorted_index');
       }
       if (_.isArray(model_or_models)) {
         observable = kb.utils.wrappedObservable(this);
@@ -1523,10 +1516,10 @@
       }
       this.view_model = view_model != null ? view_model : {};
       if (!this.read) {
-        kb.utils.throwMissing(this, 'read');
+        kb.throwMissing(this, 'read');
       }
       if (!kb.locale_manager) {
-        kb.utils.throwMissing(this, 'kb.locale_manager');
+        kb.throwMissing(this, 'kb.locale_manager');
       }
       this.__kb || (this.__kb = {});
       this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
@@ -1548,7 +1541,7 @@
         write: function(value) {
           var value_observable;
           if (!_this.write) {
-            kb.utils.throwUnexpected(_this, 'writing to read-only');
+            kb.throwUnexpected(_this, 'writing to read-only');
           }
           _this.write(value, ko.utils.unwrapObservable(_this.value_holder));
           value_observable = kb.utils.wrappedByKey(_this, 'vo');
@@ -1626,7 +1619,7 @@
         _this = this;
       this.view_model = view_model != null ? view_model : {};
       if (!options) {
-        kb.utils.throwMissing(this, 'options');
+        kb.throwMissing(this, 'options');
       }
       if (options.options) {
         options = _.defaults(_.clone(options), options.options);
@@ -1634,7 +1627,7 @@
       }
       this.key = _.isString(options) || ko.isObservable(options) ? options : options.key;
       if (!this.key) {
-        kb.utils.throwMissing(this, 'key');
+        kb.throwMissing(this, 'key');
       }
       this.args = options.args;
       this.read = options.read;
@@ -1693,9 +1686,9 @@
       }));
       kb.utils.wrappedStore(observable, options.store);
       kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, this.key));
-      if (options.mappings && ((typeof options.mappings === 'function') || options.mappings.create)) {
+      if (options.factories && ((typeof options.factories === 'function') || options.factories.create)) {
         factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
-        factory.addPathMapping(kb.utils.wrappedPath(observable), options.mappings);
+        factory.addPathMapping(kb.utils.wrappedPath(observable), options.factories);
       } else {
         kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable));
       }
@@ -1718,6 +1711,8 @@
     }
 
     Observable.prototype.destroy = function() {
+      kb.release(this.value);
+      this.value = null;
       return kb.utils.wrappedDestroy(this);
     };
 
@@ -1813,15 +1808,15 @@
         this.value_type = kb.TYPE_SIMPLE;
       }
       value_observable = kb.utils.wrappedByKey(this, 'vo');
-      previous_value = kb.utils.wrappedValue(this);
+      previous_value = this.value;
+      this.value = value;
       if (previous_value) {
         if (store) {
           store.releaseObservable(previous_value);
         } else {
-          kb.utils.release(previous_value);
+          kb.release(previous_value);
         }
       }
-      kb.utils.wrappedValue(this, value);
       return value_observable(value);
     };
 
@@ -1849,10 +1844,10 @@
         _this = this;
       this.event_name = event_name;
       if (!model) {
-        kb.utils.throwMissing(this, 'model');
+        kb.throwMissing(this, 'model');
       }
       if (!this.event_name) {
-        kb.utils.throwMissing(this, 'event_name');
+        kb.throwMissing(this, 'event_name');
       }
       kb.utils.wrappedByKey(this, 'vo', ko.observable());
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable(function() {
@@ -1925,7 +1920,7 @@
     __extends(ViewModel, _super);
 
     function ViewModel(model, options, view_model) {
-      var bb_model, keys, model_observable;
+      var bb_model, keys, mapped_keys, mapping_info, model_observable, vm_key, _ref;
       if (options == null) {
         options = {};
       }
@@ -1954,7 +1949,15 @@
       }));
       if (options.keys) {
         if (_.isArray(options.keys)) {
-          keys = options.keys;
+          keys = this.__kb.keys = options.keys;
+        } else {
+          mapped_keys = {};
+          _ref = options.keys;
+          for (vm_key in _ref) {
+            mapping_info = _ref[vm_key];
+            mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
+          }
+          this.__kb.keys = _.keys(mapped_keys);
         }
       } else {
         bb_model = model_observable.model();
@@ -1968,11 +1971,14 @@
       if (options.requires && _.isArray(options.requires)) {
         keys = keys ? _.union(keys, options.requires) : options.requires;
       }
-      if (_.isObject(options.keys)) {
+      if (_.isObject(options.keys) && !_.isArray(options.keys)) {
         this._mapObservables(model, options.keys);
       }
-      if (_.isObject(options.requires)) {
+      if (_.isObject(options.requires) && !_.isArray(options.requires)) {
         this._mapObservables(model, options.requires);
+      }
+      if (options.mappings) {
+        this._mapObservables(model, options.mappings);
       }
       if (keys) {
         this._createObservables(model, keys);
@@ -1986,7 +1992,7 @@
           this.__kb.view_model[vm_key] = null;
         }
       }
-      kb.utils.release(this, true);
+      kb.release(this, true);
       kb.utils.wrappedDestroy(this);
       ViewModel.__super__.__destroy.apply(this, arguments);
       if (kb.statistics) {
@@ -2009,6 +2015,9 @@
         return new_model;
       }
       model_observable.model(model);
+      if (this.__kb.keys) {
+        return;
+      }
       missing = _.difference(_.keys(model.attributes), _.keys(this.__kb.model_keys));
       if (missing) {
         return this._createObservables(new_model, missing);
@@ -2047,28 +2056,28 @@
       return this;
     };
 
-    ViewModel.prototype._mapObservables = function(model, mapping_info) {
-      var observable_options, options, vm_key;
+    ViewModel.prototype._mapObservables = function(model, mappings) {
+      var mapping_info, observable_options, vm_key;
       observable_options = {
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
         path: kb.utils.wrappedPath(this),
         model_observable: kb.utils.wrappedModelObservable(this)
       };
-      for (vm_key in mapping_info) {
-        options = mapping_info[vm_key];
+      for (vm_key in mappings) {
+        mapping_info = mappings[vm_key];
         if (this[vm_key]) {
           continue;
         }
-        options = _.isString(options) ? {
-          key: options
-        } : _.clone(options);
-        if (!options.key) {
-          options.key = vm_key;
+        mapping_info = _.isString(mapping_info) ? {
+          key: mapping_info
+        } : _.clone(mapping_info);
+        if (!mapping_info.key) {
+          mapping_info.key = vm_key;
         }
         this.__kb.vm_keys[vm_key] = true;
-        this.__kb.model_keys[options.key] = true;
-        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(options, observable_options), this);
+        this.__kb.model_keys[mapping_info.key] = true;
+        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, observable_options), this);
       }
       return this;
     };
@@ -2081,9 +2090,9 @@
     return new kb.ViewModel(model, options, view_model);
   };
 
-  kb.observables = function(model, mappings_info, view_model) {
-    kb.utils.legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead');
-    return new kb.ViewModel(model, mappings_info, view_model);
+  kb.observables = function(model, factories_info, view_model) {
+    kb.legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead');
+    return new kb.ViewModel(model, factories_info, view_model);
   };
 
 }).call(this);

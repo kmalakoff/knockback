@@ -113,7 +113,7 @@ $(document).ready( ->
   test("Basic Usage: no sorting and no callbacks", ->
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      mappings:
+      factories:
         models: {create: (model) -> return new ContactViewModel(model)}
     })
 
@@ -370,12 +370,12 @@ $(document).ready( ->
       major_duo4: kb.collectionObservable(major_duo, {view_model: ContactViewModelDate})
       major_duo5: kb.collectionObservable(major_duo, {create: (model, options) -> return new ContactViewModelDate(model, options)})
       major_duo6: kb.collectionObservable(major_duo, {create: (model, options) -> return if model.get('name') is 'John' then new ContactViewModelDate(model, options) else kb.viewModel(model, options)}) # mixed
-      minor_duo1: kb.collectionObservable(minor_duo, {mappings: {}})
-      minor_duo2: kb.collectionObservable(minor_duo, {mappings: models: {models_only: true}})
-      minor_duo3: kb.collectionObservable(minor_duo, {mappings: models: kb.ViewModel})
-      minor_duo4: kb.collectionObservable(minor_duo, {mappings: models: {view_model: ContactViewModelDate}})
-      minor_duo5: kb.collectionObservable(minor_duo, {mappings: models: {create: (model, options) -> return new ContactViewModelDate(model, options)}})
-      minor_duo6: kb.collectionObservable(minor_duo, {mappings: models: {create: (model, options) -> return if model.get('name') is 'George' then new ContactViewModelDate(model, options) else kb.viewModel(model, options)}}) # mixed
+      minor_duo1: kb.collectionObservable(minor_duo, {factories: {}})
+      minor_duo2: kb.collectionObservable(minor_duo, {factories: models: {models_only: true}})
+      minor_duo3: kb.collectionObservable(minor_duo, {factories: models: kb.ViewModel})
+      minor_duo4: kb.collectionObservable(minor_duo, {factories: models: {view_model: ContactViewModelDate}})
+      minor_duo5: kb.collectionObservable(minor_duo, {factories: models: {create: (model, options) -> return new ContactViewModelDate(model, options)}})
+      minor_duo6: kb.collectionObservable(minor_duo, {factories: models: {create: (model, options) -> return if model.get('name') is 'George' then new ContactViewModelDate(model, options) else kb.viewModel(model, options)}}) # mixed
     }
 
     validateContactViewModel = (view_model, name, birthdate) ->
@@ -447,7 +447,7 @@ $(document).ready( ->
     validateGenericViewModel(nested_view_model.minor_duo6()[1], 'Ringo', ringo_birthdate) # mixed
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(nested_view_model)
+    kb.release(nested_view_model)
 
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')

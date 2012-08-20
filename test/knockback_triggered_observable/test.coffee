@@ -41,7 +41,7 @@ $(document).ready( ->
     equal(trigger_count, 3, "3: changed")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
     equal(trigger_count, 3, "3: no change")
 
     # KO doesn't have a dispose for ko.observable

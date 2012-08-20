@@ -16,7 +16,8 @@
 
 class kb.ModelObservable
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
-    if options.model_observable and options.model_observable.model() is model
+    if options.model_observable
+      kb.throwUnexpected(this, 'model not matching') unless (options.model_observable.model() is model or (options.model_observable.model_ref is model))
       model_observable = kb.utils.wrappedModelObservable(obj, options.model_observable)
     else
       model_observable = kb.utils.wrappedModelObservable(obj, new kb.ModelObservable(model))
@@ -32,7 +33,10 @@ class kb.ModelObservable
 
     @registerCallbacks(obj, callback_options) if callback_options 
 
-    @model(model) if model # set up
+    if model # set up
+      @model(model) 
+    else
+      kb.utils.wrappedObject(@, null)
 
   destroy: ->
     @model(null); @__kb.callbacks = null
@@ -71,8 +75,8 @@ class kb.ModelObservable
     return new_model
   
   registerCallbacks: (obj, options) ->
-    kb.utils.throwMissing(this, 'obj') unless obj
-    kb.utils.throwMissing(this, 'options') unless options
+    kb.throwMissing(this, 'obj') unless obj
+    kb.throwMissing(this, 'options') unless options
     model = kb.utils.wrappedObject(@)
 
     event_name = if options.event_name then options.event_name else 'change'

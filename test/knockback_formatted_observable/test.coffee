@@ -110,7 +110,7 @@ $(document).ready( ->
     equal(view_model.name_number_name_song(), 'Name: Ringo, #: 555-555-5556, Name: Ringo, Song: "Yellow"', "combined repeat")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("Error cases", ->

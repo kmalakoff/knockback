@@ -34,7 +34,7 @@ $(document).ready( ->
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
   
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
   
   test("internals test (Coffeescript inheritance)", ->
@@ -98,7 +98,7 @@ $(document).ready( ->
     equal(view_model._date().getDate(), 10, "day is good")
   
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
   
   test("internals test (Javascript inheritance)", ->
@@ -164,7 +164,7 @@ $(document).ready( ->
     equal(view_model._date().getDate(), 10, "day is good")
   
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
   
   test("Using Coffeescript classes", ->
@@ -202,7 +202,7 @@ $(document).ready( ->
     equal(view_model.name(), 'First: Ringo', "Interesting name")
   
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
   
   test("Using simple Javascript classes", ->
@@ -239,7 +239,7 @@ $(document).ready( ->
     equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed")
   
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
   
   test("requires", ->
@@ -311,7 +311,7 @@ $(document).ready( ->
     equal(view_model._date().getDate(), 10, "day is good")
   
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
   
   test("reference counting and custom __destroy (Coffeescript inheritance)", ->
@@ -409,7 +409,7 @@ $(document).ready( ->
     })
 
     nested_view_model = kb.viewModel(nested_model, {
-      mappings:
+      factories:
         john: ContactViewModelDate
         george: {create: (model, options) -> return new ContactViewModelDate(model, options)}
         'major_duo1.models': ContactViewModelDate
@@ -481,7 +481,7 @@ $(document).ready( ->
     validateGenericViewModel(nested_view_model.minor_duo3()[1], 'Ringo', ringo_birthdate)
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(nested_view_model)
+    kb.release(nested_view_model)
 
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
@@ -504,7 +504,7 @@ $(document).ready( ->
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is retains type of kb.TYPE_COLLECTION')
 
     # add custom mapping
-    view_model = kb.viewModel(model, {mappings: 
+    view_model = kb.viewModel(model, {factories: 
       reused: (obj, options) -> return if obj instanceof Backbone.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
     })
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
@@ -573,7 +573,7 @@ $(document).ready( ->
     equal(current_date.getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("Bulk mode (array of keys)", ->
@@ -602,7 +602,7 @@ $(document).ready( ->
     kb.locale_manager.setLocale('fr-FR')
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("Error cases", ->

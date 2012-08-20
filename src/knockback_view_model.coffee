@@ -41,22 +41,29 @@ class kb.ViewModel extends kb.RefCountable
 
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified
-      keys = options.keys if _.isArray(options.keys)
+      if _.isArray(options.keys)
+        keys = @__kb.keys = options.keys
+      else
+        mapped_keys = {}
+        for vm_key, mapping_info of options.keys
+          mapped_keys[if _.isString(mapping_info) then mapping_info else (if mapping_info.key then mapping_info.key else vm_key)] = true
+        @__kb.keys = _.keys(mapped_keys)
     else
       bb_model = model_observable.model(); keys = _.keys(bb_model.attributes) if bb_model
     (keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals) if @__kb.internals
     (keys = if keys then _.union(keys, options.requires) else options.requires) if options.requires and _.isArray(options.requires)
 
     # initialize
-    @_mapObservables(model, options.keys) if _.isObject(options.keys)
-    @_mapObservables(model, options.requires) if _.isObject(options.requires)
+    @_mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)
+    @_mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
+    @_mapObservables(model, options.mappings) if options.mappings
     @_createObservables(model, keys) if keys
 
   __destroy: ->
     if @__kb.view_model isnt @ # clear the external references
       for vm_key of @__kb.vm_keys
         @__kb.view_model[vm_key] = null
-    kb.utils.release(this, true) # release the observables
+    kb.release(this, true) # release the observables
     kb.utils.wrappedDestroy(@)
     super
 
@@ -72,6 +79,7 @@ class kb.ViewModel extends kb.RefCountable
     model_observable.model(model) # sync with model_observable
 
     # add all the missing keys
+    return if @__kb.keys # only allow specific keys
     # NOTE: this does not remove keys that are different between the models
     missing = _.difference(_.keys(model.attributes), _.keys(@__kb.model_keys))
     @_createObservables(new_model, missing) if missing    
@@ -95,22 +103,22 @@ class kb.ViewModel extends kb.RefCountable
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, observable_options, @)
     @
 
-  _mapObservables: (model, mapping_info) ->
+  _mapObservables: (model, mappings) ->
     observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: kb.utils.wrappedPath(@), model_observable: kb.utils.wrappedModelObservable(@)}
-    for vm_key, options of mapping_info
+    for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
-      options = if _.isString(options) then {key: options} else _.clone(options)
-      options.key = vm_key unless options.key
+      mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)
+      mapping_info.key = vm_key unless mapping_info.key
 
       # add to the keys list
-      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[options.key]=true 
+      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true 
 
       # create
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(options, observable_options), @)
+      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, observable_options), @)
     @
 
 # factory function
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
-kb.observables = (model, mappings_info, view_model) -> 
-  kb.utils.legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead')
-  return new kb.ViewModel(model, mappings_info, view_model)
+kb.observables = (model, factories_info, view_model) -> 
+  kb.legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead')
+  return new kb.ViewModel(model, factories_info, view_model)

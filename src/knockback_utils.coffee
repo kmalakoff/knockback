@@ -11,32 +11,17 @@
 # utilities namespace
 kb.utils = {}
 
-# displays legacy warnings to the Knockback library user
-kb.utils.legacyWarning = (identifier, last_version, message) ->
-  kb._legacy_warnings or= {}
-  kb._legacy_warnings[identifier] or= 0
-  kb._legacy_warnings[identifier]++
-  console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
-
-kb.utils.throwMissing = (instance, message) ->
-  throw "#{instance.constructor.name}: #{message} is missing"
-
-kb.utils.throwUnexpected = (instance, message) ->
-  throw "#{instance.constructor.name}: #{message} is unexpected"
-
 kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
   owner.__kb.model_observable.releaseCallbacks(owner) if owner.__kb.model_observable
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
-  # release the value and observable
-  if __kb.value and (not __kb.value.refCount or (__kb.value.refCount() > 0))
-    if __kb.store then __kb.store.releaseObservable(__kb.value, __kb.store_is_owned) else kb.utils.release(__kb.value) # release the stored value
-  __kb.value_observable.dispose() if __kb.value_observable and __kb.value_observable.dispose # dispose
-  if __kb.observable
-    kb.utils.wrappedDestroy(__kb.observable)
-    __kb.observable.dispose() if __kb.observable.dispose # dispose
+  kb.utils.wrappedDestroy(__kb.observable) if __kb.observable
+  __kb.factory = null
   __kb.model_observable.destroy() if __kb.model_observable_is_owned # release the model_observable
+  __kb.model_observable = null
   __kb.store.destroy() if __kb.store_is_owned # release the store
+  __kb.store = null
+  kb.release(__kb, true) # release everything that remains
 
 kb.utils.wrappedByKey = (owner, key, value) ->
   # get
@@ -61,13 +46,12 @@ kb.utils.wrappedObservable = (instance, observable) ->
 kb.utils.wrappedModel = (observable, value) ->
   # get
   if (arguments.length is 1)
-    obj = kb.utils.wrappedByKey(observable, 'obj')
+    obj = kb.utils.wrappedByKey(observable, 'object')
     return if _.isUndefined(obj) then observable else obj
   else
-    return kb.utils.wrappedByKey(observable, 'obj', value)
+    return kb.utils.wrappedByKey(observable, 'object', value)
 
-kb.utils.wrappedObject = (observable, value)                  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'obj') else kb.utils.wrappedByKey(observable, 'obj', value)
-kb.utils.wrappedValue = (observable, value)                   -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'value') else kb.utils.wrappedByKey(observable, 'value', value)
+kb.utils.wrappedObject = (observable, value)                  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'object') else kb.utils.wrappedByKey(observable, 'object', value)
 kb.utils.wrappedStore = (observable, value)                   -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
 kb.utils.wrappedStoreIsOwned = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
 kb.utils.wrappedFactory = (observable, value)                 -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
@@ -88,28 +72,8 @@ kb.utils.setToDefault = (obj) ->
   return obj
 
 kb.utils.release = (obj, keys_only) ->
-  return false unless obj
-
-  # known type
-  if not keys_only and (ko.isObservable(obj) or (typeof(obj.release) is 'function') or (typeof(obj.destroy) is 'function'))
-    if obj.release
-      obj.release() if not obj.refCount or obj.refCount() > 0 # not yet released
-    else if obj.destroy
-      obj.destroy() if not obj.hasOwnProperty('__kb') or obj.__kb # not yet released
-    else if obj.dispose
-      obj.dispose()
-
-    return true # was released
-
-  # view model
-  else if _.isObject(obj) and not (typeof(obj) is 'function')
-    for key, value of obj
-      continue if !value or (key is '__kb') or ((typeof(value) is 'function') and not ko.isObservable(value))
-      obj[key] = null if kb.utils.release(value)
-
-    return true # was released
-
-  return false
+  kb.legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
+  return kb.release(obj, keys_only)
 
 kb.utils.valueType = (observable) ->
   return kb.TYPE_UNKNOWN unless observable 

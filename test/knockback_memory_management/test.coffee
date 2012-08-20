@@ -68,7 +68,7 @@ $(document).ready( ->
       @
 
     view_model = new ViewModel()
-    kb.utils.release(view_model)
+    kb.release(view_model)
 
     ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..10]
     ok(!view_model.name, "Property released: view_model.name") # kb.observables(new Backbone.Model({name: 'name1'}), 'name', @)
@@ -82,12 +82,12 @@ $(document).ready( ->
         @prop = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
 
       __destroy: ->
-        kb.utils.release(@prop); @prop = null
+        kb.release(@prop); @prop = null
 
     ref_counted = new RefViewModel()
     view_model =
       ref_counted: ref_counted.retain()
-    kb.utils.release(view_model)
+    kb.release(view_model)
     ok(!view_model.ref_counted, "Property released: view_model.ref_counted")
     ok(!!ref_counted.prop, "Property not released: ref_counted.prop")
 
@@ -103,7 +103,7 @@ $(document).ready( ->
 
     instance = collection_observable()[0].retain()
 
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
     equal(RefCountableViewModel.view_models.length, 0, "All destroyed")
 
     # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
@@ -114,7 +114,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: DestroyableViewModel})
     equal(DestroyableViewModel.view_models.length, 2, "Created: 2")
 
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
     equal(DestroyableViewModel.view_models.length, 0, "All destroyed")
 
     # simple view model
@@ -122,7 +122,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: SimpleViewModel})
     equal(SimpleViewModel.view_models.length, 2, "Created: 2")
 
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
     equal(SimpleViewModel.view_models.length, 2, "Destroyed: 2")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
   )
@@ -209,7 +209,7 @@ $(document).ready( ->
 
     instance = collection_observable()[0].retain()
 
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
     equal(RefCountableViewModel.view_models.length, 0, "All destroyed")
 
     # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
@@ -220,7 +220,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(band, {view_model: DestroyableViewModel})
     equal(DestroyableViewModel.view_models.length, 4, "Created: 4")
 
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
     equal(DestroyableViewModel.view_models.length, 0, "All destroyed")
 
     # simple view model
@@ -228,7 +228,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(band, {view_model: SimpleViewModel})
     equal(SimpleViewModel.view_models.length, 4, "Created: 4")
 
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
     equal(SimpleViewModel.view_models.length, 4, "Destroyed: 4")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
   )

@@ -29,7 +29,7 @@ class kb.Store
       if observable.release
         observable.release(true)
       else
-        kb.utils.release(observable)
+        kb.release(observable)
     @objects = null
     @observables = null
 
@@ -84,7 +84,7 @@ class kb.Store
     return if arguments.length is 2 and not owns_store and not observable.release # cares about ownership -> do not clear out observables unless owned or ref count is 0
 
     # release and exit if references still exist
-    kb.utils.release(observable)
+    kb.release(observable)
     return if observable.refCount and observable.refCount() > 0
 
     # clear our references

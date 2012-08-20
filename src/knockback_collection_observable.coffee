@@ -46,10 +46,10 @@ class kb.CollectionObservable
     options = _.defaults(_.clone(options), options.options) if options.options
     kb.Store.useOptionsOrCreate(options, collection, observable)
 
-    # view model factory create mappings
+    # view model factory create factories
     kb.utils.wrappedPath(observable, options.path)
     factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
-    factory.addPathMappings(options.mappings, options.path) if options.mappings
+    factory.addPathMappings(options.factories, options.path) if options.factories
     @models_path = kb.utils.pathJoin(options.path, 'models')
 
     # add or deduce models create information
@@ -159,7 +159,7 @@ class kb.CollectionObservable
     return null unless @hasViewModels()
     observable = kb.utils.wrappedObservable(@)
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(observable(), (test) -> return (test.__kb.obj[id_attribute] == model[id_attribute]))
+    return _.find(observable(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
 
   hasViewModels: -> return !@models_only
 
@@ -185,7 +185,7 @@ class kb.CollectionObservable
     @_collectionResync()
 
   _onCollectionResort: (model_or_models) ->
-    kb.utils.throwUnexpected(this, 'sorted_index') if @sorted_index
+    kb.throwUnexpected(this, 'sorted_index') if @sorted_index
     if _.isArray(model_or_models)
       observable = kb.utils.wrappedObservable(@)
       @trigger('resort', observable()) # notify

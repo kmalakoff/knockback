@@ -73,7 +73,7 @@ $(document).ready( ->
     equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   # NOTE: dependency on globalize
@@ -117,7 +117,7 @@ $(document).ready( ->
     equal(current_date.getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("kb.formattedObservable", ->

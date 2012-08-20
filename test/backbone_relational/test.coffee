@@ -44,226 +44,226 @@ $(document).ready( ->
   Building.setup()
 
   test("1. Model with HasMany relations: A house with multiple people living in it", ->
-      kb.statistics = new kb.Statistics() # turn on stats
+    kb.statistics = new kb.Statistics() # turn on stats
 
-      john = new Person({
-        id: 'person-1-1'
-        name: 'John'
-      })
+    john = new Person({
+      id: 'person-1-1'
+      name: 'John'
+    })
 
-      paul = new Person({
-        id: 'person-1-2'
-        name: 'Paul'
-      })
+    paul = new Person({
+      id: 'person-1-2'
+      name: 'Paul'
+    })
 
-      our_house = new Building({
-        id: 'house-1-1'
-        location: 'in the middle of the street'
-        occupants: ['person-1-1', 'person-1-2']
-      })
+    our_house = new Building({
+      id: 'house-1-1'
+      location: 'in the middle of the street'
+      occupants: ['person-1-1', 'person-1-2']
+    })
 
-      house_view_model = new kb.ViewModel(our_house)
-      equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
-      equal(house_view_model.occupants().length, 2, 'Expected occupant count')
-      for occupant_observable in house_view_model.occupants()
-        ok(_.contains(['John', 'Paul'], occupant_observable.name()), 'Expected name')
-        equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
+    house_view_model = new kb.ViewModel(our_house)
+    equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
+    equal(house_view_model.occupants().length, 2, 'Expected occupant count')
+    for occupant_observable in house_view_model.occupants()
+      ok(_.contains(['John', 'Paul'], occupant_observable.name()), 'Expected name')
+      equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
 
-        # nested check
-        equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count")
-        for occupant_observable2 in occupant_observable.occupies().occupants()
-          ok(_.contains(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
-          equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
+      # nested check
+      equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count")
+      for occupant_observable2 in occupant_observable.occupies().occupants()
+        ok(_.contains(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
+        equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
 
-      equal(house_view_model.refCount(), 1, 'Expected references')
-      kb.utils.release(house_view_model)
-      equal(house_view_model.refCount(), 0, 'Expected references')
+    equal(house_view_model.refCount(), 1, 'Expected references')
+    kb.release(house_view_model)
+    equal(house_view_model.refCount(), 0, 'Expected references')
 
-      # check stats
-      equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-      equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
 
-      kb.statistics = null # turn off stats
-    )
+    kb.statistics = null # turn off stats
+  )
 
-    test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
-      kb.statistics = new kb.Statistics() # turn on stats
+  test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
+    kb.statistics = new kb.Statistics() # turn on stats
 
-      john = new Person({
-        id: 'person-2-1'
-        name: 'John'
-      })
-      paul = new Person({
-        id: 'person-2-2'
-        name: 'Paul'
-      })
-      george = new Person({
-        id: 'person-2-3'
-        name: 'George'
-      })
-      ringo = new Person({
-        id: 'person-2-4'
-        name: 'Ringo'
-      })
+    john = new Person({
+      id: 'person-2-1'
+      name: 'John'
+    })
+    paul = new Person({
+      id: 'person-2-2'
+      name: 'Paul'
+    })
+    george = new Person({
+      id: 'person-2-3'
+      name: 'George'
+    })
+    ringo = new Person({
+      id: 'person-2-4'
+      name: 'Ringo'
+    })
 
-      abbey_flats = new Building({
-        id: 'house-2-1'
-        location: 'one side of the street'
-        occupants: ['person-2-1', 'person-2-2', 'person-2-3', 'person-2-4']
-      })
-      abbey_studios = new Building({
-        id: 'studio-2-2'
-        location: 'the other side of the street'
-        occupants: []
-      })
+    abbey_flats = new Building({
+      id: 'house-2-1'
+      location: 'one side of the street'
+      occupants: ['person-2-1', 'person-2-2', 'person-2-3', 'person-2-4']
+    })
+    abbey_studios = new Building({
+      id: 'studio-2-2'
+      location: 'the other side of the street'
+      occupants: []
+    })
 
-      # check the set up state
-      places = new Backbone.Collection([abbey_flats, abbey_studios])
-      places_observable = kb.collectionObservable(places, {view_model: kb.ViewModel})
-      for place_view_model in places_observable()
-        if place_view_model.id() == 'house-2-1'
-          equal(place_view_model.location(), 'one side of the street', 'In the right place')
-          equal(place_view_model.occupants().length, 4, "Everyone is here")
-          for occupant_observable in place_view_model.occupants()
-            ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
-            equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
+    # check the set up state
+    places = new Backbone.Collection([abbey_flats, abbey_studios])
+    places_observable = kb.collectionObservable(places, {view_model: kb.ViewModel})
+    for place_view_model in places_observable()
+      if place_view_model.id() == 'house-2-1'
+        equal(place_view_model.location(), 'one side of the street', 'In the right place')
+        equal(place_view_model.occupants().length, 4, "Everyone is here")
+        for occupant_observable in place_view_model.occupants()
+          ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
+          equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
-            # nested check
-            equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here")
-            for occupant_observable2 in occupant_observable.occupies().occupants()
-              ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
-              equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
-        else
-          equal(place_view_model.location(), 'the other side of the street', 'In the right place')
-          equal(place_view_model.occupants().length, 0, "No one is here")
+          # nested check
+          equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here")
+          for occupant_observable2 in occupant_observable.occupies().occupants()
+            ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
+            equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
+      else
+        equal(place_view_model.location(), 'the other side of the street', 'In the right place')
+        equal(place_view_model.occupants().length, 0, "No one is here")
 
-      # a beattle crosses the road
-      abbey_studios.get('occupants').add(john)
+    # a beattle crosses the road
+    abbey_studios.get('occupants').add(john)
 
-      for place_view_model in places_observable()
-        if place_view_model.id() == 'house-2-1'
-          equal(place_view_model.location(), 'one side of the street', 'In the right place')
-          equal(place_view_model.occupants().length, 3, "Almost everyone is here")
-          for occupant_observable in place_view_model.occupants()
-            ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
-            equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
+    for place_view_model in places_observable()
+      if place_view_model.id() == 'house-2-1'
+        equal(place_view_model.location(), 'one side of the street', 'In the right place')
+        equal(place_view_model.occupants().length, 3, "Almost everyone is here")
+        for occupant_observable in place_view_model.occupants()
+          ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
+          equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
-            # nested check
-            equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here")
-            for occupant_observable2 in occupant_observable.occupies().occupants()
-              ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
-              equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
-        else
-          equal(place_view_model.location(), 'the other side of the street', 'In the right place')
-          equal(place_view_model.occupants().length, 1, "In the studio")
-          for occupant_observable in place_view_model.occupants()
-            equal(occupant_observable.name(), 'John', 'Expected name')
-            equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location')
+          # nested check
+          equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here")
+          for occupant_observable2 in occupant_observable.occupies().occupants()
+            ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
+            equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
+      else
+        equal(place_view_model.location(), 'the other side of the street', 'In the right place')
+        equal(place_view_model.occupants().length, 1, "In the studio")
+        for occupant_observable in place_view_model.occupants()
+          equal(occupant_observable.name(), 'John', 'Expected name')
+          equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location')
 
-            # nested check
-            equal(occupant_observable.occupies().occupants().length, 1, "In the studio")
-            for occupant_observable2 in occupant_observable.occupies().occupants()
-              equal(occupant_observable2.name(), 'John', 'Expected name')
-              equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location')
+          # nested check
+          equal(occupant_observable.occupies().occupants().length, 1, "In the studio")
+          for occupant_observable2 in occupant_observable.occupies().occupants()
+            equal(occupant_observable2.name(), 'John', 'Expected name')
+            equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location')
 
-      kb.utils.release(places_observable)
+    kb.release(places_observable)
 
-      # check stats
-      equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-      equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-      kb.statistics = null # turn off stats
-    )
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.statistics = null # turn off stats
+  )
 
-    test("3. Model with recursive HasMany relations: Person with users who are people", ->
-      kb.statistics = new kb.Statistics() # turn on stats
+  test("3. Model with recursive HasMany relations: Person with users who are people", ->
+    kb.statistics = new kb.Statistics() # turn on stats
 
-      george = new Person({
-        id: 'person-3-3'
-        name: 'George'
-        friends: ['person-3-1', 'person-3-2', 'person-3-4']
-      })
-      john = new Person({
-        id: 'person-3-1'
-        name: 'John'
-        friends: ['person-3-2', 'person-3-3', 'person-3-4']
-        best_friend: george
-      })
-      george.set(best_friend: john)
-      paul = new Person({
-        id: 'person-3-2'
-        name: 'Paul'
-        friends: ['person-3-1', 'person-3-3', 'person-3-4']
-        best_friend: george
-      })
-      ringo = new Person({
-        id: 'person-3-4'
-        name: 'Ringo'
-        friends: ['person-3-1', 'person-3-2', 'person-3-3']
-      })
+    george = new Person({
+      id: 'person-3-3'
+      name: 'George'
+      friends: ['person-3-1', 'person-3-2', 'person-3-4']
+    })
+    john = new Person({
+      id: 'person-3-1'
+      name: 'John'
+      friends: ['person-3-2', 'person-3-3', 'person-3-4']
+      best_friend: george
+    })
+    george.set(best_friend: john)
+    paul = new Person({
+      id: 'person-3-2'
+      name: 'Paul'
+      friends: ['person-3-1', 'person-3-3', 'person-3-4']
+      best_friend: george
+    })
+    ringo = new Person({
+      id: 'person-3-4'
+      name: 'Ringo'
+      friends: ['person-3-1', 'person-3-2', 'person-3-3']
+    })
 
-      john_view_model = new kb.ViewModel(john)
-      equal(john_view_model.name(), 'John', "Name is correct")
-      for friend in john_view_model.friends()
-        ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
-      equal(john_view_model.best_friend().name(), 'George', 'Expected name')
-      equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
-      john_view_model.release(); john_view_model = null
+    john_view_model = new kb.ViewModel(john)
+    equal(john_view_model.name(), 'John', "Name is correct")
+    for friend in john_view_model.friends()
+      ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
+    equal(john_view_model.best_friend().name(), 'George', 'Expected name')
+    equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
+    john_view_model.release(); john_view_model = null
 
-      paul_view_model = new kb.ViewModel(paul)
-      equal(paul_view_model.name(), 'Paul', "Name is correct")
-      for friend in paul_view_model.friends()
-        ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
-      equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
-      equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
-      kb.utils.release(paul_view_model); paul_view_model = null
+    paul_view_model = new kb.ViewModel(paul)
+    equal(paul_view_model.name(), 'Paul', "Name is correct")
+    for friend in paul_view_model.friends()
+      ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
+    equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
+    equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
+    kb.release(paul_view_model); paul_view_model = null
 
-      george_view_model = new kb.ViewModel(george)
-      equal(george_view_model.name(), 'George', "Name is correct")
-      for friend in george_view_model.friends()
-        ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
-      equal(george_view_model.best_friend().name(), 'John', 'Expected name')
-      equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
-      equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
-      george_view_model.release(); george_view_model = null
+    george_view_model = new kb.ViewModel(george)
+    equal(george_view_model.name(), 'George', "Name is correct")
+    for friend in george_view_model.friends()
+      ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
+    equal(george_view_model.best_friend().name(), 'John', 'Expected name')
+    equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
+    equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
+    george_view_model.release(); george_view_model = null
 
-      # check stats
-      equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-      equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-      kb.statistics = null # turn off stats
-    )
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.statistics = null # turn off stats
+  )
 
-    test("4. After view model create, add models", ->
-      Person = Backbone.RelationalModel.extend({})
+  test("4. After view model create, add models", ->
+    Person = Backbone.RelationalModel.extend({})
 
-      House = Backbone.RelationalModel.extend({
-        relations: [{
-          type: Backbone.HasMany
-          key: 'occupants'
-          relatedModel: 'Person'
-          reverseRelation:
-            key: 'livesIn'
-        }]
-      })
+    House = Backbone.RelationalModel.extend({
+      relations: [{
+        type: Backbone.HasMany
+        key: 'occupants'
+        relatedModel: 'Person'
+        reverseRelation:
+          key: 'livesIn'
+      }]
+    })
 
-      bob = new Person({id: 'person-1', name: 'Bob'})
-      fred = new Person({id: 'person-2', name: 'Fred'})
+    bob = new Person({id: 'person-1', name: 'Bob'})
+    fred = new Person({id: 'person-2', name: 'Fred'})
 
-      house = new House({
-        location: 'In the middle of our street'
-        occupants: new Backbone.Collection()
-      })
+    house = new House({
+      location: 'In the middle of our street'
+      occupants: new Backbone.Collection()
+    })
 
-      # confirm no occupants
-      view_model = kb.viewModel(house)
-      equal(view_model.occupants().length, 0, "no occupants")
+    # confirm no occupants
+    view_model = kb.viewModel(house)
+    equal(view_model.occupants().length, 0, "no occupants")
 
-      occupants_relationship = house.get('occupants')
-      occupants_relationship.add(bob)
-      occupants_relationship.add(fred)
-      equal(view_model.occupants().length, 2, 'two occupants')
-      equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship')
-      equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship')
-    )
+    occupants_relationship = house.get('occupants')
+    occupants_relationship.add(bob)
+    occupants_relationship.add(fred)
+    equal(view_model.occupants().length, 2, 'two occupants')
+    equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship')
+    equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship')
+  )
 
   test("5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34", ->
     Book = Backbone.RelationalModel.extend({
@@ -326,7 +326,7 @@ $(document).ready( ->
 
     view_model = {
       books: kb.collectionObservable(bs.get('books'), {
-        mappings:
+        factories:
           models: BookViewModel
           'models.author.books.models': BookViewModel
       })
@@ -380,7 +380,7 @@ $(document).ready( ->
         @type = ko.observable('band_member')
 
     collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
-      mappings:
+      factories:
         models: BandMemberViewModel
         'models.best_friend': {create: (model, options) -> return if model then new BestFriendViewModel(model) else null}
         'models.friends.models': FriendViewModel
@@ -419,7 +419,7 @@ $(document).ready( ->
     validateFriends(collection_observable()[3].friends, ['John', 'Paul', 'George'])
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(collection_observable)
+    kb.release(collection_observable)
 
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
@@ -427,12 +427,43 @@ $(document).ready( ->
     kb.statistics = null # turn off stats
   )
 
-  test("6. Infering observable types", ->
+  test("6. Infering observable types: from the start", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     person1 = new Person({id: 'person-6-1', name: 'Daddy'})
     person2 = new Person({id: 'person-6-2', name: 'Mommy'})
-    house = new Building({id: 'house-6-1', name: 'Home Sweet Home'})
+    house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: ['person-6-1', 'person-6-2']})
+    person1.get('friends').add(person2); person2.set({best_friend: person1})
+
+    view_model_person1 = kb.viewModel(person1)
+    view_model_house1 = kb.viewModel(house)
+
+    # check friends
+    equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+    equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+    equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+
+    # check occupants
+    equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+    equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+    equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+
+    # release
+    kb.release(view_model_person1)
+    kb.release(view_model_house1)
+
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.statistics = null # turn off stats
+  )
+
+  test("7. Infering observable types: late binding", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    person1 = new Person({id: 'person-7-1', name: 'Daddy'})
+    person2 = new Person({id: 'person-7-2', name: 'Mommy'})
+    house = new Building({id: 'house-7-1', name: 'Home Sweet Home'})
 
     view_model_person1 = kb.viewModel(person1)
     view_model_house1 = kb.viewModel(house)
@@ -457,8 +488,134 @@ $(document).ready( ->
     equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
 
     # release
-    kb.utils.release(view_model_person1)
-    kb.utils.release(view_model_house1)
+    kb.release(view_model_person1)
+    kb.release(view_model_house1)
+
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.statistics = null # turn off stats
+  )
+
+  test("8. Customizing observable types: from the start", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class FriendViewModel extends kb.ViewModel
+    class BestFriendViewModel extends kb.ViewModel
+    class PersonViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, {factories: {
+          'friends.models': FriendViewModel
+          'best_friend': BestFriendViewModel
+          'occupies': HouseViewModel
+        }, options: options})
+    class HouseViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, {factories: {
+          'occupants.models': PersonViewModel
+        }, options: options})
+
+    person1 = new Person({id: 'person-8-1', name: 'Daddy'})
+    person2 = new Person({id: 'person-8-2', name: 'Mommy'})
+    family = new Backbone.Collection([person1, person2])
+    house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: ['person-8-1', 'person-8-2']})
+    person1.get('friends').add(person2); person2.set({best_friend: person1})
+
+    view_model_person1 = new PersonViewModel(person1)
+    view_model_person2 = new PersonViewModel(person2)
+    co_family = kb.collectionObservable(family, {view_model: PersonViewModel})
+    view_model_house1 = new HouseViewModel(house)
+
+    # check friends
+    equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+    ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
+    equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+    equal(view_model_person1.best_friends_with_me().length, 1, 'person1 has one best friends')
+    equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+    ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+    equal(view_model_person2.best_friend().name(), 'Daddy', 'person2 is best friends with Daddy')
+    ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+
+    # check occupants
+    equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+    equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+    ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
+    equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+    ok(view_model_house1.occupants()[0].occupies() instanceof HouseViewModel, 'person1 occupies has HouseViewModel')
+    equal(view_model_house1.occupants()[0].occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+
+    # release
+    kb.release(view_model_person1)
+    kb.release(view_model_person2)
+    kb.release(co_family)
+    kb.release(view_model_house1)
+
+    # check stats
+    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
+    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    kb.statistics = null # turn off stats
+  )
+
+  test("9. Customizing observable types: late binding", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class FriendViewModel extends kb.ViewModel
+    class BestFriendViewModel extends kb.ViewModel
+    class PersonViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, {factories: {
+          'friends.models': FriendViewModel
+          'best_friend': BestFriendViewModel
+          'occupies': HouseViewModel
+        }, options: options})
+    class HouseViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, {factories: {
+          'occupants.models': PersonViewModel
+        }, options: options})
+
+    person1 = new Person({id: 'person-9-1', name: 'Daddy'})
+    person2 = new Person({id: 'person-9-2', name: 'Mommy'})
+    family = new Backbone.Collection([person1, person2])
+    house = new Building({id: 'house-9-1', name: 'Home Sweet Home'})
+
+    view_model_person1 = new PersonViewModel(person1)
+    view_model_person2 = new PersonViewModel(person2)
+    co_family = kb.collectionObservable(family, {view_model: PersonViewModel})
+    view_model_house1 = new HouseViewModel(house)
+
+    # check initial state
+    equal(view_model_person1.friends().length, 0, 'person1 has no friends')
+    equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has no best friends')
+    ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+    ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+    equal(view_model_house1.occupants().length, 0, 'house has no occupants')
+
+    # check friends
+    person1.get('friends').add(person2); person2.set({best_friend: person1})
+    equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+    ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
+    equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+    equal(view_model_person1.best_friends_with_me().length, 1, 'person1 has one best friends')
+    equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+    ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+    equal(view_model_person2.best_friend().name(), 'Daddy', 'person2 is best friends with Daddy')
+    ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+
+    # check occupants
+    house.get('occupants').add(person1).add(person2)
+    equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+    equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+    ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
+    equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+    ok(view_model_house1.occupants()[0].occupies() instanceof HouseViewModel, 'person1 occupies has HouseViewModel')
+    equal(view_model_house1.occupants()[0].occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+
+    # release
+    kb.release(view_model_person1)
+    kb.release(view_model_person2)
+    kb.release(co_family)
+    kb.release(view_model_house1)
 
     # check stats
     equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')

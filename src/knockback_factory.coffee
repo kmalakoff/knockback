@@ -8,11 +8,11 @@
 
 class kb.Factory
   @useOptionsOrCreate: (options, obj, owner_path) ->
-    if options.factory and not options.mappings # reuse
+    if options.factory and not options.factories # reuse
       factory = kb.utils.wrappedFactory(obj, options.factory)
     else
       factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory))
-    factory.addPathMappings(options.mappings, owner_path) if options.mappings
+    factory.addPathMappings(options.factories, owner_path) if options.factories
     return factory
 
   constructor: (@parent_factory) ->
@@ -23,8 +23,8 @@ class kb.Factory
   addPathMapping: (path, create_info) ->
     @paths[path] = create_info
 
-  addPathMappings: (mappings, owner_path) ->
-    for path, create_info of mappings
+  addPathMappings: (factories, owner_path) ->
+    for path, create_info of factories
       @paths[kb.utils.pathJoin(owner_path, path)] = create_info
     @
 

@@ -39,7 +39,7 @@ $(document).ready( ->
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("2. Standard use case: direct attributes with custom read and write", ->
@@ -72,7 +72,7 @@ $(document).ready( ->
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("3. Read args", ->
@@ -110,18 +110,86 @@ $(document).ready( ->
     equal(view_model.formatted_name(), 'John', "Name changed")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
-  test("5. Infering observable types", ->
-    createCollection = (obj, options) -> 
-      return kb.collectionObservable(obj, {view_model: InferingViewModel, options: options})
+  test("5. Infering observable types: the easy way", ->
+    class ChildrenCollection extends kb.CollectionObservable
+      constructor: (collection, options) ->
+        return super(collection, {view_model: InferingViewModel, options: options}) # return the observable instead of this
+
+    class InferingViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, {
+          keys: ['name', 'parent', 'children', 'maybe_null_name', 'maybe_null_parent', 'maybe_null_children']
+          factories: {
+            'maybe_null_parent': InferingViewModel
+            'maybe_null_children': ChildrenCollection
+          }
+          options: options
+        })
+  
+    parent = new Backbone.Model({name: 'Daddy'})
+    children_child = new Backbone.Model({name: 'Baby'})
+    children = new Backbone.Collection([{name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child])}])
+    model = new Backbone.Model({})
+
+    view_model = new InferingViewModel(model)
+    equal(view_model.name(), null, 'inferred name as simple null')
+    equal(view_model.parent(), null, 'inferred parent as simple null')
+    equal(view_model.children(), null, 'inferred children as simple null')
+    equal(view_model.maybe_null_name(), null, 'name is null')
+    equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
+    ok(view_model.maybe_null_parent() instanceof InferingViewModel, 'maybe_null_parent type is inferring')
+    equal(view_model.maybe_null_children().length, 0, 'no children yet')
+
+    # update the model
+    model.set({
+      name: 'Fred'
+      parent: parent
+      children: children
+    })
+    equal(view_model.name(), 'Fred', 'name is Fred')
+    equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy')
+    ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel')
+    equal(view_model.children()[0].name(), 'Bob', 'child name is Bob')
+    ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel')
+    equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
+    ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
+    equal(view_model.maybe_null_name(), null, 'name is null')
+    equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
+    equal(view_model.maybe_null_children().length, 0, 'no children yet')
+
+    # update the model
+    model.set({
+      maybe_null_name: model.get('name')
+      maybe_null_parent: model.get('parent')
+      maybe_null_children: model.get('children')
+    })
+    equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred')
+    equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy')
+    ok(view_model.maybe_null_parent() instanceof InferingViewModel, 'maybe_null_parent type is InferingViewModel')
+    equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob')
+    ok(view_model.maybe_null_children()[0] instanceof InferingViewModel, 'child type is InferingViewModel')
+    equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
+    ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
+    equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby')
+    ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferingViewModel, 'maybe_null_children maybe_null_children type is InferingViewModel')
+
+    # and cleanup after yourself when you are done.
+    kb.release(view_model)
+  )
+
+  test("6. Infering observable types: the hard way", ->
+    class ChildrenCollection extends kb.CollectionObservable
+      constructor: (collection, options) ->
+        return super(collection, {view_model: InferingViewModel, options: options}) # return the observable instead of this
 
     InferingViewModel = (model, options) ->
-      kb.viewModel(model, {keys: ['name', 'parent', 'children', 'anything'], options: options}, @)
+      kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
       @maybe_null_name = kb.observable(model, 'maybe_null_name')
-      @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', mappings: InferingViewModel, options: options})
-      @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', mappings: {create: createCollection}, options: options})
+      @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferingViewModel, options: options})
+      @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: options})
       @
 
     parent = new Backbone.Model({name: 'Daddy'})
@@ -172,10 +240,6 @@ $(document).ready( ->
     ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferingViewModel, 'maybe_null_children maybe_null_children type is InferingViewModel')
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
-  )
-
-  test("Error cases", ->
-    # TODO
+    kb.release(view_model)
   )
 )

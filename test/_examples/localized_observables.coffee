@@ -1,15 +1,11 @@
 class _kbe.LocalizedStringLocalizer extends kb.LocalizedObservable
-  constructor: (value, options, view_model) ->
-    super
-    return kb.utils.wrappedObservable(@)
   read: (value) ->
     return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
 
 # NOTE: dependency on globalize
 class _kbe.LongDateLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
-    super
-    return kb.utils.wrappedObservable(@)
+    return super # return the observable instead of this
   read: (value) ->
     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())
   write: (localized_string, value) ->
@@ -21,7 +17,7 @@ class _kbe.LongDateLocalizer extends kb.LocalizedObservable
 _kbe.ShortDateLocalizer = kb.LocalizedObservable.extend({
   constructor: (value, options, view_model) ->
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments)
-    return kb.utils.wrappedObservable(@)
+    return kb.utils.wrappedObservable(@) # return the observable instead of this
   read: (value) ->
     return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
   write: (localized_string, value) ->

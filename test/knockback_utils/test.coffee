@@ -59,7 +59,7 @@ $(document).ready( ->
     equal(kb.utils.valueType(view_model.model_type), kb.TYPE_MODEL, "model is kb.TYPE_MODEL")
     equal(kb.utils.valueType(view_model.collection_type), kb.TYPE_COLLECTION, "collection is kb.TYPE_COLLECTION")
 
-    view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {mappings: model_attr: kb.ViewModel})
+    view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: model_attr: kb.ViewModel})
     equal(kb.utils.valueType(view_model.simple_attr), kb.TYPE_SIMPLE, 'simple_attr is kb.TYPE_SIMPLE')
     equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL')
   )

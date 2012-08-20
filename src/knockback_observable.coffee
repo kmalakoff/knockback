@@ -8,12 +8,12 @@
 
 class kb.Observable
   constructor: (model, options, @view_model={}) ->
-    kb.utils.throwMissing(this, 'options') unless options
+    kb.throwMissing(this, 'options') unless options
 
     # extract options
     (options = _.defaults(_.clone(options), options.options); delete options.options) if options.options
     @key = if _.isString(options) or ko.isObservable(options) then options else options.key
-    kb.utils.throwMissing(this, 'key') unless @key
+    kb.throwMissing(this, 'key') unless @key
     @args = options.args
     @read = options.read
     @write = options.write
@@ -56,9 +56,9 @@ class kb.Observable
     ))
     kb.utils.wrappedStore(observable, options.store)
     kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
-    if options.mappings and ((typeof(options.mappings) == 'function') or options.mappings.create)
+    if options.factories and ((typeof(options.factories) == 'function') or options.factories.create)
       factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
-      factory.addPathMapping(kb.utils.wrappedPath(observable), options.mappings)
+      factory.addPathMapping(kb.utils.wrappedPath(observable), options.factories)
     else
       kb.Factory.useOptionsOrCreate(options, observable, kb.utils.wrappedPath(observable))
 
@@ -82,6 +82,7 @@ class kb.Observable
     return observable
 
   destroy: ->
+    kb.release(@value); @value = null
     kb.utils.wrappedDestroy(@)
 
   model: (new_model) ->
@@ -164,9 +165,8 @@ class kb.Observable
 
     # set the value
     value_observable = kb.utils.wrappedByKey(@, 'vo')
-    previous_value = kb.utils.wrappedValue(@)
-    (if store then store.releaseObservable(previous_value) else kb.utils.release(previous_value)) if previous_value # release previous
-    kb.utils.wrappedValue(@, value)
+    previous_value = @value; @value = value
+    (if store then store.releaseObservable(previous_value) else kb.release(previous_value)) if previous_value # release previous
     value_observable(value)
 
 kb.observable = (model, key, options) -> new kb.Observable(model, key, options)

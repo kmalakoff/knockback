@@ -89,7 +89,7 @@ $(document).ready( ->
     equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
-    kb.utils.release(view_model)
+    kb.release(view_model)
   )
 
   test("Standard use case with kb.ViewModels", ->
@@ -159,6 +159,6 @@ $(document).ready( ->
     # equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
-    # kb.utils.release(view_model)
+    # kb.release(view_model)
   )
 )

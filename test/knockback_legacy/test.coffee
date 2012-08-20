@@ -14,6 +14,7 @@ $(document).ready( ->
 
   test("0.16.0 deprecations", ->
     kb.observables(new Backbone.Model(), ['hello'], {})
+    kb.utils.release(kb.viewModel(new Backbone.Model()))
   )
 
   test("Error cases", ->
