@@ -80,9 +80,7 @@ $(document).ready( ->
     equal(house_view_model.refCount(), 0, 'Expected references')
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
-
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -169,8 +167,7 @@ $(document).ready( ->
     kb.release(places_observable)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -227,8 +224,7 @@ $(document).ready( ->
     george_view_model.release(); george_view_model = null
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -422,8 +418,7 @@ $(document).ready( ->
     kb.release(collection_observable)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -453,8 +448,7 @@ $(document).ready( ->
     kb.release(view_model_house1)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -492,8 +486,7 @@ $(document).ready( ->
     kb.release(view_model_house1)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -551,8 +544,7 @@ $(document).ready( ->
     kb.release(view_model_house1)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 
@@ -618,8 +610,7 @@ $(document).ready( ->
     kb.release(view_model_house1)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 )

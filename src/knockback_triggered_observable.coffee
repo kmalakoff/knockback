@@ -12,8 +12,8 @@ class kb.TriggeredObservable
     kb.throwMissing(this, 'event_name') unless @event_name
 
     # internal state
-    kb.utils.wrappedByKey(@, 'vo', ko.observable())
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> kb.utils.wrappedByKey(@, 'vo')()))
+    kb.utils.wrappedKey(@, 'vo', ko.observable())
+    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> kb.utils.wrappedKey(@, 'vo')()))
 
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
@@ -39,7 +39,7 @@ class kb.TriggeredObservable
 
   update: ->
     observable = kb.utils.wrappedObservable(@)
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable = kb.utils.wrappedKey(@, 'vo')
     current_value = value_observable()
     model = kb.utils.wrappedObject(observable)
     return unless model # do not trigger if there is no model

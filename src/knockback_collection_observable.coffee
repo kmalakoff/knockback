@@ -30,8 +30,9 @@
 
 class kb.CollectionObservable
   constructor: (collection, options={}) ->
-    kb.statistics.register('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
+    kb.statistics.register(@) if kb.statistics     # collect memory management statistics
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
+    observable.__kb_is_co = true # mark as a kb.CollectionObservable
     @in_edit = 0
 
     # bind callbacks
@@ -99,11 +100,10 @@ class kb.CollectionObservable
     if collection
       @_collectionUnbind(collection)
       @_clear(true)
-      collection = kb.utils.wrappedObject(observable, null)
-
+      kb.utils.wrappedObject(observable, null)
     kb.utils.wrappedDestroy(@)
 
-    kb.statistics.unregister('kb.CollectionObservable', @) if kb.statistics     # collect memory management statistics
+    kb.statistics.unregister(@) if kb.statistics     # collect memory management statistics
 
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)

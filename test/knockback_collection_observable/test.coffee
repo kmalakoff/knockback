@@ -450,8 +450,7 @@ $(document).ready( ->
     kb.release(nested_view_model)
 
     # check stats
-    equal(kb.statistics.registeredCount('kb.CollectionObservable'), 0, 'Cleanup: no collection observables')
-    equal(kb.statistics.registeredCount('kb.ViewModel'), 0, 'Cleanup: no view models')
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
     kb.statistics = null # turn off stats
   )
 

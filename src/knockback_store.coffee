@@ -21,23 +21,27 @@ class kb.Store
     @observables = []
 
   destroy: ->
-    # then release the view models
+    
+    # release the view models
     for index, observable of @observables
       continue unless observable
 
-      @observables[index] = null # releasing
+      observable.releaseReferences?() # release all references to break cycles
+
+      # release
       if observable.release
-        observable.release(true)
+        observable.release()
       else
         kb.release(observable)
+
     @objects = null
     @observables = null
 
   registerObservable: (obj, observable, options={}) ->
     return unless (obj and observable) # nothing to register
 
-    # only store view models
-    return if kb.utils.observableInstanceOf(observable, kb.CollectionObservable) or ko.isObservable(observable) 
+    # only store view models not basic ko.observables nor kb.CollectionObservables
+    return if ko.isObservable(observable) or observable.__kb_is_co
 
     @objects.push(obj)
     kb.utils.wrappedObject(observable, obj)
@@ -80,7 +84,7 @@ class kb.Store
     return observable
 
   releaseObservable: (observable, owns_store) ->
-    return unless observable
+    return unless observable # something to release and not in destroy
     return if arguments.length is 2 and not owns_store and not observable.release # cares about ownership -> do not clear out observables unless owned or ref count is 0
 
     # release and exit if references still exist
@@ -91,5 +95,5 @@ class kb.Store
     kb.utils.wrappedObject(observable, null)
     index = _.indexOf(@observables, observable)
     return if index < 0
-    @objects[index] = null unless @objects # already destroyed
+    @objects[index] = null
     @observables[index] = null

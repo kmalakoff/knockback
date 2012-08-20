@@ -25,9 +25,12 @@ class kb.RefCountable
     @__kb_ref_count++
     @
 
-  release: (all) ->
+  releaseReferences: ->
+    # used to free all references so an object can be released
+
+  release: ->
     throw "RefCountable: ref count is corrupt: #{@__kb_ref_count}" if (@__kb_ref_count <= 0)
-    if all then @__kb_ref_count = 0 else @__kb_ref_count--
+    @__kb_ref_count--
     @__destroy() unless @__kb_ref_count
     @
 

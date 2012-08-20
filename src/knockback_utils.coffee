@@ -11,11 +11,13 @@
 # utilities namespace
 kb.utils = {}
 
-kb.utils.wrappedDestroy = (owner) ->
-  return unless owner.__kb
-  owner.__kb.model_watcher.releaseCallbacks(owner) if owner.__kb.model_watcher
-  __kb = owner.__kb; owner.__kb = null # clear now to break cycles
-  kb.utils.wrappedDestroy(__kb.observable) if __kb.observable
+kb.utils.wrappedDestroy = (obj) ->
+  return unless obj.__kb
+  obj.__kb.model_watcher.releaseCallbacks(obj) if obj.__kb.model_watcher
+  __kb = obj.__kb; obj.__kb = null # clear now to break cycles
+  if __kb.observable
+    __kb.observable.destroy = __kb.observable.release = null
+    kb.utils.wrappedDestroy(__kb.observable)
   __kb.factory = null
   __kb.model_watcher.destroy() if __kb.model_watcher_is_owned # release the model_watcher
   __kb.model_watcher = null
@@ -23,41 +25,34 @@ kb.utils.wrappedDestroy = (owner) ->
   __kb.store = null
   kb.release(__kb, true) # release everything that remains
 
-kb.utils.wrappedByKey = (owner, key, value) ->
+kb.utils.wrappedKey = (obj, key, value) ->
   # get
   if arguments.length is 2
-    return if (owner and owner.__kb and owner.__kb.hasOwnProperty(key)) then owner.__kb[key] else undefined
+    return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
 
   # set
-  throw "Knockback: no owner for wrapping #{key}" unless owner
-  owner.__kb or= {}
-  owner.__kb[key] = value
+  throw "Knockback: no obj for wrapping #{key}" unless obj
+  obj.__kb or= {}
+  obj.__kb[key] = value
   return value
 
-kb.utils.wrappedObservable = (instance, observable) ->
-  # get
-  return kb.utils.wrappedByKey(instance, 'observable') if arguments.length is 1
-
-  # set
-  kb.utils.wrappedByKey(instance, 'observable', observable)
-  kb.utils.wrappedByKey(observable, 'instance', instance) if observable
-  return observable
-
-kb.utils.wrappedModel = (observable, value) ->
+kb.utils.wrappedModel = (obj, value) ->
   # get
   if (arguments.length is 1)
-    obj = kb.utils.wrappedByKey(observable, 'object')
-    return if _.isUndefined(obj) then observable else obj
+    value = kb.utils.wrappedKey(obj, 'object')
+    return if _.isUndefined(value) then obj else value
   else
-    return kb.utils.wrappedByKey(observable, 'object', value)
+    return kb.utils.wrappedKey(obj, 'object', value)
 
-kb.utils.wrappedObject = (observable, value)                  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'object') else kb.utils.wrappedByKey(observable, 'object', value)
-kb.utils.wrappedStore = (observable, value)                   -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store') else kb.utils.wrappedByKey(observable, 'store', value)
-kb.utils.wrappedStoreIsOwned = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
-kb.utils.wrappedFactory = (observable, value)                 -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
-kb.utils.wrappedPath = (observable, value)                    -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
-kb.utils.wrappedModelWatcher = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_watcher') else kb.utils.wrappedByKey(observable, 'model_watcher', value)
-kb.utils.wrappedModelWatcherIsOwned = (observable, value)  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_watcher_is_owned') else kb.utils.wrappedByKey(observable, 'model_watcher_is_owned', value)
+splice = Array.prototype.splice
+kb.utils.wrappedObservable = (obj, value)           -> splice.call(arguments, 1, 0, 'observable');             return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedObject = (obj, value)               -> splice.call(arguments, 1, 0, 'object');                 return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedStore = (obj, value)                -> splice.call(arguments, 1, 0, 'store');                  return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedStoreIsOwned = (obj, value)         -> splice.call(arguments, 1, 0, 'store_is_owned');         return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedFactory = (obj, value)              -> splice.call(arguments, 1, 0, 'factory');                return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedPath = (obj, value)                 -> splice.call(arguments, 1, 0, 'path');                   return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedModelWatcher = (obj, value)         -> splice.call(arguments, 1, 0, 'model_watcher');          return kb.utils.wrappedKey.apply(@, arguments)
+kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> splice.call(arguments, 1, 0, 'model_watcher_is_owned'); return kb.utils.wrappedKey.apply(@, arguments)
 
 kb.utils.setToDefault = (obj) ->
   return unless obj
@@ -76,21 +71,11 @@ kb.utils.release = (obj, keys_only) ->
   return kb.release(obj, keys_only)
 
 kb.utils.valueType = (observable) ->
-  return kb.TYPE_UNKNOWN unless observable 
-  return kb.TYPE_MODEL if observable instanceof kb.ViewModel
-  unless (observable.__kb and observable.__kb.instance)
-    return kb.TYPE_MODEL if observable instanceof Backbone.Model
-    return kb.TYPE_COLLECTION if observable instanceof Backbone.Collection
-    return kb.TYPE_SIMPLE 
-  instance = observable.__kb.instance
-  return observable.valueType() if instance instanceof kb.Observable
-  return kb.TYPE_COLLECTION if instance instanceof kb.CollectionObservable
+  return kb.TYPE_UNKNOWN        unless observable 
+  return observable.valueType() if observable.__kb_is_o
+  return kb.TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof Backbone.Collection)
+  return kb.TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof Backbone.Model)
   return kb.TYPE_SIMPLE
-
-kb.utils.observableInstanceOf = (observable, type) ->
-  return false unless observable
-  return false unless observable.__kb and observable.__kb.instance
-  return (observable.__kb.instance instanceof type)
 
 kb.utils.pathJoin = (path1, path2) ->
   if not path1

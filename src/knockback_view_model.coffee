@@ -18,7 +18,7 @@ class kb.ViewModel extends kb.RefCountable
   constructor: (model, options={}, view_model) ->
     super
 
-    kb.statistics.register('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
+    kb.statistics.register(@) if kb.statistics     # collect memory management statistics
 
     # bind and extract options
     options = _.defaults(_.clone(options), options.options) if options.options
@@ -59,15 +59,20 @@ class kb.ViewModel extends kb.RefCountable
     @_mapObservables(model, options.mappings) if options.mappings
     @_createObservables(model, keys) if keys
 
-  __destroy: ->
+  releaseReferences: ->
+    @__kb.references_released = true
     if @__kb.view_model isnt @ # clear the external references
       for vm_key of @__kb.vm_keys
         @__kb.view_model[vm_key] = null
+    @__kb.view_model = null
     kb.release(this, true) # release the observables
+
+  __destroy: ->
+    @releaseReferences() unless @__kb.references_released
     kb.utils.wrappedDestroy(@)
     super
 
-    kb.statistics.unregister('kb.ViewModel', @) if kb.statistics     # collect memory management statistics
+    kb.statistics.unregister(@) if kb.statistics     # collect memory management statistics
 
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)

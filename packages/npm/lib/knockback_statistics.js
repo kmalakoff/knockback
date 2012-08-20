@@ -40,22 +40,54 @@
       return type_tracker;
     };
 
-    Statistics.prototype.register = function(type, obj) {
-      return this.typeTracker(type).push(obj);
+    Statistics.prototype.register = function(obj) {
+      return this.typeTracker(obj.constructor.name).push(obj);
     };
 
-    Statistics.prototype.unregister = function(type, obj) {
+    Statistics.prototype.unregister = function(obj) {
       var index, type_tracker;
-      type_tracker = this.typeTracker(type);
+      type_tracker = this.typeTracker(obj.constructor.name);
       index = _.indexOf(type_tracker, obj);
       if (index < 0) {
-        throw "failed to unregister type: " + type;
+        throw "failed to unregister type: " + obj.constructor.name;
       }
       return type_tracker.splice(index, 1);
     };
 
     Statistics.prototype.registeredCount = function(type) {
-      return this.typeTracker(type).length;
+      var count, type_tracker, _ref;
+      if (type) {
+        return this.typeTracker(type).length;
+      }
+      count = 0;
+      _ref = this.type_trackers[type];
+      for (type in _ref) {
+        type_tracker = _ref[type];
+        count += type_tracker.length;
+      }
+      return count;
+    };
+
+    Statistics.prototype.typeStatsString = function(success_message) {
+      var string, type, type_tracker, written, _ref;
+      string = '';
+      _ref = this.type_trackers;
+      for (type in _ref) {
+        type_tracker = _ref[type];
+        if (!type_tracker.length) {
+          continue;
+        }
+        if (written) {
+          string += ' | ';
+        }
+        string += "" + type + ": " + type_tracker.length;
+        written = true;
+      }
+      if (string) {
+        return string;
+      } else {
+        return success_message;
+      }
     };
 
     return Statistics;

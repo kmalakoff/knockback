@@ -12,7 +12,7 @@
 
 
 (function() {
-  var Backbone, Knockback, kb, ko, _,
+  var Backbone, Knockback, kb, ko, splice, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -54,32 +54,33 @@
     if (!obj) {
       return false;
     }
-    if (!keys_only && (ko.isObservable(obj) || (typeof obj.release === 'function') || (typeof obj.destroy === 'function'))) {
-      if (obj.release) {
-        if (!obj.refCount || obj.refCount() > 0) {
-          obj.release();
-        }
-      } else if (obj.destroy) {
-        if (!obj.hasOwnProperty('__kb') || obj.__kb) {
-          obj.destroy();
-        }
+    if (!keys_only && (ko.isObservable(obj) || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
+      if (obj.destroy) {
+        obj.destroy();
+      } else if (obj.release) {
+        obj.release();
       } else if (obj.dispose) {
         obj.dispose();
       }
-      return true;
     } else if (_.isObject(obj) && !(typeof obj === 'function')) {
       for (key in obj) {
         value = obj[key];
-        if (!value || (key === '__kb') || ((typeof value === 'function') && !ko.isObservable(value))) {
+        if (!value || (key === '__kb')) {
           continue;
         }
-        if (kb.release(value)) {
-          obj[key] = null;
+        if (!(ko.isObservable(value) || (typeof value.destroy === 'function') || (typeof value.release === 'function'))) {
+          continue;
+        }
+        obj[key] = null;
+        if (value.destroy) {
+          value.destroy();
+        } else if (value.release) {
+          value.release();
+        } else if (value.dispose) {
+          value.dispose();
         }
       }
-      return true;
     }
-    return false;
   };
 
   kb.legacyWarning = function(identifier, last_version, message) {
@@ -111,17 +112,18 @@
 
   kb.utils = {};
 
-  kb.utils.wrappedDestroy = function(owner) {
+  kb.utils.wrappedDestroy = function(obj) {
     var __kb;
-    if (!owner.__kb) {
+    if (!obj.__kb) {
       return;
     }
-    if (owner.__kb.model_watcher) {
-      owner.__kb.model_watcher.releaseCallbacks(owner);
+    if (obj.__kb.model_watcher) {
+      obj.__kb.model_watcher.releaseCallbacks(obj);
     }
-    __kb = owner.__kb;
-    owner.__kb = null;
+    __kb = obj.__kb;
+    obj.__kb = null;
     if (__kb.observable) {
+      __kb.observable.destroy = __kb.observable.release = null;
       kb.utils.wrappedDestroy(__kb.observable);
     }
     __kb.factory = null;
@@ -136,101 +138,75 @@
     return kb.release(__kb, true);
   };
 
-  kb.utils.wrappedByKey = function(owner, key, value) {
+  kb.utils.wrappedKey = function(obj, key, value) {
     if (arguments.length === 2) {
-      if (owner && owner.__kb && owner.__kb.hasOwnProperty(key)) {
-        return owner.__kb[key];
+      if (obj && obj.__kb && obj.__kb.hasOwnProperty(key)) {
+        return obj.__kb[key];
       } else {
         return void 0;
       }
     }
-    if (!owner) {
-      throw "Knockback: no owner for wrapping " + key;
+    if (!obj) {
+      throw "Knockback: no obj for wrapping " + key;
     }
-    owner.__kb || (owner.__kb = {});
-    owner.__kb[key] = value;
+    obj.__kb || (obj.__kb = {});
+    obj.__kb[key] = value;
     return value;
   };
 
-  kb.utils.wrappedObservable = function(instance, observable) {
+  kb.utils.wrappedModel = function(obj, value) {
     if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(instance, 'observable');
-    }
-    kb.utils.wrappedByKey(instance, 'observable', observable);
-    if (observable) {
-      kb.utils.wrappedByKey(observable, 'instance', instance);
-    }
-    return observable;
-  };
-
-  kb.utils.wrappedModel = function(observable, value) {
-    var obj;
-    if (arguments.length === 1) {
-      obj = kb.utils.wrappedByKey(observable, 'object');
-      if (_.isUndefined(obj)) {
-        return observable;
-      } else {
+      value = kb.utils.wrappedKey(obj, 'object');
+      if (_.isUndefined(value)) {
         return obj;
+      } else {
+        return value;
       }
     } else {
-      return kb.utils.wrappedByKey(observable, 'object', value);
+      return kb.utils.wrappedKey(obj, 'object', value);
     }
   };
 
-  kb.utils.wrappedObject = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'object');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'object', value);
-    }
+  splice = Array.prototype.splice;
+
+  kb.utils.wrappedObservable = function(obj, value) {
+    splice.call(arguments, 1, 0, 'observable');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
-  kb.utils.wrappedStore = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'store');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'store', value);
-    }
+  kb.utils.wrappedObject = function(obj, value) {
+    splice.call(arguments, 1, 0, 'object');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
-  kb.utils.wrappedStoreIsOwned = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'store_is_owned');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'store_is_owned', value);
-    }
+  kb.utils.wrappedStore = function(obj, value) {
+    splice.call(arguments, 1, 0, 'store');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
-  kb.utils.wrappedFactory = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'factory');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'factory', value);
-    }
+  kb.utils.wrappedStoreIsOwned = function(obj, value) {
+    splice.call(arguments, 1, 0, 'store_is_owned');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
-  kb.utils.wrappedPath = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'path');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'path', value);
-    }
+  kb.utils.wrappedFactory = function(obj, value) {
+    splice.call(arguments, 1, 0, 'factory');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
-  kb.utils.wrappedModelWatcher = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'model_watcher');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'model_watcher', value);
-    }
+  kb.utils.wrappedPath = function(obj, value) {
+    splice.call(arguments, 1, 0, 'path');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
-  kb.utils.wrappedModelWatcherIsOwned = function(observable, value) {
-    if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'model_watcher_is_owned');
-    } else {
-      return kb.utils.wrappedByKey(observable, 'model_watcher_is_owned', value);
-    }
+  kb.utils.wrappedModelWatcher = function(obj, value) {
+    splice.call(arguments, 1, 0, 'model_watcher');
+    return kb.utils.wrappedKey.apply(this, arguments);
+  };
+
+  kb.utils.wrappedModelWatcherIsOwned = function(obj, value) {
+    splice.call(arguments, 1, 0, 'model_watcher_is_owned');
+    return kb.utils.wrappedKey.apply(this, arguments);
   };
 
   kb.utils.setToDefault = function(obj) {
@@ -259,40 +235,19 @@
   };
 
   kb.utils.valueType = function(observable) {
-    var instance;
     if (!observable) {
       return kb.TYPE_UNKNOWN;
     }
-    if (observable instanceof kb.ViewModel) {
-      return kb.TYPE_MODEL;
-    }
-    if (!(observable.__kb && observable.__kb.instance)) {
-      if (observable instanceof Backbone.Model) {
-        return kb.TYPE_MODEL;
-      }
-      if (observable instanceof Backbone.Collection) {
-        return kb.TYPE_COLLECTION;
-      }
-      return kb.TYPE_SIMPLE;
-    }
-    instance = observable.__kb.instance;
-    if (instance instanceof kb.Observable) {
+    if (observable.__kb_is_o) {
       return observable.valueType();
     }
-    if (instance instanceof kb.CollectionObservable) {
+    if (observable.__kb_is_co || (observable instanceof Backbone.Collection)) {
       return kb.TYPE_COLLECTION;
     }
+    if ((observable instanceof kb.ViewModel) || (observable instanceof Backbone.Model)) {
+      return kb.TYPE_MODEL;
+    }
     return kb.TYPE_SIMPLE;
-  };
-
-  kb.utils.observableInstanceOf = function(observable, type) {
-    if (!observable) {
-      return false;
-    }
-    if (!(observable.__kb && observable.__kb.instance)) {
-      return false;
-    }
-    return observable.__kb.instance instanceof type;
   };
 
   kb.utils.pathJoin = function(path1, path2) {
@@ -339,15 +294,13 @@
       return this;
     };
 
-    RefCountable.prototype.release = function(all) {
+    RefCountable.prototype.releaseReferences = function() {};
+
+    RefCountable.prototype.release = function() {
       if (this.__kb_ref_count <= 0) {
         throw "RefCountable: ref count is corrupt: " + this.__kb_ref_count;
       }
-      if (all) {
-        this.__kb_ref_count = 0;
-      } else {
-        this.__kb_ref_count--;
-      }
+      this.__kb_ref_count--;
       if (!this.__kb_ref_count) {
         this.__destroy();
       }
@@ -517,9 +470,11 @@
         if (!observable) {
           continue;
         }
-        this.observables[index] = null;
+        if (typeof observable.releaseReferences === "function") {
+          observable.releaseReferences();
+        }
         if (observable.release) {
-          observable.release(true);
+          observable.release();
         } else {
           kb.release(observable);
         }
@@ -535,7 +490,7 @@
       if (!(obj && observable)) {
         return;
       }
-      if (kb.utils.observableInstanceOf(observable, kb.CollectionObservable) || ko.isObservable(observable)) {
+      if (ko.isObservable(observable) || observable.__kb_is_co) {
         return;
       }
       this.objects.push(obj);
@@ -622,9 +577,7 @@
       if (index < 0) {
         return;
       }
-      if (!this.objects) {
-        this.objects[index] = null;
-      }
+      this.objects[index] = null;
       return this.observables[index] = null;
     };
 
@@ -912,9 +865,10 @@
         options = {};
       }
       if (kb.statistics) {
-        kb.statistics.register('kb.CollectionObservable', this);
+        kb.statistics.register(this);
       }
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
+      observable.__kb_is_co = true;
       this.in_edit = 0;
       this.__kb || (this.__kb = {});
       this.__kb._onCollectionReset = _.bind(this._onCollectionReset, this);
@@ -981,11 +935,11 @@
       if (collection) {
         this._collectionUnbind(collection);
         this._clear(true);
-        collection = kb.utils.wrappedObject(observable, null);
+        kb.utils.wrappedObject(observable, null);
       }
       kb.utils.wrappedDestroy(this);
       if (kb.statistics) {
-        return kb.statistics.unregister('kb.CollectionObservable', this);
+        return kb.statistics.unregister(this);
       }
     };
 
@@ -1527,14 +1481,14 @@
       if (this.value_holder) {
         value = ko.utils.unwrapObservable(this.value_holder);
       }
-      kb.utils.wrappedByKey(this, 'vo', ko.observable(!value ? null : this.read(value, null)));
+      kb.utils.wrappedKey(this, 'vo', ko.observable(!value ? null : this.read(value, null)));
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
           var value_observable;
           if (_this.value_holder) {
             ko.utils.unwrapObservable(_this.value_holder);
           }
-          value_observable = kb.utils.wrappedByKey(_this, 'vo');
+          value_observable = kb.utils.wrappedKey(_this, 'vo');
           value_observable();
           return _this.read(ko.utils.unwrapObservable(_this.value_holder));
         },
@@ -1544,7 +1498,7 @@
             kb.throwUnexpected(_this, 'writing to read-only');
           }
           _this.write(value, ko.utils.unwrapObservable(_this.value_holder));
-          value_observable = kb.utils.wrappedByKey(_this, 'vo');
+          value_observable = kb.utils.wrappedKey(_this, 'vo');
           value_observable(value);
           if (_this.__kb._onChange) {
             return _this.__kb._onChange(value);
@@ -1570,7 +1524,7 @@
 
     LocalizedObservable.prototype.resetToCurrent = function() {
       var current_value, value_observable;
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
+      value_observable = kb.utils.wrappedKey(this, 'vo');
       value_observable(null);
       current_value = this.value_holder ? this.read(ko.utils.unwrapObservable(this.value_holder)) : null;
       return kb.utils.wrappedObservable(this)(current_value);
@@ -1588,7 +1542,7 @@
     LocalizedObservable.prototype._onLocaleChange = function() {
       var value, value_observable;
       value = this.read(ko.utils.unwrapObservable(this.value_holder));
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
+      value_observable = kb.utils.wrappedKey(this, 'vo');
       value_observable(value);
       if (this.__kb._onChange) {
         return this.__kb._onChange(value);
@@ -1632,7 +1586,7 @@
       this.args = options.args;
       this.read = options.read;
       this.write = options.write;
-      kb.utils.wrappedByKey(this, 'vo', ko.observable(null));
+      kb.utils.wrappedKey(this, 'vo', ko.observable(null));
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
           var arg, args, current_model, new_value, _i, _len, _ref;
@@ -1654,7 +1608,7 @@
             new_value = _this.read ? _this.read.apply(_this.view_model, args) : current_model.get.apply(current_model, args);
             _this.update(new_value);
           }
-          return ko.utils.unwrapObservable(kb.utils.wrappedByKey(_this, 'vo')());
+          return ko.utils.unwrapObservable(kb.utils.wrappedKey(_this, 'vo')());
         },
         write: function(new_value) {
           var arg, args, current_model, set_info, _i, _len, _ref;
@@ -1684,6 +1638,7 @@
         },
         owner: this.view_model
       }));
+      observable.__kb_is_o = true;
       kb.utils.wrappedStore(observable, options.store);
       kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, this.key));
       if (options.factories && ((typeof options.factories === 'function') || options.factories.create)) {
@@ -1734,7 +1689,7 @@
       var model, new_type, observable, value;
       observable = kb.utils.wrappedObservable(this);
       model = kb.utils.wrappedObject(observable);
-      value = kb.utils.wrappedByKey(this, 'vo')();
+      value = kb.utils.wrappedKey(this, 'vo')();
       if (model && !arguments.length) {
         new_value = model.get(ko.utils.unwrapObservable(this.key));
       }
@@ -1802,12 +1757,12 @@
         if (typeof value.model !== 'function') {
           kb.utils.wrappedObject(value, new_value);
         }
-      } else if (kb.utils.observableInstanceOf(value, kb.CollectionObservable)) {
+      } else if (value.__kb_is_co) {
         this.value_type = kb.TYPE_COLLECTION;
       } else {
         this.value_type = kb.TYPE_SIMPLE;
       }
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
+      value_observable = kb.utils.wrappedKey(this, 'vo');
       previous_value = this.value;
       this.value = value;
       if (previous_value) {
@@ -1849,9 +1804,9 @@
       if (!this.event_name) {
         kb.throwMissing(this, 'event_name');
       }
-      kb.utils.wrappedByKey(this, 'vo', ko.observable());
+      kb.utils.wrappedKey(this, 'vo', ko.observable());
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable(function() {
-        return kb.utils.wrappedByKey(_this, 'vo')();
+        return kb.utils.wrappedKey(_this, 'vo')();
       }));
       observable.destroy = _.bind(this.destroy, this);
       kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
@@ -1885,7 +1840,7 @@
     TriggeredObservable.prototype.update = function() {
       var current_value, model, observable, value_observable;
       observable = kb.utils.wrappedObservable(this);
-      value_observable = kb.utils.wrappedByKey(this, 'vo');
+      value_observable = kb.utils.wrappedKey(this, 'vo');
       current_value = value_observable();
       model = kb.utils.wrappedObject(observable);
       if (!model) {
@@ -1926,7 +1881,7 @@
       }
       ViewModel.__super__.constructor.apply(this, arguments);
       if (kb.statistics) {
-        kb.statistics.register('kb.ViewModel', this);
+        kb.statistics.register(this);
       }
       if (options.options) {
         options = _.defaults(_.clone(options), options.options);
@@ -1985,18 +1940,26 @@
       }
     }
 
-    ViewModel.prototype.__destroy = function() {
+    ViewModel.prototype.releaseReferences = function() {
       var vm_key;
+      this.__kb.references_released = true;
       if (this.__kb.view_model !== this) {
         for (vm_key in this.__kb.vm_keys) {
           this.__kb.view_model[vm_key] = null;
         }
       }
-      kb.release(this, true);
+      this.__kb.view_model = null;
+      return kb.release(this, true);
+    };
+
+    ViewModel.prototype.__destroy = function() {
+      if (!this.__kb.references_released) {
+        this.releaseReferences();
+      }
       kb.utils.wrappedDestroy(this);
       ViewModel.__super__.__destroy.apply(this, arguments);
       if (kb.statistics) {
-        return kb.statistics.unregister('kb.ViewModel', this);
+        return kb.statistics.unregister(this);
       }
     };
 

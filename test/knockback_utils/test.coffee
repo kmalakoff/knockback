@@ -64,16 +64,6 @@ $(document).ready( ->
     equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL')
   )
 
-  test("kb.utils.observableInstanceOf", ->
-    equal(kb.utils.observableInstanceOf(kb.collectionObservable(new Backbone.Collection()), kb.CollectionObservable), true, "Instance is kb.CollectionObservable")
-
-    equal(kb.utils.observableInstanceOf(new _kbe.LongDateLocalizer(ko.observable(new Date)), kb.LocalizedObservable), true, "Instance is kb.LocalizedObservable")
-
-    equal(kb.utils.observableInstanceOf(kb.observable(new Backbone.Model({name: 'name1'}), 'name'), kb.Observable), true, "Instance is kb.Observable")
-
-    equal(kb.utils.observableInstanceOf(kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name'), kb.TriggeredObservable), true, "Instance is kb.TriggeredObservable")
-  )
-
   test("kb.utils.path", ->
     equal(kb.utils.pathJoin(null, 'key'), 'key', "key path joined")
     equal(kb.utils.pathJoin('bob', 'key'), 'bob.key', "bob.key path joined")

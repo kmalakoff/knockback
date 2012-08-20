@@ -33,25 +33,27 @@ kb.release = (obj, keys_only) ->
   return false unless obj
 
   # known type
-  if not keys_only and (ko.isObservable(obj) or (typeof(obj.release) is 'function') or (typeof(obj.destroy) is 'function'))
-    if obj.release
-      obj.release() if not obj.refCount or obj.refCount() > 0 # not yet released
-    else if obj.destroy
-      obj.destroy() if not obj.hasOwnProperty('__kb') or obj.__kb # not yet released
+  if not keys_only and (ko.isObservable(obj) or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
+    if obj.destroy
+      obj.destroy()
+    else if obj.release
+      obj.release()
     else if obj.dispose
       obj.dispose()
-
-    return true # was released
 
   # view model
   else if _.isObject(obj) and not (typeof(obj) is 'function')
     for key, value of obj
-      continue if !value or (key is '__kb') or ((typeof(value) is 'function') and not ko.isObservable(value))
-      obj[key] = null if kb.release(value)
-
-    return true # was released
-
-  return false
+      continue if not value or (key is '__kb')
+      continue unless ko.isObservable(value) or (typeof(value.destroy) is 'function') or (typeof(value.release) is 'function')
+      obj[key] = null
+      if value.destroy
+        value.destroy()
+      else if value.release
+        value.release()
+      else if value.dispose
+        value.dispose()
+  return
 
 # displays legacy warnings to the Knockback library user
 kb.legacyWarning = (identifier, last_version, message) ->

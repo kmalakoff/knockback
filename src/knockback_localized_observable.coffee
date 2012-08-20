@@ -36,17 +36,17 @@ class kb.LocalizedObservable
 
     # internal state
     value = ko.utils.unwrapObservable(@value_holder) if @value_holder
-    kb.utils.wrappedByKey(@, 'vo', ko.observable(if not value then null else @read(value, null)))
+    kb.utils.wrappedKey(@, 'vo', ko.observable(if not value then null else @read(value, null)))
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
         ko.utils.unwrapObservable(@value_holder) if @value_holder 
-        value_observable = kb.utils.wrappedByKey(@, 'vo'); value_observable() # create a depdenency
+        value_observable = kb.utils.wrappedKey(@, 'vo'); value_observable() # create a depdenency
         return @read(ko.utils.unwrapObservable(@value_holder))
 
       write: (value) =>
         kb.throwUnexpected(this, 'writing to read-only') unless @write
         @write(value, ko.utils.unwrapObservable(@value_holder))
-        value_observable = kb.utils.wrappedByKey(@, 'vo')
+        value_observable = kb.utils.wrappedKey(@, 'vo')
         value_observable(value)
         @__kb._onChange(value) if @__kb._onChange
       
@@ -73,7 +73,7 @@ class kb.LocalizedObservable
     kb.utils.wrappedDestroy(@)
 
   resetToCurrent: ->
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable = kb.utils.wrappedKey(@, 'vo')
     value_observable(null) # force KO to think a change occurred
     current_value = if @value_holder then @read(ko.utils.unwrapObservable(@value_holder)) else null
     kb.utils.wrappedObservable(@)(current_value)
@@ -90,7 +90,7 @@ class kb.LocalizedObservable
 
   _onLocaleChange: ->
     value = @read(ko.utils.unwrapObservable(@value_holder))
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable = kb.utils.wrappedKey(@, 'vo')
     value_observable(value)
     @__kb._onChange(value) if @__kb._onChange
 

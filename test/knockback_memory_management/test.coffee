@@ -52,30 +52,37 @@ $(document).ready( ->
     }]
 
   test("Basic view model properties", ->
-    nested_view_model = kb.viewModel(new Backbone.Model({name: 'name1'}))
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ViewModel = ->
       @prop1 = ko.observable()
       @prop2 = ko.observableArray([])
       @prop3 = ko.dependentObservable(-> return true)
       @prop4 = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
-      @prop5 = kb.observables(new Backbone.Model({name: 'name1'}), {name: {}}, @)
-      @prop5 = kb.collectionObservable(new Backbone.Collection())
-      @prop6 = nested_view_model
-      @prop7 = kb.collectionObservable(new Backbone.Collection())
-      @prop8 = new _kbe.LongDateLocalizer(ko.observable(new Date))
+      @prop5 = kb.viewModel(new Backbone.Model({name: 'name1'}), {name: {}}, @)
+      @prop6 = kb.collectionObservable(new Backbone.Collection(), {models_only: true})
+      @prop7 = kb.viewModel(new Backbone.Model({name: 'name1'}))
+      @prop8 = kb.collectionObservable(new Backbone.Collection())
       @prop9 = new _kbe.LongDateLocalizer(ko.observable(new Date))
-      @prop10 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
+      @prop10 = new _kbe.LongDateLocalizer(ko.observable(new Date))
+      @prop11 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
       @
-
     view_model = new ViewModel()
+    nested_view_model = view_model.prop5
     kb.release(view_model)
 
-    ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..10]
+    ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..11]
     ok(!view_model.name, "Property released: view_model.name") # kb.observables(new Backbone.Model({name: 'name1'}), 'name', @)
     ok(!nested_view_model.name, "Property released: nested_view_model.name") # nested_view_model
+
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
   )
 
   test("kb.RefCountable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class RefViewModel extends kb.RefCountable
       constructor: ->
         super
@@ -93,9 +100,15 @@ $(document).ready( ->
 
     ref_counted.release()
     ok(!ref_counted.prop, "Property released: ref_counted.prop")
+
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
   )
 
   test("kb.CollectionObservable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     # ref counted view model
     RefCountableViewModel.view_models = []
     collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: RefCountableViewModel})
@@ -104,10 +117,8 @@ $(document).ready( ->
     instance = collection_observable()[0].retain()
 
     kb.release(collection_observable)
-    equal(RefCountableViewModel.view_models.length, 0, "All destroyed")
-
-    # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
-    equal(instance.refCount(), 0, "All instances were destroyed in the collection's store")
+    equal(RefCountableViewModel.view_models.length, 1, "Still one reference")
+    equal(instance.refCount(), 1, "All instances were destroyed in the collection's store")
 
     # destroyable view model
     DestroyableViewModel.view_models = []
@@ -125,9 +136,15 @@ $(document).ready( ->
     kb.release(collection_observable)
     equal(SimpleViewModel.view_models.length, 2, "Destroyed: 2")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
+
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
   )
 
   test("kb.CollectionObservable with external store", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     # ref counted view model
     store = new kb.Store()
     RefCountableViewModel.view_models = []
@@ -143,9 +160,8 @@ $(document).ready( ->
 
     store.destroy(); store = null
 
-    # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
-    equal(instance.refCount(), 0, "All instances were destroyed in the collection's store")
-    equal(RefCountableViewModel.view_models.length, 0, "All destroyed")
+    equal(RefCountableViewModel.view_models.length, 1, "Still one reference")
+    equal(instance.refCount(), 1, "All instances were destroyed in the collection's store")
 
     # destroyable view model
     store = new kb.Store()
@@ -176,9 +192,15 @@ $(document).ready( ->
     # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     equal(SimpleViewModel.view_models.length, 2, "Destroyed: 2")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
+
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
   )
 
   test("kb.CollectionObservable with recursive view models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     john = new Person({
       id: 'person-1-1'
       name: 'John'
@@ -210,10 +232,8 @@ $(document).ready( ->
     instance = collection_observable()[0].retain()
 
     kb.release(collection_observable)
-    equal(RefCountableViewModel.view_models.length, 0, "All destroyed")
-
-    # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
-    equal(instance.refCount(), 0, "All instances were destroyed in the collection's store")
+    equal(RefCountableViewModel.view_models.length, 1, "Still one reference")
+    equal(instance.refCount(), 1, "All instances were destroyed in the collection's store")
 
     # destroyable view model
     DestroyableViewModel.view_models = []
@@ -231,9 +251,15 @@ $(document).ready( ->
     kb.release(collection_observable)
     equal(SimpleViewModel.view_models.length, 4, "Destroyed: 4")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
+
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
   )
 
   test("kb.CollectionObservable with recursive view models and external store", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     john = new Person({
       id: 'person-2-1'
       name: 'John'
@@ -272,9 +298,8 @@ $(document).ready( ->
 
     store.destroy(); store = null
 
-    # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
-    equal(instance.refCount(), 0, "All instances were destroyed in the collection's store")
-    equal(RefCountableViewModel.view_models.length, 0, "All destroyed")
+    equal(RefCountableViewModel.view_models.length, 1, "Still one reference")
+    equal(instance.refCount(), 1, "All instances were destroyed in the collection's store")
 
     # destroyable view model
     store = new kb.Store()
@@ -305,9 +330,9 @@ $(document).ready( ->
     # all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     equal(SimpleViewModel.view_models.length, 4, "Destroyed: 4")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
-  )
 
-  test("Error cases", ->
-    # TODO
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
   )
 )

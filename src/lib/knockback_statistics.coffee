@@ -19,13 +19,26 @@ class kb.Statistics
     type_tracker = []; @type_trackers[type] = type_tracker
     return type_tracker
 
-  register: (type, obj) ->
-    @typeTracker(type).push(obj)
+  register: (obj) ->
+    @typeTracker(obj.constructor.name).push(obj)
 
-  unregister: (type, obj) ->
-    type_tracker = @typeTracker(type)
+  unregister: (obj) ->
+    type_tracker = @typeTracker(obj.constructor.name)
     index = _.indexOf(type_tracker, obj)
-    throw "failed to unregister type: #{type}" if index < 0
+    throw "failed to unregister type: #{obj.constructor.name}" if index < 0
     type_tracker.splice(index, 1)
 
-  registeredCount: (type) -> return @typeTracker(type).length
+  registeredCount: (type) -> 
+    return @typeTracker(type).length if type
+    count = 0
+    count += type_tracker.length for type, type_tracker of @type_trackers[type]
+    return count
+
+  typeStatsString: (success_message) ->
+    string = ''
+    for type, type_tracker of @type_trackers
+      continue unless type_tracker.length
+      string += ' | ' if written
+      string += "#{type}: #{type_tracker.length}"
+      written = true
+    return if string then string else success_message

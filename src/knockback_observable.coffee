@@ -19,7 +19,7 @@ class kb.Observable
     @write = options.write
 
     # set up basics
-    kb.utils.wrappedByKey(@, 'vo', ko.observable(null)) # create a value observable for the first dependency
+    kb.utils.wrappedKey(@, 'vo', ko.observable(null)) # create a value observable for the first dependency
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
         # create dependencies if needed
@@ -35,7 +35,7 @@ class kb.Observable
           @update(new_value)
 
         # get the observable
-        return ko.utils.unwrapObservable(kb.utils.wrappedByKey(@, 'vo')())
+        return ko.utils.unwrapObservable(kb.utils.wrappedKey(@, 'vo')())
 
       write: (new_value) =>
         # set on model
@@ -54,6 +54,7 @@ class kb.Observable
 
       owner: @view_model
     ))
+    observable.__kb_is_o = true # mark as a kb.Observable
     kb.utils.wrappedStore(observable, options.store)
     kb.utils.wrappedPath(observable, kb.utils.pathJoin(options.path, @key))
     if options.factories and ((typeof(options.factories) == 'function') or options.factories.create)
@@ -98,7 +99,7 @@ class kb.Observable
   update: (new_value) ->
     observable = kb.utils.wrappedObservable(@)
     model = kb.utils.wrappedObject(observable)
-    value = kb.utils.wrappedByKey(@, 'vo')()
+    value = kb.utils.wrappedKey(@, 'vo')()
     new_value = model.get(ko.utils.unwrapObservable(@key)) if model and not arguments.length
     new_value = null unless new_value # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
@@ -158,13 +159,13 @@ class kb.Observable
       @value_type = kb.TYPE_MODEL
       if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
         kb.utils.wrappedObject(value, new_value)
-    else if kb.utils.observableInstanceOf(value, kb.CollectionObservable)
+    else if value.__kb_is_co
       @value_type = kb.TYPE_COLLECTION
     else
       @value_type = kb.TYPE_SIMPLE
 
     # set the value
-    value_observable = kb.utils.wrappedByKey(@, 'vo')
+    value_observable = kb.utils.wrappedKey(@, 'vo')
     previous_value = @value; @value = value
     (if store then store.releaseObservable(previous_value) else kb.release(previous_value)) if previous_value # release previous
     value_observable(value)
