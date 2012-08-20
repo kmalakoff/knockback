@@ -1,5 +1,5 @@
 ###
-  knockback_model_observable.js
+  knockback_model_watcher.js
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
@@ -14,16 +14,16 @@
 #   * key - if provided, will only call update if the model attribute with name key has changed 
 ####################################################
 
-class kb.ModelObservable
+class kb.ModelWatcher
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
-    if options.model_observable
-      kb.throwUnexpected(this, 'model not matching') unless (options.model_observable.model() is model or (options.model_observable.model_ref is model))
-      model_observable = kb.utils.wrappedModelObservable(obj, options.model_observable)
+    if options.model_watcher
+      kb.throwUnexpected(this, 'model not matching') unless (options.model_watcher.model() is model or (options.model_watcher.model_ref is model))
+      model_watcher = kb.utils.wrappedModelWatcher(obj, options.model_watcher)
     else
-      model_observable = kb.utils.wrappedModelObservable(obj, new kb.ModelObservable(model))
-      kb.utils.wrappedModelObservableIsOwned(obj, true)
-    model_observable.registerCallbacks(obj, callback_options)
-    return model_observable
+      model_watcher = kb.utils.wrappedModelWatcher(obj, new kb.ModelWatcher(model))
+      kb.utils.wrappedModelWatcherIsOwned(obj, true)
+    model_watcher.registerCallbacks(obj, callback_options)
+    return model_watcher
 
   constructor: (model, obj, callback_options) ->
     @__kb or= {}
@@ -189,4 +189,4 @@ class kb.ModelObservable
     @
 
 # factory function
-kb.modelObservable = (model, observable) -> return new kb.ModelObservable(model, observable)
+kb.modelObservable = (model, observable) -> return new kb.ModelWatcher(model, observable)

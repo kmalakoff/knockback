@@ -19,7 +19,7 @@ class kb.TriggeredObservable
     observable.destroy = _.bind(@destroy, @)
 
     # create model observable
-    kb.utils.wrappedModelObservable(@, new kb.ModelObservable(model, @, {model: _.bind(@model, @), update: _.bind(@update, @), event_name: @event_name}))
+    kb.utils.wrappedModelWatcher(@, new kb.ModelWatcher(model, @, {model: _.bind(@model, @), update: _.bind(@update, @), event_name: @event_name}))
 
     return observable
 

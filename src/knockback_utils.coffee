@@ -13,12 +13,12 @@ kb.utils = {}
 
 kb.utils.wrappedDestroy = (owner) ->
   return unless owner.__kb
-  owner.__kb.model_observable.releaseCallbacks(owner) if owner.__kb.model_observable
+  owner.__kb.model_watcher.releaseCallbacks(owner) if owner.__kb.model_watcher
   __kb = owner.__kb; owner.__kb = null # clear now to break cycles
   kb.utils.wrappedDestroy(__kb.observable) if __kb.observable
   __kb.factory = null
-  __kb.model_observable.destroy() if __kb.model_observable_is_owned # release the model_observable
-  __kb.model_observable = null
+  __kb.model_watcher.destroy() if __kb.model_watcher_is_owned # release the model_watcher
+  __kb.model_watcher = null
   __kb.store.destroy() if __kb.store_is_owned # release the store
   __kb.store = null
   kb.release(__kb, true) # release everything that remains
@@ -56,8 +56,8 @@ kb.utils.wrappedStore = (observable, value)                   -> return if argum
 kb.utils.wrappedStoreIsOwned = (observable, value)            -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'store_is_owned') else kb.utils.wrappedByKey(observable, 'store_is_owned', value)
 kb.utils.wrappedFactory = (observable, value)                 -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'factory') else kb.utils.wrappedByKey(observable, 'factory', value)
 kb.utils.wrappedPath = (observable, value)                    -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'path') else kb.utils.wrappedByKey(observable, 'path', value)
-kb.utils.wrappedModelObservable = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_observable') else kb.utils.wrappedByKey(observable, 'model_observable', value)
-kb.utils.wrappedModelObservableIsOwned = (observable, value)  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_observable_is_owned') else kb.utils.wrappedByKey(observable, 'model_observable_is_owned', value)
+kb.utils.wrappedModelWatcher = (observable, value)         -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_watcher') else kb.utils.wrappedByKey(observable, 'model_watcher', value)
+kb.utils.wrappedModelWatcherIsOwned = (observable, value)  -> return if arguments.length is 1 then kb.utils.wrappedByKey(observable, 'model_watcher_is_owned') else kb.utils.wrappedByKey(observable, 'model_watcher_is_owned', value)
 
 kb.utils.setToDefault = (obj) ->
   return unless obj

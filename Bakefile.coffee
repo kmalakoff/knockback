@@ -8,7 +8,7 @@ module.exports =
       'src/knockback_ref_countable.coffee'
       'src/knockback_factory.coffee'
       'src/knockback_store.coffee'
-      'src/knockback_model_observable.coffee'
+      'src/knockback_model_watcher.coffee'
       'src/knockback_collection_observable.coffee'
       'src/knockback_default_wrapper.coffee'
       'src/knockback_formatted_observable.coffee'

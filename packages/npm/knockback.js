@@ -116,8 +116,8 @@
     if (!owner.__kb) {
       return;
     }
-    if (owner.__kb.model_observable) {
-      owner.__kb.model_observable.releaseCallbacks(owner);
+    if (owner.__kb.model_watcher) {
+      owner.__kb.model_watcher.releaseCallbacks(owner);
     }
     __kb = owner.__kb;
     owner.__kb = null;
@@ -125,10 +125,10 @@
       kb.utils.wrappedDestroy(__kb.observable);
     }
     __kb.factory = null;
-    if (__kb.model_observable_is_owned) {
-      __kb.model_observable.destroy();
+    if (__kb.model_watcher_is_owned) {
+      __kb.model_watcher.destroy();
     }
-    __kb.model_observable = null;
+    __kb.model_watcher = null;
     if (__kb.store_is_owned) {
       __kb.store.destroy();
     }
@@ -217,19 +217,19 @@
     }
   };
 
-  kb.utils.wrappedModelObservable = function(observable, value) {
+  kb.utils.wrappedModelWatcher = function(observable, value) {
     if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'model_observable');
+      return kb.utils.wrappedByKey(observable, 'model_watcher');
     } else {
-      return kb.utils.wrappedByKey(observable, 'model_observable', value);
+      return kb.utils.wrappedByKey(observable, 'model_watcher', value);
     }
   };
 
-  kb.utils.wrappedModelObservableIsOwned = function(observable, value) {
+  kb.utils.wrappedModelWatcherIsOwned = function(observable, value) {
     if (arguments.length === 1) {
-      return kb.utils.wrappedByKey(observable, 'model_observable_is_owned');
+      return kb.utils.wrappedByKey(observable, 'model_watcher_is_owned');
     } else {
-      return kb.utils.wrappedByKey(observable, 'model_observable_is_owned', value);
+      return kb.utils.wrappedByKey(observable, 'model_watcher_is_owned', value);
     }
   };
 
@@ -633,7 +633,7 @@
   })();
 
   /*
-    knockback_model_observable.js
+    knockback_model_watcher.js
     (c) 2011, 2012 Kevin Malakoff.
     Knockback.Observable is freely distributable under the MIT license.
     See the following for full license details:
@@ -641,24 +641,24 @@
   */
 
 
-  kb.ModelObservable = (function() {
+  kb.ModelWatcher = (function() {
 
-    ModelObservable.useOptionsOrCreate = function(options, model, obj, callback_options) {
-      var model_observable;
-      if (options.model_observable) {
-        if (!(options.model_observable.model() === model || (options.model_observable.model_ref === model))) {
+    ModelWatcher.useOptionsOrCreate = function(options, model, obj, callback_options) {
+      var model_watcher;
+      if (options.model_watcher) {
+        if (!(options.model_watcher.model() === model || (options.model_watcher.model_ref === model))) {
           kb.throwUnexpected(this, 'model not matching');
         }
-        model_observable = kb.utils.wrappedModelObservable(obj, options.model_observable);
+        model_watcher = kb.utils.wrappedModelWatcher(obj, options.model_watcher);
       } else {
-        model_observable = kb.utils.wrappedModelObservable(obj, new kb.ModelObservable(model));
-        kb.utils.wrappedModelObservableIsOwned(obj, true);
+        model_watcher = kb.utils.wrappedModelWatcher(obj, new kb.ModelWatcher(model));
+        kb.utils.wrappedModelWatcherIsOwned(obj, true);
       }
-      model_observable.registerCallbacks(obj, callback_options);
-      return model_observable;
+      model_watcher.registerCallbacks(obj, callback_options);
+      return model_watcher;
     };
 
-    function ModelObservable(model, obj, callback_options) {
+    function ModelWatcher(model, obj, callback_options) {
       this._onModelUnloaded = __bind(this._onModelUnloaded, this);
 
       this._onModelLoaded = __bind(this._onModelLoaded, this);
@@ -676,13 +676,13 @@
       }
     }
 
-    ModelObservable.prototype.destroy = function() {
+    ModelWatcher.prototype.destroy = function() {
       this.model(null);
       this.__kb.callbacks = null;
       return kb.utils.wrappedDestroy(this);
     };
 
-    ModelObservable.prototype.model = function(new_model) {
+    ModelWatcher.prototype.model = function(new_model) {
       var callbacks, event_name, info, list, model, _i, _len, _ref;
       model = kb.utils.wrappedObject(this);
       if ((arguments.length === 0) || (model === new_model)) {
@@ -724,7 +724,7 @@
       return new_model;
     };
 
-    ModelObservable.prototype.registerCallbacks = function(obj, options) {
+    ModelWatcher.prototype.registerCallbacks = function(obj, options) {
       var callbacks, event_name, info, list, model;
       if (!obj) {
         kb.throwMissing(this, 'obj');
@@ -780,7 +780,7 @@
       return info.model(model) && info.model;
     };
 
-    ModelObservable.prototype.releaseCallbacks = function(obj) {
+    ModelWatcher.prototype.releaseCallbacks = function(obj) {
       var callbacks, event_name, index, info, model, _ref, _ref1;
       if (!this.__kb.callbacks) {
         return;
@@ -806,7 +806,7 @@
       }
     };
 
-    ModelObservable.prototype._onModelLoaded = function(model) {
+    ModelWatcher.prototype._onModelLoaded = function(model) {
       var callbacks, event_name, info, is_relational, list, _i, _len, _ref;
       is_relational = Backbone.RelationalModel && (model instanceof Backbone.RelationalModel);
       kb.utils.wrappedObject(this, model);
@@ -828,7 +828,7 @@
       return this;
     };
 
-    ModelObservable.prototype._onModelUnloaded = function(model) {
+    ModelWatcher.prototype._onModelUnloaded = function(model) {
       var callbacks, event_name, info, list, _i, _len, _ref;
       kb.utils.wrappedObject(this, null);
       _ref = this.__kb.callbacks;
@@ -849,7 +849,7 @@
       return this;
     };
 
-    ModelObservable.prototype._modelBindRelatationalInfo = function(model, event_name, info) {
+    ModelWatcher.prototype._modelBindRelatationalInfo = function(model, event_name, info) {
       var key, relation;
       if ((event_name === 'change') && info.key && info.update) {
         key = ko.utils.unwrapObservable(info.key);
@@ -873,7 +873,7 @@
       return this;
     };
 
-    ModelObservable.prototype._modelUnbindRelatationalInfo = function(model, event_name, info) {
+    ModelWatcher.prototype._modelUnbindRelatationalInfo = function(model, event_name, info) {
       if (!info.rel_fn) {
         return;
       }
@@ -887,12 +887,12 @@
       return this;
     };
 
-    return ModelObservable;
+    return ModelWatcher;
 
   })();
 
   kb.modelObservable = function(model, observable) {
-    return new kb.ModelObservable(model, observable);
+    return new kb.ModelWatcher(model, observable);
   };
 
   /*
@@ -1696,7 +1696,7 @@
       observable.model = _.bind(this.model, this);
       observable.update = _.bind(this.update, this);
       observable.destroy = _.bind(this.destroy, this);
-      kb.ModelObservable.useOptionsOrCreate(options, model, this, {
+      kb.ModelWatcher.useOptionsOrCreate(options, model, this, {
         model: _.bind(this.model, this),
         update: _.bind(this.update, this),
         key: this.key
@@ -1854,7 +1854,7 @@
         return kb.utils.wrappedByKey(_this, 'vo')();
       }));
       observable.destroy = _.bind(this.destroy, this);
-      kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {
+      kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
         model: _.bind(this.model, this),
         update: _.bind(this.update, this),
         event_name: this.event_name
@@ -1920,7 +1920,7 @@
     __extends(ViewModel, _super);
 
     function ViewModel(model, options, view_model) {
-      var bb_model, keys, mapped_keys, mapping_info, model_observable, vm_key, _ref;
+      var bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref;
       if (options == null) {
         options = {};
       }
@@ -1944,7 +1944,7 @@
       kb.Store.useOptionsOrCreate(options, model, this);
       kb.utils.wrappedPath(this, options.path);
       kb.Factory.useOptionsOrCreate(options, this, options.path);
-      model_observable = kb.utils.wrappedModelObservable(this, new kb.ModelObservable(model, this, {
+      model_watcher = kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
         model: _.bind(this.model, this)
       }));
       if (options.keys) {
@@ -1960,7 +1960,7 @@
           this.__kb.keys = _.keys(mapped_keys);
         }
       } else {
-        bb_model = model_observable.model();
+        bb_model = model_watcher.model();
         if (bb_model) {
           keys = _.keys(bb_model.attributes);
         }
@@ -2001,7 +2001,7 @@
     };
 
     ViewModel.prototype.model = function(new_model) {
-      var missing, model, model_observable;
+      var missing, model, model_watcher;
       model = kb.utils.wrappedObject(this);
       if ((arguments.length === 0) || (model === new_model)) {
         return model;
@@ -2010,11 +2010,11 @@
       if (!model) {
         return;
       }
-      model_observable = kb.utils.wrappedModelObservable(this);
-      if (!model_observable) {
+      model_watcher = kb.utils.wrappedModelWatcher(this);
+      if (!model_watcher) {
         return new_model;
       }
-      model_observable.model(model);
+      model_watcher.model(model);
       if (this.__kb.keys) {
         return;
       }
@@ -2040,7 +2040,7 @@
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
         path: kb.utils.wrappedPath(this),
-        model_observable: kb.utils.wrappedModelObservable(this)
+        model_watcher: kb.utils.wrappedModelWatcher(this)
       };
       for (_i = 0, _len = keys.length; _i < _len; _i++) {
         key = keys[_i];
@@ -2062,7 +2062,7 @@
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
         path: kb.utils.wrappedPath(this),
-        model_observable: kb.utils.wrappedModelObservable(this)
+        model_watcher: kb.utils.wrappedModelWatcher(this)
       };
       for (vm_key in mappings) {
         mapping_info = mappings[vm_key];
