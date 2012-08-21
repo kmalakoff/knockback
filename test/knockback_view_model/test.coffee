@@ -352,10 +352,21 @@ $(document).ready( ->
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
         @is_destroyed = false
-      __destroy: ->
+ 
+        # monkey patch reference counting
+        @ref_count = 1
+        @super_destroy = @destroy; @destroy = null
+        @is_destroyed = false
+
+      retain: -> @ref_count++
+      refCount: -> return @ref_count
+      release: -> 
+        --@ref_count
+        throw "ref count is corrupt" if @ref_count < 0 
+        return if @ref_count
         @is_destroyed = true
-        super
-  
+        @super_destroy()
+ 
     model = new Backbone.Model({first: "Hello"})
     view_model = new ContactViewModelFullName(model)
   
@@ -369,12 +380,12 @@ $(document).ready( ->
     equal(view_model.refCount(), 1, "ref count 1")
     equal(view_model.is_destroyed, false, "not destroyed")
   
-    view_model.release()
+    kb.release(view_model)
     equal(view_model.refCount(), 0, "ref count 0")
     equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
   
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
-    raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
+    raises((->view_model.release()), null, "ref count is corrupt")
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
@@ -385,12 +396,20 @@ $(document).ready( ->
     ContactViewModelFullName = kb.ViewModel.extend({
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {requires: ['first', 'last']})
-        @is_destroyed = false
-        @
   
-      __destroy: ->
+        # monkey patch reference counting
+        @ref_count = 1
+        @super_destroy = @destroy; @destroy = null
+        @is_destroyed = false
+
+      retain: -> @ref_count++
+      refCount: -> return @ref_count
+      release: -> 
+        --@ref_count
+        throw "ref count is corrupt" if @ref_count < 0 
+        return if @ref_count
         @is_destroyed = true
-        kb.ViewModel.prototype.__destroy.call(this)
+        @super_destroy()
     })
   
     model = new Backbone.Model({first: "Hello"})
@@ -406,12 +425,12 @@ $(document).ready( ->
     equal(view_model.refCount(), 1, "ref count 1")
     equal(view_model.is_destroyed, false, "not destroyed")
   
-    view_model.release()
+    kb.release(view_model)
     equal(view_model.refCount(), 0, "ref count 0")
     equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
   
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
-    raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
+    raises((->view_model.release()), null, "ref count is corrupt")
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )

@@ -20,16 +20,8 @@ class kb.Store
     @observables = []
 
   destroy: ->
-    
-    # release the view models
     for index, observable of @observables
-      continue unless observable
-
-      observable.releaseReferences?() # release all references to break cycles
-
-      # release
-      if observable.release then observable.release() else kb.release(observable)
-
+      kb.release(observable)
     @objects = null
     @observables = null
 
@@ -43,7 +35,6 @@ class kb.Store
     @objects.push(obj)
     kb.utils.wrappedObject(observable, obj)
     @observables.push(observable)
-    observable.retain?()
 
     # set the creator
     observable.__kb or= {}
@@ -63,10 +54,14 @@ class kb.Store
       # check for an existing one of the correct type
       if obj and not (obj instanceof Backbone.Collection) # don't share collection observables
         for test, index in @objects
-          observable = @observables[index]
-          continue unless observable and observable.__kb
-          if (test is obj) and (observable.__kb.creator is creator)
-            observable.retain?()
+          continue unless (observable = @observables[index])
+          
+          # already released, release our references
+          if observable.__kb_destroyed
+            @observables[index] = null
+            @objects[index] = null
+
+          else if (test is obj) and (observable.__kb.creator is creator)
             return observable
 
       # create
@@ -77,17 +72,3 @@ class kb.Store
     unless (ko.isObservable(observable) or observable.__kb_is_co)
       (_.indexOf(@observables, observable) >= 0) or @registerObservable(obj, observable, {creator: creator}) # not registered yet, register now
     return observable
-
-  releaseObservable: (observable, owns_store) ->
-    return unless observable # something to release and not in destroy
-    return if arguments.length is 2 and not owns_store and not observable.release # cares about ownership -> do not clear out observables unless owned or ref count is 0
-
-    # release and exit if references still exist
-    kb.release(observable)
-    return if observable.refCount and observable.refCount() > 0
-
-    # clear our references
-    kb.utils.wrappedObject(observable, null)
-    return if (index = _.indexOf(@observables, observable)) < 0
-    @objects[index] = null
-    @observables[index] = null

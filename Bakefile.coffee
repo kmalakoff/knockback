@@ -5,7 +5,6 @@ module.exports =
     files: [
       'src/knockback_core.coffee'
       'src/knockback_utils.coffee'
-      'src/knockback_ref_countable.coffee'
       'src/knockback_factory.coffee'
       'src/knockback_store.coffee'
       'src/knockback_model_watcher.coffee'

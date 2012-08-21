@@ -49,13 +49,24 @@
 
   kb.TYPE_COLLECTION = 3;
 
-  kb.release = function(obj, keys_only) {
-    var key, releaseObject, value;
-    if (!obj) {
-      return false;
+  kb.releaseKeys = function(obj) {
+    var key, value;
+    for (key in obj) {
+      value = obj[key];
+      (key === '__kb') || kb.release(value, function() {
+        return obj[key] = null;
+      });
     }
-    releaseObject = function(obj) {
-      var array, view_model, view_models, _i, _len;
+  };
+
+  kb.release = function(obj, preRelease) {
+    var array, key, value, view_model, view_models, _i, _len;
+    if (!obj || !_.isObject(obj) || obj.__kb_destroyed || (typeof obj === 'function' && !ko.isObservable(obj))) {
+      return;
+    }
+    obj.__kb_destroyed = true;
+    !preRelease || preRelease();
+    if (ko.isObservable(obj) || (typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
       if (ko.isObservable(obj) && _.isArray(array = obj())) {
         if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
           if (obj.destroy) {
@@ -71,28 +82,19 @@
             kb.release(view_model);
           }
         }
-      } else if (obj.destroy) {
-        obj.destroy();
       } else if (obj.release) {
         obj.release();
+      } else if (obj.destroy) {
+        obj.destroy();
       } else if (obj.dispose) {
         obj.dispose();
       }
-      return obj;
-    };
-    if (!keys_only && (ko.isObservable(obj) || (typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
-      releaseObject(obj);
-    } else if (_.isObject(obj) && !(typeof obj === 'function')) {
+    } else {
       for (key in obj) {
         value = obj[key];
-        if (!value || (key === '__kb')) {
-          continue;
-        }
-        if (!(ko.isObservable(value) || (typeof value.dispose === 'function') || (typeof value.destroy === 'function') || (typeof value.release === 'function'))) {
-          continue;
-        }
-        obj[key] = null;
-        releaseObject(value);
+        (key === '__kb') || kb.release(value, function() {
+          return obj[key] = null;
+        });
       }
     }
   };
@@ -153,8 +155,7 @@
     if (__kb.store_is_owned) {
       __kb.store.destroy();
     }
-    __kb.store = null;
-    return kb.release(__kb, true);
+    return __kb.store = null;
   };
 
   wrappedKey = function(obj, key, value) {
@@ -237,9 +238,9 @@
     return obj;
   };
 
-  kb.utils.release = function(obj, keys_only) {
+  kb.utils.release = function(obj) {
     legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead');
-    return kb.release(obj, keys_only);
+    return kb.release(obj);
   };
 
   kb.utils.valueType = function(observable) {
@@ -267,50 +268,6 @@
       path: kb.utils.pathJoin(options.path, path)
     }, options);
   };
-
-  /*
-    knockback_ref_countable.js
-    (c) 2012 Kevin Malakoff.
-    Knockback.RefCountable is freely distributable under the MIT license.
-    See the following for full license details:
-      https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  */
-
-
-  kb.RefCountable = (function() {
-
-    RefCountable.extend = Backbone.Model.extend;
-
-    function RefCountable() {
-      this.__kb_ref_count = 1;
-    }
-
-    RefCountable.prototype.__destroy = function() {};
-
-    RefCountable.prototype.retain = function() {
-      (this.__kb_ref_count > 0) || throwUnexpected(this, 'ref count is corrupt');
-      this.__kb_ref_count++;
-      return this;
-    };
-
-    RefCountable.prototype.releaseReferences = function() {};
-
-    RefCountable.prototype.release = function() {
-      (this.__kb_ref_count > 0) || throwUnexpected(this, 'ref count is corrupt');
-      this.__kb_ref_count--;
-      if (!this.__kb_ref_count) {
-        this.__destroy();
-      }
-      return this;
-    };
-
-    RefCountable.prototype.refCount = function() {
-      return this.__kb_ref_count;
-    };
-
-    return RefCountable;
-
-  })();
 
   /*
     knockback_factory.js
@@ -458,17 +415,7 @@
       _ref = this.observables;
       for (index in _ref) {
         observable = _ref[index];
-        if (!observable) {
-          continue;
-        }
-        if (typeof observable.releaseReferences === "function") {
-          observable.releaseReferences();
-        }
-        if (observable.release) {
-          observable.release();
-        } else {
-          kb.release(observable);
-        }
+        kb.release(observable);
       }
       this.objects = null;
       return this.observables = null;
@@ -485,9 +432,6 @@
       this.objects.push(obj);
       kb.utils.wrappedObject(observable, obj);
       this.observables.push(observable);
-      if (typeof observable.retain === "function") {
-        observable.retain();
-      }
       observable.__kb || (observable.__kb = {});
       if (options.creator) {
         return observable.__kb.creator = options.creator;
@@ -516,14 +460,13 @@
           _ref = this.objects;
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             test = _ref[index];
-            observable = this.observables[index];
-            if (!(observable && observable.__kb)) {
+            if (!(observable = this.observables[index])) {
               continue;
             }
-            if ((test === obj) && (observable.__kb.creator === creator)) {
-              if (typeof observable.retain === "function") {
-                observable.retain();
-              }
+            if (observable.__kb_destroyed) {
+              this.observables[index] = null;
+              this.objects[index] = null;
+            } else if ((test === obj) && (observable.__kb.creator === creator)) {
               return observable;
             }
           }
@@ -537,26 +480,6 @@
         });
       }
       return observable;
-    };
-
-    Store.prototype.releaseObservable = function(observable, owns_store) {
-      var index;
-      if (!observable) {
-        return;
-      }
-      if (arguments.length === 2 && !owns_store && !observable.release) {
-        return;
-      }
-      kb.release(observable);
-      if (observable.refCount && observable.refCount() > 0) {
-        return;
-      }
-      kb.utils.wrappedObject(observable, null);
-      if ((index = _.indexOf(this.observables, observable)) < 0) {
-        return;
-      }
-      this.objects[index] = null;
-      return this.observables[index] = null;
     };
 
     return Store;
@@ -918,12 +841,14 @@
         observable();
         return previous_collection;
       }
-      if (collection && collection.retain) {
-        collection.retain();
+      if (collection) {
+        if (typeof collection.retain === "function") {
+          collection.retain();
+        }
       }
       if (previous_collection) {
         this._collectionUnbind(previous_collection);
-        if (previous_collection.release) {
+        if (typeof previous_collection.release === "function") {
           previous_collection.release();
         }
       }
@@ -1067,10 +992,7 @@
       this.in_edit++;
       observable.remove(view_model);
       this.in_edit--;
-      this.trigger('remove', view_model, observable);
-      if (this.hasViewModels()) {
-        return kb.utils.wrappedStore(observable).releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable));
-      }
+      return this.trigger('remove', view_model, observable);
     };
 
     CollectionObservable.prototype._onModelChange = function(model) {
@@ -1117,27 +1039,18 @@
     };
 
     CollectionObservable.prototype._clear = function(silent) {
-      var array, observable, store, view_model, view_models, _i, _len;
+      var array, observable;
       observable = kb.utils.wrappedObservable(this);
       if (!silent) {
         this.trigger('remove', observable());
       }
-      this.in_edit++;
       if (silent) {
         array = observable();
-        view_models = array.slice(0);
         array.splice(0, array.length);
       } else {
-        view_models = observable.removeAll();
-      }
-      this.in_edit--;
-      if (!this.hasViewModels()) {
-        return;
-      }
-      store = kb.utils.wrappedStore(observable);
-      for (_i = 0, _len = view_models.length; _i < _len; _i++) {
-        view_model = view_models[_i];
-        store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable));
+        this.in_edit++;
+        observable.removeAll();
+        this.in_edit--;
       }
       return this;
     };
@@ -1582,6 +1495,7 @@
     }
 
     Observable.prototype.destroy = function() {
+      this.vm = null;
       kb.release(this.value);
       this.value = null;
       return kb.utils.wrappedDestroy(this);
@@ -1667,11 +1581,7 @@
       previous_value = this.value;
       this.value = value;
       if (previous_value) {
-        if (store) {
-          store.releaseObservable(previous_value);
-        } else {
-          kb.release(previous_value);
-        }
+        kb.release(previous_value);
       }
       return this.vo(value);
     };
@@ -1755,15 +1665,14 @@
   */
 
 
-  kb.ViewModel = (function(_super) {
+  kb.ViewModel = (function() {
 
-    __extends(ViewModel, _super);
+    ViewModel.extend = Backbone.Model.extend;
 
     function ViewModel(model, options, view_model) {
       var bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref;
       options || (options = {});
       view_model || (view_model = {});
-      ViewModel.__super__.constructor.apply(this, arguments);
       if (options.options) {
         options = _.defaults(_.clone(options), options.options);
       }
@@ -1818,22 +1727,16 @@
       !kb.statistics || kb.statistics.register(this);
     }
 
-    ViewModel.prototype.releaseReferences = function() {
+    ViewModel.prototype.destroy = function() {
       var vm_key;
-      this.__kb.references_released = true;
       if (this.__kb.view_model !== this) {
         for (vm_key in this.__kb.vm_keys) {
           this.__kb.view_model[vm_key] = null;
         }
       }
       this.__kb.view_model = null;
-      return kb.release(this, true);
-    };
-
-    ViewModel.prototype.__destroy = function() {
-      this.__kb.references_released || this.releaseReferences();
+      kb.releaseKeys(this);
       kb.utils.wrappedDestroy(this);
-      ViewModel.__super__.__destroy.apply(this, arguments);
       return !kb.statistics || kb.statistics.unregister(this);
     };
 
@@ -1916,7 +1819,7 @@
 
     return ViewModel;
 
-  })(kb.RefCountable);
+  })();
 
   kb.viewModel = function(model, options, view_model) {
     return new kb.ViewModel(model, options, view_model);

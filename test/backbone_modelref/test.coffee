@@ -81,7 +81,7 @@ $(document).ready( ->
 
     # go back to loading state
     collection.reset()
-    equal(view_model.name(), 'Yoko', "Default is to retain the last value")
+    equal(view_model.name(), 'Yoko', "Default is to keep the last value")
     view_model._auto.setToDefault() # override default behavior and go back to loading state
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
@@ -155,14 +155,14 @@ $(document).ready( ->
 
     # go back to loading state
     collection.reset()
-    equal(view_model.name(), 'Yoko', "Default is to retain the last value")
+    equal(view_model.name(), 'Yoko', "Default is to keep the last value")
     kb.utils.setToDefault(view_model)
-    # kb.locale_manager.setLocale('en')
-    # equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
-    # kb.locale_manager.setLocale('en-GB')
-    # equal(view_model.name(), 'Loading sir', "Maybe too formal")
-    # kb.locale_manager.setLocale('fr-FR')
-    # equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+    kb.locale_manager.setLocale('en')
+    equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+    kb.locale_manager.setLocale('en-GB')
+    equal(view_model.name(), 'Loading sir', "Maybe too formal")
+    kb.locale_manager.setLocale('fr-FR')
+    equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)

@@ -14,11 +14,12 @@
 #       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 ####################################################
 
-class kb.ViewModel extends kb.RefCountable
+class kb.ViewModel
+  @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+
   constructor: (model, options, view_model) ->
     options or= {}
     view_model or= {}
-    super
 
     # bind and extract options
     options = _.defaults(_.clone(options), options.options) if options.options
@@ -61,18 +62,13 @@ class kb.ViewModel extends kb.RefCountable
 
     not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
 
-  releaseReferences: ->
-    @__kb.references_released = true
+  destroy: ->
     if @__kb.view_model isnt @ # clear the external references
       for vm_key of @__kb.vm_keys
         @__kb.view_model[vm_key] = null
     @__kb.view_model = null
-    kb.release(this, true) # release the observables
-
-  __destroy: ->
-    @__kb.references_released or @releaseReferences()
+    kb.releaseKeys(this)
     kb.utils.wrappedDestroy(@)
-    super
 
     not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
 

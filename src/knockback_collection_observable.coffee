@@ -117,12 +117,12 @@ class kb.CollectionObservable
       return previous_collection
 
     # no change
-    collection.retain() if collection and collection.retain
+    collection.retain?() if collection
 
     # clean up
     if previous_collection
       @_collectionUnbind(previous_collection)
-      previous_collection.release() if previous_collection.release
+      previous_collection.release?()
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
     kb.utils.wrappedObject(observable, collection)
@@ -216,9 +216,6 @@ class kb.CollectionObservable
     @in_edit--
     @trigger('remove', view_model, observable) # notify
 
-    # release
-    kb.utils.wrappedStore(observable).releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) if @hasViewModels()
-
   _onModelChange: (model) ->
     # resort if needed
     @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
@@ -258,19 +255,13 @@ class kb.CollectionObservable
     @trigger('remove', observable()) if not silent # notify
 
     # don't notify if destroying
-    @in_edit++
     if silent
       array = observable()
-      view_models = array.slice(0)
       array.splice(0, array.length)
     else
-      view_models = observable.removeAll()
-    @in_edit--
-
-    # release view models
-    return unless @hasViewModels()
-    store = kb.utils.wrappedStore(observable)
-    (store.releaseObservable(view_model, kb.utils.wrappedStoreIsOwned(observable)) for view_model in view_models) 
+      @in_edit++
+      observable.removeAll()
+      @in_edit--
     @
 
   _collectionResync: (silent) ->

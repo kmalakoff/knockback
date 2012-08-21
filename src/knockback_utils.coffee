@@ -24,7 +24,7 @@ kb.utils.wrappedDestroy = (obj) ->
   __kb.model_watcher = null
   __kb.store.destroy() if __kb.store_is_owned # release the store
   __kb.store = null
-  kb.release(__kb, true) # release everything that remains
+  # kb.release(__kb, true) # release everything that remains
 
 wrappedKey = (obj, key, value) ->
   # get
@@ -70,9 +70,9 @@ kb.utils.setToDefault = (obj) ->
       kb.utils.setToDefault(value) if value and (ko.isObservable(value) or (typeof(value) isnt 'function')) and ((key[0] isnt '_') or key.search('__kb'))
   return obj
 
-kb.utils.release = (obj, keys_only) ->
+kb.utils.release = (obj) ->
   legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
-  return kb.release(obj, keys_only)
+  return kb.release(obj)
 
 kb.utils.valueType = (observable) ->
   return kb.TYPE_UNKNOWN        unless observable 

@@ -75,9 +75,7 @@ $(document).ready( ->
         ok(_.contains(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
         equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
 
-    equal(house_view_model.refCount(), 1, 'Expected references')
     kb.release(house_view_model)
-    equal(house_view_model.refCount(), 0, 'Expected references')
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
@@ -200,7 +198,7 @@ $(document).ready( ->
       ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
     equal(john_view_model.best_friend().name(), 'George', 'Expected name')
     equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
-    john_view_model.release(); john_view_model = null
+    kb.release(john_view_model); john_view_model = null
 
     paul_view_model = new kb.ViewModel(paul)
     equal(paul_view_model.name(), 'Paul', "Name is correct")
@@ -217,7 +215,7 @@ $(document).ready( ->
     equal(george_view_model.best_friend().name(), 'John', 'Expected name')
     equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
     equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
-    george_view_model.release(); george_view_model = null
+    kb.release(george_view_model); george_view_model = null
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )

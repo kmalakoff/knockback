@@ -28,10 +28,18 @@ kb.TYPE_SIMPLE = 1
 kb.TYPE_MODEL = 2
 kb.TYPE_COLLECTION = 3
 
-kb.release = (obj, keys_only) ->
-  return false unless obj
+kb.releaseKeys = (obj) ->
+  for key, value of obj
+    (key is '__kb') or kb.release(value, -> obj[key] = null)
+  return
 
-  releaseObject = (obj) -> 
+kb.release = (obj, preRelease) ->
+  return if not obj or not _.isObject(obj) or obj.__kb_destroyed or (typeof(obj) is 'function' and not ko.isObservable(obj))
+  obj.__kb_destroyed = true
+  not preRelease or preRelease()
+
+  # observable or lifecycle managed
+  if ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
     if ko.isObservable(obj) and _.isArray(array = obj())
       if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
         if obj.destroy
@@ -42,24 +50,17 @@ kb.release = (obj, keys_only) ->
         view_models = array.slice(0)
         array.splice(0, array.length)
         kb.release(view_model) for view_model in view_models
-    else if obj.destroy
-      obj.destroy()
     else if obj.release
       obj.release()
+    else if obj.destroy
+      obj.destroy()
     else if obj.dispose
       obj.dispose()
-    return obj
-
-  # known type
-  if not keys_only and (ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
-    releaseObject(obj)
 
   # view model
-  else if _.isObject(obj) and not (typeof(obj) is 'function')
+  else
     for key, value of obj
-      continue if not value or (key is '__kb')
-      continue unless ko.isObservable(value) or (typeof(value.dispose) is 'function') or (typeof(value.destroy) is 'function') or (typeof(value.release) is 'function')
-      obj[key] = null; releaseObject(value)
+      (key is '__kb') or kb.release(value, -> obj[key] = null)
 
   return
 

@@ -28,7 +28,7 @@
 ####################################################
 
 class kb.LocalizedObservable
-  @extend = Backbone.Model.extend # from Backbone non-Coffeescript inheritance (use "kb.RefCountable_RCBase.extend({})" in Javascript instead of "class MyClass extends kb.RefCountable")
+  @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   constructor: (@value, options, @vm) -> # @vm is view_model
     options or= {}; @vm or= {}

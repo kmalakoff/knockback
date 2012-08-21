@@ -16,10 +16,24 @@ $(document).ready( ->
   kb.locale_manager = new _kbe.LocaleManager('en', {})
 
   # ref counted view model
-  class RefCountableViewModel extends kb.RefCountable
+  class RefCountableViewModel
     constructor: ->
-      super
       RefCountableViewModel.view_models.push(this)
+
+      # reference counting
+      @ref_count = 1
+
+    refCount: -> return @ref_count
+    retain: -> 
+      @ref_count++
+      @
+    release: -> 
+      --@ref_count
+      throw "ref count is corrupt" if @ref_count < 0 
+      unless @ref_count
+        @is_destroyed = true
+        @__destroy()
+      @
 
     __destroy: ->
       RefCountableViewModel.view_models.splice(RefCountableViewModel.view_models.indexOf(this), 1)
@@ -54,38 +68,51 @@ $(document).ready( ->
   test("Basic view model properties", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
+    nested_view_model = kb.viewModel(new Backbone.Model({name: 'name1'}), {name: {}}, @)
     ViewModel = ->
       @prop1 = ko.observable()
-      @prop1 = ko.observable(['test', 1, null, kb.viewModel(new Backbone.Model({name: 'name1'}))])
-      @prop2 = ko.observableArray(['test', 1, null, kb.viewModel(new Backbone.Model({name: 'name1'}))])
-      @prop3 = ko.dependentObservable(-> return true)
-      @prop4 = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
-      @prop5 = kb.viewModel(new Backbone.Model({name: 'name1'}), {name: {}}, @)
-      @prop6 = kb.collectionObservable(new Backbone.Collection(), {models_only: true})
-      @prop7 = kb.viewModel(new Backbone.Model({name: 'name1'}))
-      @prop8 = kb.collectionObservable(new Backbone.Collection())
-      @prop9 = new _kbe.LongDateLocalizer(ko.observable(new Date))
+      @prop2 = ko.observable(['test', 1, null, kb.viewModel(new Backbone.Model({name: 'name1'}))])
+      @prop3 = ko.observableArray(['test', 1, null, kb.viewModel(new Backbone.Model({name: 'name1'}))])
+      @prop4 = ko.dependentObservable(-> return true)
+      @prop5 = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
+      @prop6 = nested_view_model
+      @prop7 = kb.collectionObservable(new Backbone.Collection(), {models_only: true})
+      @prop8 = kb.viewModel(new Backbone.Model({name: 'name1'}))
+      @prop9 = kb.collectionObservable(new Backbone.Collection())
       @prop10 = new _kbe.LongDateLocalizer(ko.observable(new Date))
-      @prop11 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
+      @prop11 = new _kbe.LongDateLocalizer(ko.observable(new Date))
+      @prop12 = kb.triggeredObservable(new Backbone.Model({name: 'name1'}), 'name')
       @
     view_model = new ViewModel()
-    nested_view_model = view_model.prop5
     kb.release(view_model)
 
-    ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..11]
+    ok(!view_model["prop#{index}"], "Property released: prop#{index}") for index in [1..12]
     ok(!view_model.name, "Property released: view_model.name") # kb.viewModel(new Backbone.Model({name: 'name1'}), 'name', @)
     ok(!nested_view_model.name, "Property released: nested_view_model.name") # nested_view_model
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("kb.RefCountable", ->
+  test("RefCounting", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    class RefViewModel extends kb.RefCountable
+    class RefViewModel
       constructor: ->
-        super
         @prop = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
+        # reference counting
+        @ref_count = 1
+
+      refCount: -> return @ref_count
+      retain: -> 
+        @ref_count++
+        @
+      release: -> 
+        --@ref_count
+        throw "ref count is corrupt" if @ref_count < 0 
+        unless @ref_count
+          @is_destroyed = true
+          @__destroy()
+        @
 
       __destroy: ->
         kb.release(@prop); @prop = null
@@ -148,7 +175,7 @@ $(document).ready( ->
 
     instance = collection_observable()[0].retain()
 
-    store.releaseObservable(collection_observable)
+    kb.release(collection_observable)
     equal(RefCountableViewModel.view_models.length, 2, "Remaining: 2")
 
     equal(instance.refCount(), 2, "One instance retained and one in the store")
@@ -164,7 +191,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: DestroyableViewModel, store: store})
     equal(DestroyableViewModel.view_models.length, 2, "Created: 2")
 
-    store.releaseObservable(collection_observable)
+    kb.release(collection_observable)
     equal(DestroyableViewModel.view_models.length, 2, "All destroyed")
 
     store.destroy(); store = null
@@ -178,7 +205,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(new Backbone.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: SimpleViewModel, store: store})
     equal(SimpleViewModel.view_models.length, 2, "Created: 2")
 
-    store.releaseObservable(collection_observable)
+    kb.release(collection_observable)
     equal(SimpleViewModel.view_models.length, 2, "Remaining: 2")
     ok(view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
@@ -282,7 +309,7 @@ $(document).ready( ->
 
     instance = collection_observable()[0].retain()
 
-    store.releaseObservable(collection_observable)
+    kb.release(collection_observable)
     equal(RefCountableViewModel.view_models.length, 4, "Remaining: 4")
 
     equal(instance.refCount(), 2, "One instance retained and one in the store")
@@ -298,7 +325,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(band, {view_model: DestroyableViewModel, store: store})
     equal(DestroyableViewModel.view_models.length, 4, "Created: 4")
 
-    store.releaseObservable(collection_observable)
+    kb.release(collection_observable)
     equal(DestroyableViewModel.view_models.length, 4, "All destroyed")
 
     store.destroy(); store = null
@@ -312,7 +339,7 @@ $(document).ready( ->
     collection_observable = kb.collectionObservable(band, {view_model: SimpleViewModel, store: store})
     equal(SimpleViewModel.view_models.length, 4, "Created: 4")
 
-    store.releaseObservable(collection_observable)
+    kb.release(collection_observable)
     equal(SimpleViewModel.view_models.length, 4, "Remaining: 4")
     ok(view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 

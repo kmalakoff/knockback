@@ -81,7 +81,8 @@ class kb.Observable
     return observable
 
   destroy: ->
-    kb.release(@value); @value = null
+    @vm = null # TODO: clear?
+    kb.release(@value); @value = null # TODO: can remove this?
     kb.utils.wrappedDestroy(@)
 
   model: (new_model) ->
@@ -154,7 +155,7 @@ class kb.Observable
 
     # set the value
     previous_value = @value; @value = value
-    (if store then store.releaseObservable(previous_value) else kb.release(previous_value)) if previous_value # release previous
+    kb.release(previous_value) if previous_value # release previous
     @vo(value)
 
 kb.observable = (model, key, options) -> new kb.Observable(model, key, options)
