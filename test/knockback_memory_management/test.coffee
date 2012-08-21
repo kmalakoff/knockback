@@ -93,6 +93,38 @@ $(document).ready( ->
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
+  test("Releasing with nodes", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}))
+    collection_observable = kb.collectionObservable(new Backbone.Collection([new Backbone.Model({name: 'Fred'}), new Backbone.Model({name: 'Mary'})]))
+
+    $vm_el = $('<div id="vm" data-bind="text: name"></div>')
+    $co_el = $('<div id="co" data-bind="foreach: co"><div data-bind="text: name"></div></div>')
+    $('body').append($vm_el).append($co_el)
+
+    kb.applyBindings(view_model, $vm_el[0])
+    kb.applyBindings({co: collection_observable}, $co_el[0])
+
+    equal($vm_el.text(), 'Bob', 'found Bob')
+    for child, index in $co_el.children()
+      name = if index then 'Mary' else 'Fred'
+      equal($(child).text(), name, "found #{name}")
+
+    equal(kb.statistics.registeredCount('ViewModel'), 3, '3 bound view models')
+    equal(kb.statistics.registeredCount('CollectionObservable'), 1, '1 bound collection observable')
+
+    # dispose of the collection node
+    kb.removeNode($co_el[0])
+    equal(kb.statistics.registeredCount('ViewModel'), 1, '1 bound view model')
+    equal(kb.statistics.registeredCount('CollectionObservable'), 0, 'no bound collection observables')
+
+    # dispose of the model node
+    kb.removeNode($vm_el[0])
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
   test("RefCounting", ->
     kb.statistics = new kb.Statistics() # turn on stats
 

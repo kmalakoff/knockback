@@ -18,15 +18,41 @@ ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') el
 Knockback = kb = @Knockback = @kb = if (typeof(exports) != 'undefined') then exports else {}
 kb.VERSION = '0.16.0beta2'
 
-# Locale Manager - if you are using localization, set this property.
-# It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-kb.locale_manager = undefined
-
-# for ObservableTypes
+####################################
+# OBSERVABLE STORAGE TYPES
+####################################
 kb.TYPE_UNKNOWN = 0
 kb.TYPE_SIMPLE = 1
 kb.TYPE_MODEL = 2
 kb.TYPE_COLLECTION = 3
+
+####################################
+# HELPERS
+####################################
+arraySlice = Array.prototype.slice
+arraySplice = Array.prototype.splice
+throwMissing = (instance, message) -> throw "#{instance.constructor.name}: #{message} is missing"
+throwUnexpected = (instance, message) -> throw "#{instance.constructor.name}: #{message} is unexpected"
+
+legacyWarning = (identifier, last_version, message) ->
+  kb._legacy_warnings or= {}
+  kb._legacy_warnings[identifier] or= 0
+  kb._legacy_warnings[identifier]++
+  console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
+
+####################################
+# Memory Management
+####################################
+kb.removeNode = ko.removeNode
+
+kb.releaseOnRemoveNode = (view_model, node) ->
+  view_model or throwUnexpected(@, 'missing view model')
+  node or throwUnexpected(@, 'missing node')
+  ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
+
+kb.applyBindings = (view_model, node, skip_auto) ->
+  ko.applyBindings(view_model, node)
+  kb.releaseOnRemoveNode(view_model, node) if (arguments.length is 2) or not skip_auto
 
 kb.releaseKeys = (obj) ->
   for key, value of obj
@@ -65,17 +91,8 @@ kb.release = (obj, preRelease) ->
   return
 
 ####################################
-# HELPERS
+# Localization
 ####################################
-arraySlice = Array.prototype.slice
-arraySplice = Array.prototype.splice
-throwMissing = (instance, message) -> throw "#{instance.constructor.name}: #{message} is missing"
-throwUnexpected = (instance, message) -> throw "#{instance.constructor.name}: #{message} is unexpected"
-
-legacyWarning = (identifier, last_version, message) ->
-  kb._legacy_warnings or= {}
-  kb._legacy_warnings[identifier] or= 0
-  kb._legacy_warnings[identifier]++
-  console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
-
-
+# Locale Manager - if you are using localization, set this property.
+# It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
+kb.locale_manager = undefined

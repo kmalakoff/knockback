@@ -54,15 +54,16 @@ class kb.Store
       # check for an existing one of the correct type
       if obj and not (obj instanceof Backbone.Collection) # don't share collection observables
         for test, index in @objects
-          continue unless (observable = @observables[index])
-          
-          # already released, release our references
-          if observable.__kb_destroyed
-            @observables[index] = null
-            @objects[index] = null
+          if observable = @observables[index]
 
-          else if (test is obj) and (observable.__kb.creator is creator)
-            return observable
+            # already released, release our references
+            if observable.__kb_destroyed
+              @observables[index] = null
+              @objects[index] = null
+
+            # a match, share this
+            else if (test is obj) and (observable.__kb.creator is creator)
+              return observable
 
       # create
       observable = factory.createForPath(obj, path, this, creator)

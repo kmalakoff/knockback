@@ -39,8 +39,6 @@
 
   kb.VERSION = '0.16.0beta2';
 
-  kb.locale_manager = void 0;
-
   kb.TYPE_UNKNOWN = 0;
 
   kb.TYPE_SIMPLE = 1;
@@ -48,6 +46,43 @@
   kb.TYPE_MODEL = 2;
 
   kb.TYPE_COLLECTION = 3;
+
+  arraySlice = Array.prototype.slice;
+
+  arraySplice = Array.prototype.splice;
+
+  throwMissing = function(instance, message) {
+    throw "" + instance.constructor.name + ": " + message + " is missing";
+  };
+
+  throwUnexpected = function(instance, message) {
+    throw "" + instance.constructor.name + ": " + message + " is unexpected";
+  };
+
+  legacyWarning = function(identifier, last_version, message) {
+    var _base;
+    kb._legacy_warnings || (kb._legacy_warnings = {});
+    (_base = kb._legacy_warnings)[identifier] || (_base[identifier] = 0);
+    kb._legacy_warnings[identifier]++;
+    return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".");
+  };
+
+  kb.removeNode = ko.removeNode;
+
+  kb.releaseOnRemoveNode = function(view_model, node) {
+    view_model || throwUnexpected(this, 'missing view model');
+    node || throwUnexpected(this, 'missing node');
+    return ko.utils.domNodeDisposal.addDisposeCallback(node, function() {
+      return kb.release(view_model);
+    });
+  };
+
+  kb.applyBindings = function(view_model, node, skip_auto) {
+    ko.applyBindings(view_model, node);
+    if ((arguments.length === 2) || !skip_auto) {
+      return kb.releaseOnRemoveNode(view_model, node);
+    }
+  };
 
   kb.releaseKeys = function(obj) {
     var key, value;
@@ -99,25 +134,7 @@
     }
   };
 
-  arraySlice = Array.prototype.slice;
-
-  arraySplice = Array.prototype.splice;
-
-  throwMissing = function(instance, message) {
-    throw "" + instance.constructor.name + ": " + message + " is missing";
-  };
-
-  throwUnexpected = function(instance, message) {
-    throw "" + instance.constructor.name + ": " + message + " is unexpected";
-  };
-
-  legacyWarning = function(identifier, last_version, message) {
-    var _base;
-    kb._legacy_warnings || (kb._legacy_warnings = {});
-    (_base = kb._legacy_warnings)[identifier] || (_base[identifier] = 0);
-    kb._legacy_warnings[identifier]++;
-    return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".");
-  };
+  kb.locale_manager = void 0;
 
   /*
     knockback_utils.js
@@ -460,14 +477,13 @@
           _ref = this.objects;
           for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
             test = _ref[index];
-            if (!(observable = this.observables[index])) {
-              continue;
-            }
-            if (observable.__kb_destroyed) {
-              this.observables[index] = null;
-              this.objects[index] = null;
-            } else if ((test === obj) && (observable.__kb.creator === creator)) {
-              return observable;
+            if (observable = this.observables[index]) {
+              if (observable.__kb_destroyed) {
+                this.observables[index] = null;
+                this.objects[index] = null;
+              } else if ((test === obj) && (observable.__kb.creator === creator)) {
+                return observable;
+              }
             }
           }
         }

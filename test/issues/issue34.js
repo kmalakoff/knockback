@@ -121,9 +121,9 @@ function bookVmcreate(model){
 };
 
 
-view_model = {   books: kb.collectionObservable(bs.get('books'), {
+var view_model = {   books: kb.collectionObservable(bs.get('books'), {
     view_model: bookViewModel,
-    mappings: {
+    factories: {
       'models.author.books.models': bookViewModel
     }
 }) }; // does not work when two books refer same author
