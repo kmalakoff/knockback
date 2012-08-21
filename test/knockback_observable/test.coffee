@@ -14,6 +14,8 @@ $(document).ready( ->
   )
 
   test("1. Standard use case: direct attributes with read and write", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModel = (model) ->
       @name = kb.observable(model, 'name')
       @number = kb.observable(model, {key:'number'})
@@ -40,9 +42,13 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("2. Standard use case: direct attributes with custom read and write", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModelCustom = (model) ->
       @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
       @number = kb.observable(model, {
@@ -73,9 +79,13 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("3. Read args", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     args = []
     ContactViewModelCustom = (model) ->
       @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
@@ -85,9 +95,13 @@ $(document).ready( ->
     model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
     ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("4. Standard use case: ko.dependentObservable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModel = (model) ->
       @name = kb.observable(model, {key: 'name'})
       @formatted_name = ko.dependentObservable({
@@ -111,9 +125,13 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("5. Infering observable types: the easy way", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ChildrenCollection extends kb.CollectionObservable
       constructor: (collection, options) ->
         return super(collection, {view_model: InferingViewModel, options: options}) # return the observable instead of this
@@ -178,15 +196,19 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("6. Infering observable types: the hard way", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ChildrenCollection extends kb.CollectionObservable
       constructor: (collection, options) ->
         return super(collection, {view_model: InferingViewModel, options: options}) # return the observable instead of this
 
     InferingViewModel = (model, options) ->
-      kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
+      @_auto = kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
       @maybe_null_name = kb.observable(model, 'maybe_null_name')
       @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferingViewModel, options: options})
       @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: options})
@@ -241,5 +263,7 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

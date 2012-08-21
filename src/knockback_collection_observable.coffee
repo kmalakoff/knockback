@@ -31,7 +31,6 @@
 class kb.CollectionObservable
   constructor: (collection, options) ->
     options or= {}
-    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
     observable.__kb_is_co = true # mark as a kb.CollectionObservable
     @in_edit = 0
@@ -94,6 +93,8 @@ class kb.CollectionObservable
 
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))
+
+    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
 
     return observable
 

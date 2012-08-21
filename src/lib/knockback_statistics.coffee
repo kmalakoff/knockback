@@ -13,11 +13,15 @@ kb = if not window.kb and (typeof(require) != 'undefined') then require('knockba
 class kb.Statistics
   constructor: ->
     @type_trackers = {}
+    @events = []
 
   typeTracker: (type) ->
     return @type_trackers[type] if @type_trackers.hasOwnProperty(type)
     type_tracker = []; @type_trackers[type] = type_tracker
     return type_tracker
+
+  addEvent: (obj, event_name) ->
+    @events.push({obj: obj, event_name: event_name})
 
   register: (obj) ->
     @typeTracker(obj.constructor.name).push(obj)
@@ -34,7 +38,7 @@ class kb.Statistics
     count += type_tracker.length for type, type_tracker of @type_trackers[type]
     return count
 
-  typeStatsString: (success_message) ->
+  registeredTypeStatsString: (success_message) ->
     string = ''
     for type, type_tracker of @type_trackers
       continue unless type_tracker.length

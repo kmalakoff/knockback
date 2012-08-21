@@ -20,8 +20,6 @@ class kb.ViewModel extends kb.RefCountable
     view_model or= {}
     super
 
-    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
-
     # bind and extract options
     options = _.defaults(_.clone(options), options.options) if options.options
     options = {keys: options} if _.isArray(options) 
@@ -60,6 +58,8 @@ class kb.ViewModel extends kb.RefCountable
     @_mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
     not options.mappings or @_mapObservables(model, options.mappings)
     not keys or @_createObservables(model, keys)
+
+    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
 
   releaseReferences: ->
     @__kb.references_released = true

@@ -26,6 +26,8 @@ $(document).ready( ->
       @number = kb.observable(model, 'number')
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection)
     view_model =
@@ -46,9 +48,17 @@ $(document).ready( ->
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "1 model")
     equal(view_model.count(), 1, "1 count")
+
+    # clean up
+    kb.release(collection_observable)
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       models: ContactViewModel
@@ -72,9 +82,17 @@ $(document).ready( ->
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "1 model")
     equal(view_model.count(), 1, "1 count")
+
+    # clean up
+    kb.release(collection_observable)
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Basic Usage: no view models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.ContactsCollection()
 
     collection_observable = kb.collectionObservable(collection, {models_only: true})
@@ -108,9 +126,16 @@ $(document).ready( ->
     equal(model_count, 1, "one model")
 
     ok(collection_observable.collection()==collection, "collections match")
+
+    # clean up
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Basic Usage: no sorting and no callbacks", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       factories:
@@ -144,9 +169,16 @@ $(document).ready( ->
     equal(view_model_count, 1, "one view model")
 
     ok(collection_observable.collection()==collection, "collections match")
+
+    # clean up
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sync sorting with sort_attribute", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.ContactsCollection()
     view_model_count = 0; view_model_resort_count = 0
 
@@ -195,9 +227,16 @@ $(document).ready( ->
     equal(view_model_count, 0, "no view models")
     equal(collection_observable().length, 0, "no view models")
     ok(view_model_resort_count==0, "not resorting happened because everything was inserted once") # TODO: make a rigorous check
+
+    # clean up
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sync sorting with sorted_index", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     view_model_count = 0; view_model_resort_count = 0
 
     class SortWrapper
@@ -225,6 +264,9 @@ $(document).ready( ->
     equal(collection_observable()[0].get('name'), 'George', "George is first - sorting worked!")
     equal(collection_observable()[1].get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
+    # clean up
+    kb.release(collection_observable)
+
     # with view models
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
@@ -239,9 +281,16 @@ $(document).ready( ->
     equal(collection_observable().length, 2, "two view models")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
+
+    # clean up
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sorting with callbacks", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.NameSortedContactsCollection()
     view_model_count = 0; view_model_resort_count = 0
 
@@ -288,9 +337,16 @@ $(document).ready( ->
     equal(view_model_count, 0, "no view models")
     equal(collection_observable().length, 0, "no view models")
     ok(view_model_resort_count==0, "not resorting happened because everything was inserted once") # TODO: make a rigorous check
+
+    # clean up
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sync dynamically changing the sorting function", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     collection = new _kbe.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model:       ContactViewModel
@@ -342,6 +398,11 @@ $(document).ready( ->
     collection.reset()
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
+
+    # clean up
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Nested custom view models", ->
@@ -449,13 +510,6 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(nested_view_model)
 
-    # check stats
-    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
-    kb.statistics = null # turn off stats
-  )
-
-  test("Error cases", ->
-    kb.collectionObservable(new _kbe.ContactsCollection())
-    kb.collectionObservable(new _kbe.ContactsCollection(), {})
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

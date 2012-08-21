@@ -23,6 +23,8 @@ $(document).ready( ->
   })
 
   test("Standard use case: simple events notifications", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     trigger_count = 0
 
     view_model =
@@ -47,9 +49,7 @@ $(document).ready( ->
     # KO doesn't have a dispose for ko.observable
     kb.locale_manager.setLocale('fr-FR')
     equal(trigger_count, 3, "3: no change")
-  )
 
-  test("Error cases", ->
-    # TODO
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

@@ -39,6 +39,8 @@ $(document).ready( ->
       return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
 
   test("Localized greeting", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModelGreeting = (model) ->
       @hello = kb.observable(model, {key:'hello_greeting', localizer: _kbe.LocalizedStringLocalizer})
       @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: _kbe.LocalizedStringLocalizer})
@@ -74,6 +76,8 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   # NOTE: dependency on globalize
@@ -89,6 +93,8 @@ $(document).ready( ->
       value.setTime(new_value.valueOf())
 
   test("Date and time with jquery.globalize", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModelDate = (model) ->
       @date = kb.observable(model, {key:'date', localizer: _kbe.LongDateLocalizer}, this)
       @
@@ -118,9 +124,13 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.formattedObservable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['first', 'last']})
@@ -137,9 +147,16 @@ $(document).ready( ->
     equal(view_model.full_name(), 'Last: The Starr, First: Ringo', "full name is good")
     equal(model.get('first'), 'Ringo', "first name is good")
     equal(model.get('last'), 'The Starr', "last name is good")
+
+    # clean up
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Localization with a changing key", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     # directly with the locale manager
     greeting_key = ko.observable('formal_hello')
     locale_manager_greeting = kb.observable(kb.locale_manager, {key:greeting_key})
@@ -170,8 +187,7 @@ $(document).ready( ->
     equal(view_model.greeting(), 'Goodbye darling', "en-GB: Goodbye")
     kb.locale_manager.setLocale('en')
     equal(view_model.greeting(), 'Goodbye', "en: Goodbye")
-  )
 
-  test("Error cases", ->
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

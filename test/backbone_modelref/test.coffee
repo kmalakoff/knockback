@@ -20,9 +20,11 @@ $(document).ready( ->
   })
 
   test("Standard use case: just enough to get the picture", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModel = (model) ->
       @loading_message = new _kbe.LocalizedStringLocalizer(new _kbe.LocalizedString('loading'))
-      @dynamic_observables = kb.viewModel(model, {keys: {
+      @_auto = kb.viewModel(model, {keys: {
         name:     {key:'name', default: @loading_message}
         number:   {key:'number', default: @loading_message}
         date:     {key:'date', default: @loading_message, localizer: _kbe.ShortDateLocalizer}
@@ -80,7 +82,7 @@ $(document).ready( ->
     # go back to loading state
     collection.reset()
     equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    view_model.dynamic_observables.setToDefault() # override default behavior and go back to loading state
+    view_model._auto.setToDefault() # override default behavior and go back to loading state
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
     kb.locale_manager.setLocale('en-GB')
@@ -90,9 +92,13 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Standard use case with kb.ViewModels", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number', 'date']})
@@ -148,9 +154,9 @@ $(document).ready( ->
     equal(current_date.getDate(), 10, "day is good")
 
     # go back to loading state
-    # collection.reset()
-    # equal(view_model.name(), 'Yoko', "Default is to retain the last value")
-    # kb.utils.setToDefault(view_model)
+    collection.reset()
+    equal(view_model.name(), 'Yoko', "Default is to retain the last value")
+    kb.utils.setToDefault(view_model)
     # kb.locale_manager.setLocale('en')
     # equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
     # kb.locale_manager.setLocale('en-GB')
@@ -159,6 +165,8 @@ $(document).ready( ->
     # equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
     # and cleanup after yourself when you are done.
-    # kb.release(view_model)
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

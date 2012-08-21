@@ -66,8 +66,8 @@ kb.utils.setToDefault = (obj) ->
 
   # view model
   else if _.isObject(obj)
-    for key, observable of obj
-      (kb.utils.setToDefault(observable) if observable and (key != '__kb'))
+    for key, value of obj
+      kb.utils.setToDefault(value) if value and (ko.isObservable(value) or (typeof(value) isnt 'function')) and ((key[0] isnt '_') or key.search('__kb'))
   return obj
 
 kb.utils.release = (obj, keys_only) ->

@@ -16,8 +16,4 @@ $(document).ready( ->
     kb.observables(new Backbone.Model(), ['hello'], {})
     kb.utils.release(kb.viewModel(new Backbone.Model()))
   )
-
-  test("Error cases", ->
-    # TODO
-  )
 )

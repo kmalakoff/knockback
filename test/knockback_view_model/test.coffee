@@ -16,6 +16,8 @@ $(document).ready( ->
   kb.locale_manager = new _kbe.LocaleManager('en', {})
 
   test("Standard use case: read and write", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model)
   
@@ -35,9 +37,13 @@ $(document).ready( ->
   
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("internals test (Coffeescript inheritance)", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['email', 'date']})
@@ -99,9 +105,13 @@ $(document).ready( ->
   
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("internals test (Javascript inheritance)", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModel = kb.ViewModel.extend({
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']})
@@ -165,9 +175,13 @@ $(document).ready( ->
   
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("Using Coffeescript classes", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModelCustom extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number']})
@@ -203,9 +217,13 @@ $(document).ready( ->
   
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("Using simple Javascript classes", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModelCustom = (model) ->
       view_model = kb.viewModel(model)
       view_model.formatted_name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
@@ -240,9 +258,13 @@ $(document).ready( ->
   
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("requires", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
@@ -261,9 +283,16 @@ $(document).ready( ->
     view_model.full_name('Last: The Starr, First: Ringo')
     equal(model.get('first'), 'Ringo', "first name is good")
     equal(model.get('last'), 'The Starr', "last name is good")
+
+    # clean up
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("Using kb.localizedObservable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
@@ -312,9 +341,13 @@ $(document).ready( ->
   
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("reference counting and custom __destroy (Coffeescript inheritance)", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
@@ -342,9 +375,13 @@ $(document).ready( ->
   
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
     raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("reference counting and custom __destroy (Javascript inheritance)", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModelFullName = kb.ViewModel.extend({
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {requires: ['first', 'last']})
@@ -375,6 +412,8 @@ $(document).ready( ->
   
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
     raises((->view_model.release()), null, "ViewModel: ref_count is corrupt: 1")
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Nested custom view models", ->
@@ -483,12 +522,12 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(nested_view_model)
 
-    # check stats
-    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
-    kb.statistics = null # turn off stats
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Changing attribute types", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     model = new Backbone.Model({reused: null})
     view_model = kb.viewModel(model)
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_SIMPLE, 'reused is kb.TYPE_SIMPLE')
@@ -501,6 +540,9 @@ $(document).ready( ->
 
     model.set({reused: null})
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is retains type of kb.TYPE_COLLECTION')
+
+    # clean up
+    kb.release(view_model)
 
     # add custom mapping
     view_model = kb.viewModel(model, {factories: 
@@ -516,9 +558,16 @@ $(document).ready( ->
 
     model.set({reused: null})
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused retains type of kb.TYPE_COLLECTION')
+
+    # clean up
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Prior kb.Observables functionality", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     ContactViewModel = (model) ->
       @dynamic_observables = kb.viewModel(model, {keys: {
         name:     {key: 'name'}
@@ -573,9 +622,13 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Bulk mode (array of keys)", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     model = new _kbe.Contact({name: 'John', number: '555-555-5558'})
     view_model = kb.viewModel(model, ['name', 'number'])
 
@@ -602,9 +655,7 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
-  )
 
-  test("Error cases", ->
-    # TODO
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

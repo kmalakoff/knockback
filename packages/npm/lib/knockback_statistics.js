@@ -28,6 +28,7 @@
 
     function Statistics() {
       this.type_trackers = {};
+      this.events = [];
     }
 
     Statistics.prototype.typeTracker = function(type) {
@@ -38,6 +39,13 @@
       type_tracker = [];
       this.type_trackers[type] = type_tracker;
       return type_tracker;
+    };
+
+    Statistics.prototype.addEvent = function(obj, event_name) {
+      return this.events.push({
+        obj: obj,
+        event_name: event_name
+      });
     };
 
     Statistics.prototype.register = function(obj) {
@@ -68,7 +76,7 @@
       return count;
     };
 
-    Statistics.prototype.typeStatsString = function(success_message) {
+    Statistics.prototype.registeredTypeStatsString = function(success_message) {
       var string, type, type_tracker, written, _ref;
       string = '';
       _ref = this.type_trackers;

@@ -14,6 +14,8 @@ $(document).ready( ->
   )
 
   test("Various scenarios", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
     class ContactViewModelCustom extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number']})
@@ -111,9 +113,7 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
-  )
 
-  test("Error cases", ->
-    # TODO
+    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

@@ -218,7 +218,7 @@
   };
 
   kb.utils.setToDefault = function(obj) {
-    var key, observable;
+    var key, value;
     if (!obj) {
       return;
     }
@@ -228,9 +228,9 @@
       }
     } else if (_.isObject(obj)) {
       for (key in obj) {
-        observable = obj[key];
-        if (observable && (key !== '__kb')) {
-          kb.utils.setToDefault(observable);
+        value = obj[key];
+        if (value && (ko.isObservable(value) || (typeof value !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) {
+          kb.utils.setToDefault(value);
         }
       }
     }
@@ -531,8 +531,8 @@
         observable = factory.createForPath(obj, path, this, creator);
         observable || (observable = ko.observable(null));
       }
-      if (_.indexOf(this.observables, observable) < 0) {
-        this.registerObservable(obj, observable, {
+      if (!(ko.isObservable(observable) || observable.__kb_is_co)) {
+        (_.indexOf(this.observables, observable) >= 0) || this.registerObservable(obj, observable, {
           creator: creator
         });
       }
@@ -670,6 +670,7 @@
                 if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
                   continue;
                 }
+                !kb.statistics || kb.statistics.addEvent(this.m, "event: " + event_name + " key: " + info.key);
                 info.update();
               }
             }
@@ -775,6 +776,7 @@
           return;
         }
         info.rel_fn = function() {
+          !kb.statistics || kb.statistics.addEvent(this.m, "rel_event: " + event_name + " key: " + info.key);
           return info.update();
         };
         if (relation.collectionKey) {
@@ -824,7 +826,6 @@
     function CollectionObservable(collection, options) {
       var creator, factory, observable;
       options || (options = {});
-      !kb.statistics || kb.statistics.register(this);
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true;
       this.in_edit = 0;
@@ -885,6 +886,7 @@
         });
       }
       observable.subscribe(_.bind(this._onObservableArrayChange, this));
+      !kb.statistics || kb.statistics.register(this);
       return observable;
     }
 
@@ -1754,7 +1756,6 @@
       options || (options = {});
       view_model || (view_model = {});
       ViewModel.__super__.constructor.apply(this, arguments);
-      !kb.statistics || kb.statistics.register(this);
       if (options.options) {
         options = _.defaults(_.clone(options), options.options);
       }
@@ -1806,6 +1807,7 @@
       }
       !options.mappings || this._mapObservables(model, options.mappings);
       !keys || this._createObservables(model, keys);
+      !kb.statistics || kb.statistics.register(this);
     }
 
     ViewModel.prototype.releaseReferences = function() {

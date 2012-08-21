@@ -73,8 +73,9 @@ class kb.Store
       observable = factory.createForPath(obj, path, this, creator)
       observable or= ko.observable(null) # default to null
 
-    # check if already registered
-    @registerObservable(obj, observable, {creator: creator}) if _.indexOf(@observables, observable) < 0 # not registered yet, register now
+    # check if already registered if needed
+    unless (ko.isObservable(observable) or observable.__kb_is_co)
+      (_.indexOf(@observables, observable) >= 0) or @registerObservable(obj, observable, {creator: creator}) # not registered yet, register now
     return observable
 
   releaseObservable: (observable, owns_store) ->
