@@ -90,11 +90,7 @@ function bookVmcreate(model){
         },
         model: model
     };
-    vm.authorName = ko.computed(function(){
-            var a = vm.author();
-            if(a) return a.get('name');
-            return null;
-        });
+    vm.authorName = vm.author().name
     return vm;
 };
 
