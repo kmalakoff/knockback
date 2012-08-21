@@ -18,6 +18,7 @@ kb.utils.wrappedDestroy = (obj) ->
   if __kb.observable
     __kb.observable.destroy = __kb.observable.release = null
     kb.utils.wrappedDestroy(__kb.observable)
+    __kb.observable = null
   __kb.factory = null
   __kb.model_watcher.destroy() if __kb.model_watcher_is_owned # release the model_watcher
   __kb.model_watcher = null

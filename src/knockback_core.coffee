@@ -31,18 +31,19 @@ kb.TYPE_COLLECTION = 3
 kb.release = (obj, keys_only) ->
   return false unless obj
 
-  # special case for ko.observableArray (do not notify nor tag objects)
-  releaseObservableArray = (obj) -> 
-    return false if obj.collection or not (ko.isObservable(obj) and obj.indexOf and _.isArray(array = obj()))
-    if array.length
-      view_models = array.slice(0)
-      array.splice(0, array.length)
-      kb.release(view_model) for view_model in view_models
-    return true
-
   releaseObject = (obj) -> 
-    if obj.destroy
-      obj.destroy() unless releaseObservableArray(obj)
+    if ko.isObservable(obj) and _.isArray(array = obj())
+      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
+        if obj.destroy
+          obj.destroy()
+        else if obj.dispose # we may be releasing our observable
+          obj.dispose()
+      else if array.length
+        view_models = array.slice(0)
+        array.splice(0, array.length)
+        kb.release(view_model) for view_model in view_models
+    else if obj.destroy
+      obj.destroy()
     else if obj.release
       obj.release()
     else if obj.dispose
@@ -50,14 +51,14 @@ kb.release = (obj, keys_only) ->
     return obj
 
   # known type
-  if not keys_only and (ko.isObservable(obj) or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
+  if not keys_only and (ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function'))
     releaseObject(obj)
 
   # view model
   else if _.isObject(obj) and not (typeof(obj) is 'function')
     for key, value of obj
       continue if not value or (key is '__kb')
-      continue unless ko.isObservable(value) or (typeof(value.destroy) is 'function') or (typeof(value.release) is 'function')
+      continue unless ko.isObservable(value) or (typeof(value.dispose) is 'function') or (typeof(value.destroy) is 'function') or (typeof(value.release) is 'function')
       obj[key] = null; releaseObject(value)
 
   return

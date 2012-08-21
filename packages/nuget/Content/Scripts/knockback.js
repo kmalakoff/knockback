@@ -50,30 +50,29 @@
   kb.TYPE_COLLECTION = 3;
 
   kb.release = function(obj, keys_only) {
-    var key, releaseObject, releaseObservableArray, value;
+    var key, releaseObject, value;
     if (!obj) {
       return false;
     }
-    releaseObservableArray = function(obj) {
-      var array, view_model, view_models, _i, _len;
-      if (obj.collection || !(ko.isObservable(obj) && obj.indexOf && _.isArray(array = obj()))) {
-        return false;
-      }
-      if (array.length) {
-        view_models = array.slice(0);
-        array.splice(0, array.length);
-        for (_i = 0, _len = view_models.length; _i < _len; _i++) {
-          view_model = view_models[_i];
-          kb.release(view_model);
-        }
-      }
-      return true;
-    };
     releaseObject = function(obj) {
-      if (obj.destroy) {
-        if (!releaseObservableArray(obj)) {
-          obj.destroy();
+      var array, view_model, view_models, _i, _len;
+      if (ko.isObservable(obj) && _.isArray(array = obj())) {
+        if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
+          if (obj.destroy) {
+            obj.destroy();
+          } else if (obj.dispose) {
+            obj.dispose();
+          }
+        } else if (array.length) {
+          view_models = array.slice(0);
+          array.splice(0, array.length);
+          for (_i = 0, _len = view_models.length; _i < _len; _i++) {
+            view_model = view_models[_i];
+            kb.release(view_model);
+          }
         }
+      } else if (obj.destroy) {
+        obj.destroy();
       } else if (obj.release) {
         obj.release();
       } else if (obj.dispose) {
@@ -81,7 +80,7 @@
       }
       return obj;
     };
-    if (!keys_only && (ko.isObservable(obj) || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
+    if (!keys_only && (ko.isObservable(obj) || (typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function'))) {
       releaseObject(obj);
     } else if (_.isObject(obj) && !(typeof obj === 'function')) {
       for (key in obj) {
@@ -89,7 +88,7 @@
         if (!value || (key === '__kb')) {
           continue;
         }
-        if (!(ko.isObservable(value) || (typeof value.destroy === 'function') || (typeof value.release === 'function'))) {
+        if (!(ko.isObservable(value) || (typeof value.dispose === 'function') || (typeof value.destroy === 'function') || (typeof value.release === 'function'))) {
           continue;
         }
         obj[key] = null;
@@ -144,6 +143,7 @@
     if (__kb.observable) {
       __kb.observable.destroy = __kb.observable.release = null;
       kb.utils.wrappedDestroy(__kb.observable);
+      __kb.observable = null;
     }
     __kb.factory = null;
     if (__kb.model_watcher_is_owned) {

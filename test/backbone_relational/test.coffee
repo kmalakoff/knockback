@@ -335,93 +335,6 @@ $(document).ready( ->
         equal(authored_book.editMode(), true, 'edit mode set')
   )
 
-  test("Nested custom view models", ->
-    kb.statistics = new kb.Statistics() # turn on stats
-
-    george = new Person({
-      id: 'person-3-3'
-      name: 'George'
-      friends: ['person-3-1', 'person-3-2', 'person-3-4']
-    })
-    john = new Person({
-      id: 'person-3-1'
-      name: 'John'
-      friends: ['person-3-2', 'person-3-3', 'person-3-4']
-      best_friend: george
-    })
-    george.set(best_friend: john)
-    paul = new Person({
-      id: 'person-3-2'
-      name: 'Paul'
-      friends: ['person-3-1', 'person-3-3', 'person-3-4']
-      best_friend: george
-    })
-    ringo = new Person({
-      id: 'person-3-4'
-      name: 'Ringo'
-      friends: ['person-3-1', 'person-3-2', 'person-3-3']
-    })
-
-    FriendViewModel = (model) ->
-      @name = kb.observable(model, 'name')
-      @type = ko.observable('friend')
-      @
-    BestFriendViewModel = (model) ->
-      @name = kb.observable(model, 'name')
-      @type = ko.observable('best_friend')
-      @
-    class BandMemberViewModel extends kb.ViewModel
-      constructor: (model, options) ->
-        super
-        @type = ko.observable('band_member')
-
-    collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
-      factories:
-        models: BandMemberViewModel
-        'models.best_friend': {create: (model, options) -> return if model then new BestFriendViewModel(model) else null}
-        'models.friends.models': FriendViewModel
-    })
-
-    validateFriends = (co, names) ->
-      for name in names
-        found = false
-        for vm in co()
-          if vm.name and vm.name() == name
-            found = true
-            validateFriend(vm, name)
-        ok(found, "#{name} was found")
-    validateFriend = (vm, name) ->
-      equal(vm.type(), 'friend', "friend type matches for #{name}")
-      equal(vm.name(), name, "friend name matches for #{name}")
-    validateBestFriend = (vm, name) ->
-      equal(vm.type(), 'best_friend', "best friend type matches for #{name}")
-      equal(vm.name(), name, "best friend name matches for #{name}")
-    validateBandMember = (vm, name) ->
-      equal(vm.type(), 'band_member', "band member type matches for #{name}")
-      ok(vm instanceof BandMemberViewModel, "band member type matches for #{name}")
-      equal(vm.name(), name, "band member name matches for #{name}")
-
-    validateBandMember(collection_observable()[0], 'John')
-    validateBestFriend(collection_observable()[0].best_friend(), 'George')   
-    validateFriends(collection_observable()[0].friends, ['Paul', 'George', 'Ringo'])
-    validateBandMember(collection_observable()[1], 'Paul')
-    validateBestFriend(collection_observable()[1].best_friend(), 'George')
-    validateFriends(collection_observable()[1].friends, ['John', 'George', 'Ringo'])
-    validateBandMember(collection_observable()[2], 'George')
-    validateBestFriend(collection_observable()[2].best_friend(), 'John')
-    validateFriends(collection_observable()[2].friends, ['John', 'Paul', 'Ringo'])
-    validateBandMember(collection_observable()[3], 'Ringo')
-    equal(collection_observable()[3].best_friend(), null, 'No best friend')
-    validateFriends(collection_observable()[3].friends, ['John', 'Paul', 'George'])
-
-    # and cleanup after yourself when you are done.
-    kb.release(collection_observable)
-
-    # check stats
-    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
-    kb.statistics = null # turn off stats
-  )
-
   test("6. Infering observable types: from the start", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -608,6 +521,93 @@ $(document).ready( ->
     kb.release(view_model_person2)
     kb.release(co_family)
     kb.release(view_model_house1)
+
+    # check stats
+    equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
+    kb.statistics = null # turn off stats
+  )
+
+  test("10. Nested custom view models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    george = new Person({
+      id: 'person-10-3'
+      name: 'George'
+      friends: ['person-10-1', 'person-10-2', 'person-10-4']
+    })
+    john = new Person({
+      id: 'person-10-1'
+      name: 'John'
+      friends: ['person-10-2', 'person-10-3', 'person-10-4']
+      best_friend: george
+    })
+    george.set(best_friend: john)
+    paul = new Person({
+      id: 'person-10-2'
+      name: 'Paul'
+      friends: ['person-10-1', 'person-10-3', 'person-10-4']
+      best_friend: george
+    })
+    ringo = new Person({
+      id: 'person-10-4'
+      name: 'Ringo'
+      friends: ['person-10-1', 'person-10-2', 'person-10-3']
+    })
+
+    FriendViewModel = (model) ->
+      @name = kb.observable(model, 'name')
+      @type = ko.observable('friend')
+      @
+    BestFriendViewModel = (model) ->
+      @name = kb.observable(model, 'name')
+      @type = ko.observable('best_friend')
+      @
+    class BandMemberViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super
+        @type = ko.observable('band_member')
+
+    collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
+      factories:
+        models: BandMemberViewModel
+        'models.best_friend': {create: (model, options) -> return if model then new BestFriendViewModel(model) else null}
+        'models.friends.models': FriendViewModel
+    })
+
+    validateFriends = (co, names) ->
+      for name in names
+        found = false
+        for vm in co()
+          if vm.name and vm.name() == name
+            found = true
+            validateFriend(vm, name)
+        ok(found, "#{name} was found")
+    validateFriend = (vm, name) ->
+      equal(vm.type(), 'friend', "friend type matches for #{name}")
+      equal(vm.name(), name, "friend name matches for #{name}")
+    validateBestFriend = (vm, name) ->
+      equal(vm.type(), 'best_friend', "best friend type matches for #{name}")
+      equal(vm.name(), name, "best friend name matches for #{name}")
+    validateBandMember = (vm, name) ->
+      equal(vm.type(), 'band_member', "band member type matches for #{name}")
+      ok(vm instanceof BandMemberViewModel, "band member type matches for #{name}")
+      equal(vm.name(), name, "band member name matches for #{name}")
+
+    validateBandMember(collection_observable()[0], 'John')
+    validateBestFriend(collection_observable()[0].best_friend(), 'George')   
+    validateFriends(collection_observable()[0].friends, ['Paul', 'George', 'Ringo'])
+    validateBandMember(collection_observable()[1], 'Paul')
+    validateBestFriend(collection_observable()[1].best_friend(), 'George')
+    validateFriends(collection_observable()[1].friends, ['John', 'George', 'Ringo'])
+    validateBandMember(collection_observable()[2], 'George')
+    validateBestFriend(collection_observable()[2].best_friend(), 'John')
+    validateFriends(collection_observable()[2].friends, ['John', 'Paul', 'Ringo'])
+    validateBandMember(collection_observable()[3], 'Ringo')
+    equal(collection_observable()[3].best_friend(), null, 'No best friend')
+    validateFriends(collection_observable()[3].friends, ['John', 'Paul', 'George'])
+
+    # and cleanup after yourself when you are done.
+    kb.release(collection_observable)
 
     # check stats
     equal(kb.statistics.typeStatsString('all released'), 'all released', "Cleanup: stats")
