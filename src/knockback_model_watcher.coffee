@@ -15,6 +15,8 @@
 ####################################################
 
 # @m is @model
+addStatisticsEvent = (model, event_name, info) ->
+  not kb.statistics or kb.statistics.addEvent({model: model, event: event_name, key: info.key, path: info.path})
 
 class kb.ModelWatcher
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
@@ -70,10 +72,10 @@ class kb.ModelWatcher
       (info.model(new_model) if info.model) for info in list
     return new_model
   
-  registerCallbacks: (obj, options) ->
+  registerCallbacks: (obj, callback_info) ->
     obj or throwMissing(this, 'obj')
-    options or throwMissing(this, 'options')
-    event_name = if options.event_name then options.event_name else 'change'
+    callback_info or throwMissing(this, 'info')
+    event_name = if callback_info.event_name then callback_info.event_name else 'change'
     callbacks = @__kb.callbacks[event_name]
 
     # register new
@@ -83,13 +85,13 @@ class kb.ModelWatcher
         list: list
         fn: (model) -> 
           for info in list
-            if info.update
+            if info.update and not info.rel_fn
             
               # key doesn't match
               continue if model and info.key and (model.hasChanged and not model.hasChanged(ko.utils.unwrapObservable(info.key)))
 
               # trigger update
-              not kb.statistics or kb.statistics.addEvent(@m, "event: #{event_name} key: #{info.key}")
+              not kb.statistics or addStatisticsEvent(model, "event: #{event_name}", info)
               info.update()
 
           return null
@@ -98,11 +100,7 @@ class kb.ModelWatcher
       @m.bind(event_name, callbacks.fn) if @m # register for the new event type
 
     # add the callback information
-    info = {}
-    info.obj = obj
-    info.model = options.model
-    info.update = options.update
-    info.key = options.key
+    info = _.defaults({obj: obj}, callback_info)
     callbacks.list.push(info)
 
     if @m # loaded
@@ -163,8 +161,8 @@ class kb.ModelWatcher
       key = ko.utils.unwrapObservable(info.key)
       relation = _.find(@m.getRelations(), (test) -> return test.key is key)
       return unless relation
-      info.rel_fn = -> 
-        not kb.statistics or kb.statistics.addEvent(@m, "rel_event: #{event_name} key: #{info.key}")
+      info.rel_fn = (model) ->
+        not kb.statistics or addStatisticsEvent(model, "rel_event: #{event_name}", info)
         info.update()
       if relation.collectionKey
         info.is_collection = true

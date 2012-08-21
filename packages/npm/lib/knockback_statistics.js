@@ -41,11 +41,8 @@
       return type_tracker;
     };
 
-    Statistics.prototype.addEvent = function(obj, event_name) {
-      return this.events.push({
-        obj: obj,
-        event_name: event_name
-      });
+    Statistics.prototype.addEvent = function(event) {
+      return this.events.push(event);
     };
 
     Statistics.prototype.register = function(obj) {

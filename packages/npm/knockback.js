@@ -12,7 +12,7 @@
 
 
 (function() {
-  var Backbone, Knockback, argumentsAddKey, arraySlice, arraySplice, kb, ko, legacyWarning, throwMissing, throwUnexpected, wrappedKey, _,
+  var Backbone, Knockback, addStatisticsEvent, argumentsAddKey, arraySlice, arraySplice, kb, ko, legacyWarning, throwMissing, throwUnexpected, wrappedKey, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -572,6 +572,15 @@
   */
 
 
+  addStatisticsEvent = function(model, event_name, info) {
+    return !kb.statistics || kb.statistics.addEvent({
+      model: model,
+      event: event_name,
+      key: info.key,
+      path: info.path
+    });
+  };
+
   kb.ModelWatcher = (function() {
 
     ModelWatcher.useOptionsOrCreate = function(options, model, obj, callback_options) {
@@ -652,11 +661,11 @@
       return new_model;
     };
 
-    ModelWatcher.prototype.registerCallbacks = function(obj, options) {
+    ModelWatcher.prototype.registerCallbacks = function(obj, callback_info) {
       var callbacks, event_name, info, list;
       obj || throwMissing(this, 'obj');
-      options || throwMissing(this, 'options');
-      event_name = options.event_name ? options.event_name : 'change';
+      callback_info || throwMissing(this, 'info');
+      event_name = callback_info.event_name ? callback_info.event_name : 'change';
       callbacks = this.__kb.callbacks[event_name];
       if (!callbacks) {
         list = [];
@@ -666,11 +675,11 @@
             var info, _i, _len;
             for (_i = 0, _len = list.length; _i < _len; _i++) {
               info = list[_i];
-              if (info.update) {
+              if (info.update && !info.rel_fn) {
                 if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
                   continue;
                 }
-                !kb.statistics || kb.statistics.addEvent(this.m, "event: " + event_name + " key: " + info.key);
+                !kb.statistics || addStatisticsEvent(model, "event: " + event_name, info);
                 info.update();
               }
             }
@@ -682,11 +691,9 @@
           this.m.bind(event_name, callbacks.fn);
         }
       }
-      info = {};
-      info.obj = obj;
-      info.model = options.model;
-      info.update = options.update;
-      info.key = options.key;
+      info = _.defaults({
+        obj: obj
+      }, callback_info);
       callbacks.list.push(info);
       if (this.m) {
         if (Backbone.RelationalModel && (this.m instanceof Backbone.RelationalModel)) {
@@ -775,8 +782,8 @@
         if (!relation) {
           return;
         }
-        info.rel_fn = function() {
-          !kb.statistics || kb.statistics.addEvent(this.m, "rel_event: " + event_name + " key: " + info.key);
+        info.rel_fn = function(model) {
+          !kb.statistics || addStatisticsEvent(model, "rel_event: " + event_name, info);
           return info.update();
         };
         if (relation.collectionKey) {
@@ -1562,7 +1569,8 @@
       kb.ModelWatcher.useOptionsOrCreate(options, model, this, {
         model: _.bind(this.model, this),
         update: _.bind(this.update, this),
-        key: this.key
+        key: this.key,
+        path: this.path
       });
       if (options.localizer) {
         observable = new options.localizer(observable);

@@ -68,7 +68,7 @@ class kb.Observable
     observable.destroy = _.bind(@destroy, @)
 
     # use external model observable or create
-    kb.ModelWatcher.useOptionsOrCreate(options, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key})
+    kb.ModelWatcher.useOptionsOrCreate(options, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: @path})
 
     # wrap ourselves with a localizer
     if options.localizer

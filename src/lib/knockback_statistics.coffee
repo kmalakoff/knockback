@@ -20,8 +20,8 @@ class kb.Statistics
     type_tracker = []; @type_trackers[type] = type_tracker
     return type_tracker
 
-  addEvent: (obj, event_name) ->
-    @events.push({obj: obj, event_name: event_name})
+  addEvent: (event) ->
+    @events.push(event)
 
   register: (obj) ->
     @typeTracker(obj.constructor.name).push(obj)
