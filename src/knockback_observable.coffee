@@ -13,13 +13,18 @@ class kb.Observable
     options or throwMissing(this, 'options')
     @vm or = {}
 
+    # copy create options
+    if _.isString(options) or ko.isObservable(options)
+      c_options = @c_options = {key: options}
+    else
+      c_options = @c_options = _.clone(options)
+      (_.defaults(c_options, c_options.options); delete c_options.options) if c_options.options
+
     # extract options
-    (options = _.defaults(_.clone(options), options.options); delete options.options) if options.options
-    @key = if _.isString(options) or ko.isObservable(options) then options else options.key
-    @key or throwMissing(this, 'key')
-    @args = options.args
-    @read = options.read
-    @write = options.write
+    @key = c_options.key; delete c_options.key; @key or throwMissing(this, 'key')    
+    not c_options.args or (@args = c_options.args; delete c_options.args)
+    not c_options.read or (@read = c_options.read; delete c_options.read)
+    not c_options.write or (@write = c_options.write; delete c_options.write)
 
     # set up basics
     @vo = ko.observable(null) # create a value observable for the first dependency
@@ -55,35 +60,48 @@ class kb.Observable
       owner: @vm
     ))
     observable.__kb_is_o = true # mark as a kb.Observable
-    kb.utils.wrappedStore(observable, options.store)
-    @path = kb.utils.pathJoin(options.path, @key)
-    if options.factories and ((typeof(options.factories) == 'function') or options.factories.create)
-      factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
-      factory.addPathMapping(@path, options.factories)
+    c_options.store = kb.utils.wrappedStore(observable, c_options.store)
+    c_options.path = kb.utils.pathJoin(c_options.path, @key)
+    if c_options.factories and ((typeof(c_options.factories) == 'function') or c_options.factories.create)
+      c_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(c_options.factory))
+      c_options.factory.addPathMapping(c_options.path, c_options.factories)
     else
-      kb.Factory.useOptionsOrCreate(options, observable, @path)
+      c_options.factory = kb.Factory.useOptionsOrCreate(c_options, observable, c_options.path)
+    delete c_options.factories
 
     # publish public interface on the observable and return instead of this
+    observable.value = _.bind(@value, @)
     observable.valueType = _.bind(@valueType, @)
     observable.destroy = _.bind(@destroy, @)
 
     # use external model observable or create
-    kb.ModelWatcher.useOptionsOrCreate(options, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: @path})
+    kb.ModelWatcher.useOptionsOrCreate(c_options, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: c_options.path})
 
     # wrap ourselves with a localizer
-    if options.localizer
-      observable = new options.localizer(observable)
+    if c_options.localizer
+      observable = new c_options.localizer(observable)
+      delete c_options.localizer
 
     # wrap ourselves with a default value
-    if options.hasOwnProperty('default')
-      observable = kb.defaultWrapper(observable, options.default)
+    if c_options.hasOwnProperty('default')
+      observable = kb.defaultWrapper(observable, c_options.default)
+      delete c_options.default
 
     return observable
 
   destroy: ->
-    @vm = null # TODO: clear?
-    kb.release(@value); @value = null # TODO: can remove this?
+    kb.release(@__kb_value); @__kb_value = null
+    @vm = null
+    @c_options = null
     kb.utils.wrappedDestroy(@)
+
+  value: -> 
+    return @__kb_value
+
+  valueType: ->
+    new_value = if @m then @m.get(@key) else null
+    @value_type or @_updateValueObservable(new_value) # create so we can check the type
+    return @value_type
 
   model: (new_model) ->
     # get or no change
@@ -94,13 +112,20 @@ class kb.Observable
     value = @vo()
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
     new_value or= null # ensure null instead of undefined
+
     new_type = kb.utils.valueType(new_value)
 
     # create or change in type
-    if _.isUndefined(@value_type) or (@value_type isnt new_type and new_type isnt kb.TYPE_UNKNOWN)
-      @_updateValueObservable(new_value) # create new
+    if _.isUndefined(@value_type) or (@value_type isnt new_type and new_type isnt KB_TYPE_UNKNOWN)
 
-    else if @value_type == kb.TYPE_MODEL
+      # set the collection array
+      if (@value_type is KB_TYPE_COLLECTION) and (new_type == KB_TYPE_ARRAY)
+        value(new_value)
+
+      else
+        @_updateValueObservable(new_value) # create new
+
+    else if @value_type == KB_TYPE_MODEL
       # use the get/set methods
       if typeof(value.model) is 'function'
         value.model(new_value) if value.model() isnt new_value # different so update
@@ -109,53 +134,59 @@ class kb.Observable
       else if kb.utils.wrappedObject(value) isnt new_value
         @_updateValueObservable(new_value) # create new
 
-    else if @value_type == kb.TYPE_COLLECTION
+    else if @value_type == KB_TYPE_COLLECTION
       value.collection(new_value) if value.collection() isnt new_value # different so update
 
     else # a simple observable
       value(new_value) if value() isnt new_value # different so update
 
-  valueType: ->
-    new_value = if @m then @m.get(@key) else null
-    @value_type or @_updateValueObservable(new_value) # create so we can check the type
-    return @value_type
-
   ####################################################
   # Internal
   ####################################################
   _updateValueObservable: (new_value) ->
-    observable = kb.utils.wrappedObservable(@)
-    store = kb.utils.wrappedStore(observable)
-    factory = kb.utils.wrappedFactory(observable)
-    creator = factory.creatorForPath(new_value, @path)
+    c_options = @c_options
+    c_options.creator = kb.utils.inferCreator(new_value, c_options.factory, c_options.path, @m, @key)
+    @value_type = KB_TYPE_UNKNOWN
+    creator = c_options.creator
 
-    # infer Backbone.Relational types
-    if not creator and @m and Backbone.RelationalModel and (@m instanceof Backbone.RelationalModel)
-      key = ko.utils.unwrapObservable(@key)
-      relation = _.find(@m.getRelations(), (test) -> return test.key is key)
-      (creator = if relation.collectionKey then kb.CollectionObservable else kb.ViewModel) if relation
+    # found a creator
+    if creator
+      # have the store create
+      if c_options.store
+        value = c_options.store.findOrCreateObservable(new_value, c_options)
 
-    # create and store
-    if store
-      value = store.findOrCreateObservable(new_value, @path, factory, creator)
-    else if creator
-      value = factory.createForPath(new_value, @path, store, creator)
+      # create manually
+      else 
+        if creator.models_only
+          value = new_value
+          @value_type = KB_TYPE_SIMPLE
+        else if creator.create
+          value = creator.create(new_value, c_options)
+        else
+          value = new creator(new_value, c_options)
+
+    # create and cache the type
     else
-      value = ko.observable(new_value)
+      @value_type = KB_TYPE_SIMPLE
+      if _.isArray(new_value)
+        value = ko.observableArray(new_value)
+      else
+        value = ko.observable(new_value)
 
-    # cache the type
-    if not ko.isObservable(value) # a view model, recognize view_models as non-observable
-      @value_type = kb.TYPE_MODEL
-      if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
-        kb.utils.wrappedObject(value, new_value)
-    else if value.__kb_is_co
-      @value_type = kb.TYPE_COLLECTION
-    else
-      @value_type = kb.TYPE_SIMPLE
+    # determine the type
+    if @value_type is KB_TYPE_UNKNOWN   
+      if not ko.isObservable(value) # a view model, recognize view_models as non-observable
+        @value_type = KB_TYPE_MODEL
+        if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
+          kb.utils.wrappedObject(value, new_value)
+      else if value.__kb_is_co
+        @value_type = KB_TYPE_COLLECTION
+      else
+        @value_type = KB_TYPE_SIMPLE
 
     # set the value
-    previous_value = @value; @value = value
+    previous_value = @__kb_value; @__kb_value = value
     kb.release(previous_value) if previous_value # release previous
     @vo(value)
 
-kb.observable = (model, key, options) -> new kb.Observable(model, key, options)
+kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)

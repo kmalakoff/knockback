@@ -21,10 +21,11 @@ kb.VERSION = '0.16.0beta2'
 ####################################
 # OBSERVABLE STORAGE TYPES
 ####################################
-kb.TYPE_UNKNOWN = 0
-kb.TYPE_SIMPLE = 1
-kb.TYPE_MODEL = 2
-kb.TYPE_COLLECTION = 3
+KB_TYPE_UNKNOWN = 0
+KB_TYPE_SIMPLE = 1
+KB_TYPE_ARRAY = 2
+KB_TYPE_MODEL = 3
+KB_TYPE_COLLECTION = 4
 
 ####################################
 # HELPERS
@@ -67,7 +68,7 @@ kb.release = (obj, preRelease) ->
   # observable or lifecycle managed
   if ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
     if ko.isObservable(obj) and _.isArray(array = obj())
-      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
+      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is KB_TYPE_COLLECTION))
         if obj.destroy
           obj.destroy()
         else if obj.dispose # we may be releasing our observable

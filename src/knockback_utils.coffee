@@ -75,14 +75,38 @@ kb.utils.release = (obj) ->
   return kb.release(obj)
 
 kb.utils.valueType = (observable) ->
-  return kb.TYPE_UNKNOWN        unless observable 
+  return KB_TYPE_UNKNOWN        unless observable 
   return observable.valueType() if observable.__kb_is_o
-  return kb.TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof Backbone.Collection)
-  return kb.TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof Backbone.Model)
-  return kb.TYPE_SIMPLE
+  return KB_TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof Backbone.Collection)
+  return KB_TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof Backbone.Model)
+  return KB_TYPE_ARRAY          if _.isArray(observable)
+  return KB_TYPE_SIMPLE
 
 kb.utils.pathJoin = (path1, path2) ->
   return (if path1 then (if path1[path1.length-1] isnt '.' then "#{path1}." else path1) else '') + path2
 
 kb.utils.optionsPathJoin = (options, path) ->
   return _.defaults({path: kb.utils.pathJoin(options.path, path)}, options)
+
+kb.utils.inferCreator = (value, factory, path, owner, key) ->
+  creator = factory.creatorForPath(value, path) if factory
+  return creator if creator
+
+  # infer Backbone.Relational types
+  if owner and Backbone.RelationalModel and (owner instanceof Backbone.RelationalModel)
+    key = ko.utils.unwrapObservable(key)
+    relation = _.find(owner.getRelations(), (test) -> return test.key is key)
+    if relation
+      return if (relation.collectionType or _.isArray(relation.keyContents)) then kb.CollectionObservable else kb.ViewModel
+
+  # try fallbacks
+  return null                         unless value
+  return kb.ViewModel                 if value instanceof Backbone.Model
+  return kb.CollectionObservable      if value instanceof Backbone.Collection
+  return null
+
+kb.utils.createDefaultObservable = (obj, options) ->
+  return kb.viewModel(obj, options)                   if obj instanceof Backbone.Model
+  return kb.collectionObservable(obj, options)        if obj instanceof Backbone.Collection
+  return ko.observableArray(obj)                      if _.isArray(obj)
+  return ko.observable(obj)

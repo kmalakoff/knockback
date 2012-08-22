@@ -164,7 +164,7 @@ class kb.ModelWatcher
       info.rel_fn = (model) ->
         not kb.statistics or addStatisticsEvent(model, "rel_event: #{event_name}", info)
         info.update()
-      if relation.collectionKey
+      if relation.collectionType or _.isArray(relation.keyContents)
         info.is_collection = true
         @m.bind("add:#{info.key}", info.rel_fn) 
         @m.bind("remove:#{info.key}", info.rel_fn) 

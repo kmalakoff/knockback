@@ -34,6 +34,21 @@ module.exports =
         'cp lib/knockback_statistics.js packages/nuget/Content/Scripts/lib/knockback_statistics.js'
       ]
 
+  test_example_app:
+    join: 'app.js'
+    output: '../public/js'
+    directories: 'examples/app'
+    _build:
+      commands: [
+        'cp jquery examples/public/vendor/js/jquery.js'
+        'cp underscore examples/public/vendor/js/underscore-latest.js'
+        'cp backbone examples/public/vendor/js/backbone-latest.js'
+        'cp backbone-modelref examples/public/vendor/js/backbone-modelref-latest.js'
+        'cp backbone-relational examples/public/vendor/js/backbone-relational-latest.js'
+        'cp knockout-client/knockout.debug.js examples/public/vendor/js/knockout-latest.js'
+        'cp knockback.js examples/public/vendor/js/knockback.js'
+      ]
+
   test_examples:
     join: '_examples.js'
     output: 'test/_examples/build'

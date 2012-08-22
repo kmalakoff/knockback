@@ -28,7 +28,8 @@
     "backbone-relational": ">=0.6.0",
     "backbone-modelref": ">=0.1.2",
     "knockout": ">=2.1.0",
-    "knockout-client": ">=2.1.0"
+    "knockout-client": ">=2.1.0",
+    "jquery": ">=1.7.3"
   },
 
   "version"       : "0.16.0beta2"

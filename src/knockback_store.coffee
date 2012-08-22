@@ -43,33 +43,45 @@ class kb.Store
     else if (options.path and options.factory)
       observable.__kb.creator = options.factory.creatorForPath(obj, options.path)  # save the creator to mark the source of the observable
 
-  findOrCreateObservable: (obj, path, factory, creator) ->
-    if not factory
-      observable = (if creator then creator else kb.Factory.createDefault)(obj, {path: path, store: this, creator: creator})
+  findObservable: (obj, creator) ->
+    if (obj instanceof Backbone.Model)
+      for test, index in @objects
+        if observable = @observables[index]
+
+          # already released, release our references
+          if observable.__kb_destroyed
+            @observables[index] = null
+            @objects[index] = null
+
+          # a match, share this
+          else if (test is obj) and (observable.__kb.creator is creator)
+            return observable
+    return null
+
+  findOrCreateObservable: (obj, options) ->
+    options.store = this
+    options.creator or (options.creator = kb.utils.inferCreator(obj, options.factory, options.path))
+    options.creator = kv.ViewModel if not options.creator and (obj instanceof Backbone.Model)
+    creator = options.creator
+
+    # no creator, create default and don't store
+    if not creator 
+      return kb.utils.createDefaultObservable(obj, options)
+    else if creator.models_only
+      return obj
+
+    # found existing
+    observable = @findObservable(obj, creator)
+    return observable if observable
+
+    # create
+    if creator.create
+      observable = creator.create(obj, options)
     else
-      creator or= factory.creatorForPath(obj, path)
-      return ko.observable(obj) unless creator
-      return obj if creator.models_only  # do not create an observable
+      observable = new creator(obj, options)
+    observable or= ko.observable(null) # default to null
 
-      # check for an existing one of the correct type
-      if obj and not (obj instanceof Backbone.Collection) # don't share collection observables
-        for test, index in @objects
-          if observable = @observables[index]
-
-            # already released, release our references
-            if observable.__kb_destroyed
-              @observables[index] = null
-              @objects[index] = null
-
-            # a match, share this
-            else if (test is obj) and (observable.__kb.creator is creator)
-              return observable
-
-      # create
-      observable = factory.createForPath(obj, path, this, creator)
-      observable or= ko.observable(null) # default to null
-
-    # check if already registered if needed
-    unless (ko.isObservable(observable) or observable.__kb_is_co)
-      (_.indexOf(@observables, observable) >= 0) or @registerObservable(obj, observable, {creator: creator}) # not registered yet, register now
+    # for view models, check if already stored
+    unless ko.isObservable(observable)
+      (_.indexOf(@observables, observable) >= 0) or @registerObservable(obj, observable, options) # not registered yet, register now
     return observable

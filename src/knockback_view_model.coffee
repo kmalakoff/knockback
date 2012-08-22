@@ -9,9 +9,9 @@
 ####################################################
 # options
 #   * internals - an array of atttributes that should be scoped with an underscore, eg. name -> _name
-#       internals can be used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
 #   * requires - an array of atttributes that should be stubbed out if they don't exist on the model
-#       used to ensure a required attribute observable exists for later use, eg. for a lazy loaded model
+#   * keys - only include the provided keys on the model
+#   * excludes - keys to exclude on the view model; for exmaple, if you want to provide a custom implementation
 ####################################################
 
 class kb.ViewModel
@@ -28,7 +28,8 @@ class kb.ViewModel
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
-    @__kb.internals = options.internals
+    not options.internals or @__kb.internals = options.internals
+    not options.excludes or @__kb.excludes = options.excludes
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
@@ -51,6 +52,7 @@ class kb.ViewModel
         @__kb.keys = _.keys(mapped_keys)
     else
       bb_model = model_watcher.model(); keys = _.keys(bb_model.attributes) if bb_model and bb_model.attributes
+    keys = _.difference(keys, @__kb.excludes) if keys and @__kb.excludes  # remove excludes
     (keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals) if @__kb.internals
     (keys = if keys then _.union(keys, options.requires) else options.requires) if options.requires and _.isArray(options.requires)
 
@@ -91,7 +93,7 @@ class kb.ViewModel
     @
 
   _createObservables: (model, keys) ->
-    observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
+    c_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for key in keys
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
       continue if @[vm_key] # already exists, skip
@@ -100,12 +102,12 @@ class kb.ViewModel
       @__kb.vm_keys[vm_key]=true; @__kb.model_keys[key]=true 
 
       # create
-      observable_options.key = key
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, observable_options, @)
+      c_options.key = key
+      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, c_options, @)
     @
 
   _mapObservables: (model, mappings) ->
-    observable_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
+    c_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)
@@ -115,7 +117,7 @@ class kb.ViewModel
       @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true 
 
       # create
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, observable_options), @)
+      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, c_options), @)
     @
 
 # factory function
