@@ -39,15 +39,15 @@
 
   kb.VERSION = '0.16.0beta2';
 
-  KB_TYPE_UNKNOWN = 0;
+  kb.TYPE_UNKNOWN = KB_TYPE_UNKNOWN = 0;
 
-  KB_TYPE_SIMPLE = 1;
+  kb.TYPE_SIMPLE = KB_TYPE_SIMPLE = 1;
 
-  KB_TYPE_ARRAY = 2;
+  kb.TYPE_ARRAY = KB_TYPE_ARRAY = 2;
 
-  KB_TYPE_MODEL = 3;
+  kb.TYPE_MODEL = KB_TYPE_MODEL = 3;
 
-  KB_TYPE_COLLECTION = 4;
+  kb.TYPE_COLLECTION = KB_TYPE_COLLECTION = 4;
 
   arraySlice = Array.prototype.slice;
 

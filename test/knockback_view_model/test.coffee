@@ -549,16 +549,16 @@ $(document).ready( ->
 
     model = new Backbone.Model({reused: null})
     view_model = kb.viewModel(model)
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_SIMPLE, 'reused is KB_TYPE_SIMPLE')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_SIMPLE, 'reused is kb.TYPE_SIMPLE')
 
     model.set({reused: new Backbone.Model()})
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_MODEL, 'reused is KB_TYPE_MODEL')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
     model.set({reused: new Backbone.Collection()})
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_COLLECTION, 'reused is KB_TYPE_COLLECTION')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
 
     model.set({reused: null})
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_COLLECTION, 'reused is retains type of KB_TYPE_COLLECTION')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is retains type of kb.TYPE_COLLECTION')
 
     # clean up
     kb.release(view_model)
@@ -567,16 +567,16 @@ $(document).ready( ->
     view_model = kb.viewModel(model, {factories: 
       reused: (obj, options) -> return if obj instanceof Backbone.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
     })
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_MODEL, 'reused is KB_TYPE_MODEL')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
     model.set({reused: new Backbone.Model()})
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_MODEL, 'reused is KB_TYPE_MODEL')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
     model.set({reused: new Backbone.Collection()})
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_COLLECTION, 'reused is KB_TYPE_COLLECTION')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
 
     model.set({reused: null})
-    equal(kb.utils.valueType(view_model.reused), KB_TYPE_COLLECTION, 'reused retains type of KB_TYPE_COLLECTION')
+    equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused retains type of kb.TYPE_COLLECTION')
 
     # clean up
     kb.release(view_model)

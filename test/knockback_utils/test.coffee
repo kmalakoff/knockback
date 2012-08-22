@@ -70,24 +70,24 @@ $(document).ready( ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     co = kb.collectionObservable(new Backbone.Collection())
-    equal(kb.utils.valueType(co), KB_TYPE_COLLECTION, "kb.CollectionObservable is a collection type")
+    equal(kb.utils.valueType(co), kb.TYPE_COLLECTION, "kb.CollectionObservable is a collection type")
     kb.release(co) # clean up
 
     o = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
-    equal(kb.utils.valueType(o), KB_TYPE_SIMPLE, "kb.Observable is a KB_TYPE_SIMPLE")
+    equal(kb.utils.valueType(o), kb.TYPE_SIMPLE, "kb.Observable is a kb.TYPE_SIMPLE")
     kb.release(o) # clean up
 
     model = new Backbone.Model({simple_type: 3, model_type: new Backbone.Model(), collection_type: new Backbone.Collection})
     view_model = kb.viewModel(model)
 
-    equal(kb.utils.valueType(view_model.simple_type), KB_TYPE_SIMPLE, "simple is KB_TYPE_SIMPLE")
-    equal(kb.utils.valueType(view_model.model_type), KB_TYPE_MODEL, "model is KB_TYPE_MODEL")
-    equal(kb.utils.valueType(view_model.collection_type), KB_TYPE_COLLECTION, "collection is KB_TYPE_COLLECTION")
+    equal(kb.utils.valueType(view_model.simple_type), kb.TYPE_SIMPLE, "simple is kb.TYPE_SIMPLE")
+    equal(kb.utils.valueType(view_model.model_type), kb.TYPE_MODEL, "model is kb.TYPE_MODEL")
+    equal(kb.utils.valueType(view_model.collection_type), kb.TYPE_COLLECTION, "collection is kb.TYPE_COLLECTION")
     kb.release(view_model) # clean up
 
     view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: model_attr: kb.ViewModel})
-    equal(kb.utils.valueType(view_model.simple_attr), KB_TYPE_SIMPLE, 'simple_attr is KB_TYPE_SIMPLE')
-    equal(kb.utils.valueType(view_model.model_attr), KB_TYPE_MODEL, 'model_attr is KB_TYPE_MODEL')
+    equal(kb.utils.valueType(view_model.simple_attr), kb.TYPE_SIMPLE, 'simple_attr is kb.TYPE_SIMPLE')
+    equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL')
     kb.release(view_model) # clean up
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
