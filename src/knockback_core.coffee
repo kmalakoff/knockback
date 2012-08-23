@@ -61,7 +61,14 @@ kb.releaseKeys = (obj) ->
   return
 
 kb.release = (obj, preRelease) ->
-  return if not obj or not _.isObject(obj) or obj.__kb_destroyed or (typeof(obj) is 'function' and not ko.isObservable(obj))
+  if (
+    (not obj or not _.isObject(obj)) or # must be an object
+    obj.__kb_destroyed or # already destroyed
+    (typeof(obj) is 'function' and not ko.isObservable(obj)) or # not a simple function 
+    ((obj instanceof Backbone.Model) or (obj instanceof Backbone.Collection)) # not a model or collection
+  )
+    return
+
   obj.__kb_destroyed = true
   not preRelease or preRelease()
 

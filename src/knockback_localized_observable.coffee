@@ -77,9 +77,10 @@ class kb.LocalizedObservable
     kb.utils.wrappedDestroy(@)
 
   resetToCurrent: ->
-    @vo(null) # force KO to think a change occurred
+    observable = kb.utils.wrappedObservable(@)
     current_value = if @value then @read(ko.utils.unwrapObservable(@value)) else null
-    kb.utils.wrappedObservable(@)(current_value)
+    return if observable() is current_value
+    observable(current_value)
 
   # dual purpose set/get
   observedValue: (value) ->

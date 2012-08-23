@@ -29,6 +29,8 @@
 ####################################################
 
 class kb.CollectionObservable
+  @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+
   constructor: (collection, options) ->
     options or= {}
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
@@ -112,7 +114,7 @@ class kb.CollectionObservable
 
   shareOptions: -> 
     observable = kb.utils.wrappedObservable(@)
-    return {store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable), path: @path}
+    return {store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable)}
 
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)

@@ -43,7 +43,6 @@ $(document).ready( ->
   Person.setup()
   Building.setup()
 
-  # REMOVE
   test("1. Model with HasMany relations: A house with multiple people living in it", ->
     kb.statistics = new kb.Statistics() # turn on stats
 

@@ -16,47 +16,52 @@ class kb.Store
       return kb.utils.wrappedStore(observable, new kb.Store())
 
   constructor: ->
-    @objects = []
     @observables = []
 
   destroy: ->
-    for index, observable of @observables
-      kb.release(observable)
-    @objects = null
+    for record in @observables
+      kb.release(record.observable)
     @observables = null
 
   registerObservable: (obj, observable, options) ->
-    return unless (obj and observable) # nothing to register
+    return unless observable # nothing to register
 
     # only store view models not basic ko.observables nor kb.CollectionObservables
     return if ko.isObservable(observable) or observable.__kb_is_co
 
-    options or= {}
-    @objects.push(obj)
+    # prepare the observable
     kb.utils.wrappedObject(observable, obj)
-    @observables.push(observable)
+    observable.__kb_null = true unless obj
 
-    # set the creator
-    observable.__kb or= {}
-    if (options.creator)
-      observable.__kb.creator = options.creator  # save the creator to mark the source of the observable
-    else if (options.path and options.factory)
-      observable.__kb.creator = options.factory.creatorForPath(obj, options.path)  # save the creator to mark the source of the observable
+    # register the observable
+    creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)
+    creator or throwUnexpected(this, 'missing creator')
+    @observables.push({obj: obj, observable: observable, creator: creator})
 
   findObservable: (obj, creator) ->
-    if (obj instanceof Backbone.Model)
-      for test, index in @objects
-        if observable = @observables[index]
+    if not obj or (obj instanceof Backbone.Model)
+      for record in @observables
+        continue unless record.observable
 
-          # already released, release our references
-          if observable.__kb_destroyed
-            @observables[index] = null
-            @objects[index] = null
+        # already released, release our references
+        if record.observable.__kb_destroyed
+          record.obj = null
+          record.observable = null
 
-          # a match, share this
-          else if (test is obj) and (observable.__kb.creator is creator)
-            return observable
+        # an object observable
+        else if obj 
+          return record.observable if not record.observable.__kb_null and (record.obj is obj) and (record.creator is creator)
+
+        # a null observable            
+        else 
+          return record.observable if record.observable.__kb_null and (record.creator is creator)
+ 
     return null
+
+  observableIsRegistered: (observable) ->
+    for record in @observables
+      return true if record.observable is observable
+    return false
 
   findOrCreateObservable: (obj, options) ->
     options.store = this
@@ -71,7 +76,7 @@ class kb.Store
       return obj
 
     # found existing
-    observable = @findObservable(obj, creator)
+    observable = @findObservable(obj, creator) if creator
     return observable if observable
 
     # create
@@ -81,7 +86,7 @@ class kb.Store
       observable = new creator(obj, options)
     observable or= ko.observable(null) # default to null
 
-    # for view models, check if already stored
-    unless ko.isObservable(observable)
-      (_.indexOf(@observables, observable) >= 0) or @registerObservable(obj, observable, options) # not registered yet, register now
+    # we only store view_models, not observables
+    if not ko.isObservable(observable)
+      @observableIsRegistered(observable) or @registerObservable(obj, observable, options) # not registered yet, register now
     return observable

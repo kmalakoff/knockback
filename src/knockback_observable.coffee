@@ -25,6 +25,8 @@ class kb.Observable
     not c_options.args or (@args = c_options.args; delete c_options.args)
     not c_options.read or (@read = c_options.read; delete c_options.read)
     not c_options.write or (@write = c_options.write; delete c_options.write)
+    model_watcher = c_options.model_watcher
+    delete c_options.model_watcher
 
     # set up basics
     @vo = ko.observable(null) # create a value observable for the first dependency
@@ -75,7 +77,8 @@ class kb.Observable
     observable.destroy = _.bind(@destroy, @)
 
     # use external model observable or create
-    kb.ModelWatcher.useOptionsOrCreate(c_options, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: c_options.path})
+    kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: c_options.path})
+    @__kb_value or @update() # wasn't loaded so create
 
     # wrap ourselves with a localizer
     if c_options.localizer
@@ -90,6 +93,7 @@ class kb.Observable
     return observable
 
   destroy: ->
+    @__kb_destroyed = true
     kb.release(@__kb_value); @__kb_value = null
     @vm = null
     @c_options = null
@@ -103,17 +107,27 @@ class kb.Observable
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
+  setToDefault: ->
+    @__kb_value?.setToDefault?()
+    @
+
   model: (new_model) ->
     # get or no change
     return @m if (arguments.length == 0) or (@m is new_model)
-    @update() if (@m = new_model)
+    @m = new_model
+    @__kb_destroyed or @update() # update if we aren't being destroyed
 
   update: (new_value) ->
-    value = @vo()
+    # determine the new type
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
     new_value or= null # ensure null instead of undefined
-
     new_type = kb.utils.valueType(new_value)
+
+    # SHARED NULL MODEL - update reference
+    if not @__kb_value or (@__kb_value.__kb_destroyed or (@__kb_value.__kb_null and new_value))
+      @__kb_value = null
+      @value_type = undefined
+    value = @__kb_value
 
     # create or change in type
     if _.isUndefined(@value_type) or (@value_type isnt new_type and new_type isnt KB_TYPE_UNKNOWN)
@@ -149,9 +163,13 @@ class kb.Observable
     @value_type = KB_TYPE_UNKNOWN
     creator = c_options.creator
 
+    # release the previous value
+    previous_value = @__kb_value; @__kb_value = null
+    kb.release(previous_value) if previous_value # release previous
+
     # found a creator
     if creator
-      # have the store create
+      # have the store, use it to create
       if c_options.store
         value = c_options.store.findOrCreateObservable(new_value, c_options)
 
@@ -184,9 +202,8 @@ class kb.Observable
       else
         @value_type = KB_TYPE_SIMPLE
 
-    # set the value
-    previous_value = @__kb_value; @__kb_value = value
-    kb.release(previous_value) if previous_value # release previous
+    # store the value
+    @__kb_value = value
     @vo(value)
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)

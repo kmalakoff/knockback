@@ -74,14 +74,25 @@ class kb.ViewModel
 
     not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
 
+  shareOptions: -> 
+    return {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
+
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0) or (model is new_model) # get or no change
+
+    # SHARED NULL MODEL - keep it that way
+    if this.__kb_null
+      not new_model or throwUnexpected(this, 'model set on shared null')
+      return 
+
+    # update references
     kb.utils.wrappedObject(@, new_model)
     model_watcher = kb.utils.wrappedModelWatcher(@)
     return unless model_watcher # not yet initialized
     model_watcher.model(new_model) # sync with model_watcher
   
+    # sync missing attributes
     return if @__kb.keys or not new_model or not new_model.attributes # only allow specific keys or nothing to add
     # NOTE: this does not remove keys that are different between the models
     missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
@@ -89,7 +100,7 @@ class kb.ViewModel
 
   setToDefault: ->
     for vm_key of @__kb.vm_keys
-      @[vm_key].setToDefault() if typeof(@[vm_key].setToDefault) == 'function'
+      @[vm_key]?.setToDefault?()
     @
 
   _createObservables: (model, keys) ->

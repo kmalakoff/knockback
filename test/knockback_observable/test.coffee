@@ -210,8 +210,8 @@ $(document).ready( ->
     InferingViewModel = (model, options) ->
       @_auto = kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
       @maybe_null_name = kb.observable(model, 'maybe_null_name')
-      @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferingViewModel, options: options})
-      @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: options})
+      @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferingViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+      @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
       @
 
     parent = new Backbone.Model({name: 'Daddy'})

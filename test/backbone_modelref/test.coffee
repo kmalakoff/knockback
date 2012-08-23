@@ -81,7 +81,7 @@ $(document).ready( ->
 
     # go back to loading state
     collection.reset()
-    equal(view_model.name(), 'Yoko', "Default is to keep the last value")
+    equal(view_model.name(), 'Chargement', "Resets to default")
     view_model._auto.setToDefault() # override default behavior and go back to loading state
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
@@ -155,7 +155,7 @@ $(document).ready( ->
 
     # go back to loading state
     collection.reset()
-    equal(view_model.name(), 'Yoko', "Default is to keep the last value")
+    equal(view_model.name(), 'Chargement', "Resets to default")
     kb.utils.setToDefault(view_model)
     kb.locale_manager.setLocale('en')
     equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
