@@ -47,15 +47,16 @@ class kb.Store
         if record.observable.__kb_destroyed
           record.obj = null
           record.observable = null
+          continue
 
-        # an object observable
-        else if obj 
-          return record.observable if not record.observable.__kb_null and (record.obj is obj) and (record.creator is creator)
+        # first pass doesn't match (both not null or both not same object)
+        if (not obj and not record.observable.__kb_null) or (obj and (record.observable.__kb_null or (record.obj isnt obj)))
+          continue
 
-        # a null observable            
-        else 
-          return record.observable if record.observable.__kb_null and (record.creator is creator)
- 
+        # creator matches
+        else if ((record.creator is creator) or (record.creator.create and (record.creator.create is creator.create)))
+          return record.observable
+
     return null
 
   observableIsRegistered: (observable) ->

@@ -15,18 +15,17 @@ class kb.Observable
 
     # copy create options
     if _.isString(options) or ko.isObservable(options)
-      c_options = @c_options = {key: options}
+      create_options = @create_options = {key: options}
     else
-      c_options = @c_options = _.clone(options)
-      (_.defaults(c_options, c_options.options); delete c_options.options) if c_options.options
+      create_options = @create_options = collapseOptions(options)
 
     # extract options
-    @key = c_options.key; delete c_options.key; @key or throwMissing(this, 'key')    
-    not c_options.args or (@args = c_options.args; delete c_options.args)
-    not c_options.read or (@read = c_options.read; delete c_options.read)
-    not c_options.write or (@write = c_options.write; delete c_options.write)
-    model_watcher = c_options.model_watcher
-    delete c_options.model_watcher
+    @key = create_options.key; delete create_options.key; @key or throwMissing(this, 'key')    
+    not create_options.args or (@args = create_options.args; delete create_options.args)
+    not create_options.read or (@read = create_options.read; delete create_options.read)
+    not create_options.write or (@write = create_options.write; delete create_options.write)
+    model_watcher = create_options.model_watcher
+    delete create_options.model_watcher
 
     # set up basics
     @vo = ko.observable(null) # create a value observable for the first dependency
@@ -62,14 +61,14 @@ class kb.Observable
       owner: @vm
     ))
     observable.__kb_is_o = true # mark as a kb.Observable
-    c_options.store = kb.utils.wrappedStore(observable, c_options.store)
-    c_options.path = kb.utils.pathJoin(c_options.path, @key)
-    if c_options.factories and ((typeof(c_options.factories) == 'function') or c_options.factories.create)
-      c_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(c_options.factory))
-      c_options.factory.addPathMapping(c_options.path, c_options.factories)
+    create_options.store = kb.utils.wrappedStore(observable, create_options.store)
+    create_options.path = kb.utils.pathJoin(create_options.path, @key)
+    if create_options.factories and ((typeof(create_options.factories) == 'function') or create_options.factories.create)
+      create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory))
+      create_options.factory.addPathMapping(create_options.path, create_options.factories)
     else
-      c_options.factory = kb.Factory.useOptionsOrCreate(c_options, observable, c_options.path)
-    delete c_options.factories
+      create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path)
+    delete create_options.factories
 
     # publish public interface on the observable and return instead of this
     observable.value = _.bind(@value, @)
@@ -77,18 +76,18 @@ class kb.Observable
     observable.destroy = _.bind(@destroy, @)
 
     # use external model observable or create
-    kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: c_options.path})
+    kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
 
     # wrap ourselves with a localizer
-    if c_options.localizer
-      observable = new c_options.localizer(observable)
-      delete c_options.localizer
+    if create_options.localizer
+      observable = new create_options.localizer(observable)
+      delete create_options.localizer
 
     # wrap ourselves with a default value
-    if c_options.hasOwnProperty('default')
-      observable = kb.defaultWrapper(observable, c_options.default)
-      delete c_options.default
+    if create_options.hasOwnProperty('default')
+      observable = kb.defaultWrapper(observable, create_options.default)
+      delete create_options.default
 
     return observable
 
@@ -96,7 +95,7 @@ class kb.Observable
     @__kb_destroyed = true
     kb.release(@__kb_value); @__kb_value = null
     @vm = null
-    @c_options = null
+    @create_options = null
     kb.utils.wrappedDestroy(@)
 
   value: -> 
@@ -158,10 +157,10 @@ class kb.Observable
   # Internal
   ####################################################
   _updateValueObservable: (new_value) ->
-    c_options = @c_options
-    c_options.creator = kb.utils.inferCreator(new_value, c_options.factory, c_options.path, @m, @key)
+    create_options = @create_options
+    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, @m, @key)
     @value_type = KB_TYPE_UNKNOWN
-    creator = c_options.creator
+    creator = create_options.creator
 
     # release the previous value
     previous_value = @__kb_value; @__kb_value = null
@@ -170,8 +169,8 @@ class kb.Observable
     # found a creator
     if creator
       # have the store, use it to create
-      if c_options.store
-        value = c_options.store.findOrCreateObservable(new_value, c_options)
+      if create_options.store
+        value = create_options.store.findOrCreateObservable(new_value, create_options)
 
       # create manually
       else 
@@ -179,9 +178,9 @@ class kb.Observable
           value = new_value
           @value_type = KB_TYPE_SIMPLE
         else if creator.create
-          value = creator.create(new_value, c_options)
+          value = creator.create(new_value, create_options)
         else
-          value = new creator(new_value, c_options)
+          value = new creator(new_value, create_options)
 
     # create and cache the type
     else

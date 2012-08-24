@@ -46,34 +46,34 @@ class kb.CollectionObservable
     @__kb._onModelChange = _.bind(@_onModelChange, @)
 
     # options
-    options = _.defaults(_.clone(options), options.options) if options.options
+    options = collapseOptions(options)
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
-    c_options = @c_options = {store:  kb.Store.useOptionsOrCreate(options, collection, observable)} # create options
+    create_options = @create_options = {store:  kb.Store.useOptionsOrCreate(options, collection, observable)} # create options
 
     # view model factory create factories
     @path = options.path
-    factory = c_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
+    factory = create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
     factory.addPathMappings(options.factories, options.path) if options.factories
-    c_options.path = kb.utils.pathJoin(options.path, 'models')
+    create_options.path = kb.utils.pathJoin(options.path, 'models')
 
     # add or deduce models create information
-    c_options.creator = factory.creatorForPath(null, c_options.path)
-    if c_options.creator
-      @models_only = c_options.creator.models_only
+    create_options.creator = factory.creatorForPath(null, create_options.path)
+    if create_options.creator
+      @models_only = create_options.creator.models_only
     else
       if options.hasOwnProperty('models_only')
         if options.models_only
-          factory.addPathMapping(c_options.path, {models_only: options.models_only})
+          factory.addPathMapping(create_options.path, {models_only: options.models_only})
           @models_only = options.models_only
         else
-          factory.addPathMapping(c_options.path, kb.ViewModel)
+          factory.addPathMapping(create_options.path, kb.ViewModel)
       else if options.view_model
-        factory.addPathMapping(c_options.path, options.view_model)
+        factory.addPathMapping(create_options.path, options.view_model)
       else if options.create
-        factory.addPathMapping(c_options.path, {create: options.create})
+        factory.addPathMapping(create_options.path, {create: options.create})
       else
-        factory.addPathMapping(c_options.path, kb.ViewModel)
+        factory.addPathMapping(create_options.path, kb.ViewModel)
 
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
@@ -107,7 +107,7 @@ class kb.CollectionObservable
       @_collectionUnbind(collection)
       @_clear(true)
       kb.utils.wrappedObject(observable, null)
-    @c_options = null
+    @create_options = null
     kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
@@ -167,7 +167,7 @@ class kb.CollectionObservable
   sortAttribute: (sort_attribute, sorted_index, silent) -> return @sortedIndex(sorted_index, sort_attribute, silent)
 
   viewModelByModel: (model) ->
-    return null unless @hasViewModels()
+    return null if @models_only
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(kb.utils.wrappedObservable(@)(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
 
@@ -215,7 +215,7 @@ class kb.CollectionObservable
 
   _onModelRemove: (model) ->
     # either remove a view model or a model
-    view_model = if @hasViewModels() then @viewModelByModel(model) else model
+    view_model = if @models_only then model else @viewModelByModel(model)
     return unless view_model  # it may have already been removed
     observable = kb.utils.wrappedObservable(@)
     @in_edit++
@@ -231,7 +231,7 @@ class kb.CollectionObservable
     # either move a view model or a model
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
-    view_model = if @hasViewModels() then @viewModelByModel(model) else model
+    view_model = if @models_only then model else @viewModelByModel(model)
     previous_index = observable.indexOf(view_model)
     if @sorted_index
       sorted_view_models = _.clone(observable())
@@ -283,7 +283,7 @@ class kb.CollectionObservable
         add_index = @sorted_index(view_models, view_model)
         view_models.splice(add_index, 0, view_model)
     else
-      view_models = if @hasViewModels() then _.map(collection.models, (model) => @_createViewModel(model)) else _.clone(collection.models)
+      view_models = if @models_only then _.clone(collection.models) else _.map(collection.models, (model) => @_createViewModel(model))
 
     @in_edit++
     observable(view_models)
@@ -291,13 +291,13 @@ class kb.CollectionObservable
     @trigger('add', observable()) if not silent # notify
 
   _sortAttributeFn: (sort_attribute) ->
-    if @hasViewModels()
-      return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(sort_attribute))
-    else
+    if @models_only
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
+    else
+      return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(sort_attribute))
 
   _createViewModel: (model) ->
-    return if @hasViewModels() then @c_options.store.findOrCreateObservable(model, @c_options) else model
+    return if @models_only then model else @create_options.store.findOrCreateObservable(model, @create_options)
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

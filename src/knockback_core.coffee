@@ -8,15 +8,18 @@
     Optional dependency: Backbone.ModelRef.js.
 ###
 
-# import Underscore (or Lo-Dash with precedence), Backbone, and Knockout
-if (typeof(require) != 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
-_ = _._ if _ and (_.hasOwnProperty('_')) # LEGACY
-Backbone = if not @Backbone and (typeof(require) != 'undefined') then require('backbone') else @Backbone
-ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') else @ko
-
 # export or create Knockback namespace and kb alias
 Knockback = kb = @Knockback = @kb = if (typeof(exports) != 'undefined') then exports else {}
 kb.VERSION = '0.16.0beta2'
+
+####################################
+# import Underscore (or Lo-Dash with precedence), Backbone, and Knockout
+####################################
+if (typeof(require) != 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
+_ = _._ if _ and _.hasOwnProperty('_') # LEGACY
+kb._ = _
+kb.Backbone = Backbone = if not @Backbone and (typeof(require) != 'undefined') then require('backbone') else @Backbone
+kb.ko = ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') else @ko
 
 ####################################
 # OBSERVABLE STORAGE TYPES
@@ -30,8 +33,6 @@ kb.TYPE_COLLECTION = KB_TYPE_COLLECTION = 4
 ####################################
 # HELPERS
 ####################################
-arraySlice = Array.prototype.slice
-arraySplice = Array.prototype.splice
 throwMissing = (instance, message) -> throw "#{instance.constructor.name}: #{message} is missing"
 throwUnexpected = (instance, message) -> throw "#{instance.constructor.name}: #{message} is unexpected"
 
@@ -41,10 +42,26 @@ legacyWarning = (identifier, last_version, message) ->
   kb._legacy_warnings[identifier]++
   console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
 
+arraySlice = Array.prototype.slice
+arraySplice = Array.prototype.splice
+
+collapseOptions = (options) ->
+  result = _.clone(options)
+  while options.options
+    _.defaults(result, options.options)
+    options = options.options
+  delete result.options
+  return result
+
 ####################################
-# Memory Management
+# LifeCycle Management
 ####################################
-kb.removeNode = ko.removeNode
+kb.renderAndBindTemplate = (template, view_model, no_auto_destroy) -> 
+  el = $("<div data-bind=\"template: {name: '#{template}', data: $data}\"></div>")[0]
+
+  # by default, Knockback uses kb.applyBindings which releases the view_model when the element is destroyed using ko.removeNode(node) or kb.releaseNode(node)
+  if no_auto_destroy then ko.applyBindings(view_model, el) else kb.applyBindings(view_model, el)
+  return el
 
 kb.releaseOnRemoveNode = (view_model, node) ->
   view_model or throwUnexpected(@, 'missing view model')
@@ -54,11 +71,6 @@ kb.releaseOnRemoveNode = (view_model, node) ->
 kb.applyBindings = (view_model, node, skip_auto) ->
   ko.applyBindings(view_model, node)
   kb.releaseOnRemoveNode(view_model, node) if (arguments.length is 2) or not skip_auto
-
-kb.releaseKeys = (obj) ->
-  for key, value of obj
-    (key is '__kb') or kb.release(value, -> obj[key] = null)
-  return
 
 kb.release = (obj, preRelease) ->
   if (
@@ -97,6 +109,14 @@ kb.release = (obj, preRelease) ->
       (key is '__kb') or kb.release(value, -> obj[key] = null)
 
   return
+
+kb.releaseKeys = (obj) ->
+  for key, value of obj
+    (key is '__kb') or kb.release(value, -> obj[key] = null)
+  return
+
+# will auto-destroy the bound view model
+kb.releaseNode = ko.removeNode
 
 ####################################
 # Localization

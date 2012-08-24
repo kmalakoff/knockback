@@ -18,7 +18,7 @@
     _ = window._;
   }
 
-  if (_ && (_.hasOwnProperty('_'))) {
+  if (_ && _.hasOwnProperty('_')) {
     _ = _._;
   }
 

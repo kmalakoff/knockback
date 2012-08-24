@@ -22,8 +22,10 @@ class kb.ViewModel
     view_model or= {}
 
     # bind and extract options
-    options = _.defaults(_.clone(options), options.options) if options.options
-    options = {keys: options} if _.isArray(options) 
+    if _.isArray(options) 
+      options = {keys: options} 
+    else
+      options = collapseOptions(options)
     @__kb or= {}
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
@@ -104,7 +106,7 @@ class kb.ViewModel
     @
 
   _createObservables: (model, keys) ->
-    c_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
+    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for key in keys
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
       continue if @[vm_key] # already exists, skip
@@ -113,12 +115,12 @@ class kb.ViewModel
       @__kb.vm_keys[vm_key]=true; @__kb.model_keys[key]=true 
 
       # create
-      c_options.key = key
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, c_options, @)
+      create_options.key = key
+      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
     @
 
   _mapObservables: (model, mappings) ->
-    c_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
+    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)
@@ -128,7 +130,7 @@ class kb.ViewModel
       @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true 
 
       # create
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, c_options), @)
+      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), @)
     @
 
 # factory function

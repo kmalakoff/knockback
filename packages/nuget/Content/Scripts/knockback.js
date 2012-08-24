@@ -12,10 +12,14 @@
 
 
 (function() {
-  var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, Knockback, addStatisticsEvent, argumentsAddKey, arraySlice, arraySplice, kb, ko, legacyWarning, throwMissing, throwUnexpected, wrappedKey, _,
+  var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, Knockback, addStatisticsEvent, argumentsAddKey, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, throwMissing, throwUnexpected, wrappedKey, _,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  Knockback = kb = this.Knockback = this.kb = typeof exports !== 'undefined' ? exports : {};
+
+  kb.VERSION = '0.16.0beta2';
 
   if (typeof require !== 'undefined') {
     try {
@@ -27,17 +31,15 @@
     _ = this._;
   }
 
-  if (_ && (_.hasOwnProperty('_'))) {
+  if (_ && _.hasOwnProperty('_')) {
     _ = _._;
   }
 
-  Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
+  kb._ = _;
 
-  ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
+  kb.Backbone = Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
-  Knockback = kb = this.Knockback = this.kb = typeof exports !== 'undefined' ? exports : {};
-
-  kb.VERSION = '0.16.0beta2';
+  kb.ko = ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 
   kb.TYPE_UNKNOWN = KB_TYPE_UNKNOWN = 0;
 
@@ -48,10 +50,6 @@
   kb.TYPE_MODEL = KB_TYPE_MODEL = 3;
 
   kb.TYPE_COLLECTION = KB_TYPE_COLLECTION = 4;
-
-  arraySlice = Array.prototype.slice;
-
-  arraySplice = Array.prototype.splice;
 
   throwMissing = function(instance, message) {
     throw "" + instance.constructor.name + ": " + message + " is missing";
@@ -69,7 +67,31 @@
     return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".");
   };
 
-  kb.removeNode = ko.removeNode;
+  arraySlice = Array.prototype.slice;
+
+  arraySplice = Array.prototype.splice;
+
+  collapseOptions = function(options) {
+    var result;
+    result = _.clone(options);
+    while (options.options) {
+      _.defaults(result, options.options);
+      options = options.options;
+    }
+    delete result.options;
+    return result;
+  };
+
+  kb.renderAndBindTemplate = function(template, view_model, no_auto_destroy) {
+    var el;
+    el = $("<div data-bind=\"template: {name: '" + template + "', data: $data}\"></div>")[0];
+    if (no_auto_destroy) {
+      ko.applyBindings(view_model, el);
+    } else {
+      kb.applyBindings(view_model, el);
+    }
+    return el;
+  };
 
   kb.releaseOnRemoveNode = function(view_model, node) {
     view_model || throwUnexpected(this, 'missing view model');
@@ -83,16 +105,6 @@
     ko.applyBindings(view_model, node);
     if ((arguments.length === 2) || !skip_auto) {
       return kb.releaseOnRemoveNode(view_model, node);
-    }
-  };
-
-  kb.releaseKeys = function(obj) {
-    var key, value;
-    for (key in obj) {
-      value = obj[key];
-      (key === '__kb') || kb.release(value, function() {
-        return obj[key] = null;
-      });
     }
   };
 
@@ -135,6 +147,18 @@
       }
     }
   };
+
+  kb.releaseKeys = function(obj) {
+    var key, value;
+    for (key in obj) {
+      value = obj[key];
+      (key === '__kb') || kb.release(value, function() {
+        return obj[key] = null;
+      });
+    }
+  };
+
+  kb.releaseNode = ko.removeNode;
 
   kb.locale_manager = void 0;
 
@@ -472,14 +496,12 @@
           if (record.observable.__kb_destroyed) {
             record.obj = null;
             record.observable = null;
-          } else if (obj) {
-            if (!record.observable.__kb_null && (record.obj === obj) && (record.creator === creator)) {
-              return record.observable;
-            }
-          } else {
-            if (record.observable.__kb_null && (record.creator === creator)) {
-              return record.observable;
-            }
+            continue;
+          }
+          if ((!obj && !record.observable.__kb_null) || (obj && (record.observable.__kb_null || (record.obj !== obj)))) {
+            continue;
+          } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
+            return record.observable;
           }
         }
       }
@@ -803,7 +825,7 @@
     CollectionObservable.extend = Backbone.Model.extend;
 
     function CollectionObservable(collection, options) {
-      var c_options, factory, observable;
+      var create_options, factory, observable;
       options || (options = {});
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true;
@@ -814,41 +836,39 @@
       this.__kb._onModelAdd = _.bind(this._onModelAdd, this);
       this.__kb._onModelRemove = _.bind(this._onModelRemove, this);
       this.__kb._onModelChange = _.bind(this._onModelChange, this);
-      if (options.options) {
-        options = _.defaults(_.clone(options), options.options);
-      }
+      options = collapseOptions(options);
       this.sort_attribute = options.sort_attribute;
       this.sorted_index = options.sorted_index;
-      c_options = this.c_options = {
+      create_options = this.create_options = {
         store: kb.Store.useOptionsOrCreate(options, collection, observable)
       };
       this.path = options.path;
-      factory = c_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
+      factory = create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
       if (options.factories) {
         factory.addPathMappings(options.factories, options.path);
       }
-      c_options.path = kb.utils.pathJoin(options.path, 'models');
-      c_options.creator = factory.creatorForPath(null, c_options.path);
-      if (c_options.creator) {
-        this.models_only = c_options.creator.models_only;
+      create_options.path = kb.utils.pathJoin(options.path, 'models');
+      create_options.creator = factory.creatorForPath(null, create_options.path);
+      if (create_options.creator) {
+        this.models_only = create_options.creator.models_only;
       } else {
         if (options.hasOwnProperty('models_only')) {
           if (options.models_only) {
-            factory.addPathMapping(c_options.path, {
+            factory.addPathMapping(create_options.path, {
               models_only: options.models_only
             });
             this.models_only = options.models_only;
           } else {
-            factory.addPathMapping(c_options.path, kb.ViewModel);
+            factory.addPathMapping(create_options.path, kb.ViewModel);
           }
         } else if (options.view_model) {
-          factory.addPathMapping(c_options.path, options.view_model);
+          factory.addPathMapping(create_options.path, options.view_model);
         } else if (options.create) {
-          factory.addPathMapping(c_options.path, {
+          factory.addPathMapping(create_options.path, {
             create: options.create
           });
         } else {
-          factory.addPathMapping(c_options.path, kb.ViewModel);
+          factory.addPathMapping(create_options.path, kb.ViewModel);
         }
       }
       observable.destroy = _.bind(this.destroy, this);
@@ -882,7 +902,7 @@
         this._clear(true);
         kb.utils.wrappedObject(observable, null);
       }
-      this.c_options = null;
+      this.create_options = null;
       kb.utils.wrappedDestroy(this);
       return !kb.statistics || kb.statistics.unregister(this);
     };
@@ -965,7 +985,7 @@
 
     CollectionObservable.prototype.viewModelByModel = function(model) {
       var id_attribute;
-      if (!this.hasViewModels()) {
+      if (this.models_only) {
         return null;
       }
       id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
@@ -1047,7 +1067,7 @@
 
     CollectionObservable.prototype._onModelRemove = function(model) {
       var observable, view_model;
-      view_model = this.hasViewModels() ? this.viewModelByModel(model) : model;
+      view_model = this.models_only ? model : this.viewModelByModel(model);
       if (!view_model) {
         return;
       }
@@ -1068,7 +1088,7 @@
       var collection, new_index, observable, previous_index, sorted_view_models, view_model;
       observable = kb.utils.wrappedObservable(this);
       collection = kb.utils.wrappedObject(observable);
-      view_model = this.hasViewModels() ? this.viewModelByModel(model) : model;
+      view_model = this.models_only ? model : this.viewModelByModel(model);
       previous_index = observable.indexOf(view_model);
       if (this.sorted_index) {
         sorted_view_models = _.clone(observable());
@@ -1134,9 +1154,9 @@
           view_models.splice(add_index, 0, view_model);
         }
       } else {
-        view_models = this.hasViewModels() ? _.map(collection.models, function(model) {
+        view_models = this.models_only ? _.clone(collection.models) : _.map(collection.models, function(model) {
           return _this._createViewModel(model);
-        }) : _.clone(collection.models);
+        });
       }
       this.in_edit++;
       observable(view_models);
@@ -1147,26 +1167,26 @@
     };
 
     CollectionObservable.prototype._sortAttributeFn = function(sort_attribute) {
-      if (this.hasViewModels()) {
-        return function(view_models, model) {
-          return _.sortedIndex(view_models, model, function(test) {
-            return kb.utils.wrappedModel(test).get(sort_attribute);
-          });
-        };
-      } else {
+      if (this.models_only) {
         return function(models, model) {
           return _.sortedIndex(models, model, function(test) {
             return test.get(sort_attribute);
+          });
+        };
+      } else {
+        return function(view_models, model) {
+          return _.sortedIndex(view_models, model, function(test) {
+            return kb.utils.wrappedModel(test).get(sort_attribute);
           });
         };
       }
     };
 
     CollectionObservable.prototype._createViewModel = function(model) {
-      if (this.hasViewModels()) {
-        return this.c_options.store.findOrCreateObservable(model, this.c_options);
-      } else {
+      if (this.models_only) {
         return model;
+      } else {
+        return this.create_options.store.findOrCreateObservable(model, this.create_options);
       }
     };
 
@@ -1469,30 +1489,26 @@
   kb.Observable = (function() {
 
     function Observable(model, options, vm) {
-      var c_options, model_watcher, observable,
+      var create_options, model_watcher, observable,
         _this = this;
       this.vm = vm;
       options || throwMissing(this, 'options');
       this.vm || (this.vm = {});
       if (_.isString(options) || ko.isObservable(options)) {
-        c_options = this.c_options = {
+        create_options = this.create_options = {
           key: options
         };
       } else {
-        c_options = this.c_options = _.clone(options);
-        if (c_options.options) {
-          _.defaults(c_options, c_options.options);
-          delete c_options.options;
-        }
+        create_options = this.create_options = collapseOptions(options);
       }
-      this.key = c_options.key;
-      delete c_options.key;
+      this.key = create_options.key;
+      delete create_options.key;
       this.key || throwMissing(this, 'key');
-      !c_options.args || (this.args = c_options.args, delete c_options.args);
-      !c_options.read || (this.read = c_options.read, delete c_options.read);
-      !c_options.write || (this.write = c_options.write, delete c_options.write);
-      model_watcher = c_options.model_watcher;
-      delete c_options.model_watcher;
+      !create_options.args || (this.args = create_options.args, delete create_options.args);
+      !create_options.read || (this.read = create_options.read, delete create_options.read);
+      !create_options.write || (this.write = create_options.write, delete create_options.write);
+      model_watcher = create_options.model_watcher;
+      delete create_options.model_watcher;
       this.vo = ko.observable(null);
       observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
         read: function() {
@@ -1543,15 +1559,15 @@
         owner: this.vm
       }));
       observable.__kb_is_o = true;
-      c_options.store = kb.utils.wrappedStore(observable, c_options.store);
-      c_options.path = kb.utils.pathJoin(c_options.path, this.key);
-      if (c_options.factories && ((typeof c_options.factories === 'function') || c_options.factories.create)) {
-        c_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(c_options.factory));
-        c_options.factory.addPathMapping(c_options.path, c_options.factories);
+      create_options.store = kb.utils.wrappedStore(observable, create_options.store);
+      create_options.path = kb.utils.pathJoin(create_options.path, this.key);
+      if (create_options.factories && ((typeof create_options.factories === 'function') || create_options.factories.create)) {
+        create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory));
+        create_options.factory.addPathMapping(create_options.path, create_options.factories);
       } else {
-        c_options.factory = kb.Factory.useOptionsOrCreate(c_options, observable, c_options.path);
+        create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
       }
-      delete c_options.factories;
+      delete create_options.factories;
       observable.value = _.bind(this.value, this);
       observable.valueType = _.bind(this.valueType, this);
       observable.destroy = _.bind(this.destroy, this);
@@ -1561,16 +1577,16 @@
         model: _.bind(this.model, this),
         update: _.bind(this.update, this),
         key: this.key,
-        path: c_options.path
+        path: create_options.path
       });
       this.__kb_value || this.update();
-      if (c_options.localizer) {
-        observable = new c_options.localizer(observable);
-        delete c_options.localizer;
+      if (create_options.localizer) {
+        observable = new create_options.localizer(observable);
+        delete create_options.localizer;
       }
-      if (c_options.hasOwnProperty('default')) {
-        observable = kb.defaultWrapper(observable, c_options["default"]);
-        delete c_options["default"];
+      if (create_options.hasOwnProperty('default')) {
+        observable = kb.defaultWrapper(observable, create_options["default"]);
+        delete create_options["default"];
       }
       return observable;
     }
@@ -1580,7 +1596,7 @@
       kb.release(this.__kb_value);
       this.__kb_value = null;
       this.vm = null;
-      this.c_options = null;
+      this.create_options = null;
       return kb.utils.wrappedDestroy(this);
     };
 
@@ -1651,27 +1667,27 @@
     };
 
     Observable.prototype._updateValueObservable = function(new_value) {
-      var c_options, creator, previous_value, value;
-      c_options = this.c_options;
-      c_options.creator = kb.utils.inferCreator(new_value, c_options.factory, c_options.path, this.m, this.key);
+      var create_options, creator, previous_value, value;
+      create_options = this.create_options;
+      create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, this.m, this.key);
       this.value_type = KB_TYPE_UNKNOWN;
-      creator = c_options.creator;
+      creator = create_options.creator;
       previous_value = this.__kb_value;
       this.__kb_value = null;
       if (previous_value) {
         kb.release(previous_value);
       }
       if (creator) {
-        if (c_options.store) {
-          value = c_options.store.findOrCreateObservable(new_value, c_options);
+        if (create_options.store) {
+          value = create_options.store.findOrCreateObservable(new_value, create_options);
         } else {
           if (creator.models_only) {
             value = new_value;
             this.value_type = KB_TYPE_SIMPLE;
           } else if (creator.create) {
-            value = creator.create(new_value, c_options);
+            value = creator.create(new_value, create_options);
           } else {
-            value = new creator(new_value, c_options);
+            value = new creator(new_value, create_options);
           }
         }
       } else {
@@ -1785,13 +1801,12 @@
       var bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref;
       options || (options = {});
       view_model || (view_model = {});
-      if (options.options) {
-        options = _.defaults(_.clone(options), options.options);
-      }
       if (_.isArray(options)) {
         options = {
           keys: options
         };
+      } else {
+        options = collapseOptions(options);
       }
       this.__kb || (this.__kb = {});
       this.__kb.vm_keys = {};
@@ -1901,8 +1916,8 @@
     };
 
     ViewModel.prototype._createObservables = function(model, keys) {
-      var c_options, key, vm_key, _i, _len;
-      c_options = {
+      var create_options, key, vm_key, _i, _len;
+      create_options = {
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
         path: this.__kb.path,
@@ -1916,15 +1931,15 @@
         }
         this.__kb.vm_keys[vm_key] = true;
         this.__kb.model_keys[key] = true;
-        c_options.key = key;
-        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, c_options, this);
+        create_options.key = key;
+        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, create_options, this);
       }
       return this;
     };
 
     ViewModel.prototype._mapObservables = function(model, mappings) {
-      var c_options, mapping_info, vm_key;
-      c_options = {
+      var create_options, mapping_info, vm_key;
+      create_options = {
         store: kb.utils.wrappedStore(this),
         factory: kb.utils.wrappedFactory(this),
         path: this.__kb.path,
@@ -1941,7 +1956,7 @@
         mapping_info.key || (mapping_info.key = vm_key);
         this.__kb.vm_keys[vm_key] = true;
         this.__kb.model_keys[mapping_info.key] = true;
-        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, c_options), this);
+        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), this);
       }
       return this;
     };
