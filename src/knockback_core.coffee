@@ -56,21 +56,25 @@ collapseOptions = (options) ->
 ####################################
 # LifeCycle Management
 ####################################
-kb.renderAndBindTemplate = (template, view_model, no_auto_destroy) -> 
-  el = $("<div data-bind=\"template: {name: '#{template}', data: $data}\"></div>")[0]
+kb.renderAndBindTemplate = (template, view_model, no_auto_release) -> 
+  # create and bind the template
+  $template_el = $("<div data-bind=\"template: {name: '#{template}', data: $data}\"></div>")
+  ko.applyBindings(view_model, $template_el[0])
 
-  # by default, Knockback uses kb.applyBindings which releases the view_model when the element is destroyed using ko.removeNode(node) or kb.releaseNode(node)
-  if no_auto_destroy then ko.applyBindings(view_model, el) else kb.applyBindings(view_model, el)
+  # extract a single node to represent the template
+  $children_els = $template_el.children()
+  el = if $children_els.length is 1 then $children_els[0] else $template_el[0] # get the first child node or return the template node if there are multiple children
+  no_auto_release or kb.releaseOnNodeRelease(view_model, el) # register auto-release
   return el
 
-kb.releaseOnRemoveNode = (view_model, node) ->
+kb.releaseOnNodeRelease = (view_model, node) ->
   view_model or throwUnexpected(@, 'missing view model')
   node or throwUnexpected(@, 'missing node')
   ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
 
 kb.applyBindings = (view_model, node, skip_auto) ->
   ko.applyBindings(view_model, node)
-  kb.releaseOnRemoveNode(view_model, node) if (arguments.length is 2) or not skip_auto
+  kb.releaseOnNodeRelease(view_model, node) if (arguments.length is 2) or not skip_auto
 
 kb.release = (obj, preRelease) ->
   if (
