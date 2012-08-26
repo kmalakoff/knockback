@@ -71,7 +71,7 @@ class kb.Store
     creator = options.creator
 
     # no creator, create default and don't store
-    if not creator 
+    if not creator
       return kb.utils.createDefaultObservable(obj, options)
     else if creator.models_only
       return obj

@@ -32,7 +32,7 @@ class kb.Statistics
     throw "failed to unregister type: #{obj.constructor.name}" if index < 0
     type_tracker.splice(index, 1)
 
-  registeredCount: (type) -> 
+  registeredCount: (type) ->
     return @typeTracker(type).length if type
     count = 0
     count += type_tracker.length for type, type_tracker of @type_trackers[type]

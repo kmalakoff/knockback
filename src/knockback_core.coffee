@@ -56,31 +56,27 @@ collapseOptions = (options) ->
 ####################################
 # LifeCycle Management
 ####################################
-kb.renderAndBindTemplate = (template, view_model, no_auto_release) -> 
-  # create and bind the template
-  $template_el = $("<div data-bind=\"template: {name: '#{template}', data: $data}\"></div>")
-  ko.applyBindings(view_model, $template_el[0])
-
-  # extract a single node to represent the template
-  $children_els = $template_el.children()
-  el = if $children_els.length is 1 then $children_els[0] else $template_el[0] # get the first child node or return the template node if there are multiple children
-  no_auto_release or kb.releaseOnNodeRelease(view_model, el) # register auto-release
+kb.renderAndBindTemplate = (template, view_model, no_auto_release) ->
+  el = document.createElement('div')
+  ko.renderTemplate(template, view_model, {}, el, 'replaceChildren');
+  el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
+  no_auto_release or kb.releaseOnNodeRemove(view_model, el)
   return el
 
-kb.releaseOnNodeRelease = (view_model, node) ->
+kb.releaseOnNodeRemove = (view_model, node) ->
   view_model or throwUnexpected(@, 'missing view model')
   node or throwUnexpected(@, 'missing node')
   ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
 
 kb.applyBindings = (view_model, node, skip_auto) ->
   ko.applyBindings(view_model, node)
-  kb.releaseOnNodeRelease(view_model, node) if (arguments.length is 2) or not skip_auto
+  kb.releaseOnNodeRemove(view_model, node) if (arguments.length is 2) or not skip_auto
 
 kb.release = (obj, preRelease) ->
   if (
     (not obj or not _.isObject(obj)) or # must be an object
     obj.__kb_destroyed or # already destroyed
-    (typeof(obj) is 'function' and not ko.isObservable(obj)) or # not a simple function 
+    (typeof(obj) is 'function' and not ko.isObservable(obj)) or # not a simple function
     ((obj instanceof Backbone.Model) or (obj instanceof Backbone.Collection)) # not a model or collection
   )
     return
@@ -118,9 +114,6 @@ kb.releaseKeys = (obj) ->
   for key, value of obj
     (key is '__kb') or kb.release(value, -> obj[key] = null)
   return
-
-# will auto-destroy the bound view model
-kb.releaseNode = ko.removeNode
 
 ####################################
 # Localization

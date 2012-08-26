@@ -115,12 +115,12 @@ $(document).ready( ->
     equal(kb.statistics.registeredCount('CollectionObservable'), 1, '1 bound collection observable')
 
     # dispose of the collection node
-    kb.releaseNode($co_el[0])
+    ko.removeNode($co_el[0])
     equal(kb.statistics.registeredCount('ViewModel'), 1, '1 bound view model')
     equal(kb.statistics.registeredCount('CollectionObservable'), 0, 'no bound collection observables')
 
     # dispose of the model node
-    kb.releaseNode($vm_el[0])
+    ko.removeNode($vm_el[0])
 
     equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )

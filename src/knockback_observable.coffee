@@ -20,7 +20,7 @@ class kb.Observable
       create_options = @create_options = collapseOptions(options)
 
     # extract options
-    @key = create_options.key; delete create_options.key; @key or throwMissing(this, 'key')    
+    @key = create_options.key; delete create_options.key; @key or throwMissing(this, 'key')
     not create_options.args or (@args = create_options.args; delete create_options.args)
     not create_options.read or (@read = create_options.read; delete create_options.read)
     not create_options.write or (@write = create_options.write; delete create_options.write)
@@ -32,7 +32,7 @@ class kb.Observable
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
         # create dependencies if needed
-        args = [ko.utils.unwrapObservable(@key)] 
+        args = [ko.utils.unwrapObservable(@key)]
         if @args
           if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
 
@@ -98,7 +98,7 @@ class kb.Observable
     @create_options = null
     kb.utils.wrappedDestroy(@)
 
-  value: -> 
+  value: ->
     return @__kb_value
 
   valueType: ->
@@ -173,7 +173,7 @@ class kb.Observable
         value = create_options.store.findOrCreateObservable(new_value, create_options)
 
       # create manually
-      else 
+      else
         if creator.models_only
           value = new_value
           @value_type = KB_TYPE_SIMPLE
@@ -191,7 +191,7 @@ class kb.Observable
         value = ko.observable(new_value)
 
     # determine the type
-    if @value_type is KB_TYPE_UNKNOWN   
+    if @value_type is KB_TYPE_UNKNOWN
       if not ko.isObservable(value) # a view model, recognize view_models as non-observable
         @value_type = KB_TYPE_MODEL
         if typeof(value.model) isnt 'function' # manually cache the model to check for changes later

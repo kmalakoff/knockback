@@ -45,7 +45,7 @@ class kb.LocalizedObservable
     @vo = ko.observable(if not value then null else @read(value, null))
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        ko.utils.unwrapObservable(@value) if @value 
+        ko.utils.unwrapObservable(@value) if @value
         @vo() # create a depdenency
         return @read(ko.utils.unwrapObservable(@value))
 
@@ -54,7 +54,7 @@ class kb.LocalizedObservable
         @write(value, ko.utils.unwrapObservable(@value))
         @vo(value)
         @__kb._onChange(value) if @__kb._onChange
-      
+
       owner: @vm
     }))
 

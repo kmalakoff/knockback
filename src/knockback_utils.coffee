@@ -75,7 +75,7 @@ kb.utils.release = (obj) ->
   return kb.release(obj)
 
 kb.utils.valueType = (observable) ->
-  return KB_TYPE_UNKNOWN        unless observable 
+  return KB_TYPE_UNKNOWN        unless observable
   return observable.valueType() if observable.__kb_is_o
   return KB_TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof Backbone.Collection)
   return KB_TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof Backbone.Model)

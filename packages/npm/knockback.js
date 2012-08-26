@@ -83,16 +83,17 @@
   };
 
   kb.renderAndBindTemplate = function(template, view_model, no_auto_release) {
-    var $children_els, $template_el, el;
-    $template_el = $("<div data-bind=\"template: {name: '" + template + "', data: $data}\"></div>");
-    ko.applyBindings(view_model, $template_el[0]);
-    $children_els = $template_el.children();
-    el = $children_els.length === 1 ? $children_els[0] : $template_el[0];
-    no_auto_release || kb.releaseOnNodeRelease(view_model, el);
+    var el;
+    el = document.createElement('div');
+    ko.renderTemplate(template, view_model, {}, el, 'replaceChildren');
+    if (el.children.length === 1) {
+      el = el.children[0];
+    }
+    no_auto_release || kb.releaseOnNodeRemove(view_model, el);
     return el;
   };
 
-  kb.releaseOnNodeRelease = function(view_model, node) {
+  kb.releaseOnNodeRemove = function(view_model, node) {
     view_model || throwUnexpected(this, 'missing view model');
     node || throwUnexpected(this, 'missing node');
     return ko.utils.domNodeDisposal.addDisposeCallback(node, function() {
@@ -103,7 +104,7 @@
   kb.applyBindings = function(view_model, node, skip_auto) {
     ko.applyBindings(view_model, node);
     if ((arguments.length === 2) || !skip_auto) {
-      return kb.releaseOnNodeRelease(view_model, node);
+      return kb.releaseOnNodeRemove(view_model, node);
     }
   };
 
@@ -156,8 +157,6 @@
       });
     }
   };
-
-  kb.releaseNode = ko.removeNode;
 
   kb.locale_manager = void 0;
 

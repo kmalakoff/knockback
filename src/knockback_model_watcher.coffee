@@ -11,7 +11,7 @@
 #   * model - called to set and clear the model
 #   * update - called when the event is triggered
 #   * event_name - optional name of the event to register for on the model (default is update)
-#   * key - if provided, will only call update if the model attribute with name key has changed 
+#   * key - if provided, will only call update if the model attribute with name key has changed
 ####################################################
 
 # @m is @model
@@ -30,10 +30,10 @@ class kb.ModelWatcher
   constructor: (model, obj, callback_options) ->
     @__kb or= {}
     @__kb.callbacks = {}
-    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @) 
-    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @) 
+    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
+    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
-    @registerCallbacks(obj, callback_options) if callback_options 
+    @registerCallbacks(obj, callback_options) if callback_options
 
     if model then @model(model) else (@m = null)
 
@@ -71,7 +71,7 @@ class kb.ModelWatcher
       list = callbacks.list
       (info.model(new_model) if info.model) for info in list
     return new_model
-  
+
   registerCallbacks: (obj, callback_info) ->
     obj or throwMissing(this, 'obj')
     callback_info or throwMissing(this, 'info')
@@ -83,10 +83,10 @@ class kb.ModelWatcher
       list = []
       callbacks = {
         list: list
-        fn: (model) -> 
+        fn: (model) ->
           for info in list
             if info.update and not info.rel_fn
-            
+
               # key doesn't match
               continue if model and info.key and (model.hasChanged and not model.hasChanged(ko.utils.unwrapObservable(info.key)))
 
@@ -120,7 +120,7 @@ class kb.ModelWatcher
           callbacks.list.splice(index, 1)
 
           # unbind relational updates
-          @_modelUnbindRelatationalInfo(event_name, info) if info.rel_fn 
+          @_modelUnbindRelatationalInfo(event_name, info) if info.rel_fn
           info.model(null) if info.model
           return
 
@@ -139,10 +139,10 @@ class kb.ModelWatcher
       list = callbacks.list
       for info in list
         @_modelBindRelatationalInfo(event_name, info) if is_relational
-        (info.model(model) if info.model) 
+        (info.model(model) if info.model)
     @
 
-  _onModelUnloaded: (model) => 
+  _onModelUnloaded: (model) =>
     @m = null
 
     # unbind all events
@@ -166,20 +166,20 @@ class kb.ModelWatcher
         info.update()
       if relation.collectionType or _.isArray(relation.keyContents)
         info.is_collection = true
-        @m.bind("add:#{info.key}", info.rel_fn) 
-        @m.bind("remove:#{info.key}", info.rel_fn) 
+        @m.bind("add:#{info.key}", info.rel_fn)
+        @m.bind("remove:#{info.key}", info.rel_fn)
       else
-        @m.bind("update:#{info.key}", info.rel_fn) 
+        @m.bind("update:#{info.key}", info.rel_fn)
     @
 
   _modelUnbindRelatationalInfo: (event_name, info) ->
     return unless info.rel_fn
     if info.is_collection
-      @m.unbind("add:#{info.key}", info.rel_fn) 
-      @m.unbind("remove:#{info.key}", info.rel_fn) 
+      @m.unbind("add:#{info.key}", info.rel_fn)
+      @m.unbind("remove:#{info.key}", info.rel_fn)
     else
       @m.unbind("update:#{info.key}", info.rel_fn)
-    info.rel_fn = null 
+    info.rel_fn = null
     @
 
 # factory function

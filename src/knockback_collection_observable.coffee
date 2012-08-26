@@ -112,7 +112,7 @@ class kb.CollectionObservable
 
     not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
 
-  shareOptions: -> 
+  shareOptions: ->
     observable = kb.utils.wrappedObservable(@)
     return {store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable)}
 

@@ -22,8 +22,8 @@ class kb.ViewModel
     view_model or= {}
 
     # bind and extract options
-    if _.isArray(options) 
-      options = {keys: options} 
+    if _.isArray(options)
+      options = {keys: options}
     else
       options = collapseOptions(options)
     @__kb or= {}
@@ -76,7 +76,7 @@ class kb.ViewModel
 
     not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
 
-  shareOptions: -> 
+  shareOptions: ->
     return {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
 
   model: (new_model) ->
@@ -86,19 +86,19 @@ class kb.ViewModel
     # SHARED NULL MODEL - keep it that way
     if this.__kb_null
       not new_model or throwUnexpected(this, 'model set on shared null')
-      return 
+      return
 
     # update references
     kb.utils.wrappedObject(@, new_model)
     model_watcher = kb.utils.wrappedModelWatcher(@)
     return unless model_watcher # not yet initialized
     model_watcher.model(new_model) # sync with model_watcher
-  
+
     # sync missing attributes
     return if @__kb.keys or not new_model or not new_model.attributes # only allow specific keys or nothing to add
     # NOTE: this does not remove keys that are different between the models
     missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
-    @_createObservables(new_model, missing) if missing    
+    @_createObservables(new_model, missing) if missing
 
   setToDefault: ->
     for vm_key of @__kb.vm_keys
@@ -112,7 +112,7 @@ class kb.ViewModel
       continue if @[vm_key] # already exists, skip
 
       # add to the keys list
-      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[key]=true 
+      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[key]=true
 
       # create
       create_options.key = key
@@ -127,7 +127,7 @@ class kb.ViewModel
       mapping_info.key or= vm_key
 
       # add to the keys list
-      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true 
+      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true
 
       # create
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), @)
@@ -135,6 +135,6 @@ class kb.ViewModel
 
 # factory function
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
-kb.observables = (model, factories_info, view_model) -> 
+kb.observables = (model, factories_info, view_model) ->
   legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead')
   return new kb.ViewModel(model, factories_info, view_model)
