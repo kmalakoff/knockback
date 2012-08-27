@@ -18,6 +18,8 @@ class kb.ViewModel
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   constructor: (model, options, view_model) ->
+    not model or (model instanceof Backbone.Model) or (Backbone.ModelRef and (model instanceof Backbone.ModelRef)) or throwUnexpected('not a model')
+
     options or= {}
     view_model or= {}
 

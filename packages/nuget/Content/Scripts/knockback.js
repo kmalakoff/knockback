@@ -877,6 +877,7 @@
 
     function CollectionObservable(collection, options) {
       var create_options, factory, observable;
+      !collection || (collection instanceof Backbone.Collection) || throwUnexpected('not a collection');
       options || (options = {});
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true;
@@ -1871,6 +1872,7 @@
 
     function ViewModel(model, options, view_model) {
       var bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref;
+      !model || (model instanceof Backbone.Model) || (Backbone.ModelRef && (model instanceof Backbone.ModelRef)) || throwUnexpected('not a model');
       options || (options = {});
       view_model || (view_model = {});
       if (_.isArray(options)) {

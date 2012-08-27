@@ -32,6 +32,8 @@ class kb.CollectionObservable
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   constructor: (collection, options) ->
+    not collection or (collection instanceof Backbone.Collection) or throwUnexpected('not a collection')
+
     options or= {}
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
     observable.__kb_is_co = true # mark as a kb.CollectionObservable
