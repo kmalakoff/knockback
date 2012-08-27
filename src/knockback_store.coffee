@@ -9,7 +9,7 @@
 class kb.Store
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
-      options.store.registerObservable(obj, observable, options)
+      options.store.register(obj, observable, options)
       return kb.utils.wrappedStore(observable, options.store)
     else
       kb.utils.wrappedStoreIsOwned(observable, true)
@@ -23,7 +23,7 @@ class kb.Store
       kb.release(record.observable)
     @observables = null
 
-  registerObservable: (obj, observable, options) ->
+  register: (obj, observable, options) ->
     return unless observable # nothing to register
 
     # only store view models not basic ko.observables nor kb.CollectionObservables
@@ -38,7 +38,7 @@ class kb.Store
     creator or throwUnexpected(this, 'missing creator')
     @observables.push({obj: obj, observable: observable, creator: creator})
 
-  findObservable: (obj, creator) ->
+  find: (obj, creator) ->
     if not obj or (obj instanceof Backbone.Model)
       for record in @observables
         continue unless record.observable
@@ -59,12 +59,12 @@ class kb.Store
 
     return null
 
-  observableIsRegistered: (observable) ->
+  isRegistered: (observable) ->
     for record in @observables
       return true if record.observable is observable
     return false
 
-  findOrCreateObservable: (obj, options) ->
+  findOrCreate: (obj, options) ->
     options.store = this
     options.creator or (options.creator = kb.utils.inferCreator(obj, options.factory, options.path))
     options.creator = kv.ViewModel if not options.creator and (obj instanceof Backbone.Model)
@@ -77,7 +77,7 @@ class kb.Store
       return obj
 
     # found existing
-    observable = @findObservable(obj, creator) if creator
+    observable = @find(obj, creator) if creator
     return observable if observable
 
     # create
@@ -89,5 +89,5 @@ class kb.Store
 
     # we only store view_models, not observables
     if not ko.isObservable(observable)
-      @observableIsRegistered(observable) or @registerObservable(obj, observable, options) # not registered yet, register now
+      @isRegistered(observable) or @register(obj, observable, options) # not registered yet, register now
     return observable

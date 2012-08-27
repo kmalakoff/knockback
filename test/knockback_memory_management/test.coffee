@@ -90,7 +90,7 @@ $(document).ready( ->
     ok(!view_model.name, "Property released: view_model.name") # kb.viewModel(new Backbone.Model({name: 'name1'}), 'name', @)
     ok(!nested_view_model.name, "Property released: nested_view_model.name") # nested_view_model
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Releasing with nodes", ->
@@ -122,7 +122,7 @@ $(document).ready( ->
     # dispose of the model node
     ko.removeNode($vm_el[0])
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("RefCounting", ->
@@ -159,7 +159,7 @@ $(document).ready( ->
     ref_counted.release()
     ok(!ref_counted.prop, "Property released: ref_counted.prop")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.CollectionObservable", ->
@@ -193,7 +193,7 @@ $(document).ready( ->
     equal(SimpleViewModel.view_models.length, 2, "Destroyed: 2")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.CollectionObservable with external store", ->
@@ -247,7 +247,7 @@ $(document).ready( ->
     equal(SimpleViewModel.view_models.length, 2, "Destroyed: 2")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.CollectionObservable with recursive view models", ->
@@ -304,7 +304,7 @@ $(document).ready( ->
     equal(SimpleViewModel.view_models.length, 4, "Destroyed: 4")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.CollectionObservable with recursive view models and external store", ->
@@ -381,6 +381,6 @@ $(document).ready( ->
     equal(SimpleViewModel.view_models.length, 4, "Destroyed: 4")
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

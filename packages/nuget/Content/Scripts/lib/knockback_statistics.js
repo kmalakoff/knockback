@@ -73,7 +73,7 @@
       return count;
     };
 
-    Statistics.prototype.registeredTypeStatsString = function(success_message) {
+    Statistics.prototype.registeredStatsString = function(success_message) {
       var string, type, type_tracker, written, _ref;
       string = '';
       _ref = this.type_trackers;

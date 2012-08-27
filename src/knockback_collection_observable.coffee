@@ -297,7 +297,7 @@ class kb.CollectionObservable
       return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(sort_attribute))
 
   _createViewModel: (model) ->
-    return if @models_only then model else @create_options.store.findOrCreateObservable(model, @create_options)
+    return if @models_only then model else @create_options.store.findOrCreate(model, @create_options)
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe

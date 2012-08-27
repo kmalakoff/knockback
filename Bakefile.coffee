@@ -27,11 +27,11 @@ module.exports =
 
   statistics:
     output: 'lib'
-    files: 'src/lib/knockback_statistics.coffee'
+    files: 'src/lib/knockback-statistics.coffee'
     _build:
       commands: [
-        'cp lib/knockback_statistics.js packages/npm/lib/knockback_statistics.js'
-        'cp lib/knockback_statistics.js packages/nuget/Content/Scripts/lib/knockback_statistics.js'
+        'cp lib/knockback-statistics.js packages/npm/lib/knockback-statistics.js'
+        'cp lib/knockback-statistics.js packages/nuget/Content/Scripts/lib/knockback-statistics.js'
       ]
 
   test_examples:

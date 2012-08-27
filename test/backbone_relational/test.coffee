@@ -77,7 +77,7 @@ $(document).ready( ->
 
     kb.release(house_view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
@@ -162,7 +162,7 @@ $(document).ready( ->
 
     kb.release(places_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("3. Model with recursive HasMany relations: Person with users who are people", ->
@@ -217,7 +217,7 @@ $(document).ready( ->
     equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
     kb.release(george_view_model); george_view_model = null
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("4. After view model create, add models", ->
@@ -352,7 +352,7 @@ $(document).ready( ->
     kb.release(view_model_person1)
     kb.release(view_model_house1)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("7. Infering observable types: late binding", ->
@@ -388,7 +388,7 @@ $(document).ready( ->
     kb.release(view_model_person1)
     kb.release(view_model_house1)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("8. Customizing observable types: from the start", ->
@@ -444,7 +444,7 @@ $(document).ready( ->
     kb.release(co_family)
     kb.release(view_model_house1)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("9. Customizing observable types: late binding", ->
@@ -508,7 +508,7 @@ $(document).ready( ->
     kb.release(co_family)
     kb.release(view_model_house1)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("10. Nested custom view models", ->
@@ -593,6 +593,6 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

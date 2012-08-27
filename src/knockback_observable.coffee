@@ -170,7 +170,7 @@ class kb.Observable
     if creator
       # have the store, use it to create
       if create_options.store
-        value = create_options.store.findOrCreateObservable(new_value, create_options)
+        value = create_options.store.findOrCreate(new_value, create_options)
 
       # create manually
       else

@@ -43,7 +43,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("2. Standard use case: direct attributes with custom read and write", ->
@@ -80,7 +80,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("3. Read args", ->
@@ -96,7 +96,7 @@ $(document).ready( ->
     view_model = new ContactViewModelCustom(model)
     ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("4. Standard use case: ko.dependentObservable", ->
@@ -126,7 +126,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("5. Infering observable types: the easy way", ->
@@ -197,7 +197,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("6. Infering observable types: the hard way", ->
@@ -264,6 +264,6 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

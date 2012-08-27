@@ -93,7 +93,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Standard use case with kb.ViewModels", ->
@@ -167,6 +167,6 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

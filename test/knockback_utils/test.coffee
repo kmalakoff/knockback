@@ -23,7 +23,7 @@ $(document).ready( ->
     kb.utils.wrappedObservable(instance, observable) # set
     equal(kb.utils.wrappedObservable(instance), observable, "observable was wrapped") # get
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.utils.wrappedModel", ->
@@ -36,7 +36,7 @@ $(document).ready( ->
     kb.utils.wrappedModel(instance, model) # set
     equal(kb.utils.wrappedModel(instance), model, "model was wrapped") # get
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.utils.wrappedStore", ->
@@ -63,7 +63,7 @@ $(document).ready( ->
     kb.release(collection_observable_shared)
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.utils.valueType", ->
@@ -90,7 +90,7 @@ $(document).ready( ->
     equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL')
     kb.release(view_model) # clean up
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.utils.path", ->
@@ -108,6 +108,6 @@ $(document).ready( ->
     equal(kb.utils.optionsPathJoin({path: 'bob.harry'}, 'key').path, 'bob.harry.key', "bob.harry.key path joined")
     equal(kb.utils.optionsPathJoin({path: 'bob.harry.'}, 'key').path, 'bob.harry.key', "bob.harry.key path joined")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

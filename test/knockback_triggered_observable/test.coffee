@@ -50,6 +50,6 @@ $(document).ready( ->
     kb.locale_manager.setLocale('fr-FR')
     equal(trigger_count, 3, "3: no change")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

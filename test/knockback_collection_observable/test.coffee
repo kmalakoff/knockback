@@ -53,7 +53,7 @@ $(document).ready( ->
     kb.release(collection_observable)
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Basic Usage: collection observable with ko.dependentObservable", ->
@@ -87,7 +87,7 @@ $(document).ready( ->
     kb.release(collection_observable)
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Basic Usage: no view models", ->
@@ -130,7 +130,7 @@ $(document).ready( ->
     # clean up
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Basic Usage: no sorting and no callbacks", ->
@@ -173,7 +173,7 @@ $(document).ready( ->
     # clean up
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sync sorting with sort_attribute", ->
@@ -231,7 +231,7 @@ $(document).ready( ->
     # clean up
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sync sorting with sorted_index", ->
@@ -285,7 +285,7 @@ $(document).ready( ->
     # clean up
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sorting with callbacks", ->
@@ -341,7 +341,7 @@ $(document).ready( ->
     # clean up
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Collection sync dynamically changing the sorting function", ->
@@ -402,7 +402,7 @@ $(document).ready( ->
     # clean up
     kb.release(collection_observable)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Nested custom view models", ->
@@ -510,6 +510,6 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(nested_view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

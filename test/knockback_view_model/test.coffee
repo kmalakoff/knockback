@@ -38,7 +38,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("internals test (Coffeescript inheritance)", ->
@@ -106,7 +106,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("internals test (Javascript inheritance)", ->
@@ -176,7 +176,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("Using Coffeescript classes", ->
@@ -218,7 +218,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("Using simple Javascript classes", ->
@@ -259,7 +259,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("requires", ->
@@ -287,7 +287,7 @@ $(document).ready( ->
     # clean up
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("Using kb.localizedObservable", ->
@@ -342,7 +342,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("reference counting and custom __destroy (Coffeescript inheritance)", ->
@@ -387,7 +387,7 @@ $(document).ready( ->
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
     raises((->view_model.release()), null, "ref count is corrupt")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
   
   test("reference counting and custom __destroy (Javascript inheritance)", ->
@@ -432,7 +432,7 @@ $(document).ready( ->
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
     raises((->view_model.release()), null, "ref count is corrupt")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Nested custom view models", ->
@@ -541,7 +541,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(nested_view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Changing attribute types", ->
@@ -581,7 +581,7 @@ $(document).ready( ->
     # clean up
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Prior kb.Observables functionality", ->
@@ -642,7 +642,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Bulk mode (array of keys)", ->
@@ -675,6 +675,6 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

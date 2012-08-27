@@ -77,7 +77,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   # NOTE: dependency on globalize
@@ -125,7 +125,7 @@ $(document).ready( ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("kb.formattedObservable", ->
@@ -151,7 +151,7 @@ $(document).ready( ->
     # clean up
     kb.release(view_model)
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
   test("Localization with a changing key", ->
@@ -188,6 +188,6 @@ $(document).ready( ->
     kb.locale_manager.setLocale('en')
     equal(view_model.greeting(), 'Goodbye', "en: Goodbye")
 
-    equal(kb.statistics.registeredTypeStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 )

@@ -16,7 +16,7 @@
 
 # @m is @model
 addStatisticsEvent = (model, event_name, info) ->
-  not kb.statistics or kb.statistics.addEvent({model: model, event: event_name, key: info.key, path: info.path})
+  not kb.statistics or kb.statistics.addModelEvent({name: event_name, model: model, key: info.key, path: info.path})
 
 class kb.ModelWatcher
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
@@ -91,7 +91,7 @@ class kb.ModelWatcher
               continue if model and info.key and (model.hasChanged and not model.hasChanged(ko.utils.unwrapObservable(info.key)))
 
               # trigger update
-              not kb.statistics or addStatisticsEvent(model, "event: #{event_name}", info)
+              not kb.statistics or addStatisticsEvent(model, event_name, info)
               info.update()
 
           return null
@@ -162,7 +162,7 @@ class kb.ModelWatcher
       relation = _.find(@m.getRelations(), (test) -> return test.key is key)
       return unless relation
       info.rel_fn = (model) ->
-        not kb.statistics or addStatisticsEvent(model, "rel_event: #{event_name}", info)
+        not kb.statistics or addStatisticsEvent(model, "#{event_name} (relational)", info)
         info.update()
       if relation.collectionType or _.isArray(relation.keyContents)
         info.is_collection = true

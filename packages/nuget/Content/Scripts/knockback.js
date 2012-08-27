@@ -439,7 +439,7 @@
 
     Store.useOptionsOrCreate = function(options, obj, observable) {
       if (options.store) {
-        options.store.registerObservable(obj, observable, options);
+        options.store.register(obj, observable, options);
         return kb.utils.wrappedStore(observable, options.store);
       } else {
         kb.utils.wrappedStoreIsOwned(observable, true);
@@ -461,7 +461,7 @@
       return this.observables = null;
     };
 
-    Store.prototype.registerObservable = function(obj, observable, options) {
+    Store.prototype.register = function(obj, observable, options) {
       var creator;
       if (!observable) {
         return;
@@ -482,7 +482,7 @@
       });
     };
 
-    Store.prototype.findObservable = function(obj, creator) {
+    Store.prototype.find = function(obj, creator) {
       var record, _i, _len, _ref;
       if (!obj || (obj instanceof Backbone.Model)) {
         _ref = this.observables;
@@ -506,7 +506,7 @@
       return null;
     };
 
-    Store.prototype.observableIsRegistered = function(observable) {
+    Store.prototype.isRegistered = function(observable) {
       var record, _i, _len, _ref;
       _ref = this.observables;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -518,7 +518,7 @@
       return false;
     };
 
-    Store.prototype.findOrCreateObservable = function(obj, options) {
+    Store.prototype.findOrCreate = function(obj, options) {
       var creator, observable;
       options.store = this;
       options.creator || (options.creator = kb.utils.inferCreator(obj, options.factory, options.path));
@@ -532,7 +532,7 @@
         return obj;
       }
       if (creator) {
-        observable = this.findObservable(obj, creator);
+        observable = this.find(obj, creator);
       }
       if (observable) {
         return observable;
@@ -544,7 +544,7 @@
       }
       observable || (observable = ko.observable(null));
       if (!ko.isObservable(observable)) {
-        this.observableIsRegistered(observable) || this.registerObservable(obj, observable, options);
+        this.isRegistered(observable) || this.register(obj, observable, options);
       }
       return observable;
     };
@@ -563,9 +563,9 @@
 
 
   addStatisticsEvent = function(model, event_name, info) {
-    return !kb.statistics || kb.statistics.addEvent({
+    return !kb.statistics || kb.statistics.addModelEvent({
+      name: event_name,
       model: model,
-      event: event_name,
       key: info.key,
       path: info.path
     });
@@ -669,7 +669,7 @@
                 if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
                   continue;
                 }
-                !kb.statistics || addStatisticsEvent(model, "event: " + event_name, info);
+                !kb.statistics || addStatisticsEvent(model, event_name, info);
                 info.update();
               }
             }
@@ -773,7 +773,7 @@
           return;
         }
         info.rel_fn = function(model) {
-          !kb.statistics || addStatisticsEvent(model, "rel_event: " + event_name, info);
+          !kb.statistics || addStatisticsEvent(model, "" + event_name + " (relational)", info);
           return info.update();
         };
         if (relation.collectionType || _.isArray(relation.keyContents)) {
@@ -1184,7 +1184,7 @@
       if (this.models_only) {
         return model;
       } else {
-        return this.create_options.store.findOrCreateObservable(model, this.create_options);
+        return this.create_options.store.findOrCreate(model, this.create_options);
       }
     };
 
@@ -1677,7 +1677,7 @@
       }
       if (creator) {
         if (create_options.store) {
-          value = create_options.store.findOrCreateObservable(new_value, create_options);
+          value = create_options.store.findOrCreate(new_value, create_options);
         } else {
           if (creator.models_only) {
             value = new_value;
