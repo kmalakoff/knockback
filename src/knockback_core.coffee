@@ -56,11 +56,11 @@ collapseOptions = (options) ->
 ####################################
 # LifeCycle Management
 ####################################
-kb.renderAndBindTemplate = (template, view_model, no_auto_release) ->
+kb.renderAutoReleasedTemplate = (template, view_model, options={}) ->
   el = document.createElement('div')
-  ko.renderTemplate(template, view_model, {}, el, 'replaceChildren');
+  ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
   el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
-  no_auto_release or kb.releaseOnNodeRemove(view_model, el)
+  kb.releaseOnNodeRemove(view_model, el)
   return el
 
 kb.releaseOnNodeRemove = (view_model, node) ->

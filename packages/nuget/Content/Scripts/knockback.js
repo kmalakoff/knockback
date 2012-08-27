@@ -82,14 +82,17 @@
     return result;
   };
 
-  kb.renderAndBindTemplate = function(template, view_model, no_auto_release) {
+  kb.renderAutoReleasedTemplate = function(template, view_model, options) {
     var el;
+    if (options == null) {
+      options = {};
+    }
     el = document.createElement('div');
-    ko.renderTemplate(template, view_model, {}, el, 'replaceChildren');
+    ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
     if (el.children.length === 1) {
       el = el.children[0];
     }
-    no_auto_release || kb.releaseOnNodeRemove(view_model, el);
+    kb.releaseOnNodeRemove(view_model, el);
     return el;
   };
 
