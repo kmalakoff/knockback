@@ -57,6 +57,20 @@ kb.utils.wrappedFactory = (obj, value)              -> return wrappedKey.apply(@
 kb.utils.wrappedModelWatcher = (obj, value)         -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'model_watcher'))
 kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'model_watcher_is_owned'))
 
+# used for attribute setting to ensure all model attributes have their underlying models
+kb.utils.unwrapModels = (obj) ->
+  if obj.__kb
+    return if ('object' of obj.__kb) then obj.__kb.object else obj
+  else if _.isArray(obj)
+    return _.map(obj, (test) -> return kb.utils.unwrapModels(test))
+  else if _.isObject(obj) and not ko.isObservable(obj)
+    result = {}
+    for key, value of obj
+      result[key] = kb.utils.unwrapModels(value)
+    return result
+  else
+    return obj
+
 kb.utils.setToDefault = (obj) ->
   return unless obj
 

@@ -37,10 +37,11 @@ class kb.Store
     creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)
     creator or throwUnexpected(this, 'missing creator')
     @observables.push({obj: obj, observable: observable, creator: creator})
+    observable
 
-  find: (obj, creator) ->
+  findIndex: (obj, creator) ->
     if not obj or (obj instanceof Backbone.Model)
-      for record in @observables
+      for index, record of @observables
         continue unless record.observable
 
         # already released, release our references
@@ -55,9 +56,11 @@ class kb.Store
 
         # creator matches
         else if ((record.creator is creator) or (record.creator.create and (record.creator.create is creator.create)))
-          return record.observable
+          return index
 
-    return null
+    return -1
+
+  find: (obj, creator) -> return if (index = @findIndex(obj, creator)) < 0 then null else @observables[index].observable
 
   isRegistered: (observable) ->
     for record in @observables
@@ -91,3 +94,16 @@ class kb.Store
     if not ko.isObservable(observable)
       @isRegistered(observable) or @register(obj, observable, options) # not registered yet, register now
     return observable
+
+  findOrReplace: (obj, creator, observable) ->
+    if (index = @findIndex(obj, creator)) < 0
+      return @register(obj, observable, {creator: creator})
+    else
+      record = @observables[index]
+      (kb.utils.wrappedObject(record.observable) is obj) or throwUnexpected(this, 'different object') # same object
+      if (record.observable isnt observable) # a change
+        (record.observable.constructor is observable.constructor) or throwUnexpected(this, 'replacing different type')
+        previous_observable = record.observable
+        record.observable = observable
+        kb.release(previous_observable)
+      return observable

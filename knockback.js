@@ -259,6 +259,30 @@
     return wrappedKey.apply(this, argumentsAddKey(arguments, 'model_watcher_is_owned'));
   };
 
+  kb.utils.unwrapModels = function(obj) {
+    var key, result, value;
+    if (obj.__kb) {
+      if ('object' in obj.__kb) {
+        return obj.__kb.object;
+      } else {
+        return obj;
+      }
+    } else if (_.isArray(obj)) {
+      return _.map(obj, function(test) {
+        return kb.utils.unwrapModels(test);
+      });
+    } else if (_.isObject(obj) && !ko.isObservable(obj)) {
+      result = {};
+      for (key in obj) {
+        value = obj[key];
+        result[key] = kb.utils.unwrapModels(value);
+      }
+      return result;
+    } else {
+      return obj;
+    }
+  };
+
   kb.utils.setToDefault = function(obj) {
     var key, value;
     if (!obj) {
@@ -475,19 +499,20 @@
       }
       creator = options.creator ? options.creator : (options.path && options.factory ? options.factory.creatorForPath(obj, options.path) : null);
       creator || throwUnexpected(this, 'missing creator');
-      return this.observables.push({
+      this.observables.push({
         obj: obj,
         observable: observable,
         creator: creator
       });
+      return observable;
     };
 
-    Store.prototype.find = function(obj, creator) {
-      var record, _i, _len, _ref;
+    Store.prototype.findIndex = function(obj, creator) {
+      var index, record, _ref;
       if (!obj || (obj instanceof Backbone.Model)) {
         _ref = this.observables;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          record = _ref[_i];
+        for (index in _ref) {
+          record = _ref[index];
           if (!record.observable) {
             continue;
           }
@@ -499,11 +524,20 @@
           if ((!obj && !record.observable.__kb_null) || (obj && (record.observable.__kb_null || (record.obj !== obj)))) {
             continue;
           } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
-            return record.observable;
+            return index;
           }
         }
       }
-      return null;
+      return -1;
+    };
+
+    Store.prototype.find = function(obj, creator) {
+      var index;
+      if ((index = this.findIndex(obj, creator)) < 0) {
+        return null;
+      } else {
+        return this.observables[index].observable;
+      }
     };
 
     Store.prototype.isRegistered = function(observable) {
@@ -547,6 +581,25 @@
         this.isRegistered(observable) || this.register(obj, observable, options);
       }
       return observable;
+    };
+
+    Store.prototype.findOrReplace = function(obj, creator, observable) {
+      var index, previous_observable, record;
+      if ((index = this.findIndex(obj, creator)) < 0) {
+        return this.register(obj, observable, {
+          creator: creator
+        });
+      } else {
+        record = this.observables[index];
+        (kb.utils.wrappedObject(record.observable) === obj) || throwUnexpected(this, 'different object');
+        if (record.observable !== observable) {
+          (record.observable.constructor === observable.constructor) || throwUnexpected(this, 'replacing different type');
+          previous_observable = record.observable;
+          record.observable = observable;
+          kb.release(previous_observable);
+        }
+        return observable;
+      }
     };
 
     return Store;
@@ -868,6 +921,7 @@
         } else {
           factory.addPathMapping(create_options.path, kb.ViewModel);
         }
+        create_options.creator = factory.creatorForPath(null, create_options.path);
       }
       observable.destroy = _.bind(this.destroy, this);
       observable.shareOptions = _.bind(this.shareOptions, this);
@@ -1053,9 +1107,9 @@
 
     CollectionObservable.prototype._onModelAdd = function(model) {
       var add_index, collection, observable, view_model;
-      view_model = this._createViewModel(model);
       observable = kb.utils.wrappedObservable(this);
       collection = kb.utils.wrappedObject(observable);
+      view_model = this._createViewModel(model);
       add_index = this.sorted_index ? this.sorted_index(observable(), view_model) : collection.indexOf(model);
       this.in_edit++;
       observable.splice(add_index, 0, view_model);
@@ -1106,12 +1160,27 @@
     };
 
     CollectionObservable.prototype._onObservableArrayChange = function(values) {
-      var collection, observable;
+      var collection, has_view_model, observable, value, _i, _j, _len, _len1;
       if (this.in_edit) {
         return;
       }
       observable = kb.utils.wrappedObservable(this);
       collection = kb.utils.wrappedObject(observable);
+      if (!this.models_only) {
+        for (_i = 0, _len = values.length; _i < _len; _i++) {
+          value = values[_i];
+          if (value && !(value instanceof Backbone.Model)) {
+            has_view_model = true;
+            break;
+          }
+        }
+        if (has_view_model) {
+          for (_j = 0, _len1 = values.length; _j < _len1; _j++) {
+            value = values[_j];
+            this.create_options.store.findOrReplace(kb.utils.wrappedObject(value), this.create_options.creator, value);
+          }
+        }
+      }
       this.in_edit++;
       collection.reset(_.map(values, function(test) {
         return kb.utils.wrappedModel(test);
@@ -1137,11 +1206,15 @@
     };
 
     CollectionObservable.prototype._collectionResync = function(silent) {
-      var add_index, collection, model, observable, view_model, view_models, _i, _len, _ref,
+      var add_index, array, collection, model, observable, view_model, view_models, _i, _len, _ref,
         _this = this;
-      this._clear(silent);
       observable = kb.utils.wrappedObservable(this);
       collection = kb.utils.wrappedObject(observable);
+      if (!silent) {
+        this.trigger('remove', observable());
+      }
+      array = observable();
+      array.splice(0, array.length);
       if (this.sorted_index) {
         view_models = [];
         _ref = collection.models;
@@ -1530,10 +1603,11 @@
           return ko.utils.unwrapObservable(_this.vo());
         },
         write: function(new_value) {
-          var arg, args, set_info, _i, _len, _ref;
+          var arg, args, set_info, unwrapped_new_value, _i, _len, _ref;
+          unwrapped_new_value = kb.utils.unwrapModels(new_value);
           set_info = {};
-          set_info[ko.utils.unwrapObservable(_this.key)] = new_value;
-          args = _this.write ? [new_value] : [set_info];
+          set_info[ko.utils.unwrapObservable(_this.key)] = unwrapped_new_value;
+          args = _this.write ? [unwrapped_new_value] : [set_info];
           if (_this.args) {
             if (_.isArray(_this.args)) {
               _ref = _this.args;

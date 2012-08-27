@@ -74,6 +74,7 @@ class kb.CollectionObservable
         factory.addPathMapping(create_options.path, {create: options.create})
       else
         factory.addPathMapping(create_options.path, kb.ViewModel)
+      create_options.creator = factory.creatorForPath(null, create_options.path)
 
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
@@ -171,7 +172,7 @@ class kb.CollectionObservable
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(kb.utils.wrappedObservable(@)(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
 
-  hasViewModels: -> return !@models_only
+  hasViewModels: -> return not @models_only
 
   ####################################################
   # Internal
@@ -203,9 +204,9 @@ class kb.CollectionObservable
     @
 
   _onModelAdd: (model) ->
-    view_model = @_createViewModel(model)
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
+    view_model = @_createViewModel(model)
     add_index = if @sorted_index then @sorted_index(observable(), view_model) else collection.indexOf(model)
 
     @in_edit++
@@ -252,6 +253,14 @@ class kb.CollectionObservable
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
 
+    # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
+    if not @models_only
+      for value in values
+        (has_view_model = true; break) if value and not (value instanceof Backbone.Model)
+      # ensure we have the right view models in the store
+      if has_view_model
+        @create_options.store.findOrReplace(kb.utils.wrappedObject(value), @create_options.creator, value) for value in values
+
     # allow dual-sync for options: https://github.com/kmalakoff/knockback/issues/37
     @in_edit++
     collection.reset(_.map(values, (test) -> return kb.utils.wrappedModel(test)))
@@ -272,9 +281,13 @@ class kb.CollectionObservable
     @
 
   _collectionResync: (silent) ->
-    @_clear(silent)
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
+    @trigger('remove', observable()) if not silent # notify
+
+    # clear the observable array manually
+    array = observable()
+    array.splice(0, array.length)
 
     if @sorted_index
       view_models = []
