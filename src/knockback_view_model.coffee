@@ -45,20 +45,26 @@ class kb.ViewModel
     # update to set up first values observable
     model_watcher = kb.utils.wrappedModelWatcher(@, new kb.ModelWatcher(model, @, {model: _.bind(@model, @)}))
 
+    # collect requires and internls first because they could be used to define the include order
+    (keys = _.clone(options.requires)) if options.requires and _.isArray(options.requires)
+    (keys = if keys then _.union(keys, @__kb.internals) else _.clone(@__kb.internals)) if @__kb.internals
+
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified
       if _.isArray(options.keys)
-        keys = @__kb.keys = options.keys
+        @__kb.keys = options.keys
+        (keys = if keys then _.union(keys, options.keys) else _.clone(options.keys))
       else
         mapped_keys = {}
         for vm_key, mapping_info of options.keys
           mapped_keys[if _.isString(mapping_info) then mapping_info else (if mapping_info.key then mapping_info.key else vm_key)] = true
         @__kb.keys = _.keys(mapped_keys)
     else
-      bb_model = model_watcher.model(); keys = _.keys(bb_model.attributes) if bb_model and bb_model.attributes
+      bb_model = model_watcher.model()
+      if bb_model and bb_model.attributes
+        attribute_keys = _.keys(bb_model.attributes)
+        keys = if keys then _.union(keys, attribute_keys) else attribute_keys
     keys = _.difference(keys, @__kb.excludes) if keys and @__kb.excludes  # remove excludes
-    (keys = if keys then _.union(keys, @__kb.internals) else @__kb.internals) if @__kb.internals
-    (keys = if keys then _.union(keys, options.requires) else options.requires) if options.requires and _.isArray(options.requires)
 
     # initialize
     @_mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)

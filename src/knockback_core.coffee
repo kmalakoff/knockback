@@ -79,8 +79,15 @@ kb.release = (obj, preRelease) ->
     (typeof(obj) is 'function' and not ko.isObservable(obj)) or # not a simple function
     ((obj instanceof Backbone.Model) or (obj instanceof Backbone.Collection)) # not a model or collection
   )
-    return
+    return @
 
+  # release array
+  if _.isArray(obj)
+    array = obj.splice(0, obj.length)
+    kb.release(item) for item in array
+    return @
+
+  # release object
   obj.__kb_destroyed = true
   not preRelease or preRelease()
 
@@ -108,12 +115,12 @@ kb.release = (obj, preRelease) ->
     for key, value of obj
       (key is '__kb') or kb.release(value, -> obj[key] = null)
 
-  return
+  return @
 
 kb.releaseKeys = (obj) ->
   for key, value of obj
     (key is '__kb') or kb.release(value, -> obj[key] = null)
-  return
+  return @
 
 ####################################
 # Localization

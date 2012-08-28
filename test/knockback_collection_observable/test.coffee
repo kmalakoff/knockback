@@ -25,7 +25,7 @@ $(document).ready( ->
       @name = kb.observable(model, 'name')
       @number = kb.observable(model, 'number')
 
-  test("Basic Usage: collection observable with ko.dependentObservable", ->
+  test("2. Basic Usage: collection observable with ko.dependentObservable", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.ContactsCollection()
@@ -56,7 +56,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Basic Usage: collection observable with ko.dependentObservable", ->
+  test("3. Basic Usage: collection observable with ko.dependentObservable", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.ContactsCollection()
@@ -90,7 +90,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Basic Usage: no view models", ->
+  test("4. Basic Usage: no view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.ContactsCollection()
@@ -133,7 +133,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Basic Usage: no sorting and no callbacks", ->
+  test("5. Basic Usage: no sorting and no callbacks", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.ContactsCollection()
@@ -176,7 +176,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Collection sync sorting with sort_attribute", ->
+  test("6. Collection sync sorting with sort_attribute", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.ContactsCollection()
@@ -234,7 +234,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Collection sync sorting with sorted_index", ->
+  test("7. Collection sync sorting with sorted_index", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model_count = 0; view_model_resort_count = 0
@@ -288,7 +288,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Collection sorting with callbacks", ->
+  test("8. Collection sorting with callbacks", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.NameSortedContactsCollection()
@@ -344,7 +344,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Collection sync dynamically changing the sorting function", ->
+  test("9. Collection sync dynamically changing the sorting function", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new _kbe.ContactsCollection()
@@ -405,7 +405,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Nested custom view models", ->
+  test("10. Nested custom view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelDate extends kb.ViewModel
@@ -509,6 +509,94 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(nested_view_model)
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
+  test("11. Shared Options", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    collection = new Backbone.Collection({id: 1, name: 'Bob'})
+
+    collection_observable1 = kb.collectionObservable(collection)
+    collection_observable2 = kb.collectionObservable(collection)
+    collection_observable3 = kb.collectionObservable(collection, collection_observable1.shareOptions())
+
+    ok(collection_observable1()[0] isnt collection_observable2()[0], 'not sharing')
+    ok(collection_observable1()[0] is collection_observable3()[0], 'sharing')
+
+    kb.release([collection_observable1, collection_observable2, collection_observable3])
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
+  test("12. Filters option", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    collection = new Backbone.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+
+    collection_observable1 = kb.collectionObservable(collection)
+    collection_observable2 = kb.collectionObservable(collection, {filters: 1})
+    collection_observable3 = kb.collectionObservable(collection, {filters: [2]})
+    collection_observable4 = kb.collectionObservable(collection, {filters: 5})
+    collection_observable5 = kb.collectionObservable(collection, {filters: [5]})
+    collection_observable6 = kb.collectionObservable(collection, {filters: (model) -> model.get('name') is 'George'})
+    collection_observable7 = kb.collectionObservable(collection, {filters: [((model) -> model.get('name') is 'Bob'), ((model) -> return model.get('name') is 'Fred')]})
+    observable1 = ko.dependentObservable(-> _.filter(collection_observable6(), (vm) -> vm.name() isnt 'Bob'))
+
+    equal(_.map(_.pluck(collection_observable1(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
+    equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Fred, George')
+    equal(_.map(_.pluck(collection_observable3(), 'name'), (o) -> o()).join(', '), 'Bob, George')
+    equal(_.map(_.pluck(collection_observable4(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
+    equal(_.map(_.pluck(collection_observable5(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
+    equal(_.map(_.pluck(collection_observable6(), 'name'), (o) -> o()).join(', '), 'Bob, Fred')
+    equal(_.map(_.pluck(collection_observable7(), 'name'), (o) -> o()).join(', '), 'George')
+    equal(_.map(_.pluck(observable1(), 'name'), (o) -> o()).join(', '), 'Fred')
+
+    collection.add([{id: 4, name: 'Bob'}, {id: 5, name: 'Fred'}, {id: 6, name: 'George'}, {id: 7, name: 'Mary'}])
+
+    equal(_.map(_.pluck(collection_observable1(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George, Bob, Fred, George, Mary')
+    equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Fred, George, Bob, Fred, George, Mary')
+    equal(_.map(_.pluck(collection_observable3(), 'name'), (o) -> o()).join(', '), 'Bob, George, Bob, Fred, George, Mary')
+    equal(_.map(_.pluck(collection_observable4(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George, Bob, George, Mary')
+    equal(_.map(_.pluck(collection_observable5(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George, Bob, George, Mary')
+    equal(_.map(_.pluck(collection_observable6(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, Bob, Fred, Mary')
+    equal(_.map(_.pluck(collection_observable7(), 'name'), (o) -> o()).join(', '), 'George, George, Mary')
+    equal(_.map(_.pluck(observable1(), 'name'), (o) -> o()).join(', '), 'Fred, Fred, Mary')
+
+    kb.release([collection_observable1, collection_observable2, collection_observable3, collection_observable4, collection_observable5, collection_observable6, collection_observable7, observable1])
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
+  test("13. Setting view models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    collection = new Backbone.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+
+    # set the viewmodels (simulating a selectOptions)
+    collection_observable = kb.collectionObservable(collection)
+    view_models = _.map(collection.models, (model) -> kb.viewModel(model))
+    previous_view_model = collection_observable()[0]
+    collection_observable(view_models)
+    ok(collection_observable()[0] isnt previous_view_model, 'view model updated')
+    ok(collection_observable()[0] is view_models[0], 'view model updated from new list')
+    store = kb.utils.wrappedStore(collection_observable)
+    ok(store.find(collection.models[0], kb.ViewModel) is view_models[0], 'view model was added to the store')
+    ok(store.find(collection.models[0], kb.ViewModel) isnt previous_view_model, 'previous view model was removed from the store')
+    kb.release(view_models)
+    kb.release(collection_observable)
+
+    # set the viewmodels (simulating a selectOptions)
+    class SpecializedViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(collection)
+    view_models = _.map(collection.models, (model) -> new SpecializedViewModel(model))
+    previous_view_model = collection_observable()[0]
+    raises((->collection_observable(view_models)), null, 'Store: replacing different type')
+    ok(collection_observable()[0] isnt previous_view_model, 'view model updated')
+    ok(collection_observable()[0] is view_models[0], 'view model updated from new list')
+    store = kb.utils.wrappedStore(collection_observable)
+    ok(store.find(collection.models[0], kb.ViewModel) isnt view_models[0], 'view model was not added to the store')
+    ok(store.find(collection.models[0], kb.ViewModel) is previous_view_model, 'previous view model was not removed from the store')
+    kb.release(view_models)
+    kb.release(collection_observable)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )

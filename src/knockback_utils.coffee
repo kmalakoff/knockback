@@ -8,6 +8,44 @@
     Optional dependency: Backbone.ModelRef.js.
 ###
 
+####################################################
+# Internal
+####################################################
+_wrappedKey = (obj, key, value) ->
+  # get
+  if arguments.length is 2
+    return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
+
+  # set
+  obj or throwUnexpected(this, "no obj for wrapping #{key}")
+  obj.__kb or= {}
+  obj.__kb[key] = value
+  return value
+
+_argumentsAddKey = (args, key) ->
+  arraySplice.call(args, 1, 0, key)
+  return args
+
+# used for attribute setting to ensure all model attributes have their underlying models
+_unwrapModels = (obj) ->
+  if not obj
+    return obj
+  else if obj.__kb
+    return if ('object' of obj.__kb) then obj.__kb.object else obj
+  else if _.isArray(obj)
+    return _.map(obj, (test) -> return _unwrapModels(test))
+  else if _.isObject(obj) and not ko.isObservable(obj)
+    result = {}
+    for key, value of obj
+      result[key] = _unwrapModels(value)
+    return result
+  else
+    return obj
+
+####################################################
+# Public API
+####################################################
+
 # utilities namespace
 kb.utils = {}
 
@@ -26,50 +64,21 @@ kb.utils.wrappedDestroy = (obj) ->
   __kb.store = null
   # kb.release(__kb, true) # release everything that remains
 
-wrappedKey = (obj, key, value) ->
-  # get
-  if arguments.length is 2
-    return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
-
-  # set
-  obj or throwUnexpected(this, "no obj for wrapping #{key}")
-  obj.__kb or= {}
-  obj.__kb[key] = value
-  return value
-
-argumentsAddKey = (args, key) ->
-  arraySplice.call(args, 1, 0, key)
-  return args
-
 kb.utils.wrappedModel = (obj, value) ->
   # get
   if (arguments.length is 1)
-    value = wrappedKey(obj, 'object')
+    value = _wrappedKey(obj, 'object')
     return if _.isUndefined(value) then obj else value
   else
-    return wrappedKey(obj, 'object', value)
+    return _wrappedKey(obj, 'object', value)
 
-kb.utils.wrappedObservable = (obj, value)           -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'observable'))
-kb.utils.wrappedObject = (obj, value)               -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'object'))
-kb.utils.wrappedStore = (obj, value)                -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'store'))
-kb.utils.wrappedStoreIsOwned = (obj, value)         -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'store_is_owned'))
-kb.utils.wrappedFactory = (obj, value)              -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'factory'))
-kb.utils.wrappedModelWatcher = (obj, value)         -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'model_watcher'))
-kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> return wrappedKey.apply(@, argumentsAddKey(arguments, 'model_watcher_is_owned'))
-
-# used for attribute setting to ensure all model attributes have their underlying models
-kb.utils.unwrapModels = (obj) ->
-  if obj.__kb
-    return if ('object' of obj.__kb) then obj.__kb.object else obj
-  else if _.isArray(obj)
-    return _.map(obj, (test) -> return kb.utils.unwrapModels(test))
-  else if _.isObject(obj) and not ko.isObservable(obj)
-    result = {}
-    for key, value of obj
-      result[key] = kb.utils.unwrapModels(value)
-    return result
-  else
-    return obj
+kb.utils.wrappedObservable = (obj, value)           -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'observable'))
+kb.utils.wrappedObject = (obj, value)               -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
+kb.utils.wrappedStore = (obj, value)                -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
+kb.utils.wrappedStoreIsOwned = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store_is_owned'))
+kb.utils.wrappedFactory = (obj, value)              -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
+kb.utils.wrappedModelWatcher = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher'))
+kb.utils.wrappedModelWatcherIsOwned = (obj, value)  -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher_is_owned'))
 
 kb.utils.setToDefault = (obj) ->
   return unless obj
@@ -83,10 +92,6 @@ kb.utils.setToDefault = (obj) ->
     for key, value of obj
       kb.utils.setToDefault(value) if value and (ko.isObservable(value) or (typeof(value) isnt 'function')) and ((key[0] isnt '_') or key.search('__kb'))
   return obj
-
-kb.utils.release = (obj) ->
-  legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
-  return kb.release(obj)
 
 kb.utils.valueType = (observable) ->
   return KB_TYPE_UNKNOWN        unless observable
@@ -124,3 +129,8 @@ kb.utils.createDefaultObservable = (obj, options) ->
   return kb.collectionObservable(obj, options)        if obj instanceof Backbone.Collection
   return ko.observableArray(obj)                      if _.isArray(obj)
   return ko.observable(obj)
+
+# deprecations
+kb.utils.release = (obj) ->
+  legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
+  return kb.release(obj)

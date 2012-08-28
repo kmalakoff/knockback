@@ -15,33 +15,33 @@ $(document).ready( ->
 
   kb.locale_manager = new _kbe.LocaleManager('en', {})
 
-  test("Standard use case: read and write", ->
+  test("1. Standard use case: read and write", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model)
-  
+
     # get
     equal(view_model.name(), 'Ringo', "Interesting name")
     equal(view_model.number(), '555-555-5556', "Not so interesting number")
-  
+
     # set from the view model
     view_model.number('9222-222-222')
     equal(model.get('number'), '9222-222-222', "Number was changed")
     equal(view_model.number(), '9222-222-222', "Number was changed")
-  
+
     # set from the model
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
     equal(view_model.name(), 'Starr', "Name changed")
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
-  
+
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("internals test (Coffeescript inheritance)", ->
+
+  test("2. internals test (Coffeescript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModel extends kb.ViewModel
@@ -49,23 +49,23 @@ $(document).ready( ->
         super(model, {internals: ['email', 'date']})
         @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
         @date = new _kbe.LongDateLocalizer(@_date)
-  
+
     birthdate = new Date(1940, 10, 9)
     model = new _kbe.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
-  
+
     # check email
     equal(view_model._email(), undefined, "no email")
     equal(view_model.email(), 'your.name@yourplace.com', "default message")
-  
+
     view_model._email('j@imagine.com')
     equal(view_model._email(), 'j@imagine.com', "received email")
     equal(view_model.email(), 'j@imagine.com', "received email")
-  
+
     view_model.email('john@imagine.com')
     equal(view_model._email(), 'john@imagine.com', "received email")
     equal(view_model.email(), 'john@imagine.com', "received email")
-  
+
     # set from the view model
     kb.locale_manager.setLocale('en-GB')
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
@@ -77,7 +77,7 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1963, "year is good")
     equal(view_model._date().getMonth(), 11, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
     kb.locale_manager.setLocale('fr-FR')
@@ -90,7 +90,7 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1940, "year is good")
     equal(view_model._date().getMonth(), 10, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
     kb.locale_manager.setLocale('fr-FR')
@@ -102,14 +102,14 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1940, "year is good")
     equal(view_model._date().getMonth(), 10, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("internals test (Javascript inheritance)", ->
+
+  test("3. internals test (Javascript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     ContactViewModel = kb.ViewModel.extend({
@@ -119,23 +119,23 @@ $(document).ready( ->
         @date = new _kbe.LongDateLocalizer(@_date)
         @
     })
-  
+
     birthdate = new Date(1940, 10, 9)
     model = new _kbe.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
-  
+
     # check email
     equal(view_model._email(), undefined, "no email")
     equal(view_model.email(), 'your.name@yourplace.com', "default message")
-  
+
     view_model._email('j@imagine.com')
     equal(view_model._email(), 'j@imagine.com', "received email")
     equal(view_model.email(), 'j@imagine.com', "received email")
-  
+
     view_model.email('john@imagine.com')
     equal(view_model._email(), 'john@imagine.com', "received email")
     equal(view_model.email(), 'john@imagine.com', "received email")
-  
+
     # set from the view model
     kb.locale_manager.setLocale('en-GB')
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
@@ -147,7 +147,7 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1963, "year is good")
     equal(view_model._date().getMonth(), 11, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
     kb.locale_manager.setLocale('fr-FR')
@@ -160,7 +160,7 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1940, "year is good")
     equal(view_model._date().getMonth(), 10, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
     kb.locale_manager.setLocale('fr-FR')
@@ -172,14 +172,14 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1940, "year is good")
     equal(view_model._date().getMonth(), 10, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("Using Coffeescript classes", ->
+
+  test("4. Using Coffeescript classes", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelCustom extends kb.ViewModel
@@ -187,41 +187,41 @@ $(document).ready( ->
         super(model, {internals: ['name', 'number']})
         @name = ko.dependentObservable(=> return "First: #{@_name()}")
         @number = kb.formattedObservable('#: {0}', @_number)
-  
+
     model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
-  
+
     # get
     equal(view_model._name(), 'Ringo', "Interesting name")
     equal(view_model.name(), 'First: Ringo', "Interesting name")
     equal(view_model._number(), '555-555-5556', "Not so interesting number")
     equal(view_model.number(), '#: 555-555-5556', "Not so interesting number")
-  
+
     # set from the view model
     view_model.number('#: 9222-222-222')
     equal(model.get('number'), '9222-222-222', "Number was changed")
     equal(view_model._number(), '9222-222-222', "Number was changed")
     equal(view_model.number(), '#: 9222-222-222', "Number was changed")
-  
+
     # set from the model
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
     equal(view_model._name(), 'Starr', "Name changed")
     equal(view_model.name(), 'First: Starr', "Name changed")
     equal(view_model._number(), 'XXX-XXX-XXXX', "Number was changed")
     equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
-  
+
     # set from the generated attribute
     view_model._name('Ringo')
     equal(view_model._name(), 'Ringo', "Interesting name")
     equal(view_model.name(), 'First: Ringo', "Interesting name")
-  
+
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("Using simple Javascript classes", ->
+
+  test("5. Using simple Javascript classes", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     ContactViewModelCustom = (model) ->
@@ -233,53 +233,53 @@ $(document).ready( ->
         write: (value) -> model.set({number: value.substring(3)})
       }, view_model)
       return view_model
-  
+
     model = new _kbe.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
-  
+
     # get
     equal(view_model.name(), 'Ringo', "Interesting name")
     equal(view_model.formatted_name(), 'First: Ringo', "Interesting name")
     equal(view_model.number(), '555-555-5556', "Not so interesting number")
     equal(view_model.formatted_number(), '#: 555-555-5556', "Not so interesting number")
-  
+
     # set from the view model
     view_model.formatted_number('#: 9222-222-222')
     equal(model.get('number'), '9222-222-222', "Number was changed")
     equal(view_model.number(), '9222-222-222', "Number was changed")
     equal(view_model.formatted_number(), '#: 9222-222-222', "Number was changed")
-  
+
     # set from the model
     model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
     equal(view_model.name(), 'Starr', "Name changed")
     equal(view_model.formatted_name(), 'First: Starr', "Name changed")
     equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
     equal(view_model.formatted_number(), '#: XXX-XXX-XXXX', "Number was changed")
-  
+
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("requires", ->
+
+  test("6. requires", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
         @full_name = kb.formattedObservable('Last: {1}, First: {0}', @first, @last)
-  
+
     model = new Backbone.Model()
     view_model = new ContactViewModelFullName(model)
     equal(view_model.full_name(), 'Last: , First: ', "full name is good")
-  
+
     model.set({first: 'Ringo', last: 'Starr'})
     equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
-  
+
     model.set({first: 'Bongo'})
     equal(view_model.full_name(), 'Last: Starr, First: Bongo', "full name is good")
-  
+
     view_model.full_name('Last: The Starr, First: Ringo')
     equal(model.get('first'), 'Ringo', "first name is good")
     equal(model.get('last'), 'The Starr', "last name is good")
@@ -289,19 +289,19 @@ $(document).ready( ->
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("Using kb.localizedObservable", ->
+
+  test("7. Using kb.localizedObservable", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['date']})
         @date = new _kbe.LongDateLocalizer(@_date)
-  
+
     birthdate = new Date(1940, 10, 9)
     model = new _kbe.Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
-  
+
     # set from the view model
     kb.locale_manager.setLocale('en-GB')
     equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
@@ -313,7 +313,7 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1963, "year is good")
     equal(view_model._date().getMonth(), 11, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # set from the model
     model.set({date: new Date(birthdate.valueOf())})
     kb.locale_manager.setLocale('fr-FR')
@@ -326,7 +326,7 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1940, "year is good")
     equal(view_model._date().getMonth(), 10, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # set from the automatically-generated date observable
     view_model.date(new Date(birthdate.valueOf()))
     kb.locale_manager.setLocale('fr-FR')
@@ -338,21 +338,21 @@ $(document).ready( ->
     equal(view_model._date().getFullYear(), 1940, "year is good")
     equal(view_model._date().getMonth(), 10, "month is good")
     equal(view_model._date().getDate(), 10, "day is good")
-  
+
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("reference counting and custom __destroy (Coffeescript inheritance)", ->
+
+  test("8. reference counting and custom __destroy (Coffeescript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
         @is_destroyed = false
- 
+
         # monkey patch reference counting
         @ref_count = 1
         @super_destroy = @destroy; @destroy = null
@@ -360,43 +360,43 @@ $(document).ready( ->
 
       retain: -> @ref_count++
       refCount: -> return @ref_count
-      release: -> 
+      release: ->
         --@ref_count
-        throw "ref count is corrupt" if @ref_count < 0 
+        throw "ref count is corrupt" if @ref_count < 0
         return if @ref_count
         @is_destroyed = true
         @super_destroy()
- 
+
     model = new Backbone.Model({first: "Hello"})
     view_model = new ContactViewModelFullName(model)
-  
+
     equal(view_model.first(), "Hello", "Hello exists")
-  
+
     view_model.retain()
     equal(view_model.refCount(), 2, "ref count 2")
     equal(view_model.is_destroyed, false, "not destroyed")
-  
+
     view_model.release()
     equal(view_model.refCount(), 1, "ref count 1")
     equal(view_model.is_destroyed, false, "not destroyed")
-  
+
     kb.release(view_model)
     equal(view_model.refCount(), 0, "ref count 0")
     equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
-  
+
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
     raises((->view_model.release()), null, "ref count is corrupt")
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
-  
-  test("reference counting and custom __destroy (Javascript inheritance)", ->
+
+  test("9. reference counting and custom __destroy (Javascript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     ContactViewModelFullName = kb.ViewModel.extend({
       constructor: (model) ->
         kb.ViewModel.prototype.constructor.call(this, model, {requires: ['first', 'last']})
-  
+
         # monkey patch reference counting
         @ref_count = 1
         @super_destroy = @destroy; @destroy = null
@@ -404,38 +404,38 @@ $(document).ready( ->
 
       retain: -> @ref_count++
       refCount: -> return @ref_count
-      release: -> 
+      release: ->
         --@ref_count
-        throw "ref count is corrupt" if @ref_count < 0 
+        throw "ref count is corrupt" if @ref_count < 0
         return if @ref_count
         @is_destroyed = true
         @super_destroy()
     })
-  
+
     model = new Backbone.Model({first: "Hello"})
     view_model = new ContactViewModelFullName(model)
-  
+
     equal(view_model.first(), "Hello", "Hello exists")
-  
+
     view_model.retain()
     equal(view_model.refCount(), 2, "ref count 2")
     equal(view_model.is_destroyed, false, "not destroyed")
-  
+
     view_model.release()
     equal(view_model.refCount(), 1, "ref count 1")
     equal(view_model.is_destroyed, false, "not destroyed")
-  
+
     kb.release(view_model)
     equal(view_model.refCount(), 0, "ref count 0")
     equal(view_model.is_destroyed, true, "is destroyed using overridden destroy function")
-  
+
     raises((->view_model.first()), null, "Hello doesn't exist anymore")
     raises((->view_model.release()), null, "ref count is corrupt")
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Nested custom view models", ->
+  test("10. Nested custom view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class ContactViewModelDate extends kb.ViewModel
@@ -544,7 +544,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Changing attribute types", ->
+  test("11. Changing attribute types", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     model = new Backbone.Model({reused: null})
@@ -564,7 +564,7 @@ $(document).ready( ->
     kb.release(view_model)
 
     # add custom mapping
-    view_model = kb.viewModel(model, {factories: 
+    view_model = kb.viewModel(model, {factories:
       reused: (obj, options) -> return if obj instanceof Backbone.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
     })
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
@@ -584,7 +584,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Prior kb.Observables functionality", ->
+  test("12. Prior kb.Observables functionality", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     ContactViewModel = (model) ->
@@ -645,7 +645,7 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("Bulk mode (array of keys)", ->
+  test("13. Bulk mode (array of keys)", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     model = new _kbe.Contact({name: 'John', number: '555-555-5558'})
@@ -673,6 +673,61 @@ $(document).ready( ->
     kb.locale_manager.setLocale('fr-FR')
 
     # and cleanup after yourself when you are done.
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
+  test("14. Shared Options", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    model1 = new Backbone.Model({id: 1, name: 'Bob'})
+    model2 = new Backbone.Model({id: 1, name: 'Bob'})
+    model3 = new Backbone.Model({id: 1, name: 'Bob'})
+
+    view_model1 = kb.viewModel(model1)
+    view_model2 = kb.viewModel(model2)
+    view_model3 = kb.viewModel(model3, view_model1.shareOptions())
+
+    ok((view_model1.name isnt view_model2.name) and (view_model1.name() is view_model2.name()), 'not sharing')
+    ok((view_model1.name isnt view_model3.name) and (view_model1.name() is view_model3.name()), 'sharing')
+
+    kb.release([view_model1, view_model2, view_model3])
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
+  test("15. Options", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    # keys
+    view_model = new kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: ['name', 'date'])
+    equals(view_model.name(), 'Bob', 'keys: Bob')
+    ok(view_model.date, 'keys: date')
+    equal(view_model.date(), null, 'keys: date fn')
+    kb.release(view_model)
+
+    # excludes
+    view_model = new kb.viewModel(new Backbone.Model({name: 'Bob', date: new Date()}), excludes: ['date'])
+    equals(view_model.name(), 'Bob', 'excludes: Bob')
+    ok(not view_model.date, 'excludes: date')
+    kb.release(view_model)
+
+    # requires
+    view_model = new kb.viewModel(new Backbone.Model(), requires: ['name'])
+    equals(view_model.name(), null, 'requires: name')
+    ok(not view_model.date, 'requires: date')
+    kb.release(view_model)
+
+    # internals
+    view_model = new kb.viewModel(new Backbone.Model(), internals: ['name'])
+    equals(view_model._name(), null, 'internals: name')
+    ok(not view_model.date, 'internals: date')
+    kb.release(view_model)
+
+    # mappings
+    view_model = new kb.viewModel(new Backbone.Model(), mappings: {name: {}})
+    equals(view_model.name(), null, 'mappings: name')
+    ok(not view_model.date, 'mappings: date')
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null

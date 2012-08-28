@@ -16,12 +16,16 @@ class kb.Store
       return kb.utils.wrappedStore(observable, new kb.Store())
 
   constructor: ->
-    @observables = []
+    @observable_records = []
+    @replaced_observables = []
 
   destroy: ->
-    for record in @observables
+    for record in @observable_records
       kb.release(record.observable)
-    @observables = null
+    for observable in @replaced_observables
+      kb.release(observable)
+    @observable_records = null
+    @replaced_observables = null
 
   register: (obj, observable, options) ->
     return unless observable # nothing to register
@@ -35,13 +39,13 @@ class kb.Store
 
     # register the observable
     creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)
-    creator or throwUnexpected(this, 'missing creator')
-    @observables.push({obj: obj, observable: observable, creator: creator})
+    creator = observable.constructor unless creator # default is to use the constructor
+    @observable_records.push({obj: obj, observable: observable, creator: creator})
     observable
 
   findIndex: (obj, creator) ->
     if not obj or (obj instanceof Backbone.Model)
-      for index, record of @observables
+      for index, record of @observable_records
         continue unless record.observable
 
         # already released, release our references
@@ -60,10 +64,10 @@ class kb.Store
 
     return -1
 
-  find: (obj, creator) -> return if (index = @findIndex(obj, creator)) < 0 then null else @observables[index].observable
+  find: (obj, creator) -> return if (index = @findIndex(obj, creator)) < 0 then null else @observable_records[index].observable
 
   isRegistered: (observable) ->
-    for record in @observables
+    for record in @observable_records
       return true if record.observable is observable
     return false
 
@@ -96,14 +100,17 @@ class kb.Store
     return observable
 
   findOrReplace: (obj, creator, observable) ->
+    obj or raiseUnexpected('obj missing')
     if (index = @findIndex(obj, creator)) < 0
       return @register(obj, observable, {creator: creator})
     else
-      record = @observables[index]
+      record = @observable_records[index]
       (kb.utils.wrappedObject(record.observable) is obj) or throwUnexpected(this, 'different object') # same object
       if (record.observable isnt observable) # a change
         (record.observable.constructor is observable.constructor) or throwUnexpected(this, 'replacing different type')
-        previous_observable = record.observable
+
+        # put the previous observable on the destroy list (but don't release until the store is released)
+        @replaced_observables.push(record.observable)
         record.observable = observable
-        kb.release(previous_observable)
+
       return observable

@@ -46,7 +46,7 @@ class kb.Observable
 
       write: (new_value) =>
         # set on model
-        unwrapped_new_value = kb.utils.unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
+        unwrapped_new_value = _unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
         set_info = {}; set_info[ko.utils.unwrapObservable(@key)] = unwrapped_new_value
         args = if @write then [unwrapped_new_value] else [set_info]
         if @args

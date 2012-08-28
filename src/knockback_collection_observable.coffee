@@ -51,6 +51,7 @@ class kb.CollectionObservable
     options = collapseOptions(options)
     @sort_attribute = options.sort_attribute
     @sorted_index = options.sorted_index
+    @filters = if _.isArray(options.filters) then options.filters else [options.filters] if options.filters
     create_options = @create_options = {store:  kb.Store.useOptionsOrCreate(options, collection, observable)} # create options
 
     # view model factory create factories
@@ -208,6 +209,10 @@ class kb.CollectionObservable
   _onModelAdd: (model) ->
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
+
+    # filtered
+    return if @_modelIsFiltered(model)
+
     view_model = @_createViewModel(model)
     add_index = if @sorted_index then @sorted_index(observable(), view_model) else collection.indexOf(model)
 
@@ -227,8 +232,13 @@ class kb.CollectionObservable
     @trigger('remove', view_model, observable) # notify
 
   _onModelChange: (model) ->
+    # filtered, remove
+    if @_modelIsFiltered(model)
+      @_onModelRemove(model)
+
     # resort if needed
-    @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
+    else
+      @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
 
   _onModelResort: (model) ->
     # either move a view model or a model
@@ -263,10 +273,16 @@ class kb.CollectionObservable
       if has_view_model
         @create_options.store.findOrReplace(kb.utils.wrappedObject(value), @create_options.creator, value) for value in values
 
-    # allow dual-sync for options: https://github.com/kmalakoff/knockback/issues/37
-    @in_edit++
-    collection.reset(_.map(values, (test) -> return kb.utils.wrappedModel(test)))
-    @in_edit--
+    # get the new models
+    models = _.map(values, (test) -> return kb.utils.wrappedModel(test))
+    if @filters
+      models = _.filter(models, (model) => not @_modelIsFiltered(model))
+
+    # a change
+    if (models.length isnt values.length) or _.difference(collection.models, models).length
+      @in_edit++
+      collection.reset(models)
+      @in_edit--
 
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)
@@ -291,14 +307,19 @@ class kb.CollectionObservable
     array = observable()
     array.splice(0, array.length)
 
+    if @filters
+      models = _.filter(collection.models, (model) => not @_modelIsFiltered(model))
+    else
+      models = collection.models
+
     if @sorted_index
       view_models = []
-      for model in collection.models
+      for model in models
         view_model = @_createViewModel(model)
         add_index = @sorted_index(view_models, view_model)
         view_models.splice(add_index, 0, view_model)
     else
-      view_models = if @models_only then _.clone(collection.models) else _.map(collection.models, (model) => @_createViewModel(model))
+      view_models = if @models_only then (if @filters then models else _.clone(models)) else _.map(models, (model) => @_createViewModel(model))
 
     @in_edit++
     observable(view_models)
@@ -313,6 +334,15 @@ class kb.CollectionObservable
 
   _createViewModel: (model) ->
     return if @models_only then model else @create_options.store.findOrCreate(model, @create_options)
+
+  _modelIsFiltered: (model) ->
+    if @filters
+      for filter in @filters
+        if ((typeof(filter) is 'function') and not ko.isObservable(filter))
+          return true if filter(model)
+        else if (model and (model.id is ko.utils.unwrapObservable(filter)))
+          return true
+    return false
 
 #######################################
 # Mix in Backbone.Events so callers can subscribe
