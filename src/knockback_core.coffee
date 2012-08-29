@@ -58,9 +58,10 @@ collapseOptions = (options) ->
 ####################################
 kb.renderAutoReleasedTemplate = (template, view_model, options={}) ->
   el = document.createElement('div')
-  ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
+  observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
   el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
   kb.releaseOnNodeRemove(view_model, el)
+  observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
   return el
 
 kb.releaseOnNodeRemove = (view_model, node) ->
@@ -74,9 +75,9 @@ kb.applyBindings = (view_model, node, skip_auto) ->
 
 kb.release = (obj, preRelease) ->
   if (
-    (not obj or not _.isObject(obj)) or # must be an object
+    (not obj or (obj isnt Object(obj))) or # must be an object
+    ((typeof(obj) is 'function') and not ko.isObservable(obj)) or # not a simple function
     obj.__kb_destroyed or # already destroyed
-    (typeof(obj) is 'function' and not ko.isObservable(obj)) or # not a simple function
     ((obj instanceof Backbone.Model) or (obj instanceof Backbone.Collection)) # not a model or collection
   )
     return @
@@ -112,14 +113,13 @@ kb.release = (obj, preRelease) ->
 
   # view model
   else
-    for key, value of obj
-      (key is '__kb') or kb.release(value, -> obj[key] = null)
+    kb.releaseKeys(obj)
 
   return @
 
 kb.releaseKeys = (obj) ->
   for key, value of obj
-    (key is '__kb') or kb.release(value, -> obj[key] = null)
+    (key is '__kb') or kb.release(value, (-> obj[key] = null))
   return @
 
 ####################################

@@ -83,16 +83,17 @@
   };
 
   kb.renderAutoReleasedTemplate = function(template, view_model, options) {
-    var el;
+    var el, observable;
     if (options == null) {
       options = {};
     }
     el = document.createElement('div');
-    ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
+    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
     if (el.children.length === 1) {
       el = el.children[0];
     }
     kb.releaseOnNodeRemove(view_model, el);
+    observable.dispose();
     return el;
   };
 
@@ -112,8 +113,8 @@
   };
 
   kb.release = function(obj, preRelease) {
-    var array, item, key, value, view_model, view_models, _i, _j, _len, _len1;
-    if ((!obj || !_.isObject(obj)) || obj.__kb_destroyed || (typeof obj === 'function' && !ko.isObservable(obj)) || ((obj instanceof Backbone.Model) || (obj instanceof Backbone.Collection))) {
+    var array, item, view_model, view_models, _i, _j, _len, _len1;
+    if ((!obj || (obj !== Object(obj))) || ((typeof obj === 'function') && !ko.isObservable(obj)) || obj.__kb_destroyed || ((obj instanceof Backbone.Model) || (obj instanceof Backbone.Collection))) {
       return this;
     }
     if (_.isArray(obj)) {
@@ -150,12 +151,7 @@
         obj.dispose();
       }
     } else {
-      for (key in obj) {
-        value = obj[key];
-        (key === '__kb') || kb.release(value, function() {
-          return obj[key] = null;
-        });
-      }
+      kb.releaseKeys(obj);
     }
     return this;
   };
@@ -164,9 +160,9 @@
     var key, value;
     for (key in obj) {
       value = obj[key];
-      (key === '__kb') || kb.release(value, function() {
+      (key === '__kb') || kb.release(value, (function() {
         return obj[key] = null;
-      });
+      }));
     }
     return this;
   };
@@ -907,11 +903,7 @@
       observable.__kb_is_co = true;
       this.in_edit = 0;
       this.__kb || (this.__kb = {});
-      this.__kb._onCollectionReset = _.bind(this._onCollectionReset, this);
-      this.__kb._onCollectionResort = _.bind(this._onCollectionResort, this);
-      this.__kb._onModelAdd = _.bind(this._onModelAdd, this);
-      this.__kb._onModelRemove = _.bind(this._onModelRemove, this);
-      this.__kb._onModelChange = _.bind(this._onModelChange, this);
+      this.__kb._onCollectionChange = _.bind(this._onCollectionChange, this);
       options = collapseOptions(options);
       this.sort_attribute = options.sort_attribute;
       this.sorted_index = options.sorted_index;
@@ -976,10 +968,12 @@
       observable = kb.utils.wrappedObservable(this);
       collection = kb.utils.wrappedObject(observable);
       if (collection) {
-        this._collectionUnbind(collection);
+        collection.unbind('all', this.__kb._onCollectionChange);
         this._clear(true);
         kb.utils.wrappedObject(observable, null);
       }
+      this.filters = null;
+      this.sorted_index;
       this.create_options = null;
       kb.utils.wrappedDestroy(this);
       return !kb.statistics || kb.statistics.unregister(this);
@@ -1008,14 +1002,14 @@
         }
       }
       if (previous_collection) {
-        this._collectionUnbind(previous_collection);
+        previous_collection.unbind('all', this.__kb._onCollectionChange);
         if (typeof previous_collection.release === "function") {
           previous_collection.release();
         }
       }
       kb.utils.wrappedObject(observable, collection);
       if (collection) {
-        this._collectionBind(collection);
+        collection.bind('all', this.__kb._onCollectionChange);
         this.sortedIndex(this.sorted_index, this.sort_attribute, options);
       } else {
         this._clear();
@@ -1076,74 +1070,41 @@
       return !this.models_only;
     };
 
-    CollectionObservable.prototype._collectionBind = function(collection) {
-      var event, _i, _j, _len, _len1, _ref, _ref1;
-      collection.bind('reset', this.__kb._onCollectionReset);
-      if (!this.sorted_index) {
-        collection.bind('resort', this.__kb._onCollectionResort);
-      }
-      _ref = ['new', 'add'];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        event = _ref[_i];
-        collection.bind(event, this.__kb._onModelAdd);
-      }
-      _ref1 = ['remove', 'destroy'];
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        event = _ref1[_j];
-        collection.bind(event, this.__kb._onModelRemove);
-      }
-      return collection.bind('change', this.__kb._onModelChange);
-    };
-
-    CollectionObservable.prototype._collectionUnbind = function(collection) {
-      var event, _i, _j, _len, _len1, _ref, _ref1;
-      collection.unbind('reset', this.__kb._onCollectionReset);
-      if (!this.sorted_index) {
-        collection.unbind('resort', this.__kb._onCollectionResort);
-      }
-      _ref = ['new', 'add'];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        event = _ref[_i];
-        collection.unbind(event, this.__kb._onModelAdd);
-      }
-      _ref1 = ['remove', 'destroy'];
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        event = _ref1[_j];
-        collection.unbind(event, this.__kb._onModelRemove);
-      }
-      return collection.unbind('change', this.__kb._onModelChange);
-    };
-
-    CollectionObservable.prototype._onCollectionReset = function() {
+    CollectionObservable.prototype._onCollectionChange = function(event, arg) {
+      var add_index, collection, observable, view_model;
       if (this.in_edit) {
         return;
       }
-      return this._collectionResync();
-    };
-
-    CollectionObservable.prototype._onCollectionResort = function(model_or_models) {
-      !this.sorted_index || throwUnexpected(this, 'sorted_index');
-      if (_.isArray(model_or_models)) {
-        this.trigger('resort', kb.utils.wrappedObservable(this)());
-      } else {
-        this._onModelResort(model_or_models);
+      switch (event) {
+        case 'reset':
+          return this._collectionResync();
+        case 'resort':
+          return !this.sorted_index;
+          if (_.isArray(arg)) {
+            return this.trigger('resort', kb.utils.wrappedObservable(this)());
+          } else {
+            return this._onModelResort(arg);
+          }
+          break;
+        case 'new':
+        case 'add':
+          if (this._modelIsFiltered(arg)) {
+            return;
+          }
+          observable = kb.utils.wrappedObservable(this);
+          collection = kb.utils.wrappedObject(observable);
+          view_model = this._createViewModel(arg);
+          add_index = this.sorted_index ? this.sorted_index(observable(), view_model) : collection.indexOf(arg);
+          this.in_edit++;
+          observable.splice(add_index, 0, view_model);
+          this.in_edit--;
+          return this.trigger('add', view_model, observable());
+        case 'remove':
+        case 'destroy':
+          return this._onModelRemove(arg);
+        case 'change':
+          return this._onModelChange(arg);
       }
-      return this;
-    };
-
-    CollectionObservable.prototype._onModelAdd = function(model) {
-      var add_index, collection, observable, view_model;
-      observable = kb.utils.wrappedObservable(this);
-      collection = kb.utils.wrappedObject(observable);
-      if (this._modelIsFiltered(model)) {
-        return;
-      }
-      view_model = this._createViewModel(model);
-      add_index = this.sorted_index ? this.sorted_index(observable(), view_model) : collection.indexOf(model);
-      this.in_edit++;
-      observable.splice(add_index, 0, view_model);
-      this.in_edit--;
-      return this.trigger('add', view_model, observable());
     };
 
     CollectionObservable.prototype._onModelRemove = function(model) {
@@ -1315,11 +1276,8 @@
         _ref = this.filters;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           filter = _ref[_i];
-          if ((typeof filter === 'function') && !ko.isObservable(filter)) {
-            if (filter(model)) {
-              return true;
-            }
-          } else if (model && (model.id === ko.utils.unwrapObservable(filter))) {
+          filter = ko.utils.unwrapObservable(filter);
+          if (((typeof filter === 'function') && filter(model)) || (model && (model.id === filter))) {
             return true;
           }
         }

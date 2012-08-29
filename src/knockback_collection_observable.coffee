@@ -41,11 +41,7 @@ class kb.CollectionObservable
 
     # bind callbacks
     @__kb or= {}
-    @__kb._onCollectionReset = _.bind(@_onCollectionReset, @)
-    @__kb._onCollectionResort = _.bind(@_onCollectionResort, @)
-    @__kb._onModelAdd = _.bind(@_onModelAdd, @)
-    @__kb._onModelRemove = _.bind(@_onModelRemove, @)
-    @__kb._onModelChange = _.bind(@_onModelChange, @)
+    @__kb._onCollectionChange = _.bind(@_onCollectionChange, @)
 
     # options
     options = collapseOptions(options)
@@ -108,10 +104,10 @@ class kb.CollectionObservable
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
     if collection
-      @_collectionUnbind(collection)
+      collection.unbind('all', @__kb._onCollectionChange)
       @_clear(true)
       kb.utils.wrappedObject(observable, null)
-    @create_options = null
+    @filters = null; @sorted_index; @create_options = null
     kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
@@ -132,13 +128,13 @@ class kb.CollectionObservable
 
     # clean up
     if previous_collection
-      @_collectionUnbind(previous_collection)
+      previous_collection.unbind('all', @__kb._onCollectionChange)
       previous_collection.release?()
 
     # store in _kb_collection so that a collection() function can be exposed on the observable
     kb.utils.wrappedObject(observable, collection)
     if collection
-      @_collectionBind(collection)
+      collection.bind('all', @__kb._onCollectionChange)
       @sortedIndex(@sorted_index, @sort_attribute, options)
     else
       @_clear()
@@ -161,7 +157,7 @@ class kb.CollectionObservable
       observable = kb.utils.wrappedObservable(@)
       collection = kb.utils.wrappedObject(observable)
       return if (collection.models.length == 0) and (observable().length == 0) # don't do anything
-      @_collectionResync(true) # resort everything (TODO: do it incrementally with a notification for resort if not too complex)
+      @_collectionResync(true) # resort everything
       @trigger('resort', observable()) unless options.silent # notify
 
     # resync now or later
@@ -180,50 +176,38 @@ class kb.CollectionObservable
   ####################################################
   # Internal
   ####################################################
-  _collectionBind: (collection) ->
-    collection.bind('reset', @__kb._onCollectionReset)
-    collection.bind('resort', @__kb._onCollectionResort) if not @sorted_index
-    collection.bind(event, @__kb._onModelAdd) for event in ['new', 'add']
-    collection.bind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
-    collection.bind('change', @__kb._onModelChange)
-
-  _collectionUnbind: (collection) ->
-    collection.unbind('reset', @__kb._onCollectionReset)
-    collection.unbind('resort', @__kb._onCollectionResort) if not @sorted_index
-    collection.unbind(event, @__kb._onModelAdd) for event in ['new', 'add']
-    collection.unbind(event, @__kb._onModelRemove) for event in ['remove', 'destroy']
-    collection.unbind('change', @__kb._onModelChange)
-
-  _onCollectionReset: ->
+  _onCollectionChange: (event, arg) ->
     return if @in_edit # we are doing the editing
-    @_collectionResync()
 
-  _onCollectionResort: (model_or_models) ->
-    not @sorted_index or throwUnexpected(this, 'sorted_index')
-    if _.isArray(model_or_models)
-      @trigger('resort', kb.utils.wrappedObservable(@)()) # notify
-    else
-      @_onModelResort(model_or_models)
-    @
+    switch event
+      # collection events
+      when 'reset' then @_collectionResync()
+      when 'resort'
+        return not @sorted_index
+        if _.isArray(arg)
+          @trigger('resort', kb.utils.wrappedObservable(@)()) # notify
+        else
+          @_onModelResort(arg)
 
-  _onModelAdd: (model) ->
-    observable = kb.utils.wrappedObservable(@)
-    collection = kb.utils.wrappedObject(observable)
+      # model events
+      when 'new', 'add'
+        return if @_modelIsFiltered(arg) # filtered
 
-    # filtered
-    return if @_modelIsFiltered(model)
+        observable = kb.utils.wrappedObservable(@)
+        collection = kb.utils.wrappedObject(observable)
+        view_model = @_createViewModel(arg)
+        add_index = if @sorted_index then @sorted_index(observable(), view_model) else collection.indexOf(arg)
 
-    view_model = @_createViewModel(model)
-    add_index = if @sorted_index then @sorted_index(observable(), view_model) else collection.indexOf(model)
+        @in_edit++
+        observable.splice(add_index, 0, view_model)
+        @in_edit--
+        @trigger('add', view_model, observable()) # notify
 
-    @in_edit++
-    observable.splice(add_index, 0, view_model)
-    @in_edit--
-    @trigger('add', view_model, observable()) # notify
+      when 'remove', 'destroy' then @_onModelRemove(arg)
+      when 'change' then @_onModelChange(arg)
 
   _onModelRemove: (model) ->
-    # either remove a view model or a model
-    view_model = if @models_only then model else @viewModelByModel(model)
+    view_model = if @models_only then model else @viewModelByModel(model) # either remove a view model or a model
     return unless view_model  # it may have already been removed
     observable = kb.utils.wrappedObservable(@)
     @in_edit++
@@ -338,9 +322,8 @@ class kb.CollectionObservable
   _modelIsFiltered: (model) ->
     if @filters
       for filter in @filters
-        if ((typeof(filter) is 'function') and not ko.isObservable(filter))
-          return true if filter(model)
-        else if (model and (model.id is ko.utils.unwrapObservable(filter)))
+        filter = ko.utils.unwrapObservable(filter)
+        if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
           return true
     return false
 
