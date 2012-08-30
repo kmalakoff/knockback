@@ -104,33 +104,35 @@ module.exports =
         'cp -v underscore/underscore-min.js vendor/underscore.min.js'
         'cp -v backbone vendor/backbone.js'
         'cp -v backbone/backbone-min.js vendor/backbone.min.js'
-        'cp -v knockout-client/knockout.js vendor/knockout.js'
-        'cp -v knockout-client/knockout.debug.js vendor/knockout.min.js'
+        'cp -v knockout-client/knockout.debug.js vendor/knockout.js'
+        'cp -v knockout-client/knockout.js vendor/knockout.min.js'
 
         # knockback optional dependencies
         'cp -v lodash vendor/optional/lodash.js'
-        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js'
+        'uglifyjs -o vendor/optional/lodash-0.6.1.min.js vendor/optional/lodash-0.6.1.js'
+#        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js' # packaged lodash.min.js doesn't concatenate properly
         'cp -v backbone-modelref vendor/optional/backbone-modelref.js'
         'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref.min.js'
         'cp -v backbone-relational vendor/optional/backbone-relational.js'
         'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational.min.js'
 
-        # minimally-sized stack
-        'uglifyjs -o vendor/underscore-1.3.3-kb.min.js vendor/underscore-1.3.3-kb.js'
-        'uglifyjs -o vendor/backbone-0.9.2-kb.min.js vendor/backbone-0.9.2-kb.js'
-        'uglifyjs -o vendor/knockout-2.1.0-kb.min.js vendor/knockout-2.1.0-kb.js'
-        'uglifyjs -o vendor/optional/lodash-0.6.1-kb.min.js vendor/optional/lodash-0.6.1-kb.js'
-        'cat vendor/underscore-1.3.3-kb.js vendor/backbone-0.9.2-kb.js vendor/knockout-2.1.0-kb.js knockback-core.js > knockback-minimal-stack.js'
-        'cat vendor/underscore-1.3.3-kb.min.js vendor/backbone-0.9.2-kb.min.js vendor/knockout-2.1.0-kb.min.js knockback-core.min.js > knockback-minimal-stack.min.js'
+        # full and core stack
+        'cat vendor/underscore-1.3.3.js vendor/backbone-0.9.2.js vendor/knockout-2.1.0.js knockback.js > knockback-full-stack.js'
+        'cat vendor/underscore-1.3.3.min.js vendor/backbone-0.9.2.min.js vendor/knockout-2.1.0.min.js knockback.min.js > knockback-full-stack.min.js'
+        'cat vendor/underscore-1.3.3.js vendor/backbone-0.9.2.js vendor/knockout-2.1.0.js knockback-core.js > knockback-core-stack.js'
+        'cat vendor/underscore-1.3.3.min.js vendor/backbone-0.9.2.min.js vendor/knockout-2.1.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
 
         # npm
+        'cp README.md packages/npm/README.md'
         'cp knockback.js packages/npm/knockback.js'
         'cp knockback.min.js packages/npm/knockback.min.js'
-        'cp knockback-minimal-stack.js packages/npm/knockback-minimal-stack.js'
-        'cp knockback-minimal-stack.min.js packages/npm/knockback-minimal-stack.min.js'
+        'cp knockback-full-stack.js packages/npm/knockback-full-stack.js'
+        'cp knockback-full-stack.min.js packages/npm/knockback-full-stack.min.js'
+
         'cp knockback-core.js packages/npm/knockback-core.js'
         'cp knockback-core.min.js packages/npm/knockback-core.min.js'
-        'cp README.md packages/npm/README.md'
+        'cp knockback-core-stack.js packages/npm/knockback-core-stack.js'
+        'cp knockback-core-stack.min.js packages/npm/knockback-core-stack.min.js'
 
         # npm: components
         'cp lib/knockback-defaults.js packages/npm/lib/knockback-defaults.js'
@@ -139,24 +141,16 @@ module.exports =
         'cp lib/knockback-localization.js packages/npm/lib/knockback-localization.js'
         'cp lib/knockback-statistics.js packages/npm/lib/knockback-statistics.js'
 
-        # npm: minimally-sized stack
-        'cp vendor/underscore-1.3.3-kb.js packages/npm/vendor/underscore-1.3.3-kb.js'
-        'cp vendor/underscore-1.3.3-kb.min.js packages/npm/vendor/underscore-1.3.3-kb.min.js'
-        'cp vendor/backbone-0.9.2-kb.js packages/npm/vendor/backbone-0.9.2-kb.js'
-        'cp vendor/backbone-0.9.2-kb.min.js packages/npm/vendor/backbone-0.9.2-kb.min.js'
-        'cp vendor/knockout-2.1.0-kb.js packages/npm/vendor/knockout-2.1.0-kb.js'
-        'cp vendor/knockout-2.1.0-kb.min.js packages/npm/vendor/knockout-2.1.0-kb.min.js'
-        'cp vendor/optional/lodash-0.6.1-kb.js packages/npm/vendor/optional/lodash-0.6.1-kb.js'
-        'cp vendor/optional/lodash-0.6.1-kb.min.js packages/npm/vendor/optional/lodash-0.6.1-kb.min.js'
-
         # nuget
         'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
         'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
-        'cp knockback-minimal-stack.js packages/nuget/Content/Scripts/knockback-minimal-stack.js'
-        'cp knockback-minimal-stack.min.js packages/nuget/Content/Scripts/knockback-minimal-stack.min.js'
+        'cp knockback-full-stack.js packages/nuget/Content/Scripts/knockback-full-stack.js'
+        'cp knockback-full-stack.min.js packages/nuget/Content/Scripts/knockback-full-stack.min.js'
+
         'cp knockback-core.js packages/nuget/Content/Scripts/knockback-core.js'
         'cp knockback-core.min.js packages/nuget/Content/Scripts/knockback-core.min.js'
-        'cp knockback-core.js packages/nuget/Content/Scripts/knockback-core.js'
+        'cp knockback-core-stack.js packages/nuget/Content/Scripts/knockback-core-stack.js'
+        'cp knockback-core-stack.min.js packages/nuget/Content/Scripts/knockback-core-stack.min.js'
 
         # nuget: components
         'cp lib/knockback-defaults.js packages/nuget/Content/Scripts/lib/knockback-defaults.js'
@@ -164,16 +158,6 @@ module.exports =
         'cp lib/knockback-triggering.js packages/nuget/Content/Scripts/lib/knockback-triggering.js'
         'cp lib/knockback-localization.js packages/nuget/Content/Scripts/lib/knockback-localization.js'
         'cp lib/knockback-statistics.js packages/nuget/Content/Scripts/lib/knockback-statistics.js'
-
-        # nuget: minimally-sized stack
-        'cp vendor/underscore-1.3.3-kb.js packages/nuget/Content/Scripts/vendor/underscore-1.3.3-kb.js'
-        'cp vendor/underscore-1.3.3-kb.min.js packages/nuget/Content/Scripts/vendor/underscore-1.3.3-kb.min.js'
-        'cp vendor/backbone-0.9.2-kb.js packages/nuget/Content/Scripts/vendor/backbone-0.9.2-kb.js'
-        'cp vendor/backbone-0.9.2-kb.min.js packages/nuget/Content/Scripts/vendor/backbone-0.9.2-kb.min.js'
-        'cp vendor/knockout-2.1.0-kb.js packages/nuget/Content/Scripts/vendor/knockout-2.1.0-kb.js'
-        'cp vendor/knockout-2.1.0-kb.min.js packages/nuget/Content/Scripts/vendor/knockout-2.1.0-kb.min.js'
-        'cp vendor/optional/lodash-0.6.1-kb.js packages/nuget/Content/Scripts/vendor/optional/lodash-0.6.1-kb.js'
-        'cp vendor/optional/lodash-0.6.1-kb.min.js packages/nuget/Content/Scripts/vendor/optional/lodash-0.6.1-kb.min.js'
       ]
 
   tests:
@@ -199,7 +183,7 @@ module.exports =
       commands: [
         'mbundle test/packaging/bundle-config.coffee'
         'mbundle test/lodash/bundle-config.coffee'
-        'mbundle test/minimal-stack/bundle-config.coffee'
+        'mbundle test/full-stack/bundle-config.coffee'
       ]
     _test:
       command: 'phantomjs'
@@ -222,7 +206,7 @@ module.exports =
         'test/knockback-localization'
         'test/knockback-triggering'
 
-        'test/minimal-stack'
+        'test/full-stack'
         'test/packaging'
         'test/lodash'
       ]

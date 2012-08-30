@@ -1,51 +1,10 @@
-//     Underscore.js 1.3.3 (Knockback Minimal Stack)
+//     Underscore.js 1.3.3
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
 //     Portions of Underscore are inspired or borrowed from Prototype,
 //     Oliver Steele's Functional, and John Resig's Micro-Templating.
 //     For all details and documentation:
 //     http://documentcloud.github.com/underscore
-// NOTE: This is a reduced version for Knockback.js Minimal Stack (http://kmalakoff.github.com/knockback/)
-
-{};
-//     underscore-1.3.3-kb.js
-//     This is a reduced version of Underscore.js that removes features to create a minimally-sized Knockback.js stack.
-//     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
-//
-//     Removed features:
-//        Collection Functions
-//        _.reduceRight = _.foldr
-//        _.invoke
-//        _.max
-//        _.min
-//        _.shuffle
-//
-//        Array Functions
-//        _.first = _.head = _.take
-//        _.initial
-//        _.rest = _.tail
-//        _.zip
-//        _.lastIndexOf
-//        _.range
-//
-//        Function (ahem) Functions
-//        _.memoize
-//        _.throttle
-//        _.debounce
-//        _.once
-//        _.wrap
-//        _.compose
-//        _.after
-//
-//        Object Functions
-//        _.pick
-//        _.tap
-//
-//        Utility Functions
-//        _.times
-//        _.result
-//        _.templateSettings
-//        _.template
 
 (function() {
 
@@ -162,7 +121,6 @@
     return memo;
   };
 
-/*kb
   // The right-associative version of reduce, also known as `foldr`.
   // Delegates to **ECMAScript 5**'s native `reduceRight` if available.
   _.reduceRight = _.foldr = function(obj, iterator, memo, context) {
@@ -176,7 +134,6 @@
     if (context && !initial) iterator = _.bind(iterator, context);
     return initial ? _.reduce(reversed, iterator, memo, context) : _.reduce(reversed, iterator);
   };
-kb*/
 
   // Return the first value which passes a truth test. Aliased as `detect`.
   _.find = _.detect = function(obj, iterator, context) {
@@ -252,7 +209,6 @@ kb*/
     return found;
   };
 
-/*kb
   // Invoke a method (with arguments) on every item in a collection.
   _.invoke = function(obj, method) {
     var args = slice.call(arguments, 2);
@@ -260,14 +216,12 @@ kb*/
       return (_.isFunction(method) ? method || value : value[method]).apply(value, args);
     });
   };
-kb*/
 
   // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
     return _.map(obj, function(value){ return value[key]; });
   };
 
-/*kb
   // Return the maximum element or (element-based computation).
   _.max = function(obj, iterator, context) {
     if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.max.apply(Math, obj);
@@ -302,7 +256,7 @@ kb*/
     });
     return shuffled;
   };
-kb*/
+
   // Sort the object's values by a criterion produced by an iterator.
   _.sortBy = function(obj, val, context) {
     var iterator = _.isFunction(val) ? val : function(obj) { return obj[val]; };
@@ -360,7 +314,6 @@ kb*/
   // Array Functions
   // ---------------
 
-/*kb
   // Get the first element of an array. Passing **n** will return the first N
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
@@ -375,7 +328,6 @@ kb*/
   _.initial = function(array, n, guard) {
     return slice.call(array, 0, array.length - ((n == null) || guard ? 1 : n));
   };
-kb*/
 
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array. The **guard** check allows it to work with `_.map`.
@@ -456,7 +408,6 @@ kb*/
     return _.filter(array, function(value){ return !_.include(rest, value); });
   };
 
-/*kb
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
   _.zip = function() {
@@ -466,7 +417,6 @@ kb*/
     for (var i = 0; i < length; i++) results[i] = _.pluck(args, "" + i);
     return results;
   };
-kb*/
 
   // If the browser doesn't supply us with indexOf (I'm looking at you, **MSIE**),
   // we need this function. Return the position of the first occurrence of an
@@ -486,7 +436,6 @@ kb*/
     return -1;
   };
 
-/*kb
   // Delegates to **ECMAScript 5**'s native `lastIndexOf` if available.
   _.lastIndexOf = function(array, item) {
     if (array == null) return -1;
@@ -517,7 +466,6 @@ kb*/
 
     return range;
   };
-kb*/
 
   // Function (ahem) Functions
   // ------------------
@@ -553,7 +501,6 @@ kb*/
     return obj;
   };
 
-/*kb
   // Memoize an expensive function by storing its results.
   _.memoize = function(func, hasher) {
     var memo = {};
@@ -563,7 +510,6 @@ kb*/
       return _.has(memo, key) ? memo[key] : (memo[key] = func.apply(this, arguments));
     };
   };
-kb*/
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
@@ -578,7 +524,6 @@ kb*/
     return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
   };
 
-/*kb
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time.
   _.throttle = function(func, wait) {
@@ -662,7 +607,6 @@ kb*/
       if (--times < 1) { return func.apply(this, arguments); }
     };
   };
-kb*/
 
   // Object Functions
   // ----------------
@@ -701,7 +645,6 @@ kb*/
     return obj;
   };
 
-/*kb
   // Return a copy of the object only containing the whitelisted properties.
   _.pick = function(obj) {
     var result = {};
@@ -710,7 +653,6 @@ kb*/
     });
     return result;
   };
-kb*/
 
   // Fill in a given object with default properties.
   _.defaults = function(obj) {
@@ -728,7 +670,6 @@ kb*/
     return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
   };
 
-/*kb
   // Invokes interceptor with the obj, and then returns obj.
   // The primary purpose of this method is to "tap into" a method chain, in
   // order to perform operations on intermediate results within the chain.
@@ -736,7 +677,6 @@ kb*/
     interceptor(obj);
     return obj;
   };
-kb*/
 
   // Internal recursive comparison function.
   function eq(a, b, stack) {
@@ -937,19 +877,16 @@ kb*/
     return value;
   };
 
-/*kb
   // Run a function **n** times.
   _.times = function (n, iterator, context) {
     for (var i = 0; i < n; i++) iterator.call(context, i);
   };
-kb*/
 
   // Escape a string for HTML interpolation.
   _.escape = function(string) {
     return (''+string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g,'&#x2F;');
   };
 
-/*kb
   // If the value of the named property is a function then invoke it;
   // otherwise, return it.
   _.result = function(object, property) {
@@ -957,7 +894,6 @@ kb*/
     var value = object[property];
     return _.isFunction(value) ? value.call(object) : value;
   };
-*/
 
   // Add your own custom functions to the Underscore object, ensuring that
   // they're correctly added to the OOP wrapper as well.
@@ -975,7 +911,6 @@ kb*/
     return prefix ? prefix + id : id;
   };
 
-/*kb
   // By default, Underscore uses ERB-style template delimiters, change the
   // following template settings to use alternative delimiters.
   _.templateSettings = {
@@ -1056,7 +991,6 @@ kb*/
 
     return template;
   };
-kb*/
 
   // Add a "chain" function, which will delegate to the wrapper.
   _.chain = function(obj) {
@@ -1124,19 +1058,11 @@ kb*/
 
 }).call(this);
 //     Backbone.js 0.9.2
+
 //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
-//     **NOTE: This is a reduced version for Knockback.js Minimal Stack (http://kmalakoff.github.com/knockback/)
-
-{};
-//     backbone-0.9.2-kb.js
-//     This is a reduced version of Backbone.js that removes features to create a minimally-sized Knockback.js stack.
-//     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
-//
-//     Removed features:
-//        Backbone.View
 
 (function(){
 
@@ -2273,8 +2199,7 @@ kb*/
 
   // Creating a Backbone.View creates its initial element outside of the DOM,
   // if an existing element is not provided...
-/*kb
-    var View = Backbone.View = function(options) {
+  var View = Backbone.View = function(options) {
     this.cid = _.uniqueId('view');
     this._configure(options || {});
     this._ensureElement();
@@ -2409,7 +2334,6 @@ kb*/
     }
 
   });
-kb*/
 
   // The self-propagating extend function that Backbone classes use.
   var extend = function (protoProps, classProps) {
@@ -2419,7 +2343,7 @@ kb*/
   };
 
   // Set up inheritance for the model, collection, and view.
-  Model.extend = Collection.extend = Router.extend = /*kb View.extend = kb*/ extend;
+  Model.extend = Collection.extend = Router.extend = View.extend = extend;
 
   // Backbone.sync
   // -------------
@@ -2567,35 +2491,8 @@ kb*/
 // Knockout JavaScript library v2.1.0
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
-// **NOTE: This is a reduced version for Knockback.js Minimal Stack (http://kmalakoff.github.com/knockback/)
-
-{};
-//     knockout-2.1.0-kb.js
-//     This is a reduced version of Knockout.js that removes features to create a minimally-sized Knockback.js stack.
-//     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
-//
-//     Removed features:
-//        ko.utils.parseJson
-//        ko.utils.stringifyJson
-//        ko.utils.postJson
-//        ko.toJS
-//        ko.toJSON
-//     Replaced features:
-//        arrayForEach: _.each
-//        arrayIndexOf: _.indexOf
-//        arrayGetDistinctValues: _.uniq
-//        arrayMap: _.map
-//        arrayFilter: _.filter
-//        extend: _.extend
 
 (function(window,document,navigator,undefined){
-
-/*kb kb*/
-var _;
-  if (typeof require !== 'undefined') {try {_ = require('lodash');} catch (e) {_ = require('underscore');}} else {_ = window._;}
-  if (_ && _.hasOwnProperty('_')) {_ = _._;}
-/*kb kb*/
-
 var DEBUG=true;
 !function(factory) {
     // Support three module loading scenarios
@@ -2673,20 +2570,19 @@ ko.utils = new (function () {
     return {
         fieldsIncludedWithJsonPost: ['authenticity_token', /^__RequestVerificationToken(_.*)?$/],
 
-
-        arrayForEach: _.each /*kb function (array, action) {
+        arrayForEach: function (array, action) {
             for (var i = 0, j = array.length; i < j; i++)
                 action(array[i]);
-        }kb*/,
+        },
 
-        arrayIndexOf: _.indexOf /*kb function (array, item) {
+        arrayIndexOf: function (array, item) {
             if (typeof Array.prototype.indexOf == "function")
                 return Array.prototype.indexOf.call(array, item);
             for (var i = 0, j = array.length; i < j; i++)
                 if (array[i] === item)
                     return i;
             return -1;
-        } kb*/,
+        },
 
         arrayFirst: function (array, predicate, predicateOwner) {
             for (var i = 0, j = array.length; i < j; i++)
@@ -2701,7 +2597,7 @@ ko.utils = new (function () {
                 array.splice(index, 1);
         },
 
-        arrayGetDistinctValues: _.uniq /*kb function (array) {
+        arrayGetDistinctValues: function (array) {
             array = array || [];
             var result = [];
             for (var i = 0, j = array.length; i < j; i++) {
@@ -2709,24 +2605,24 @@ ko.utils = new (function () {
                     result.push(array[i]);
             }
             return result;
-        } kb*/,
+        },
 
-        arrayMap: _.map /*kb function (array, mapping) {
+        arrayMap: function (array, mapping) {
             array = array || [];
             var result = [];
             for (var i = 0, j = array.length; i < j; i++)
                 result.push(mapping(array[i]));
             return result;
-        } kb*/,
+        },
 
-        arrayFilter: _.filter /*kb function (array, predicate) {
+        arrayFilter: function (array, predicate) {
             array = array || [];
             var result = [];
             for (var i = 0, j = array.length; i < j; i++)
                 if (predicate(array[i]))
                     result.push(array[i]);
             return result;
-        } KB */,
+        },
 
         arrayPushAll: function (array, valuesToPush) {
             if (valuesToPush instanceof Array)
@@ -2737,7 +2633,7 @@ ko.utils = new (function () {
             return array;
         },
 
-        extend: _.extend /* KB function (target, source) {
+        extend: function (target, source) {
             if (source) {
                 for(var prop in source) {
                     if(source.hasOwnProperty(prop)) {
@@ -2746,7 +2642,7 @@ ko.utils = new (function () {
                 }
             }
             return target;
-        } kb*/,
+        },
 
         emptyDomNode: function (domNode) {
             while (domNode.firstChild) {
@@ -2986,7 +2882,7 @@ ko.utils = new (function () {
                     matches.push(fields[i]);
             };
             return matches;
-        }/*kb,
+        },
 
         parseJson: function (jsonString) {
             if (typeof jsonString == "string") {
@@ -3044,7 +2940,6 @@ ko.utils = new (function () {
             options['submitter'] ? options['submitter'](form) : form.submit();
             setTimeout(function () { form.parentNode.removeChild(form); }, 0);
         }
-KM*/
     }
 })();
 
@@ -3862,7 +3757,6 @@ ko.exportSymbol('dependentObservable', ko.dependentObservable);
 ko.exportSymbol('computed', ko.dependentObservable); // Make "ko.computed" an alias for "ko.dependentObservable"
 ko.exportSymbol('isComputed', ko.isComputed);
 
-/*kb
 (function() {
     var maxNestedObservableDepth = 10; // Escape the (unlikely) pathalogical case where an observable's current value is itself (or similar reference cycle)
 
@@ -3953,7 +3847,6 @@ ko.exportSymbol('isComputed', ko.isComputed);
 
 ko.exportSymbol('toJS', ko.toJS);
 ko.exportSymbol('toJSON', ko.toJSON);
-kb*/
 (function () {
     var hasDomDataExpandoProperty = '__ko__hasDomDataOptionValue__';
 
@@ -6051,7 +5944,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 
 
 (function() {
-  var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, Knockback, addStatisticsEvent, arraySplice, collapseOptions, kb, ko, legacyWarning, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+  var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, Knockback, addStatisticsEvent, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -7751,6 +7644,341 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
         return new wrapper_constructor(kb.utils.wrappedModel(test).get(attribute_name));
       });
     };
+  };
+
+  /*
+    knockback_default_wrapper.js
+    (c) 2011, 2012 Kevin Malakoff.
+    Knockback.DefaultWrapper is freely distributable under the MIT license.
+    See the following for full license details:
+      https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  */
+
+
+  kb.DefaultWrapper = (function() {
+
+    function DefaultWrapper(target_observable, dv) {
+      var observable,
+        _this = this;
+      this.dv = dv;
+      observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+        read: function() {
+          var current_target;
+          if ((current_target = ko.utils.unwrapObservable(target_observable()))) {
+            return current_target;
+          } else {
+            return ko.utils.unwrapObservable(_this.dv);
+          }
+        },
+        write: function(value) {
+          return target_observable(value);
+        }
+      }));
+      observable.destroy = _.bind(this.destroy, this);
+      observable.setToDefault = _.bind(this.setToDefault, this);
+      return observable;
+    }
+
+    DefaultWrapper.prototype.destroy = function() {
+      return kb.utils.wrappedDestroy(this);
+    };
+
+    DefaultWrapper.prototype.setToDefault = function() {
+      return kb.utils.wrappedObservable(this)(this.dv);
+    };
+
+    return DefaultWrapper;
+
+  })();
+
+  kb.defaultWrapper = function(target, default_value) {
+    return new kb.DefaultWrapper(target, default_value);
+  };
+
+  /*
+    knockback-formatted-observable.js
+    (c) 2011, 2012 Kevin Malakoff.
+    Knockback.FormattedObservable is freely distributable under the MIT license.
+    See the following for full license details:
+      https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  */
+
+
+  arraySlice = Array.prototype.slice;
+
+  kb.toFormattedString = function(format) {
+    var arg, args, index, parameter_index, result, value;
+    result = format.slice();
+    args = arraySlice.call(arguments, 1);
+    for (index in args) {
+      arg = args[index];
+      value = ko.utils.unwrapObservable(arg);
+      value || (value = '');
+      parameter_index = format.indexOf("\{" + index + "\}");
+      while (parameter_index >= 0) {
+        result = result.replace("{" + index + "}", value);
+        parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+      }
+    }
+    return result;
+  };
+
+  kb.parseFormattedString = function(string, format) {
+    var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, result, results, sorted_positions;
+    regex_string = format.slice();
+    index = 0;
+    parameter_count = 0;
+    positions = {};
+    while (regex_string.search("\\{" + index + "\\}") >= 0) {
+      parameter_index = format.indexOf("\{" + index + "\}");
+      while (parameter_index >= 0) {
+        regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
+        positions[parameter_index] = index;
+        parameter_count++;
+        parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+      }
+      index++;
+    }
+    count = index;
+    regex = new RegExp(regex_string);
+    matches = regex.exec(string);
+    if (matches) {
+      matches.shift();
+    }
+    if (!matches || (matches.length !== parameter_count)) {
+      result = [];
+      while (count-- > 0) {
+        result.push('');
+      }
+      return result;
+    }
+    sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
+      return parseInt(parameter_index, 10);
+    });
+    format_indices_to_matched_indices = {};
+    for (match_index in sorted_positions) {
+      parameter_index = sorted_positions[match_index];
+      index = positions[parameter_index];
+      if (format_indices_to_matched_indices.hasOwnProperty(index)) {
+        continue;
+      }
+      format_indices_to_matched_indices[index] = match_index;
+    }
+    results = [];
+    index = 0;
+    while (index < count) {
+      results.push(matches[format_indices_to_matched_indices[index]]);
+      index++;
+    }
+    return results;
+  };
+
+  kb.FormattedObservable = (function() {
+
+    function FormattedObservable(format, args) {
+      var observable, observable_args;
+      if (_.isArray(args)) {
+        format = format;
+        observable_args = args;
+      } else {
+        observable_args = arraySlice.call(arguments, 1);
+      }
+      observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+        read: function() {
+          var arg, _i, _len;
+          args = [ko.utils.unwrapObservable(format)];
+          for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
+            arg = observable_args[_i];
+            args.push(ko.utils.unwrapObservable(arg));
+          }
+          return kb.toFormattedString.apply(null, args);
+        },
+        write: function(value) {
+          var index, matches, max_count;
+          matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+          max_count = Math.min(observable_args.length, matches.length);
+          index = 0;
+          while (index < max_count) {
+            observable_args[index](matches[index]);
+            index++;
+          }
+          return this;
+        }
+      }));
+      return observable;
+    }
+
+    FormattedObservable.prototype.destroy = function() {
+      return kb.utils.wrappedDestroy(this);
+    };
+
+    return FormattedObservable;
+
+  })();
+
+  kb.formattedObservable = function(format, args) {
+    return new kb.FormattedObservable(format, arraySlice.call(arguments, 1));
+  };
+
+  /*
+    knockback-localized-observable.js
+    (c) 2011, 2012 Kevin Malakoff.
+    Knockback.LocalizedObservable is freely distributable under the MIT license.
+    See the following for full license details:
+      https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  */
+
+
+  kb.LocalizedObservable = (function() {
+
+    LocalizedObservable.extend = Backbone.Model.extend;
+
+    function LocalizedObservable(value, options, vm) {
+      var observable,
+        _this = this;
+      this.value = value;
+      this.vm = vm;
+      options || (options = {});
+      this.vm || (this.vm = {});
+      this.read || throwMissing(this, 'read');
+      kb.locale_manager || throwMissing(this, 'kb.locale_manager');
+      this.__kb || (this.__kb = {});
+      this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
+      this.__kb._onChange = options.onChange;
+      if (this.value) {
+        value = ko.utils.unwrapObservable(this.value);
+      }
+      this.vo = ko.observable(!value ? null : this.read(value, null));
+      observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+        read: function() {
+          if (_this.value) {
+            ko.utils.unwrapObservable(_this.value);
+          }
+          _this.vo();
+          return _this.read(ko.utils.unwrapObservable(_this.value));
+        },
+        write: function(value) {
+          _this.write || throwUnexpected(_this, 'writing to read-only');
+          _this.write(value, ko.utils.unwrapObservable(_this.value));
+          _this.vo(value);
+          if (_this.__kb._onChange) {
+            return _this.__kb._onChange(value);
+          }
+        },
+        owner: this.vm
+      }));
+      observable.destroy = _.bind(this.destroy, this);
+      observable.observedValue = _.bind(this.observedValue, this);
+      observable.resetToCurrent = _.bind(this.resetToCurrent, this);
+      kb.locale_manager.bind('change', this.__kb._onLocaleChange);
+      if (options.hasOwnProperty('default')) {
+        observable = kb.DefaultWrapper && ko.defaultWrapper(observable, options["default"]);
+      }
+      return observable;
+    }
+
+    LocalizedObservable.prototype.destroy = function() {
+      kb.locale_manager.unbind('change', this.__kb._onLocaleChange);
+      this.vm = null;
+      return kb.utils.wrappedDestroy(this);
+    };
+
+    LocalizedObservable.prototype.resetToCurrent = function() {
+      var current_value, observable;
+      observable = kb.utils.wrappedObservable(this);
+      current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
+      if (observable() === current_value) {
+        return;
+      }
+      return observable(current_value);
+    };
+
+    LocalizedObservable.prototype.observedValue = function(value) {
+      if (arguments.length === 0) {
+        return this.value;
+      }
+      this.value = value;
+      this._onLocaleChange();
+      return this;
+    };
+
+    LocalizedObservable.prototype._onLocaleChange = function() {
+      var value;
+      value = this.read(ko.utils.unwrapObservable(this.value));
+      this.vo(value);
+      if (this.__kb._onChange) {
+        return this.__kb._onChange(value);
+      }
+    };
+
+    return LocalizedObservable;
+
+  })();
+
+  kb.localizedObservable = function(value, options, view_model) {
+    return new kb.LocalizedObservable(value, options, view_model);
+  };
+
+  /*
+    knockback-triggered-observable.js
+    (c) 2011, 2012 Kevin Malakoff.
+    Knockback.Observable is freely distributable under the MIT license.
+    See the following for full license details:
+      https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  */
+
+
+  kb.TriggeredObservable = (function() {
+
+    function TriggeredObservable(model, event_name) {
+      var observable,
+        _this = this;
+      this.event_name = event_name;
+      model || throwMissing(this, 'model');
+      this.event_name || throwMissing(this, 'event_name');
+      this.vo = ko.observable();
+      observable = kb.utils.wrappedObservable(this, ko.dependentObservable(function() {
+        return _this.vo();
+      }));
+      observable.destroy = _.bind(this.destroy, this);
+      kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
+        model: _.bind(this.model, this),
+        update: _.bind(this.update, this),
+        event_name: this.event_name
+      }));
+      return observable;
+    }
+
+    TriggeredObservable.prototype.destroy = function() {
+      return kb.utils.wrappedDestroy(this);
+    };
+
+    TriggeredObservable.prototype.model = function(new_model) {
+      if ((arguments.length === 0) || (this.m === new_model)) {
+        return this.m;
+      }
+      if ((this.m = new_model)) {
+        return this.update();
+      }
+    };
+
+    TriggeredObservable.prototype.update = function() {
+      if (!this.m) {
+        return;
+      }
+      if (this.vo() !== this.m) {
+        return this.vo(this.m);
+      } else {
+        return this.vo.valueHasMutated();
+      }
+    };
+
+    return TriggeredObservable;
+
+  })();
+
+  kb.triggeredObservable = function(model, event_name) {
+    return new kb.TriggeredObservable(model, event_name);
   };
 
 }).call(this);
