@@ -2,18 +2,22 @@ $(document).ready( ->
   module("knockback_view_model.js")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  if (typeof(require) != 'undefined') then _ = require('underscore') else _ = window._
+  if (typeof(require) isnt 'undefined') then _ = require('underscore') else _ = window._
   _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
-  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
-  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
+  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
+  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) isnt 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
+    ok(!!ko, 'ko')
+    ok(!!_, '_')
+    ok(!!Backbone, 'Backbone')
+    ok(!!kb, 'kb')
+    ok(!!_kbe, '_kbe')
   )
 
-  kb.locale_manager = new _kbe.LocaleManager('en', {})
+  locale_manager = new _kbe.LocaleManager('en', {})
 
   test("1. Standard use case: read and write", ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -43,6 +47,7 @@ $(document).ready( ->
 
   test("2. internals test (Coffeescript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
 
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
@@ -111,6 +116,7 @@ $(document).ready( ->
 
   test("3. internals test (Javascript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
 
     ContactViewModel = kb.ViewModel.extend({
       constructor: (model) ->
@@ -292,6 +298,7 @@ $(document).ready( ->
 
   test("7. Using kb.localizedObservable", ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
 
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model) ->
@@ -437,6 +444,7 @@ $(document).ready( ->
 
   test("10. Nested custom view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
 
     class ContactViewModelDate extends kb.ViewModel
       constructor: (model, options) ->
@@ -586,6 +594,7 @@ $(document).ready( ->
 
   test("12. Prior kb.Observables functionality", ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
 
     ContactViewModel = (model) ->
       @dynamic_observables = kb.viewModel(model, {keys: {
@@ -647,6 +656,7 @@ $(document).ready( ->
 
   test("13. Bulk mode (array of keys)", ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
 
     model = new _kbe.Contact({name: 'John', number: '555-555-5558'})
     view_model = kb.viewModel(model, ['name', 'number'])

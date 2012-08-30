@@ -18,11 +18,58 @@ module.exports =
     ]
     _build:
       commands: [
+        # knockback dependencies
+        'cp -v underscore vendor/underscore.js'
+        'cp -v underscore/underscore-min.js vendor/underscore.min.js'
+        'cp -v backbone vendor/backbone.js'
+        'cp -v backbone/backbone-min.js vendor/backbone.min.js'
+        'cp -v knockout-client/knockout.js vendor/knockout.js'
+        'cp -v knockout-client/knockout.debug.js vendor/knockout.min.js'
+
+        # knockback optional dependencies
+        'cp -v lodash vendor/optional/lodash.js'
+        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js'
+        'cp -v backbone-modelref vendor/optional/backbone-modelref.js'
+        'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref.min.js'
+        'cp -v backbone-relational vendor/optional/backbone-relational.js'
+        'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational.min.js'
+
+        # reduced-size stack
+        'uglifyjs -o vendor/underscore-1.3.3-kb.min.js vendor/underscore-1.3.3-kb.js'
+        'uglifyjs -o vendor/backbone-0.9.2-kb.min.js vendor/backbone-0.9.2-kb.js'
+        'uglifyjs -o vendor/knockout-2.1.0-kb.min.js vendor/knockout-2.1.0-kb.js'
+        'uglifyjs -o vendor/optional/lodash-0.6.1-kb.min.js vendor/optional/lodash-0.6.1-kb.js'
+        'cat -o knockback-minimal-stack.js vendor/underscore-1.3.3-kb.js vendor/backbone-0.9.2-kb.js vendor/knockout-2.1.0-kb.js knockback.js'
+        'cat -o knockback-minimal-stack.min.js vendor/underscore-1.3.3-kb.min.js vendor/backbone-0.9.2-kb.min.js vendor/knockout-2.1.0-kb.min.js knockback.min.js'
+
+        # npm
         'cp knockback.js packages/npm/knockback.js'
         'cp knockback.min.js packages/npm/knockback.min.js'
+        'cp knockback.js packages/npm/knockback-minimal-stack.js'
+        'cp knockback.min.js packages/npm/knockback-minimal-stack.min.js'
         'cp README.md packages/npm/README.md'
+        'cp vendor/underscore-1.3.3-kb.js packages/npm/vendor/underscore-1.3.3-kb.js'
+        'cp vendor/underscore-1.3.3-kb.min.js packages/npm/vendor/underscore-1.3.3-kb.min.js'
+        'cp vendor/backbone-0.9.2-kb.js packages/npm/vendor/backbone-0.9.2-kb.js'
+        'cp vendor/backbone-0.9.2-kb.min.js packages/npm/vendor/backbone-0.9.2-kb.min.js'
+        'cp vendor/knockout-2.1.0-kb.js packages/npm/vendor/knockout-2.1.0-kb.js'
+        'cp vendor/knockout-2.1.0-kb.min.js packages/npm/vendor/knockout-2.1.0-kb.min.js'
+        'cp vendor/optional/lodash-0.6.1-kb.js packages/npm/vendor/optional/lodash-0.6.1-kb.js'
+        'cp vendor/optional/lodash-0.6.1-kb.min.js packages/npm/vendor/optional/lodash-0.6.1-kb.min.js'
+
+        # nuget
         'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
         'cp knockback.min.js packages/nuget/Content/Scripts/knockback.min.js'
+        'cp knockback.js packages/nuget/Content/Scripts/knockback-minimal-stack.js'
+        'cp knockback.min.js packages/nuget/Content/Scripts/knockback-minimal-stack.min.js'
+        'cp vendor/underscore-1.3.3-kb.js packages/nuget/Content/Scripts/vendor/underscore-1.3.3-kb.js'
+        'cp vendor/underscore-1.3.3-kb.min.js packages/nuget/Content/Scripts/vendor/underscore-1.3.3-kb.min.js'
+        'cp vendor/backbone-0.9.2-kb.js packages/nuget/Content/Scripts/vendor/backbone-0.9.2-kb.js'
+        'cp vendor/backbone-0.9.2-kb.min.js packages/nuget/Content/Scripts/vendor/backbone-0.9.2-kb.min.js'
+        'cp vendor/knockout-2.1.0-kb.js packages/nuget/Content/Scripts/vendor/knockout-2.1.0-kb.js'
+        'cp vendor/knockout-2.1.0-kb.min.js packages/nuget/Content/Scripts/vendor/knockout-2.1.0-kb.min.js'
+        'cp vendor/optional/lodash-0.6.1-kb.js packages/nuget/Content/Scripts/vendor/optional/lodash-0.6.1-kb.js'
+        'cp vendor/optional/lodash-0.6.1-kb.min.js packages/nuget/Content/Scripts/vendor/optional/lodash-0.6.1-kb.min.js'
       ]
 
   statistics:
@@ -63,6 +110,7 @@ module.exports =
       commands: [
         'mbundle test/packaging/bundle-config.coffee'
         'mbundle test/lodash/bundle-config.coffee'
+        'mbundle test/minimal-stack/bundle-config.coffee'
       ]
     _test:
       command: 'phantomjs'
@@ -80,15 +128,7 @@ module.exports =
         'test/knockback_triggered_observable'
         'test/knockback_view_model'
         'test/knockback_memory_management'
+        'test/minimal-stack'
         'test/packaging'
         'test/lodash'
       ]
-
-  _postinstall:
-    commands: [
-      'cp underscore vendor/underscore-latest.js'
-      'cp backbone vendor/backbone-latest.js'
-      'cp backbone-modelref vendor/backbone-modelref-latest.js'
-      'cp backbone-relational vendor/backbone-relational-latest.js'
-      'cp knockout-client/knockout.debug.js vendor/knockout-latest.js'
-    ]

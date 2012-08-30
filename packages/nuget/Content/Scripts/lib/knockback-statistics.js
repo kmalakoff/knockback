@@ -53,16 +53,16 @@
       return stats_string;
     };
 
-    Statistics.prototype.register = function(obj) {
-      return this.registeredTracker(obj.constructor.name).push(obj);
+    Statistics.prototype.register = function(key, obj) {
+      return this.registeredTracker(key).push(obj);
     };
 
-    Statistics.prototype.unregister = function(obj) {
+    Statistics.prototype.unregister = function(key, obj) {
       var index, type_tracker;
-      type_tracker = this.registeredTracker(obj.constructor.name);
+      type_tracker = this.registeredTracker(key);
       index = _.indexOf(type_tracker, obj);
       if (index < 0) {
-        console.log("kb.Statistics: failed to unregister type: " + obj.constructor.name);
+        console.log("kb.Statistics: failed to unregister type: " + key);
       }
       return type_tracker.splice(index, 1);
     };
@@ -103,13 +103,13 @@
       }
     };
 
-    Statistics.prototype.registeredTracker = function(type) {
+    Statistics.prototype.registeredTracker = function(key) {
       var type_tracker;
-      if (this.registered_tracker.hasOwnProperty(type)) {
-        return this.registered_tracker[type];
+      if (this.registered_tracker.hasOwnProperty(key)) {
+        return this.registered_tracker[key];
       }
       type_tracker = [];
-      this.registered_tracker[type] = type_tracker;
+      this.registered_tracker[key] = type_tracker;
       return type_tracker;
     };
 

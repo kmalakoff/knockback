@@ -897,7 +897,7 @@
 
     function CollectionObservable(collection, options) {
       var create_options, factory, observable;
-      !collection || (collection instanceof Backbone.Collection) || throwUnexpected('not a collection');
+      !collection || (collection instanceof Backbone.Collection) || throwUnexpected(this, 'not a collection');
       options || (options = {});
       observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true;
@@ -959,7 +959,7 @@
         });
       }
       observable.subscribe(_.bind(this._onObservableArrayChange, this));
-      !kb.statistics || kb.statistics.register(this);
+      !kb.statistics || kb.statistics.register('CollectionObservable', this);
       return observable;
     }
 
@@ -976,7 +976,7 @@
       this.sorted_index;
       this.create_options = null;
       kb.utils.wrappedDestroy(this);
-      return !kb.statistics || kb.statistics.unregister(this);
+      return !kb.statistics || kb.statistics.unregister('CollectionObservable', this);
     };
 
     CollectionObservable.prototype.shareOptions = function() {
@@ -1379,7 +1379,7 @@
   };
 
   kb.parseFormattedString = function(string, format) {
-    var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, results, sorted_positions;
+    var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, result, results, sorted_positions;
     regex_string = format.slice();
     index = 0;
     parameter_count = 0;
@@ -1401,9 +1401,11 @@
       matches.shift();
     }
     if (!matches || (matches.length !== parameter_count)) {
-      return _.range(count).map(function() {
-        return '';
-      });
+      result = [];
+      while (count-- > 0) {
+        result.push('');
+      }
+      return result;
     }
     sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
       return parseInt(parameter_index, 10);
@@ -1895,7 +1897,7 @@
 
     function ViewModel(model, options, view_model) {
       var attribute_keys, bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref;
-      !model || (model instanceof Backbone.Model) || (Backbone.ModelRef && (model instanceof Backbone.ModelRef)) || throwUnexpected('not a model');
+      !model || (model instanceof Backbone.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || throwUnexpected(this, 'not a model');
       options || (options = {});
       view_model || (view_model = {});
       if (_.isArray(options)) {
@@ -1954,7 +1956,7 @@
       }
       !options.mappings || this._mapObservables(model, options.mappings);
       !keys || this._createObservables(model, keys);
-      !kb.statistics || kb.statistics.register(this);
+      !kb.statistics || kb.statistics.register('ViewModel', this);
     }
 
     ViewModel.prototype.destroy = function() {
@@ -1967,7 +1969,7 @@
       this.__kb.view_model = null;
       kb.releaseKeys(this);
       kb.utils.wrappedDestroy(this);
-      return !kb.statistics || kb.statistics.unregister(this);
+      return !kb.statistics || kb.statistics.unregister('ViewModel', this);
     };
 
     ViewModel.prototype.shareOptions = function() {

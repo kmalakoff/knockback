@@ -2,18 +2,22 @@ $(document).ready( ->
   module("knockback_core utils")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  if (typeof(require) != 'undefined') then _ = require('underscore') else _ = window._
+  if (typeof(require) isnt 'undefined') then _ = require('underscore') else _ = window._
   _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) != 'undefined') then require('backbone') else window.Backbone
-  ko = if not window.ko and (typeof(require) != 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
-  _kbe = if not window._kbe and (typeof(require) != 'undefined') then require('knockback-examples') else window._kbe
+  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
+  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
+  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _kbe = if not window._kbe and (typeof(require) isnt 'undefined') then require('knockback-examples') else window._kbe
 
   test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko); ok(!!_); ok(!!Backbone); ok(!!kb); ok(!!_kbe)
+    ok(!!ko, 'ko')
+    ok(!!_, '_')
+    ok(!!Backbone, 'Backbone')
+    ok(!!kb, 'kb')
+    ok(!!_kbe, '_kbe')
   )
 
-  kb.locale_manager = new _kbe.LocaleManager('en', {})
+  locale_manager = new _kbe.LocaleManager('en', {})
 
   test("kb.utils.wrappedObservable", ->
     kb.statistics = new kb.Statistics() # turn on stats

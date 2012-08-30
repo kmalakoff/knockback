@@ -21,7 +21,7 @@ addStatisticsEvent = (model, event_name, info) ->
 class kb.ModelWatcher
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
     if options.model_watcher
-      throwUnexpected(this, 'model not matching') unless (options.model_watcher.model() is model or (options.model_watcher.model_ref is model))
+      throwUnexpected(@, 'model not matching') unless (options.model_watcher.model() is model or (options.model_watcher.model_ref is model))
       return kb.utils.wrappedModelWatcher(obj, options.model_watcher).registerCallbacks(obj, callback_options)
     else
       kb.utils.wrappedModelWatcherIsOwned(obj, true)

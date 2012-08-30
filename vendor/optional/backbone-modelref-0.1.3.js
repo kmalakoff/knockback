@@ -33,10 +33,10 @@
 
   Backbone.ModelRef = (function() {
 
-    function ModelRef(collection, model_id, cached_model) {
+    function ModelRef(collection, id, cached_model) {
       var event, _i, _j, _len, _len1, _ref, _ref1;
       this.collection = collection;
-      this.model_id = model_id;
+      this.id = id;
       this.cached_model = cached_model != null ? cached_model : null;
       _.bindAll(this, '_checkForLoad', '_checkForUnload');
       if (!this.collection) {
@@ -47,10 +47,10 @@
         this.collection.retain();
       }
       if (this.cached_model) {
-        this.model_id = this.cached_model.id;
+        this.id = this.cached_model.id;
       }
-      if (!this.cached_model && this.model_id) {
-        this.cached_model = this.collection.get(this.model_id);
+      if (!this.cached_model && this.id) {
+        this.cached_model = this.collection.get(this.id);
       }
       if (this.cached_model) {
         _ref = Backbone.ModelRef.MODEL_EVENTS_WHEN_LOADED;
@@ -103,23 +103,23 @@
 
     ModelRef.prototype.getModel = function() {
       if (this.cached_model && !this.cached_model.isNew()) {
-        this.model_id = this.cached_model.id;
+        this.id = this.cached_model.id;
       }
       if (this.cached_model) {
         return this.cached_model;
       }
-      if (this.model_id) {
-        this.cached_model = this.collection.get(this.model_id);
+      if (this.id) {
+        this.cached_model = this.collection.get(this.id);
       }
       return this.cached_model;
     };
 
     ModelRef.prototype._checkForLoad = function() {
       var event, model, _i, _j, _len, _len1, _ref, _ref1;
-      if (this.cached_model || !this.model_id) {
+      if (this.cached_model || !this.id) {
         return;
       }
-      model = this.collection.get(this.model_id);
+      model = this.collection.get(this.id);
       if (!model) {
         return;
       }
@@ -139,10 +139,10 @@
 
     ModelRef.prototype._checkForUnload = function() {
       var event, model, _i, _j, _len, _len1, _ref, _ref1;
-      if (!this.cached_model || !this.model_id) {
+      if (!this.cached_model || !this.id) {
         return;
       }
-      model = this.collection.get(this.model_id);
+      model = this.collection.get(this.id);
       if (model) {
         return;
       }
@@ -202,9 +202,9 @@
       throw new Error("Backbone.ModelRef.get(): only id is permitted");
     }
     if (this.cached_model && !this.cached_model.isNew()) {
-      this.model_id = this.cached_model.id;
+      this.id = this.cached_model.id;
     }
-    return this.model_id;
+    return this.id;
   };
 
   Backbone.ModelRef.prototype.model = function(model) {
@@ -215,13 +215,13 @@
     if (model && (model.collection !== this.collection)) {
       throw new Error("Backbone.ModelRef.model(): collections don't match");
     }
-    changed = this.model_id ? !model || (this.model_id !== model.get('id')) : !!model;
+    changed = this.id ? !model || (this.id !== model.get('id')) : !!model;
     if (!changed) {
       return;
     }
     if (this.cached_model) {
       previous_model = this.cached_model;
-      this.model_id = null;
+      this.id = null;
       this.cached_model = null;
       _ref = Backbone.ModelRef.MODEL_EVENTS_WHEN_LOADED;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -238,7 +238,7 @@
     if (!model) {
       return;
     }
-    this.model_id = model.get('id');
+    this.id = model.get('id');
     this.cached_model = model.model();
     _ref2 = Backbone.ModelRef.MODEL_EVENTS_WHEN_UNLOADED;
     for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {

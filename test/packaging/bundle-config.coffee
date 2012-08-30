@@ -3,6 +3,6 @@ module.exports =
     underscore: 'underscore'
     backbone: 'backbone'
     'backbone-modelref': 'backbone-modelref'
-    knockout: 'vendor/knockout-latest.js'
+    knockout: 'vendor/knockout-2.1.0.js'
     knockback: 'knockback.js'
     'knockback-examples': 'test/_examples/build/_examples.js'

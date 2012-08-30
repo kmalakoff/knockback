@@ -32,7 +32,7 @@ class kb.CollectionObservable
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   constructor: (collection, options) ->
-    not collection or (collection instanceof Backbone.Collection) or throwUnexpected('not a collection')
+    not collection or (collection instanceof Backbone.Collection) or throwUnexpected(@, 'not a collection')
 
     options or= {}
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
@@ -96,7 +96,7 @@ class kb.CollectionObservable
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))
 
-    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
+    not kb.statistics or kb.statistics.register('CollectionObservable', @)     # collect memory management statistics
 
     return observable
 
@@ -110,7 +110,7 @@ class kb.CollectionObservable
     @filters = null; @sorted_index; @create_options = null
     kb.utils.wrappedDestroy(@)
 
-    not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
+    not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
 
   shareOptions: ->
     observable = kb.utils.wrappedObservable(@)

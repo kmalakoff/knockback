@@ -6,9 +6,9 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-if (typeof(require) != 'undefined') then _ = require('underscore') else _ = window._
+if (typeof(require) isnt 'undefined') then _ = require('underscore') else _ = window._
 _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-kb = if not window.kb and (typeof(require) != 'undefined') then require('knockback') else window.kb
+kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 
 class kb.Statistics
   constructor: ->
@@ -35,13 +35,13 @@ class kb.Statistics
   ###############################
   # Registered Observables and View Models
   ###############################
-  register: (obj) ->
-    @registeredTracker(obj.constructor.name).push(obj)
+  register: (key, obj) ->
+    @registeredTracker(key).push(obj)
 
-  unregister: (obj) ->
-    type_tracker = @registeredTracker(obj.constructor.name)
+  unregister: (key, obj) ->
+    type_tracker = @registeredTracker(key)
     index = _.indexOf(type_tracker, obj)
-    console.log("kb.Statistics: failed to unregister type: #{obj.constructor.name}") if index < 0
+    console.log("kb.Statistics: failed to unregister type: #{key}") if index < 0
     type_tracker.splice(index, 1)
 
   registeredCount: (type) ->
@@ -59,7 +59,7 @@ class kb.Statistics
       written = true
     return if stats_string then stats_string else success_message
 
-  registeredTracker: (type) ->
-    return @registered_tracker[type] if @registered_tracker.hasOwnProperty(type)
-    type_tracker = []; @registered_tracker[type] = type_tracker
+  registeredTracker: (key) ->
+    return @registered_tracker[key] if @registered_tracker.hasOwnProperty(key)
+    type_tracker = []; @registered_tracker[key] = type_tracker
     return type_tracker

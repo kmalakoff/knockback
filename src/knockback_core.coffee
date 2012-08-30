@@ -9,17 +9,17 @@
 ###
 
 # export or create Knockback namespace and kb alias
-Knockback = kb = @Knockback = @kb = if (typeof(exports) != 'undefined') then exports else {}
+Knockback = kb = @Knockback = @kb = if (typeof(exports) isnt 'undefined') then exports else {}
 kb.VERSION = '0.16.0beta2'
 
 ####################################
 # import Underscore (or Lo-Dash with precedence), Backbone, and Knockout
 ####################################
-if (typeof(require) != 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
+if (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
 _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
 kb._ = _
-kb.Backbone = Backbone = if not @Backbone and (typeof(require) != 'undefined') then require('backbone') else @Backbone
-kb.ko = ko = if not @ko and (typeof(require) != 'undefined') then require('knockout') else @ko
+kb.Backbone = Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
+kb.ko = ko = if not @ko and (typeof(require) isnt 'undefined') then require('knockout') else @ko
 
 ####################################
 # OBSERVABLE STORAGE TYPES

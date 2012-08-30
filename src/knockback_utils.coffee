@@ -17,7 +17,7 @@ _wrappedKey = (obj, key, value) ->
     return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
 
   # set
-  obj or throwUnexpected(this, "no obj for wrapping #{key}")
+  obj or throwUnexpected(@, "no obj for wrapping #{key}")
   obj.__kb or= {}
   obj.__kb[key] = value
   return value

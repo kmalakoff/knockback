@@ -18,7 +18,7 @@ class kb.ViewModel
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   constructor: (model, options, view_model) ->
-    not model or (model instanceof Backbone.Model) or (Backbone.ModelRef and (model instanceof Backbone.ModelRef)) or throwUnexpected('not a model')
+    not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or throwUnexpected(@, 'not a model')
 
     options or= {}
     view_model or= {}
@@ -72,7 +72,7 @@ class kb.ViewModel
     not options.mappings or @_mapObservables(model, options.mappings)
     not keys or @_createObservables(model, keys)
 
-    not kb.statistics or kb.statistics.register(@)     # collect memory management statistics
+    not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
 
   destroy: ->
     if @__kb.view_model isnt @ # clear the external references
@@ -82,7 +82,7 @@ class kb.ViewModel
     kb.releaseKeys(this)
     kb.utils.wrappedDestroy(@)
 
-    not kb.statistics or kb.statistics.unregister(@)     # collect memory management statistics
+    not kb.statistics or kb.statistics.unregister('ViewModel', @)     # collect memory management statistics
 
   shareOptions: ->
     return {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
@@ -93,7 +93,7 @@ class kb.ViewModel
 
     # SHARED NULL MODEL - keep it that way
     if this.__kb_null
-      not new_model or throwUnexpected(this, 'model set on shared null')
+      not new_model or throwUnexpected(@, 'model set on shared null')
       return
 
     # update references

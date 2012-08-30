@@ -50,7 +50,7 @@ class kb.LocalizedObservable
         return @read(ko.utils.unwrapObservable(@value))
 
       write: (value) =>
-        @write or throwUnexpected(this, 'writing to read-only')
+        @write or throwUnexpected(@, 'writing to read-only')
         @write(value, ko.utils.unwrapObservable(@value))
         @vo(value)
         @__kb._onChange(value) if @__kb._onChange

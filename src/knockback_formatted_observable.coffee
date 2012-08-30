@@ -35,10 +35,13 @@ kb.parseFormattedString = (string, format) ->
   matches = regex.exec(string)
   matches.shift() if (matches)
   # return fake empty data
-  return _.range(count).map(-> '') if not matches or (matches.length isnt parameter_count)
+  if not matches or (matches.length isnt parameter_count)
+    result = []
+    result.push('') while count-- > 0
+    return result
 
   # sort the matches since the parameters could be requested unordered
-  sorted_positions = _.sortBy(_.keys(positions), (parameter_index, format_index)->return parseInt(parameter_index,10))
+  sorted_positions = _.sortBy(_.keys(positions), (parameter_index, format_index) -> return parseInt(parameter_index,10))
   format_indices_to_matched_indices = {}
   for match_index, parameter_index of sorted_positions
     index = positions[parameter_index]

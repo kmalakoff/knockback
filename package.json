@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",
-    "easy-bake": "0.1.6"
+    "easy-bake": "0.1.7"
   },
   "optionalDependencies": {
     "underscore": ">=1.3.3",
@@ -28,7 +28,8 @@
     "backbone-relational": ">=0.6.0",
     "backbone-modelref": ">=0.1.2",
     "knockout": ">=2.1.0",
-    "knockout-client": ">=2.1.0"
+    "knockout-client": ">=2.1.0",
+    "lodash": ">=0.6.1"
   },
 
   "version"       : "0.16.0beta2"
