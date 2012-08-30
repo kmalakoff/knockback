@@ -92,6 +92,7 @@ class kb.LocalizedObservable
   # Internal
   ####################################################
 
+  # @private
   _onLocaleChange: ->
     value = @read(ko.utils.unwrapObservable(@value))
     @vo(value)

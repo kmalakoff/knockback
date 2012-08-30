@@ -127,6 +127,8 @@ class kb.ModelWatcher
   ####################################################
   # Internal
   ####################################################
+
+  # @private
   _onModelLoaded: (model) =>
     is_relational = Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
     @m = model
@@ -142,6 +144,7 @@ class kb.ModelWatcher
         (info.model(model) if info.model)
     @
 
+  # @private
   _onModelUnloaded: (model) =>
     @m = null
 
@@ -156,6 +159,7 @@ class kb.ModelWatcher
         info.model(null) if info.model
     @
 
+  # @private
   _modelBindRelatationalInfo: (event_name, info) ->
     if (event_name is 'change') and info.key and info.update
       key = ko.utils.unwrapObservable(info.key)
@@ -172,6 +176,7 @@ class kb.ModelWatcher
         @m.bind("update:#{info.key}", info.rel_fn)
     @
 
+  # @private
   _modelUnbindRelatationalInfo: (event_name, info) ->
     return unless info.rel_fn
     if info.is_collection

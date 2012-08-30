@@ -157,6 +157,8 @@ class kb.Observable
   ####################################################
   # Internal
   ####################################################
+
+  # @private
   _updateValueObservable: (new_value) ->
     create_options = @create_options
     create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, @m, @key)

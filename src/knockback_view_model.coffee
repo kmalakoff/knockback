@@ -113,6 +113,11 @@ class kb.ViewModel
       @[vm_key]?.setToDefault?()
     @
 
+  ####################################################
+  # Internal
+  ####################################################
+
+  # @private
   _createObservables: (model, keys) ->
     create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for key in keys
@@ -127,6 +132,7 @@ class kb.ViewModel
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
     @
 
+  # @private
   _mapObservables: (model, mappings) ->
     create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
     for vm_key, mapping_info of mappings

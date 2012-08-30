@@ -176,11 +176,12 @@ class kb.CollectionObservable
   ####################################################
   # Internal
   ####################################################
+
+  # @private
   _onCollectionChange: (event, arg) ->
     return if @in_edit # we are doing the editing
 
     switch event
-      # collection events
       when 'reset' then @_collectionResync()
       when 'resort'
         return not @sorted_index
@@ -189,7 +190,6 @@ class kb.CollectionObservable
         else
           @_onModelResort(arg)
 
-      # model events
       when 'new', 'add'
         return if @_modelIsFiltered(arg) # filtered
 
@@ -206,6 +206,7 @@ class kb.CollectionObservable
       when 'remove', 'destroy' then @_onModelRemove(arg)
       when 'change' then @_onModelChange(arg)
 
+  # @private
   _onModelRemove: (model) ->
     view_model = if @models_only then model else @viewModelByModel(model) # either remove a view model or a model
     return unless view_model  # it may have already been removed
@@ -215,6 +216,7 @@ class kb.CollectionObservable
     @in_edit--
     @trigger('remove', view_model, observable) # notify
 
+  # @private
   _onModelChange: (model) ->
     # filtered, remove
     if @_modelIsFiltered(model)
@@ -224,6 +226,7 @@ class kb.CollectionObservable
     else
       @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
 
+  # @private
   _onModelResort: (model) ->
     # either move a view model or a model
     observable = kb.utils.wrappedObservable(@)
@@ -244,6 +247,7 @@ class kb.CollectionObservable
     @in_edit--
     @trigger('resort', view_model, observable(), new_index) # notify
 
+  # @private
   _onObservableArrayChange: (values) ->
     return if @in_edit # we are doing the editing
     observable = kb.utils.wrappedObservable(@)
@@ -268,6 +272,7 @@ class kb.CollectionObservable
       collection.reset(models)
       @in_edit--
 
+  # @private
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)
     @trigger('remove', observable()) if not silent # notify
@@ -282,6 +287,7 @@ class kb.CollectionObservable
       @in_edit--
     @
 
+  # @private
   _collectionResync: (silent) ->
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
@@ -310,15 +316,18 @@ class kb.CollectionObservable
     @in_edit--
     @trigger('add', observable()) if not silent # notify
 
+  # @private
   _sortAttributeFn: (sort_attribute) ->
     if @models_only
       return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
     else
       return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(sort_attribute))
 
+  # @private
   _createViewModel: (model) ->
     return if @models_only then model else @create_options.store.findOrCreate(model, @create_options)
 
+  # @private
   _modelIsFiltered: (model) ->
     if @filters
       for filter in @filters
