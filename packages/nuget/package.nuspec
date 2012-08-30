@@ -22,8 +22,21 @@
   <files>
     <file src="content/Scripts/knockback.js" target="content/Scripts/knockback.js" />
     <file src="content/Scripts/knockback.min.js" target="content/Scripts/knockback.min.js" />
+    <file src="content/Scripts/knockback-core.js" target="content/Scripts/knockback-core.js" />
+    <file src="content/Scripts/knockback-core.min.js" target="content/Scripts/knockback-core.min.js" />
+    <file src="content/Scripts/knockback-minimal-stack.js" target="content/Scripts/knockback-minimal-stack.js" />
+    <file src="content/Scripts/knockback-minimal-stack.min.js" target="content/Scripts/knockback-minimal-stack.min.js" />
 
+    <file src="content/Scripts/lib/knockback-defaults.js" target="content/Scripts/lib/knockback-defaults.js" />
+    <file src="content/Scripts/lib/knockback-defaults.min.js" target="content/Scripts/lib/knockback-defaults.min.js" />
+    <file src="content/Scripts/lib/knockback-formatting.js" target="content/Scripts/lib/knockback-formatting.js" />
+    <file src="content/Scripts/lib/knockback-formatting.min.js" target="content/Scripts/lib/knockback-formatting.min.js" />
+    <file src="content/Scripts/lib/knockback-localized.js" target="content/Scripts/lib/knockback-localized.js" />
+    <file src="content/Scripts/lib/knockback-localized.min.js" target="content/Scripts/lib/knockback-localized.min.js" />
+    <file src="content/Scripts/lib/knockback-triggering.js" target="content/Scripts/lib/knockback-triggering.js" />
+    <file src="content/Scripts/lib/knockback-triggering.min.js" target="content/Scripts/lib/knockback-triggering.min.js" />
     <file src="content/Scripts/lib/knockback-statistics.js" target="content/Scripts/lib/knockback-statistics.js" />
+    <file src="content/Scripts/lib/knockback-statistics.min.js" target="content/Scripts/lib/knockback-statistics.min.js" />
 
     <file src="content/Scripts/vendor/underscore-1.3.3-kb.js" target="content/Scripts/vendor/underscore-1.3.3-kb.js" />
     <file src="content/Scripts/vendor/underscore-1.3.3-kb.min.js" target="content/Scripts/vendor/underscore-1.3.3-kb.min.js" />

@@ -1,4 +1,4 @@
-class _kbe.LocaleManager
+class kb.LocaleManager
   _.extend(this.prototype, Backbone.Events) # Mix in Backbone.Events so callers can subscribe
 
   constructor: (locale_identifier, @translations_by_locale) ->

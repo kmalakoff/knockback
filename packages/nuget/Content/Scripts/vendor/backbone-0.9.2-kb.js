@@ -1,13 +1,13 @@
 //     Backbone.js 0.9.2
-
 //     (c) 2010-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
+//     **NOTE: This is a reduced version for Knockback.js Minimal Stack (http://kmalakoff.github.com/knockback/)
 
 {};
-//     knockback-backbone-0.9.2.js
-//     This is a reduced version of Backbone.js that removes features to create a reduced-size Knockback.js stack.
+//     backbone-0.9.2-kb.js
+//     This is a reduced version of Backbone.js that removes features to create a minimally-sized Knockback.js stack.
 //     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
 //
 //     Removed features:

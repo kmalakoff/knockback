@@ -1,14 +1,15 @@
-//     Underscore.js 1.3.3
+//     Underscore.js 1.3.3 (Knockback Minimal Stack)
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
 //     Portions of Underscore are inspired or borrowed from Prototype,
 //     Oliver Steele's Functional, and John Resig's Micro-Templating.
 //     For all details and documentation:
 //     http://documentcloud.github.com/underscore
+// NOTE: This is a reduced version for Knockback.js Minimal Stack (http://kmalakoff.github.com/knockback/)
 
 {};
 //     underscore-1.3.3-kb.js
-//     This is a reduced version of Underscore.js that removes features to create a reduced-size Knockback.js stack.
+//     This is a reduced version of Underscore.js that removes features to create a minimally-sized Knockback.js stack.
 //     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
 //
 //     Removed features:

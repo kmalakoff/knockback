@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<head>
+  <title>Knockback Minimal Stack Test Suite (Components)</title>
+  <!-- LIBRARY -->
+  <script type="text/javascript" src="../../knockback-minimal-stack.min.js"></script>
+  <script type="text/javascript" src="../../lib/knockback-defaults.min.js"></script>
+  <script type="text/javascript" src="../../lib/knockback-formatting.min.js"></script>
+  <script type="text/javascript" src="../../lib/knockback-localization.min.js"></script>
+  <script type="text/javascript" src="../../lib/knockback-triggering.min.js"></script>
+  <script type="text/javascript" src="../../lib/knockback-statistics.js"></script>
+
+  <!-- HELPERS -->
+  <script type="text/javascript" src="../../vendor/optional/backbone-relational-0.6.0.js"></script>
+  <script type="text/javascript" src="../../vendor/optional/backbone-modelref-0.1.3.js"></script>
+  <script type="text/javascript" src="../../test/_examples/build/_contact_examples.js"></script>
+  <script type="text/javascript" src="../../test/_examples/build/_localization_examples.js"></script>
+  <script type="text/javascript" src="../vendor/globalize/globalize.js"></script>
+  <script type="text/javascript" src="../vendor/globalize/globalize.culture.en-GB.js"></script>
+  <script type="text/javascript" src="../vendor/globalize/globalize.culture.fr-FR.js"></script>
+
+  <!-- TESTS -->
+  <link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../vendor/qunit/jquery.js"></script>
+  <script type="text/javascript" src="../vendor/qunit/qunit.js"></script>
+  <script type="text/javascript" src="../vendor/qunit/jslitmus.js"></script>
+
+  <script type="text/javascript" src="../backbone-modelref/build/test.js"></script>
+  <script type="text/javascript" src="../backbone-relational/build/test.js"></script>
+
+  <script type="text/javascript" src="../knockback-utils/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-memory-management/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-collection-observable/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-observable/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-view-model/build/test.js"></script>
+
+  <script type="text/javascript" src="../knockback-formatting/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-localization/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-triggering/build/test.js"></script>
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Knockback Minimal Stack Test Suite (Components)</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+  </div>
+  <script type="text/javascript">QUnit.done = function(failures, total) {if (!total) { $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail'); throw 'Warning: no tests run'}}</script>
+</body>
+</html>

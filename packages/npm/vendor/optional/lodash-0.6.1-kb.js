@@ -8,7 +8,7 @@
 
  {};
 //     lodash-0.6.1-kb.js
-//     This is a reduced version of Lo-Dash.js that removes features to create a reduced-size Knockback.js stack.
+//     This is a reduced version of Lo-Dash.js that removes features to create a minimally-sized Knockback.js stack.
 //     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
 //
 //     Removed features:

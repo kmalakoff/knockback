@@ -1,10 +1,11 @@
 // Knockout JavaScript library v2.1.0
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
+// **NOTE: This is a reduced version for Knockback.js Minimal Stack (http://kmalakoff.github.com/knockback/)
 
 {};
 //     knockout-2.1.0-kb.js
-//     This is a reduced version of Knockout.js that removes features to create a reduced-size Knockback.js stack.
+//     This is a reduced version of Knockout.js that removes features to create a minimally-sized Knockback.js stack.
 //     If you want to use features not in this reduced version, either use the full library or make a request: https://github.com/kmalakoff/knockback/issues
 //
 //     Removed features:
