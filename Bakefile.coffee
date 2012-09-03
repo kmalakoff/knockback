@@ -36,7 +36,7 @@ module.exports =
     output: 'lib'
     compress: true
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'src/knockback-defaults/knockback-default-wrapper.coffee'
       'src/knockback-defaults/knockback-extensions.coffee'
     ]
@@ -46,7 +46,7 @@ module.exports =
     output: 'lib'
     compress: true
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'src/knockback-formatting/knockback-formatted-observable.coffee'
     ]
 
@@ -55,7 +55,7 @@ module.exports =
     output: 'lib'
     compress: true
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'src/knockback-localization/knockback-extensions.coffee'
       'src/knockback-localization/knockback-localized-observable.coffee'
     ]
@@ -65,7 +65,7 @@ module.exports =
     output: 'lib'
     compress: true
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'src/knockback-triggering/knockback-triggered-observable.coffee'
     ]
 
@@ -74,7 +74,7 @@ module.exports =
     output: 'lib'
     compress: true
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'src/knockback-statistics/knockback-statistics.coffee'
     ]
 
@@ -82,7 +82,7 @@ module.exports =
     join: '_localization_examples.js'
     output: 'test/_examples/build'
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'test/_examples/locale_manager.coffee'
       'test/_examples/localized_observables.coffee'
       'test/_examples/localized_string.coffee'
@@ -92,7 +92,7 @@ module.exports =
     join: '_contact_examples.js'
     output: 'test/_examples/build'
     files: [
-      'src/import-knockback.coffee'
+      'src/component-imports.coffee'
       'test/_examples/contact.coffee'
     ]
 

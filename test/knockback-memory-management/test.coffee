@@ -37,7 +37,7 @@ $(document).ready( ->
       @
 
     __destroy: ->
-      RefCountableViewModel.view_models.splice(RefCountableViewModel.view_models.indexOf(this), 1)
+      RefCountableViewModel.view_models.splice(_.indexOf(RefCountableViewModel.view_models, this), 1)
 
     @view_models: []
 
@@ -47,7 +47,7 @@ $(document).ready( ->
       DestroyableViewModel.view_models.push(this)
 
     destroy: ->
-      DestroyableViewModel.view_models.splice(DestroyableViewModel.view_models.indexOf(this), 1)
+      DestroyableViewModel.view_models.splice(_.indexOf(DestroyableViewModel.view_models, this), 1)
 
     @view_models: []
 

@@ -16,55 +16,11 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  if (typeof require !== 'undefined') {
-    try {
-      _ = require('lodash');
-    } catch (e) {
-      _ = require('underscore');
-    }
-  } else {
-    _ = this._;
-  }
-
-  if (_ && _.hasOwnProperty('_')) {
-    _ = _._;
-  }
-
   kb = (function() {
 
     function kb() {}
 
     kb.VERSION = '0.16.0beta3';
-
-    kb.renderAutoReleasedTemplate = function(template, view_model, options) {
-      var el, observable;
-      if (options == null) {
-        options = {};
-      }
-      el = document.createElement('div');
-      observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-      if (el.children.length === 1) {
-        el = el.children[0];
-      }
-      kb.releaseOnNodeRemove(view_model, el);
-      observable.dispose();
-      return el;
-    };
-
-    kb.releaseOnNodeRemove = function(view_model, node) {
-      view_model || throwUnexpected(this, 'missing view model');
-      node || throwUnexpected(this, 'missing node');
-      return ko.utils.domNodeDisposal.addDisposeCallback(node, function() {
-        return kb.release(view_model);
-      });
-    };
-
-    kb.applyBindings = function(view_model, node, skip_auto) {
-      ko.applyBindings(view_model, node);
-      if ((arguments.length === 2) || !skip_auto) {
-        return kb.releaseOnNodeRemove(view_model, node);
-      }
-    };
 
     kb.release = function(obj, preRelease) {
       var array, item, view_model, view_models, _i, _j, _len, _len1;
@@ -121,6 +77,34 @@
       return this;
     };
 
+    kb.releaseOnNodeRemove = function(view_model, node) {
+      view_model || throwUnexpected(this, 'missing view model');
+      node || throwUnexpected(this, 'missing node');
+      return ko.utils.domNodeDisposal.addDisposeCallback(node, function() {
+        return kb.release(view_model);
+      });
+    };
+
+    kb.renderAutoReleasedTemplate = function(template, view_model, options) {
+      var el, observable;
+      if (options == null) {
+        options = {};
+      }
+      el = document.createElement('div');
+      observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
+      if (el.children.length === 1) {
+        el = el.children[0];
+      }
+      kb.releaseOnNodeRemove(view_model, el);
+      observable.dispose();
+      return el;
+    };
+
+    kb.applyBindings = function(view_model, node) {
+      ko.applyBindings(view_model, node);
+      return kb.releaseOnNodeRemove(view_model, node);
+    };
+
     return kb;
 
   })();
@@ -131,7 +115,17 @@
     module.exports = kb;
   }
 
-  kb._ = _;
+  if (!this._ && (typeof require !== 'undefined')) {
+    try {
+      _ = require('lodash');
+    } catch (e) {
+      _ = require('underscore');
+    }
+  } else {
+    _ = this._;
+  }
+
+  kb._ = _ = _.hasOwnProperty('_') ? _._ : _;
 
   kb.Backbone = Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 

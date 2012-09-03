@@ -7,34 +7,12 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 ###
 
-####################################
-# import Underscore (or Lo-Dash with precedence), Backbone, and Knockout
-####################################
-if (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
-_ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-
 class kb
 
   # Library version (semantic)
   @VERSION = '0.16.0beta3'
 
-  @renderAutoReleasedTemplate = (template, view_model, options={}) ->
-    el = document.createElement('div')
-    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-    el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
-    kb.releaseOnNodeRemove(view_model, el)
-    observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
-    return el
-
-  @releaseOnNodeRemove = (view_model, node) ->
-    view_model or throwUnexpected(@, 'missing view model')
-    node or throwUnexpected(@, 'missing node')
-    ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
-
-  @applyBindings = (view_model, node, skip_auto) ->
-    ko.applyBindings(view_model, node)
-    kb.releaseOnNodeRemove(view_model, node) if (arguments.length is 2) or not skip_auto
-
+  # ViewModel lifecycle
   @release = (obj, preRelease) ->
     if (
       (not obj or (obj isnt Object(obj))) or # must be an object
@@ -84,14 +62,33 @@ class kb
       (key is '__kb') or kb.release(value, (-> obj[key] = null))
     return @
 
+  # Node/element with bound ViewModel lifecycle
+  @releaseOnNodeRemove = (view_model, node) ->
+    view_model or throwUnexpected(@, 'missing view model')
+    node or throwUnexpected(@, 'missing node')
+    ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
+
+  @renderAutoReleasedTemplate = (template, view_model, options={}) ->
+    el = document.createElement('div')
+    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
+    el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
+    kb.releaseOnNodeRemove(view_model, el)
+    observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
+    return el
+
+  @applyBindings = (view_model, node) ->
+    ko.applyBindings(view_model, node)
+    kb.releaseOnNodeRemove(view_model, node)
+
 ####################################
 # Module
 ####################################
 # export Knockback and kb namespcaes globally and to modules
 @Knockback = Knockback = @kb = kb; module.exports = kb if (typeof(exports) isnt 'undefined')
 
-# export Underscore (or Lo-Dash), Backbone, and Knockout
-kb._ = _
+# import and re-export Underscore (or Lo-Dash with precedence), Backbone, and Knockout
+if not @_ and (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
+kb._ = _ = if _.hasOwnProperty('_') then _._ else _ # LEGACY
 kb.Backbone = Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
 kb.ko = ko = if not @ko and (typeof(require) isnt 'undefined') then require('knockout') else @ko
 

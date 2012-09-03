@@ -105,9 +105,15 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback_core.coffee</td>
+          <td>src/knockback-core/knockback-core.coffee</td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>knockback.js 0.16.0beta3 (c) 2011, 2012 Kevin Malakoff. Knockback.js is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> Dependencies: Knockout.js, Backbone.js, and Underscore.js. </p> 
+</div>
+<div class='tags'>
+</div>
       <h2>Constant Summary</h2>
       <dl class='constants'>
         <dt id='VERSION-constant'>
@@ -127,8 +133,18 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#renderAutoReleasedTemplate-class'>
-        + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+      <a href='#release-class'>
+        + (void) <strong>release</strong>(obj, preRelease)
+      </a>
+    </span>
+    <span class='desc'>
+      ViewModel lifecycle
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#releaseKeys-class'>
+        + (void) <strong>releaseKeys</strong>(obj)
       </a>
     </span>
     <span class='desc'>
@@ -142,33 +158,23 @@
       </a>
     </span>
     <span class='desc'>
+      Node/element with bound ViewModel lifecycle
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#renderAutoReleasedTemplate-class'>
+        + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+      </a>
+    </span>
+    <span class='desc'>
       
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#applyBindings-class'>
-        + (void) <strong>applyBindings</strong>(view_model, node, skip_auto)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#release-class'>
-        + (void) <strong>release</strong>(obj, preRelease)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#releaseKeys-class'>
-        + (void) <strong>releaseKeys</strong>(obj)
+        + (void) <strong>applyBindings</strong>(view_model, node)
       </a>
     </span>
     <span class='desc'>
@@ -179,31 +185,13 @@
       <h2>Class Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='renderAutoReleasedTemplate-class'>
-      + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='releaseOnNodeRemove-class'>
-      + (void) <strong>releaseOnNodeRemove</strong>(view_model, node)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='applyBindings-class'>
-      + (void) <strong>applyBindings</strong>(view_model, node, skip_auto)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='release-class'>
       + (void) <strong>release</strong>(obj, preRelease)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>ViewModel lifecycle </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -213,11 +201,35 @@
     <div class='tags'>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='releaseOnNodeRemove-class'>
+      + (void) <strong>releaseOnNodeRemove</strong>(view_model, node)
+    </p>
+    <div class='docstring'>
+  <p>Node/element with bound ViewModel lifecycle </p> 
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='renderAutoReleasedTemplate-class'>
+      + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='applyBindings-class'>
+      + (void) <strong>applyBindings</strong>(view_model, node)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Thu Aug 30 2012 17:01:09 GMT+0900 (JST)
+  Tue Sep 04 2012 08:23:59 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.2.3
