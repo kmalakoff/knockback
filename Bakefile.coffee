@@ -136,10 +136,15 @@ module.exports =
 
         # npm: components
         'cp lib/knockback-defaults.js packages/npm/lib/knockback-defaults.js'
+        'cp lib/knockback-defaults.min.js packages/npm/lib/knockback-defaults.min.js'
         'cp lib/knockback-formatting.js packages/npm/lib/knockback-formatting.js'
+        'cp lib/knockback-formatting.min.js packages/npm/lib/knockback-formatting.min.js'
         'cp lib/knockback-triggering.js packages/npm/lib/knockback-triggering.js'
+        'cp lib/knockback-triggering.min.js packages/npm/lib/knockback-triggering.min.js'
         'cp lib/knockback-localization.js packages/npm/lib/knockback-localization.js'
+        'cp lib/knockback-localization.min.js packages/npm/lib/knockback-localization.min.js'
         'cp lib/knockback-statistics.js packages/npm/lib/knockback-statistics.js'
+        'cp lib/knockback-statistics.min.js packages/npm/lib/knockback-statistics.min.js'
 
         # nuget
         'cp knockback.js packages/nuget/Content/Scripts/knockback.js'
@@ -154,10 +159,15 @@ module.exports =
 
         # nuget: components
         'cp lib/knockback-defaults.js packages/nuget/Content/Scripts/lib/knockback-defaults.js'
+        'cp lib/knockback-defaults.min.js packages/nuget/Content/Scripts/lib/knockback-defaults.min.js'
         'cp lib/knockback-formatting.js packages/nuget/Content/Scripts/lib/knockback-formatting.js'
+        'cp lib/knockback-formatting.min.js packages/nuget/Content/Scripts/lib/knockback-formatting.min.js'
         'cp lib/knockback-triggering.js packages/nuget/Content/Scripts/lib/knockback-triggering.js'
+        'cp lib/knockback-triggering.min.js packages/nuget/Content/Scripts/lib/knockback-triggering.min.js'
         'cp lib/knockback-localization.js packages/nuget/Content/Scripts/lib/knockback-localization.js'
+        'cp lib/knockback-localization.min.js packages/nuget/Content/Scripts/lib/knockback-localization.min.js'
         'cp lib/knockback-statistics.js packages/nuget/Content/Scripts/lib/knockback-statistics.js'
+        'cp lib/knockback-statistics.min.js packages/nuget/Content/Scripts/lib/knockback-statistics.min.js'
       ]
 
   tests:
