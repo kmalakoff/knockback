@@ -18,9 +18,9 @@ You can get the library here:
 * [Development version][2]
 * [Production version][3]
 
-**NOTE: there are breaking changes in 0.15.+** Please see the [release notes](http://kmalakoff.github.com/knockback/release_notes.html) for details.
+**NOTE: there are breaking changes in 0.16.+** Please see the [release notes](https://github.com/kmalakoff/knockback/wiki/Release-Notes) for details.
 
-**NOTE: Please feel free to try out the 0.16.0 pre-release** by taking the .js files directly from this repository and filing any [issues](https://github.com/kmalakoff/knockback/issues?direction=desc&sort=created&state=open) you find. I am aiming for a full release in the coming week along with a reference application implementation.
+Also, I am in the process of updating the release notes, website, and releasing a reference application for 0.16.0 so they are slightly out-of-sync with this release. I'll have this done by the end of the week.
 
 ### Dependencies
 
@@ -107,7 +107,7 @@ ko.applyBindings(view_model)
 # ...
 
 # and cleanup after yourself when you are done.
-kb.utils.release(view_model)
+kb.release(view_model)
 ```
 
 And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
@@ -134,8 +134,8 @@ Building, Running and Testing the library
 Look at: https://github.com/kmalakoff/easy-bake
 
 [1]: http://kmalakoff.github.com/knockback/
-[2]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.js
-[3]: https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.min.js
+[2]: https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.js
+[3]: https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.min.js
 [4]: http://backbonejs.org/
 [5]: http://underscorejs.org/
 [6]: http://knockoutjs.com/

@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.16.0beta3
+  knockback.js 0.16.0
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -10,7 +10,7 @@
 class kb
 
   # Library version (semantic)
-  @VERSION = '0.16.0beta3'
+  @VERSION = '0.16.0'
 
   # ViewModel lifecycle
   @release = (obj, preRelease) ->

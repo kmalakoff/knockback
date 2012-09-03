@@ -19,5 +19,5 @@
   },
 
   "main"          : "knockback.js",
-  "version"       : "0.16.0beta3"
+  "version"       : "0.16.0"
 }
