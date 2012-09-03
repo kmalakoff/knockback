@@ -32,9 +32,9 @@ You can get the library here:
 ### Compatible Components
 
 * [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/) - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.
-* [BackboneModelRef.js](http://kmalakoff.github.com/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
-* [KnockbackNavigators.js](http://kmalakoff.github.com/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
-* [KnockbackInspector.js](http://kmalakoff.github.com/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
+* [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
+* (***new***) [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
+* [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
 
 
 Why Write Knockback.js?
