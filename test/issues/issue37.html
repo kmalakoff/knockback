@@ -1,0 +1,33 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Knockback Issue 37 Test</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+
+  <div id="wrapper" data-bind="with: thing">
+      <form data-bind="submit: onSubmit">
+      <label for="things">Things</label>
+      <div>
+          <select name="things" multiple data-bind="options: allThings, optionsText: 'name',  selectedOptions: subthings"></select>
+      </div>
+      <ul data-bind="foreach: subthings">
+          <li data-bind="html: name() + ' (' + id() + ')'"></li>
+      </ul>
+      <button type="submit">Show JSON</button>
+      </form>
+      <code id="theJson"></code>
+  </div>​
+
+  <script src="client-bundle.js"></script>
+  <script src="../../knockback.js"></script>
+  <script src="issue37.js"></script>
+
+</body>
+</html>

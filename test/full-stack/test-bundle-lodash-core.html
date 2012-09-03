@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<head>
+  <title>Knockback Stack (Bundle Lo-Dash) Test Suite</title>
+
+  <!-- LIBRARY -->
+  <script type="text/javascript" src="build/bundle-lodash-core.js"></script>
+  <script type="text/javascript" src="../../lib/knockback-statistics.js"></script>
+
+  <!-- TESTS -->
+  <link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../vendor/qunit/jquery.js"></script>
+  <script type="text/javascript" src="../vendor/qunit/qunit.js"></script>
+  <script type="text/javascript" src="../vendor/qunit/jslitmus.js"></script>
+
+  <script type="text/javascript" src="../backbone-modelref/build/test.js"></script>
+  <script type="text/javascript" src="../backbone-relational/build/test.js"></script>
+
+  <script type="text/javascript" src="../knockback-utils/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-memory-management/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-collection-observable/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-observable/build/test.js"></script>
+  <script type="text/javascript" src="../knockback-view-model/build/test.js"></script>
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Knockback Stack (Bundle Lo-Dash) Test Suite</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+  </div>
+  <script type="text/javascript">QUnit.done = function(failures, total) {if (!total) { $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail'); throw 'Warning: no tests run'}}</script>
+</body>
+</html>

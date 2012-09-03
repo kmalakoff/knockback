@@ -1353,7 +1353,7 @@ var QUnit = {
 			if (!expected) {
 				ok = true;
 			// expected is a regexp
-			} else if (QUnit.objectType(expected) === "regexp") {
+			} else if (QUnit.valueType(expected) === "regexp") {
 				ok = expected.test(actual);
 			// expected is a constructor
 			} else if (actual instanceof expected) {
@@ -1517,10 +1517,10 @@ extend(QUnit, {
 
 	// Safe object type checking
 	is: function( type, obj ) {
-		return QUnit.objectType( obj ) == type;
+		return QUnit.valueType( obj ) == type;
 	},
 
-	objectType: function( obj ) {
+	valueType: function( obj ) {
 		if (typeof obj === "undefined") {
 				return "undefined";
 
@@ -1875,9 +1875,9 @@ QUnit.equiv = function () {
 
     // Call the o related callback with the given arguments.
     function bindCallbacks(o, callbacks, args) {
-        var prop = QUnit.objectType(o);
+        var prop = QUnit.valueType(o);
         if (prop) {
-            if (QUnit.objectType(callbacks[prop]) === "function") {
+            if (QUnit.valueType(callbacks[prop]) === "function") {
                 return callbacks[prop].apply(callbacks, args);
             } else {
                 return callbacks[prop]; // or undefined
@@ -1911,11 +1911,11 @@ QUnit.equiv = function () {
             },
 
             "date": function (b, a) {
-                return QUnit.objectType(b) === "date" && a.valueOf() === b.valueOf();
+                return QUnit.valueType(b) === "date" && a.valueOf() === b.valueOf();
             },
 
             "regexp": function (b, a) {
-                return QUnit.objectType(b) === "regexp" &&
+                return QUnit.valueType(b) === "regexp" &&
                     a.source === b.source && // the regex itself
                     a.global === b.global && // and its modifers (gmi) ...
                     a.ignoreCase === b.ignoreCase &&
@@ -1936,7 +1936,7 @@ QUnit.equiv = function () {
                 var len;
 
                 // b could be an object literal here
-                if ( ! (QUnit.objectType(b) === "array")) {
+                if ( ! (QUnit.valueType(b) === "array")) {
                     return false;
                 }
 
@@ -2014,7 +2014,7 @@ QUnit.equiv = function () {
         return (function (a, b) {
             if (a === b) {
                 return true; // catch the most you can
-            } else if (a === null || b === null || typeof a === "undefined" || typeof b === "undefined" || QUnit.objectType(a) !== QUnit.objectType(b)) {
+            } else if (a === null || b === null || typeof a === "undefined" || typeof b === "undefined" || QUnit.valueType(a) !== QUnit.valueType(b)) {
                 return false; // don't lose time with error prone cases
             } else {
                 return bindCallbacks(a, callbacks, [b, a]);

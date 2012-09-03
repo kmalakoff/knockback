@@ -1,4 +1,6 @@
-class _kbe.LocaleManager
+class kb.LocaleManager
+  _.extend(this.prototype, Backbone.Events) # Mix in Backbone.Events so callers can subscribe
+
   constructor: (locale_identifier, @translations_by_locale) ->
     @setLocale(locale_identifier) if locale_identifier
 
@@ -18,12 +20,8 @@ class _kbe.LocaleManager
     culture_map = @translations_by_locale[@locale_identifier]
     return if not culture_map
     @trigger("change:#{key}", value) for key, value of culture_map
+    @
   getLocales: ->
     locales = []
     locales.push(string_id) for string_id, value of @translations_by_locale
     return locales
-
-#######################################
-# Mix in Backbone.Events so callers can subscribe
-#######################################
-_kbe.LocaleManager.prototype extends Backbone.Events
