@@ -18,7 +18,9 @@ You can get the library here:
 * [Development version][2]
 * [Production version][3]
 
-**NOTE: there are breaking changes in 0.15.+** Please see the [release notes][http://kmalakoff.github.com/knockback/release_notes.html] for details.
+**NOTE: there are breaking changes in 0.15.+** Please see the [release notes](http://kmalakoff.github.com/knockback/release_notes.html) for details.
+
+**NOTE: Please feel free to try out the 0.16.0 pre-release** by taking the .js files directly from this repository and filing any [issues](https://github.com/kmalakoff/knockback/issues?direction=desc&sort=created&state=open) you find. I am aiming for a full release in the coming week along with a reference application implementation.
 
 ### Dependencies
 
