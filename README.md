@@ -118,7 +118,7 @@ Demos and Documentation
 -----------------------
 For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
 
-Try a live demo: http://kmalakoff.github.com/knockback-todos/ or http://jsfiddle.net/kmalakoff/QSkpv/
+Try a live demo: http://kmalakoff.github.com/knockback-todos/
 
 
 Building, Running and Testing the library
