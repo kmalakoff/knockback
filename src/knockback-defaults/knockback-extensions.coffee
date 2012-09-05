@@ -17,6 +17,12 @@ kb.ViewModel::setToDefault = ->
     @[vm_key]?.setToDefault?()
   @
 
+# @example
+#   var model = new Backbone.Model({name: 'Bob'});
+#   var view_model = {
+#     wrapped_name: kb.defaultWrapper(kb.observable(model, 'name'), '(no name)')
+#   }; // view_model.wrapped name: Bob
+#   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
 kb.utils.setToDefault = (obj) ->
   return unless obj
 

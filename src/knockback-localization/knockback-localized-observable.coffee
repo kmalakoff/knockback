@@ -7,29 +7,62 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-####################################################
-# Note: If you are deriving a class, you need to return the underlying observable rather than your instance since Knockout is expecting observable functions:
-#   For example:
-#     constructor: ->
-#       super
-#       return kb.utils.wrappedObservable(@)
+# @abstract You must provide the following two methods:
+#   * read: function(value, observable) called to get the value and each time the locale changes
+#   * write: function(localized_string, value, observable) called to set the value (optional)
 #
-#   OR
+# Base class for observing localized data that changes when the locale changes.
 #
-#     constructor: ->
-#       return super
+# @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+#   kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
+#     constructor: function(value, options, view_model) {
+#       kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+#       return kb.utils.wrappedObservable(this);
+#     },
+#     read: function(value) {
+#       return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+#     },
+#     write: function(localized_string, value) {
+#       var new_value;
+#       new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+#       if (!(new_value && _.isDate(new_value))) {
+#         return kb.utils.wrappedObservable(this).resetToCurrent();
+#       }
+#       return value.setTime(new_value.valueOf());
+#     }
+#   });
+#   var ViewModel = function(model) {
+#     this.localized_date = kb.observable(model, {
+#       key: 'date',
+#       'default': this.loading_message,
+#       localizer: ShortDateLocalizer
+#     }, this);
+#   };
+#   var view_model = new ViewModel(new Backbone.Model({date: new Date()}));
 #
-# You can either provide a read or a read and write function in the options or on the class itself.
-# Options (all optional)
-#   * default - the value automatically returned when there is no value present. If there is no default, it will return ''
-#   * read: (value, observable) - called to get the value and each time the locale changes
-#   * write: (localized_string, value, observable) ->  - called to set the value (optional)
-#   * onChange: (localized_string, value, observable) -> called when the value changes
-####################################################
-
+# @method #extend(prototype_properties, class_properties)
+#   Class method for JavaScript inheritance.
+#   @param [Object] prototype_properties the properties to add to the prototype
+#   @param [Object] class_properties the properties to add to the class
+#   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+#   @example
+#     var MyLocalizedObservable = kb.LocalizedObservable.extend({
+#        constructor: function(value, options, view_model) {
+#          // the constructor does not return 'this' but a ko.observable
+#          return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+#        }
+#     });
 class kb.LocalizedObservable
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
+  # Used to create a new kb.LocalizedObservable. This an abstract class.
+  #
+  # @param [Data|ko.observable] value the value to localize
+  # @param [Object] options the create options
+  # @option options [Data|ko.observable] default a default value to present when the value is null, an empty string, etc.
+  # @option options [Function] onChange a notification that gets called when the locale changes. Signature: function(localized_string, value, observable)
+  # @return [ko.observable] the constructor does not return 'this' but a ko.observable
+  # @note the constructor does not return 'this' but a ko.observable
   constructor: (@value, options, @vm) -> # @vm is view_model
     options or= {}; @vm or= {}
     @read or throwMissing(this, 'read')
@@ -67,22 +100,25 @@ class kb.LocalizedObservable
     kb.locale_manager.bind('change', @__kb._onLocaleChange)
 
     # wrap ourselves with a default value
-    observable = kb.DefaultWrapper and ko.defaultWrapper(observable, options.default) if options.hasOwnProperty('default')
+    observable = kb.DefaultObservable and ko.defaultObservable(observable, options.default) if options.hasOwnProperty('default')
 
     return observable
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     kb.locale_manager.unbind('change', @__kb._onLocaleChange)
     @vm = null
     kb.utils.wrappedDestroy(@)
 
+  # Used to reset the value if localization is not possible.
   resetToCurrent: ->
     observable = kb.utils.wrappedObservable(@)
     current_value = if @value then @read(ko.utils.unwrapObservable(@value)) else null
     return if observable() is current_value
     observable(current_value)
 
-  # dual purpose set/get
+  # Dual purpose set/get
   observedValue: (value) ->
     return @value if arguments.length == 0
     @value = value; @_onLocaleChange()

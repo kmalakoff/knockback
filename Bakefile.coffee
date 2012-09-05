@@ -11,7 +11,7 @@ module.exports =
       'src/knockback-core/knockback-observable.coffee'
       'src/knockback-core/knockback-view-model.coffee'
       'src/knockback-core/knockback-collection-observable.coffee'
-      'src/knockback-defaults/knockback-default-wrapper.coffee'
+      'src/knockback-defaults/knockback-default-observable.coffee'
       'src/knockback-formatting/knockback-formatted-observable.coffee'
       'src/knockback-localization/knockback-localized-observable.coffee'
       'src/knockback-triggering/knockback-triggered-observable.coffee'
@@ -37,7 +37,7 @@ module.exports =
     compress: true
     files: [
       'src/component-imports.coffee'
-      'src/knockback-defaults/knockback-default-wrapper.coffee'
+      'src/knockback-defaults/knockback-default-observable.coffee'
       'src/knockback-defaults/knockback-extensions.coffee'
     ]
 

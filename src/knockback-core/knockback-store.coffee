@@ -6,7 +6,21 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+# Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
+#
+# @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+#   var co = kb.collectionObservable(new Backbone.Collection());
+#   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
+#     store: kb.utils.wrappedStore(co)
+#   });
 class kb.Store
+  # Used to either register yourself with the existing store or to create a new store.
+  #
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
+  # @param [Instance] obj the instance that will own or register with the store
+  # @param [ko.observable] observable the observable that will own the store
+  # @example
+  #   kb.Store.useOptionsOrCreate(model, this, options);
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
       options.store.register(obj, observable, options)
@@ -15,10 +29,13 @@ class kb.Store
       kb.utils.wrappedStoreIsOwned(observable, true)
       return kb.utils.wrappedStore(observable, new kb.Store())
 
+  # Used to create a new kb.Store.
   constructor: ->
     @observable_records = []
     @replaced_observables = []
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     for record in @observable_records
       kb.release(record.observable)
@@ -27,6 +44,18 @@ class kb.Store
     @observable_records = null
     @replaced_observables = null
 
+  # Used to register a new view model with the store.
+  #
+  # @param [Backbone.Model] obj the Backbone.Model
+  # @param [ko.observable] observable the observable to share for the Backbone.Model
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
+  # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
+  # @option options [String] path the path to the value (used to create related observables from the factory).
+  # @option options [kb.Store] store a store used to cache and share view models.
+  # @option options [kb.Factory] factory a factory used to create view models.
+  #
+  # @example register an observable with th store
+  #   store.registerObservable(obj, observable, {creator: creator});
   register: (obj, observable, options) ->
     return unless observable # nothing to register
 
@@ -43,6 +72,7 @@ class kb.Store
     @observable_records.push({obj: obj, observable: observable, creator: creator})
     observable
 
+  # @private
   findIndex: (obj, creator) ->
     if not obj or (obj instanceof Backbone.Model)
       for index, record of @observable_records
@@ -64,13 +94,26 @@ class kb.Store
 
     return -1
 
+  # @private
   find: (obj, creator) -> return if (index = @findIndex(obj, creator)) < 0 then null else @observable_records[index].observable
 
+  # @private
   isRegistered: (observable) ->
     for record in @observable_records
       return true if record.observable is observable
     return false
 
+  # Used to find an existing observable in the store or create a new one if it doesn't exist.
+  #
+  # @param [Backbone.Model|Backbone.Collection|Data] obj the object to create the observable for. Only Backbone.Models are cached in the store.
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
+  # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
+  # @option options [String] path the path to the value (used to create related observables from the factory).
+  # @option options [kb.Store] store a store used to cache and share view models.
+  # @option options [kb.Factory] factory a factory used to create view models.
+  #
+  # @example register an observable with th store
+  #   observable = store.findOrCreateObservable(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
   findOrCreate: (obj, options) ->
     options.store = this
     options.creator or (options.creator = kb.utils.inferCreator(obj, options.factory, options.path))
@@ -79,7 +122,7 @@ class kb.Store
 
     # no creator, create default and don't store
     if not creator
-      return kb.utils.createDefaultObservable(obj, options)
+      return kb.utils.createFromDefaultCreator(obj, options)
     else if creator.models_only
       return obj
 
@@ -99,6 +142,7 @@ class kb.Store
       @isRegistered(observable) or @register(obj, observable, options) # not registered yet, register now
     return observable
 
+  # @private
   findOrReplace: (obj, creator, observable) ->
     obj or raiseUnexpected('obj missing')
     if (index = @findIndex(obj, creator)) < 0

@@ -113,7 +113,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback.js 0.16.0 (c) 2011, 2012 Kevin Malakoff. Knockback.js is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> Dependencies: Knockout.js, Backbone.js, and Underscore.js. </p> 
+  <p>knockback.js 0.16.1 (c) 2011, 2012 Kevin Malakoff. Knockback.js is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> Dependencies: Knockout.js, Backbone.js, and Underscore.js. </p> 
 </div>
 <div class='tags'>
 </div>
@@ -122,14 +122,11 @@
         <dt id='VERSION-constant'>
           VERSION
           =
-          <div class='docstring'>
-  <p>Library version (semantic) </p> 
-</div>
-<div class='tags'>
+          <div class='tags'>
 </div>
         </dt>
         <dd>
-          <pre><code class='coffee'>'0.16.0'</code></pre>
+          <pre><code class='coffee'>'0.16.1'</code></pre>
         </dd>
       </dl>
       <h2>Class Method Summary</h2>
@@ -137,11 +134,11 @@
   <li>
     <span class='signature'>
       <a href='#release-class'>
-        + (void) <strong>release</strong>(obj, preRelease)
+        + (void) <strong>release</strong>(obj, pre_release_fn)
       </a>
     </span>
     <span class='desc'>
-      ViewModel lifecycle
+      Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
     </span>
   </li>
   <li>
@@ -151,7 +148,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
     </span>
   </li>
   <li>
@@ -161,7 +158,7 @@
       </a>
     </span>
     <span class='desc'>
-      Node/element with bound ViewModel lifecycle
+      Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
     </span>
   </li>
   <li>
@@ -171,7 +168,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
     </span>
   </li>
   <li>
@@ -181,7 +178,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
     </span>
   </li>
 </ul>
@@ -189,19 +186,55 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='release-class'>
-      + (void) <strong>release</strong>(obj, preRelease)
+      + (void) <strong>release</strong>(obj, pre_release_fn)
     </p>
     <div class='docstring'>
-  <p>ViewModel lifecycle </p> 
+  <p>Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose(). </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var view_model = kb.viewModel(model);
+kb.utils.release(view_model); view_model = null;</code></pre>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var todos = kb.collectionObservable(collection);
+kb.utils.release(todos); todos = null;
+</code></pre>
+  </div>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the object to release and also release its keys</span>
+    </li>
+    <li>
+      <span class='name'>pre_release_fn</span>
+      <span class='type'>
+        (<tt>Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>an optional function to clear the key on the object before the key's value is released. Used by kb.releaseKeys.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='releaseKeys-class'>
       + (void) <strong>releaseKeys</strong>(obj)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself. </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -209,7 +242,20 @@
       + (void) <strong>releaseOnNodeRemove</strong>(view_model, node)
     </p>
     <div class='docstring'>
-  <p>Node/element with bound ViewModel lifecycle </p> 
+  <p>Binds a callback to the node that releases the view model when the node is removed using ko.removeNode. </p> <pre><code>ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );</code></pre> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      The hard way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+    </h4>
+    <pre><code class='coffee'>var el = $(&#39;&lt;div data-bind=&quot;name: name&quot;&gt;&lt;/div&gt;&#39;)[0];
+var view_model = kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;}));
+ko.applyBindings(view_model, el);
+kb.releaseOnNodeRemove(view_model, el);
+...
+ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
+</code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -218,21 +264,48 @@
     <p class='signature' id='renderAutoReleasedTemplate-class'>
       + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+    </h4>
+    <pre><code class='coffee'>var el = kb.renderAutoReleasedTemplate(&#39;my_template&#39;, kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;})));
+...
+ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='applyBindings-class'>
       + (void) <strong>applyBindings</strong>(view_model, node)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+    </h4>
+    <pre><code class='coffee'>var el = $(&#39;&lt;div data-bind=&quot;name: name&quot;&gt;&lt;/div&gt;&#39;)[0];
+kb.applyBindings(kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;})), el);
+...
+ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

@@ -15,7 +15,7 @@
     &raquo;
     <a href='../../classes/kb.html' title='kb'>kb</a>
     &raquo;
-    <span class='title'>FormattedObservable</span>
+    <span class='title'>DefaultObservable</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -105,23 +105,23 @@
     <div id='content'>
       <h1>
         Class:
-        kb.FormattedObservable
+        kb.DefaultObservable
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-formatting/knockback-formatted-observable.coffee</td>
+          <td>src/knockback-defaults/knockback-default-observable.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Handles two-way formatted string convertions and will reformat a string when any argument changes. The format string can also be an observable. </p> 
+  <p>Used to provide a default value when an observable is null, undefined, or the empty string. </p> 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
-      change the formatted name whenever a model's name attribute changes
+      Provide a observable with observable and/or non observable default argument in the form of:
     </h4>
-    <pre><code class='coffee'>var observable = kb.formattedObservable(&quot;{0} and {1}&quot;, arg1, arg2);</code></pre>
+    <pre><code class='coffee'>var wrapped_name = kb.defaultObservable(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;);</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -131,12 +131,12 @@
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
-        - (ko.observable) <strong>constructor</strong>(format, args)
+        - (ko.observable) <strong>constructor</strong>(target_observable, dv)
       </a>
     </span>
     <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      Used to create a new kb.FormattedObservable.
+      Used to create a new kb.CollectionObservable.
     </span>
   </li>
   <li>
@@ -149,38 +149,48 @@
       Required clean up function to break cycles, release view models, etc.
     </span>
   </li>
+  <li>
+    <span class='signature'>
+      <a href='#setToDefault-instance'>
+        - (void) <strong>setToDefault</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Forces the observable to take the default value.
+    </span>
+  </li>
 </ul>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-instance'>
-      - (ko.observable) <strong>constructor</strong>(format, args)
+      - (ko.observable) <strong>constructor</strong>(target_observable, dv)
     </p>
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
     the constructor does not return 'this' but a ko.observable
   </div>
-  <p>Used to create a new kb.FormattedObservable. </p> 
+  <p>Used to create a new kb.CollectionObservable. </p> 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>format</span>
+      <span class='name'>target_observable</span>
       <span class='type'>
-        (<tt>String|ko.observable</tt>)
+        (<tt>ko.observable</tt>)
       </span>
       &mdash;
-      <span class='desc'>the format string. Format: "{0} and {1}" where {0} and {1} would be synchronized with the arguments (eg. "Bob and Carol" where {0} is Bob and {1} is Carol)</span>
+      <span class='desc'>the observable to check for null, undefined, or the empty string</span>
     </li>
     <li>
-      <span class='name'>args</span>
+      <span class='name'>default_value</span>
       <span class='type'>
-        (<tt>Array</tt>)
+        (<tt>Any</tt>)
       </span>
       &mdash;
-      <span class='desc'>arguments to be passed to the kb.LocaleManager's get() method</span>
+      <span class='desc'>the default value. Can be a value, string or ko.observable</span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -204,6 +214,20 @@
     </p>
     <div class='docstring'>
   <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setToDefault-instance'>
+      - (void) <strong>setToDefault</strong>()
+    </p>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
+  </div>
+  <p>Forces the observable to take the default value. </p> 
 </div>
 <div class='tags'>
 </div>

@@ -134,13 +134,10 @@
 
 </p>
 <ul>
-<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.js">Development version</a></li>
-<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.min.js">Production version</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js">Development version</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js">Production version</a></li>
 </ul>
 <p><strong>NOTE: there are breaking changes in 0.16.+</strong> Please see the <a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">release notes</a> for details.
-
-</p>
-<p>Also, I am in the process of updating the release notes, website, and releasing a reference application for 0.16.0 so they are slightly out-of-sync with this release. I&#39;ll have this done by the end of the week.
 
 </p>
 <h3>Dependencies</h3>
@@ -153,14 +150,14 @@
 <ul>
 <li><a href="https://github.com/PaulUithol/Backbone-relational/">BackboneRelational.js</a> - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.</li>
 <li><a href="https://github.com/kmalakoff/backbone-modelref/">BackboneModelRef.js</a> - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).</li>
-<li>(<strong><em>new</em></strong>) <a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
+<li>(<strong><em>new!</em></strong>) <a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
 <li><a href="https://github.com/kmalakoff/knockback-inspector/">KnockbackInspector.js</a> - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).</li>
 </ul>
 <h3>Demos and Documentation</h3>
 <p>For comprehensive tutorials, take a look at the website: <a href="http://kmalakoff.github.com/knockback/">http://kmalakoff.github.com/knockback/</a>
 
 </p>
-<p>Please try the <a href="http://kmalakoff.github.com/knockback-todos/">TodoMVC App</a> and check out the <a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App</a> for some best practices when using Knockback.js.
+<p>Please try the <a href="http://kmalakoff.github.com/knockback-todos/">TodoMVC App</a> and check out the (<strong><em>new!</em></strong>) <a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App</a> for some best practices when using Knockback.js.
 
 
 </p>
@@ -198,7 +195,7 @@
 <pre><code class="lang-coffeescript">class ContactViewModel extends kb.ViewModel
   constructor: (model) -&gt;
     super(model, {internals: [&#39;email&#39;, &#39;date&#39;]})  # call super constructor: @name, @_email, and @_date created in super from the model attributes
-    @email = kb.defaultWrapper(@_email, &#39;your.name@yourplace.com&#39;)
+    @email = kb.defaultObservable(@_email, &#39;your.name@yourplace.com&#39;)
     @date = new LongDateLocalizer(@_date)</code></pre>
 <p>or (Javascript)
 
@@ -206,7 +203,7 @@
 <pre><code class="lang-javascript">var ContactViewModel = kb.ViewModel.extend({
   constructor: function(model) {
     kb.ViewModel.prototype.constructor.call(this, model, {internals: [&#39;email&#39;, &#39;date&#39;]});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
-    this.email = kb.defaultWrapper(this._email, &#39;your.name@yourplace.com&#39;);
+    this.email = kb.defaultObservable(this._email, &#39;your.name@yourplace.com&#39;);
     this.date = new LongDateLocalizer(this._date);
     return this;
   }
@@ -246,7 +243,7 @@ kb.release(view_model)</code></pre>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

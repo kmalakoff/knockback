@@ -110,12 +110,19 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-defaults/knockback-default-wrapper.coffee</td>
+          <td>src/knockback-defaults/knockback-default-observable.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback_default_wrapper.js (c) 2011, 2012 Kevin Malakoff. Knockback.DefaultWrapper is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> </p> 
+  <p>Used to provide a default value when an observable is null, undefined, or the empty string. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      Provide a observable with observable and/or non observable default argument in the form of:
+    </h4>
+    <pre><code class='coffee'>var wrapped_name = kb.defaultObservable(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;);</code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -129,7 +136,7 @@
     </span>
     <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      
+      Used to create a new kb.CollectionObservable.
     </span>
   </li>
   <li>
@@ -139,7 +146,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Required clean up function to break cycles, release view models, etc.
     </span>
   </li>
   <li>
@@ -149,7 +156,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Forces the observable to take the default value.
     </span>
   </li>
 </ul>
@@ -159,7 +166,29 @@
     <p class='signature' id='constructor-instance'>
       - (void) <strong>constructor</strong>(target_observable, dv)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Used to create a new kb.CollectionObservable. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>target_observable</span>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the observable to check for null, undefined, or the empty string</span>
+    </li>
+    <li>
+      <span class='name'>default_value</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the default value. Can be a value, string or ko.observable</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -169,21 +198,31 @@
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='setToDefault-instance'>
       - (void) <strong>setToDefault</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
+  </div>
+  <p>Forces the observable to take the default value. </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 21:39:16 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

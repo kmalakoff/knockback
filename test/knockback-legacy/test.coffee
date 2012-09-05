@@ -15,8 +15,9 @@ $(document).ready( ->
     ok(!!kb, 'kb')
   )
 
-  test("0.16.0 deprecations", ->
+  test("0.16.1 deprecations", ->
     kb.observables(new Backbone.Model(), ['hello'], {})
     kb.utils.release(kb.viewModel(new Backbone.Model()))
+    kb.defaultWrapper(ko.observable(), 'test')
   )
 )

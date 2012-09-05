@@ -140,7 +140,7 @@ var view_model = {
   <li>
     <span class='signature'>
       <a href='#extend-instance'>
-        - (ko.observableArray) <strong>extend</strong>(prototype_properties, class_properties)
+        - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
       </a>
     </span>
     <span class='desc'>
@@ -181,11 +181,11 @@ var view_model = {
   <li>
     <span class='signature'>
       <a href='#collection-instance'>
-        - (void) <strong>collection</strong>(collection, options)
+        - (Backbone.Collection|void) <strong>collection</strong>(collection, options)
       </a>
     </span>
     <span class='desc'>
-      Getter/setter for the observed collection.
+      Dual-purpose getter/setter for the observed collection.
     </span>
   </li>
   <li>
@@ -195,7 +195,7 @@ var view_model = {
       </a>
     </span>
     <span class='desc'>
-      Getter/setter for the sorted index function.
+      Dual-purpose getter/setter for the sorted index function.
     </span>
   </li>
   <li>
@@ -205,7 +205,7 @@ var view_model = {
       </a>
     </span>
     <span class='desc'>
-      Getter/setter for the sorted index function.
+      Dual-purpose getter/setter for the sorted index function.
     </span>
   </li>
   <li>
@@ -236,6 +236,10 @@ var view_model = {
       - (ko.observableArray) <strong>constructor</strong>(collection, options)
     </p>
     <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    the constructor does not return 'this' but a ko.observableArray
+  </div>
   <p>Used to create a new kb.CollectionObservable. </p> <p>When the observable is updated, the following Backbone.Events are triggered: </p> <ul> <li><strong><em>add</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li> <li><strong><em>resort</em></strong>: (view_model, collection_observable, new_index) or if batch: (collection_observable)</li> <li><strong><em>remove</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li> </ul> 
 </div>
 <div class='tags'>
@@ -293,7 +297,7 @@ var view_model = {
         (<tt>Object</tt>)
       </span>
       &mdash;
-      <span class='desc'>a map of dot-deliminated paths (for example {'models.owner': kb.ViewModel}) to either constructors or create functions. Signature: {'some.path': function(object, options)}</span>
+      <span class='desc'>a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)</span>
     </li>
     <li>
       <span class='name'>sorted_index</span>
@@ -320,6 +324,14 @@ var view_model = {
       <span class='desc'>if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.</span>
     </li>
     <li>
+      <span class='name'>path</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the path to the value (used to create related observables from the factory).</span>
+    </li>
+    <li>
       <span class='name'>store</span>
       <span class='type'>
         (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
@@ -334,6 +346,14 @@ var view_model = {
       </span>
       &mdash;
       <span class='desc'>a factory used to create view models.</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.</span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -353,7 +373,7 @@ var view_model = {
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='extend-instance'>
-      - (ko.observableArray) <strong>extend</strong>(prototype_properties, class_properties)
+      - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
     </p>
     <div class='docstring'>
   <p>Class method for JavaScript inheritance.</p> 
@@ -363,7 +383,12 @@ var view_model = {
       
     </h4>
     <pre><code class='coffee'>var MyCollectionObservable = kb.CollectionObservable.extend({
-  method1: function() { return &#39;something&#39;; }
+   constructor: function(collection, options) {
+     // the constructor does not return &#39;this&#39; but a ko.observableArray
+     return kb.CollectionObservable.prototype.constructor.call(this, collection, {
+       view_model: MyViewModel,
+       options: options
+   });
 });</code></pre>
   </div>
 </div>
@@ -391,7 +416,7 @@ var view_model = {
   <ul class='return'>
     <li>
       <span class='type'>
-        (<tt>ko.observableArray</tt>)
+        (<tt>ko.observable</tt>)
       </span>
       &mdash;
       <span class='desc'>the constructor does not return 'this' but a ko.observableArray</span>
@@ -404,7 +429,7 @@ var view_model = {
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(collection_observable) or as a consequence of ko.releaseNode(element). </p> 
+  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
 </div>
 <div class='tags'>
 </div>
@@ -432,10 +457,10 @@ var available = kb.collectionObservable(available_collection, available_collecti
   </div>
   <div class='method_details'>
     <p class='signature' id='collection-instance'>
-      - (void) <strong>collection</strong>(collection, options)
+      - (Backbone.Collection|void) <strong>collection</strong>(collection, options)
     </p>
     <div class='docstring'>
-  <p>Getter/setter for the observed collection. </p> 
+  <p>Dual-purpose getter/setter for the observed collection. </p> 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -449,6 +474,16 @@ var available = kb.collectionObservable(available_collection, available_collecti
       <span class='desc'>the collection to observe (can be null)</span>
     </li>
   </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Backbone.Collection|void</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>returns the collection only if getter (no parameters)</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -456,7 +491,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
       - (void) <strong>sortedIndex</strong>(sorted_index, sort_attribute, options)
     </p>
     <div class='docstring'>
-  <p>Getter/setter for the sorted index function. </p> 
+  <p>Dual-purpose getter/setter for the sorted index function. </p> 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -528,7 +563,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
       - (void) <strong>sortAttribute</strong>(sort_attribute, sorted_index, options)
     </p>
     <div class='docstring'>
-  <p>Getter/setter for the sorted index function. </p> 
+  <p>Dual-purpose getter/setter for the sorted index function. </p> 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -628,7 +663,7 @@ todos2.hasViewModels();     // true
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

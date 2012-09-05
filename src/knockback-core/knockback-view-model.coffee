@@ -6,17 +6,69 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-####################################################
-# options
-#   * internals - an array of atttributes that should be scoped with an underscore, eg. name -> _name
-#   * requires - an array of atttributes that should be stubbed out if they don't exist on the model
-#   * keys - only include the provided keys on the model
-#   * excludes - keys to exclude on the view model; for exmaple, if you want to provide a custom implementation
-####################################################
-
+# Base class for ViewModels for Backbone.Models.
+#
+# @example How to create a ViewModel with first_name and last_name observables.
+#   var view_model = kb.viewModel(new Backbone.Model({first_name: "Planet", last_name: "Earth"}));
+#
+# @example Bulk kb.Observable create using 'key' Object to customize the kb.Observable created per attribute.
+#   var ContactViewModel = function(model) {
+#     this.loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString('loading'));
+#     this._auto = kb.viewModel(model, {
+#       keys: {
+#         name: { key: 'name', 'default': this.loading_message },
+#         number: { key: 'number', 'default': this.loading_message },
+#         date: { key: 'date', 'default': this.loading_message, localizer: kb.ShortDateLocalizer }
+#       }
+#     }, this);
+#     return this;
+#   };
+#
+# @example Creating ko.Observables on a target ViewModel
+#   var view_model = {};
+#   kb.viewModel(model, ['name', 'date'], view_model); // observables are added to view_model
+#
+# @method #extend(prototype_properties, class_properties)
+#   Class method for JavaScript inheritance.
+#   @param [Object] prototype_properties the properties to add to the prototype
+#   @param [Object] class_properties the properties to add to the class
+#   @return [kb.ViewModel] the constructor returns 'this'
+#   @example
+#     var ContactViewModel = kb.ViewModel.extend({
+#       constructor: function(model) {
+#         kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
+#         this.email = kb.defaultObservable(this._email, 'your.name@yourplace.com');
+#         this.date = new LongDateLocalizer(this._date);
+#         return this;
+#       }
+#     });
+#
+#   @example
+#     var ViewModel = kb.ViewModel.extend({
+#       constructor: function(model){
+#         kb.ViewModel.prototype.constructor.apply(this, arguments);
+#         this.full_name = ko.computed(function() { return this.first_name() + " " + this.last_name(); }, this);
+#       }
+#     });
+#     var view_model = new ViewModel(model);
 class kb.ViewModel
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
+  # Used to create a new kb.ViewModel.
+  #
+  # @param [Backbone.Model|Backbone.ModelRef] model the model to observe (can be null)
+  # @param [Object] options the create options
+  # @option options [Array] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
+  # @option options [Array] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Backbone.Model. Useful for binding Views that require specific observables to exist
+  # @option options [Array] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Backbone.Model attributes
+  # @option options [Object|Array] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
+  # @option options [String] path the path to the value (used to create related observables from the factory).
+  # @option options [kb.Store] store a store used to cache and share view models.
+  # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
+  # @option options [kb.Factory] factory a factory used to create view models.
+  # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
+  # @return [ko.observable] the constructor does not return 'this' but a ko.observableArray
+  # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) ->
     not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or throwUnexpected(@, 'not a model')
 
@@ -74,6 +126,8 @@ class kb.ViewModel
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     if @__kb.view_model isnt @ # clear the external references
       for vm_key of @__kb.vm_keys
@@ -84,9 +138,19 @@ class kb.ViewModel
 
     not kb.statistics or kb.statistics.unregister('ViewModel', @)     # collect memory management statistics
 
+  # Get the options for a new view model that can be used for sharing view models.
   shareOptions: ->
     return {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
 
+  # Dual-purpose getter/setter for the observed model.
+  #
+  # @param [Backbone.Model] model the model whose attribute to observe (can be null)
+  # @return [Backbone.Model|void] returns the model only if getter (no parameters)
+  #
+  # @example
+  #   var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
+  #   var the_model = view_model.model(); // get
+  #   view_model.model(new Backbone.Model({name: 'fred'})); // set
   model: (new_model) ->
     model = kb.utils.wrappedObject(@)
     return model if (arguments.length == 0) or (model is new_model) # get or no change
@@ -144,6 +208,6 @@ class kb.ViewModel
 
 # factory function
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
-kb.observables = (model, factories_info, view_model) ->
-  legacyWarning('ko.observables', '0.16.0', 'Please use kb.viewModel instead')
-  return new kb.ViewModel(model, factories_info, view_model)
+kb.observables = (model, binding_info, view_model) ->
+  legacyWarning('ko.observables', '0.16.1', 'Please use kb.viewModel instead')
+  return new kb.ViewModel(model, binding_info, view_model)

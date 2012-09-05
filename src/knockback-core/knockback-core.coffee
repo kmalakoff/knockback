@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.16.0
+  knockback.js 0.16.1
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -9,11 +9,19 @@
 
 class kb
 
-  # Library version (semantic)
-  @VERSION = '0.16.0'
+  @VERSION = '0.16.1'
 
-  # ViewModel lifecycle
-  @release = (obj, preRelease) ->
+  # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
+  # @param [Any] obj the object to release and also release its keys
+  # @param [Function] pre_release_fn an optional function to clear the key on the object before the key's value is released. Used by kb.releaseKeys.
+  #
+  # @example
+  #   var view_model = kb.viewModel(model);
+  #   kb.utils.release(view_model); view_model = null;
+  # @example
+  #   var todos = kb.collectionObservable(collection);
+  #   kb.utils.release(todos); todos = null;
+  @release = (obj, pre_release_fn) ->
     if (
       (not obj or (obj isnt Object(obj))) or # must be an object
       ((typeof(obj) is 'function') and not ko.isObservable(obj)) or # not a simple function
@@ -30,7 +38,7 @@ class kb
 
     # release object
     obj.__kb_destroyed = true
-    not preRelease or preRelease()
+    not pre_release_fn or pre_release_fn()
 
     # observable or lifecycle managed
     if ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
@@ -57,17 +65,34 @@ class kb
 
     return @
 
+  # Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
   @releaseKeys = (obj) ->
     for key, value of obj
       (key is '__kb') or kb.release(value, (-> obj[key] = null))
     return @
 
-  # Node/element with bound ViewModel lifecycle
+  # Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+  # ```
+  # ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );
+  # ```
+  # @example The hard way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+  #   var el = $('<div data-bind="name: name"></div>')[0];
+  #   var view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}));
+  #   ko.applyBindings(view_model, el);
+  #   kb.releaseOnNodeRemove(view_model, el);
+  #   ...
+  #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @releaseOnNodeRemove = (view_model, node) ->
     view_model or throwUnexpected(@, 'missing view model')
     node or throwUnexpected(@, 'missing node')
     ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
 
+  # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+  #
+  # @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+  #   var el = kb.renderAutoReleasedTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
+  #   ...
+  #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @renderAutoReleasedTemplate = (template, view_model, options={}) ->
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
@@ -76,6 +101,13 @@ class kb
     observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
     return el
 
+  # Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+  #
+  # @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+  #   var el = $('<div data-bind="name: name"></div>')[0];
+  #   kb.applyBindings(kb.viewModel(new Backbone.Model({name: 'Bob'})), el);
+  #   ...
+  #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @applyBindings = (view_model, node) ->
     ko.applyBindings(view_model, node)
     kb.releaseOnNodeRemove(view_model, node)

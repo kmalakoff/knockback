@@ -6,19 +6,23 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-####################################################
-# options
-#   * model - called to set and clear the model
-#   * update - called when the event is triggered
-#   * event_name - optional name of the event to register for on the model (default is update)
-#   * key - if provided, will only call update if the model attribute with name key has changed
-####################################################
-
-# @m is @model
 addStatisticsEvent = (model, event_name, info) ->
   not kb.statistics or kb.statistics.addModelEvent({name: event_name, model: model, key: info.key, path: info.path})
 
+# Used to provide a central place to aggregate registered Backbone.Model events rather than having all kb.Observables register for updates independently.
+#
 class kb.ModelWatcher
+
+  # Used to either register yourself with the existing model watcher or to create a new one.
+  #
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
+  # @param [Backbone.Model|Backbone.ModelRef] obj the Model that will own or register with the store
+  # @param [ko.observable|Object] owner the owners of the model watcher
+  # @param [Object] callback_options information about the event and callback to register
+  # @option options [Function] model callback for when the model changes (eg. is loaded). Signature: function(new_model)
+  # @option options [Function] update callback for when the registered event is triggered. Signature: function(new_value)
+  # @option options [String] event_name the name of the event.
+  # @option options [String] key the optional key to filter update attribute events.
   @useOptionsOrCreate: (options, model, obj, callback_options) ->
     if options.model_watcher
       throwUnexpected(@, 'model not matching') unless (options.model_watcher.model() is model or (options.model_watcher.model_ref is model))
@@ -37,10 +41,16 @@ class kb.ModelWatcher
 
     if model then @model(model) else (@m = null)
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     @model(null); @__kb.callbacks = null
     kb.utils.wrappedDestroy(@)
 
+  # Dual-purpose getter/setter for the observed model.
+  #
+  # @param [Backbone.Model] model the model whose attribute to observe (can be null)
+  # @return [Backbone.Model|void] returns the model only if getter (no parameters)
   model: (new_model) ->
     # get or no change
     return @m if (arguments.length is 0) or (@m == new_model)
@@ -72,6 +82,14 @@ class kb.ModelWatcher
       (info.model(new_model) if info.model) for info in list
     return new_model
 
+  # Used to register callbacks for an owner.
+  #
+  # @param [Object] obj the owning object.
+  # @param [Object] callback_info the callback information
+  # @option options [Function] model callback for when the model changes (eg. is loaded). Signature: function(new_model)
+  # @option options [Function] update callback for when the registered event is triggered. Signature: function(new_value)
+  # @option options [String] event_name the name of the event.
+  # @option options [String] key the optional key to filter update attribute events.
   registerCallbacks: (obj, callback_info) ->
     obj or throwMissing(this, 'obj')
     callback_info or throwMissing(this, 'info')

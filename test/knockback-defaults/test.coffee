@@ -108,9 +108,9 @@ $(document).ready( ->
       constructor: (model) ->
         super(model, {internals: ['name', 'number', 'date']})
         @loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString('loading'))
-        @name = kb.defaultWrapper(@_name, @loading_message)
-        @number = kb.defaultWrapper(@_number, @loading_message)
-        @date = kb.defaultWrapper(new kb.LongDateLocalizer(@_date), @loading_message)
+        @name = kb.defaultObservable(@_name, @loading_message)
+        @number = kb.defaultObservable(@_number, @loading_message)
+        @date = kb.defaultObservable(new kb.LongDateLocalizer(@_date), @loading_message)
 
     collection = new kb.ContactsCollection()
     model_ref = new Backbone.ModelRef(collection, 'b4')
@@ -181,7 +181,7 @@ $(document).ready( ->
     class ContactViewModel extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['email', 'date']})
-        @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+        @email = kb.defaultObservable(@_email, 'your.name@yourplace.com')
         @date = new kb.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)

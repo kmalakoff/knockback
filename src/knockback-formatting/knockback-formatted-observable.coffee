@@ -56,12 +56,18 @@ kb.parseFormattedString = (string, format) ->
     index++
   return results
 
-######################################
-# kb.formattedObservable to provide two-way formtted string convertions
-# Provide a format string with observable and/or non observable arguments in the form of:
-#   kb.formattedObservable("Something {0} and {1} and you know", arg1, arg2)
-######################################
+# Handles two-way formatted string convertions and will reformat a string when any argument changes. The format string can also be an observable.
+#
+# @example change the formatted name whenever a model's name attribute changes
+#   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
 class kb.FormattedObservable
+
+  # Used to create a new kb.FormattedObservable.
+  #
+  # @param [String|ko.observable] format the format string. Format: "{0} and {1}" where {0} and {1} would be synchronized with the arguments (eg. "Bob and Carol" where {0} is Bob and {1} is Carol)
+  # @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
+  # @return [ko.observable] the constructor does not return 'this' but a ko.observable
+  # @note the constructor does not return 'this' but a ko.observable
   constructor: (format, args) ->
     # being called by the factory function
     if _.isArray(args)
@@ -86,6 +92,8 @@ class kb.FormattedObservable
 
     return observable
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: -> kb.utils.wrappedDestroy(@)
 
 kb.formattedObservable = (format, args) -> return new kb.FormattedObservable(format, arraySlice.call(arguments, 1))

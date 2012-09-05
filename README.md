@@ -20,8 +20,6 @@ You can get the library here:
 
 **NOTE: there are breaking changes in 0.16.+** Please see the [release notes](https://github.com/kmalakoff/knockback/wiki/Release-Notes) for details.
 
-Also, I am in the process of updating the release notes, website, and releasing a reference application for 0.16.0 so they are slightly out-of-sync with this release. I'll have this done by the end of the week.
-
 ### Dependencies
 
 * [Backbone.js][4]
@@ -33,14 +31,14 @@ Also, I am in the process of updating the release notes, website, and releasing 
 
 * [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/) - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.
 * [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
-* (***new***) [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
+* (***new!***) [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
 * [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
 
 ###Demos and Documentation
 
 For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
 
-Please try the [TodoMVC App](http://kmalakoff.github.com/knockback-todos/) and check out the [Knockback.js Reference App](http://kmalakoff.github.com/knockback-reference-app/) for some best practices when using Knockback.js.
+Please try the [TodoMVC App](http://kmalakoff.github.com/knockback-todos/) and check out the (***new!***) [Knockback.js Reference App](http://kmalakoff.github.com/knockback-reference-app/) for some best practices when using Knockback.js.
 
 
 Why Write Knockback.js?
@@ -79,7 +77,7 @@ or (Coffeescript)
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
     super(model, {internals: ['email', 'date']})  # call super constructor: @name, @_email, and @_date created in super from the model attributes
-    @email = kb.defaultWrapper(@_email, 'your.name@yourplace.com')
+    @email = kb.defaultObservable(@_email, 'your.name@yourplace.com')
     @date = new LongDateLocalizer(@_date)
 ```
 
@@ -89,7 +87,7 @@ or (Javascript)
 var ContactViewModel = kb.ViewModel.extend({
   constructor: function(model) {
     kb.ViewModel.prototype.constructor.call(this, model, {internals: ['email', 'date']});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
-    this.email = kb.defaultWrapper(this._email, 'your.name@yourplace.com');
+    this.email = kb.defaultObservable(this._email, 'your.name@yourplace.com');
     this.date = new LongDateLocalizer(this._date);
     return this;
   }
@@ -135,8 +133,8 @@ Building, Running and Testing the library
 Look at: https://github.com/kmalakoff/easy-bake
 
 [1]: http://kmalakoff.github.com/knockback/
-[2]: https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.js
-[3]: https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.min.js
+[2]: https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js
+[3]: https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js
 [4]: http://backbonejs.org/
 [5]: http://underscorejs.org/
 [6]: http://knockoutjs.com/

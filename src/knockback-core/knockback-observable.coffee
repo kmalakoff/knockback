@@ -6,10 +6,39 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-# @m is @model
-
+# Base class for observing model attributes.
+#
+# @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+#   var ContactViewModel = function(model) {
+#     this.name = kb.observable(model, 'name');
+#     this.number = kb.observable(model, { key: 'number'});
+#   };
+#   var model = new Contact({ name: 'Ringo', number: '555-555-5556' });
+#   var view_model = new ContactViewModel(model);
+#
+# @example How to create a kb.Observable with a default value.
+#   var model = Backbone.Model({name: 'Bob'});
+#   var name = kb.observable(model, {key:'name', default: '(none)'}); // name is Bob
+#   name.setToDefault(); // name is (none)
 class kb.Observable
-  constructor: (model, options, @vm) -> # vm is view_model
+
+  # Used to create a new kb.Observable.
+  #
+  # @param [Backbone.Model] model the model to observe (can be null)
+  # @param [String|Array|Object] options the create options. String is a single attribute name, Array is an array of attribute names.
+  # @option options [String] key the name of the attribute.
+  # @option options [Function] read a function used to provide transform the attribute value before passing it to the caller. Signature: read()
+  # @option options [Function] write a function used to provide transform the value before passing it to the model set function. Signature: write(value)
+  # @option options [Array] args arguments to pass to the read and write functions (they can be ko.observables). Can be useful for passing arguments to a locale manager.
+  # @option options [Constructor] localizer a concrete kb.LocalizedObservable constructor for localization.
+  # @option options [Data|ko.observable] default the default value. Can be a value, string or ko.observable.
+  # @option options [String] path the path to the value (used to create related observables from the factory).
+  # @option options [kb.Store] store a store used to cache and share view models.
+  # @option options [kb.Factory] factory a factory used to create view models.
+  # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
+  # @return [ko.observable] the constructor does not return 'this' but a ko.observable
+  # @note the constructor does not return 'this' but a ko.observable
+  constructor: (model, options, @vm) ->
     options or throwMissing(this, 'options')
     @vm or = {}
 
@@ -86,12 +115,14 @@ class kb.Observable
       delete create_options.localizer
 
     # wrap ourselves with a default value
-    if kb.DefaultWrapper and create_options.hasOwnProperty('default')
-      observable = kb.defaultWrapper(observable, create_options.default)
+    if kb.DefaultObservable and create_options.hasOwnProperty('default')
+      observable = kb.defaultObservable(observable, create_options.default)
       delete create_options.default
 
     return observable
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     @__kb_destroyed = true
     kb.release(@__kb_value); @__kb_value = null
@@ -99,20 +130,30 @@ class kb.Observable
     @create_options = null
     kb.utils.wrappedDestroy(@)
 
+  # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Backbone.Collection, it will hold a kb.CollectionObservable.
   value: ->
     return @__kb_value
 
+  # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: ->
     new_value = if @m then @m.get(@key) else null
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
+  # Dual-purpose getter/setter for the observed model.
+  #
+  # @param [Backbone.Model] model the model whose attribute to observe (can be null)
+  # @return [Backbone.Model|void] returns the model only if getter (no parameters)
   model: (new_model) ->
     # get or no change
     return @m if (arguments.length == 0) or (@m is new_model)
     @m = new_model
     @__kb_destroyed or @update() # update if we aren't being destroyed
 
+  ####################################################
+  # Internal
+  ####################################################
+  # @private
   update: (new_value) ->
     # determine the new type
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
@@ -149,10 +190,6 @@ class kb.Observable
 
     else # a simple observable
       value(new_value) if value() isnt new_value # different so update
-
-  ####################################################
-  # Internal
-  ####################################################
 
   # @private
   _updateValueObservable: (new_value) ->

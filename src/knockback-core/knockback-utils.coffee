@@ -46,11 +46,46 @@ _unwrapModels = (obj) ->
 # Public API
 ####################################################
 
-# utilities namespace
+# Library of general-purpose utilities
 class kb.utils
 
+  # Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'. Relevant for:
+  #
+  #   * [kb.CollectionObservable]('classes/kb/CollectionObservable.html')
+  #   * [kb.Observable]('classes/kb/Observable.html')
+  #   * [kb.DefaultObservable]('classes/kb/DefaultObservable.html')
+  #   * [kb.FormattedObservable]('classes/kb/FormattedObservable.html')
+  #   * [kb.LocalizedObservable]('classes/kb/LocalizedObservable.html')
+  #   * [kb.TriggeredObservable]('classes/kb/TriggeredObservable.html')
+  #
+  # @param [Instance] instance the instance owning the ko.observable.
+  # @param [ko.observable] observable if provided, sets the observable; otherwise, gets the observable.
+  #
+  # @example
+  #   var ShortDateLocalizer = kb.LocalizedObservable.extend({
+  #     constructor: function(value, options, view_model) {
+  #       kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+  #       return kb.utils.wrappedObservable(this);
+  #     }
+  #   });
   @wrappedObservable = (obj, value)           -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'observable'))
+
+  # Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.
+  #
+  # @note this is almost the same as {kb.utils.wrappedModel} except that if the Model doesn't exist, it returns null.
+  # @param [Object|kb.ViewModel|kb.CollectionObservable] owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
+  # @param [Backbone.Model|Backbone.Collection] model/collection if provided, sets the Model/Collection; otherwise, gets the Model/Collection.
+  #
+  # @example
+  #   var model = kb.utils.wrappedObject(view_model);
+  #   var collection = kb.utils.wrappedObject(collection_observable);
   @wrappedObject = (obj, value)               -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
+
+  # Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
+  #
+  # @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting).
+  # @param [Object|kb.ViewModel] view_model the ViewModel owning the Backbone.Model.
+  # @param [Backbone.Model] model if provided, sets the Model; otherwise, gets the Model or ViewModel itself if there is no Model.
   @wrappedModel = (obj, value) ->
     # get
     if (arguments.length is 1)
@@ -58,12 +93,38 @@ class kb.utils
       return if _.isUndefined(value) then obj else value
     else
       return _wrappedKey(obj, 'object', value)
+
+  # Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
+  #
+  # @param [Any] owner the kb.Store owner.
+  # @param [kb.Store] store if provided, sets the store; otherwise, gets the store.
+  #
+  # @example
+  #   var co = kb.collectionObservable(new Backbone.Collection());
+  #   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
+  #     store: kb.utils.wrappedStore(co)
+  #   });
   @wrappedStore = (obj, value)                -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
+
+  # @private
   @wrappedStoreIsOwned = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store_is_owned'))
+
+  # Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner.
+  #
+  # @param [Any] owner the kb.Factory owner.
+  # @param [kb.Factory] factory if provided, sets the factory; otherwise, gets the factory.
   @wrappedFactory = (obj, value)              -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
+
+  # Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.
+  #
+  # @param [Any] owner the kb.ModelWatcher owner.
+  # @param [kb.ModelWatcher] model_watcher if provided, sets the model watcher; otherwise, gets the model watcher.
   @wrappedModelWatcher = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher'))
+
+  # @private
   @wrappedModelWatcherIsOwned = (obj, value)  -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher_is_owned'))
 
+  # Clean up function that releases all of the wrapped values on an owner.
   @wrappedDestroy = (obj) ->
     return unless obj.__kb
     obj.__kb.model_watcher.releaseCallbacks(obj) if obj.__kb.model_watcher
@@ -79,6 +140,14 @@ class kb.utils
     __kb.store = null
     # kb.release(__kb, true) # release everything that remains
 
+  # Retrieves the value stored in a ko.observable.
+  #
+  # @see kb.Observable.valueType
+  #
+  # @example
+  #   var view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
+  #   kb.utils.valueType(view_model.simple_attr); // kb.TYPE_SIMPLE
+  #   kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   @valueType = (observable) ->
     return KB_TYPE_UNKNOWN        unless observable
     return observable.valueType() if observable.__kb_is_o
@@ -87,12 +156,21 @@ class kb.utils
     return KB_TYPE_ARRAY          if _.isArray(observable)
     return KB_TYPE_SIMPLE
 
+  # Helper to join a dot-deliminated path.
+  #
+  # @example
+  #   kb.utils.pathJoin('models', 'name'); // 'models.name'
   @pathJoin = (path1, path2) ->
     return (if path1 then (if path1[path1.length-1] isnt '.' then "#{path1}." else path1) else '') + path2
 
+  # Helper to join a dot-deliminated path with the path on options and returns a new options object with the result.
+  #
+  # @example
+  #   this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));
   @optionsPathJoin = (options, path) ->
     return _.defaults({path: @pathJoin(options.path, path)}, options)
 
+  # Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value's type.
   @inferCreator = (value, factory, path, owner, key) ->
     creator = factory.creatorForPath(value, path) if factory
     return creator if creator
@@ -110,13 +188,15 @@ class kb.utils
     return kb.CollectionObservable      if value instanceof Backbone.Collection
     return null
 
-  @createDefaultObservable = (obj, options) ->
+  # Creates an observable based on a value's type.
+  @createFromDefaultCreator = (obj, options) ->
     return kb.viewModel(obj, options)                   if obj instanceof Backbone.Model
     return kb.collectionObservable(obj, options)        if obj instanceof Backbone.Collection
     return ko.observableArray(obj)                      if _.isArray(obj)
     return ko.observable(obj)
 
-  # @deprecated Please use kb.release instead
+  # @deprecated please use kb.release instead
+  # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   @release = (obj) ->
-    legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
+    legacyWarning('kb.utils.release', '0.16.1', 'Please use kb.release instead')
     return kb.release(obj)

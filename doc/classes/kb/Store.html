@@ -115,7 +115,17 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback_store.js (c) 2012 Kevin Malakoff. Knockback.Store is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> </p> 
+  <p>Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions). </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+    </h4>
+    <pre><code class='coffee'>var co = kb.collectionObservable(new Backbone.Collection());
+var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
+  store: kb.utils.wrappedStore(co)
+});</code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -128,7 +138,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Used to either register yourself with the existing store or to create a new store.
     </span>
   </li>
 </ul>
@@ -142,7 +152,7 @@
     </span>
     <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      
+      Used to create a new kb.Store.
     </span>
   </li>
   <li>
@@ -152,7 +162,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Required clean up function to break cycles, release view models, etc.
     </span>
   </li>
   <li>
@@ -162,37 +172,7 @@
       </a>
     </span>
     <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#findIndex-instance'>
-        - (void) <strong>findIndex</strong>(obj, creator)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#find-instance'>
-        - (void) <strong>find</strong>(obj, creator)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#isRegistered-instance'>
-        - (void) <strong>isRegistered</strong>(observable)
-      </a>
-    </span>
-    <span class='desc'>
-      
+      Used to register a new view model with the store.
     </span>
   </li>
   <li>
@@ -202,17 +182,7 @@
       </a>
     </span>
     <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#findOrReplace-instance'>
-        - (void) <strong>findOrReplace</strong>(obj, creator, observable)
-      </a>
-    </span>
-    <span class='desc'>
-      
+      Used to find an existing observable in the store or create a new one if it doesn't exist.
     </span>
   </li>
 </ul>
@@ -222,7 +192,45 @@
     <p class='signature' id='useOptionsOrCreate-class'>
       + (void) <strong>useOptionsOrCreate</strong>(options, obj, observable)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Used to either register yourself with the existing store or to create a new store. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>kb.Store.useOptionsOrCreate(model, this, options);
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(model, options)</span>
+    </li>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Instance</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the instance that will own or register with the store</span>
+    </li>
+    <li>
+      <span class='name'>observable</span>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the observable that will own the store</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -232,7 +240,10 @@
     <p class='signature' id='constructor-instance'>
       - (void) <strong>constructor</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Used to create a new kb.Store. </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
 </div>
@@ -242,56 +253,175 @@
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='register-instance'>
       - (void) <strong>register</strong>(obj, observable, options)
     </p>
-    <div class='tags'>
-</div>
+    <div class='docstring'>
+  <p>Used to register a new view model with the store. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      register an observable with th store
+    </h4>
+    <pre><code class='coffee'>store.registerObservable(obj, observable, {creator: creator});
+</code></pre>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='findIndex-instance'>
-      - (void) <strong>findIndex</strong>(obj, creator)
-    </p>
-    <div class='tags'>
 </div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='find-instance'>
-      - (void) <strong>find</strong>(obj, creator)
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='isRegistered-instance'>
-      - (void) <strong>isRegistered</strong>(observable)
-    </p>
-    <div class='tags'>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Backbone.Model</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the Backbone.Model</span>
+    </li>
+    <li>
+      <span class='name'>observable</span>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the observable to share for the Backbone.Model</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(model, options)</span>
+    </li>
+  </ul>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
+    <li>
+      <span class='name'>creator</span>
+      <span class='type'>
+        (<tt>Constructor|Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor or function used to create the observable. It is used to match observables in the store.</span>
+    </li>
+    <li>
+      <span class='name'>path</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the path to the value (used to create related observables from the factory).</span>
+    </li>
+    <li>
+      <span class='name'>store</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a store used to cache and share view models.</span>
+    </li>
+    <li>
+      <span class='name'>factory</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a factory used to create view models.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='findOrCreate-instance'>
       - (void) <strong>findOrCreate</strong>(obj, options)
     </p>
-    <div class='tags'>
-</div>
+    <div class='docstring'>
+  <p>Used to find an existing observable in the store or create a new one if it doesn&#39;t exist. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      register an observable with th store
+    </h4>
+    <pre><code class='coffee'>observable = store.findOrCreateObservable(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
+</code></pre>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='findOrReplace-instance'>
-      - (void) <strong>findOrReplace</strong>(obj, creator, observable)
-    </p>
-    <div class='tags'>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.Collection|Data</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the object to create the observable for. Only Backbone.Models are cached in the store.</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(model, options)</span>
+    </li>
+  </ul>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
+    <li>
+      <span class='name'>creator</span>
+      <span class='type'>
+        (<tt>Constructor|Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor or function used to create the observable. It is used to match observables in the store.</span>
+    </li>
+    <li>
+      <span class='name'>path</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the path to the value (used to create related observables from the factory).</span>
+    </li>
+    <li>
+      <span class='name'>store</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a store used to cache and share view models.</span>
+    </li>
+    <li>
+      <span class='name'>factory</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a factory used to create view models.</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

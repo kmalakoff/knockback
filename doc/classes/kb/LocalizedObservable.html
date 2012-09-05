@@ -106,6 +106,7 @@
       <h1>
         Class:
         kb.LocalizedObservable
+        <span class='note title'>Abstract</span>
       </h1>
       <table class='box'>
         <tr>
@@ -115,7 +116,46 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback-localized-observable.js (c) 2011, 2012 Kevin Malakoff. Knockback.LocalizedObservable is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> </p> 
+  <div class='abstract note'>
+    <strong>
+      This
+      class
+      is abstract.
+    </strong>
+    You must provide the following two methods:
+  </div>
+  <ul> <li>read: function(value, observable) called to get the value and each time the locale changes</li> <li>write: function(localized_string, value, observable) called to set the value (optional)</li> </ul> <p>Base class for observing localized data that changes when the locale changes. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+    </h4>
+    <pre><code class='coffee'>kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
+  constructor: function(value, options, view_model) {
+    kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+    return kb.utils.wrappedObservable(this);
+  },
+  read: function(value) {
+    return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+  },
+  write: function(localized_string, value) {
+    var new_value;
+    new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+    if (!(new_value &amp;&amp; _.isDate(new_value))) {
+      return kb.utils.wrappedObservable(this).resetToCurrent();
+    }
+    return value.setTime(new_value.valueOf());
+  }
+});
+var ViewModel = function(model) {
+  this.localized_date = kb.observable(model, {
+    key: &#39;date&#39;,
+    &#39;default&#39;: this.loading_message,
+    localizer: ShortDateLocalizer
+  }, this);
+};
+var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -123,13 +163,23 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
+      <a href='#extend-instance'>
+        - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
+      </a>
+    </span>
+    <span class='desc'>
+      Class method for JavaScript inheritance.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#constructor-instance'>
-        - (void) <strong>constructor</strong>(value, options, vm)
+        - (ko.observable) <strong>constructor</strong>(value, options, vm)
       </a>
     </span>
     <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      
+      Used to create a new kb.LocalizedObservable.
     </span>
   </li>
   <li>
@@ -139,7 +189,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Required clean up function to break cycles, release view models, etc.
     </span>
   </li>
   <li>
@@ -149,7 +199,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Used to reset the value if localization is not possible.
     </span>
   </li>
   <li>
@@ -159,7 +209,7 @@
       </a>
     </span>
     <span class='desc'>
-      dual purpose set/get
+      Dual purpose set/get
     </span>
   </li>
 </ul>
@@ -167,26 +217,141 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-instance'>
-      - (void) <strong>constructor</strong>(value, options, vm)
+      - (ko.observable) <strong>constructor</strong>(value, options, vm)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    the constructor does not return 'this' but a ko.observable
+  </div>
+  <p>Used to create a new kb.LocalizedObservable. This an abstract class. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>value</span>
+      <span class='type'>
+        (<tt>Data|ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the value to localize</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the create options</span>
+    </li>
+  </ul>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
+    <li>
+      <span class='name'>default</span>
+      <span class='type'>
+        (<tt>Data|ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a default value to present when the value is null, an empty string, etc.</span>
+    </li>
+    <li>
+      <span class='name'>onChange</span>
+      <span class='type'>
+        (<tt>Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a notification that gets called when the locale changes. Signature: function(localized_string, value, observable)</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
+    <p class='signature' id='extend-instance'>
+      - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
+    </p>
+    <div class='docstring'>
+  <p>Class method for JavaScript inheritance.</p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var MyLocalizedObservable = kb.LocalizedObservable.extend({
+   constructor: function(value, options, view_model) {
+     // the constructor does not return &#39;this&#39; but a ko.observable
+     return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+   }
+});</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>prototype_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the prototype</span>
+    </li>
+    <li>
+      <span class='name'>class_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the class</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='resetToCurrent-instance'>
       - (void) <strong>resetToCurrent</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Used to reset the value if localization is not possible. </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -194,7 +359,7 @@
       - (void) <strong>observedValue</strong>(value)
     </p>
     <div class='docstring'>
-  <p>dual purpose set/get </p> 
+  <p>Dual purpose set/get </p> 
 </div>
 <div class='tags'>
 </div>
@@ -203,7 +368,7 @@
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

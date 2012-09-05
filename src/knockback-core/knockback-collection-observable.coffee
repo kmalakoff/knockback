@@ -23,13 +23,18 @@
 #   Class method for JavaScript inheritance.
 #   @param [Object] prototype_properties the properties to add to the prototype
 #   @param [Object] class_properties the properties to add to the class
-#   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
+#   @return [ko.observable] the constructor does not return 'this' but a ko.observableArray
 #   @example
 #     var MyCollectionObservable = kb.CollectionObservable.extend({
-#       method1: function() { return 'something'; }
+#        constructor: function(collection, options) {
+#          // the constructor does not return 'this' but a ko.observableArray
+#          return kb.CollectionObservable.prototype.constructor.call(this, collection, {
+#            view_model: MyViewModel,
+#            options: options
+#        });
 #     });
 class kb.CollectionObservable
-  @extend = Backbone.Model.extend
+  @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.CollectionObservable.
   #
@@ -44,13 +49,16 @@ class kb.CollectionObservable
   # @option options [Boolean] models_only flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.
   # @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
   # @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
-  # @option options [Object] factories a map of dot-deliminated paths (for example {'models.owner': kb.ViewModel}) to either constructors or create functions. Signature: {'some.path': function(object, options)}
+  # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
   # @option options [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
   # @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
   # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
+  # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
+  # @note the constructor does not return 'this' but a ko.observableArray
   constructor: (collection, options) ->
     not collection or (collection instanceof Backbone.Collection) or throwUnexpected(@, 'not a collection')
 
@@ -121,7 +129,7 @@ class kb.CollectionObservable
     return observable
 
   # Required clean up function to break cycles, release view models, etc.
-  # Can be called directly, via kb.release(collection_observable) or as a consequence of ko.releaseNode(element).
+  # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
@@ -145,9 +153,10 @@ class kb.CollectionObservable
     observable = kb.utils.wrappedObservable(@)
     return {store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable)}
 
-  # Getter/setter for the observed collection.
+  # Dual-purpose getter/setter for the observed collection.
   #
   # @param [Backbone.Collection] collection the collection to observe (can be null)
+  # @return [Backbone.Collection|void] returns the collection only if getter (no parameters)
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)
     previous_collection = kb.utils.wrappedObject(observable)
@@ -173,7 +182,7 @@ class kb.CollectionObservable
 
     return collection
 
-  # Getter/setter for the sorted index function.
+  # Dual-purpose getter/setter for the sorted index function.
   #
   # @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
   # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
@@ -210,7 +219,7 @@ class kb.CollectionObservable
     if options['defer'] then _.defer(_resync) else _resync()
     @
 
-  # Getter/setter for the sorted index function.
+  # Dual-purpose getter/setter for the sorted index function.
   #
   # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
   # @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)

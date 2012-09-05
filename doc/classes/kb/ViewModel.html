@@ -115,7 +115,33 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback-view-model.js (c) 2011, 2012 Kevin Malakoff. Knockback.Observable is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> </p> 
+  <p>Base class for ViewModels for Backbone.Models. </p> <p>  @example     var ViewModel = kb.ViewModel.extend({       constructor: function(model){         kb.ViewModel.prototype.constructor.apply(this, arguments);         this.full_name = ko.computed(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);       }     });     var view_model = new ViewModel(model); </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      How to create a ViewModel with first_name and last_name observables.
+    </h4>
+    <pre><code class='coffee'>var view_model = kb.viewModel(new Backbone.Model({first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;}));</code></pre>
+    <h4>
+      Bulk kb.Observable create using 'key' Object to customize the kb.Observable created per attribute.
+    </h4>
+    <pre><code class='coffee'>var ContactViewModel = function(model) {
+  this.loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString(&#39;loading&#39;));
+  this._auto = kb.viewModel(model, {
+    keys: {
+      name: { key: &#39;name&#39;, &#39;default&#39;: this.loading_message },
+      number: { key: &#39;number&#39;, &#39;default&#39;: this.loading_message },
+      date: { key: &#39;date&#39;, &#39;default&#39;: this.loading_message, localizer: kb.ShortDateLocalizer }
+    }
+  }, this);
+  return this;
+};</code></pre>
+    <h4>
+      Creating ko.Observables on a target ViewModel
+    </h4>
+    <pre><code class='coffee'>var view_model = {};
+kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observables are added to view_model</code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -123,13 +149,23 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
+      <a href='#extend-instance'>
+        - (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
+      </a>
+    </span>
+    <span class='desc'>
+      Class method for JavaScript inheritance.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#constructor-instance'>
-        - (void) <strong>constructor</strong>(model, options, view_model)
+        - (ko.observable) <strong>constructor</strong>(model, options, view_model)
       </a>
     </span>
     <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      
+      Used to create a new kb.ViewModel.
     </span>
   </li>
   <li>
@@ -139,7 +175,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Required clean up function to break cycles, release view models, etc.
     </span>
   </li>
   <li>
@@ -149,17 +185,17 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Get the options for a new view model that can be used for sharing view models.
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#model-instance'>
-        - (void) <strong>model</strong>(new_model)
+        - (Backbone.Model|void) <strong>model</strong>(new_model)
       </a>
     </span>
     <span class='desc'>
-      
+      Dual-purpose getter/setter for the observed model.
     </span>
   </li>
 </ul>
@@ -167,40 +203,251 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-instance'>
-      - (void) <strong>constructor</strong>(model, options, view_model)
+      - (ko.observable) <strong>constructor</strong>(model, options, view_model)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Used to create a new kb.ViewModel. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>model</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model to observe (can be null)</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the create options</span>
+    </li>
+    <li>
+      <span class='name'>view_model</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.</span>
+    </li>
+  </ul>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
+    <li>
+      <span class='name'>internals</span>
+      <span class='type'>
+        (<tt>Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>an array of atttributes that should be scoped with an underscore, eg. name -> _name</span>
+    </li>
+    <li>
+      <span class='name'>requires</span>
+      <span class='type'>
+        (<tt>Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>an array of atttributes that will have kb.Observables created even if they do not exist on the Backbone.Model. Useful for binding Views that require specific observables to exist</span>
+    </li>
+    <li>
+      <span class='name'>keys</span>
+      <span class='type'>
+        (<tt>Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Backbone.Model attributes</span>
+    </li>
+    <li>
+      <span class='name'>if</span>
+      <span class='type'>
+        (<tt>Object|Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.</span>
+    </li>
+    <li>
+      <span class='name'>path</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the path to the value (used to create related observables from the factory).</span>
+    </li>
+    <li>
+      <span class='name'>store</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a store used to cache and share view models.</span>
+    </li>
+    <li>
+      <span class='name'>factories</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)</span>
+    </li>
+    <li>
+      <span class='name'>factory</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a factory used to create view models.</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observableArray</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
+    <p class='signature' id='extend-instance'>
+      - (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
+    </p>
+    <div class='docstring'>
+  <p>Class method for JavaScript inheritance.</p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var ContactViewModel = kb.ViewModel.extend({
+  constructor: function(model) {
+    kb.ViewModel.prototype.constructor.call(this, model, {internals: [&#39;email&#39;, &#39;date&#39;]});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
+    this.email = kb.defaultObservable(this._email, &#39;your.name@yourplace.com&#39;);
+    this.date = new LongDateLocalizer(this._date);
+    return this;
+  }
+});</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>prototype_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the prototype</span>
+    </li>
+    <li>
+      <span class='name'>class_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the class</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/ViewModel.html'>kb.ViewModel</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor returns 'this'</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='shareOptions-instance'>
       - (void) <strong>shareOptions</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Get the options for a new view model that can be used for sharing view models. </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='model-instance'>
-      - (void) <strong>model</strong>(new_model)
+      - (Backbone.Model|void) <strong>model</strong>(new_model)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter for the observed model. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var view_model = kb.viewModel(new Backbone.Model({name: &#39;bob&#39;}));
+var the_model = view_model.model(); // get
+view_model.model(new Backbone.Model({name: &#39;fred&#39;})); // set
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>model</span>
+      <span class='type'>
+        (<tt>Backbone.Model</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model whose attribute to observe (can be null)</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Backbone.Model|void</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>returns the model only if getter (no parameters)</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

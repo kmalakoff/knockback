@@ -139,7 +139,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Clear the tracked model events (but keep the registered objects intact)
     </span>
   </li>
   <li>
@@ -149,7 +149,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Register a model event
     </span>
   </li>
   <li>
@@ -159,7 +159,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      A debug helper to summarize the registered events in human-readable form
     </span>
   </li>
   <li>
@@ -169,7 +169,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Register an object by key
     </span>
   </li>
   <li>
@@ -179,13 +179,13 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Unregister an object by key
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#registeredCount-instance'>
-        - (void) <strong>registeredCount</strong>(type)
+        - (Integer) <strong>registeredCount</strong>(type)
       </a>
     </span>
     <span class='desc'>
@@ -195,21 +195,11 @@
   <li>
     <span class='signature'>
       <a href='#registeredStatsString-instance'>
-        - (void) <strong>registeredStatsString</strong>(success_message)
+        - (String) <strong>registeredStatsString</strong>(success_message)
       </a>
     </span>
     <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#registeredTracker-instance'>
-        - (void) <strong>registeredTracker</strong>(key)
-      </a>
-    </span>
-    <span class='desc'>
-      
+      A debug helper to summarize the current registered objects by key
     </span>
   </li>
 </ul>
@@ -229,63 +219,105 @@
     <p class='signature' id='clear-instance'>
       - (void) <strong>clear</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Clear the tracked model events (but keep the registered objects intact) </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='addModelEvent-instance'>
       - (void) <strong>addModelEvent</strong>(event)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Register a model event </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='modelEventsStatsString-instance'>
       - (void) <strong>modelEventsStatsString</strong>()
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>A debug helper to summarize the registered events in human-readable form </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='register-instance'>
       - (void) <strong>register</strong>(key, obj)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Register an object by key </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='unregister-instance'>
       - (void) <strong>unregister</strong>(key, obj)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Unregister an object by key </p> 
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='registeredCount-instance'>
-      - (void) <strong>registeredCount</strong>(type)
+      - (Integer) <strong>registeredCount</strong>(type)
     </p>
     <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Integer</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the number of registered objects by type</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='registeredStatsString-instance'>
-      - (void) <strong>registeredStatsString</strong>(success_message)
+      - (String) <strong>registeredStatsString</strong>(success_message)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>A debug helper to summarize the current registered objects by key </p> 
 </div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='registeredTracker-instance'>
-      - (void) <strong>registeredTracker</strong>(key)
-    </p>
-    <div class='tags'>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>success_message</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a message to return if there are no registered objects</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a human readable string summarizing the currently registered objects or success_message</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0

@@ -13,15 +13,15 @@
   /*
     knockback_default_wrapper.js
     (c) 2011, 2012 Kevin Malakoff.
-    Knockback.DefaultWrapper is freely distributable under the MIT license.
+    Knockback.DefaultObservable is freely distributable under the MIT license.
     See the following for full license details:
       https://github.com/kmalakoff/knockback/blob/master/LICENSE
   */
 
 
-  kb.DefaultWrapper = (function() {
+  kb.DefaultObservable = (function() {
 
-    function DefaultWrapper(target_observable, dv) {
+    function DefaultObservable(target_observable, dv) {
       var observable,
         _this = this;
       this.dv = dv;
@@ -43,20 +43,25 @@
       return observable;
     }
 
-    DefaultWrapper.prototype.destroy = function() {
+    DefaultObservable.prototype.destroy = function() {
       return kb.utils.wrappedDestroy(this);
     };
 
-    DefaultWrapper.prototype.setToDefault = function() {
+    DefaultObservable.prototype.setToDefault = function() {
       return kb.utils.wrappedObservable(this)(this.dv);
     };
 
-    return DefaultWrapper;
+    return DefaultObservable;
 
   })();
 
+  kb.defaultObservable = function(target, default_value) {
+    return new kb.DefaultObservable(target, default_value);
+  };
+
   kb.defaultWrapper = function(target, default_value) {
-    return new kb.DefaultWrapper(target, default_value);
+    legacyWarning('ko.defaultWrapper', '0.16.1', 'Please use kb.defaultObservable instead');
+    return new kb.DefaultObservable(target, default_value);
   };
 
   /*

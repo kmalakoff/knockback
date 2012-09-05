@@ -115,7 +115,16 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback_factory.js (c) 2011, 2012 Kevin Malakoff. Knockback.Factory is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> </p> 
+  <p>Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      Create an instance by path.
+    </h4>
+    <pre><code class='coffee'>var factory = new kb.Factory();
+factory.addPathMapping(&#39;bob.the.builder&#39;, kb.ViewModel);
+view_model = factory.createForPath(new Backbone.Model({name: &#39;Bob&#39;}), &#39;bob.the.builder&#39;); // creates kb.ViewModel</code></pre>
+  </div>
 </div>
 <div class='tags'>
 </div>
@@ -128,7 +137,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      Used to either register yourself with the existing factory or to create a new factory.
     </span>
   </li>
 </ul>
@@ -182,7 +191,7 @@
       </a>
     </span>
     <span class='desc'>
-      
+      If possible, creates an observable for an object using a dot-deliminated path.
     </span>
   </li>
 </ul>
@@ -192,7 +201,51 @@
     <p class='signature' id='useOptionsOrCreate-class'>
       + (void) <strong>useOptionsOrCreate</strong>(options, obj, owner_path)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>Used to either register yourself with the existing factory or to create a new factory. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(model, options)</span>
+    </li>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Instance</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the instance that will own or register with the store</span>
+    </li>
+    <li>
+      <span class='name'>owner_path</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the path to the owning object for turning relative scoping of the factories to absolute paths.</span>
+    </li>
+  </ul>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
+    <li>
+      <span class='name'>factories</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)</span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -233,14 +286,27 @@
     <p class='signature' id='creatorForPath-instance'>
       - (void) <strong>creatorForPath</strong>(obj, path)
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>If possible, creates an observable for an object using a dot-deliminated path. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      Create an instance by path.
+    </h4>
+    <pre><code class='coffee'>var factory = new kb.Factory();
+factory.addPathMapping(&#39;bob.the.builder&#39;, kb.ViewModel);
+view_model = factory.createForPath(new Backbone.Model({name: &#39;Bob&#39;}), &#39;bob.the.builder&#39;); // creates kb.ViewModel
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
+  Wed Sep 05 2012 23:36:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.0
