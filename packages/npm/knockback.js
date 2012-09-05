@@ -1695,7 +1695,7 @@
 
   __extends(kb.CollectionObservable.prototype, Backbone.Events);
 
-  kb.collectionObservable = function(collection, options) {
+  kb.prototype.collectionObservable = function(collection, options) {
     return new kb.CollectionObservable(collection, options);
   };
 

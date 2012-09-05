@@ -23,9 +23,8 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='class_list.html'>Classes</a>
-      <a id='mixin_list_link' href='mixin_list.html'>Mixins</a>
       <a id='method_list_link' href='method_list.html'>Methods</a>
-      <a id='file_list_link' href='file_list.html'>Files</a>
+      <a id='extra_list_link' href='extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -65,12 +64,16 @@
         Mixin list
       </li>
       <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
         <span>Ctrl-M</span>
         Method list
       </li>
       <li>
-        <span>Ctrl-F</span>
-        File list
+        <span>Ctrl-E</span>
+        Extras list
       </li>
     </ul>
     <p>
@@ -134,10 +137,10 @@
 <li><a href="https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.js">Development version</a></li>
 <li><a href="https://raw.github.com/kmalakoff/knockback/0.16.0/knockback.min.js">Production version</a></li>
 </ul>
-<p><strong>NOTE: there are breaking changes in 0.15.+</strong> Please see the <a href="http://kmalakoff.github.com/knockback/release_notes.html">release notes</a> for details.
+<p><strong>NOTE: there are breaking changes in 0.16.+</strong> Please see the <a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">release notes</a> for details.
 
 </p>
-<p><strong>NOTE: Please feel free to try out the 0.16.0 pre-release</strong> by taking the .js files directly from this repository and filing any <a href="https://github.com/kmalakoff/knockback/issues?direction=desc&amp;sort=created&amp;state=open">issues</a> you find. I am aiming for a full release in the coming week along with a reference application implementation.
+<p>Also, I am in the process of updating the release notes, website, and releasing a reference application for 0.16.0 so they are slightly out-of-sync with this release. I&#39;ll have this done by the end of the week.
 
 </p>
 <h3>Dependencies</h3>
@@ -153,6 +156,14 @@
 <li>(<strong><em>new</em></strong>) <a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
 <li><a href="https://github.com/kmalakoff/knockback-inspector/">KnockbackInspector.js</a> - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).</li>
 </ul>
+<h3>Demos and Documentation</h3>
+<p>For comprehensive tutorials, take a look at the website: <a href="http://kmalakoff.github.com/knockback/">http://kmalakoff.github.com/knockback/</a>
+
+</p>
+<p>Please try the <a href="http://kmalakoff.github.com/knockback-todos/">TodoMVC App</a> and check out the <a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App</a> for some best practices when using Knockback.js.
+
+
+</p>
 <h2>Why Write Knockback.js?</h2>
 <p>When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to &quot;mix and match&quot; the best features. I started with <a href="http://documentcloud.github.com/backbone/">Backbone.js</a> and really loved the Models and Collections, and used <a href="http://brunch.io/">Brunch</a> to get me up and running quickly.
 
@@ -211,18 +222,12 @@ ko.applyBindings(view_model)
 # ...
 
 # and cleanup after yourself when you are done.
-kb.utils.release(view_model)</code></pre>
+kb.release(view_model)</code></pre>
 <p>And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
 
 </p>
 <p>Of course, this is just a simple example, but hopefully you get the picture.
 
-</p>
-<h2>Demos and Documentation</h2>
-<p>For comprehensive tutorials, take a look at the website: <a href="http://kmalakoff.github.com/knockback/">http://kmalakoff.github.com/knockback/</a>
-
-</p>
-<p>Try a live demo: <a href="http://kmalakoff.github.com/knockback-todos/">http://kmalakoff.github.com/knockback-todos/</a> or <a href="http://jsfiddle.net/kmalakoff/QSkpv/">http://jsfiddle.net/kmalakoff/QSkpv/</a>
 
 
 </p>
@@ -241,10 +246,10 @@ kb.utils.release(view_model)</code></pre>
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 04 2012 08:26:59 GMT+0900 (JST)
+  Wed Sep 05 2012 16:16:23 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.2.3
+  v1.3.0
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

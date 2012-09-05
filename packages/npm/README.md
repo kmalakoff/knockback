@@ -36,6 +36,12 @@ Also, I am in the process of updating the release notes, website, and releasing 
 * (***new***) [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
 * [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
 
+###Demos and Documentation
+
+For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
+
+Please try the [TodoMVC App](http://kmalakoff.github.com/knockback-todos/) and check out the [Knockback.js Reference App](http://kmalakoff.github.com/knockback-reference-app/) for some best practices when using Knockback.js.
+
 
 Why Write Knockback.js?
 -----------------------
@@ -114,11 +120,6 @@ And now when you type in the input boxes, the values are properly transferred to
 
 Of course, this is just a simple example, but hopefully you get the picture.
 
-Demos and Documentation
------------------------
-For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
-
-Try a live demo: http://kmalakoff.github.com/knockback-todos/ or http://jsfiddle.net/kmalakoff/QSkpv/
 
 
 Building, Running and Testing the library

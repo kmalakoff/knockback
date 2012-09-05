@@ -6,31 +6,51 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-####################################################
-# options
-#   sorted_index: (models, model) -> return add_index. Optional hook for sorted_index a model.
-#     Default: the model's index in the collection is used.
-#     Setter: sorted_index: (sorted_index, sort_attribute) -> where sort_attribute is optional
-#   sort_attribute: attribute_name. An optimization to check if a specific attribute has changed.
-#     Default: resort on all changes to a model.
-#     Setter: sort_attribute: (sort_attribute, sorted_index) -> where sort_attribute is optional
+# Base class for observing collections.
 #
-# Options:
-#   view_model: (model) -> ... view model constructor
-#   create: (model) -> ... view model create function
-#   defer: if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a cycle.
-#   store
-#   models_only: flags for skipping the creation of view models
+# @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+#   var collection = new Backbone.Collection([{name: 'name1'}, {name: 'name2'}]);
+#   var view_model = {
+#     todos: kb.collectionObservable(collection)
+#   };
 #
-# With view models, the following are triggered the following Backbone.Events
-#   add: (view_model, collection_observable) or if batch: (collection_observable)
-#   resort: (view_model, collection_observable, new_index) or if batch: (collection_observable)
-#   remove: (view_model, collection_observable) or if batch: (collection_observable)
-####################################################
-
+# @example How to access and change the observed collection.
+#    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'name1'}, {name: 'name2'}]);
+#    var current_collection = todos.collection(); // get
+#    todos.collection(new Backbone.Collection([{name: 'name3'}, {name: 'name4'}])); // set
+#
+# @method #extend(prototype_properties, class_properties)
+#   Class method for JavaScript inheritance.
+#   @param [Object] prototype_properties the properties to add to the prototype
+#   @param [Object] class_properties the properties to add to the class
+#   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
+#   @example
+#     var MyCollectionObservable = kb.CollectionObservable.extend({
+#       method1: function() { return 'something'; }
+#     });
 class kb.CollectionObservable
-  @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+  @extend = Backbone.Model.extend
 
+  # Used to create a new kb.CollectionObservable.
+  #
+  # When the observable is updated, the following Backbone.Events are triggered:
+  #
+  # * ***add***: (view_model, collection_observable) or if batch: (collection_observable)
+  # * ***resort***: (view_model, collection_observable, new_index) or if batch: (collection_observable)
+  # * ***remove***: (view_model, collection_observable) or if batch: (collection_observable)
+  #
+  # @param [Backbone.Collection] collection the collection to observe (can be null)
+  # @param [Object] options the create options
+  # @option options [Boolean] models_only flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.
+  # @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
+  # @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
+  # @option options [Object] factories a map of dot-deliminated paths (for example {'models.owner': kb.ViewModel}) to either constructors or create functions. Signature: {'some.path': function(object, options)}
+  # @option options [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
+  # @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
+  # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  # @option options [kb.Store] store a store used to cache and share view models.
+  # @option options [kb.Factory] factory a factory used to create view models.
+  # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   constructor: (collection, options) ->
     not collection or (collection instanceof Backbone.Collection) or throwUnexpected(@, 'not a collection')
 
@@ -100,6 +120,8 @@ class kb.CollectionObservable
 
     return observable
 
+  # Required clean up function to break cycles, release view models, etc.
+  # Can be called directly, via kb.release(collection_observable) or as a consequence of ko.releaseNode(element).
   destroy: ->
     observable = kb.utils.wrappedObservable(@)
     collection = kb.utils.wrappedObject(observable)
@@ -112,10 +134,20 @@ class kb.CollectionObservable
 
     not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
 
+  # Get the options for a new collection that can be used for sharing view models.
+  #
+  # @example Sharing view models for an HTML select element.
+  #   var selected_collection = new Backbone.Collection();
+  #   var available_collection = new Backbone.Collection([{name: 'Bob'}, {name: 'Fred'}]);
+  #   var selected = kb.collectionObservable(available_collection);
+  #   var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); // view models shared with selected collection observable
   shareOptions: ->
     observable = kb.utils.wrappedObservable(@)
     return {store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable)}
 
+  # Getter/setter for the observed collection.
+  #
+  # @param [Backbone.Collection] collection the collection to observe (can be null)
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)
     previous_collection = kb.utils.wrappedObject(observable)
@@ -141,6 +173,20 @@ class kb.CollectionObservable
 
     return collection
 
+  # Getter/setter for the sorted index function.
+  #
+  # @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
+  # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
+  # @param [Object] options the options.
+  # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  # @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  # @example
+  #    // change the sorting function
+  #    collection_observable.sortedIndex(
+  #      function(view_models, vm){
+  #        return _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
+  #      }
+  #    );
   sortedIndex: (sorted_index, sort_attribute, options) ->
     options or= {}
     if sorted_index
@@ -164,13 +210,33 @@ class kb.CollectionObservable
     if options['defer'] then _.defer(_resync) else _resync()
     @
 
-  sortAttribute: (sort_attribute, sorted_index, silent) -> return @sortedIndex(sorted_index, sort_attribute, silent)
+  # Getter/setter for the sorted index function.
+  #
+  # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
+  # @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
+  # @param [Object] options the options.
+  # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  # @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  # @example
+  #    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
+  #    // in order of Zanadu then Alex
+  #    todos.sortAttribute('name');
+  #    // in order of Alex then Zanadu
+  sortAttribute: (sort_attribute, sorted_index, options) -> return @sortedIndex(sorted_index, sort_attribute, options)
 
+  # Reverse lookup for a view model by model. If created with models_only option, will return null.
   viewModelByModel: (model) ->
     return null if @models_only
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
     return _.find(kb.utils.wrappedObservable(@)(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
 
+  # Will return true unless created with models_only option.
+  #
+  # @example
+  #   var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
+  #   todos1.hasViewModels();     // false
+  #   var todos2 = new kb.CollectionObservable(new Backbone.Collection());
+  #   todos2.hasViewModels();     // true
   hasViewModels: -> return not @models_only
 
   ####################################################
