@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Tutorial: kb.Observable</title>
+    <link rel="stylesheet" href="vendor/css/normalize.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/layout_components.css">
+    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" href="css/tutorial.css">
+    <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
+    <script type="application/javascript" src="js/stylecode.js"></script>
+    <script type="application/javascript" src="js/interface.js"></script>
+  </head>
+  <body>
+    <div class="page navbar">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="doc/index.html">API</a></li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                  </ul>
+                </li>
+                <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
+              </ul>
+              <div id="script_language" class="pull-right">
+                <div class="separator">
+                  <div class="selection codestyle">
+                    <div class="option">
+                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <label for="cs-cs">CS</label>
+                    </div>
+                    <div class="option">
+                      <input id="cs-js" type="radio" name="codestyle" value="js"/>
+                      <label for="cs-js">JS</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <header class="page">
+      </header>
+      <content class="page">
+        <section>
+          <h1>Tutorial: kb.Observable</h1>
+          <p><a href="index.html">Knockback.js</a><span> provides ways to customize a kb.Observable when it is created. This tutorial provides working examples of using these options.</span></p>
+          <p></p>
+          <h2>Create Options: {read: function(), write: function(value)}</h2>
+          <p>Instead of performing a simple Backbone.Model get or set to synchronize with a kb.Observable, you can provide a custom read or write method like for a ko.observable.</p>
+          <p><strong>Note:</strong><span> just like in Knockout.js, if you require access to the owning view model, it provided as 'this' in read and write methods if you provide it as a parameter to the kb.observable's create method: (model, options, owning_view_model)</span></p>
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kboo_read_write_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kboo_read_write_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kboo_read_write_view" class="tab-pane active">
+                  <pre>&lt;div id='kboo_read_write'&gt;
+  &lt;input class='input-small pull-right' data-bind=&quot;value: formatted_number&quot;/&gt;
+  &lt;label data-bind=&quot;text: number&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kboo_read_write_view_model" class="tab-pane">
+                  <pre data-for="cs">model = new Backbone.Model({number: 33})
+
+ViewModel = (model) ->
+  @number = kb.observable(model, 'number')
+  @formatted_number = kb.observable(model, {
+    key:'number'
+    read: -> return "#: #{@number()}"
+    write: (value) -> @number(value.substring(3))
+  }, @)
+  @
+
+view_model = new ViewModel(model)
+
+ko.applyBindings(view_model, $('#kboo_read_write')[0])</pre>
+                  <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var ViewModel, model, view_model;
+
+model = new Backbone.Model({
+  number: 33
+});
+
+ViewModel = function(model) {
+  this.number = kb.observable(model, 'number');
+  this.formatted_number = kb.observable(model, {
+    key: 'number',
+    read: function() {
+      return "#: " + (this.number());
+    },
+    write: function(value) {
+      return this.number(value.substring(3));
+    }
+  }, this);
+  return this;
+};
+
+view_model = new ViewModel(model);
+
+ko.applyBindings(view_model, $('#kboo_read_write')[0]);
+</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kboo_read_write'>
+  <input class='input-small pull-right' data-bind="value: formatted_number"/>
+  <label data-bind="text: number"></label>
+</div>
+                <script type="application/javascript" src="tutorials/kb_observable_options/kboo_read_write_view_model_bindings.js"></script>
+              </div>
+            </div>
+          </div>
+          <p></p>
+          <h2>Create Options: {localizer: constructor(value)}</h2>
+          <p><span>Instead of a read and/or write option, you can provide a kb.LocalizedObservable derived class for custom localized of an attribute. Please see the</span><a href="tutorial_kb_localized_observable.html#localized_input"> kb.LocalizedObservable tutorial</a><span> an explaination of the following:</span></p>
+          <h4>ViewModel and Bindings:</h4>
+          <pre data-for="cs">model = new Backbone.Model({date: new Date()})
+
+view_model =
+  date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})</pre>
+          <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var model, view_model;
+
+model = new Backbone.Model({
+  date: new Date()
+});
+
+view_model = {
+  date: kb.observable(model, {
+    key: 'date',
+    localizer: LongDateLocalizer
+  })
+};
+</pre>
+          <p></p>
+          <h2>Create Options: {default: value or observable}</h2>
+          <p><span>You can pass a default function or parameter to provide a value when there is no value available.</span></p>
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kboo_default_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kboo_default_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kboo_default_view" class="tab-pane active">
+                  <pre>&lt;div id='kboo_default'&gt;
+  &lt;p&gt;Name: &lt;input class='input-small pull-right' data-bind=&quot;value: name&quot;/&gt;&lt;/p&gt;
+  &lt;p&gt;Name with default: &lt;span data-bind=&quot;text: name_with_default&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kboo_default_view_model" class="tab-pane">
+                  <pre data-for="cs">model = new Backbone.Model({})
+
+ViewModel = (model) ->
+  @name = kb.observable(model, 'name')
+  @name_with_default = kb.observable(model, {key: 'name', default: '(no name)'})
+  @
+
+view_model = new ViewModel(model)
+
+ko.applyBindings(view_model, $('#kboo_default')[0])</pre>
+                  <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var ViewModel, model, view_model;
+
+model = new Backbone.Model({});
+
+ViewModel = function(model) {
+  this.name = kb.observable(model, 'name');
+  this.name_with_default = kb.observable(model, {
+    key: 'name',
+    "default": '(no name)'
+  });
+  return this;
+};
+
+view_model = new ViewModel(model);
+
+ko.applyBindings(view_model, $('#kboo_default')[0]);
+</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kboo_default'>
+  <p>Name: <input class='input-small pull-right' data-bind="value: name"/></p>
+  <p>Name with default: <span data-bind="text: name_with_default"></span></p>
+</div>
+                <script type="application/javascript" src="tutorials/kb_observable_options/kboo_default_view_model_bindings.js"></script>
+              </div>
+            </div>
+          </div>
+        </section>
+      </content>
+      <footer class="page">
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+  <script src='../../assets/search_data.js'></script>
+</head>
+  <body>
+    <div id='base' data-path='../../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../../class_index.html' title='Index'>Index</a>
+    &raquo;
+    <a href='../../classes/kb.html' title='kb'>kb</a>
+    &raquo;
+    <span class='title'>utils</span>
+    <nav>
+      <ul>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='method_list_link' href='../../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+  <div id='fuzzySearch'>
+    <input type='text'>
+    <ol></ol>
+  </div>
+  <div id='help'>
+    <p>
+      Quickly fuzzy find classes, mixins, methods, file:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-T</span>
+        Open fuzzy finder dialog
+      </li>
+    </ul>
+    <p>
+      In frame mode you can toggle the list naviation frame on the left side:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-L</span>
+        Toggle list view
+      </li>
+    </ul>
+    <p>
+      You can focus a list in frame mode or toggle a tab in frameless mode:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-C</span>
+        Class list
+      </li>
+      <li>
+        <span>Ctrl-I</span>
+        Mixin list
+      </li>
+      <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
+        <span>Ctrl-M</span>
+        Method list
+      </li>
+      <li>
+        <span>Ctrl-E</span>
+        Extras list
+      </li>
+    </ul>
+    <p>
+      You can focus and blur the search input:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-S</span>
+        Focus search input
+      </li>
+      <li>
+        <span>Esc</span>
+        Blur search input
+      </li>
+    </ul>
+    <p>
+      In frameless mode you can close the list tab:
+    </p>
+    <ul>
+      <li>
+        <span>Esc</span>
+        Close list tab
+      </li>
+    </ul>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        kb.utils
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src/knockback-core/knockback-utils.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Library of general-purpose utilities </p> 
+</div>
+<div class='tags'>
+</div>
+      <h2>Class Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedObservable-class'>
+        + (void) <strong>wrappedObservable</strong>(obj, value)
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedObject-class'>
+        + (void) <strong>wrappedObject</strong>(obj, value)
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedModel-class'>
+        + (void) <strong>wrappedModel</strong>(obj, value)
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedStore-class'>
+        + (void) <strong>wrappedStore</strong>(obj, value)
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedFactory-class'>
+        + (void) <strong>wrappedFactory</strong>(obj, value)
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedModelWatcher-class'>
+        + (void) <strong>wrappedModelWatcher</strong>(obj, value)
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#wrappedDestroy-class'>
+        + (void) <strong>wrappedDestroy</strong>(obj)
+      </a>
+    </span>
+    <span class='desc'>
+      Clean up function that releases all of the wrapped values on an owner.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#valueType-class'>
+        + (void) <strong>valueType</strong>(observable)
+      </a>
+    </span>
+    <span class='desc'>
+      Retrieves the value stored in a ko.observable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#pathJoin-class'>
+        + (void) <strong>pathJoin</strong>(path1, path2)
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to join a dot-deliminated path.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#optionsPathJoin-class'>
+        + (void) <strong>optionsPathJoin</strong>(options, path)
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to join a dot-deliminated path with the path on options and returns a new options object with the result.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#inferCreator-class'>
+        + (void) <strong>inferCreator</strong>(value, factory, path, owner, key)
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value's type.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#createFromDefaultCreator-class'>
+        + (void) <strong>createFromDefaultCreator</strong>(obj, options)
+      </a>
+    </span>
+    <span class='desc'>
+      Creates an observable based on a value's type.
+    </span>
+  </li>
+  <li deprecated>
+    <span class='signature'>
+      <a href='#release-class'>
+        + (void) <strong>release</strong>(obj)
+      </a>
+    </span>
+    <span class='deprecated note title'>Deprecated</span>
+    <span class='desc'>
+      <strong>Deprecated.</strong>
+      please use kb.release instead
+    </span>
+  </li>
+</ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='wrappedObservable-class'>
+      + (void) <strong>wrappedObservable</strong>(obj, value)
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of &#39;this&#39;. Relevant for: </p> <ul> <li><a href="&#39;classes/kb/CollectionObservable.html&#39;">kb.CollectionObservable</a></li> <li><a href="&#39;classes/kb/Observable.html&#39;">kb.Observable</a></li> <li><a href="&#39;classes/kb/DefaultObservable.html&#39;">kb.DefaultObservable</a></li> <li><a href="&#39;classes/kb/FormattedObservable.html&#39;">kb.FormattedObservable</a></li> <li><a href="&#39;classes/kb/LocalizedObservable.html&#39;">kb.LocalizedObservable</a></li> <li><a href="&#39;classes/kb/TriggeredObservable.html&#39;">kb.TriggeredObservable</a></li> </ul> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var ShortDateLocalizer = kb.LocalizedObservable.extend({
+  constructor: function(value, options, view_model) {
+    kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+    return kb.utils.wrappedObservable(this);
+  }
+});
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>instance</span>
+      <span class='type'>
+        (<tt>Instance</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the instance owning the ko.observable.</span>
+    </li>
+    <li>
+      <span class='name'>observable</span>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>if provided, sets the observable; otherwise, gets the observable.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='wrappedObject-class'>
+      + (void) <strong>wrappedObject</strong>(obj, value)
+    </p>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    this is almost the same as <a href='../../classes/kb/utils.html#wrappedModel-class'>kb.utils.wrappedModel</a> except that if the Model doesn't exist, it returns null.
+  </div>
+  <p>Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var model = kb.utils.wrappedObject(view_model);
+var collection = kb.utils.wrappedObject(collection_observable);
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>owner</span>
+      <span class='type'>
+        (<tt>Object|kb.ViewModel|kb.CollectionObservable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.</span>
+    </li>
+    <li>
+      <span class='name'>model/collection</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.Collection</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>if provided, sets the Model/Collection; otherwise, gets the Model/Collection.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='wrappedModel-class'>
+      + (void) <strong>wrappedModel</strong>(obj, value)
+    </p>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    this is almost the same as <a href='../../classes/kb/utils.html#wrappedObject-class'>kb.utils.wrappedObject</a> except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting).
+  </div>
+  <p>Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>view_model</span>
+      <span class='type'>
+        (<tt>Object|kb.ViewModel</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the ViewModel owning the Backbone.Model.</span>
+    </li>
+    <li>
+      <span class='name'>model</span>
+      <span class='type'>
+        (<tt>Backbone.Model</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>if provided, sets the Model; otherwise, gets the Model or ViewModel itself if there is no Model.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='wrappedStore-class'>
+      + (void) <strong>wrappedStore</strong>(obj, value)
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var co = kb.collectionObservable(new Backbone.Collection());
+var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
+  store: kb.utils.wrappedStore(co)
+});
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>owner</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the kb.Store owner.</span>
+    </li>
+    <li>
+      <span class='name'>store</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>if provided, sets the store; otherwise, gets the store.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='wrappedFactory-class'>
+      + (void) <strong>wrappedFactory</strong>(obj, value)
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>owner</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the kb.Factory owner.</span>
+    </li>
+    <li>
+      <span class='name'>factory</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>if provided, sets the factory; otherwise, gets the factory.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='wrappedModelWatcher-class'>
+      + (void) <strong>wrappedModelWatcher</strong>(obj, value)
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner. </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>owner</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the kb.ModelWatcher owner.</span>
+    </li>
+    <li>
+      <span class='name'>model_watcher</span>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>if provided, sets the model watcher; otherwise, gets the model watcher.</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='wrappedDestroy-class'>
+      + (void) <strong>wrappedDestroy</strong>(obj)
+    </p>
+    <div class='docstring'>
+  <p>Clean up function that releases all of the wrapped values on an owner. </p> 
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='valueType-class'>
+      + (void) <strong>valueType</strong>(observable)
+    </p>
+    <div class='docstring'>
+  <p>Retrieves the value stored in a ko.observable. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
+kb.utils.valueType(view_model.simple_attr); // kb.TYPE_SIMPLE
+kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>See also:</h3>
+  <ul class='see'>
+    <li>
+      kb.Observable.valueType
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='pathJoin-class'>
+      + (void) <strong>pathJoin</strong>(path1, path2)
+    </p>
+    <div class='docstring'>
+  <p>Helper to join a dot-deliminated path. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>kb.utils.pathJoin(&#39;models&#39;, &#39;name&#39;); // &#39;models.name&#39;
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='optionsPathJoin-class'>
+      + (void) <strong>optionsPathJoin</strong>(options, path)
+    </p>
+    <div class='docstring'>
+  <p>Helper to join a dot-deliminated path with the path on options and returns a new options object with the result. </p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>this.friends = kb.collectionObservable(model.get(&#39;friends&#39;), kb.utils.optionsPathJoin(options, &#39;friends&#39;));
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='inferCreator-class'>
+      + (void) <strong>inferCreator</strong>(value, factory, path, owner, key)
+    </p>
+    <div class='docstring'>
+  <p>Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value&#39;s type. </p> 
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='createFromDefaultCreator-class'>
+      + (void) <strong>createFromDefaultCreator</strong>(obj, options)
+    </p>
+    <div class='docstring'>
+  <p>Creates an observable based on a value&#39;s type. </p> 
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='release-class'>
+      + (void) <strong>release</strong>(obj)
+    </p>
+    <div class='docstring'>
+  <div class='deprecated note'>
+    <strong>Deprecated.</strong>
+    please use kb.release instead
+  </div>
+  <p>Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose(). </p> 
+</div>
+<div class='tags'>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
+  v1.3.1
+  (Node.js v0.8.7).
+  &#10034;
+  Press Ctrl-h to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>

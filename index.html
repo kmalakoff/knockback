@@ -1,49 +1,364 @@
-<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><title>Knockback.js Home</title><link rel="stylesheet" href="vendor/stylesheets/bootstrap.min.css"><link rel="stylesheet" href="stylesheets/layout.css"><link rel="stylesheet" href="stylesheets/layout_components.css"><script type="application/javascript" src="vendor/javascripts/jquery-1.7.2.js"></script><link rel="stylesheet" href="stylesheets/index.css"><link rel="stylesheet" href="vendor/lib/highlight/highlightjs/stylesheets/dark.css"><script type="application/javascript" src="vendor/lib/highlight/highlightjs/highlight.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlightjs/languages/javascript.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlight-coffee.js"></script><script type="application/javascript" src="vendor/javascripts/bootstrap.js"></script><script type="application/javascript" src="javascripts/interface.js"></script><script type="application/javascript">hljs.tabReplace = '  ';
-hljs.initHighlightingOnLoad();</script></head><body><div id="wrap"><div class="page navbar"><div class="page github_fork_me"><a href="https://github.com/kmalakoff/knockback" class="github_fork_me"><img style="position:absolute; top:0; right:0; border:0; z-index:9999;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a></div><div class="navbar page"><div class="navbar-inner"><div class="container"><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a><ul class="nav"><li class="active"><a href="index.html">Home</a></li><li><a href="tutorial_getting_started.html">Getting Started</a></li><li><a href="docs.html">Docs</a></li><li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a><ul class="dropdown-menu"><li></li><a href="tutorial_getting_started.html">Getting Started</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable_options.html">kb.Observable Options</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_todos_app.html">Todos App</a><a href="tutorial_inspector_library.html">Inspector Library</a></ul></li><li><a href="release_notes.html">Release Notes</a></li></ul></div></div></div></div></div><div id="wrap"><div class="page container"><header class="page"><div class="knockback_logo"><div class="lock"><div class="logo"><div class="part left animated fadeInRight"><img src="images/left.svg"></div><div class="part right animated fadeInLeft"><img src="images/right.svg"></div></div><h1><span class="knock animated fadeInRight kb">Knock</span><span class="back animated fadeInLeft kb">back.js</span></h1></div><h2><span class="knock animated fadeIn">brings Knockout.js </span><span class="magic animated fadeIn">magic </span><span class="back animated fadeIn">to Backbone.js</span></h2></div></header><content class="page"><section id="content" class="animated fadeIn"><div class="cols wrapped"><div class="col"><div class="content"><h2>Dependencies</h2><p>Knockback requires Knockout.js and Backbone.js (and therefore Underscore.js) to be already loaded on the page:</p><ul><li><a href="https://github.com/SteveSanderson/knockout/downloads/">Knockout.js</a></li><li><a href="http://documentcloud.github.com/underscore/">Underscore.js</a></li><li><a href="http://documentcloud.github.com/backbone/">Backbone.js</a></li></ul><p>Optional dependencies:</p><ul><li><a href="https://github.com/kmalakoff/backbone-modelref">Backbone-ModelRef</a><div> (for lazy loading)</div></li><li><a href="https://github.com/PaulUithol/Backbone-relational/">Backbone-Relational</a><div> (for inter-model dependency management)</div></li></ul></div></div><div class="col"><div class="content"><h2>Features</h2><ul><li>Localization</li><li>Knockout.js' bindings and automagical update</li><li>Backbone's sleek Model definition</li><li>Dynamic collection sorting</li><li>Two-way string formatting</li></ul></div></div><div class="col"><div class="content"><h2>Latest <small>0.15.4</small></h2><ul><li><a href='https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.js'>Development</a> <small>71 KB</small></li><li><a href='https://raw.github.com/kmalakoff/knockback/0.15.4/knockback.min.js'>Production</a> <small>42 KB</small></li></ul><p><span>Please look at the</span><a href="release_notes.html"> release and upgrade notes</a><span> if you are migrating from an earlier version.</span></p><h2>Source</h2><p>You can find the source on <a href="https://github.com/kmalakoff/knockback">Github</a>. To provide feedback leave a message
-or <a href="https://github.com/kmalakoff/knockback/issues">create an issue</a>.</p></div></div></div><!--<div class="content"><h2>Some background</h2><p>Both Knockout and Backbone have their strengths and weaknesses, but together they are amazing!</p><p>At the same time you can have the strong ORM provided by Backbone and the dynamic view-models that Knockout.js offers.</p></div>--><div id="comparison_table"></div><p></p><div class="content"><table class="comparison"><col><col class="mid"><col><col class="ref"><thead><tr><th>Backbone.js</th><th class="kb mid">Knockback.js</th><th>Knockout.js</th><th class="ref">!</th></tr></thead><tbody><tr><td class="yes">Bullet-proof ORM</td><td class="done">&#9754;</td><td class="no">Weak ORM</td><td class="hidden"></td></tr><tr><td class="yes">Built-in Serialization / Deserialization</td><td class="done">&#9754;</td><td class="no">Manual serialization</td><td class="ref"><a title="View description" href="#comparison-1">1</a></td></tr><tr><td class="no"><abbr>MVC</abbr></td><td class="done">&#9755;</td><td class="yes"><abbr>MVVM</abbr></td><td class="hidden"></td></tr><tr><td class="no">Low level DOM maninulation</td><td class="done">&#9755;</td><td class="yes">Reduced jQuery effort</td><td class="hidden"></td></tr><tr><td class="no">Manual view updating</td><td class="done">&#9755;</td><td class="yes"><code>data-bind</code> based sorcery</td><td class="hidden"></td></tr><tr><td class="yes">Routing and history support</td><td class="done">&#9754;</td><td class="no">No routing</td><td class="ref"><a title="View description" href="#comparison-2">2</a></td></tr><tr><td class="no">Blurred separation between: <br> Views | Controllers</td><td class="own">Proper separation between: <br> Models | Views | Controllers (ViewModels)</td><td class="no">Blurred separation between: <br> Models | Controllers (ViewModels)</td><td class="ref"><a title="View description" href="#comparison-3">3</a></td></tr><tr><td class="hidden"></td><td class="own dependent">Cross-view Model state synchronization</td><td class="hidden"></td><td class="hidden"></td></tr><tr><td class="no">Messy collection/view updating</td><td class="own">Fully sorted and updated collection views</td><td class="hidden"></td><td class="hidden"></td></tr><tr><td class="hidden"></td><td class="own">View settings and control properties</td><td class="hidden"></td><td class="ref"><a title="View description" href="#comparison-4">4</a></td></tr><tr><td class="hidden"></td><td class="own dependent">Localization</td><td class="hidden"></td><td class="hidden"></td></tr></tbody></table></div><div class="content notes"><h2>Notes</h2><section><div id="comparison-1"><h1>Serialization</h1>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Knockback.js Home</title>
+    <link rel="stylesheet" href="vendor/css/normalize.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/layout_components.css">
+    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+    <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
+    <script type="application/javascript" src="js/stylecode.js"></script>
+    <script type="application/javascript" src="js/interface.js"></script>
+  </head>
+  <body>
+    <div class="page navbar">
+      <div class="page github_fork_me"><a href="https://github.com/kmalakoff/knockback" class="github_fork_me"><img style="position:absolute; top:0; right:0; border:0; z-index:9999;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a></div>
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li class="active"><a href="index.html">Home</a></li>
+                <li><a href="doc/index.html">API</a></li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                  </ul>
+                </li>
+                <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <header class="page">
+        <div class="knockback_logo">
+          <div class="lock">
+            <div class="logo">
+              <div class="part left animated fadeInRight"><img src="img/left.svg"></div>
+              <div class="part right animated fadeInLeft"><img src="img/right.svg"></div>
+            </div>
+            <h1><span class="knock animated fadeInRight kb">Knock</span><span class="back animated fadeInLeft kb">back.js</span></h1>
+          </div>
+          <h2><span class="knock animated fadeIn">brings Knockout.js </span><span class="magic animated fadeIn">magic </span><span class="back animated fadeIn">to Backbone.js</span></h2>
+        </div>
+      </header>
+      <content class="page">
+        <section id="content" class="animated fadeIn">
+          <div class="wrapped">
+            <div class="content">
+              <h2>Background</h2>
+              <p>Both Knockout.js and Backbone.js have their strengths and weaknesses, but together they are amazing! With Knockback.js, you can use the strong ORM provided by Backbone and create dynamic views using Knockout bindings.</p>
+            </div>
+            <div class="row-fluid">
+              <div class="span4">
+                <h2>Features</h2>
+                <ul>
+                  <li>Localization</li>
+                  <li>Knockout.js' bindings and automagical update</li>
+                  <li>Backbone's sleek Model definition</li>
+                  <li>Dynamic collection sorting</li>
+                  <li>Two-way string formatting</li>
+                </ul>
+              </div>
+              <div class="span4">
+                <h2>Dependencies</h2>
+                <p>Knockback requires Knockout.js and Backbone.js (and therefore Underscore.js) to be already loaded on the page:</p>
+                <ul>
+                  <li><a href="https://github.com/SteveSanderson/knockout/downloads/">Knockout.js</a></li>
+                  <li><a href="http://documentcloud.github.com/underscore/">Underscore.js</a></li>
+                  <li><a href="http://documentcloud.github.com/backbone/">Backbone.js</a></li>
+                </ul>
+              </div>
+              <div class="span4">
+                <h2>Components</h2>
+                <p>Knockback is compatible with the following components:</p>
+                <ul>
+                  <li><a href="https://github.com/PaulUithol/Backbone-relational/">Backbone-Relational</a></li>
+                  <li><a href="https://github.com/kmalakoff/backbone-modelref">Backbone-ModelRef</a></li>
+                  <li><a href="https://github.com/kmalakoff/knockback-inspector">Knockback-Inspector</a></li>
+                  <li><a href="https://github.com/kmalakoff/knockback-navigators/">Knockback-Navigators</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="content row">
+              <div class="span7 wrapped">
+                <h2>Download Latest <small>0.16.1</small></h2>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th><strong>Library</strong></th>
+                      <th><strong>Stack</strong></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Full</td>
+                      <td>
+                        <ul>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js'>Development</a> <small>69 KB</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js'>Production</a> <small>32 KB</small></li>
+                        </ul>
+                      </td>
+                      <td>
+                        <ul>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.js'>Development</a> <small>330 KB</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.min.js'>Production</a> <small>102 KB</small></li>
+                        </ul>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Core</td>
+                      <td>
+                        <ul>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.js'>Development</a> <small>58 KB</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.min.js'>Production</a> <small>27 KB</small></li>
+                        </ul>
+                      </td>
+                      <td>
+                        <ul>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.js'>Development</a> <small>319 KB</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.min.js'>Production</a> <small>98 KB</small></li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p>
+                  <div><strong>*Stack</strong> provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.</div><br>
+                  <div><strong>*Core</strong> removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics.</div>
+                </p>
+              </div>
+              <div class="span3"><h2>Distributions</h2>
+<ul>
+<li><a href="http://search.npmjs.org/#/knockback">npm registry</a></li>
+<li><a href="http://nuget.org/packages/Knockback.js">NuGet Gallery</a></li>
+</ul>
+<h2>Source</h2>
+<p>You can find the source on <a href="https://github.com/kmalakoff/knockback">Github</a>. To provide feedback leave a message or <a href="https://github.com/kmalakoff/knockback/issues">create an issue</a>.
 
+</p>
+<h2>Release Notes</h2>
+<p>Please look at the <a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">release notes</a> if you are migrating from an earlier version.
+</p>
+
+              </div>
+            </div>
+          </div>
+          <div id="comparison_table"></div>
+          <p></p>
+          <div class="content">
+            <table class="comparison">
+              <col>
+              <col class="mid">
+              <col>
+              <col class="ref">
+              <thead>
+                <tr>
+                  <th>Backbone.js</th>
+                  <th class="kb mid">Knockback.js</th>
+                  <th>Knockout.js</th>
+                  <th class="ref">!</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="yes">Bullet-proof ORM</td>
+                  <td class="done">&#9754;</td>
+                  <td class="no">Weak ORM</td>
+                  <td class="hidden"></td>
+                </tr>
+                <tr>
+                  <td class="yes">Built-in Serialization / Deserialization</td>
+                  <td class="done">&#9754;</td>
+                  <td class="no">Manual serialization</td>
+                  <td class="ref"><a title="View description" href="#comparison-1">1</a></td>
+                </tr>
+                <tr>
+                  <td class="no"><abbr>MVC</abbr></td>
+                  <td class="done">&#9755;</td>
+                  <td class="yes"><abbr>MVVM</abbr></td>
+                  <td class="hidden"></td>
+                </tr>
+                <tr>
+                  <td class="no">Low level DOM maninulation</td>
+                  <td class="done">&#9755;</td>
+                  <td class="yes">Reduced jQuery effort</td>
+                  <td class="hidden"></td>
+                </tr>
+                <tr>
+                  <td class="no">Manual view updating</td>
+                  <td class="done">&#9755;</td>
+                  <td class="yes"><code>data-bind</code> based sorcery</td>
+                  <td class="hidden"></td>
+                </tr>
+                <tr>
+                  <td class="yes">Routing and history support</td>
+                  <td class="done">&#9754;</td>
+                  <td class="no">No routing</td>
+                  <td class="ref"><a title="View description" href="#comparison-2">2</a></td>
+                </tr>
+                <tr>
+                  <td class="no">Blurred separation between: <br> Views | Controllers</td>
+                  <td class="own">Proper separation between: <br> Models | Views | Controllers (ViewModels)</td>
+                  <td class="no">Blurred separation between: <br> Models | Controllers (ViewModels)</td>
+                  <td class="ref"><a title="View description" href="#comparison-3">3</a></td>
+                </tr>
+                <tr>
+                  <td class="hidden"></td>
+                  <td class="own dependent">Cross-view Model state synchronization</td>
+                  <td class="hidden"></td>
+                  <td class="hidden"></td>
+                </tr>
+                <tr>
+                  <td class="no">Messy collection/view updating</td>
+                  <td class="own">Fully sorted and updated collection views</td>
+                  <td class="hidden"></td>
+                  <td class="hidden"></td>
+                </tr>
+                <tr>
+                  <td class="hidden"></td>
+                  <td class="own">View settings and control properties</td>
+                  <td class="hidden"></td>
+                  <td class="ref"><a title="View description" href="#comparison-4">4</a></td>
+                </tr>
+                <tr>
+                  <td class="hidden"></td>
+                  <td class="own dependent">Localization</td>
+                  <td class="hidden"></td>
+                  <td class="hidden"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="content notes">
+            <h2>Notes</h2>
+            <section>
+              <div id="comparison-1"><h1>Serialization</h1>
 <p>As you probably know, Backbone is known to have a fantastic syncing system built
 as close as possible to the RESTful pattern. And if this is not good for your
 application you can always opt to build a custom <code>Backbone.sync</code> or, if further
-granularity is required, you can customize a Model/Collection&#39;s own <code>sync</code> function.</p>
+granularity is required, you can customize a Model/Collection&#39;s own <code>sync</code> function.
 
+</p>
 <p>Knockout.js instead does not provide such a feature, and what it offers is a simple
-plugin to map into/from any JSON source.</p>
+plugin to map into/from any JSON source.
 
+</p>
 <p>Knockback uses Backbone&#39;s models and collections, and this means that all the
-serialization features we all love are still there!</p></div><div id="comparison-2"><h1>Routing</h1>
+serialization features we all love are still there!
+</p>
 
+              </div>
+              <div id="comparison-2"><h1>Routing</h1>
 <p>In Knockback, while using Knockout.js ViewModel pattern, we developed a full
-pattern that supports Backbone&#39;s routing solution.</p></div></section><section><div id="comparison-3"><h1>(Im)proper use of tools</h1>
+pattern that supports Backbone&#39;s routing solution.
+</p>
 
+              </div>
+            </section>
+            <section>
+              <div id="comparison-3"><h1>(Im)proper use of tools</h1>
 <p>Too often, in a large Backbone application you find yourself building up views
 with too much logic in them, almost always requiring sub-state management. This is
-actually an improper use of views, which should be as logic-less as possible.</p>
+actually an improper use of views, which should be as logic-less as possible.
 
+</p>
 <p>But you <em>have</em> to do things like that, and Backbone doesn&#39;t help the developer
-solving this (ethical?) issue.</p>
+solving this (ethical?) issue.
 
+</p>
 <p>In Knockout.js, this is not a problem, because ViewModels differ from Views
 exactly in this: they own states, methods and properties allowing the <em>views</em> to
-be logic-less.</p>
+be logic-less.
 
+</p>
 <p>So Knockout solves the blurry View/Controller issue you&#39;ll find building large
 applications with Backbone. <strong>But</strong> because Knockout simply provides ViewModels and no
-Models, how can you build a proper MVC/MVVM? <em>Backbone to the rescue!</em></p>
+Models, how can you build a proper MVC/MVVM? <em>Backbone to the rescue!</em>
 
+</p>
 <p>And the circle is complete: Models from Backbone, and Views/ViewModels from
-Knockout.js.</p></div></section><section><div id="comparison-4"><h1>Views&#39; settings</h1>
+Knockout.js.
+</p>
 
+              </div>
+            </section>
+            <section>
+              <div id="comparison-4"><h1>Views&#39; settings</h1>
 <p>Following MVVM principles where a ViewModel is the &quot;View&#39;s Model&quot;, and therefore
 owns its own properties and methods which are <em>then</em> reflected in the View
 itself, Knockback ViewModels can add View setting and control properties, which are not
-(and should not be!) owned by the model.</p>
+(and should not be!) owned by the model.
 
+</p>
 <p>What does this allow? Actual settings (<em>eg</em> colors for different priorities in a
 task list) to be applied on all the associated ViewModels, or...something more
-interesting, like an design pattern for localization.</p>
+interesting, like an design pattern for localization.
 
+</p>
 <p>If you consider localized labels as observed properties, then you can understand
-how Knockback provides internationalization to your applications.</p></div></section></div><div class="cols wrapped"><div class="col"><div class="content"><h3>Projects Using Knockback.js</h3><p><span>Coming soon...</span><a href="https://github.com/kmalakoff/knockback-site/issues"> submit yours now!</a></p></div></div><div class="col"><div class="content"><h3>Frameworks</h3><ul><li><a href="https://github.com/thedrow/django-knockback">django-knockback</a></li></ul><p></p><h3>Distributions</h3><ul><li><a href="http://search.npmjs.org/#/knockback">npm registry</a></li><li><a href="http://nuget.org/packages/Knockback.js">NuGet Gallery</a></li></ul></div></div><div class="col"><div class="content"><h3>Community Extensions</h3><ul><li><a href="https://github.com/kmalakoff/knockback-inspector">Knockback-Inspector</a></li></ul></div></div></div></section></content><footer class="page"><div class="knockback_credits"><p><em>Knockback</em> is brought you by <a href="https://github.com/kmalakoff">Kevin Malakoff</a></p>
+how Knockback provides internationalization to your applications.
+</p>
 
-<p>Designed by <a href="https://github.com/yuchi">Pier Paolo Ramon</a></p></div></footer></div></div></body></html>
+              </div>
+            </section>
+          </div>
+          <div class="wrapped">
+            <div class="row-fluid">
+              <div class="span4"><h2>Projects</h2>
+<p><a href="https://github.com/kmalakoff/knockback-site/issues">Submit yours now</a>!
+</p>
+
+              </div>
+              <div class="span3"><h2>Frameworks</h2>
+<ul>
+<li><a href="https://github.com/thedrow/django-knockback">django-knockback</a></li>
+</ul>
+
+              </div>
+              <div class="span4"><h2>Community Extensions</h2>
+<p><a href="https://github.com/kmalakoff/knockback-site/issues">Submit yours now</a>!
+</p>
+
+              </div>
+            </div>
+          </div>
+        </section>
+      </content>
+      <footer class="page">
+        <div class="knockback_credits"><p><em>Knockback</em> is brought you by <a href="https://github.com/kmalakoff">Kevin Malakoff</a>
+
+</p>
+<p>Designed by <a href="https://github.com/yuchi">Pier Paolo Ramon</a>
+</p>
+
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

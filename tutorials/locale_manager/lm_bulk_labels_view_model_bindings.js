@@ -18,11 +18,7 @@ var view_model = kb.viewModel(new Backbone.Model({
 }));
 
 // use ko.observable to create multiple labels quickly
-view_model.labels = kb.observables(bulk_locale_manager, {
-  name: {},
-  start_date: {},
-  end_date: {}
-});
+view_model.labels = kb.observables(bulk_locale_manager, ['name', 'start_date', 'end_date']);
 view_model.toggleLocale = function() {
   if (bulk_locale_manager.getLocale() === 'en') {
     return bulk_locale_manager.setLocale('fr');

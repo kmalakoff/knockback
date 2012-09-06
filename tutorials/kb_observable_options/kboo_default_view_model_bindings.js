@@ -4,7 +4,8 @@ var ViewModel, model, view_model;
 model = new Backbone.Model({});
 
 ViewModel = function(model) {
-  this.name = kb.observable(model, {
+  this.name = kb.observable(model, 'name');
+  this.name_with_default = kb.observable(model, {
     key: 'name',
     "default": '(no name)'
   });

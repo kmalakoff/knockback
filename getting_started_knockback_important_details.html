@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Getting Started: Knockback.js Important Details</title>
+    <link rel="stylesheet" href="vendor/css/normalize.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/layout_components.css">
+    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" href="css/tutorial.css">
+    <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
+    <script type="application/javascript" src="js/stylecode.js"></script>
+    <script type="application/javascript" src="js/interface.js"></script>
+  </head>
+  <body>
+    <div class="page navbar">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="doc/index.html">API</a></li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                  </ul>
+                </li>
+                <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
+              </ul>
+              <div id="script_language" class="pull-right">
+                <div class="separator">
+                  <div class="selection codestyle">
+                    <div class="option">
+                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <label for="cs-cs">CS</label>
+                    </div>
+                    <div class="option">
+                      <input id="cs-js" type="radio" name="codestyle" value="js"/>
+                      <label for="cs-js">JS</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <header class="page">
+      </header>
+      <content class="page">
+        <section><h1>Getting Started with Knockback.js: Knockback.js Important Details</h1>
+<h1>Inheritance</h1>
+<p>Some Knockback classes are meant to be inherited. Specifically:
+
+</p>
+<ul>
+<li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
+<li><a href="doc/classes/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
+</ul>
+<p>When using CoffeeScript, you can derive from a super class using:
+
+</p>
+<pre><code>class YourClass extends SuperClass
+  # extensions</code></pre>
+<p>or when using JavaScript, you can derive from a super class using:
+
+</p>
+<pre><code>var YourClass = SuperClass.extend({
+  /* extensions */
+})</code></pre>
+<p>For example:
+</p>
+
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kb_view_model_inheritance_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kb_view_model_inheritance_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kb_view_model_inheritance_view" class="tab-pane active">
+                  <pre>&lt;div id='kb_view_model_inheritance'&gt;
+  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Hello, &lt;span data-bind=&quot;text: full_name&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kb_view_model_inheritance_view_model" class="tab-pane">
+                  <pre data-for="cs">model = new Backbone.Model({first_name: "Planet", last_name: "Earth"})
+
+class ViewModel extends kb.ViewModel
+  constructor: (model) ->
+    super
+    @full_name = ko.computed((->return "#{@first_name()} #{@last_name()}"), @)
+view_model = new ViewModel(model)
+
+ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0])</pre>
+                  <pre data-for="js">var model = new Backbone.Model({
+  first_name: "Planet",
+  last_name: "Earth"
+});
+
+var ViewModel = kb.ViewModel.extend({
+  constructor: function(model) {
+    kb.ViewModel.prototype.constructor.apply(this, arguments);
+    this.full_name = ko.computed((function() {
+      return "" + (this.first_name()) + " " + (this.last_name());
+    }), this);
+  }
+});
+
+var view_model = new ViewModel(model);
+
+ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
+</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kb_view_model_inheritance'>
+  <p>First name: <input class='input-small pull-right' data-bind="value: first_name" /></p>
+  <p>Last name: <input class='input-small pull-right' data-bind="value: last_name" /></p>
+  <p>Hello, <span data-bind="text: full_name"> </span>!</p>
+</div>
+                <script type="application/javascript" src="getting_started/knockback_important_details/kb_view_model_inheritance.js"></script>
+              </div>
+            </div>
+          </div><h1>Classes vs Factory Functions</h1>
+<p>You may have noticed that there is both kb.viewModel(model, options) and kb.ViewModel. The reason is that to reduce the need of using <code>new</code> and to be more familiar with Knockout, there are factory methods that create the underlying classes.
+
+</p>
+<p>A factory function uses new to create a new instance:</p>
+
+          <pre data-for="cs">Knockback.viewModel = (model, options) -&gt; return new Knockback.ViewModel(model, options)
+</pre>
+          <pre data-for="js">Knockback.viewModel = function(model, options) { return new Knockback.ViewModel(model, options); };
+</pre><h1>Specifying Mappings Paths for Nested Models</h1>
+<p>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the <code>factories</code> option when creating a <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> or <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a>
+
+</p>
+<p>Please take a look at the <a href="tutorial_nested_models.html">Nested Model Tutorial</a> for an example.
+
+</p>
+<h1>API Coding Conventions</h1>
+<p>Knockback uses the following conventions: ClassName, functionName, property_name, &#39;constant string&#39;, &quot;dynamic string&quot;, CONSTANT_NAME
+</p>
+<h1>Knockout Observables Foundations</h1>
+<p>Many Knockback.js classes return Knockout.js observables so their dependencies/subscriptions can and should be managed like any Knockout observable. This is **very important if you choose to extend Knockback classes.
+
+</p>
+<p>These classes return a ko.observable instead of &#39;this&#39;:
+
+</p>
+<ul>
+<li><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a></li>
+<li><a href="doc/classes/kb/Observable.html">kb.Observable</a></li>
+<li><a href="doc/classes/kb/DefaultWrapper.html">kb.DefaultWrapper</a></li>
+<li><a href="doc/classes/kb/FormattedObservable.html">kb.FormattedObservable</a></li>
+<li><a href="doc/classes/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
+<li><a href="doc/classes/kb/TriggeredObservable.html">kb.TriggeredObservable</a></li>
+</ul>
+<p>Use ko.utils.wrappedObservable(this) or return the constructor result if you dervive from them:
+
+</p>
+<pre><code>YourCollectionObservable = kb.CollectionObservable.extend({
+  constructor: function(collection, options) {
+    return kb.CollectionObservable.prototype.constructor.call(this, collection, { view_model: YourViewModel, options: options });
+  }
+});</code></pre>
+<p>or
+
+</p>
+<pre><code>YourCollectionObservable = kb.CollectionObservable.extend({
+  constructor: function(collection, options) {
+    kb.CollectionObservable.prototype.constructor.call(this, collection, { view_model: YourViewModel, options: options });
+    return ko.utils.wrappedObservable(this);
+  }
+});</code></pre>
+<p>These classes return &#39;this&#39;:
+
+</p>
+<ul>
+<li><a href="doc/classes/kb/Factory.html">kb.Factory</a></li>
+<li><a href="doc/classes/kb/ModelWatcher.html">kb.ModelWatcher</a></li>
+<li><a href="doc/classes/kb/Store.html">kb.Store</a></li>
+<li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
+<li><a href="doc/classes/kb/Statistics.html">kb.Statistics</a></li>
+</ul>
+<h1>Namespace Aliasing</h1>
+<p>&#39;kb&#39; and &#39;Knockback&#39; can be used interchangeably
+
+</p>
+<h1>Backbone.Model Signatures</h1>
+<p>Knockback.js does not require Backbone.Models for attribute watching, but requires Backbone.Model-like signature.
+
+</p>
+<p>The minimal Backbone.Model signature is:
+
+</p>
+<ul>
+<li><strong><em>Backbone.Events</em></strong>: &#39;bind(event, callback)&#39;, &#39;unbind(event, callback)&#39;, and &#39;trigger(event, params...)&#39;</li>
+<li><strong><em>Backbone.Model</em></strong>: &#39;get(attribute_name)&#39;</li>
+<li><strong><em>Triggering</em></strong>: &#39;change&#39; and/or &quot;change:attribute_name&quot; events when the Backbone.Models-like instance&#39;s attributes change.</li>
+</ul>
+<p>This fact is used when implementing a <a href="tutorial_locale_manager.html">Custom Locale Manager</a> and could be used to port another library like Spine.js to Knockback.js.</p>
+
+        </section>
+      </content>
+      <footer class="page">
+      </footer>
+    </div>
+  </body>
+</html>

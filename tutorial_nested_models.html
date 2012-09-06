@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Tutorial: Relational Models</title>
+    <link rel="stylesheet" href="vendor/css/normalize.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/layout_components.css">
+    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" href="css/tutorial.css">
+    <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/js/backbone-relational-0.6.0.js"></script>
+    <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
+    <script type="application/javascript" src="js/stylecode.js"></script>
+    <script type="application/javascript" src="js/interface.js"></script>
+  </head>
+  <body>
+    <div class="page navbar">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="doc/index.html">API</a></li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                  </ul>
+                </li>
+                <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
+              </ul>
+              <div id="script_language" class="pull-right">
+                <div class="separator">
+                  <div class="selection codestyle">
+                    <div class="option">
+                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <label for="cs-cs">CS</label>
+                    </div>
+                    <div class="option">
+                      <input id="cs-js" type="radio" name="codestyle" value="js"/>
+                      <label for="cs-js">JS</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <header class="page">
+      </header>
+      <content class="page">
+        <section>
+          <h1>Tutorial: Nested Models</h1>
+          <div><span>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the `factories` option when creating a</span><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a><span> or</span><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable.</a></div>
+          <h2>Specifying Mappings Paths for kb.CollectionObservables</h2>
+          <p>In the following example, we specify bindings so the collection view models (path: 'models') use a PersonViewModel; whereas, the 'friends' relationship (path: 'models.friends.models') uses FriendViewModel.</p>
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kbnm_collection_observables_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kbnm_collection_observables_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kbnm_collection_observables_view" class="tab-pane active">
+                  <pre>&lt;div id='kbnm_collection_observables' data-bind=&quot;foreach: people&quot;&gt;
+  &lt;p&gt;Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;p&gt;Name: &lt;input class='input-small pull-right' data-bind=&quot;value: name&quot;/&gt;&lt;/p&gt;
+
+  &lt;div data-bind=&quot;foreach: friends&quot;&gt;
+    &lt;p&gt;Friend Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt; &lt;span class=&quot;pull-right&quot; &gt;Name: &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kbnm_collection_observables_view_model" class="tab-pane">
+                  <pre data-for="cs">bob = new Backbone.Model({name: "Bob", friends: new Backbone.Collection()})
+fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([bob])})
+
+FriendViewModel = (model) ->
+  @name = kb.observable(model, 'name')
+  @type = ko.observable('friend')
+  @
+
+class PersonViewModel extends kb.ViewModel
+  constructor: (model, options) ->
+    super
+    @type = ko.observable('person')
+
+view_model = {
+  people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
+    factories:
+      'models': PersonViewModel
+      'models.friends.models': FriendViewModel
+  })
+}
+
+ko.applyBindings(view_model, $('#kbnm_collection_observables')[0])</pre>
+                  <pre data-for="js">var bob = new Backbone.Model({name: "Bob", friends: new Backbone.Collection()});
+var fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([bob])});
+
+var FriendViewModel = function(model) {
+  this.name = kb.observable(model, 'name');
+  this.type = ko.observable('friend');
+  return this;
+};
+
+var PersonViewModel = kb.ViewModel.extend({
+  constructor: function(model, options) {
+    kb.ViewModel.prototype.constructor.apply(this, arguments);
+    this.type = ko.observable('person');
+  }
+});
+
+var view_model = {
+  people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
+    factories: {
+      'models': PersonViewModel,
+      'models.friends.models': FriendViewModel
+    }
+  })
+};
+
+ko.applyBindings(view_model, $('#kbnm_collection_observables')[0]);
+</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kbnm_collection_observables' data-bind="foreach: people">
+  <p>Type: <span data-bind="text: type"></span></p>
+  <p>Name: <input class='input-small pull-right' data-bind="value: name"/></p>
+
+  <div data-bind="foreach: friends">
+    <p>Friend Type: <span data-bind="text: type"></span> <span class="pull-right" >Name: <span data-bind="text: name"></span></span></p>
+  </div>
+</div>
+                <script type="application/javascript" src="tutorials/nested_models/kbnm_collection_observables.js"></script>
+              </div>
+            </div>
+          </div>
+          <h2>Specifying Mappings Paths for ViewMoels</h2>
+          <p>In the following example, we specify bindings so the collection view models (path: 'models') use a PersonViewModel; whereas, the 'friends' relationship (path: 'models.friends.models') uses FriendViewModel.</p>
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kbnm_view_models_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kbnm_view_models_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kbnm_view_models_view" class="tab-pane active">
+                  <pre>&lt;div id='kbnm_view_models'&gt;
+  &lt;p&gt;Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt;&lt;/p&gt;
+  &lt;p&gt;Name: &lt;input class='input-small pull-right' data-bind=&quot;value: name&quot;/&gt;&lt;/p&gt;
+
+  &lt;div data-bind=&quot;foreach: friends&quot;&gt;
+    &lt;p&gt;Friend Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt; &lt;span class=&quot;pull-right&quot; &gt;Name: &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+    &lt;div data-bind=&quot;foreach: friends&quot;&gt;
+      &lt;p&gt;Friend Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt; &lt;span class=&quot;pull-right&quot; &gt;Name: &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kbnm_view_models_view_model" class="tab-pane">
+                  <pre data-for="cs">bob = new Backbone.Model({name: "Bob"})
+fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([bob])})
+bob.set({friends: new Backbone.Collection([fred])})
+
+FriendViewModel = (model, options) ->
+  @name = kb.observable(model, 'name')
+  @type = ko.observable('friend')
+  @friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'))
+  @
+
+class PersonViewModel extends kb.ViewModel
+  constructor: (model, options) ->
+    super
+    @type = ko.observable('person')
+
+view_model = new PersonViewModel(fred, {
+  factories:
+    'friends.models': FriendViewModel
+    'friends.models.friends.models': FriendViewModel
+})
+
+ko.applyBindings(view_model, $('#kbnm_view_models')[0])</pre>
+                  <pre data-for="js">var bob = new Backbone.Model({name: "Bob"});
+var fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([bob])});
+bob.set({friends: new Backbone.Collection([fred])});
+
+var FriendViewModel = function(model, options) {
+  this.name = kb.observable(model, 'name');
+  this.type = ko.observable('friend');
+  this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));
+  return this;
+};
+
+var PersonViewModel = kb.ViewModel.extend({
+  constructor: function(model, options) {
+    kb.ViewModel.prototype.constructor.apply(this, arguments);
+    this.type = ko.observable('person');
+  }
+});
+
+var view_model = new PersonViewModel(fred, {
+  factories: {
+    'friends.models': FriendViewModel,
+    'friends.models.friends.models': FriendViewModel
+  }
+});
+
+ko.applyBindings(view_model, $('#kbnm_view_models')[0]);</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kbnm_view_models'>
+  <p>Type: <span data-bind="text: type"></span></p>
+  <p>Name: <input class='input-small pull-right' data-bind="value: name"/></p>
+
+  <div data-bind="foreach: friends">
+    <p>Friend Type: <span data-bind="text: type"></span> <span class="pull-right" >Name: <span data-bind="text: name"></span></span></p>
+    <div data-bind="foreach: friends">
+      <p>Friend Type: <span data-bind="text: type"></span> <span class="pull-right" >Name: <span data-bind="text: name"></span></span></p>
+    </div>
+  </div>
+</div>
+                <script type="application/javascript" src="tutorials/nested_models/kbnm_view_models.js"></script>
+              </div>
+            </div>
+          </div>
+        </section>
+      </content>
+      <footer class="page">
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,5 +1,86 @@
-<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8"><title>Tutorial: kb.LocalizedObservable</title><link rel="stylesheet" href="vendor/stylesheets/bootstrap.min.css"><link rel="stylesheet" href="stylesheets/layout.css"><link rel="stylesheet" href="stylesheets/layout_components.css"><script type="application/javascript" src="vendor/javascripts/jquery-1.7.2.js"></script><link rel="stylesheet" href="stylesheets/tutorial.css"><script type="application/javascript" src="vendor/javascripts/knockout-2.1.0.debug.js"></script><script type="application/javascript" src="vendor/javascripts/underscore-1.3.1.js"></script><script type="application/javascript" src="vendor/javascripts/backbone-0.9.2.js"></script><script type="application/javascript" src="vendor/javascripts/knockback-0.15.4.js"></script><script type="application/javascript" src="vendor/javascripts/globalize/globalize.js"></script><script type="application/javascript" src="vendor/javascripts/globalize/globalize.culture.en-GB.js"></script><script type="application/javascript" src="vendor/javascripts/globalize/globalize.culture.fr-FR.js"></script><link rel="stylesheet" href="vendor/lib/highlight/highlightjs/stylesheets/dark.css"><script type="application/javascript" src="vendor/lib/highlight/highlightjs/highlight.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlightjs/languages/javascript.js"></script><script type="application/javascript" src="vendor/lib/highlight/highlight-coffee.js"></script><script type="application/javascript" src="vendor/javascripts/bootstrap.js"></script><script type="application/javascript" src="javascripts/interface.js"></script><script type="application/javascript">hljs.tabReplace = '  ';
-hljs.initHighlightingOnLoad();</script></head><body><div id="wrap"><div class="page navbar"><div class="navbar page"><div class="navbar-inner"><div class="container"><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a><ul class="nav"><li><a href="index.html">Home</a></li><li><a href="tutorial_getting_started.html">Getting Started</a></li><li><a href="docs.html">Docs</a></li><li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a><ul class="dropdown-menu"><li></li><a href="tutorial_getting_started.html">Getting Started</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable_options.html">kb.Observable Options</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_todos_app.html">Todos App</a><a href="tutorial_inspector_library.html">Inspector Library</a></ul></li><li><a href="release_notes.html">Release Notes</a></li></ul><div id="script_language"><div class="separator"><div class="selection codestyle"><div class="option"><input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/><label for="cs-cs">CoffeeScript</label></div><div class="option"><input id="cs-js" type="radio" name="codestyle" value="js"/><label for="cs-js">Javascript</label></div></div></div></div></div></div></div></div></div><div id="wrap"><div class="page container"><header class="page"></header><content class="page"><section><h1>Tutorial: kb.LocalizedObservable</h1><p><a href="index.html">Knockback.js</a><span> uses a convention of storing your custom Locale Manager in 'kb.locale_manager' so that it can be globally used to localize aspects of your application (please see the</span><a href="tutorial_locale_manager.html"> Custom Locale Manager</a><span> tutorial for usage examples).</span></p><p><span>The</span><a href="docs_kb_Localized_observable.html"> kb.LocalizedObservable</a><span> watches the 'kb.locale_manager' instance for changes and updates itself accordingly.</span></p><p><span><span class='label label-important'>warning</span> This is one of the few cases where you are likely to derive from a Knockback class and where you need to know about <span class='label label-warning'>observable returned</span>. Basically, when you derive your own type of kb.LocalizedObservable, you need to return the wrapped observable rather than the instance itself from the constructor using</span><a href="docs_kb_utils.html#wrapped_observable">kb.utils.wrappedObservable</a></p><p><span>We'll use the following Locale Manager for these examples:</span><pre data-for="cs">class LocaleManager
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Tutorial: kb.LocalizedObservable</title>
+    <link rel="stylesheet" href="vendor/css/normalize.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/layout_components.css">
+    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" href="css/tutorial.css">
+    <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
+    <script type="application/javascript" src="js/stylecode.js"></script>
+    <script type="application/javascript" src="js/interface.js"></script>
+  </head>
+  <body>
+    <div class="page navbar">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="doc/index.html">API</a></li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                  </ul>
+                </li>
+                <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
+              </ul>
+              <div id="script_language" class="pull-right">
+                <div class="separator">
+                  <div class="selection codestyle">
+                    <div class="option">
+                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <label for="cs-cs">CS</label>
+                    </div>
+                    <div class="option">
+                      <input id="cs-js" type="radio" name="codestyle" value="js"/>
+                      <label for="cs-js">JS</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <header class="page">
+      </header>
+      <content class="page">
+        <section>
+          <h1>Tutorial: kb.LocalizedObservable</h1>
+          <p><a href="index.html">Knockback.js</a><span> uses a convention of storing your custom Locale Manager in 'kb.locale_manager' so that it can be globally used to localize aspects of your application (please see the</span><a href="tutorial_locale_manager.html"> Custom Locale Manager</a><span> tutorial for usage examples).</span></p>
+          <p><span>The</span><a href="doc/classes/kb/LocalizedObservable.html"> kb.LocalizedObservable</a><span> watches the 'kb.locale_manager' instance for changes and updates itself accordingly.</span></p>
+          <p><span><span class='label label-important'>warning</span> This is one of the few cases where you are likely to derive from a Knockback class and where you need to know about <span class='label label-warning'>observable returned</span>. Basically, when you derive your own type of kb.LocalizedObservable, you need to return the wrapped observable rather than the instance itself from the constructor using</span><a href="doc/classes/kb/utils.html#wrapped_observable">kb.utils.wrappedObservable</a></p>
+          <p><span>We'll use the following Locale Manager for these examples:</span>
+            <pre data-for="cs">class LocaleManager
   constructor: (locale_identifier, @translations_by_locale) ->
     @current_locale = ko.observable(locale_identifier)
 
@@ -21,7 +102,8 @@ kb.locale_manager = new LocaleManager('en-GB', {
   'fr-FR':
     body: 'J\'ai besoin de localiser cette phrase.'
 })
-</pre><pre data-for="js">var LocaleManager = function(locale_identifier, translations_by_locale) {
+</pre>
+            <pre data-for="js">var LocaleManager = function(locale_identifier, translations_by_locale) {
   this.translations_by_locale = translations_by_locale;
   this.current_locale = ko.observable(locale_identifier);
 
@@ -55,14 +137,31 @@ kb.locale_manager = new LocaleManager('en-GB', {
     body: 'J\'ai besoin de localiser cette phrase.'
   }
 });
-</pre><script type="application/javascript" src="tutorials/kb_localized_observable/kblo_locale_manager.js"></script></p><p></p><h3>Nested String Id</h3><p></p><p>If you want to simply localize some read-only text based on a nested string id, you typically use a ko.Observable to access the attribute with the string id and use a localizer that simply looks up the string in the kb.locale_manager.</p><div class="container-fluid"><div class="row-fluid"><div class="span8"><h4>Custom kb.LocalizedObservable:</h4><pre data-for="cs">LocalizedStringLocalizer = kb.LocalizedObservable.extend({
+</pre>
+            <script type="application/javascript" src="tutorials/kb_localized_observable/kblo_locale_manager.js"></script>
+          </p>
+          <p></p>
+          <h3>Nested String Id</h3>
+          <p></p>
+          <p>If you want to simply localize some read-only text based on a nested string id, you typically use a ko.Observable to access the attribute with the string id and use a localizer that simply looks up the string in the kb.locale_manager.</p>
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kblo_string_id_custom" data-toggle="tab">Custom kb.LocalizedObservable (CS/JS)</a></li>
+                <li><a href="#kblo_string_id_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kblo_string_id_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kblo_string_id_custom" class="tab-pane active">
+                  <pre data-for="cs">LocalizedStringLocalizer = kb.LocalizedObservable.extend({
   constructor: (value, options, view_model) ->
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments)
     return kb.utils.wrappedObservable(@)
 
   read: (string_id) ->
     return if (string_id) then kb.locale_manager.get(string_id) else ''
-})</pre><pre data-for="js">// Generated by CoffeeScript 1.3.3
+})</pre>
+                  <pre data-for="js">// Generated by CoffeeScript 1.3.3
 var LocalizedStringLocalizer;
 
 LocalizedStringLocalizer = kb.LocalizedObservable.extend({
@@ -78,7 +177,10 @@ LocalizedStringLocalizer = kb.LocalizedObservable.extend({
     }
   }
 });
-</pre><h4>Views:</h4><pre>&lt;div id='kblo_read_only'&gt;
+</pre>
+                </div>
+                <div id="kblo_string_id_view" class="tab-pane">
+                  <pre>&lt;div id='kblo_read_only'&gt;
   &lt;p data-bind=&quot;text: main_text&quot;&gt;&lt;/p&gt;
 
   &lt;p&gt;
@@ -86,7 +188,10 @@ LocalizedStringLocalizer = kb.LocalizedObservable.extend({
     &lt;span data-bind=&quot;text: kb.locale_manager.getLocale()&quot;&gt;&lt;span&gt;
   &lt;/p&gt;
   &lt;button data-bind=&quot;click: toggleLocale&quot;&gt;Toggle Locale&lt;/button&gt;
-&lt;/div&gt;</pre><h4>ViewModel and Bindings:</h4><pre data-for="cs">texts = new Backbone.Model({main_text_id: 'body'})
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kblo_string_id_view_model" class="tab-pane">
+                  <pre data-for="cs">texts = new Backbone.Model({main_text_id: 'body'})
 
 view_model =
   main_text: kb.observable(texts, {key: 'main_text_id', localizer: LocalizedStringLocalizer})
@@ -96,7 +201,8 @@ view_model =
     else
       kb.locale_manager.setLocale('en-GB')
 
-ko.applyBindings(view_model, $('#kblo_read_only')[0])</pre><pre data-for="js">// Generated by CoffeeScript 1.3.3
+ko.applyBindings(view_model, $('#kblo_read_only')[0])</pre>
+                  <pre data-for="js">// Generated by CoffeeScript 1.3.3
 var texts, view_model;
 
 texts = new Backbone.Model({
@@ -118,7 +224,13 @@ view_model = {
 };
 
 ko.applyBindings(view_model, $('#kblo_read_only')[0]);
-</pre></div><div class="span4"><h4>Live Result</h4><div class="demos_result_box"><div id='kblo_read_only'>
+</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kblo_read_only'>
   <p data-bind="text: main_text"></p>
 
   <p>
@@ -126,7 +238,26 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);
     <span data-bind="text: kb.locale_manager.getLocale()"><span>
   </p>
   <button data-bind="click: toggleLocale">Toggle Locale</button>
-</div><script type="application/javascript" src="tutorials/kb_localized_observable/kblo_string_id_models.js"></script><script type="application/javascript" src="tutorials/kb_localized_observable/kblo_string_id_view_model_bindings.js"></script></div></div></div></div><p></p><h3 id="localized_input">Localized Input</h3><p></p><p>If you want to simply label an input field, you can use a read-only localized observable that only looks up the string in the kb.locale_manager.</p><div class="container-fluid"><div class="row-fluid"><div class="span8"><h4>Custom kb.LocalizedObservable:</h4><pre data-for="cs">LongDateLocalizer = kb.LocalizedObservable.extend({
+</div>
+                <script type="application/javascript" src="tutorials/kb_localized_observable/kblo_string_id_models.js"></script>
+                <script type="application/javascript" src="tutorials/kb_localized_observable/kblo_string_id_view_model_bindings.js"></script>
+              </div>
+            </div>
+          </div>
+          <p></p>
+          <h3 id="localized_input">Localized Input</h3>
+          <p></p>
+          <p>If you want to simply label an input field, you can use a read-only localized observable that only looks up the string in the kb.locale_manager.</p>
+          <div class="row-fluid">
+            <div class="span8">
+              <ul class="nav nav-tabs">
+                <li class="active"><a href="#kblo_localized_input_custom" data-toggle="tab">Custom kb.LocalizedObservable (CS/JS)</a></li>
+                <li><a href="#kblo_localized_input_view" data-toggle="tab">View (HTML)</a></li>
+                <li><a href="#kblo_localized_input_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
+              </ul>
+              <div class="tab-content">
+                <div id="kblo_localized_input_custom" class="tab-pane active">
+                  <pre data-for="cs">LongDateLocalizer = kb.LocalizedObservable.extend({
   constructor: (value, options, view_model) ->
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments)
     return kb.utils.wrappedObservable(@)
@@ -142,7 +273,8 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);
       return kb.utils.wrappedObservable(this).resetToCurrent()
 
     value.setTime(new_value.valueOf())
-})</pre><pre data-for="js">// Generated by CoffeeScript 1.3.3
+})</pre>
+                  <pre data-for="js">// Generated by CoffeeScript 1.3.3
 var LongDateLocalizer;
 
 LongDateLocalizer = kb.LocalizedObservable.extend({
@@ -162,15 +294,21 @@ LongDateLocalizer = kb.LocalizedObservable.extend({
     return value.setTime(new_value.valueOf());
   }
 });
-</pre><h4>Views:</h4><pre>&lt;div id='kblo_read_write'&gt;
-  &lt;input data-bind=&quot;value: date&quot;/&gt;
+</pre>
+                </div>
+                <div id="kblo_localized_input_view" class="tab-pane">
+                  <pre>&lt;div id='kblo_read_write'&gt;
+  &lt;input class='input-small pull-right' data-bind=&quot;value: date&quot;/&gt;
 
   &lt;p&gt;
     &lt;span&gt;Current Locale: &lt;span&gt;
     &lt;span data-bind=&quot;text: kb.locale_manager.getLocale()&quot;&gt;&lt;span&gt;
   &lt;/p&gt;
   &lt;button data-bind=&quot;click: toggleLocale&quot;&gt;Toggle Locale&lt;/button&gt;
-&lt;/div&gt;</pre><h4>ViewModel and Bindings:</h4><pre data-for="cs">model = new Backbone.Model({date: new Date()})
+&lt;/div&gt;</pre>
+                </div>
+                <div id="kblo_localized_input_view_model" class="tab-pane">
+                  <pre data-for="cs">model = new Backbone.Model({date: new Date()})
 
 view_model =
   date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})
@@ -180,7 +318,8 @@ view_model =
     else
       kb.locale_manager.setLocale('en-GB')
 
-ko.applyBindings(view_model, $('#kblo_read_write')[0])</pre><pre data-for="js">// Generated by CoffeeScript 1.3.3
+ko.applyBindings(view_model, $('#kblo_read_write')[0])</pre>
+                  <pre data-for="js">// Generated by CoffeeScript 1.3.3
 var model, view_model;
 
 model = new Backbone.Model({
@@ -202,12 +341,30 @@ view_model = {
 };
 
 ko.applyBindings(view_model, $('#kblo_read_write')[0]);
-</pre></div><div class="span4"><h4>Live Result</h4><div class="demos_result_box"><div id='kblo_read_write'>
-  <input data-bind="value: date"/>
+</pre>
+                </div>
+              </div>
+            </div>
+            <div class="span4">
+              <h4>Live Result</h4>
+              <div class="demos_result_box"><div id='kblo_read_write'>
+  <input class='input-small pull-right' data-bind="value: date"/>
 
   <p>
     <span>Current Locale: <span>
     <span data-bind="text: kb.locale_manager.getLocale()"><span>
   </p>
   <button data-bind="click: toggleLocale">Toggle Locale</button>
-</div><script type="application/javascript" src="tutorials/kb_localized_observable/kblo_localized_input_models.js"></script><script type="application/javascript" src="tutorials/kb_localized_observable/kblo_localized_input_view_model_bindings.js"></script></div></div></div></div></section></content><footer class="page"></footer></div></div></body></html>
+</div>
+                <script type="application/javascript" src="tutorials/kb_localized_observable/kblo_localized_input_models.js"></script>
+                <script type="application/javascript" src="tutorials/kb_localized_observable/kblo_localized_input_view_model_bindings.js"></script>
+              </div>
+            </div>
+          </div>
+        </section>
+      </content>
+      <footer class="page">
+      </footer>
+    </div>
+  </body>
+</html>

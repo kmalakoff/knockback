@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='assets/codo.css' type='text/css'>
+  <script src='assets/codo.js'></script>
+  <script src='assets/search_data.js'></script>
+</head>
+  <body>
+    <div id='base' data-path=''></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='class_index.html' title='Index'>Index</a>
+    &raquo;
+    <span class='title'>README.md</span>
+    <nav>
+      <ul>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='class_list.html'>Classes</a>
+      <a id='method_list_link' href='method_list.html'>Methods</a>
+      <a id='extra_list_link' href='extra_list.html'>Extras</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+  <div id='fuzzySearch'>
+    <input type='text'>
+    <ol></ol>
+  </div>
+  <div id='help'>
+    <p>
+      Quickly fuzzy find classes, mixins, methods, file:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-T</span>
+        Open fuzzy finder dialog
+      </li>
+    </ul>
+    <p>
+      In frame mode you can toggle the list naviation frame on the left side:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-L</span>
+        Toggle list view
+      </li>
+    </ul>
+    <p>
+      You can focus a list in frame mode or toggle a tab in frameless mode:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-C</span>
+        Class list
+      </li>
+      <li>
+        <span>Ctrl-I</span>
+        Mixin list
+      </li>
+      <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
+        <span>Ctrl-M</span>
+        Method list
+      </li>
+      <li>
+        <span>Ctrl-E</span>
+        Extras list
+      </li>
+    </ul>
+    <p>
+      You can focus and blur the search input:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-S</span>
+        Focus search input
+      </li>
+      <li>
+        <span>Esc</span>
+        Blur search input
+      </li>
+    </ul>
+    <p>
+      In frameless mode you can close the list tab:
+    </p>
+    <ul>
+      <li>
+        <span>Esc</span>
+        Close list tab
+      </li>
+    </ul>
+  </div>
+</div>
+    <div id='content'>
+      <nav class='toc'>
+        <p class='title'>
+          <a class='hide_toc' href='#'>
+            <strong>Table of Contents</strong>
+          </a>
+          <small>
+            (<a class='float_toc' href='#'>left</a>)
+          </small>
+        </p>
+      </nav>
+      <div id='filecontents'>
+        <p><a href="http://travis-ci.org/kmalakoff/knockback"><img src="https://secure.travis-ci.org/kmalakoff/knockback.png" alt="Build Status"></a>
+
+</p>
+<p><img src="https://github.com/kmalakoff/knockback/raw/master/media/logo.png" alt="logo">
+
+</p>
+<p>Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
+
+</p>
+<h3>Website: <a href="http://kmalakoff.github.com/knockback/">kmalakoff.github.com/knockback</a></h3>
+<p>You can get the library here:
+
+</p>
+<ul>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js">Development version</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js">Production version</a></li>
+</ul>
+<p><strong>NOTE: there are breaking changes in 0.16.+</strong> Please see the <a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">release notes</a> for details.
+
+</p>
+<h3>Dependencies</h3>
+<ul>
+<li><a href="http://backbonejs.org/">Backbone.js</a></li>
+<li><a href="http://underscorejs.org/">Underscore.js</a></li>
+<li><a href="http://knockoutjs.com/">Knockout.js</a></li>
+</ul>
+<h3>Compatible Components</h3>
+<ul>
+<li><a href="https://github.com/PaulUithol/Backbone-relational/">BackboneRelational.js</a> - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.</li>
+<li><a href="https://github.com/kmalakoff/backbone-modelref/">BackboneModelRef.js</a> - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).</li>
+<li>(<strong><em>new!</em></strong>) <a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
+<li><a href="https://github.com/kmalakoff/knockback-inspector/">KnockbackInspector.js</a> - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).</li>
+</ul>
+<h3>Demos and Documentation</h3>
+<p>For comprehensive tutorials, take a look at the website: <a href="http://kmalakoff.github.com/knockback/">http://kmalakoff.github.com/knockback/</a>
+
+</p>
+<p>Please try the <a href="http://kmalakoff.github.com/knockback-todos/">TodoMVC App</a> and check out the (<strong><em>new!</em></strong>) <a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App</a> for some best practices when using Knockback.js.
+
+
+</p>
+<h2>Why Write Knockback.js?</h2>
+<p>When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to &quot;mix and match&quot; the best features. I started with <a href="http://documentcloud.github.com/backbone/">Backbone.js</a> and really loved the Models and Collections, and used <a href="http://brunch.io/">Brunch</a> to get me up and running quickly.
+
+</p>
+<p>After a while, I found the view coding too slow so I wrote <a href="https://github.com/kmalakoff/mixin">Mixin.js</a> to extract out reusable aspects of my views. When I was looking for my next productivity increase, an ex-work colleague suggested <a href="http://www.sproutcore.com/">Sproutcore</a>, but at the time, it wasn&#39;t yet micro-frameworky enough meaning I would need to learn something big and &quot;to throw the baby out with the bathwater&quot; as they say (it is hard to give up Backbone models and collections!). Then, I discovered <a href="http://knockoutjs.com/">Knockout</a> and knew it was for me!
+
+</p>
+<p>Knockout provided just the right building blocks for a layer between my templates and data. As I used it more, I built additional functionality like <a href="https://github.com/kmalakoff/backbone-modelref">Backbone.ModelRefs</a> for lazy model loading, localization helpers for truly dynamic views, and most recently, an easier way to sync collections and their model&#39;s view models.
+
+</p>
+<p>So here it is...the refactored and shareable version of my Backbone bindings for Knockout: Knockback.js
+
+</p>
+<p>Enjoy!
+
+</p>
+<p>Kevin
+
+</p>
+<h2>An Example</h2>
+<h3>The view model:</h3>
+<pre><code class="lang-coffeescript">ContactViewModel = (model) -&gt;
+  kb.observables(model, {
+    name:     &#39;name&#39;
+    email:    {key:&#39;email&#39;, default: &#39;your.name@yourplace.com&#39;}
+    date:     {key:&#39;date&#39;, localizer: LongDateLocalizer}
+  }, this)
+  @           # must return this or Coffeescript will return the last statement which is not what we want!</code></pre>
+<p>or (Coffeescript)
+
+</p>
+<pre><code class="lang-coffeescript">class ContactViewModel extends kb.ViewModel
+  constructor: (model) -&gt;
+    super(model, {internals: [&#39;email&#39;, &#39;date&#39;]})  # call super constructor: @name, @_email, and @_date created in super from the model attributes
+    @email = kb.defaultObservable(@_email, &#39;your.name@yourplace.com&#39;)
+    @date = new LongDateLocalizer(@_date)</code></pre>
+<p>or (Javascript)
+
+</p>
+<pre><code class="lang-javascript">var ContactViewModel = kb.ViewModel.extend({
+  constructor: function(model) {
+    kb.ViewModel.prototype.constructor.call(this, model, {internals: [&#39;email&#39;, &#39;date&#39;]});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
+    this.email = kb.defaultObservable(this._email, &#39;your.name@yourplace.com&#39;);
+    this.date = new LongDateLocalizer(this._date);
+    return this;
+  }
+});</code></pre>
+<h3>The HTML:</h3>
+<pre><code class="lang-html">&lt;label&gt;Name: &lt;/label&gt;&lt;input data-bind=&quot;value: name&quot; /&gt;
+&lt;label&gt;Email: &lt;/label&gt;&lt;input data-bind=&quot;value: email&quot; /&gt;
+&lt;label&gt;Birthdate: &lt;/label&gt;&lt;input data-bind=&quot;value: date&quot; /&gt;</code></pre>
+<h3>And...engage:</h3>
+<pre><code class="lang-coffeescript">view_model = new ContactViewModel(new Backbone.Model({name: &#39;Bob&#39;, email: &#39;bob@bob.com&#39;, date: new Date()}))
+ko.applyBindings(view_model)
+
+# ...
+
+# and cleanup after yourself when you are done.
+kb.release(view_model)</code></pre>
+<p>And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!
+
+</p>
+<p>Of course, this is just a simple example, but hopefully you get the picture.
+
+
+
+</p>
+<h2>Building, Running and Testing the library</h2>
+<h3>Installing:</h3>
+<ol>
+<li>install node.js: <a href="http://nodejs.org">http://nodejs.org</a></li>
+<li>install node packages: &#39;npm install&#39;</li>
+</ol>
+<h3>Commands:</h3>
+<p>Look at: <a href="https://github.com/kmalakoff/easy-bake">https://github.com/kmalakoff/easy-bake</a>
+
+</p>
+
+      </div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
+  v1.3.1
+  (Node.js v0.8.7).
+  &#10034;
+  Press Ctrl-h to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>
