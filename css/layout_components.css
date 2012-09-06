@@ -96,6 +96,9 @@ div.knockback_credits p:last-child {
   margin-top: 1ex;
 }
 div#script_language {
+  position: fixed;
+  top: 50px;
+  right: 15px;
   z-index: 200;
   padding-top: 8px;
   -webkit-border-top-left-radius: 2px;
@@ -155,11 +158,4 @@ div#script_language .selection .option input[type='radio']:checked + label {
   -webkit-box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.4);
   box-shadow: inset 0px 0px 0px 1px rgba(0,0,0,0.4);
   cursor: default;
-}
-@media (max-width: 979px) {
-  div#script_language {
-    position: absolute;
-    top: 50px;
-    right: 15px;
-  }
 }
