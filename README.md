@@ -1,13 +1,6 @@
 [![Build Status](https://secure.travis-ci.org/kmalakoff/knockback.png)](http://travis-ci.org/kmalakoff/knockback)
 
-````
-    __ __                  __   __               __       _
-   / //_/____  ____  _____/ /__/ /_  ____ ______/ /__    (_)____
-  / ,<  / __ \/ __ \/ ___/ //_/ __ \/ __ `/ ___/ //_/   / / ___/
- / /| |/ / / / /_/ / /__/ ,< / /_/ / /_/ / /__/ ,< _   / (__  )
-/_/ |_/_/ /_/\____/\___/_/|_/_.___/\__,_/\___/_/|_(_)_/ /____/
-                                                   /___/
-````
+![logo](https://github.com/kmalakoff/knockback/raw/master/media/logo.png)
 
 Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
