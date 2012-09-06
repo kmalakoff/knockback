@@ -10,7 +10,6 @@ body > .container {
   padding-top: 20px;
 }
 body div.page.github_fork_me {
-  z-index: 200;
   position: fixed;
   top: 0px;
   right: 0px;
