@@ -14,7 +14,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.2.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
@@ -72,9 +72,9 @@
 
 </p>
 <ul>
-<li><strong><em>Thumbnail View</em></strong>: the ViewModel could only expose a subset of the Model&#39;s attributes, dates/time may be in the shortest format possible, or maybe just an image would be provided to the template.</li>
-<li><strong><em>Cell View</em></strong>: the ViewModel could again expose a subset of only the most relevant summary attributes, routing information to a detailed summary view, etc.</li>
-<li><strong><em>Editing View</em></strong>: the ViewModel could expose almost all of the Model&#39;s attributes, localized labels for each, data and functions for the editing controls and functionality, routing information to specialized editing views, etc.</li>
+<li><strong>Thumbnail View</strong>: the ViewModel could only expose a subset of the Model&#39;s attributes, dates/time may be in the shortest format possible, or maybe just an image would be provided to the template.</li>
+<li><strong>Cell View</strong>: the ViewModel could again expose a subset of only the most relevant summary attributes, routing information to a detailed summary view, etc.</li>
+<li><strong>Editing View</strong>: the ViewModel could expose almost all of the Model&#39;s attributes, localized labels for each, data and functions for the editing controls and functionality, routing information to specialized editing views, etc.</li>
 </ul>
 <p>Important to understand that in a larger application the relationship between Models and ViewModels tends to be one-to-many. In this application, there is a one-to-many relationship from the Priority model through the the HeaderViewModel and TodoViewModel ViewModels because each one uses the Priority for rendering their priority colors and providing priority settings data to their tooltip, but the actions on selecting a priority in the tool tip differ.</p>
 

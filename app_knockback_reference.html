@@ -14,7 +14,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.2.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
@@ -299,19 +299,19 @@ window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
 
 </p>
 <ul>
-<li>Panes: adds sliding panes with embedded cells for each relationship instead of simple buttons.</li>
-<li>Page Animations: adds transition animations without history when navigating between pages.</li>
-<li>Page Animations + History: adds transition animations with history when navigating between pages. Note: you can re-loading the page and the transitions will work as if you navigated from the main page.</li>
-<li>Page Animations + History + No Cache: when you use history, you need to be careful to not keep too many pages in memory. This example show you how to on-demand load pages by passing a create function instead of element to the page navigator.</li>
+<li><strong>Panes</strong>: adds sliding panes with embedded cells for each relationship instead of simple buttons.</li>
+<li><strong>Page Animations</strong>: adds transition animations without history when navigating between pages.</li>
+<li><strong>Page Animations + History</strong>: adds transition animations with history when navigating between pages. Note: you can re-loading the page and the transitions will work as if you navigated from the main page.</li>
+<li><strong>Page Animations + History + No Cache</strong>: when you use history, you need to be careful to not keep too many pages in memory. This example show you how to on-demand load pages by passing a create function instead of element to the page navigator.</li>
 </ul>
 <p>To help verify correct memory management and performance, the reference application provides some statistics helpers (under DemoMode -&gt; Statistics):
 
 </p>
 <ul>
-<li><strong><em>Chrome memory heap statistics</em></strong>: You need to launch Chrome with the --enable-memory-info flag and also you might need to trigger heap compaction to ensure the statistics are up-to-date (for example, by using Developer Tools -&gt; Profiles -&gt; Take Heap Snapshot).</li>
-<li><strong><em>Active ViewModels/CollectionObservables</em></strong>: using the Knockback.js statistics component, you can see what which ViewModels and CollectionObservables are in memory. Note: if you do not derive from kb.ViewModel or kb.CollectionObservable, you need to add them manually using kb.Statistics.register(key, obj)</li>
-<li><strong><em>Backbone.Model Events</em></strong>: using the Knockback.js statistics component, you can see and reset all of the events that Knockback.js has intercepted from Backbone.js</li>
-<li><strong><em>Page Cycling</em></strong>: to do soak testing, you can choose the number of randomized page cycles and time per page to see the memory characteristics over time.</li>
+<li><strong>Chrome memory heap statistics</strong>: You need to launch Chrome with the --enable-memory-info flag and also you might need to trigger heap compaction to ensure the statistics are up-to-date (for example, by using Developer Tools -&gt; Profiles -&gt; Take Heap Snapshot).</li>
+<li><strong>Active ViewModels/CollectionObservables</strong>: using the Knockback.js statistics component, you can see what which ViewModels and CollectionObservables are in memory. Note: if you do not derive from kb.ViewModel or kb.CollectionObservable, you need to add them manually using kb.Statistics.register(key, obj)</li>
+<li><strong>Backbone.Model Events</strong>: using the Knockback.js statistics component, you can see and reset all of the events that Knockback.js has intercepted from Backbone.js</li>
+<li><strong>Page Cycling</strong>: to do soak testing, you can choose the number of randomized page cycles and time per page to see the memory characteristics over time.</li>
 </ul>
 
         </section>

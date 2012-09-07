@@ -14,7 +14,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.1.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.2.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
@@ -221,9 +221,9 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
 
 </p>
 <ul>
-<li><strong><em>Backbone.Events</em></strong>: &#39;bind(event, callback)&#39;, &#39;unbind(event, callback)&#39;, and &#39;trigger(event, params...)&#39;</li>
-<li><strong><em>Backbone.Model</em></strong>: &#39;get(attribute_name)&#39;</li>
-<li><strong><em>Triggering</em></strong>: &#39;change&#39; and/or &quot;change:attribute_name&quot; events when the Backbone.Models-like instance&#39;s attributes change.</li>
+<li><strong>Backbone.Events</strong>: &#39;bind(event, callback)&#39;, &#39;unbind(event, callback)&#39;, and &#39;trigger(event, params...)&#39;</li>
+<li><strong>Backbone.Model</strong>: &#39;get(attribute_name)&#39;</li>
+<li><strong>Triggering</strong>: &#39;change&#39; and/or &quot;change:attribute_name&quot; events when the Backbone.Models-like instance&#39;s attributes change.</li>
 </ul>
 <p>This fact is used when implementing a <a href="tutorial_locale_manager.html">Custom Locale Manager</a> and could be used to port another library like Spine.js to Knockback.js.</p>
 
