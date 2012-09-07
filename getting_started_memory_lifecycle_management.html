@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Getting Started: Knockback.js Important Details</title>
+    <title>Getting Started: Memory and Lifecycle Management</title>
     <link rel="stylesheet" href="vendor/css/normalize.css">
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
@@ -51,6 +51,20 @@
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
               </ul>
+              <div id="script_language">
+                <div class="separator">
+                  <div class="selection codestyle">
+                    <div class="option">
+                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <label for="cs-cs">CS</label>
+                    </div>
+                    <div class="option">
+                      <input id="cs-js" type="radio" name="codestyle" value="js"/>
+                      <label for="cs-js">JS</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -60,24 +74,86 @@
       <header class="page">
       </header>
       <content class="page">
-        <section><h1>Models, Views, and ViewModels: One-To-Many Relationships</h1>
-<p>The distinction between Models and ViewModels is important:
-
+        <section><h1>Auto-Releasing View Models</h1>
+<p>When an element is created, Knockback provides functions to auto-release ViewModels using Knockout&#39;s dispose node callback:
 </p>
-<p><em>Backbone.Models encapsulate the data and operations on the data, are serialized/deserialized from/to the server, and are in short Models.
-</em>ViewModels provide the attributes and logic to the templates often interacting with the Model data like Controllers. However, they may have their own data and logic that is purely View-related and that the server should never know about.
 
+          <pre data-for="cs"># binds a callback to the node that releases the view model when the node is removed using ko.removeNode
+ko.utils.domNodeDisposal.addDisposeCallback(node, -&gt; kb.release(view_model) );</pre>
+          <pre data-for="js">// binds a callback to the node that releases the view model when the node is removed using ko.removeNode
+ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );</pre><p>There are three ways to do this in Knockback:
 </p>
-<p>Besides providing a clean separation between data and display, this separation becomes important in a larger application. In a larger application, you often have different ways to present the same Model with different ViewModels. For example, a Model could have the following ViewModels:
 
+          <pre data-for="cs"># Auto-released Template
+el = kb.renderAutoReleasedTemplate('template_name', view_model, options)
+
+# OR: When applying bindings
+kb.applyBindings(view_model, el)
+
+# OR: Manually
+kb.releaseOnNodeRemove(view_model, el)</pre>
+          <pre data-for="js">// Auto-released Template
+var el = kb.renderAutoReleasedTemplate('template_name', view_model, options);
+
+// OR: When applying bindings
+kb.applyBindings(view_model, el);
+
+// OR: Manually
+kb.releaseOnNodeRemove(view_model, el);</pre><p>This means you can use a Backbone.Router as follows and not need to explicitly call kb.release() because ko.removeNode calls it for you:
 </p>
-<ul>
-<li><strong><em>Thumbnail View</em></strong>: the ViewModel could only expose a subset of the Model&#39;s attributes, dates/time may be in the shortest format possible, or maybe just an image would be provided to the template.</li>
-<li><strong><em>Cell View</em></strong>: the ViewModel could again expose a subset of only the most relevant summary attributes, routing information to a detailed summary view, etc.</li>
-<li><strong><em>Editing View</em></strong>: the ViewModel could expose almost all of the Model&#39;s attributes, localized labels for each, data and functions for the editing controls and functionality, routing information to specialized editing views, etc.</li>
-</ul>
-<p>Important to understand that in a larger application the relationship between Models and ViewModels tends to be one-to-many. In this application, there is a one-to-many relationship from the Priority model through the the HeaderViewModel and TodoViewModel ViewModels because each one uses the Priority for rendering their priority colors and providing priority settings data to their tooltip, but the actions on selecting a priority in the tool tip differ.</p>
 
+          <pre data-for="cs">window.RouterBackboneJS = Backbone.Router.extend({
+  constructor: -&gt;
+    Backbone.Router.prototype.constructor.apply(@, arguments)
+    
+    @route('', null, =&gt;
+      ko.removeNode(@active_el) if @active_el # remove previous
+      
+      @active_el = kb.renderAutoReleasedTemplate('home', new HomeViewModel())
+      $('body').append(@active_el)
+    )
+    
+    @route('things', null, =&gt;
+      ko.removeNode(@active_el) if @active_el # remove previous
+      
+      @active_el = kb.renderAutoReleasedTemplate('things_page', new ThingsPageViewModel())
+      $('body').append(@active_el)
+    )
+    
+    @route('things/:id', null, (id) =&gt;
+      ko.removeNode(@active_el) if @active_el # remove previous
+      
+      @active_el = kb.renderAutoReleasedTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))
+      $('body').append(@active_el)
+    )
+})</pre>
+          <pre data-for="js">window.RouterBackboneJS = Backbone.Router.extend({
+
+  constructor: function() {
+    Backbone.Router.prototype.constructor.apply(this, arguments);
+    
+    this.route('', null, function() {
+      if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
+      
+      this.active_el = kb.renderAutoReleasedTemplate('home', new HomeViewModel());
+      $('body').append(this.active_el);
+    });
+    
+    this.route('things', null, function() {
+      if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
+      
+      this.active_el = kb.renderAutoReleasedTemplate('things_page', new ThingsPageViewModel());
+      $('body').append(this.active_el);
+    });
+    
+    this.route('things/:id', null, function(id) {
+      if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
+      
+      this.active_el = kb.renderAutoReleasedTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)));
+      $('body').append(this.active_el);
+    });
+  }
+});</pre>
         </section>
       </content>
       <footer class="page">

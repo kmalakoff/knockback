@@ -31,7 +31,7 @@
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
@@ -78,10 +78,10 @@
 <p>Knockback.js requires you to release your view models using &#39;kb.release(view_model)&#39;. The reason for this is that kb.CollectionObservables and kb.ViewModels may have cicular references that need to be broken. Also, kb.release walks your ViewModel properties so it ensures all ko.observables, kb.observables, and the like to be properly released to avoid memory leaks.
 
 </p>
-<p>That said, you can largely automate this using the approach from <a href="https://github.com/kmalakoff/knockback-navigators">KnockbackNavigators.js</a>!
+<p>That said, you can largely automate this using the approach from <a href="https://github.com/kmalakoff/knockback-navigators">Knockback-Navigators.js</a>!
 
 </p>
-<p>KnockbackNavigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:
+<p>Knockback-Navigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:
 
 </p>
 <pre><code>// binds a callback to the node that releases the view model when the node is removed using ko.removeNode
@@ -142,7 +142,7 @@ ko.releaseNode(statistics_el);</code></pre>
   }
 });</code></pre>
 <h1>Advanced Routing</h1>
-<p>You can use <a href="https://github.com/kmalakoff/knockback-navigators">KnockbackNavigators.js</a> to provide more exciting and interesting functionality. Here&#39;s an example with transitions and non-cached pages:
+<p>You can use <a href="https://github.com/kmalakoff/knockback-navigators">Knockback-Navigators.js</a> to provide more exciting and interesting functionality. Here&#39;s an example with transitions and non-cached pages:
 
 </p>
 <pre><code>window.RouterBackboneJSExtendedNoCache = Backbone.Router.extend({
@@ -295,7 +295,7 @@ window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
   }
 });</code></pre>
 <h1>Extended Features</h1>
-<p>In addition to a the Tutorial reference application, you can find more advanced implementations that use <a href="https://github.com/kmalakoff/knockback-navigators">KnockbackNavigators.js</a> for page and embedded pane transitions (under DemoMode):
+<p>In addition to a the Tutorial reference application, you can find more advanced implementations that use <a href="https://github.com/kmalakoff/knockback-navigators">Knockback-Navigators.js</a> for page and embedded pane transitions (under DemoMode):
 
 </p>
 <ul>

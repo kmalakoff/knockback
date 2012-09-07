@@ -121,17 +121,47 @@
 <p>Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
 </p>
-<h3>Website: <a href="http://kmalakoff.github.com/knockback/">kmalakoff.github.com/knockback</a></h3>
-<p>You can get the library here:
+<p>These resources can help you get started:
 
 </p>
 <ul>
-<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js">Development version</a></li>
-<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js">Production version</a></li>
+<li><p><a href="http://kmalakoff.github.com/knockback/">Knockback.js Website</a></p>
+</li>
+<li><p><a href="http://kmalakoff.github.com/knockback/doc/index.html">API Docs</a></p>
+</li>
+<li><p><a href="http://kmalakoff.github.com/knockback/tutorials_introduction.html">Tutorials</a></p>
+</li>
+<li><p><a href="http://kmalakoff.github.com/knockback-todos-app/">TodoMVC App (Live!)</a></p>
+</li>
+<li><p><a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App (Live!)</a> (<strong><em>new!</em></strong>): demonstrates best practices when using Knockback.js including page routing and lifecycle management.</p>
+</li>
+<li><p><a href="http://kmalakoff.github.com/knockback-navigators">Knockback-Navigators.js (Live!)</a> (<strong><em>new!</em></strong>): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!</p>
+</li>
 </ul>
-<p><strong>NOTE: there are breaking changes in 0.16.+</strong> Please see the <a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">release notes</a> for details.
+<h1>Download Latest (0.16.1):</h1>
+<p>Please see the <a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">release notes</a> for upgrade pointers.
 
 </p>
+<h3>Full</h3>
+<p>Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+
+</p>
+<ul>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js">Full Library (Development), 69 KB</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js">Full Library (Production), 32 KB</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.js">Full Stack (Development), 330 KB</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.min.js">Full Stack (Production, 102 KB</a></li>
+</ul>
+<h3>Core</h3>
+<p>Removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+
+</p>
+<ul>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.js">Core Library (Development), 58 KB</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.min.js">Core Library (Production), 27 KB</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.js">Core Stack (Development), 319 KB</a></li>
+<li><a href="https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.min.js">Core Stack (Production), 98 KB</a></li>
+</ul>
 <h3>Dependencies</h3>
 <ul>
 <li><a href="http://backbonejs.org/">Backbone.js</a></li>
@@ -142,17 +172,9 @@
 <ul>
 <li><a href="https://github.com/PaulUithol/Backbone-relational/">BackboneRelational.js</a> - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.</li>
 <li><a href="https://github.com/kmalakoff/backbone-modelref/">BackboneModelRef.js</a> - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).</li>
-<li>(<strong><em>new!</em></strong>) <a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
+<li><a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> (<strong><em>new!</em></strong>) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
 <li><a href="https://github.com/kmalakoff/knockback-inspector/">KnockbackInspector.js</a> - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).</li>
 </ul>
-<h3>Demos and Documentation</h3>
-<p>For comprehensive tutorials, take a look at the website: <a href="http://kmalakoff.github.com/knockback/">http://kmalakoff.github.com/knockback/</a>
-
-</p>
-<p>Please try the <a href="http://kmalakoff.github.com/knockback-todos/">TodoMVC App</a> and check out the (<strong><em>new!</em></strong>) <a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App</a> for some best practices when using Knockback.js.
-
-
-</p>
 <h2>Why Write Knockback.js?</h2>
 <p>When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to &quot;mix and match&quot; the best features. I started with <a href="http://documentcloud.github.com/backbone/">Backbone.js</a> and really loved the Models and Collections, and used <a href="http://brunch.io/">Brunch</a> to get me up and running quickly.
 
@@ -175,7 +197,7 @@
 <h2>An Example</h2>
 <h3>The view model:</h3>
 <pre><code class="lang-coffeescript">ContactViewModel = (model) -&gt;
-  kb.observables(model, {
+  kb.viewModel(model, {
     name:     &#39;name&#39;
     email:    {key:&#39;email&#39;, default: &#39;your.name@yourplace.com&#39;}
     date:     {key:&#39;date&#39;, localizer: LongDateLocalizer}
@@ -227,15 +249,13 @@ kb.release(view_model)</code></pre>
 <li>install node packages: &#39;npm install&#39;</li>
 </ol>
 <h3>Commands:</h3>
-<p>Look at: <a href="https://github.com/kmalakoff/easy-bake">https://github.com/kmalakoff/easy-bake</a>
-
-</p>
+<p>Look at: <a href="https://github.com/kmalakoff/easy-bake">https://github.com/kmalakoff/easy-bake</a></p>
 
       </div>
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 16:42:13 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

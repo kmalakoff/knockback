@@ -31,7 +31,7 @@
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
@@ -76,11 +76,12 @@
       <content class="page">
         <section><h1>Getting Started with Knockback.js: Knockback.js Important Details</h1>
 <h1>Inheritance</h1>
-<p>Some Knockback classes are meant to be inherited. Specifically:
+<p>Some Knockback classes are meant to be inherited from. Specifically:
 
 </p>
 <ul>
 <li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
+<li><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a></li>
 <li><a href="doc/classes/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
 </ul>
 <p>When using CoffeeScript, you can derive from a super class using:
@@ -114,19 +115,16 @@
                 <div id="kb_view_model_inheritance_view_model" class="tab-pane">
                   <pre data-for="cs">model = new Backbone.Model({first_name: "Planet", last_name: "Earth"})
 
-class ViewModel extends kb.ViewModel
+class MyViewModel extends kb.ViewModel
   constructor: (model) ->
     super
     @full_name = ko.computed((->return "#{@first_name()} #{@last_name()}"), @)
-view_model = new ViewModel(model)
+view_model = new MyViewModel(model)
 
 ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0])</pre>
-                  <pre data-for="js">var model = new Backbone.Model({
-  first_name: "Planet",
-  last_name: "Earth"
-});
+                  <pre data-for="js">var model = new Backbone.Model({first_name: "Planet", last_name: "Earth"});
 
-var ViewModel = kb.ViewModel.extend({
+var MyViewModel = kb.ViewModel.extend({
   constructor: function(model) {
     kb.ViewModel.prototype.constructor.apply(this, arguments);
     this.full_name = ko.computed((function() {
@@ -135,7 +133,7 @@ var ViewModel = kb.ViewModel.extend({
   }
 });
 
-var view_model = new ViewModel(model);
+var view_model = new MyViewModel(model);
 
 ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
 </pre>
@@ -152,24 +150,26 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
                 <script type="application/javascript" src="getting_started/knockback_important_details/kb_view_model_inheritance.js"></script>
               </div>
             </div>
-          </div><h1>Classes vs Factory Functions</h1>
-<p>You may have noticed that there is both kb.viewModel(model, options) and kb.ViewModel. The reason is that to reduce the need of using <code>new</code> and to be more familiar with Knockout, there are factory methods that create the underlying classes.
-
-</p>
-<p>A factory function uses new to create a new instance:</p>
-
-          <pre data-for="cs">Knockback.viewModel = (model, options) -&gt; return new Knockback.ViewModel(model, options)
-</pre>
-          <pre data-for="js">Knockback.viewModel = function(model, options) { return new Knockback.ViewModel(model, options); };
-</pre><h1>Specifying Mappings Paths for Nested Models</h1>
+          </div><h1>Specifying Mappings Paths for Nested Models</h1>
 <p>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the <code>factories</code> option when creating a <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> or <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a>
-
 </p>
-<p>Please take a look at the <a href="tutorial_nested_models.html">Nested Model Tutorial</a> for an example.
 
-</p>
-<h1>API Coding Conventions</h1>
-<p>Knockback uses the following conventions: ClassName, functionName, property_name, &#39;constant string&#39;, &quot;dynamic string&quot;, CONSTANT_NAME
+          <pre data-for="cs">view_model = {
+  people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
+    factories:
+      'models': PersonViewModel
+      'models.friends.models': FriendViewModel
+  })
+}</pre>
+          <pre data-for="js">var view_model = {
+  people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
+    factories: {
+      'models': PersonViewModel,
+      'models.friends.models': FriendViewModel
+    }
+  })
+};</pre><p>Please take a look at the <a href="tutorial_nested_models.html">Nested Model Tutorial</a> for more details.
+
 </p>
 <h1>Knockout Observables Foundations</h1>
 <p>Many Knockback.js classes return Knockout.js observables so their dependencies/subscriptions can and should be managed like any Knockout observable. This is **very important if you choose to extend Knockback classes.
@@ -213,12 +213,8 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
 <li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
 <li><a href="doc/classes/kb/Statistics.html">kb.Statistics</a></li>
 </ul>
-<h1>Namespace Aliasing</h1>
-<p>&#39;kb&#39; and &#39;Knockback&#39; can be used interchangeably
-
-</p>
 <h1>Backbone.Model Signatures</h1>
-<p>Knockback.js does not require Backbone.Models for attribute watching, but requires Backbone.Model-like signature.
+<p>Knockback.js does not require Backbone.Models or Backbone.ModelRefs for attribute watching, but requires only Backbone.Model-like signature.
 
 </p>
 <p>The minimal Backbone.Model signature is:

@@ -27,7 +27,7 @@
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
@@ -42,7 +42,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/wiki/Release-Notes">Release Notes</a></li>
@@ -56,7 +56,7 @@
       <header class="page">
       </header>
       <content class="page"><h1>Compatible Components: Knockback-Navigators.js</h1>
-<p>KnockbackNavigators.js provides page navigators, a pane navigator, and transition animations to help you make dynamic, single-page applications. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
+<p>Knockback-Navigators.js provides page navigators, a pane navigator, and transition animations to help you make dynamic, single-page applications. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 </p>
 <p><a href="http://kmalakoff.github.com/knockback-navigators/">Try the demo</a>
@@ -228,7 +228,7 @@ $(info.to_el).hide().fadeIn(500, state.callback);</code></pre>
 </p>
 <h2>Note on Lifecycle Management</h2>
 <h1>Auto-Releasing View Models</h1>
-<p>KnockbackNavigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:
+<p>Knockback-Navigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:
 
 </p>
 <pre><code>// binds a callback to the node that releases the view model when the node is removed using ko.removeNode
@@ -245,7 +245,7 @@ kb.applyBindings(view_model, el);
 // OR: Manually
 kb.releaseOnNodeRemove(view_model, el);</code></pre>
 <h1>Notifications</h1>
-<p>KnockbackNavigators.js provides hooks to receive notifications when an element is activated and deactivated so you can have fine-grained control (for example, to stop background page processing) when your element is detached ($(el).detach()) rather than removed (ko.removeNode(el)). It uses two conventions to provide the notifications:
+<p>Knockback-Navigators.js provides hooks to receive notifications when an element is activated and deactivated so you can have fine-grained control (for example, to stop background page processing) when your element is detached ($(el).detach()) rather than removed (ko.removeNode(el)). It uses two conventions to provide the notifications:
 
 </p>
 <pre><code>// created manually or through page_navigator.loadPaga({el: el, view_model: view_model})

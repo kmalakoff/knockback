@@ -159,18 +159,21 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
 </div>
 <div class='tags'>
 </div>
-      <h2>Instance Method Summary</h2>
+      <h2>Class Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#extend-instance'>
-        - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
+      <a href='#extend-class'>
+        + (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
       </a>
     </span>
     <span class='desc'>
       Class method for JavaScript inheritance.
     </span>
   </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
@@ -213,6 +216,60 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     </span>
   </li>
 </ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='extend-class'>
+      + (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
+    </p>
+    <div class='docstring'>
+  <p>Class method for JavaScript inheritance.</p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var MyLocalizedObservable = kb.LocalizedObservable.extend({
+   constructor: function(value, options, view_model) {
+     // the constructor does not return &#39;this&#39; but a ko.observable
+     return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+   }
+});</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>prototype_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the prototype</span>
+    </li>
+    <li>
+      <span class='name'>class_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the class</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -284,57 +341,6 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='extend-instance'>
-      - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
-    </p>
-    <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p> 
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffee'>var MyLocalizedObservable = kb.LocalizedObservable.extend({
-   constructor: function(value, options, view_model) {
-     // the constructor does not return &#39;this&#39; but a ko.observable
-     return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-   }
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>prototype_properties</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the prototype</span>
-    </li>
-    <li>
-      <span class='name'>class_properties</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the class</span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
@@ -368,7 +374,7 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 16:42:13 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

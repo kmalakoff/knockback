@@ -115,7 +115,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Base class for ViewModels for Backbone.Models. </p> <p>  @example     var ViewModel = kb.ViewModel.extend({       constructor: function(model){         kb.ViewModel.prototype.constructor.apply(this, arguments);         this.full_name = ko.computed(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);       }     });     var view_model = new ViewModel(model); </p> 
+  <p>Base class for ViewModels for Backbone.Models. </p> 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -145,18 +145,21 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
 </div>
 <div class='tags'>
 </div>
-      <h2>Instance Method Summary</h2>
+      <h2>Class Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#extend-instance'>
-        - (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
+      <a href='#extend-class'>
+        + (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
       </a>
     </span>
     <span class='desc'>
       Class method for JavaScript inheritance.
     </span>
   </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
@@ -191,7 +194,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
   <li>
     <span class='signature'>
       <a href='#model-instance'>
-        - (Backbone.Model|void) <strong>model</strong>(new_model)
+        - (void) <strong>model</strong>(new_model)
       </a>
     </span>
     <span class='desc'>
@@ -199,6 +202,72 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
     </span>
   </li>
 </ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='extend-class'>
+      + (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
+    </p>
+    <div class='docstring'>
+  <p>Class method for JavaScript inheritance.</p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var ContactViewModel = kb.ViewModel.extend({
+  constructor: function(model) {
+    kb.ViewModel.prototype.constructor.call(this, model, {internals: [&#39;email&#39;, &#39;date&#39;]});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
+    this.email = kb.defaultObservable(this._email, &#39;your.name@yourplace.com&#39;);
+    this.date = new LongDateLocalizer(this._date);
+    return this;
+  }
+});</code></pre>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var ViewModel = kb.ViewModel.extend({
+  constructor: function(model){
+    kb.ViewModel.prototype.constructor.apply(this, arguments);
+    this.full_name = ko.computed(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);
+  }
+});
+var view_model = new ViewModel(model);</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>prototype_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the prototype</span>
+    </li>
+    <li>
+      <span class='name'>class_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the class</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/ViewModel.html'>kb.ViewModel</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor returns 'this'</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -321,7 +390,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
         (<tt>ko.observable</tt>)
       </span>
       &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observableArray</span>
+      <span class='desc'>the constructor returns 'this'</span>
     </li>
   </ul>
 </div>
@@ -329,59 +398,6 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
 </div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='extend-instance'>
-      - (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
-    </p>
-    <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p> 
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffee'>var ContactViewModel = kb.ViewModel.extend({
-  constructor: function(model) {
-    kb.ViewModel.prototype.constructor.call(this, model, {internals: [&#39;email&#39;, &#39;date&#39;]});   // call super constructor: @name, @_email, and @_date created in super from the model attributes
-    this.email = kb.defaultObservable(this._email, &#39;your.name@yourplace.com&#39;);
-    this.date = new LongDateLocalizer(this._date);
-    return this;
-  }
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>prototype_properties</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the prototype</span>
-    </li>
-    <li>
-      <span class='name'>class_properties</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the class</span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'>
-        (<tt><a href='../../classes/kb/ViewModel.html'>kb.ViewModel</a></tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the constructor returns 'this'</span>
-    </li>
-  </ul>
-</div>
-  </div>
   <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
@@ -404,7 +420,10 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
   </div>
   <div class='method_details'>
     <p class='signature' id='model-instance'>
-      - (Backbone.Model|void) <strong>model</strong>(new_model)
+      - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+      <br>
+      - (void) <strong>model</strong>(new_model)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for the observed model. </p> 
@@ -420,34 +439,57 @@ view_model.model(new Backbone.Model({name: &#39;fred&#39;})); // set
   </div>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>model</span>
-      <span class='type'>
-        (<tt>Backbone.Model</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the model whose attribute to observe (can be null)</span>
-    </li>
-  </ul>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+      </p>
+      <div class='docstring'>
+  <p>Gets the model or model reference</p> 
+</div>
+<div class='tags'>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'>
-        (<tt>Backbone.Model|void</tt>)
+        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       </span>
       &mdash;
-      <span class='desc'>returns the model only if getter (no parameters)</span>
+      <span class='desc'>the model whose attributes are being observed (can be null)</span>
     </li>
   </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        - (void) <strong>model</strong>(new_model)
+      </p>
+      <div class='docstring'>
+  <p>Sets the model or model reference</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>new_model</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model whose attributes will be observed (can be null)</span>
+    </li>
+  </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 16:42:13 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1
