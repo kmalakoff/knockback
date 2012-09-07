@@ -28,7 +28,7 @@
 #   var view_model = {};
 #   kb.viewModel(model, ['name', 'date'], view_model); // observables are added to view_model
 #
-# @method #extend(prototype_properties, class_properties)
+# @method .extend(prototype_properties, class_properties)
 #   Class method for JavaScript inheritance.
 #   @param [Object] prototype_properties the properties to add to the prototype
 #   @param [Object] class_properties the properties to add to the class
@@ -42,7 +42,6 @@
 #         return this;
 #       }
 #     });
-#
 #   @example
 #     var ViewModel = kb.ViewModel.extend({
 #       constructor: function(model){
@@ -51,6 +50,7 @@
 #       }
 #     });
 #     var view_model = new ViewModel(model);
+#
 class kb.ViewModel
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
@@ -67,7 +67,7 @@ class kb.ViewModel
   # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
   # @option options [kb.Factory] factory a factory used to create view models.
   # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
-  # @return [ko.observable] the constructor does not return 'this' but a ko.observableArray
+  # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) ->
     not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or throwUnexpected(@, 'not a model')
@@ -144,8 +144,12 @@ class kb.ViewModel
 
   # Dual-purpose getter/setter for the observed model.
   #
-  # @param [Backbone.Model] model the model whose attribute to observe (can be null)
-  # @return [Backbone.Model|void] returns the model only if getter (no parameters)
+  # @overload model()
+  #   Gets the model or model reference
+  #   @return [Backbone.Model|Backbone.ModelRef] the model whose attributes are being observed (can be null)
+  # @overload model(new_model)
+  #   Sets the model or model reference
+  #   @param [Backbone.Model|Backbone.ModelRef] new_model the model whose attributes will be observed (can be null)
   #
   # @example
   #   var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
@@ -206,7 +210,11 @@ class kb.ViewModel
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), @)
     @
 
-# factory function
+# Factory function to create a kb.ViewModel.
+#
+# @mixin
+# @author Rockstar Ninja
+#
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
 kb.observables = (model, binding_info, view_model) ->
   legacyWarning('kb.observables', '0.16.1', 'Please use kb.viewModel instead')

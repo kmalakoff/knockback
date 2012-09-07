@@ -5955,6 +5955,16 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 
     kb.VERSION = '0.16.1';
 
+    kb.TYPE_UNKNOWN = 0;
+
+    kb.TYPE_SIMPLE = 1;
+
+    kb.TYPE_ARRAY = 2;
+
+    kb.TYPE_MODEL = 3;
+
+    kb.TYPE_COLLECTION = 4;
+
     kb.release = function(obj, pre_release_fn) {
       var array, item, view_model, view_models, _i, _j, _len, _len1;
       if ((!obj || (obj !== Object(obj))) || ((typeof obj === 'function') && !ko.isObservable(obj)) || obj.__kb_destroyed || ((obj instanceof Backbone.Model) || (obj instanceof Backbone.Collection))) {
@@ -6093,15 +6103,15 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
     return result;
   };
 
-  kb.TYPE_UNKNOWN = KB_TYPE_UNKNOWN = 0;
+  KB_TYPE_UNKNOWN = kb.TYPE_UNKNOWN;
 
-  kb.TYPE_SIMPLE = KB_TYPE_SIMPLE = 1;
+  KB_TYPE_SIMPLE = kb.TYPE_SIMPLE;
 
-  kb.TYPE_ARRAY = KB_TYPE_ARRAY = 2;
+  KB_TYPE_ARRAY = kb.TYPE_ARRAY;
 
-  kb.TYPE_MODEL = KB_TYPE_MODEL = 3;
+  KB_TYPE_MODEL = kb.TYPE_MODEL;
 
-  kb.TYPE_COLLECTION = KB_TYPE_COLLECTION = 4;
+  KB_TYPE_COLLECTION = kb.TYPE_COLLECTION;
 
   /*
     knockback-utils.js
@@ -7215,7 +7225,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   };
 
   kb.observables = function(model, binding_info, view_model) {
-    legacyWarning('ko.observables', '0.16.1', 'Please use kb.viewModel instead');
+    legacyWarning('kb.observables', '0.16.1', 'Please use kb.viewModel instead');
     return new kb.ViewModel(model, binding_info, view_model);
   };
 

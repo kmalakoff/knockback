@@ -113,7 +113,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>knockback.js 0.16.1 (c) 2011, 2012 Kevin Malakoff. Knockback.js is freely distributable under the MIT license. See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a> Dependencies: Knockout.js, Backbone.js, and Underscore.js. </p> 
+  <p>The &#39;kb&#39; namespace for classes, factory functions, constants, etc. Aliased to &#39;Knockback&#39; </p> 
 </div>
 <div class='tags'>
 </div>
@@ -128,9 +128,114 @@
         <dd>
           <pre><code class='coffee'>'0.16.1'</code></pre>
         </dd>
+        <dt id='TYPE_UNKNOWN-constant'>
+          TYPE_UNKNOWN
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>0</code></pre>
+        </dd>
+        <dt id='TYPE_SIMPLE-constant'>
+          TYPE_SIMPLE
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>1</code></pre>
+        </dd>
+        <dt id='TYPE_ARRAY-constant'>
+          TYPE_ARRAY
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>2</code></pre>
+        </dd>
+        <dt id='TYPE_MODEL-constant'>
+          TYPE_MODEL
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>3</code></pre>
+        </dd>
+        <dt id='TYPE_COLLECTION-constant'>
+          TYPE_COLLECTION
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>4</code></pre>
+        </dd>
       </dl>
       <h2>Class Method Summary</h2>
       <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#collectionObservable-class'>
+        + (ko.observableArray) <strong>collectionObservable</strong>(collection, options)
+      </a>
+    </span>
+    <span class='desc'>
+      Factory to create a new kb.CollectionObservable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#observable-class'>
+        + (ko.observable) <strong>observable</strong>(model, options)
+      </a>
+    </span>
+    <span class='desc'>
+      Factory to create a new kb.Observable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#viewModel-class'>
+        + (ko.observable) <strong>viewModel</strong>(model, options)
+      </a>
+    </span>
+    <span class='desc'>
+      Factory to create a new kb.ViewModel.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#defaultObservable-class'>
+        + (ko.observable) <strong>defaultObservable</strong>(target_observable, default_value)
+      </a>
+    </span>
+    <span class='desc'>
+      Factory to create a new kb.DefaultObservable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#formattedObservable-class'>
+        + (ko.observable) <strong>formattedObservable</strong>(format, args)
+      </a>
+    </span>
+    <span class='desc'>
+      Factory to create a new kb.FormattedObservable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#localizedObservable-class'>
+        + (ko.observable) <strong>localizedObservable</strong>(value, options)
+      </a>
+    </span>
+    <span class='desc'>
+      Factory to create a new kb.LocalizedObservable.
+    </span>
+  </li>
   <li>
     <span class='signature'>
       <a href='#release-class'>
@@ -138,7 +243,7 @@
       </a>
     </span>
     <span class='desc'>
-      Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
+      
     </span>
   </li>
   <li>
@@ -185,46 +290,244 @@
       <h2>Class Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='release-class'>
-      + (void) <strong>release</strong>(obj, pre_release_fn)
+    <p class='signature' id='collectionObservable-class'>
+      + (ko.observableArray) <strong>collectionObservable</strong>(collection, options)
     </p>
     <div class='docstring'>
-  <p>Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose(). </p> 
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffee'>var view_model = kb.viewModel(model);
-kb.utils.release(view_model); view_model = null;</code></pre>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffee'>var todos = kb.collectionObservable(collection);
-kb.utils.release(todos); todos = null;
-</code></pre>
-  </div>
+  <p>Factory to create a new kb.CollectionObservable. See <a href='../classes/kb/CollectionObservable.html#constructor-instance'>kb.CollectionObservable#constructor</a> for information on options</p> 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>obj</span>
+      <span class='name'>collection</span>
+      <span class='type'>
+        (<tt>Backbone.Collection</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the collection to observe (can be null)</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the create options</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observableArray</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observableArray</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='observable-class'>
+      + (ko.observable) <strong>observable</strong>(model, options)
+    </p>
+    <div class='docstring'>
+  <p>Factory to create a new kb.Observable. See <a href='../classes/kb/Observable.html#constructor-instance'>kb.Observable#constructor</a> for information on options</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>model</span>
+      <span class='type'>
+        (<tt>Backbone.Model</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model to observe (can be null)</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>String|Array|Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the create options. String is a single attribute name, Array is an array of attribute names.</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='viewModel-class'>
+      + (ko.observable) <strong>viewModel</strong>(model, options)
+    </p>
+    <div class='docstring'>
+  <p>Factory to create a new kb.ViewModel. See <a href='../classes/kb/ViewModel.html#constructor-instance'>kb.ViewModel#constructor</a> for information on options</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>model</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model to observe (can be null)</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the create options</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor returns 'this'</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='defaultObservable-class'>
+      + (ko.observable) <strong>defaultObservable</strong>(target_observable, default_value)
+    </p>
+    <div class='docstring'>
+  <p>Factory to create a new kb.DefaultObservable. See <a href='../classes/kb/DefaultObservable.html#constructor-instance'>kb.DefaultObservable#constructor</a> for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>target_observable</span>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the observable to check for null, undefined, or the empty string</span>
+    </li>
+    <li>
+      <span class='name'>default_value</span>
       <span class='type'>
         (<tt>Any</tt>)
       </span>
       &mdash;
-      <span class='desc'>the object to release and also release its keys</span>
-    </li>
-    <li>
-      <span class='name'>pre_release_fn</span>
-      <span class='type'>
-        (<tt>Function</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>an optional function to clear the key on the object before the key's value is released. Used by kb.releaseKeys.</span>
+      <span class='desc'>the default value. Can be a value, string or ko.observable</span>
     </li>
   </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='formattedObservable-class'>
+      + (ko.observable) <strong>formattedObservable</strong>(format, args)
+    </p>
+    <div class='docstring'>
+  <p>Factory to create a new kb.FormattedObservable. See <a href='../classes/kb/FormattedObservable.html#constructor-instance'>kb.FormattedObservable#constructor</a> for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>format</span>
+      <span class='type'>
+        (<tt>String|ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the format string. Format: "{0} and {1}" where {0} and {1} would be synchronized with the arguments (eg. "Bob and Carol" where {0} is Bob and {1} is Carol)</span>
+    </li>
+    <li>
+      <span class='name'>args</span>
+      <span class='type'>
+        (<tt>Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>arguments to be passed to the kb.LocaleManager's get() method</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='localizedObservable-class'>
+      + (ko.observable) <strong>localizedObservable</strong>(value, options)
+    </p>
+    <div class='docstring'>
+  <p>Factory to create a new kb.LocalizedObservable. See <a href='../classes/kb/LocalizedObservable.html#constructor-instance'>kb.LocalizedObservable#constructor</a> for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>value</span>
+      <span class='type'>
+        (<tt>Data|ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the value to localize</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the create options</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='release-class'>
+      + (void) <strong>release</strong>(obj, pre_release_fn)
+    </p>
+    <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -305,7 +608,7 @@ ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 14:16:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

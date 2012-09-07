@@ -58,8 +58,14 @@ class kb.utils
   #   * [kb.LocalizedObservable]('classes/kb/LocalizedObservable.html')
   #   * [kb.TriggeredObservable]('classes/kb/TriggeredObservable.html')
   #
-  # @param [Instance] instance the instance owning the ko.observable.
-  # @param [ko.observable] observable if provided, sets the observable; otherwise, gets the observable.
+  # @overload wrappedObservable(instance)
+  #   Gets the observable from an object
+  #   @param [Any] instance the owner
+  #   @return [ko.observable|ko.observableArray] the observable
+  # @overload wrappedObservable(instance, observable)
+  #   Sets the observable on an object
+  #   @param [Any] instance the owner
+  #   @param [ko.observable|ko.observableArray] observable the observable
   #
   # @example
   #   var ShortDateLocalizer = kb.LocalizedObservable.extend({
@@ -71,10 +77,16 @@ class kb.utils
   @wrappedObservable = (obj, value)           -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'observable'))
 
   # Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.
-  #
   # @note this is almost the same as {kb.utils.wrappedModel} except that if the Model doesn't exist, it returns null.
-  # @param [Object|kb.ViewModel|kb.CollectionObservable] owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
-  # @param [Backbone.Model|Backbone.Collection] model/collection if provided, sets the Model/Collection; otherwise, gets the Model/Collection.
+  #
+  # @overload wrappedObject(obj)
+  #   Gets the observable from an object
+  #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
+  #   @return [Backbone.Model|Backbone.Collection] the model/collection
+  # @overload wrappedObject(obj, value)
+  #   Sets the observable on an object
+  #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
+  #   @param [Backbone.Model|Backbone.Collection] value the model/collection
   #
   # @example
   #   var model = kb.utils.wrappedObject(view_model);
@@ -82,10 +94,16 @@ class kb.utils
   @wrappedObject = (obj, value)               -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
 
   # Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
+  # @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
   #
-  # @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting).
-  # @param [Object|kb.ViewModel] view_model the ViewModel owning the Backbone.Model.
-  # @param [Backbone.Model] model if provided, sets the Model; otherwise, gets the Model or ViewModel itself if there is no Model.
+  # @overload wrappedModel(view_model)
+  #   Gets the model from a ViewModel
+  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Backbone.Model.
+  #   @return [Backbone.Model|ViewModel] the Model or ViewModel itself if there is no Model
+  # @overload wrappedModel(view_model, model)
+  #   Sets the observable on an object
+  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Backbone.Model.
+  #   @param [Backbone.Model] model the Model
   @wrappedModel = (obj, value) ->
     # get
     if (arguments.length is 1)
@@ -96,8 +114,14 @@ class kb.utils
 
   # Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
   #
-  # @param [Any] owner the kb.Store owner.
-  # @param [kb.Store] store if provided, sets the store; otherwise, gets the store.
+  # @overload wrappedStore(obj)
+  #   Gets the store from an object
+  #   @param [Any] obj the owner
+  #   @return [kb.Store] the store
+  # @overload wrappedStore(obj, store)
+  #   Sets the store on an object
+  #   @param [Any] obj the owner
+  #   @param [kb.Store] store the store
   #
   # @example
   #   var co = kb.collectionObservable(new Backbone.Collection());
@@ -111,14 +135,26 @@ class kb.utils
 
   # Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner.
   #
-  # @param [Any] owner the kb.Factory owner.
-  # @param [kb.Factory] factory if provided, sets the factory; otherwise, gets the factory.
+  # @overload wrappedFactory(obj)
+  #   Gets the factory from an object
+  #   @param [Any] obj the owner
+  #   @return [kb.Factory] the factory
+  # @overload wrappedFactory(obj, factory)
+  #   Sets the factory on an object
+  #   @param [Any] obj the owner
+  #   @param [kb.Factory] factory the factory
   @wrappedFactory = (obj, value)              -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
 
   # Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.
   #
-  # @param [Any] owner the kb.ModelWatcher owner.
-  # @param [kb.ModelWatcher] model_watcher if provided, sets the model watcher; otherwise, gets the model watcher.
+  # @overload wrappedModelWatcher(obj)
+  #   Gets the model_watcher from an object
+  #   @param [Any] obj the owner
+  #   @return [kb.ModelWatcher] the model_watcher
+  # @overload wrappedModelWatcher(obj, model_watcher)
+  #   Sets the model_watcher on an object
+  #   @param [Any] obj the owner
+  #   @param [kb.ModelWatcher] model_watcher the model_watcher
   @wrappedModelWatcher = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher'))
 
   # @private
@@ -142,7 +178,7 @@ class kb.utils
 
   # Retrieves the value stored in a ko.observable.
   #
-  # @see kb.Observable.valueType
+  # @see kb.Observable valueType
   #
   # @example
   #   var view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});

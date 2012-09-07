@@ -19,7 +19,7 @@
 #    var current_collection = todos.collection(); // get
 #    todos.collection(new Backbone.Collection([{name: 'name3'}, {name: 'name4'}])); // set
 #
-# @method #extend(prototype_properties, class_properties)
+# @method .extend(prototype_properties, class_properties)
 #   Class method for JavaScript inheritance.
 #   @param [Object] prototype_properties the properties to add to the prototype
 #   @param [Object] class_properties the properties to add to the class
@@ -155,8 +155,14 @@ class kb.CollectionObservable
 
   # Dual-purpose getter/setter for the observed collection.
   #
-  # @param [Backbone.Collection] collection the collection to observe (can be null)
-  # @return [Backbone.Collection|void] returns the collection only if getter (no parameters)
+  # @overload collection()
+  #   Gets the collection from a kb.CollectionObservable
+  #   @return [Backbone.Collection] the collection
+  # @overload collection(collection, options)
+  #   Sets the collection on a kb.CollectionObservable
+  #   @param [Backbone.Collection] collection the collection
+  #   @param [Object] options
+  #   @option options [Boolean] silent flag for skipping notifications.
   collection: (collection, options) ->
     observable = kb.utils.wrappedObservable(@)
     previous_collection = kb.utils.wrappedObject(observable)
@@ -182,13 +188,19 @@ class kb.CollectionObservable
 
     return collection
 
-  # Dual-purpose getter/setter for the sorted index function.
+  # Dual-purpose getter/setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
-  # @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
-  # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
-  # @param [Object] options the options.
-  # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
-  # @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  # @overload sortedIndex()
+  #   Gets the sorted index function from a kb.CollectionObservable
+  #   @return [Function] a function that returns an index where to insert the model. Signature: function(models, model)
+  # @overload sortedIndex(sorted_index, sort_attribute, options)
+  #   Sets the sorted index function on a kb.CollectionObservable
+  #   @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
+  #   @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
+  #   @param [Object] options the options.
+  #   @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  #   @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  #
   # @example
   #    // change the sorting function
   #    collection_observable.sortedIndex(
@@ -219,13 +231,19 @@ class kb.CollectionObservable
     if options['defer'] then _.defer(_resync) else _resync()
     @
 
-  # Dual-purpose getter/setter for the sorted index function.
+  # Dual-purpose getter/setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
-  # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
-  # @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
-  # @param [Object] options the options.
-  # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
-  # @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  # @overload sortAttribute()
+  #   Gets the sorted index function from a kb.CollectionObservable
+  #   @return [Function] a function that returns an index where to insert the model. Signature: function(models, model)
+  # @overload sortAttribute(sort_attribute, sorted_index, options)
+  #   Sets the sorted attribue name on a kb.CollectionObservable
+  #   @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
+  #   @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
+  #   @param [Object] options the options.
+  #   @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  #   @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  #
   # @example
   #    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
   #    // in order of Zanadu then Alex

@@ -183,7 +183,7 @@ name.setToDefault(); // name is (none)</code></pre>
   <li>
     <span class='signature'>
       <a href='#model-instance'>
-        - (Backbone.Model|void) <strong>model</strong>(new_model)
+        - (void) <strong>model</strong>(new_model)
       </a>
     </span>
     <span class='desc'>
@@ -371,40 +371,66 @@ name.setToDefault(); // name is (none)</code></pre>
   </div>
   <div class='method_details'>
     <p class='signature' id='model-instance'>
-      - (Backbone.Model|void) <strong>model</strong>(new_model)
+      - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+      <br>
+      - (void) <strong>model</strong>(new_model)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for the observed model. </p> 
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>model</span>
-      <span class='type'>
-        (<tt>Backbone.Model</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the model whose attribute to observe (can be null)</span>
-    </li>
-  </ul>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+      </p>
+      <div class='docstring'>
+  <p>Gets the model or model reference</p> 
+</div>
+<div class='tags'>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'>
-        (<tt>Backbone.Model|void</tt>)
+        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       </span>
       &mdash;
-      <span class='desc'>returns the model only if getter (no parameters)</span>
+      <span class='desc'>the model whose attribute by key is being observed (can be null)</span>
     </li>
   </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        - (void) <strong>model</strong>(new_model)
+      </p>
+      <div class='docstring'>
+  <p>Sets the model or model reference </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>new_model</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model whose attribute by key will be observed (can be null)</span>
+    </li>
+  </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 14:16:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

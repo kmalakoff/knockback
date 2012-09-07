@@ -142,8 +142,12 @@ class kb.Observable
 
   # Dual-purpose getter/setter for the observed model.
   #
-  # @param [Backbone.Model] model the model whose attribute to observe (can be null)
-  # @return [Backbone.Model|void] returns the model only if getter (no parameters)
+  # @overload model()
+  #   Gets the model or model reference
+  #   @return [Backbone.Model|Backbone.ModelRef] the model whose attribute by key is being observed (can be null)
+  # @overload model(new_model)
+  #   Sets the model or model reference
+  #   @param [Backbone.Model|Backbone.ModelRef] new_model the model whose attribute by key will be observed (can be null)
   model: (new_model) ->
     # get or no change
     return @m if (arguments.length == 0) or (@m is new_model)

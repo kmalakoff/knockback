@@ -135,18 +135,21 @@ var view_model = {
 </div>
 <div class='tags'>
 </div>
-      <h2>Instance Method Summary</h2>
+      <h2>Class Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#extend-instance'>
-        - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
+      <a href='#extend-class'>
+        + (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
       </a>
     </span>
     <span class='desc'>
       Class method for JavaScript inheritance.
     </span>
   </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
@@ -181,7 +184,7 @@ var view_model = {
   <li>
     <span class='signature'>
       <a href='#collection-instance'>
-        - (Backbone.Collection|void) <strong>collection</strong>(collection, options)
+        - (void) <strong>collection</strong>(collection, options)
       </a>
     </span>
     <span class='desc'>
@@ -195,7 +198,7 @@ var view_model = {
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter for the sorted index function.
+      Dual-purpose getter/setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
     </span>
   </li>
   <li>
@@ -205,7 +208,7 @@ var view_model = {
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter for the sorted index function.
+      Dual-purpose getter/setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
     </span>
   </li>
   <li>
@@ -229,6 +232,62 @@ var view_model = {
     </span>
   </li>
 </ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='extend-class'>
+      + (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
+    </p>
+    <div class='docstring'>
+  <p>Class method for JavaScript inheritance.</p> 
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var MyCollectionObservable = kb.CollectionObservable.extend({
+   constructor: function(collection, options) {
+     // the constructor does not return &#39;this&#39; but a ko.observableArray
+     return kb.CollectionObservable.prototype.constructor.call(this, collection, {
+       view_model: MyViewModel,
+       options: options
+   });
+});</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>prototype_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the prototype</span>
+    </li>
+    <li>
+      <span class='name'>class_properties</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the class</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the constructor does not return 'this' but a ko.observableArray</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -372,59 +431,6 @@ var view_model = {
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='extend-instance'>
-      - (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
-    </p>
-    <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p> 
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffee'>var MyCollectionObservable = kb.CollectionObservable.extend({
-   constructor: function(collection, options) {
-     // the constructor does not return &#39;this&#39; but a ko.observableArray
-     return kb.CollectionObservable.prototype.constructor.call(this, collection, {
-       view_model: MyViewModel,
-       options: options
-   });
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>prototype_properties</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the prototype</span>
-    </li>
-    <li>
-      <span class='name'>class_properties</span>
-      <span class='type'>
-        (<tt>Object</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the class</span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observableArray</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
@@ -457,10 +463,43 @@ var available = kb.collectionObservable(available_collection, available_collecti
   </div>
   <div class='method_details'>
     <p class='signature' id='collection-instance'>
-      - (Backbone.Collection|void) <strong>collection</strong>(collection, options)
+      - (Backbone.Collection) <strong>collection</strong>()
+      <br>
+      - (void) <strong>collection</strong>(collection, options)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for the observed collection. </p> 
+</div>
+<div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        - (Backbone.Collection) <strong>collection</strong>()
+      </p>
+      <div class='docstring'>
+  <p>Gets the collection from a kb.CollectionObservable</p> 
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Backbone.Collection</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the collection</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        - (void) <strong>collection</strong>(collection, options)
+      </p>
+      <div class='docstring'>
+  <p>Sets the collection on a kb.CollectionObservable </p> 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -471,27 +510,43 @@ var available = kb.collectionObservable(available_collection, available_collecti
         (<tt>Backbone.Collection</tt>)
       </span>
       &mdash;
-      <span class='desc'>the collection to observe (can be null)</span>
+      <span class='desc'>the collection</span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
     </li>
   </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
     <li>
+      <span class='name'>silent</span>
       <span class='type'>
-        (<tt>Backbone.Collection|void</tt>)
+        (<tt>Boolean</tt>)
       </span>
       &mdash;
-      <span class='desc'>returns the collection only if getter (no parameters)</span>
+      <span class='desc'>flag for skipping notifications.</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='sortedIndex-instance'>
+      - (Function) <strong>sortedIndex</strong>()
+      <br>
       - (void) <strong>sortedIndex</strong>(sorted_index, sort_attribute, options)
+      <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the sorted index function. </p> 
+  <p>Dual-purpose getter/setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable. </p> 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -507,6 +562,36 @@ var available = kb.collectionObservable(available_collection, available_collecti
   </div>
 </div>
 <div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        - (Function) <strong>sortedIndex</strong>()
+      </p>
+      <div class='docstring'>
+  <p>Gets the sorted index function from a kb.CollectionObservable</p> 
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a function that returns an index where to insert the model. Signature: function(models, model)</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        - (void) <strong>sortedIndex</strong>(sorted_index, sort_attribute, options)
+      </p>
+      <div class='docstring'>
+  <p>Sets the sorted index function on a kb.CollectionObservable</p> 
+</div>
+<div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
@@ -557,13 +642,19 @@ var available = kb.collectionObservable(available_collection, available_collecti
     </li>
   </ul>
 </div>
+    </div>
+  </div>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='sortAttribute-instance'>
+      - (Function) <strong>sortAttribute</strong>()
+      <br>
       - (void) <strong>sortAttribute</strong>(sort_attribute, sorted_index, options)
+      <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the sorted index function. </p> 
+  <p>Dual-purpose getter/setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable. </p> 
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -575,6 +666,36 @@ var available = kb.collectionObservable(available_collection, available_collecti
  // in order of Alex then Zanadu
 </code></pre>
   </div>
+</div>
+<div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        - (Function) <strong>sortAttribute</strong>()
+      </p>
+      <div class='docstring'>
+  <p>Gets the sorted index function from a kb.CollectionObservable</p> 
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a function that returns an index where to insert the model. Signature: function(models, model)</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        - (void) <strong>sortAttribute</strong>(sort_attribute, sorted_index, options)
+      </p>
+      <div class='docstring'>
+  <p>Sets the sorted attribue name on a kb.CollectionObservable</p> 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -626,6 +747,9 @@ var available = kb.collectionObservable(available_collection, available_collecti
       <span class='desc'>do not fire Backbone events nor trigger ko.subscriptions.</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
@@ -663,7 +787,7 @@ todos2.hasViewModels();     // true
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 14:16:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

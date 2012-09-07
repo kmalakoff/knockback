@@ -7,9 +7,63 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 ###
 
+# The 'kb' namespace for classes, factory functions, constants, etc. Aliased to 'Knockback'
+#
+# @method .collectionObservable(collection, options)
+#   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
+#   @param [Backbone.Collection] collection the collection to observe (can be null)
+#   @param [Object] options the create options
+#   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
+#
+# @method .observable(model, options, view_model)
+#   Factory to create a new kb.Observable. See {kb.Observable#constructor} for information on options
+#   @param [Backbone.Model] model the model to observe (can be null)
+#   @param [String|Array|Object] options the create options. String is a single attribute name, Array is an array of attribute names.
+#   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+#
+# @method .viewModel(model, options, view_model)
+#   Factory to create a new kb.ViewModel. See {kb.ViewModel#constructor} for information on options
+#   @param [Backbone.Model|Backbone.ModelRef] model the model to observe (can be null)
+#   @param [Object] options the create options
+#   @return [ko.observable] the constructor returns 'this'
+#
+# @method .defaultObservable(target, default_value)
+#   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
+#   @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
+#   @param [Any] default_value the default value. Can be a value, string or ko.observable
+#   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+#
+# @method .formattedObservable(format, arg1, arg2, ...)
+#   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
+#   @param [String|ko.observable] format the format string. Format: "{0} and {1}" where {0} and {1} would be synchronized with the arguments (eg. "Bob and Carol" where {0} is Bob and {1} is Carol)
+#   @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
+#   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+#
+# @method .localizedObservable(value, options, view_model)
+#   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
+#   @param [Data|ko.observable] value the value to localize
+#   @param [Object] options the create options
+#   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+#
 class kb
 
-  @VERSION = '0.16.1'
+  # Knockback library semantic version
+  @VERSION: '0.16.1'
+
+  ####################################
+  # OBSERVABLE STORAGE TYPES
+  ####################################
+
+  # Stored value type is not known like null/undefined (could be observed as a Backbone.Model or a Backbone.Collection or a simple type)
+  @TYPE_UNKNOWN: 0
+  # Stored value type is simple like a String or Number -> observable type: ko.observable
+  @TYPE_SIMPLE: 1
+  # Stored value type is an Array -> observable type: ko.observableArray
+  @TYPE_ARRAY: 2
+  # Stored value type is a Backbone.Model -> observable type: ViewModel
+  @TYPE_MODEL: 3
+  # Stored value type is a Backbone.Collection -> observable type: kb.CollectionObservable
+  @TYPE_COLLECTION: 4
 
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   # @param [Any] obj the object to release and also release its keys
@@ -150,9 +204,9 @@ collapseOptions = (options) ->
 # OBSERVABLE STORAGE TYPES
 ####################################
 
-# @constant
-kb.TYPE_UNKNOWN = KB_TYPE_UNKNOWN = 0
-kb.TYPE_SIMPLE = KB_TYPE_SIMPLE = 1
-kb.TYPE_ARRAY = KB_TYPE_ARRAY = 2
-kb.TYPE_MODEL = KB_TYPE_MODEL = 3
-kb.TYPE_COLLECTION = KB_TYPE_COLLECTION = 4
+# constants optimized for internal minimization
+KB_TYPE_UNKNOWN = kb.TYPE_UNKNOWN
+KB_TYPE_SIMPLE = kb.TYPE_SIMPLE
+KB_TYPE_ARRAY = kb.TYPE_ARRAY
+KB_TYPE_MODEL = kb.TYPE_MODEL
+KB_TYPE_COLLECTION = kb.TYPE_COLLECTION

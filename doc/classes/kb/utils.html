@@ -258,7 +258,10 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='wrappedObservable-class'>
-      + (void) <strong>wrappedObservable</strong>(obj, value)
+      + (ko.observable|ko.observableArray) <strong>wrappedObservable</strong>(instance)
+      <br>
+      + (void) <strong>wrappedObservable</strong>(instance, observable)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of &#39;this&#39;. Relevant for: </p> <ul> <li><a href="&#39;classes/kb/CollectionObservable.html&#39;">kb.CollectionObservable</a></li> <li><a href="&#39;classes/kb/Observable.html&#39;">kb.Observable</a></li> <li><a href="&#39;classes/kb/DefaultObservable.html&#39;">kb.DefaultObservable</a></li> <li><a href="&#39;classes/kb/FormattedObservable.html&#39;">kb.FormattedObservable</a></li> <li><a href="&#39;classes/kb/LocalizedObservable.html&#39;">kb.LocalizedObservable</a></li> <li><a href="&#39;classes/kb/TriggeredObservable.html&#39;">kb.TriggeredObservable</a></li> </ul> 
@@ -277,30 +280,77 @@
   </div>
 </div>
 <div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        + (ko.observable|ko.observableArray) <strong>wrappedObservable</strong>(instance)
+      </p>
+      <div class='docstring'>
+  <p>Gets the observable from an object</p> 
+</div>
+<div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
       <span class='name'>instance</span>
       <span class='type'>
-        (<tt>Instance</tt>)
+        (<tt>Any</tt>)
       </span>
       &mdash;
-      <span class='desc'>the instance owning the ko.observable.</span>
+      <span class='desc'>the owner</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>ko.observable|ko.observableArray</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the observable</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        + (void) <strong>wrappedObservable</strong>(instance, observable)
+      </p>
+      <div class='docstring'>
+  <p>Sets the observable on an object</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>instance</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the owner</span>
     </li>
     <li>
       <span class='name'>observable</span>
       <span class='type'>
-        (<tt>ko.observable</tt>)
+        (<tt>ko.observable|ko.observableArray</tt>)
       </span>
       &mdash;
-      <span class='desc'>if provided, sets the observable; otherwise, gets the observable.</span>
+      <span class='desc'>the observable</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedObject-class'>
+      + (Backbone.Model|Backbone.Collection) <strong>wrappedObject</strong>(obj)
+      <br>
       + (void) <strong>wrappedObject</strong>(obj, value)
+      <br>
     </p>
     <div class='docstring'>
   <div class='note'>
@@ -319,37 +369,94 @@ var collection = kb.utils.wrappedObject(collection_observable);
   </div>
 </div>
 <div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        + (Backbone.Model|Backbone.Collection) <strong>wrappedObject</strong>(obj)
+      </p>
+      <div class='docstring'>
+  <p>Gets the observable from an object</p> 
+</div>
+<div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>owner</span>
+      <span class='name'>obj</span>
       <span class='type'>
         (<tt>Object|kb.ViewModel|kb.CollectionObservable</tt>)
       </span>
       &mdash;
-      <span class='desc'>the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.</span>
+      <span class='desc'>owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.</span>
     </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
     <li>
-      <span class='name'>model/collection</span>
       <span class='type'>
         (<tt>Backbone.Model|Backbone.Collection</tt>)
       </span>
       &mdash;
-      <span class='desc'>if provided, sets the Model/Collection; otherwise, gets the Model/Collection.</span>
+      <span class='desc'>the model/collection</span>
     </li>
   </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        + (void) <strong>wrappedObject</strong>(obj, value)
+      </p>
+      <div class='docstring'>
+  <p>Sets the observable on an object</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Object|kb.ViewModel|kb.CollectionObservable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.</span>
+    </li>
+    <li>
+      <span class='name'>value</span>
+      <span class='type'>
+        (<tt>Backbone.Model|Backbone.Collection</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model/collection</span>
+    </li>
+  </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedModel-class'>
-      + (void) <strong>wrappedModel</strong>(obj, value)
+      + (Backbone.Model|ViewModel) <strong>wrappedModel</strong>(view_model)
+      <br>
+      + (void) <strong>wrappedModel</strong>(view_model, model)
+      <br>
     </p>
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    this is almost the same as <a href='../../classes/kb/utils.html#wrappedObject-class'>kb.utils.wrappedObject</a> except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting).
+    this is almost the same as <a href='../../classes/kb/utils.html#wrappedObject-class'>kb.utils.wrappedObject</a> except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
   </div>
   <p>Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel. </p> 
+</div>
+<div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        + (Backbone.Model|ViewModel) <strong>wrappedModel</strong>(view_model)
+      </p>
+      <div class='docstring'>
+  <p>Gets the model from a ViewModel</p> 
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -360,7 +467,38 @@ var collection = kb.utils.wrappedObject(collection_observable);
         (<tt>Object|kb.ViewModel</tt>)
       </span>
       &mdash;
-      <span class='desc'>the ViewModel owning the Backbone.Model.</span>
+      <span class='desc'>the owning ViewModel for the Backbone.Model.</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt>Backbone.Model|ViewModel</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the Model or ViewModel itself if there is no Model</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        + (void) <strong>wrappedModel</strong>(view_model, model)
+      </p>
+      <div class='docstring'>
+  <p>Sets the observable on an object </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>view_model</span>
+      <span class='type'>
+        (<tt>Object|kb.ViewModel</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the owning ViewModel for the Backbone.Model.</span>
     </li>
     <li>
       <span class='name'>model</span>
@@ -368,14 +506,20 @@ var collection = kb.utils.wrappedObject(collection_observable);
         (<tt>Backbone.Model</tt>)
       </span>
       &mdash;
-      <span class='desc'>if provided, sets the Model; otherwise, gets the Model or ViewModel itself if there is no Model.</span>
+      <span class='desc'>the Model</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedStore-class'>
-      + (void) <strong>wrappedStore</strong>(obj, value)
+      + (kb.Store) <strong>wrappedStore</strong>(obj)
+      <br>
+      + (void) <strong>wrappedStore</strong>(obj, store)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner. </p> 
@@ -392,15 +536,56 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   </div>
 </div>
 <div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        + (kb.Store) <strong>wrappedStore</strong>(obj)
+      </p>
+      <div class='docstring'>
+  <p>Gets the store from an object</p> 
+</div>
+<div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>owner</span>
+      <span class='name'>obj</span>
       <span class='type'>
         (<tt>Any</tt>)
       </span>
       &mdash;
-      <span class='desc'>the kb.Store owner.</span>
+      <span class='desc'>the owner</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the store</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        + (void) <strong>wrappedStore</strong>(obj, store)
+      </p>
+      <div class='docstring'>
+  <p>Sets the store on an object</p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the owner</span>
     </li>
     <li>
       <span class='name'>store</span>
@@ -408,28 +593,75 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>if provided, sets the store; otherwise, gets the store.</span>
+      <span class='desc'>the store</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedFactory-class'>
-      + (void) <strong>wrappedFactory</strong>(obj, value)
+      + (kb.Factory) <strong>wrappedFactory</strong>(obj)
+      <br>
+      + (void) <strong>wrappedFactory</strong>(obj, factory)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner. </p> 
 </div>
 <div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        + (kb.Factory) <strong>wrappedFactory</strong>(obj)
+      </p>
+      <div class='docstring'>
+  <p>Gets the factory from an object</p> 
+</div>
+<div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>owner</span>
+      <span class='name'>obj</span>
       <span class='type'>
         (<tt>Any</tt>)
       </span>
       &mdash;
-      <span class='desc'>the kb.Factory owner.</span>
+      <span class='desc'>the owner</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the factory</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        + (void) <strong>wrappedFactory</strong>(obj, factory)
+      </p>
+      <div class='docstring'>
+  <p>Sets the factory on an object </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the owner</span>
     </li>
     <li>
       <span class='name'>factory</span>
@@ -437,28 +669,75 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>if provided, sets the factory; otherwise, gets the factory.</span>
+      <span class='desc'>the factory</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedModelWatcher-class'>
-      + (void) <strong>wrappedModelWatcher</strong>(obj, value)
+      + (kb.ModelWatcher) <strong>wrappedModelWatcher</strong>(obj)
+      <br>
+      + (void) <strong>wrappedModelWatcher</strong>(obj, model_watcher)
+      <br>
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner. </p> 
 </div>
 <div class='tags'>
+  <div class='overloads'>
+    <h3>Overloads:</h3>
+    <div class='overload'>
+      <p class='signature'>
+        + (kb.ModelWatcher) <strong>wrappedModelWatcher</strong>(obj)
+      </p>
+      <div class='docstring'>
+  <p>Gets the model_watcher from an object</p> 
+</div>
+<div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>owner</span>
+      <span class='name'>obj</span>
       <span class='type'>
         (<tt>Any</tt>)
       </span>
       &mdash;
-      <span class='desc'>the kb.ModelWatcher owner.</span>
+      <span class='desc'>the owner</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'>
+        (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the model_watcher</span>
+    </li>
+  </ul>
+</div>
+    </div>
+    <div class='overload'>
+      <p class='signature'>
+        + (void) <strong>wrappedModelWatcher</strong>(obj, model_watcher)
+      </p>
+      <div class='docstring'>
+  <p>Sets the model_watcher on an object </p> 
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the owner</span>
     </li>
     <li>
       <span class='name'>model_watcher</span>
@@ -466,9 +745,12 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>if provided, sets the model watcher; otherwise, gets the model watcher.</span>
+      <span class='desc'>the model_watcher</span>
     </li>
   </ul>
+</div>
+    </div>
+  </div>
 </div>
   </div>
   <div class='method_details'>
@@ -502,7 +784,7 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   <h3>See also:</h3>
   <ul class='see'>
     <li>
-      kb.Observable.valueType
+      <a href='../../classes/kb/Observable.html'>valueType</a>
     </li>
   </ul>
 </div>
@@ -581,7 +863,7 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
     </div>
     <div id='footer'>
   Generated on
-  Thu Sep 06 2012 20:32:43 GMT+0900 (JST)
+  Fri Sep 07 2012 14:16:37 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

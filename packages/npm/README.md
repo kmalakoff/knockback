@@ -4,34 +4,55 @@
 
 Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
-### Website: [kmalakoff.github.com/knockback][1]
+These resources can help you get started:
 
-You can get the library here:
+* [Knockback.js Website](http://kmalakoff.github.com/knockback/)
 
-* [Development version][2]
-* [Production version][3]
+* [API Docs](http://kmalakoff.github.com/knockback/doc/index.html)
 
-**NOTE: there are breaking changes in 0.16.+** Please see the [release notes](https://github.com/kmalakoff/knockback/wiki/Release-Notes) for details.
+* [Tutorials](http://kmalakoff.github.com/knockback/tutorials_introduction.html)
 
-### Dependencies
+* [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos/)
 
-* [Backbone.js][4]
-* [Underscore.js][5]
-* [Knockout.js][6]
+* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) (***new!***): demonstrates best practices when using Knockback.js including page routing and lifecycle management.
+
+* [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators) (***new!***): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 
-### Compatible Components
+#Download Latest (0.16.1):
+
+Please see the [release notes](https://github.com/kmalakoff/knockback/wiki/Release-Notes) for upgrade pointers.
+
+###Full
+
+Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+
+* [Full Library (Development), 69 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js)
+* [Full Library (Production), 32 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js)
+* [Full Stack (Development), 330 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.js)
+* [Full Stack (Production, 102 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.min.js)
+
+###Core
+
+Removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+
+* [Core Library (Development), 58 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.js)
+* [Core Library (Production), 27 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.min.js)
+* [Core Stack (Development), 319 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.js)
+* [Core Stack (Production), 98 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.min.js)
+
+###Dependencies
+
+* [Backbone.js](http://backbonejs.org/)
+* [Underscore.js](http://underscorejs.org/)
+* [Knockout.js](http://knockoutjs.com/)
+
+###Compatible Components
 
 * [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/) - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.
 * [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
-* (***new!***) [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
+* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) (***new!***) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
 * [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
-
-###Demos and Documentation
-
-For comprehensive tutorials, take a look at the website: http://kmalakoff.github.com/knockback/
-
-Please try the [TodoMVC App](http://kmalakoff.github.com/knockback-todos/) and check out the (***new!***) [Knockback.js Reference App](http://kmalakoff.github.com/knockback-reference-app/) for some best practices when using Knockback.js.
 
 
 Why Write Knockback.js?
@@ -124,10 +145,3 @@ Building, Running and Testing the library
 ###Commands:
 
 Look at: https://github.com/kmalakoff/easy-bake
-
-[1]: http://kmalakoff.github.com/knockback/
-[2]: https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js
-[3]: https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js
-[4]: http://backbonejs.org/
-[5]: http://underscorejs.org/
-[6]: http://knockoutjs.com/

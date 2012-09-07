@@ -99,6 +99,9 @@ module.exports =
   publishing:
     _build:
       commands: [
+        # create docs
+        'codo src'
+
         # knockback dependencies
         'cp -v underscore vendor/underscore.js'
         'cp -v underscore/underscore-min.js vendor/underscore.min.js'

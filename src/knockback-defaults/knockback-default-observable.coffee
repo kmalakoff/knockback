@@ -12,7 +12,7 @@
 #   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
 class kb.DefaultObservable
 
-  # Used to create a new kb.CollectionObservable.
+  # Used to create a new kb.DefaultObservable.
   #
   # @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
   # @param [Any] default_value the default value. Can be a value, string or ko.observable

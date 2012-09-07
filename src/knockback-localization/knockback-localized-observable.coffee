@@ -40,7 +40,7 @@
 #   };
 #   var view_model = new ViewModel(new Backbone.Model({date: new Date()}));
 #
-# @method #extend(prototype_properties, class_properties)
+# @method .extend(prototype_properties, class_properties)
 #   Class method for JavaScript inheritance.
 #   @param [Object] prototype_properties the properties to add to the prototype
 #   @param [Object] class_properties the properties to add to the class
