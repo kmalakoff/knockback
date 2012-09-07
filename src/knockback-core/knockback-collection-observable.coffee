@@ -227,6 +227,9 @@ class kb.CollectionObservable
       @_collectionResync(true) # resort everything
       @trigger('resort', observable()) unless options.silent # notify
 
+    # subscribe to the sort_attribute
+    @sort_attribute.subscribe(_resync) if @sort_attribute and ko.isObservable(@sort_attribute)
+
     # resync now or later
     if options['defer'] then _.defer(_resync) else _resync()
     @
@@ -317,7 +320,7 @@ class kb.CollectionObservable
 
     # resort if needed
     else
-      @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(@sort_attribute))
+      @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(ko.utils.unwrapObservable(@sort_attribute)))
 
   # @private
   _onModelResort: (model) ->
@@ -412,9 +415,13 @@ class kb.CollectionObservable
   # @private
   _sortAttributeFn: (sort_attribute) ->
     if @models_only
-      return (models, model) -> _.sortedIndex(models, model, (test) -> test.get(sort_attribute))
+      return (models, model) ->
+        attribute_name = ko.utils.unwrapObservable(sort_attribute)
+        _.sortedIndex(models, model, (test) -> test.get(attribute_name))
     else
-      return (view_models, model) -> _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(sort_attribute))
+      return (view_models, model) ->
+        attribute_name = ko.utils.unwrapObservable(sort_attribute)
+        _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(attribute_name))
 
   # @private
   _createViewModel: (model) ->

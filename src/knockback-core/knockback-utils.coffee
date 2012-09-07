@@ -234,5 +234,5 @@ class kb.utils
   # @deprecated please use kb.release instead
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   @release = (obj) ->
-    legacyWarning('kb.utils.release', '0.16.1', 'Please use kb.release instead')
+    legacyWarning('kb.utils.release', '0.16.2', 'Please use kb.release instead')
     return kb.release(obj)

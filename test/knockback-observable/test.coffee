@@ -150,7 +150,7 @@ $(document).ready( ->
           }
           options: options
         })
-  
+
     parent = new Backbone.Model({name: 'Daddy'})
     children_child = new Backbone.Model({name: 'Baby'})
     children = new Backbone.Collection([{name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child])}])

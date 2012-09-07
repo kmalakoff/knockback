@@ -217,5 +217,5 @@ class kb.ViewModel
 #
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
 kb.observables = (model, binding_info, view_model) ->
-  legacyWarning('kb.observables', '0.16.1', 'Please use kb.viewModel instead')
+  legacyWarning('kb.observables', '0.16.2', 'Please use kb.viewModel instead')
   return new kb.ViewModel(model, binding_info, view_model)

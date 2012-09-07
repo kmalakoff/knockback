@@ -395,32 +395,32 @@ $(document).ready( ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     # keys
-    view_model = new kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: ['name', 'date'])
+    view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: ['name', 'date'])
     equals(view_model.name(), 'Bob', 'keys: Bob')
     ok(view_model.date, 'keys: date')
     equal(view_model.date(), null, 'keys: date fn')
     kb.release(view_model)
 
     # excludes
-    view_model = new kb.viewModel(new Backbone.Model({name: 'Bob', date: new Date()}), excludes: ['date'])
+    view_model = kb.viewModel(new Backbone.Model({name: 'Bob', date: new Date()}), excludes: ['date'])
     equals(view_model.name(), 'Bob', 'excludes: Bob')
     ok(not view_model.date, 'excludes: date')
     kb.release(view_model)
 
     # requires
-    view_model = new kb.viewModel(new Backbone.Model(), requires: ['name'])
+    view_model = kb.viewModel(new Backbone.Model(), requires: ['name'])
     equals(view_model.name(), null, 'requires: name')
     ok(not view_model.date, 'requires: date')
     kb.release(view_model)
 
     # internals
-    view_model = new kb.viewModel(new Backbone.Model(), internals: ['name'])
+    view_model = kb.viewModel(new Backbone.Model(), internals: ['name'])
     equals(view_model._name(), null, 'internals: name')
     ok(not view_model.date, 'internals: date')
     kb.release(view_model)
 
     # mappings
-    view_model = new kb.viewModel(new Backbone.Model(), mappings: {name: {}})
+    view_model = kb.viewModel(new Backbone.Model(), mappings: {name: {}})
     equals(view_model.name(), null, 'mappings: name')
     ok(not view_model.date, 'mappings: date')
     kb.release(view_model)
