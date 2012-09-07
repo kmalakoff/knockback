@@ -131,7 +131,7 @@
 </li>
 <li><p><a href="http://kmalakoff.github.com/knockback/tutorials_introduction.html">Tutorials</a></p>
 </li>
-<li><p><a href="http://kmalakoff.github.com/knockback-todos/">TodoMVC App (Live!)</a></p>
+<li><p><a href="http://kmalakoff.github.com/knockback-todos-app/">TodoMVC App (Live!)</a></p>
 </li>
 <li><p><a href="http://kmalakoff.github.com/knockback-reference-app/">Knockback.js Reference App (Live!)</a> (<strong><em>new!</em></strong>): demonstrates best practices when using Knockback.js including page routing and lifecycle management.</p>
 </li>
@@ -197,7 +197,7 @@
 <h2>An Example</h2>
 <h3>The view model:</h3>
 <pre><code class="lang-coffeescript">ContactViewModel = (model) -&gt;
-  kb.observables(model, {
+  kb.viewModel(model, {
     name:     &#39;name&#39;
     email:    {key:&#39;email&#39;, default: &#39;your.name@yourplace.com&#39;}
     date:     {key:&#39;date&#39;, localizer: LongDateLocalizer}
@@ -255,7 +255,7 @@ kb.release(view_model)</code></pre>
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 14:16:37 GMT+0900 (JST)
+  Fri Sep 07 2012 16:42:13 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.3.1

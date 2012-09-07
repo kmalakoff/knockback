@@ -12,7 +12,7 @@ These resources can help you get started:
 
 * [Tutorials](http://kmalakoff.github.com/knockback/tutorials_introduction.html)
 
-* [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos/)
+* [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/)
 
 * [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) (***new!***): demonstrates best practices when using Knockback.js including page routing and lifecycle management.
 
@@ -77,7 +77,7 @@ An Example
 
 ```coffeescript
 ContactViewModel = (model) ->
-  kb.observables(model, {
+  kb.viewModel(model, {
     name:     'name'
     email:    {key:'email', default: 'your.name@yourplace.com'}
     date:     {key:'date', localizer: LongDateLocalizer}
