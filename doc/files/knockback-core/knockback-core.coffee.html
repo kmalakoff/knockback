@@ -13,9 +13,9 @@
   <div id='menu'>
     <a href='../../class_index.html' title='Index'>Index</a>
     &raquo;
-    <a href='../../classes/kb.html' title='kb'>kb</a>
+    <span class='title'>knockback-core</span>
     &raquo;
-    <span class='title'>DefaultObservable</span>
+    <span class='title'>knockback-core.coffee</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -105,131 +105,140 @@
 </div>
     <div id='content'>
       <h1>
-        Class:
-        kb.DefaultObservable
+        File:
+        knockback-core.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-defaults/knockback-default-observable.coffee</td>
+          <td>knockback-core</td>
         </tr>
       </table>
-      <h2>Overview</h2>
-      <div class='docstring'>
-  <p>Used to provide a default value when an observable is null, undefined, or the empty string.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      Provide a observable with observable and/or non observable default argument in the form of:
-    </h4>
-    <pre><code class='coffee'>var wrapped_name = kb.defaultObservable(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;);</code></pre>
-  </div>
+      <h2>Constant Summary</h2>
+      <dl class='constants'>
+        <dt id='KB_TYPE_UNKNOWN-constant'>
+          KB_TYPE_UNKNOWN
+          =
+          <div class='docstring'>
+  <p>constants optimized for internal minimization</p>
 </div>
 <div class='tags'>
 </div>
-      <h2>Instance Method Summary</h2>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>kb</code></pre>
+        </dd>
+        <dt id='KB_TYPE_SIMPLE-constant'>
+          KB_TYPE_SIMPLE
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>kb</code></pre>
+        </dd>
+        <dt id='KB_TYPE_ARRAY-constant'>
+          KB_TYPE_ARRAY
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>kb</code></pre>
+        </dd>
+        <dt id='KB_TYPE_MODEL-constant'>
+          KB_TYPE_MODEL
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>kb</code></pre>
+        </dd>
+        <dt id='KB_TYPE_COLLECTION-constant'>
+          KB_TYPE_COLLECTION
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>kb</code></pre>
+        </dd>
+      </dl>
+      <h2>Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#constructor-instance'>
-        - (ko.observable) <strong>constructor</strong>(target_observable, dv)
+      <a href='#throwMissing-file'>
+        ? (void) <strong>throwMissing</strong>(instance, message)
       </a>
     </span>
-    <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      Used to create a new kb.DefaultObservable.
+      <h6>#</h6>
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#destroy-instance'>
-        - (void) <strong>destroy</strong>()
+      <a href='#throwUnexpected-file'>
+        ? (void) <strong>throwUnexpected</strong>(instance, message)
       </a>
     </span>
     <span class='desc'>
-      Required clean up function to break cycles, release view models, etc.
+      
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setToDefault-instance'>
-        - (void) <strong>setToDefault</strong>()
+      <a href='#legacyWarning-file'>
+        ? (void) <strong>legacyWarning</strong>(identifier, last_version, message)
       </a>
     </span>
     <span class='desc'>
-      Forces the observable to take the default value.
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#collapseOptions-file'>
+        ? (void) <strong>collapseOptions</strong>(options)
+      </a>
+    </span>
+    <span class='desc'>
+      
     </span>
   </li>
 </ul>
-      <h2>Constructor Details</h2>
+      <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='constructor-instance'>
-      - (ko.observable) <strong>constructor</strong>(target_observable, dv)
+    <p class='signature' id='throwMissing-file'>
+      ? (void) <strong>throwMissing</strong>(instance, message)
     </p>
     <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    the constructor does not return &#39;this&#39; but a ko.observable
-  </div>
-  <p>Used to create a new kb.DefaultObservable.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>target_observable</span>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the observable to check for null, undefined, or the empty string</span>
-    </li>
-    <li>
-      <span class='name'>default_value</span>
-      <span class='type'>
-        (<tt>Any</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the default value. Can be a value, string or ko.observable</span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>ko.observable</tt>)
-      &mdash;
-      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
-    </li>
-  </ul>
-</div>
-  </div>
-</div>
-      <h2>Instance Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='destroy-instance'>
-      - (void) <strong>destroy</strong>()
-    </p>
-    <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
+  <h6>#</h6><p>INTERNAL HELPERS</p><h6>#</h6>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='setToDefault-instance'>
-      - (void) <strong>setToDefault</strong>()
+    <p class='signature' id='throwUnexpected-file'>
+      ? (void) <strong>throwUnexpected</strong>(instance, message)
     </p>
-    <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
-  </div>
-  <p>Forces the observable to take the default value.</p>
+    <div class='tags'>
 </div>
-<div class='tags'>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='legacyWarning-file'>
+      ? (void) <strong>legacyWarning</strong>(identifier, last_version, message)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='collapseOptions-file'>
+      ? (void) <strong>collapseOptions</strong>(options)
+    </p>
+    <div class='tags'>
 </div>
   </div>
 </div>

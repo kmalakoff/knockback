@@ -3,16 +3,16 @@ var fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([b
 bob.set({friends: new Backbone.Collection([fred])});
 
 var FriendViewModel = function(model, options) {
+  this.type = 'friend';
   this.name = kb.observable(model, 'name');
-  this.type = ko.observable('friend');
   this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));
   return this;
 };
 
 var PersonViewModel = kb.ViewModel.extend({
   constructor: function(model, options) {
+    this.type = 'person';
     kb.ViewModel.prototype.constructor.apply(this, arguments);
-    this.type = ko.observable('person');
   }
 });
 

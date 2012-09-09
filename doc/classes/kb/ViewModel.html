@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -115,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Base class for ViewModels for Backbone.Models. </p> 
+  <p>Base class for ViewModels for Backbone.Models.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -209,7 +210,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
       + (kb.ViewModel) <strong>extend</strong>(prototype_properties, class_properties)
     </p>
     <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p> 
+  <p>Class method for JavaScript inheritance.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -258,11 +259,10 @@ var view_model = new ViewModel(model);</code></pre>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt><a href='../../classes/kb/ViewModel.html'>kb.ViewModel</a></tt>)
-      </span>
+      <span class='type'></span>
+      (<tt><a href='../../classes/kb/ViewModel.html'>kb.ViewModel</a></tt>)
       &mdash;
-      <span class='desc'>the constructor returns 'this'</span>
+      <span class='desc'>the constructor returns &#39;this&#39;</span>
     </li>
   </ul>
 </div>
@@ -275,7 +275,7 @@ var view_model = new ViewModel(model);</code></pre>
       - (ko.observable) <strong>constructor</strong>(model, options, view_model)
     </p>
     <div class='docstring'>
-  <p>Used to create a new kb.ViewModel. </p> 
+  <p>Used to create a new kb.ViewModel.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -316,7 +316,7 @@ var view_model = new ViewModel(model);</code></pre>
         (<tt>Array</tt>)
       </span>
       &mdash;
-      <span class='desc'>an array of atttributes that should be scoped with an underscore, eg. name -> _name</span>
+      <span class='desc'>an array of atttributes that should be scoped with an underscore, eg. name -&gt; _name</span>
     </li>
     <li>
       <span class='name'>requires</span>
@@ -364,7 +364,7 @@ var view_model = new ViewModel(model);</code></pre>
         (<tt>Object</tt>)
       </span>
       &mdash;
-      <span class='desc'>a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)</span>
+      <span class='desc'>a map of dot-deliminated paths; for example &#39;models.owner&#39;: kb.ViewModel to either constructors or create functions. Signature: &#39;some.path&#39;: function(object, options)</span>
     </li>
     <li>
       <span class='name'>factory</span>
@@ -386,11 +386,10 @@ var view_model = new ViewModel(model);</code></pre>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>ko.observable</tt>)
       &mdash;
-      <span class='desc'>the constructor returns 'this'</span>
+      <span class='desc'>the constructor returns &#39;this&#39;</span>
     </li>
   </ul>
 </div>
@@ -403,7 +402,7 @@ var view_model = new ViewModel(model);</code></pre>
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
@@ -413,7 +412,7 @@ var view_model = new ViewModel(model);</code></pre>
       - (void) <strong>shareOptions</strong>()
     </p>
     <div class='docstring'>
-  <p>Get the options for a new view model that can be used for sharing view models. </p> 
+  <p>Get the options for a new view model that can be used for sharing view models.</p>
 </div>
 <div class='tags'>
 </div>
@@ -426,7 +425,7 @@ var view_model = new ViewModel(model);</code></pre>
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed model. </p> 
+  <p>Dual-purpose getter/setter for the observed model.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -446,15 +445,14 @@ view_model.model(new Backbone.Model({name: &#39;fred&#39;})); // set
         - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
       </p>
       <div class='docstring'>
-  <p>Gets the model or model reference</p> 
+  <p>Gets the model or model reference</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       &mdash;
       <span class='desc'>the model whose attributes are being observed (can be null)</span>
     </li>
@@ -466,7 +464,7 @@ view_model.model(new Backbone.Model({name: &#39;fred&#39;})); // set
         - (void) <strong>model</strong>(new_model)
       </p>
       <div class='docstring'>
-  <p>Sets the model or model reference</p> 
+  <p>Sets the model or model reference</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -489,10 +487,10 @@ view_model.model(new Backbone.Model({name: &#39;fred&#39;})); // set
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Mon Sep 10 2012 02:22:40 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.1
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

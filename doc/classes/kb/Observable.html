@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -115,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Base class for observing model attributes. </p> 
+  <p>Base class for observing model attributes.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -200,9 +201,9 @@ name.setToDefault(); // name is (none)</code></pre>
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    the constructor does not return 'this' but a ko.observable
+    the constructor does not return &#39;this&#39; but a ko.observable
   </div>
-  <p>Used to create a new kb.Observable. </p> 
+  <p>Used to create a new kb.Observable.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -313,11 +314,10 @@ name.setToDefault(); // name is (none)</code></pre>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>ko.observable</tt>)
       &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
     </li>
   </ul>
 </div>
@@ -330,7 +330,7 @@ name.setToDefault(); // name is (none)</code></pre>
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
@@ -343,9 +343,8 @@ name.setToDefault(); // name is (none)</code></pre>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>kb.CollectionObservable|kb.ViewModel|ko.observable</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>kb.CollectionObservable|kb.ViewModel|ko.observable</tt>)
       &mdash;
       <span class='desc'>exposes the raw value inside the kb.observable. For example, if your attribute is a Backbone.Collection, it will hold a kb.CollectionObservable.</span>
     </li>
@@ -360,9 +359,8 @@ name.setToDefault(); // name is (none)</code></pre>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION</tt>)
       &mdash;
       <span class='desc'>provides the type of the wrapped value.</span>
     </li>
@@ -377,7 +375,7 @@ name.setToDefault(); // name is (none)</code></pre>
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed model. </p> 
+  <p>Dual-purpose getter/setter for the observed model.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
@@ -387,15 +385,14 @@ name.setToDefault(); // name is (none)</code></pre>
         - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
       </p>
       <div class='docstring'>
-  <p>Gets the model or model reference</p> 
+  <p>Gets the model or model reference</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       &mdash;
       <span class='desc'>the model whose attribute by key is being observed (can be null)</span>
     </li>
@@ -407,7 +404,7 @@ name.setToDefault(); // name is (none)</code></pre>
         - (void) <strong>model</strong>(new_model)
       </p>
       <div class='docstring'>
-  <p>Sets the model or model reference </p> 
+  <p>Sets the model or model reference</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -430,10 +427,10 @@ name.setToDefault(); // name is (none)</code></pre>
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Mon Sep 10 2012 02:22:40 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.1
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

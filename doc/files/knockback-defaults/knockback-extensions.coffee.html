@@ -13,9 +13,9 @@
   <div id='menu'>
     <a href='../../class_index.html' title='Index'>Index</a>
     &raquo;
-    <a href='../../classes/kb.html' title='kb'>kb</a>
+    <span class='title'>knockback-defaults</span>
     &raquo;
-    <span class='title'>DefaultObservable</span>
+    <span class='title'>knockback-extensions.coffee</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -105,129 +105,84 @@
 </div>
     <div id='content'>
       <h1>
-        Class:
-        kb.DefaultObservable
+        File:
+        knockback-extensions.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-defaults/knockback-default-observable.coffee</td>
+          <td>knockback-defaults</td>
         </tr>
       </table>
-      <h2>Overview</h2>
-      <div class='docstring'>
-  <p>Used to provide a default value when an observable is null, undefined, or the empty string.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      Provide a observable with observable and/or non observable default argument in the form of:
-    </h4>
-    <pre><code class='coffee'>var wrapped_name = kb.defaultObservable(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;);</code></pre>
-  </div>
-</div>
-<div class='tags'>
-</div>
-      <h2>Instance Method Summary</h2>
+      <h2>Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#constructor-instance'>
-        - (ko.observable) <strong>constructor</strong>(target_observable, dv)
+      <a href='#kb.Observable.prototype.setToDefault-file'>
+        ? (void) <strong>kb.Observable.prototype.setToDefault</strong>()
       </a>
     </span>
-    <span class='constructor note title'>Constructor</span>
     <span class='desc'>
-      Used to create a new kb.DefaultObservable.
+      knockback-extensions.js (knockback-defaults) (c) 2011, 2012 Kevin Malakoff.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#destroy-instance'>
-        - (void) <strong>destroy</strong>()
+      <a href='#kb.ViewModel.prototype.setToDefault-file'>
+        ? (void) <strong>kb.ViewModel.prototype.setToDefault</strong>()
       </a>
     </span>
     <span class='desc'>
-      Required clean up function to break cycles, release view models, etc.
+      
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setToDefault-instance'>
-        - (void) <strong>setToDefault</strong>()
+      <a href='#kb.utils.setToDefault-file'>
+        ? (void) <strong>kb.utils.setToDefault</strong>(obj)
       </a>
     </span>
     <span class='desc'>
-      Forces the observable to take the default value.
+      
     </span>
   </li>
 </ul>
-      <h2>Constructor Details</h2>
+      <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='constructor-instance'>
-      - (ko.observable) <strong>constructor</strong>(target_observable, dv)
+    <p class='signature' id='kb.Observable.prototype.setToDefault-file'>
+      ? (void) <strong>kb.Observable.prototype.setToDefault</strong>()
     </p>
     <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    the constructor does not return &#39;this&#39; but a ko.observable
-  </div>
-  <p>Used to create a new kb.DefaultObservable.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>target_observable</span>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the observable to check for null, undefined, or the empty string</span>
-    </li>
-    <li>
-      <span class='name'>default_value</span>
-      <span class='type'>
-        (<tt>Any</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the default value. Can be a value, string or ko.observable</span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>ko.observable</tt>)
-      &mdash;
-      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
-    </li>
-  </ul>
-</div>
-  </div>
-</div>
-      <h2>Instance Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='destroy-instance'>
-      - (void) <strong>destroy</strong>()
-    </p>
-    <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
+  <p>knockback-extensions.js (knockback-defaults)<br />(c) 2011, 2012 Kevin Malakoff.<br />Knockback.js is freely distributable under the MIT license.<br />See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a>Dependencies: Knockout.js, Backbone.js, and Underscore.js. Optional dependency: Backbone.ModelRef.js.</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='setToDefault-instance'>
-      - (void) <strong>setToDefault</strong>()
+    <p class='signature' id='kb.ViewModel.prototype.setToDefault-file'>
+      ? (void) <strong>kb.ViewModel.prototype.setToDefault</strong>()
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='kb.utils.setToDefault-file'>
+      ? (void) <strong>kb.utils.setToDefault</strong>(obj)
     </p>
     <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
+  
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var model = new Backbone.Model({name: &#39;Bob&#39;});
+var view_model = {
+  wrapped_name: kb.defaultWrapper(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;)
+}; // view_model.wrapped name: Bob
+kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)</code></pre>
   </div>
-  <p>Forces the observable to take the default value.</p>
 </div>
 <div class='tags'>
 </div>
