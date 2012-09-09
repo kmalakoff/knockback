@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -115,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute. </p> 
+  <p>Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -202,7 +203,7 @@ view_model = factory.createForPath(new Backbone.Model({name: &#39;Bob&#39;}), &#
       + (void) <strong>useOptionsOrCreate</strong>(options, obj, owner_path)
     </p>
     <div class='docstring'>
-  <p>Used to either register yourself with the existing factory or to create a new factory. </p> 
+  <p>Used to either register yourself with the existing factory or to create a new factory.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -243,7 +244,7 @@ view_model = factory.createForPath(new Backbone.Model({name: &#39;Bob&#39;}), &#
         (<tt>Object</tt>)
       </span>
       &mdash;
-      <span class='desc'>a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)</span>
+      <span class='desc'>a map of dot-deliminated paths; for example &#39;models.owner&#39;: kb.ViewModel to either constructors or create functions. Signature: &#39;some.path&#39;: function(object, options)</span>
     </li>
   </ul>
 </div>
@@ -287,7 +288,7 @@ view_model = factory.createForPath(new Backbone.Model({name: &#39;Bob&#39;}), &#
       - (void) <strong>creatorForPath</strong>(obj, path)
     </p>
     <div class='docstring'>
-  <p>If possible, creates an observable for an object using a dot-deliminated path. </p> 
+  <p>If possible, creates an observable for an object using a dot-deliminated path.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -306,10 +307,10 @@ view_model = factory.createForPath(new Backbone.Model({name: &#39;Bob&#39;}), &#
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Sun Sep 09 2012 20:26:06 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.0
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -115,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Library of general-purpose utilities </p> 
+  <p>Library of general-purpose utilities</p>
 </div>
 <div class='tags'>
 </div>
@@ -128,7 +129,7 @@
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'.
+      Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of &#39;this&#39;.
     </span>
   </li>
   <li>
@@ -204,7 +205,7 @@
   <li>
     <span class='signature'>
       <a href='#pathJoin-class'>
-        + (void) <strong>pathJoin</strong>(path1, path2)
+        + (String) <strong>pathJoin</strong>(path1, path2)
       </a>
     </span>
     <span class='desc'>
@@ -214,7 +215,7 @@
   <li>
     <span class='signature'>
       <a href='#optionsPathJoin-class'>
-        + (void) <strong>optionsPathJoin</strong>(options, path)
+        + (Object) <strong>optionsPathJoin</strong>(options, path)
       </a>
     </span>
     <span class='desc'>
@@ -228,7 +229,7 @@
       </a>
     </span>
     <span class='desc'>
-      Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value's type.
+      Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value&#39;s type.
     </span>
   </li>
   <li>
@@ -238,7 +239,7 @@
       </a>
     </span>
     <span class='desc'>
-      Creates an observable based on a value's type.
+      Creates an observable based on a value&#39;s type.
     </span>
   </li>
   <li deprecated>
@@ -264,7 +265,7 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of &#39;this&#39;. Relevant for: </p> <ul> <li><a href="&#39;classes/kb/CollectionObservable.html&#39;">kb.CollectionObservable</a></li> <li><a href="&#39;classes/kb/Observable.html&#39;">kb.Observable</a></li> <li><a href="&#39;classes/kb/DefaultObservable.html&#39;">kb.DefaultObservable</a></li> <li><a href="&#39;classes/kb/FormattedObservable.html&#39;">kb.FormattedObservable</a></li> <li><a href="&#39;classes/kb/LocalizedObservable.html&#39;">kb.LocalizedObservable</a></li> <li><a href="&#39;classes/kb/TriggeredObservable.html&#39;">kb.TriggeredObservable</a></li> </ul> 
+  <p>Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of &#39;this&#39;. Relevant for:</p><ul><li><a href="&#39;classes/kb/CollectionObservable.html&#39;">kb.CollectionObservable</a></li><li><a href="&#39;classes/kb/Observable.html&#39;">kb.Observable</a></li><li><a href="&#39;classes/kb/DefaultObservable.html&#39;">kb.DefaultObservable</a></li><li><a href="&#39;classes/kb/FormattedObservable.html&#39;">kb.FormattedObservable</a></li><li><a href="&#39;classes/kb/LocalizedObservable.html&#39;">kb.LocalizedObservable</a></li><li><a href="&#39;classes/kb/TriggeredObservable.html&#39;">kb.TriggeredObservable</a></li></ul>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -287,7 +288,7 @@
         + (ko.observable|ko.observableArray) <strong>wrappedObservable</strong>(instance)
       </p>
       <div class='docstring'>
-  <p>Gets the observable from an object</p> 
+  <p>Gets the observable from an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -304,9 +305,8 @@
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>ko.observable|ko.observableArray</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>ko.observable|ko.observableArray</tt>)
       &mdash;
       <span class='desc'>the observable</span>
     </li>
@@ -318,7 +318,7 @@
         + (void) <strong>wrappedObservable</strong>(instance, observable)
       </p>
       <div class='docstring'>
-  <p>Sets the observable on an object</p> 
+  <p>Sets the observable on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -355,9 +355,9 @@
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    this is almost the same as <a href='../../classes/kb/utils.html#wrappedModel-class'>kb.utils.wrappedModel</a> except that if the Model doesn't exist, it returns null.
+    this is almost the same as <a href='../../classes/kb/utils.html#wrappedModel-class'>kb.utils.wrappedModel</a> except that if the Model doesn&#39;t exist, it returns null.
   </div>
-  <p>Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner. </p> 
+  <p>Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -376,7 +376,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
         + (Backbone.Model|Backbone.Collection) <strong>wrappedObject</strong>(obj)
       </p>
       <div class='docstring'>
-  <p>Gets the observable from an object</p> 
+  <p>Gets the observable from an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -393,9 +393,8 @@ var collection = kb.utils.wrappedObject(collection_observable);
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>Backbone.Model|Backbone.Collection</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>Backbone.Model|Backbone.Collection</tt>)
       &mdash;
       <span class='desc'>the model/collection</span>
     </li>
@@ -407,7 +406,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
         + (void) <strong>wrappedObject</strong>(obj, value)
       </p>
       <div class='docstring'>
-  <p>Sets the observable on an object</p> 
+  <p>Sets the observable on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -444,9 +443,9 @@ var collection = kb.utils.wrappedObject(collection_observable);
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    this is almost the same as <a href='../../classes/kb/utils.html#wrappedObject-class'>kb.utils.wrappedObject</a> except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
+    this is almost the same as <a href='../../classes/kb/utils.html#wrappedObject-class'>kb.utils.wrappedObject</a> except that if the Model doesn&#39;t exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable&#39;s ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
   </div>
-  <p>Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel. </p> 
+  <p>Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
@@ -456,7 +455,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
         + (Backbone.Model|ViewModel) <strong>wrappedModel</strong>(view_model)
       </p>
       <div class='docstring'>
-  <p>Gets the model from a ViewModel</p> 
+  <p>Gets the model from a ViewModel</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -473,9 +472,8 @@ var collection = kb.utils.wrappedObject(collection_observable);
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>Backbone.Model|ViewModel</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>Backbone.Model|ViewModel</tt>)
       &mdash;
       <span class='desc'>the Model or ViewModel itself if there is no Model</span>
     </li>
@@ -487,7 +485,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
         + (void) <strong>wrappedModel</strong>(view_model, model)
       </p>
       <div class='docstring'>
-  <p>Sets the observable on an object </p> 
+  <p>Sets the observable on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -522,7 +520,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner. </p> 
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -543,7 +541,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         + (kb.Store) <strong>wrappedStore</strong>(obj)
       </p>
       <div class='docstring'>
-  <p>Gets the store from an object</p> 
+  <p>Gets the store from an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -560,9 +558,8 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
-      </span>
+      <span class='type'></span>
+      (<tt><a href='../../classes/kb/Store.html'>kb.Store</a></tt>)
       &mdash;
       <span class='desc'>the store</span>
     </li>
@@ -574,7 +571,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         + (void) <strong>wrappedStore</strong>(obj, store)
       </p>
       <div class='docstring'>
-  <p>Sets the store on an object</p> 
+  <p>Sets the store on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -609,7 +606,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner. </p> 
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
@@ -619,7 +616,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         + (kb.Factory) <strong>wrappedFactory</strong>(obj)
       </p>
       <div class='docstring'>
-  <p>Gets the factory from an object</p> 
+  <p>Gets the factory from an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -636,9 +633,8 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
-      </span>
+      <span class='type'></span>
+      (<tt><a href='../../classes/kb/Factory.html'>kb.Factory</a></tt>)
       &mdash;
       <span class='desc'>the factory</span>
     </li>
@@ -650,7 +646,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         + (void) <strong>wrappedFactory</strong>(obj, factory)
       </p>
       <div class='docstring'>
-  <p>Sets the factory on an object </p> 
+  <p>Sets the factory on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -685,7 +681,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner. </p> 
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
@@ -695,7 +691,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         + (kb.ModelWatcher) <strong>wrappedModelWatcher</strong>(obj)
       </p>
       <div class='docstring'>
-  <p>Gets the model_watcher from an object</p> 
+  <p>Gets the model_watcher from an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -712,9 +708,8 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
-      </span>
+      <span class='type'></span>
+      (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
       &mdash;
       <span class='desc'>the model_watcher</span>
     </li>
@@ -726,7 +721,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
         + (void) <strong>wrappedModelWatcher</strong>(obj, model_watcher)
       </p>
       <div class='docstring'>
-  <p>Sets the model_watcher on an object </p> 
+  <p>Sets the model_watcher on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -758,7 +753,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       + (void) <strong>wrappedDestroy</strong>(obj)
     </p>
     <div class='docstring'>
-  <p>Clean up function that releases all of the wrapped values on an owner. </p> 
+  <p>Clean up function that releases all of the wrapped values on an owner.</p>
 </div>
 <div class='tags'>
 </div>
@@ -768,7 +763,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       + (void) <strong>valueType</strong>(observable)
     </p>
     <div class='docstring'>
-  <p>Retrieves the value stored in a ko.observable. </p> 
+  <p>Retrieves the value stored in a ko.observable.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -791,10 +786,10 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   </div>
   <div class='method_details'>
     <p class='signature' id='pathJoin-class'>
-      + (void) <strong>pathJoin</strong>(path1, path2)
+      + (String) <strong>pathJoin</strong>(path1, path2)
     </p>
     <div class='docstring'>
-  <p>Helper to join a dot-deliminated path. </p> 
+  <p>Helper to join a dot-deliminated path.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -805,14 +800,42 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   </div>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>path1</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>start path.</span>
+    </li>
+    <li>
+      <span class='name'>path2</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>append path.</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>String</tt>)
+      &mdash;
+      <span class='desc'>combined dot-delimited path.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='optionsPathJoin-class'>
-      + (void) <strong>optionsPathJoin</strong>(options, path)
+      + (Object) <strong>optionsPathJoin</strong>(options, path)
     </p>
     <div class='docstring'>
-  <p>Helper to join a dot-deliminated path with the path on options and returns a new options object with the result. </p> 
+  <p>Helper to join a dot-deliminated path with the path on options and returns a new options object with the result.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -823,6 +846,34 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   </div>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>with path property for the start path</span>
+    </li>
+    <li>
+      <span class='name'>path</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>append path.</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Object</tt>)
+      &mdash;
+      <span class='desc'>new options with combined dot-delimited path <code>{path: combined_path}</code>.</span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -830,7 +881,7 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
       + (void) <strong>inferCreator</strong>(value, factory, path, owner, key)
     </p>
     <div class='docstring'>
-  <p>Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value&#39;s type. </p> 
+  <p>Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value&#39;s type.</p>
 </div>
 <div class='tags'>
 </div>
@@ -840,7 +891,7 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
       + (void) <strong>createFromDefaultCreator</strong>(obj, options)
     </p>
     <div class='docstring'>
-  <p>Creates an observable based on a value&#39;s type. </p> 
+  <p>Creates an observable based on a value&#39;s type.</p>
 </div>
 <div class='tags'>
 </div>
@@ -854,7 +905,7 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
     <strong>Deprecated.</strong>
     please use kb.release instead
   </div>
-  <p>Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose(). </p> 
+  <p>Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().</p>
 </div>
 <div class='tags'>
 </div>
@@ -863,10 +914,10 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Sun Sep 09 2012 20:26:06 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.0
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

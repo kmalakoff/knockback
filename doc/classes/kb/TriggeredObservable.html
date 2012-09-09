@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -115,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Class for observing model events. </p> 
+  <p>Class for observing model events.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -184,9 +185,9 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    the constructor does not return 'this' but a ko.observable
+    the constructor does not return &#39;this&#39; but a ko.observable
   </div>
-  <p>Used to create a new kb.Observable. </p> 
+  <p>Used to create a new kb.Observable.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -211,11 +212,10 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>ko.observable</tt>)
       &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
     </li>
   </ul>
 </div>
@@ -228,7 +228,7 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
@@ -241,7 +241,7 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed model. </p> 
+  <p>Dual-purpose getter/setter for the observed model.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
@@ -251,15 +251,14 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
         - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
       </p>
       <div class='docstring'>
-  <p>Gets the model or model reference</p> 
+  <p>Gets the model or model reference</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       &mdash;
       <span class='desc'>the model whose events are being bound (can be null)</span>
     </li>
@@ -271,7 +270,7 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
         - (void) <strong>model</strong>(new_model)
       </p>
       <div class='docstring'>
-  <p>Sets the model or model reference </p> 
+  <p>Sets the model or model reference</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -294,10 +293,10 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Sun Sep 09 2012 20:26:06 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.0
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

@@ -194,12 +194,20 @@ class kb.utils
 
   # Helper to join a dot-deliminated path.
   #
+  # @param [String] path1 start path.
+  # @param [String] path2 append path.
+  # @return [String] combined dot-delimited path.
+  #
   # @example
   #   kb.utils.pathJoin('models', 'name'); // 'models.name'
   @pathJoin = (path1, path2) ->
     return (if path1 then (if path1[path1.length-1] isnt '.' then "#{path1}." else path1) else '') + path2
 
   # Helper to join a dot-deliminated path with the path on options and returns a new options object with the result.
+  #
+  # @param [Object] options with path property for the start path
+  # @param [String] path append path.
+  # @return [Object] new options with combined dot-delimited path `{path: combined_path}`.
   #
   # @example
   #   this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));

@@ -394,8 +394,15 @@ $(document).ready( ->
   test("15. Options", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    # keys
+    # keys - array
     view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: ['name', 'date'])
+    equals(view_model.name(), 'Bob', 'keys: Bob')
+    ok(view_model.date, 'keys: date')
+    equal(view_model.date(), null, 'keys: date fn')
+    kb.release(view_model)
+
+    # keys - object
+    view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: {name: {}, date: {}})
     equals(view_model.name(), 'Bob', 'keys: Bob')
     ok(view_model.date, 'keys: date')
     equal(view_model.date(), null, 'keys: date fn')

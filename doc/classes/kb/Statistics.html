@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -115,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>kb.Statistics is an optional components that is useful for measuring your application&#39;s performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (count-only) of your ViewModels and collection observables. </p> 
+  <p>kb.Statistics is an optional components that is useful for measuring your application&#39;s performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.</p><p>kb.Statistics is not included in <code>knockback.js</code> nor <code>knockback-core.js</code> so you need to manually include it from the <code>lib</code> directory.</p>
 </div>
 <div class='tags'>
 </div>
@@ -220,7 +221,7 @@
       - (void) <strong>clear</strong>()
     </p>
     <div class='docstring'>
-  <p>Clear the tracked model events (but keep the registered objects intact) </p> 
+  <p>Clear the tracked model events (but keep the registered objects intact)</p>
 </div>
 <div class='tags'>
 </div>
@@ -230,7 +231,7 @@
       - (void) <strong>addModelEvent</strong>(event)
     </p>
     <div class='docstring'>
-  <p>Register a model event </p> 
+  <p>Register a model event</p>
 </div>
 <div class='tags'>
 </div>
@@ -240,7 +241,7 @@
       - (void) <strong>modelEventsStatsString</strong>()
     </p>
     <div class='docstring'>
-  <p>A debug helper to summarize the registered events in human-readable form </p> 
+  <p>A debug helper to summarize the registered events in human-readable form</p>
 </div>
 <div class='tags'>
 </div>
@@ -250,7 +251,7 @@
       - (void) <strong>register</strong>(key, obj)
     </p>
     <div class='docstring'>
-  <p>Register an object by key </p> 
+  <p>Register an object by key</p>
 </div>
 <div class='tags'>
 </div>
@@ -260,7 +261,7 @@
       - (void) <strong>unregister</strong>(key, obj)
     </p>
     <div class='docstring'>
-  <p>Unregister an object by key </p> 
+  <p>Unregister an object by key</p>
 </div>
 <div class='tags'>
 </div>
@@ -273,9 +274,8 @@
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>Integer</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>Integer</tt>)
       &mdash;
       <span class='desc'>the number of registered objects by type</span>
     </li>
@@ -287,7 +287,7 @@
       - (String) <strong>registeredStatsString</strong>(success_message)
     </p>
     <div class='docstring'>
-  <p>A debug helper to summarize the current registered objects by key </p> 
+  <p>A debug helper to summarize the current registered objects by key</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -304,9 +304,8 @@
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>String</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>String</tt>)
       &mdash;
       <span class='desc'>a human readable string summarizing the currently registered objects or success_message</span>
     </li>
@@ -317,10 +316,10 @@
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Sun Sep 09 2012 20:26:06 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.0
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

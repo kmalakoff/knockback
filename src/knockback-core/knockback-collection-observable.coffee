@@ -50,9 +50,9 @@ class kb.CollectionObservable
   # @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
   # @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
   # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
-  # @option options [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
+  # @option options [Function] sorted_index_fn a function that returns an index where to insert the model. Signature: function(models, model)
   # @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
-  # @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
+  # @option options [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
@@ -73,9 +73,17 @@ class kb.CollectionObservable
 
     # options
     options = collapseOptions(options)
-    @sort_attribute = options.sort_attribute
-    @sorted_index = options.sorted_index
-    @filters = if _.isArray(options.filters) then options.filters else [options.filters] if options.filters
+    if options.sort_attribute
+      @sorted_index_fn = ko.observable(@_sortAttributeFn(options.sort_attribute))
+    else
+      if options.sorted_index
+        legacyWarning(this, '0.16.2', 'use sorted_index_fn instead')
+        options.sorted_index_fn = options.sorted_index
+      @sorted_index_fn = ko.observable(options.sorted_index_fn)
+    if options.filters
+      @filters = ko.observableArray(if _.isArray(options.filters) then options.filters else [options.filters] if options.filters)
+    else
+      @filters = ko.observableArray([])
     create_options = @create_options = {store:  kb.Store.useOptionsOrCreate(options, collection, observable)} # create options
 
     # view model factory create factories
@@ -112,14 +120,49 @@ class kb.CollectionObservable
     observable.sortAttribute = _.bind(@sortAttribute, @)
     observable.hasViewModels = _.bind(@hasViewModels, @)
 
-    # Backbone.Event interface
-    observable.bind = _.bind(@bind, @)
-    observable.unbind = _.bind(@unbind, @)
-    observable.trigger = _.bind(@trigger, @)
-
     # start the processing
-    kb.utils.wrappedObject(observable, null) # clear the collection so it is updated
-    @collection(collection, {silent: true, 'defer': options['defer']}) if collection
+    @_col = ko.observable() # use for sorting dependencies
+    @collection(collection)
+
+    # observable that will re-trigger when sort or filters or collection changes
+    @_mapper = ko.dependentObservable(=>
+      observable = kb.utils.wrappedObservable(@)
+
+      # get the filters, sorting, models and create a dependency
+      collection = @_col()
+      models = collection.models if collection
+      sorted_index_fn = @sorted_index_fn()
+      filters = @filters()
+
+      # no models
+      if not models or (collection.models.length is 0)
+        view_models = []
+
+      # process filters, sorting, etc
+      else
+        # apply filters
+        models = _.filter(models, (model) => not @_modelIsFiltered(model)) if filters.length
+
+        # apply sorting
+        if sorted_index_fn
+          view_models = []
+          for model in models
+            view_model = @_createViewModel(model)
+            add_index = sorted_index_fn(view_models, view_model)
+            view_models.splice(add_index, 0, view_model)
+
+        # no sorting
+        else
+          if @models_only
+           view_models = if filters.length then models else _.clone(models) # may need to clone so array isn't shared
+          else
+            view_models = _.map(models, (model) => @_createViewModel(model))
+
+      # update the observable array for this collection observable
+      @in_edit++
+      observable(view_models)
+      @in_edit--
+    )
 
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))
@@ -132,12 +175,11 @@ class kb.CollectionObservable
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     observable = kb.utils.wrappedObservable(@)
-    collection = kb.utils.wrappedObject(observable)
+    collection = @_col()
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
       @_clear(true)
-      kb.utils.wrappedObject(observable, null)
-    @filters = null; @sorted_index; @create_options = null
+    kb.release(@filters); @filters = null; @create_options = null
     kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
@@ -158,48 +200,28 @@ class kb.CollectionObservable
   # @overload collection()
   #   Gets the collection from a kb.CollectionObservable
   #   @return [Backbone.Collection] the collection
-  # @overload collection(collection, options)
+  # @overload collection(collection)
   #   Sets the collection on a kb.CollectionObservable
   #   @param [Backbone.Collection] collection the collection
-  #   @param [Object] options
-  #   @option options [Boolean] silent flag for skipping notifications.
-  collection: (collection, options) ->
+  collection: (collection) ->
     observable = kb.utils.wrappedObservable(@)
-    previous_collection = kb.utils.wrappedObject(observable)
+    previous_collection = @_col()
     if (arguments.length is 0) or (collection == previous_collection)
       observable() # force a dependency
       return previous_collection
 
-    # no change
-    collection.retain?() if collection
-
     # clean up
-    if previous_collection
-      previous_collection.unbind('all', @__kb._onCollectionChange)
-      previous_collection.release?()
+    previous_collection.unbind('all', @__kb._onCollectionChange) if previous_collection
 
-    # store in _kb_collection so that a collection() function can be exposed on the observable
-    kb.utils.wrappedObject(observable, collection)
-    if collection
-      collection.bind('all', @__kb._onCollectionChange)
-      @sortedIndex(@sorted_index, @sort_attribute, options)
-    else
-      @_clear()
+    # store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
+    collection.bind('all', @__kb._onCollectionChange) if collection
+    @_col(collection) # update the observed collection to trigger a resync
 
     return collection
 
-  # Dual-purpose getter/setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
+  # Setter for the filters array for excluding models in the collection observable.
   #
-  # @overload sortedIndex()
-  #   Gets the sorted index function from a kb.CollectionObservable
-  #   @return [Function] a function that returns an index where to insert the model. Signature: function(models, model)
-  # @overload sortedIndex(sorted_index, sort_attribute, options)
-  #   Sets the sorted index function on a kb.CollectionObservable
-  #   @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
-  #   @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
-  #   @param [Object] options the options.
-  #   @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
-  #   @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  # @param [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
   #
   # @example
   #    // change the sorting function
@@ -208,51 +230,35 @@ class kb.CollectionObservable
   #        return _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
   #      }
   #    );
-  sortedIndex: (sorted_index, sort_attribute, options) ->
-    options or= {}
-    if sorted_index
-      @sorted_index = sorted_index
-      @sort_attribute = sort_attribute
-    else if sort_attribute
-      @sort_attribute = sort_attribute
-      @sorted_index = @_sortAttributeFn(sort_attribute)
+  filters: (filters) ->
+    if filters
+      @filters(if _.isArray(filters) then filters else [filters])
     else
-      @sort_attribute = null
-      @sorted_index = null
+      @filters([])
 
-    _resync = =>
-      observable = kb.utils.wrappedObservable(@)
-      collection = kb.utils.wrappedObject(observable)
-      return if (collection.models.length == 0) and (observable().length == 0) # don't do anything
-      @_collectionResync(true) # resort everything
-      @trigger('resort', observable()) unless options.silent # notify
-
-    # subscribe to the sort_attribute
-    @sort_attribute.subscribe(_resync) if @sort_attribute and ko.isObservable(@sort_attribute)
-
-    # resync now or later
-    if options['defer'] then _.defer(_resync) else _resync()
-    @
-
-  # Dual-purpose getter/setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
+  # Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
-  # @overload sortAttribute()
-  #   Gets the sorted index function from a kb.CollectionObservable
-  #   @return [Function] a function that returns an index where to insert the model. Signature: function(models, model)
-  # @overload sortAttribute(sort_attribute, sorted_index, options)
-  #   Sets the sorted attribue name on a kb.CollectionObservable
-  #   @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
-  #   @param [Function] sorted_index a function that returns an index where to insert the model. Signature: function(models, model)
-  #   @param [Object] options the options.
-  #   @option options [Boolean] defer if you are creating the observable during dependent cycle, you can defer the loading of the collection to avoid a triggered dependency cycle.
-  #   @option options [Boolean] silent do not fire Backbone events nor trigger ko.subscriptions.
+  # @param [Function] sorted_index_fn a function that returns an index where to insert the model. Signature: function(models, model)
+  #
+  # @example
+  #    // change the sorting function
+  #    collection_observable.sortedIndex(
+  #      function(view_models, vm){
+  #        return _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
+  #      }
+  #    );
+  sortedIndex: (sorted_index_fn) -> @sorted_index_fn(sorted_index_fn)
+
+  # Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
+  #
+  # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
   #
   # @example
   #    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
   #    // in order of Zanadu then Alex
   #    todos.sortAttribute('name');
   #    // in order of Alex then Zanadu
-  sortAttribute: (sort_attribute, sorted_index, options) -> return @sortedIndex(sorted_index, sort_attribute, options)
+  sortAttribute: (sort_attribute) -> @sorted_index_fn(if sort_attribute then @_sortAttributeFn(sort_attribute) else null)
 
   # Reverse lookup for a view model by model. If created with models_only option, will return null.
   viewModelByModel: (model) ->
@@ -278,26 +284,24 @@ class kb.CollectionObservable
     return if @in_edit # we are doing the editing
 
     switch event
-      when 'reset' then @_collectionResync()
-      when 'resort'
-        return not @sorted_index
-        if _.isArray(arg)
-          @trigger('resort', kb.utils.wrappedObservable(@)()) # notify
-        else
-          @_onModelResort(arg)
+      when 'reset', 'resort'
+        return if event is 'resort' and not @sorted_index_fn() # no sorting
+        @_col.notifySubscribers(@_col())
 
       when 'new', 'add'
         return if @_modelIsFiltered(arg) # filtered
 
         observable = kb.utils.wrappedObservable(@)
-        collection = kb.utils.wrappedObject(observable)
+        collection = @_col()
         view_model = @_createViewModel(arg)
-        add_index = if @sorted_index then @sorted_index(observable(), view_model) else collection.indexOf(arg)
+        if (sorted_index_fn = @sorted_index_fn())
+          add_index = sorted_index_fn(observable(), view_model)
+        else
+          add_index = collection.indexOf(arg)
 
         @in_edit++
         observable.splice(add_index, 0, view_model)
         @in_edit--
-        @trigger('add', view_model, observable()) # notify
 
       when 'remove', 'destroy' then @_onModelRemove(arg)
       when 'change' then @_onModelChange(arg)
@@ -310,7 +314,6 @@ class kb.CollectionObservable
     @in_edit++
     observable.remove(view_model)
     @in_edit--
-    @trigger('remove', view_model, observable) # notify
 
   # @private
   _onModelChange: (model) ->
@@ -319,35 +322,34 @@ class kb.CollectionObservable
       @_onModelRemove(model)
 
     # resort if needed
-    else
-      @_onModelResort(model) if @sorted_index and (not @sort_attribute or model.hasChanged(ko.utils.unwrapObservable(@sort_attribute)))
+    else if @sorted_index_fn()
+      @_onModelResort(model)
 
   # @private
   _onModelResort: (model) ->
     # either move a view model or a model
     observable = kb.utils.wrappedObservable(@)
-    collection = kb.utils.wrappedObject(observable)
     view_model = if @models_only then model else @viewModelByModel(model)
     previous_index = observable.indexOf(view_model)
-    if @sorted_index
+    if @sorted_index_fn
       sorted_view_models = _.clone(observable())
       sorted_view_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
-      new_index = @sorted_index(sorted_view_models, view_model)
+      new_index = @sorted_index_fn(sorted_view_models, view_model)
     else
-      new_index = collection.indexOf(model)
+      new_index = @_col().indexOf(model)
     return if previous_index == new_index # no change
 
     # either remove a view model or a model
     @in_edit++
     observable.splice(previous_index, 1); observable.splice(new_index, 0, view_model) # move
     @in_edit--
-    @trigger('resort', view_model, observable(), new_index) # notify
 
   # @private
   _onObservableArrayChange: (values) ->
     return if @in_edit # we are doing the editing
     observable = kb.utils.wrappedObservable(@)
-    collection = kb.utils.wrappedObject(observable)
+    collection = @_col()
+    return unless collection # no collection
 
     # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
     if not @models_only
@@ -359,7 +361,7 @@ class kb.CollectionObservable
 
     # get the new models
     models = _.map(values, (test) -> return kb.utils.wrappedModel(test))
-    if @filters
+    if @filters().length
       models = _.filter(models, (model) => not @_modelIsFiltered(model))
 
     # a change
@@ -367,11 +369,11 @@ class kb.CollectionObservable
       @in_edit++
       collection.reset(models)
       @in_edit--
+    @
 
   # @private
   _clear: (silent) ->
     observable = kb.utils.wrappedObservable(@)
-    @trigger('remove', observable()) if not silent # notify
 
     # don't notify if destroying
     if silent
@@ -382,35 +384,6 @@ class kb.CollectionObservable
       observable.removeAll()
       @in_edit--
     @
-
-  # @private
-  _collectionResync: (silent) ->
-    observable = kb.utils.wrappedObservable(@)
-    collection = kb.utils.wrappedObject(observable)
-    @trigger('remove', observable()) if not silent # notify
-
-    # clear the observable array manually
-    array = observable()
-    array.splice(0, array.length)
-
-    if @filters
-      models = _.filter(collection.models, (model) => not @_modelIsFiltered(model))
-    else
-      models = collection.models
-
-    if @sorted_index
-      view_models = []
-      for model in models
-        view_model = @_createViewModel(model)
-        add_index = @sorted_index(view_models, view_model)
-        view_models.splice(add_index, 0, view_model)
-    else
-      view_models = if @models_only then (if @filters then models else _.clone(models)) else _.map(models, (model) => @_createViewModel(model))
-
-    @in_edit++
-    observable(view_models)
-    @in_edit--
-    @trigger('add', observable()) if not silent # notify
 
   # @private
   _sortAttributeFn: (sort_attribute) ->
@@ -429,17 +402,12 @@ class kb.CollectionObservable
 
   # @private
   _modelIsFiltered: (model) ->
-    if @filters
-      for filter in @filters
-        filter = ko.utils.unwrapObservable(filter)
-        if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
-          return true
+    filters = @filters()
+    for filter in filters
+      filter = ko.utils.unwrapObservable(filter)
+      if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
+        return true
     return false
-
-#######################################
-# Mix in Backbone.Events so callers can subscribe
-#######################################
-kb.CollectionObservable.prototype extends Backbone.Events
 
 # factory function
 kb.collectionObservable = (collection, options) -> return new kb.CollectionObservable(collection, options)

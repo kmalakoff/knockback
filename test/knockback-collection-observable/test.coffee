@@ -182,18 +182,13 @@ $(document).ready( ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new kb.ContactsCollection()
-    view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
       view_model:           ContactViewModelClass
       sort_attribute:       'name'
     })
-    collection_observable.bind('add', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
-    collection_observable.bind('resort', (view_model, collection_observable, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
-    collection_observable.bind('remove', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count-=view_model.length) else view_model_count--)
 
     equal(collection.length, 0, "no models")
-    equal(view_model_count, 0, "no view models")
     equal(collection_observable().length, 0, "no view models")
 
     collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
@@ -201,7 +196,6 @@ $(document).ready( ->
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
-    equal(view_model_count, 2, "two view models")
     equal(collection_observable().length, 2, "two view models")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
@@ -211,7 +205,6 @@ $(document).ready( ->
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(collection.models[2].get('name'), 'Paul', "Paul is second")
-    equal(view_model_count, 3, "three view models")
     equal(collection_observable().length, 3, "two view models")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
@@ -219,16 +212,13 @@ $(document).ready( ->
 
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "one model")
-    equal(view_model_count, 1, "one view model")
     equal(collection_observable().length, 1, "one view model")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
 
     collection.reset()
     equal(collection.length, 0, "no models")
-    equal(view_model_count, 0, "no view models")
     equal(collection_observable().length, 0, "no view models")
-    ok(view_model_resort_count==0, "not resorting happened because everything was inserted once") # TODO: make a rigorous check
 
     # clean up
     kb.release(collection_observable)
@@ -236,10 +226,8 @@ $(document).ready( ->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("7. Collection sync sorting with sorted_index", ->
+  test("7. Collection sync sorting with sorted_index_fn", ->
     kb.statistics = new kb.Statistics() # turn on stats
-
-    view_model_count = 0; view_model_resort_count = 0
 
     class SortWrapper
       constructor: (value) ->
@@ -255,7 +243,7 @@ $(document).ready( ->
     collection = new kb.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       models_only:              true
-      sorted_index:             kb.siwa('number', SortWrapper)
+      sorted_index_fn:          kb.siwa('number', SortWrapper)
     })
     collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
     collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
@@ -273,7 +261,7 @@ $(document).ready( ->
     collection = new kb.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model:         ContactViewModelClass
-      sorted_index:       kb.siwa('number', SortWrapper)
+      sorted_index_fn:       kb.siwa('number', SortWrapper)
     })
     collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
     collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
@@ -294,14 +282,10 @@ $(document).ready( ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new kb.NameSortedContactsCollection()
-    view_model_count = 0; view_model_resort_count = 0
 
     collection_observable = kb.collectionObservable(collection, {
       view_model:       ContactViewModel    # view_model is legacy for view_model, it should be replaced with view_model or create
     })
-    collection_observable.bind('add', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count+=view_model.length) else view_model_count++)
-    collection_observable.bind('resort', (view_model, collection_observable, new_index) -> if _.isArray(view_model) then (view_model_resort_count+=view_model.length) else view_model_resort_count++ )
-    collection_observable.bind('remove', (view_model, collection_observable) -> if _.isArray(view_model) then (view_model_count-=view_model.length) else view_model_count--)
 
     equal(collection.length, 0, "no models")
     equal(collection_observable().length, 0, "no view models")
@@ -311,7 +295,6 @@ $(document).ready( ->
     equal(collection.length, 2, "two models")
     equal(collection.models[0].get('name'), 'George', "George is first")
     equal(collection.models[1].get('name'), 'Ringo', "Ringo is second")
-    equal(view_model_count, 2, "two view models")
     equal(collection_observable().length, 2, "two view models")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
@@ -321,7 +304,6 @@ $(document).ready( ->
     equal(collection.models[0].get('name'), 'George', "George is first")
     equal(collection.models[1].get('name'), 'Paul', "Paul is second")
     equal(collection.models[2].get('name'), 'Ringo', "Ringo is second")
-    equal(view_model_count, 3, "three view models")
     equal(collection_observable().length, 3, "two view models")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
@@ -329,16 +311,13 @@ $(document).ready( ->
 
     collection.remove('b2').remove('b3')
     equal(collection.length, 1, "one models")
-    equal(view_model_count, 1, "one view models")
     equal(collection_observable().length, 1, "one view models")
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is left")
 
     collection.reset()
     equal(collection.length, 0, "no models")
-    equal(view_model_count, 0, "no view models")
     equal(collection_observable().length, 0, "no view models")
-    ok(view_model_resort_count==0, "not resorting happened because everything was inserted once") # TODO: make a rigorous check
 
     # clean up
     kb.release(collection_observable)

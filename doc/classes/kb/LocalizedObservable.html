@@ -25,6 +25,7 @@
     </nav>
     <div id='search'>
       <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
       <a id='method_list_link' href='../../method_list.html'>Methods</a>
       <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
@@ -124,7 +125,7 @@
     </strong>
     You must provide the following two methods:
   </div>
-  <ul> <li>read: function(value, observable) called to get the value and each time the locale changes</li> <li>write: function(localized_string, value, observable) called to set the value (optional)</li> </ul> <p>Base class for observing localized data that changes when the locale changes. </p> 
+  <ul><li>read: function(value, observable) called to get the value and each time the locale changes</li><li>write: function(localized_string, value, observable) called to set the value (optional)</li></ul><p>Base class for observing localized data that changes when the locale changes.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -223,7 +224,7 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
       + (ko.observable) <strong>extend</strong>(prototype_properties, class_properties)
     </p>
     <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p> 
+  <p>Class method for JavaScript inheritance.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -260,11 +261,10 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>ko.observable</tt>)
       &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
     </li>
   </ul>
 </div>
@@ -279,9 +279,9 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     <div class='docstring'>
   <div class='note'>
     <strong>Note:</strong>
-    the constructor does not return 'this' but a ko.observable
+    the constructor does not return &#39;this&#39; but a ko.observable
   </div>
-  <p>Used to create a new kb.LocalizedObservable. This an abstract class. </p> 
+  <p>Used to create a new kb.LocalizedObservable. This an abstract class.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -328,11 +328,10 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
-      <span class='type'>
-        (<tt>ko.observable</tt>)
-      </span>
+      <span class='type'></span>
+      (<tt>ko.observable</tt>)
       &mdash;
-      <span class='desc'>the constructor does not return 'this' but a ko.observable</span>
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
     </li>
   </ul>
 </div>
@@ -345,7 +344,7 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc. Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element). </p> 
+  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
@@ -355,7 +354,7 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
       - (void) <strong>resetToCurrent</strong>()
     </p>
     <div class='docstring'>
-  <p>Used to reset the value if localization is not possible. </p> 
+  <p>Used to reset the value if localization is not possible.</p>
 </div>
 <div class='tags'>
 </div>
@@ -365,7 +364,7 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
       - (void) <strong>observedValue</strong>(value)
     </p>
     <div class='docstring'>
-  <p>Dual purpose set/get </p> 
+  <p>Dual purpose set/get</p>
 </div>
 <div class='tags'>
 </div>
@@ -374,10 +373,10 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     </div>
     <div id='footer'>
   Generated on
-  Fri Sep 07 2012 22:57:31 GMT+0900 (JST)
+  Sun Sep 09 2012 20:26:06 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.3.1
+  v1.4.0
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
