@@ -2,6 +2,7 @@ module.exports =
   library:
     join: 'knockback.js'
     compress: true
+    wrapper: 'src/knockback-loader.js'
     files: [
       'src/knockback-core/knockback-core.coffee'
       'src/knockback-core/knockback-utils.coffee'
@@ -19,6 +20,7 @@ module.exports =
 
   knockback_core:
     join: 'knockback-core.js'
+    wrapper: 'src/knockback-loader.js'
     compress: true
     files: [
       'src/knockback-core/knockback-core.coffee'
@@ -33,6 +35,7 @@ module.exports =
 
   knockback_defaults:
     join: 'knockback-defaults.js'
+    wrapper: 'src/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -43,6 +46,7 @@ module.exports =
 
   knockback_formatting:
     join: 'knockback-formatting.js'
+    wrapper: 'src/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -52,6 +56,7 @@ module.exports =
 
   knockback_localization:
     join: 'knockback-localization.js'
+    wrapper: 'src/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -62,6 +67,7 @@ module.exports =
 
   knockback_triggering:
     join: 'knockback-triggering.js'
+    wrapper: 'src/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -177,8 +183,6 @@ module.exports =
     _build:
       output: 'build'
       directories: [
-        'test/knockback-legacy'
-
         'test/knockback-utils'
         'test/knockback-memory-management'
         'test/knockback-observable'
@@ -192,6 +196,8 @@ module.exports =
         'test/knockback-formatting'
         'test/knockback-localization'
         'test/knockback-triggering'
+
+        'test/deprecated'
       ]
       commands: [
         'mbundle test/packaging/bundle-config.coffee'
@@ -203,8 +209,6 @@ module.exports =
       runner: 'phantomjs-qunit-runner.js'
       files: '**/*.html'
       directories: [
-        'test/knockback-legacy'
-
         'test/knockback-utils'
         'test/knockback-memory-management'
         'test/knockback-observable'
@@ -219,6 +223,7 @@ module.exports =
         'test/knockback-localization'
         'test/knockback-triggering'
 
+        'test/deprecated'
         'test/full-stack'
         'test/packaging'
         'test/lodash'

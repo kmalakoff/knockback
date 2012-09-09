@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.16.2
+  knockback-core.js 0.16.2
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -170,7 +170,7 @@ class kb
 # Module
 ####################################
 # export Knockback and kb namespcaes globally and to modules
-@Knockback = Knockback = @kb = kb; module.exports = kb if (typeof(exports) isnt 'undefined')
+@Knockback = @kb = kb; module.exports = kb if (typeof(exports) isnt 'undefined')
 
 # import and re-export Underscore (or Lo-Dash with precedence), Backbone, and Knockout
 if not @_ and (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_

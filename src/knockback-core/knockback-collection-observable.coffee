@@ -126,6 +126,7 @@ class kb.CollectionObservable
 
     # observable that will re-trigger when sort or filters or collection changes
     @_mapper = ko.dependentObservable(=>
+      return if @in_edit # we are doing the editing
       observable = kb.utils.wrappedObservable(@)
 
       # get the filters, sorting, models and create a dependency
@@ -304,7 +305,14 @@ class kb.CollectionObservable
         @in_edit--
 
       when 'remove', 'destroy' then @_onModelRemove(arg)
-      when 'change' then @_onModelChange(arg)
+      when 'change'
+        # filtered, remove
+        if @_modelIsFiltered(arg)
+          @_onModelRemove(arg)
+
+        # resort if needed
+        else if @sorted_index_fn()
+          @_onModelResort(arg)
 
   # @private
   _onModelRemove: (model) ->
@@ -314,16 +322,6 @@ class kb.CollectionObservable
     @in_edit++
     observable.remove(view_model)
     @in_edit--
-
-  # @private
-  _onModelChange: (model) ->
-    # filtered, remove
-    if @_modelIsFiltered(model)
-      @_onModelRemove(model)
-
-    # resort if needed
-    else if @sorted_index_fn()
-      @_onModelResort(model)
 
   # @private
   _onModelResort: (model) ->
@@ -364,11 +362,10 @@ class kb.CollectionObservable
     if @filters().length
       models = _.filter(models, (model) => not @_modelIsFiltered(model))
 
-    # a change
-    if (models.length isnt values.length) or _.difference(collection.models, models).length
-      @in_edit++
-      collection.reset(models)
-      @in_edit--
+    # update models
+    @in_edit++
+    collection.reset(models)
+    @in_edit--
     @
 
   # @private
