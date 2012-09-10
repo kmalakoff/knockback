@@ -5960,7 +5960,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, arraySplice, collapseOptions, kb, ko, legacyWarning, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -7324,7 +7324,7 @@ kb.CollectionObservable = (function() {
     this._col = ko.observable();
     this.collection(collection);
     this._mapper = ko.dependentObservable(function() {
-      var add_index, filters, model, models, sorted_index_fn, view_model, view_models, _i, _len;
+      var filters, model, models, sorted_index_fn, view_model, view_models, _i, _len;
       if (_this.in_edit) {
         return;
       }
@@ -7348,12 +7348,11 @@ kb.CollectionObservable = (function() {
           for (_i = 0, _len = models.length; _i < _len; _i++) {
             model = models[_i];
             view_model = _this._createViewModel(model);
-            add_index = sorted_index_fn(view_models, view_model);
-            view_models.splice(add_index, 0, view_model);
+            view_models.splice(sorted_index_fn(view_models, view_model), 0, view_model);
           }
         } else {
           if (_this.models_only) {
-            view_models = filters.length ? models : _.clone(models);
+            view_models = filters.length ? models : models.slice();
           } else {
             view_models = _.map(models, function(model) {
               return _this._createViewModel(model);
@@ -7612,5 +7611,58 @@ kb.sortedIndexWrapAttr = kb.siwa = function(attribute_name, wrapper_constructor)
     });
   };
 };
+
+/*
+  knockback-inject.js
+  (c) 2011, 2012 Kevin Malakoff.
+  Knockback.Inject is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+*/
+
+
+ko.bindingHandlers['kb-inject'] = {
+  'init': function(element, value_accessor, all_bindings_accessor, view_model) {
+    var data;
+    data = ko.utils.unwrapObservable(value_accessor());
+    return ko.computed(function() {
+      if (_.isFunction(data)) {
+        return data(view_model, element, value_accessor, all_bindings_accessor);
+      } else if (_.isObject(data)) {
+        return _.extend(view_model, data);
+      }
+    });
+  }
+};
+
+kb.injectApps = function(root) {
+  var app_el, app_els, getAppElements, _i, _len;
+  app_els = [];
+  getAppElements = function(el) {
+    var child_el, _i, _len, _ref;
+    if (el.attributes && _.find(el.attributes, function(attr) {
+      return attr.name === 'kb-app';
+    })) {
+      app_els.push(el);
+    }
+    _ref = el.childNodes;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      child_el = _ref[_i];
+      getAppElements(child_el);
+    }
+  };
+  getAppElements(root || document);
+  for (_i = 0, _len = app_els.length; _i < _len; _i++) {
+    app_el = app_els[_i];
+    kb.applyBindings({}, app_el);
+  }
+};
+
+(onReady = function() {
+  if (!document.body) {
+    return setTimeout(onReady, 1);
+  }
+  kb.injectApps();
+})();
 ; return kb;});
 }).call(this);

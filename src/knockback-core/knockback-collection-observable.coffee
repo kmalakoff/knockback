@@ -149,13 +149,12 @@ class kb.CollectionObservable
           view_models = []
           for model in models
             view_model = @_createViewModel(model)
-            add_index = sorted_index_fn(view_models, view_model)
-            view_models.splice(add_index, 0, view_model)
+            view_models.splice(sorted_index_fn(view_models, view_model), 0, view_model)
 
         # no sorting
         else
           if @models_only
-           view_models = if filters.length then models else _.clone(models) # may need to clone so array isn't shared
+            view_models = if filters.length then models else models.slice() # may need to clone so array isn't shared
           else
             view_models = _.map(models, (model) => @_createViewModel(model))
 

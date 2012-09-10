@@ -12,6 +12,7 @@ module.exports =
       'src/knockback-core/knockback-observable.coffee'
       'src/knockback-core/knockback-view-model.coffee'
       'src/knockback-core/knockback-collection-observable.coffee'
+      'src/knockback-core/knockback-inject.coffee'
       'src/knockback-defaults/knockback-default-observable.coffee'
       'src/knockback-formatting/knockback-formatted-observable.coffee'
       'src/knockback-localization/knockback-localized-observable.coffee'
@@ -31,6 +32,7 @@ module.exports =
       'src/knockback-core/knockback-observable.coffee'
       'src/knockback-core/knockback-view-model.coffee'
       'src/knockback-core/knockback-collection-observable.coffee'
+      'src/knockback-core/knockback-inject.coffee'
     ]
 
   knockback_defaults:
@@ -186,8 +188,9 @@ module.exports =
         'test/knockback-utils'
         'test/knockback-memory-management'
         'test/knockback-observable'
-        'test/knockback-collection-observable'
         'test/knockback-view-model'
+        'test/knockback-collection-observable'
+        'test/knockback-inject'
 
         'test/backbone-modelref'
         'test/backbone-relational'
@@ -212,8 +215,9 @@ module.exports =
         'test/knockback-utils'
         'test/knockback-memory-management'
         'test/knockback-observable'
-        'test/knockback-collection-observable'
         'test/knockback-view-model'
+        'test/knockback-collection-observable'
+        'test/knockback-inject'
 
         'test/backbone-modelref'
         'test/backbone-relational'
