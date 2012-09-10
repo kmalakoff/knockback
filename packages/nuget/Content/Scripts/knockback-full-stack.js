@@ -7496,14 +7496,14 @@ kb.CollectionObservable = (function() {
   };
 
   CollectionObservable.prototype._onModelResort = function(model) {
-    var new_index, observable, previous_index, sorted_view_models, view_model;
+    var new_index, observable, previous_index, sorted_index_fn, sorted_view_models, view_model;
     observable = kb.utils.wrappedObservable(this);
     view_model = this.models_only ? model : this.viewModelByModel(model);
     previous_index = observable.indexOf(view_model);
-    if (this.sorted_index_fn) {
+    if ((sorted_index_fn = this.sorted_index_fn())) {
       sorted_view_models = _.clone(observable());
       sorted_view_models.splice(previous_index, 1);
-      new_index = this.sorted_index_fn(sorted_view_models, view_model);
+      new_index = sorted_index_fn(sorted_view_models, view_model);
     } else {
       new_index = this._col().indexOf(model);
     }

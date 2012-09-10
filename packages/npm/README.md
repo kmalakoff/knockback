@@ -21,7 +21,7 @@ These resources can help you get started:
 
 #Download Latest (0.16.1):
 
-Please see the [release notes](https://github.com/kmalakoff/knockback/wiki/Release-Notes) for upgrade pointers.
+Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
 ###Full
 

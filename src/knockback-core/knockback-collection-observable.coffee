@@ -329,10 +329,10 @@ class kb.CollectionObservable
     observable = kb.utils.wrappedObservable(@)
     view_model = if @models_only then model else @viewModelByModel(model)
     previous_index = observable.indexOf(view_model)
-    if @sorted_index_fn
+    if (sorted_index_fn = @sorted_index_fn())
       sorted_view_models = _.clone(observable())
       sorted_view_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
-      new_index = @sorted_index_fn(sorted_view_models, view_model)
+      new_index = sorted_index_fn(sorted_view_models, view_model)
     else
       new_index = @_col().indexOf(model)
     return if previous_index == new_index # no change
