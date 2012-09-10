@@ -27,19 +27,19 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/wiki/Relea
 
 Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* [Full Library (Development), 69 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js)
-* [Full Library (Production), 32 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js)
-* [Full Stack (Development), 330 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.js)
-* [Full Stack (Production, 102 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.min.js)
+* [Full Library (64k dev)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.js)
+* [Full Library (8k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback.min.js)
+* [Full Stack (330k dev)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.js)
+* [Full Stack (32k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-full-stack.min.js)
 
 ###Core
 
 Removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* [Core Library (Development), 58 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.js)
-* [Core Library (Production), 27 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.min.js)
-* [Core Stack (Development), 319 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.js)
-* [Core Stack (Production), 98 KB](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.min.js)
+* [Core Library (54k dev)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.js)
+* [Core Library (7k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core.min.js)
+* [Core Stack (315k dev)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.js)
+* [Core Stack (31k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.1/knockback-core-stack.min.js)
 
 ###Dependencies
 

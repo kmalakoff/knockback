@@ -123,7 +123,10 @@
         <dt id='VERSION-constant'>
           VERSION
           =
-          <div class='tags'>
+          <div class='docstring'>
+  <p>Knockback library semantic version</p>
+</div>
+<div class='tags'>
 </div>
         </dt>
         <dd>
@@ -132,7 +135,10 @@
         <dt id='TYPE_UNKNOWN-constant'>
           TYPE_UNKNOWN
           =
-          <div class='tags'>
+          <div class='docstring'>
+  <p>Stored value type is not known like null/undefined (could be observed as a Backbone.Model or a Backbone.Collection or a simple type)</p>
+</div>
+<div class='tags'>
 </div>
         </dt>
         <dd>
@@ -141,7 +147,10 @@
         <dt id='TYPE_SIMPLE-constant'>
           TYPE_SIMPLE
           =
-          <div class='tags'>
+          <div class='docstring'>
+  <p>Stored value type is simple like a String or Number -&gt; observable type: ko.observable</p>
+</div>
+<div class='tags'>
 </div>
         </dt>
         <dd>
@@ -150,7 +159,10 @@
         <dt id='TYPE_ARRAY-constant'>
           TYPE_ARRAY
           =
-          <div class='tags'>
+          <div class='docstring'>
+  <p>Stored value type is an Array -&gt; observable type: ko.observableArray</p>
+</div>
+<div class='tags'>
 </div>
         </dt>
         <dd>
@@ -159,7 +171,10 @@
         <dt id='TYPE_MODEL-constant'>
           TYPE_MODEL
           =
-          <div class='tags'>
+          <div class='docstring'>
+  <p>Stored value type is a Backbone.Model -&gt; observable type: ViewModel</p>
+</div>
+<div class='tags'>
 </div>
         </dt>
         <dd>
@@ -168,7 +183,10 @@
         <dt id='TYPE_COLLECTION-constant'>
           TYPE_COLLECTION
           =
-          <div class='tags'>
+          <div class='docstring'>
+  <p>Stored value type is a Backbone.Collection -&gt; observable type: kb.CollectionObservable</p>
+</div>
+<div class='tags'>
 </div>
         </dt>
         <dd>
@@ -458,7 +476,7 @@
         (<tt>String|ko.observable</tt>)
       </span>
       &mdash;
-      <span class='desc'>the format string. Format: <code>&quot;{0} and {1}&quot;</code> where <code>0</code> and <code>1</code> would be synchronized with the arguments (eg. &quot;Bob and Carol&quot; where <code>0</code> is Bob and <code>1</code> is Carol)</span>
+      <span class='desc'>the format string. Format: <code>&quot;{0} and {1}&quot;</code> where <code>{0}</code> and <code>{1}</code> would be synchronized with the arguments (eg. &quot;Bob and Carol&quot; where <code>{0}</code> is Bob and <code>{1}</code> is Carol)</span>
     </li>
     <li>
       <span class='name'>args</span>
@@ -603,10 +621,10 @@ ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
     </div>
     <div id='footer'>
   Generated on
-  Mon Sep 10 2012 01:54:21 GMT+0900 (JST)
+  Mon Sep 10 2012 10:02:04 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.0
+  v1.4.1
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
