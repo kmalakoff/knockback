@@ -7371,16 +7371,16 @@ kb.CollectionObservable = (function() {
   }
 
   CollectionObservable.prototype.destroy = function() {
-    var collection, observable;
+    var array, collection, observable;
     observable = kb.utils.wrappedObservable(this);
     collection = this._col();
     if (collection) {
       collection.unbind('all', this.__kb._onCollectionChange);
-      this._clear(true);
+      array = observable();
+      array.splice(0, array.length);
     }
     kb.release(this.filters);
-    this.filters = null;
-    this.create_options = null;
+    this.filters = this._col = this.sorted_index_fn = this._mapper = this.create_options = null;
     kb.utils.wrappedDestroy(this);
     return !kb.statistics || kb.statistics.unregister('CollectionObservable', this);
   };
@@ -7553,20 +7553,6 @@ kb.CollectionObservable = (function() {
     this.in_edit++;
     collection.reset(models);
     this.in_edit--;
-    return this;
-  };
-
-  CollectionObservable.prototype._clear = function(silent) {
-    var array, observable;
-    observable = kb.utils.wrappedObservable(this);
-    if (silent) {
-      array = observable();
-      array.splice(0, array.length);
-    } else {
-      this.in_edit++;
-      observable.removeAll();
-      this.in_edit--;
-    }
     return this;
   };
 

@@ -179,8 +179,8 @@ class kb.CollectionObservable
     collection = @_col()
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
-      @_clear(true)
-    kb.release(@filters); @filters = null; @create_options = null
+      array = observable(); array.splice(0, array.length) # clear the view models or models
+    kb.release(@filters); @filters = @_col = @sorted_index_fn = @_mapper = @create_options = null
     kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
@@ -366,20 +366,6 @@ class kb.CollectionObservable
     @in_edit++
     collection.reset(models)
     @in_edit--
-    @
-
-  # @private
-  _clear: (silent) ->
-    observable = kb.utils.wrappedObservable(@)
-
-    # don't notify if destroying
-    if silent
-      array = observable()
-      array.splice(0, array.length)
-    else
-      @in_edit++
-      observable.removeAll()
-      @in_edit--
     @
 
   # @private
