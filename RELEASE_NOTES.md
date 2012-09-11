@@ -6,13 +6,15 @@ Please refer to the following release notes when upgrading your version of Knock
 
 * **added app and view_model injection**: you are now able to inject an application using a kb-app attribute on a dom element and inject into a view model using an 'inject' data-bind attribute.
 
+**note**: I have found a 'NOT_FOUND_ERR: DOM Exception 8 error' error with injection. It will be fixed in 0.16.3 soon! Please treat injection (kb-app and inject) as a beta feature until a patch is released.
+
 * **added validators**: you can use kb.valueValidator, kb.inputValidator, or kb.formValidator to add validations. Currently only the following are support: 'required', 'url', 'number', 'email' and you can extend by adding properties to kb.validators
 
 ### Deprecations
 
 * **ko.renderAutoReleasedTemplate replaced by kb.renderTemplate**: reduced verbosity
 
-## 0.16.2
+## 0.16.1
 
 * renamed kb.DefaultWrapper to kb.DefaultObservable to provide consistency with classes that return a ko.observable or ko.observableAray instead of 'this' from constructor.
 

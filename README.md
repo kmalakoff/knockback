@@ -19,6 +19,8 @@ These resources can help you get started:
 * [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators) (***new!***): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 
+**note**: I have found a 'NOT_FOUND_ERR: DOM Exception 8 error' error with injection. It will be fixed in 0.16.3 soon! Please treat injection (kb-app and inject) as a beta feature until a patch is released.
+
 #Download Latest (0.16.2):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
