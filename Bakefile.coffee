@@ -17,6 +17,7 @@ module.exports =
       'src/knockback-formatting/knockback-formatted-observable.coffee'
       'src/knockback-localization/knockback-localized-observable.coffee'
       'src/knockback-triggering/knockback-triggered-observable.coffee'
+      'src/knockback-validation/knockback-validators.coffee'
     ]
 
   knockback_core:
@@ -75,6 +76,16 @@ module.exports =
     files: [
       'src/component-imports.coffee'
       'src/knockback-triggering/knockback-triggered-observable.coffee'
+    ]
+
+  knockback_validation:
+    join: 'knockback-validation.js'
+    wrapper: 'src/knockback-loader.js'
+    output: 'lib'
+    compress: true
+    files: [
+      'src/component-imports.coffee'
+      'src/knockback-validation/knockback-validators.coffee'
     ]
 
   knockback_statistics:
@@ -150,10 +161,12 @@ module.exports =
         'cp lib/knockback-defaults.min.js packages/npm/lib/knockback-defaults.min.js'
         'cp lib/knockback-formatting.js packages/npm/lib/knockback-formatting.js'
         'cp lib/knockback-formatting.min.js packages/npm/lib/knockback-formatting.min.js'
-        'cp lib/knockback-triggering.js packages/npm/lib/knockback-triggering.js'
-        'cp lib/knockback-triggering.min.js packages/npm/lib/knockback-triggering.min.js'
         'cp lib/knockback-localization.js packages/npm/lib/knockback-localization.js'
         'cp lib/knockback-localization.min.js packages/npm/lib/knockback-localization.min.js'
+        'cp lib/knockback-triggering.js packages/npm/lib/knockback-triggering.js'
+        'cp lib/knockback-triggering.min.js packages/npm/lib/knockback-triggering.min.js'
+        'cp lib/knockback-validation.js packages/npm/lib/knockback-validation.js'
+        'cp lib/knockback-validation.min.js packages/npm/lib/knockback-validation.min.js'
         'cp lib/knockback-statistics.js packages/npm/lib/knockback-statistics.js'
         'cp lib/knockback-statistics.min.js packages/npm/lib/knockback-statistics.min.js'
 
@@ -173,10 +186,10 @@ module.exports =
         'cp lib/knockback-defaults.min.js packages/nuget/Content/Scripts/lib/knockback-defaults.min.js'
         'cp lib/knockback-formatting.js packages/nuget/Content/Scripts/lib/knockback-formatting.js'
         'cp lib/knockback-formatting.min.js packages/nuget/Content/Scripts/lib/knockback-formatting.min.js'
-        'cp lib/knockback-triggering.js packages/nuget/Content/Scripts/lib/knockback-triggering.js'
-        'cp lib/knockback-triggering.min.js packages/nuget/Content/Scripts/lib/knockback-triggering.min.js'
         'cp lib/knockback-localization.js packages/nuget/Content/Scripts/lib/knockback-localization.js'
         'cp lib/knockback-localization.min.js packages/nuget/Content/Scripts/lib/knockback-localization.min.js'
+        'cp lib/knockback-validation.js packages/nuget/Content/Scripts/lib/knockback-validation.js'
+        'cp lib/knockback-validation.min.js packages/nuget/Content/Scripts/lib/knockback-validation.min.js'
         'cp lib/knockback-statistics.js packages/nuget/Content/Scripts/lib/knockback-statistics.js'
         'cp lib/knockback-statistics.min.js packages/nuget/Content/Scripts/lib/knockback-statistics.min.js'
       ]
@@ -199,6 +212,7 @@ module.exports =
         'test/knockback-formatting'
         'test/knockback-localization'
         'test/knockback-triggering'
+        'test/knockback-validation'
 
         'test/deprecated'
       ]
@@ -226,6 +240,7 @@ module.exports =
         'test/knockback-formatting'
         'test/knockback-localization'
         'test/knockback-triggering'
+        'test/knockback-validation'
 
         'test/deprecated'
         'test/full-stack'

@@ -46,7 +46,7 @@
 #     var ViewModel = kb.ViewModel.extend({
 #       constructor: function(model){
 #         kb.ViewModel.prototype.constructor.apply(this, arguments);
-#         this.full_name = ko.computed(function() { return this.first_name() + " " + this.last_name(); }, this);
+#         this.full_name = ko.dependentObservable(function() { return this.first_name() + " " + this.last_name(); }, this);
 #       }
 #     });
 #     var view_model = new ViewModel(model);

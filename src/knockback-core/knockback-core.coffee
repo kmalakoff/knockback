@@ -144,16 +144,21 @@ class kb
   # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   #
   # @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
-  #   var el = kb.renderAutoReleasedTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
+  #   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-  @renderAutoReleasedTemplate = (template, view_model, options={}) ->
+  @renderTemplate = (template, view_model, options={}) ->
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
     el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
     kb.releaseOnNodeRemove(view_model, el)
     observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
     return el
+
+  # @deprecated Use kb.renderTemplate
+  @renderAutoReleasedTemplate = (template, view_model, options={}) ->
+    legacyWarning('kb.renderAutoReleasedTemplate', '0.16.2', 'Please use kb.renderTemplate instead')
+    @renderTemplate(template, view_model, options={})
 
   # Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   #

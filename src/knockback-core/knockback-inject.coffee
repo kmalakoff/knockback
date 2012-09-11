@@ -12,29 +12,45 @@
 #   TODO
 #
 
-ko.bindingHandlers['kb-inject'] =
+ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
     data = ko.utils.unwrapObservable(value_accessor())
     # wrap to avoid dependencies propagating to the template
-    ko.computed(->
+    wrapper = ko.dependentObservable(->
       if _.isFunction(data)
         data(view_model, element, value_accessor, all_bindings_accessor)
       else if _.isObject(data)
-        _.extend(view_model, data)
+        for key, value of data
+          # resolve like a function
+          if _.isObject(value) and value.resolve and _.isFunction(value.resolve)
+            view_model[key] = value.resolve(view_model, element, value_accessor, all_bindings_accessor)
+          else
+            view_model[key] = value
     )
+    wrapper.dispose() # done with the wrapper
 
 # bind app if it exists after the document body has been loaded
 kb.injectApps = (root) ->
   # find all of the app elements
-  app_els = []
+  apps = []
   getAppElements = (el) ->
-    app_els.push(el) if el.attributes and _.find(el.attributes, (attr)-> attr.name is 'kb-app')
+    if el.attributes and (attr = _.find(el.attributes, (attr)-> attr.name is 'kb-app'))
+      apps.push([el, attr])
     getAppElements(child_el) for child_el in el.childNodes
     return
   getAppElements(root or document)
 
-  # bind the apps
-  kb.applyBindings({}, app_el) for app_el in app_els
+  # create the apps
+  for app in apps
+    # evaluate the options
+    if app[1].value
+      options = ko.utils.buildEvalWithinScopeFunction("{#{app[1].value}}", 0)()
+    options or= {}
+    options.view_model or= {}
+
+    options.beforeBinding(options.view_model, app[0], options) if options.beforeBinding
+    kb.applyBindings(options.view_model, app[0], {})
+    options.afterBinding(options.view_model, app[0], options) if options.afterBinding
   return
 
 (onReady = ->

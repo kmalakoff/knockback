@@ -4,6 +4,13 @@ Please refer to the following release notes when upgrading your version of Knock
 
 * **major changes to kb.CollectionObservable**: added support for observable mappings (sort_attribute, sorted_index_fn and filters), removed defer, removed optional collection reference counting, removed Backbone.Events (use ko.subscription instead, removed wrappedObject in the collection).
 
+* **added app and view_model injection**: you are now able to inject an application using a kb-app attribute on a dom element and inject into a view model using an 'inject' data-bind attribute.
+
+* **added validators**: you can use kb.valueValidator, kb.inputValidator, or kb.formValidator to add validations. Currently only the following are support: 'required', 'url', 'number', 'email' and you can extend by adding properties to kb.validators
+
+### Deprecations
+
+* **ko.renderAutoReleasedTemplate replaced by kb.renderTemplate**
 
 ## 0.16.1
 
