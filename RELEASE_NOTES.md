@@ -10,7 +10,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ### Deprecations
 
-* **ko.renderAutoReleasedTemplate replaced by kb.renderTemplate**
+* **ko.renderAutoReleasedTemplate replaced by kb.renderTemplate**: reduced verbosity
 
 ## 0.16.1
 
