@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.16.1
+  knockback.js 0.16.2
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -32,7 +32,7 @@
 
     function kb() {}
 
-    kb.VERSION = '0.16.1';
+    kb.VERSION = '0.16.2';
 
     kb.release = function(obj, pre_release_fn) {
       var array, item, view_model, view_models, _i, _j, _len, _len1;
@@ -385,7 +385,7 @@
     };
 
     utils.release = function(obj) {
-      legacyWarning('kb.utils.release', '0.16.1', 'Please use kb.release instead');
+      legacyWarning('kb.utils.release', '0.16.2', 'Please use kb.release instead');
       return kb.release(obj);
     };
 
@@ -1294,7 +1294,7 @@
   };
 
   kb.observables = function(model, binding_info, view_model) {
-    legacyWarning('ko.observables', '0.16.1', 'Please use kb.viewModel instead');
+    legacyWarning('ko.observables', '0.16.2', 'Please use kb.viewModel instead');
     return new kb.ViewModel(model, binding_info, view_model);
   };
 
@@ -1769,7 +1769,7 @@
   };
 
   kb.defaultWrapper = function(target, default_value) {
-    legacyWarning('ko.defaultWrapper', '0.16.1', 'Please use kb.defaultObservable instead');
+    legacyWarning('ko.defaultWrapper', '0.16.2', 'Please use kb.defaultObservable instead');
     return new kb.DefaultObservable(target, default_value);
   };
 

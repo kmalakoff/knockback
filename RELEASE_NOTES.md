@@ -12,7 +12,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 * **ko.renderAutoReleasedTemplate replaced by kb.renderTemplate**: reduced verbosity
 
-## 0.16.1
+## 0.16.2
 
 * renamed kb.DefaultWrapper to kb.DefaultObservable to provide consistency with classes that return a ko.observable or ko.observableAray instead of 'this' from constructor.
 
