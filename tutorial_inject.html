@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Tutorial: Application Injection (like Angular.js)</title>
+    <link rel="stylesheet" href="vendor/css/normalize.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
+    <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/layout_components.css">
+    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <link rel="stylesheet" href="css/tutorial.css">
+    <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
+    <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.2.js"></script>
+    <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
+    <script type="application/javascript" src="js/stylecode.js"></script>
+    <script type="application/javascript" src="js/interface.js"></script>
+  </head>
+  <body>
+    <div class="page navbar">
+      <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+            <div class="nav-collapse">
+              <ul class="nav">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="doc/index.html">API</a></li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  </ul>
+                </li>
+                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">Application Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  </ul>
+                </li>
+                <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
+              </ul>
+              <div id="script_language">
+                <div class="separator">
+                  <div class="selection codestyle">
+                    <div class="option">
+                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <label for="cs-cs">CS</label>
+                    </div>
+                    <div class="option">
+                      <input id="cs-js" type="radio" name="codestyle" value="js"/>
+                      <label for="cs-js">JS</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <header class="page">
+      </header>
+      <content class="page"><h1>Tutorial: Application Injection (like Angular.js)</h1>
+<p><a href="index.html">Knockback.js</a> provides an a few helpers to inject application code in a similar way to <a href="http://angular.org">Angular.js</a> so you can build up an application by dynamically adding observables to your ViewModel directly from your HTML.
+
+</p>
+<p>The following examples show how you might port Angular.js samples to Knockback to help you compare approaches. There&#39;s no magic here, just a kb-app attribute and a custom kb-inject Knockout bindings to add observables to your ViewModel.
+
+</p>
+<p>There are a few helpers to get us started:
+
+</p>
+<p>pre(data-for=&#39;cs&#39;)
+  include kbi_helpers.coffee
+
+</p>
+<p>pre(data-for=&#39;js&#39;)
+  include ../../../public/tutorials/inject/kbi_helpers.js
+
+</p>
+<h2>Hello Example</h2>
+
+        <div class="row-fluid">
+          <div class="span8">
+            <h4>View (HTML)</h4>
+            <pre>&lt;div kb-app=&quot;view_model: {yourName: ko.observable('')}&quot;&gt;
+  &lt;label&gt;Name:&lt;/label&gt;
+  &lt;input type=&quot;text&quot; data-bind=&quot;value: yourName, valueUpdate: 'keyup'&quot; placeholder=&quot;Enter a name here&quot;&gt;
+  &lt;hr&gt;
+  &lt;h1 data-bind=&quot;text: 'Hello ' + yourName() + '!'&quot;&gt;&lt;/h1&gt;
+&lt;/div&gt;</pre>
+          </div>
+          <div class="span4">
+            <h4>Live Result</h4>
+            <div class="demos_result_box"><div kb-app="view_model: {yourName: ko.observable('')}">
+  <label>Name:</label>
+  <input type="text" data-bind="value: yourName, valueUpdate: 'keyup'" placeholder="Enter a name here">
+  <hr>
+  <h1 data-bind="text: 'Hello ' + yourName() + '!'"></h1>
+</div>
+            </div>
+          </div>
+        </div><h2>Todo Example</h2>
+
+        <div class="row-fluid">
+          <div class="span8">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#kbi_todo_view" data-toggle="tab">View (HTML)</a></li>
+              <li><a href="#kbi_todo_view_model" data-toggle="tab">Controller (CS/JS)</a></li>
+              <li><a href="#kbi_todo_css" data-toggle="tab">Styling (CSS)</a></li>
+            </ul>
+            <div class="tab-content">
+              <div id="kbi_todo_view" class="tab-pane active">
+                <pre>&lt;div kb-app&gt;
+  &lt;h2&gt;Todo&lt;/h2&gt;
+  &lt;div data-bind=&quot;inject: TodoCtrl&quot;&gt;
+    &lt;span data-bind=&quot;text: remaining() + ' of ' + todos().length + ' remaining'&quot;&gt;&lt;/span&gt;
+    [ &lt;a href=&quot;&quot; data-bind=&quot;click: archive&quot;&gt;archive&lt;/a&gt; ]
+    &lt;ul class=&quot;unstyled&quot; data-bind=&quot;foreach: todos&quot;&gt;
+      &lt;li&gt;
+        &lt;input type=&quot;checkbox&quot; data-bind=&quot;checked: done&quot;&gt;
+        &lt;span data-bind=&quot;css: {done: done}, text: text&quot;&gt;&lt;/span&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;form&gt;
+      &lt;input type=&quot;text&quot; data-bind=&quot;value: todoText&quot;  size=&quot;30&quot;
+             placeholder=&quot;add new todo here&quot;&gt;
+      &lt;button class=&quot;btn-primary&quot; data-bind=&quot;click: addTodo&quot;&gt;add&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div id="kbi_todo_view_model" class="tab-pane">
+                <pre data-for="cs">TodoCtrl = (view_model) ->
+  view_model.todos = ko.observableArray([
+    {text:'learn knockback', done:ko.observable(true)},
+    {text:'build a knockback app', done:ko.observable(false)}]
+  )
+
+  view_model.todoText = ko.observable('')
+  view_model.addTodo = ->
+    view_model.todos.push({text:view_model.todoText(), done:ko.observable(false)})
+    view_model.todoText('')
+
+  view_model.remaining = ko.computed(->
+    return _.reduce(view_model.todos(), ((count, todo) -> return count + (if todo.done() then 0 else 1)), 0)
+  )
+
+  view_model.archive = ->
+    view_model.todos.remove((todo) -> return todo.done())</pre>
+                <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var TodoCtrl;
+
+TodoCtrl = function(view_model) {
+  view_model.todos = ko.observableArray([
+    {
+      text: 'learn knockback',
+      done: ko.observable(true)
+    }, {
+      text: 'build a knockback app',
+      done: ko.observable(false)
+    }
+  ]);
+  view_model.todoText = ko.observable('');
+  view_model.addTodo = function() {
+    view_model.todos.push({
+      text: view_model.todoText(),
+      done: ko.observable(false)
+    });
+    return view_model.todoText('');
+  };
+  view_model.remaining = ko.computed(function() {
+    return _.reduce(view_model.todos(), (function(count, todo) {
+      return count + (todo.done() ? 0 : 1);
+    }), 0);
+  });
+  return view_model.archive = function() {
+    return view_model.todos.remove(function(todo) {
+      return todo.done();
+    });
+  };
+};
+</pre>
+              </div>
+              <div id="kbi_todo_css" class="tab-pane">
+                <pre>.done {
+  text-decoration: line-through;
+  color: grey;
+}</pre>
+              </div>
+            </div>
+          </div>
+          <div class="span4">
+            <h4>Live Result</h4>
+            <div class="demos_result_box">
+              <link rel="stylesheet" href="tutorials/inject/kbi_todo.css">
+              <script type="application/javascript" src="tutorials/inject/kbi_todo_controller.js"></script><div kb-app>
+  <h2>Todo</h2>
+  <div data-bind="inject: TodoCtrl">
+    <span data-bind="text: remaining() + ' of ' + todos().length + ' remaining'"></span>
+    [ <a href="" data-bind="click: archive">archive</a> ]
+    <ul class="unstyled" data-bind="foreach: todos">
+      <li>
+        <input type="checkbox" data-bind="checked: done">
+        <span data-bind="css: {done: done}, text: text"></span>
+      </li>
+    </ul>
+    <form>
+      <input type="text" data-bind="value: todoText"  size="30"
+             placeholder="add new todo here">
+      <button class="btn-primary" data-bind="click: addTodo">add</button>
+    </form>
+  </div>
+</div>
+            </div>
+          </div>
+        </div><h2>Project Example</h2>
+<p>You can use knockback-navigators-0.1.0.css and knockback-page-navigator-panes-0.1.0.js and knockback-sample-transitions-0.1.0.js
+</p>
+
+        <script type="application/javascript" src="tutorials/inject/kbi_helpers.js"></script>
+        <script type="application/javascript" src="tutorials/inject/kbi_project_model.js"></script>
+        <script type="application/javascript" src="tutorials/inject/kbi_project_collection.js"></script>
+        <script type="application/javascript" src="tutorials/inject/kbi_project_app_controller.js"></script>
+        <script type="application/javascript" src="tutorials/inject/kbi_project_list_view_model.js"></script>
+        <script type="application/javascript" src="tutorials/inject/kbi_project_view_model.js"></script><script type="text/x-jquery-tmpl" id="list.html">
+  <div>
+    <input type="text" class="search-query" placeholder="Search" data-bind="value: filter, valueUpdate: 'keyup'">
+    <table>
+      <thead>
+      <tr>
+        <th>Project</th>
+        <th>Description</th>
+        <th><a data-bind="click: loadUrlFn('new')"><i class="icon-plus-sign"></i></a></th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- ko foreach: projects -->
+        <tr>
+          <td><a data-bind="attr: {href: site}, text: name"target="_blank"></a></td>
+          <td data-bind="text: description"></td>
+          <td>
+            <a data-bind="click: loadUrlFn('edit/' + id())"><i class="icon-pencil"></i></a>
+          </td>
+        </tr>
+      <!-- /ko -->
+      </tbody>
+    </table>
+  </div>
+</script><script type="text/x-jquery-tmpl" id="detail.html">
+  <form name="myForm" data-bind="inject: kb.formValidator">
+    <div class="control-group" data-bind="classes: {error: $myForm.name().invalid}">
+      <label>Name</label>
+      <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
+      <span data-bind="visible: $myForm.name().required" class="help-inline">
+          Required</span>
+    </div>
+
+    <div class="control-group" data-bind="classes: {error: $myForm.site().invalid}">
+      <label>Website</label>
+      <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+      <span data-bind="visible: $myForm.site().required" class="help-inline">
+          Required</span>
+      <span data-bind="visible: $myForm.site().url" class="help-inline">
+          Not a URL</span>
+    </div>
+
+    <label>Description</label>
+    <textarea name="description" data-bind="value: description"></textarea>
+
+    <br>
+    <a class="btn" data-bind="click: loadUrlFn('')">Cancel</a>
+    <button data-bind="click: save, disable: isClean() || $myForm.invalid()"
+            class="btn btn-primary">Save</button>
+    <button data-bind="click: onDelete"
+            class="btn btn-danger">Delete</button>
+  </form>
+</script>
+        <div class="row-fluid">
+          <div class="span8">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#kbi_project_app_view" data-toggle="tab">App View (HTML)</a></li>
+              <li><a href="#kbi_project_list_view" data-toggle="tab">List View (HTML)</a></li>
+              <li><a href="#kbi_project_detail_view" data-toggle="tab">Detail View (HTML)</a></li>
+              <li><a href="#kbi_project_app_controller" data-toggle="tab">App Controller (CS/JS)</a></li>
+              <li><a href="#kbi_project_collection" data-toggle="tab">Project ORM (CS/JS)</a></li>
+              <li><a href="#kbi_project_list_view_model" data-toggle="tab">List ViewModel (CS/JS)</a></li>
+              <li><a href="#kbi_project_view_model" data-toggle="tab">Project ViewModel (CS/JS)</a></li>
+            </ul>
+            <div class="tab-content">
+              <div id="kbi_project_app_view" class="tab-pane active">
+                <pre>&lt;div kb-app=&quot;afterBinding: projectAppStartRouting&quot;&gt;
+  &lt;h2&gt;JavaScript Projects&lt;/h2&gt;
+  &lt;div data-bind=&quot;inject: ProjectAppController&quot;&gt;&lt;/div&gt;
+&lt;div&gt;</pre>
+              </div>
+              <div id="kbi_project_list_view" class="tab-pane">
+                <pre>&lt;script type=&quot;text/x-jquery-tmpl&quot; id=&quot;list.html&quot;&gt;
+  &lt;div&gt;
+    &lt;input type=&quot;text&quot; class=&quot;search-query&quot; placeholder=&quot;Search&quot; data-bind=&quot;value: filter, valueUpdate: 'keyup'&quot;&gt;
+    &lt;table&gt;
+      &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Project&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;&lt;a data-bind=&quot;click: loadUrlFn('new')&quot;&gt;&lt;i class=&quot;icon-plus-sign&quot;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+      &lt;!-- ko foreach: projects --&gt;
+        &lt;tr&gt;
+          &lt;td&gt;&lt;a data-bind=&quot;attr: {href: site}, text: name&quot;target=&quot;_blank&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+          &lt;td data-bind=&quot;text: description&quot;&gt;&lt;/td&gt;
+          &lt;td&gt;
+            &lt;a data-bind=&quot;click: loadUrlFn('edit/' + id())&quot;&gt;&lt;i class=&quot;icon-pencil&quot;&gt;&lt;/i&gt;&lt;/a&gt;
+          &lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;!-- /ko --&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+&lt;/script&gt;</pre>
+              </div>
+              <div id="kbi_project_detail_view" class="tab-pane">
+                <pre>&lt;script type=&quot;text/x-jquery-tmpl&quot; id=&quot;detail.html&quot;&gt;
+  &lt;form name=&quot;myForm&quot; data-bind=&quot;inject: kb.formValidator&quot;&gt;
+    &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.name().invalid}&quot;&gt;
+      &lt;label&gt;Name&lt;/label&gt;
+      &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name, valueUpdate: 'keyup'&quot; required&gt;
+      &lt;span data-bind=&quot;visible: $myForm.name().required&quot; class=&quot;help-inline&quot;&gt;
+          Required&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.site().invalid}&quot;&gt;
+      &lt;label&gt;Website&lt;/label&gt;
+      &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site, valueUpdate: 'keyup'&quot; required&gt;
+      &lt;span data-bind=&quot;visible: $myForm.site().required&quot; class=&quot;help-inline&quot;&gt;
+          Required&lt;/span&gt;
+      &lt;span data-bind=&quot;visible: $myForm.site().url&quot; class=&quot;help-inline&quot;&gt;
+          Not a URL&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;label&gt;Description&lt;/label&gt;
+    &lt;textarea name=&quot;description&quot; data-bind=&quot;value: description&quot;&gt;&lt;/textarea&gt;
+
+    &lt;br&gt;
+    &lt;a class=&quot;btn&quot; data-bind=&quot;click: loadUrlFn('')&quot;&gt;Cancel&lt;/a&gt;
+    &lt;button data-bind=&quot;click: save, disable: isClean() || $myForm.invalid()&quot;
+            class=&quot;btn btn-primary&quot;&gt;Save&lt;/button&gt;
+    &lt;button data-bind=&quot;click: onDelete&quot;
+            class=&quot;btn btn-danger&quot;&gt;Delete&lt;/button&gt;
+  &lt;/form&gt;
+&lt;/script&gt;</pre>
+              </div>
+              <div id="kbi_project_app_controller" class="tab-pane">
+                <pre data-for="cs">ProjectAppController = (view_model, element) ->
+  knockback_model = {id: 'id_kb', name: 'Knockback.js', description: 'Backbone.js + Knockout.js is amazingly!', site: 'http://kmalakoff.github.com/knockback/'}
+  projects = new ProjectCollection([knockback_model])
+  projects.fetch()
+
+  active_el = null
+  loadPage = (el) ->
+    ko.removeNode(active_el) if active_el
+    element.appendChild(active_el = el)
+
+  router = new Backbone.Router()
+  router.route('*path', null, -> _.defer(loadUrlFn('')))
+  router.route('', null, ->
+    loadPage(kb.renderTemplate('list.html', new ProjectListViewModel(projects)))
+  )
+  router.route('new', null, ->
+    loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(new Project(), projects)))
+  )
+  router.route('edit/:projectId', null, (project_id) ->
+    (loadUrl(''); return) unless project = projects.get(project_id) # not a valid project
+    loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(project)))
+  )
+  @
+
+# start outside of the binding loop
+projectAppStartRouting = ->
+  Backbone.history.start({pushState: true, root: window.location.pathname}) unless Backbone.History.started</pre>
+                <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var ProjectAppController, projectAppStartRouting;
+
+ProjectAppController = function(view_model, element) {
+  var active_el, knockback_model, loadPage, projects, router;
+  knockback_model = {
+    id: 'id_kb',
+    name: 'Knockback.js',
+    description: 'Backbone.js + Knockout.js is amazingly!',
+    site: 'http://kmalakoff.github.com/knockback/'
+  };
+  projects = new ProjectCollection([knockback_model]);
+  projects.fetch();
+  active_el = null;
+  loadPage = function(el) {
+    if (active_el) {
+      ko.removeNode(active_el);
+    }
+    return element.appendChild(active_el = el);
+  };
+  router = new Backbone.Router();
+  router.route('*path', null, function() {
+    return _.defer(loadUrlFn(''));
+  });
+  router.route('', null, function() {
+    return loadPage(kb.renderTemplate('list.html', new ProjectListViewModel(projects)));
+  });
+  router.route('new', null, function() {
+    return loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(new Project(), projects)));
+  });
+  router.route('edit/:projectId', null, function(project_id) {
+    var project;
+    if (!(project = projects.get(project_id))) {
+      loadUrl('');
+      return;
+    }
+    return loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(project)));
+  });
+  return this;
+};
+
+projectAppStartRouting = function() {
+  if (!Backbone.History.started) {
+    return Backbone.history.start({
+      pushState: true,
+      root: window.location.pathname
+    });
+  }
+};
+</pre>
+              </div>
+              <div id="kbi_project_collection" class="tab-pane">
+                <pre data-for="cs">PROJECTS_BASE_URL = 'https://api.mongolab.com/api/1/databases/angularjs/collections/projects'
+PROJECTS_API_KEY_PARAM = 'apiKey=4f847ad3e4b08a2eed5f3b54'
+
+Project = Backbone.Model.extend({
+  url: -> "#{PROJECTS_BASE_URL}/#{@id}?#{PROJECTS_API_KEY_PARAM}"
+})
+ProjectCollection = Backbone.Collection.extend({
+  url: "#{PROJECTS_BASE_URL}?#{PROJECTS_API_KEY_PARAM}"
+  parse: (data) -> return _.map(data, (item) -> item.id = item._id.$oid; return item) # remap the ids
+  model: Project
+})</pre>
+                <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var PROJECTS_API_KEY_PARAM, PROJECTS_BASE_URL, Project;
+
+PROJECTS_BASE_URL = 'https://api.mongolab.com/api/1/databases/angularjs/collections/projects';
+
+PROJECTS_API_KEY_PARAM = 'apiKey=4f847ad3e4b08a2eed5f3b54';
+
+Project = Backbone.Model.extend({
+  url: function() {
+    return "" + PROJECTS_BASE_URL + "/" + this.id + "?" + PROJECTS_API_KEY_PARAM;
+  }
+});
+// Generated by CoffeeScript 1.3.3
+var ProjectCollection;
+
+ProjectCollection = Backbone.Collection.extend({
+  url: "" + PROJECTS_BASE_URL + "?" + PROJECTS_API_KEY_PARAM,
+  parse: function(data) {
+    return _.map(data, function(item) {
+      item.id = item._id.$oid;
+      return item;
+    });
+  },
+  model: Project
+});
+</pre>
+              </div>
+              <div id="kbi_project_list_view_model" class="tab-pane">
+                <pre data-for="cs">ProjectListViewModel = (projects) ->
+  @filter = ko.observable('')
+  @projects = kb.collectionObservable(projects, {
+    view_model: ProjectViewModel
+    sort_attribute: 'name'
+    filters: (model) =>
+      filter = @filter()
+      return false unless filter
+      return (model.get('name').search(filter) < 0)
+  })
+  @</pre>
+                <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var ProjectListViewModel;
+
+ProjectListViewModel = function(projects) {
+  var _this = this;
+  this.filter = ko.observable('');
+  this.projects = kb.collectionObservable(projects, {
+    view_model: ProjectViewModel,
+    sort_attribute: 'name',
+    filters: function(model) {
+      var filter;
+      filter = _this.filter();
+      if (!filter) {
+        return false;
+      }
+      return model.get('name').search(filter) < 0;
+    }
+  });
+  return this;
+};
+</pre>
+              </div>
+              <div id="kbi_project_view_model" class="tab-pane">
+                <pre data-for="cs">ProjectViewModel = kb.ViewModel.extend({
+  constructor: (project, projects) ->
+    kb.ViewModel.prototype.constructor.call(@, project, {requires: ['id', 'name', 'site', 'description']})
+
+    start_attributes = _.clone(project.attributes)
+    @model_changed = kb.triggeredObservable(project, 'change')
+    @isClean = ko.computed(=>
+      @model_changed() # create a depdendency
+      return _.isEqual(start_attributes, project.attributes)
+    )
+    @onDelete = -> # destroy() is reserved for ViewModel lifecycle
+      project.destroy() unless project.isNew()
+      loadUrl('')
+      return false
+    @save = ->
+      projects.add(project) if project.isNew()
+      project.save()
+      loadUrl('')
+      return false
+    @
+})</pre>
+                <pre data-for="js">// Generated by CoffeeScript 1.3.3
+var ProjectViewModel;
+
+ProjectViewModel = kb.ViewModel.extend({
+  constructor: function(project, projects) {
+    var start_attributes,
+      _this = this;
+    kb.ViewModel.prototype.constructor.call(this, project, {
+      requires: ['id', 'name', 'site', 'description']
+    });
+    start_attributes = _.clone(project.attributes);
+    this.model_changed = kb.triggeredObservable(project, 'change');
+    this.isClean = ko.computed(function() {
+      _this.model_changed();
+      return _.isEqual(start_attributes, project.attributes);
+    });
+    this.onDelete = function() {
+      if (!project.isNew()) {
+        project.destroy();
+      }
+      loadUrl('');
+      return false;
+    };
+    this.save = function() {
+      if (project.isNew()) {
+        projects.add(project);
+      }
+      project.save();
+      loadUrl('');
+      return false;
+    };
+    return this;
+  }
+});
+</pre>
+              </div>
+            </div>
+          </div>
+          <div class="span4">
+            <h4>Live Result</h4>
+            <div class="demos_result_box"><div kb-app="afterBinding: projectAppStartRouting">
+  <h2>JavaScript Projects</h2>
+  <div data-bind="inject: ProjectAppController"></div>
+<div>
+            </div>
+          </div>
+          <script type="application/javascript">kb.injectApps();</script>
+        </div>
+      </content>
+      <footer class="page">
+      </footer>
+    </div>
+  </body>
+</html>

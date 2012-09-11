@@ -230,7 +230,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); // observable
     <pre><code class='coffee'>var ViewModel = kb.ViewModel.extend({
   constructor: function(model){
     kb.ViewModel.prototype.constructor.apply(this, arguments);
-    this.full_name = ko.computed(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);
+    this.full_name = ko.dependentObservable(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);
   }
 });
 var view_model = new ViewModel(model);</code></pre>
@@ -487,7 +487,7 @@ view_model.model(new Backbone.Model({name: &#39;fred&#39;})); // set
     </div>
     <div id='footer'>
   Generated on
-  Mon Sep 10 2012 10:11:46 GMT+0900 (JST)
+  Wed Sep 12 2012 00:21:28 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.4.1

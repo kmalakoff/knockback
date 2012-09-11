@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">Application Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -90,7 +90,7 @@ ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_m
 
 </p>
 <pre><code>// Auto-released Template
-var el = kb.renderAutoReleasedTemplate(&#39;template_name&#39;, view_model, options);
+var el = kb.renderTemplate(&#39;template_name&#39;, view_model, options);
 
 // OR: When applying bindings
 kb.applyBindings(view_model, el);
@@ -101,7 +101,7 @@ kb.releaseOnNodeRemove(view_model, el);</code></pre>
 <p>In the reference application, I manually create the statistics view model:
 
 </p>
-<pre><code>var statistics_el = kb.renderAutoReleasedTemplate(&#39;statistics&#39;, new StatisticsViewModel());
+<pre><code>var statistics_el = kb.renderTemplate(&#39;statistics&#39;, new StatisticsViewModel());
 $(&#39;body&#39;).append(statistics_el);
 ...
 ko.releaseNode(statistics_el);</code></pre>
@@ -119,16 +119,16 @@ ko.releaseNode(statistics_el);</code></pre>
     Backbone.Router.prototype.constructor.apply(this, arguments);
     this.active_el = null;
     this.route(&#39;&#39;, null, function() {
-      return _this.loadPage(kb.renderAutoReleasedTemplate(&#39;home&#39;, {}));
+      return _this.loadPage(kb.renderTemplate(&#39;home&#39;, {}));
     });
 
     this.route(&#39;things&#39;, null, function() {
-      return _this.loadPage(kb.renderAutoReleasedTemplate(&#39;things_page&#39;, new ThingsPageViewModel()));
+      return _this.loadPage(kb.renderTemplate(&#39;things_page&#39;, new ThingsPageViewModel()));
     });
 
     this.route(&#39;things/:id&#39;, null, function(id) {
       var model = app.collections.things.get(id) || new Backbone.ModelRef(app.collections.things, id);
-      return _this.loadPage(kb.renderAutoReleasedTemplate(&#39;thing_page&#39;, new ThingCellViewModel(model)));
+      return _this.loadPage(kb.renderTemplate(&#39;thing_page&#39;, new ThingCellViewModel(model)));
     });
   },
 
@@ -151,14 +151,14 @@ ko.releaseNode(statistics_el);</code></pre>
 
     this.route(&#39;&#39;, null, page_navigator.dispatcher(function() {
       return page_navigator.loadPage({
-        create: function() { return kb.renderAutoReleasedTemplate(&#39;home&#39;, {}); },
+        create: function() { return kb.renderTemplate(&#39;home&#39;, {}); },
         transition: { name: &#39;FadeIn&#39;, duration: 1000 }
       });
     }));
 
     this.route(&#39;things&#39;, null, page_navigator.dispatcher(function() {
       return page_navigator.loadPage({
-        create: function() { return kb.renderAutoReleasedTemplate(&#39;things_page&#39;, new ThingsPageViewModel()); },
+        create: function() { return kb.renderTemplate(&#39;things_page&#39;, new ThingsPageViewModel()); },
         transition: &#39;NavigationSlide&#39;
       });
     }));
@@ -166,7 +166,7 @@ ko.releaseNode(statistics_el);</code></pre>
     this.route(&#39;things/:id&#39;, null, page_navigator.dispatcher(function(id) {
       var model = app.collections.things.get(id) || new Backbone.ModelRef(app.collections.things, id);
       page_navigator.loadPage({
-        create: function() { return kb.renderAutoReleasedTemplate(&#39;thing_page&#39;, new ThingCellViewModel(model)); },
+        create: function() { return kb.renderTemplate(&#39;thing_page&#39;, new ThingCellViewModel(model)); },
         transition: &#39;CoverVertical&#39;
       });
     }));

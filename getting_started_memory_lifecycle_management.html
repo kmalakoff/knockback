@@ -46,7 +46,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">Application Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -85,7 +85,7 @@ ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_m
 </p>
 
           <pre data-for="cs"># Auto-released Template
-el = kb.renderAutoReleasedTemplate('template_name', view_model, options)
+el = kb.renderTemplate('template_name', view_model, options)
 
 # OR: When applying bindings
 kb.applyBindings(view_model, el)
@@ -93,7 +93,7 @@ kb.applyBindings(view_model, el)
 # OR: Manually
 kb.releaseOnNodeRemove(view_model, el)</pre>
           <pre data-for="js">// Auto-released Template
-var el = kb.renderAutoReleasedTemplate('template_name', view_model, options);
+var el = kb.renderTemplate('template_name', view_model, options);
 
 // OR: When applying bindings
 kb.applyBindings(view_model, el);
@@ -109,21 +109,21 @@ kb.releaseOnNodeRemove(view_model, el);</pre><p>This means you can use a Backbon
     @route('', null, =&gt;
       ko.removeNode(@active_el) if @active_el # remove previous
       
-      @active_el = kb.renderAutoReleasedTemplate('home', new HomeViewModel())
+      @active_el = kb.renderTemplate('home', new HomeViewModel())
       $('body').append(@active_el)
     )
     
     @route('things', null, =&gt;
       ko.removeNode(@active_el) if @active_el # remove previous
       
-      @active_el = kb.renderAutoReleasedTemplate('things_page', new ThingsPageViewModel())
+      @active_el = kb.renderTemplate('things_page', new ThingsPageViewModel())
       $('body').append(@active_el)
     )
     
     @route('things/:id', null, (id) =&gt;
       ko.removeNode(@active_el) if @active_el # remove previous
       
-      @active_el = kb.renderAutoReleasedTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))
+      @active_el = kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))
       $('body').append(@active_el)
     )
 })</pre>
@@ -135,21 +135,21 @@ kb.releaseOnNodeRemove(view_model, el);</pre><p>This means you can use a Backbon
     this.route('', null, function() {
       if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
       
-      this.active_el = kb.renderAutoReleasedTemplate('home', new HomeViewModel());
+      this.active_el = kb.renderTemplate('home', new HomeViewModel());
       $('body').append(this.active_el);
     });
     
     this.route('things', null, function() {
       if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
       
-      this.active_el = kb.renderAutoReleasedTemplate('things_page', new ThingsPageViewModel());
+      this.active_el = kb.renderTemplate('things_page', new ThingsPageViewModel());
       $('body').append(this.active_el);
     });
     
     this.route('things/:id', null, function(id) {
       if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
       
-      this.active_el = kb.renderAutoReleasedTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)));
+      this.active_el = kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)));
       $('body').append(this.active_el);
     });
   }

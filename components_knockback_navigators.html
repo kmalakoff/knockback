@@ -42,7 +42,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">Application Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -93,12 +93,12 @@ Path.map(&#39;#page2&#39;).to(page_navigator.dispatcher(function(){ page_navigat
 Path.listen();
 Path.dispatch(window.location.hash);</code></pre>
 <h3>Dynamic Pages using Knockback.js</h3>
-<p>You can dynamic pages either by hand or using Knockback.js&#39;s &#39;kb.renderAutoReleasedTemplate(template_name, view_model, options)&#39; function.
+<p>You can dynamic pages either by hand or using Knockback.js&#39;s &#39;kb.renderTemplate(template_name, view_model, options)&#39; function.
 
 </p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
-  page_navigator.loadPage( kb.renderAutoReleasedTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))) );
+  page_navigator.loadPage( kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))) );
 }));
 ...</code></pre>
 <p>You can also force pages to unload when they are not active, but supplying a &#39;create&#39; function rather than an element.
@@ -106,7 +106,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
 </p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
-  create: function() { return kb.renderAutoReleasedTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;page1&#39;))) }
+  create: function() { return kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;page1&#39;))) }
 }));
 ...</code></pre>
 <h1>Adding Transition Animations</h1>
@@ -119,7 +119,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   page_navigator.loadPage({
-    el: kb.renderAutoReleasedTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))),
+    el: kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))),
     transition: &#39;FadeIn&#39;
   });
 }));
@@ -130,7 +130,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   page_navigator.loadPage({
-    el: kb.renderAutoReleasedTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))),
+    el: kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))),
     transition: {name: &#39;FadeIn&#39;, duration: 1000}
   });
 }));
@@ -237,7 +237,7 @@ ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_m
 
 </p>
 <pre><code>// Auto-released Template
-var el = kb.renderAutoReleasedTemplate(&#39;template_name&#39;, view_model, options);
+var el = kb.renderTemplate(&#39;template_name&#39;, view_model, options);
 
 // OR: When applying bindings
 kb.applyBindings(view_model, el);

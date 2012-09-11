@@ -287,12 +287,24 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#renderAutoReleasedTemplate-class'>
-        + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+      <a href='#renderTemplate-class'>
+        + (void) <strong>renderTemplate</strong>(template, view_model, options = {})
       </a>
     </span>
     <span class='desc'>
       Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+    </span>
+  </li>
+  <li deprecated>
+    <span class='signature'>
+      <a href='#renderAutoReleasedTemplate-class'>
+        + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+      </a>
+    </span>
+    <span class='deprecated note title'>Deprecated</span>
+    <span class='desc'>
+      <strong>Deprecated.</strong>
+      Use kb.renderTemplate
     </span>
   </li>
   <li>
@@ -577,8 +589,8 @@ ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='renderAutoReleasedTemplate-class'>
-      + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+    <p class='signature' id='renderTemplate-class'>
+      + (void) <strong>renderTemplate</strong>(template, view_model, options = {})
     </p>
     <div class='docstring'>
   <p>Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.</p>
@@ -587,13 +599,20 @@ ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
     <h4>
       The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
     </h4>
-    <pre><code class='coffee'>var el = kb.renderAutoReleasedTemplate(&#39;my_template&#39;, kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;})));
+    <pre><code class='coffee'>var el = kb.renderTemplate(&#39;my_template&#39;, kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;})));
 ...
 ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
 </code></pre>
   </div>
 </div>
 <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='renderAutoReleasedTemplate-class'>
+      + (void) <strong>renderAutoReleasedTemplate</strong>(template, view_model, options = {})
+    </p>
+    <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -621,7 +640,7 @@ ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
     </div>
     <div id='footer'>
   Generated on
-  Mon Sep 10 2012 10:11:46 GMT+0900 (JST)
+  Wed Sep 12 2012 00:21:28 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.4.1
