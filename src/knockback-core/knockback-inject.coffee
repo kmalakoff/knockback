@@ -8,10 +8,18 @@
 
 # Helpers for building single page apps using injection.
 #
-# @example Create an embedded app.
+# @example Auto binding using kb-app attribute.
 #   TODO
 #
-
+# @example Injecting by view model.
+#   TODO
+#
+# @example Injecting by function.
+#   TODO
+#
+# @example Injecting with resolve.
+#   TODO
+#
 ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
     data = ko.utils.unwrapObservable(value_accessor())
@@ -34,8 +42,10 @@ kb.injectApps = (root) ->
   # find all of the app elements
   apps = []
   getAppElements = (el) ->
-    if el.attributes and (attr = _.find(el.attributes, (attr)-> attr.name is 'kb-app'))
-      apps.push([el, attr])
+    unless el.__kb_injected # already injected -> skip, but still process children in case they were added afterwards
+      if el.attributes and (attr = _.find(el.attributes, (attr)-> attr.name is 'kb-app'))
+        el.__kb_injected = true # mark injected
+        apps.push([el, attr])
     getAppElements(child_el) for child_el in el.childNodes
     return
   getAppElements(root or document)

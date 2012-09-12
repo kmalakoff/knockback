@@ -582,7 +582,7 @@ $(document).ready( ->
       equal(vm.name(), name, "band member name matches for #{name}")
 
     validateBandMember(collection_observable()[0], 'John')
-    validateBestFriend(collection_observable()[0].best_friend(), 'George')   
+    validateBestFriend(collection_observable()[0].best_friend(), 'George')
     validateFriends(collection_observable()[0].friends, ['Paul', 'George', 'Ringo'])
     validateBandMember(collection_observable()[1], 'Paul')
     validateBestFriend(collection_observable()[1].best_friend(), 'George')
@@ -596,6 +596,59 @@ $(document).ready( ->
 
     # and cleanup after yourself when you are done.
     kb.release(collection_observable)
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+
+  test("11. Minimum factory tree for shared dependent models", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    george = new Person({
+      id: 'person-11-3'
+      name: 'George'
+      friends: ['person-11-1', 'person-11-2', 'person-11-4']
+    })
+    john = new Person({
+      id: 'person-11-1'
+      name: 'John'
+      friends: ['person-11-2', 'person-11-3', 'person-11-4']
+    })
+    paul = new Person({
+      id: 'person-11-2'
+      name: 'Paul'
+      friends: ['person-11-1', 'person-11-3', 'person-11-4']
+    })
+    ringo = new Person({
+      id: 'person-11-4'
+      name: 'Ringo'
+      friends: ['person-11-1', 'person-11-2', 'person-11-3']
+    })
+
+    class window.PersonViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super(model, {
+          factories:
+            'friends': PersonCollection
+            'best_friend': PersonViewModel
+            'best_friends_with_me': PersonViewModel
+          options: options
+        })
+
+    class window.PersonCollection extends kb.CollectionObservable
+      constructor: (collection, options) ->
+        return super(collection, {
+          factories:
+            'models': PersonViewModel
+          options: options
+        })
+
+    collection_observable1 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]))
+    collection_observable2 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]), collection_observable1.shareOptions())
+
+    ok(!collection_observable2.__kb.factory.parent_factory, "the factory should be shared")
+
+    kb.release(collection_observable1)
+    kb.release(collection_observable2)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )

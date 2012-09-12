@@ -1,12 +1,15 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.3
+
+* **kb-app injection bugfix**: fixed 'NOT_FOUND_ERR: DOM Exception 8 error' (chrome warning) when app is bound multiple times.
+* **increased factory sharing**: reduced the factory nesting through more aggressive sharing
+
 ## 0.16.2
 
 * **major changes to kb.CollectionObservable**: added support for observable mappings (sort_attribute, sorted_index_fn and filters), removed defer, removed optional collection reference counting, removed Backbone.Events (use ko.subscription instead, removed wrappedObject in the collection).
 
 * **added app and view_model injection**: you are now able to inject an application using a kb-app attribute on a dom element and inject into a view model using an 'inject' data-bind attribute.
-
-**note**: I have found a 'NOT_FOUND_ERR: DOM Exception 8 error' error with injection. It will be fixed in 0.16.3 soon! Please treat injection (kb-app and inject) as a beta feature until a patch is released.
 
 * **added validators**: you can use kb.valueValidator, kb.inputValidator, or kb.formValidator to add validations. Currently only the following are support: 'required', 'url', 'number', 'email' and you can extend by adding properties to kb.validators
 

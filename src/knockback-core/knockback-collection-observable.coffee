@@ -88,28 +88,12 @@ class kb.CollectionObservable
 
     # view model factory create factories
     @path = options.path
-    factory = create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory))
-    factory.addPathMappings(options.factories, options.path) if options.factories
+    create_options.factory = kb.utils.wrappedFactory(observable, @_shareOrCreateFactory(options))
     create_options.path = kb.utils.pathJoin(options.path, 'models')
 
-    # add or deduce models create information
-    create_options.creator = factory.creatorForPath(null, create_options.path)
-    if create_options.creator
-      @models_only = create_options.creator.models_only
-    else
-      if options.hasOwnProperty('models_only')
-        if options.models_only
-          factory.addPathMapping(create_options.path, {models_only: options.models_only})
-          @models_only = options.models_only
-        else
-          factory.addPathMapping(create_options.path, kb.ViewModel)
-      else if options.view_model
-        factory.addPathMapping(create_options.path, options.view_model)
-      else if options.create
-        factory.addPathMapping(create_options.path, {create: options.create})
-      else
-        factory.addPathMapping(create_options.path, kb.ViewModel)
-      create_options.creator = factory.creatorForPath(null, create_options.path)
+    # check for models only
+    create_options.creator = create_options.factory.creatorForPath(null, create_options.path)
+    @models_only = create_options.creator.models_only if create_options.creator
 
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
@@ -278,6 +262,39 @@ class kb.CollectionObservable
   ####################################################
   # Internal
   ####################################################
+
+  # @private
+  _shareOrCreateFactory: (options) ->
+    absolute_models_path = kb.utils.pathJoin(options.path, 'models')
+    factories = options.factories
+
+    # check the existing factory
+    if (factory = options.factory)
+      # models matches, check additional paths
+      if (existing_creator = factory.creatorForPath(null, absolute_models_path)) and (not factories or (factories['models'] is existing_creator))
+        return factory unless factories # all match, share the factory
+
+        # all match, share the factory
+        return factory if factory.hasPathMappings(factories, options.path)
+
+    # need to create a new factory
+    factory = new kb.Factory(options.factory)
+    factory.addPathMappings(factories, options.path) if factories
+
+    # set up the default create function
+    unless factory.creatorForPath(null, absolute_models_path)
+      if options.hasOwnProperty('models_only')
+        if options.models_only
+          factory.addPathMapping(absolute_models_path, {models_only: true})
+        else
+          factory.addPathMapping(absolute_models_path, kb.ViewModel)
+      else if options.view_model
+        factory.addPathMapping(absolute_models_path, options.view_model)
+      else if options.create
+        factory.addPathMapping(absolute_models_path, {create: options.create})
+      else
+        factory.addPathMapping(absolute_models_path, kb.ViewModel)
+    return factory
 
   # @private
   _onCollectionChange: (event, arg) ->

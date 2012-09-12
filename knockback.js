@@ -426,11 +426,10 @@ kb.Factory = (function() {
 
   Factory.useOptionsOrCreate = function(options, obj, owner_path) {
     var factory;
-    if (options.factory && !options.factories) {
-      factory = kb.utils.wrappedFactory(obj, options.factory);
-    } else {
-      factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
+    if (options.factory && (!options.factories || (options.factories && options.factory.hasPathMappings(options.factories, owner_path)))) {
+      return kb.utils.wrappedFactory(obj, options.factory);
     }
+    factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
     if (options.factories) {
       factory.addPathMappings(options.factories, owner_path);
     }
@@ -457,6 +456,16 @@ kb.Factory = (function() {
       this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
     }
     return this;
+  };
+
+  Factory.prototype.hasPathMappings = function(factories, owner_path) {
+    var all_exist, creator, existing_creator, path;
+    all_exist = true;
+    for (path in factories) {
+      creator = factories[path];
+      all_exist &= (existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path))) && (creator === existing_creator);
+    }
+    return all_exist;
   };
 
   Factory.prototype.creatorForPath = function(obj, path) {
@@ -1332,7 +1341,7 @@ kb.CollectionObservable = (function() {
   CollectionObservable.extend = Backbone.Model.extend;
 
   function CollectionObservable(collection, options) {
-    var create_options, factory, observable,
+    var create_options, observable,
       _this = this;
     !collection || (collection instanceof Backbone.Collection) || throwUnexpected(this, 'not a collection');
     options || (options = {});
@@ -1360,34 +1369,11 @@ kb.CollectionObservable = (function() {
       store: kb.Store.useOptionsOrCreate(options, collection, observable)
     };
     this.path = options.path;
-    factory = create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(options.factory));
-    if (options.factories) {
-      factory.addPathMappings(options.factories, options.path);
-    }
+    create_options.factory = kb.utils.wrappedFactory(observable, this._shareOrCreateFactory(options));
     create_options.path = kb.utils.pathJoin(options.path, 'models');
-    create_options.creator = factory.creatorForPath(null, create_options.path);
+    create_options.creator = create_options.factory.creatorForPath(null, create_options.path);
     if (create_options.creator) {
       this.models_only = create_options.creator.models_only;
-    } else {
-      if (options.hasOwnProperty('models_only')) {
-        if (options.models_only) {
-          factory.addPathMapping(create_options.path, {
-            models_only: options.models_only
-          });
-          this.models_only = options.models_only;
-        } else {
-          factory.addPathMapping(create_options.path, kb.ViewModel);
-        }
-      } else if (options.view_model) {
-        factory.addPathMapping(create_options.path, options.view_model);
-      } else if (options.create) {
-        factory.addPathMapping(create_options.path, {
-          create: options.create
-        });
-      } else {
-        factory.addPathMapping(create_options.path, kb.ViewModel);
-      }
-      create_options.creator = factory.creatorForPath(null, create_options.path);
     }
     observable.destroy = _.bind(this.destroy, this);
     observable.shareOptions = _.bind(this.shareOptions, this);
@@ -1515,6 +1501,46 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype.hasViewModels = function() {
     return !this.models_only;
+  };
+
+  CollectionObservable.prototype._shareOrCreateFactory = function(options) {
+    var absolute_models_path, existing_creator, factories, factory;
+    absolute_models_path = kb.utils.pathJoin(options.path, 'models');
+    factories = options.factories;
+    if ((factory = options.factory)) {
+      if ((existing_creator = factory.creatorForPath(null, absolute_models_path)) && (!factories || (factories['models'] === existing_creator))) {
+        if (!factories) {
+          return factory;
+        }
+        if (factory.hasPathMappings(factories, options.path)) {
+          return factory;
+        }
+      }
+    }
+    factory = new kb.Factory(options.factory);
+    if (factories) {
+      factory.addPathMappings(factories, options.path);
+    }
+    if (!factory.creatorForPath(null, absolute_models_path)) {
+      if (options.hasOwnProperty('models_only')) {
+        if (options.models_only) {
+          factory.addPathMapping(absolute_models_path, {
+            models_only: true
+          });
+        } else {
+          factory.addPathMapping(absolute_models_path, kb.ViewModel);
+        }
+      } else if (options.view_model) {
+        factory.addPathMapping(absolute_models_path, options.view_model);
+      } else if (options.create) {
+        factory.addPathMapping(absolute_models_path, {
+          create: options.create
+        });
+      } else {
+        factory.addPathMapping(absolute_models_path, kb.ViewModel);
+      }
+    }
+    return factory;
   };
 
   CollectionObservable.prototype._onCollectionChange = function(event, arg) {
@@ -1726,10 +1752,13 @@ kb.injectApps = function(root) {
   apps = [];
   getAppElements = function(el) {
     var attr, child_el, _i, _len, _ref;
-    if (el.attributes && (attr = _.find(el.attributes, function(attr) {
-      return attr.name === 'kb-app';
-    }))) {
-      apps.push([el, attr]);
+    if (!el.__kb_injected) {
+      if (el.attributes && (attr = _.find(el.attributes, function(attr) {
+        return attr.name === 'kb-app';
+      }))) {
+        el.__kb_injected = true;
+        apps.push([el, attr]);
+      }
     }
     _ref = el.childNodes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {

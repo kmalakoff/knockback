@@ -21,10 +21,12 @@ class kb.Factory
   # @param [Instance] obj the instance that will own or register with the store
   # @param [String] owner_path the path to the owning object for turning relative scoping of the factories to absolute paths.
   @useOptionsOrCreate: (options, obj, owner_path) ->
-    if options.factory and not options.factories # reuse
-      factory = kb.utils.wrappedFactory(obj, options.factory)
-    else
-      factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory))
+    # share
+    if options.factory and (not options.factories or (options.factories and options.factory.hasPathMappings(options.factories, owner_path)))
+      return kb.utils.wrappedFactory(obj, options.factory)
+
+    # create a new factory
+    factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory))
     factory.addPathMappings(options.factories, owner_path) if options.factories
     return factory
 
@@ -40,6 +42,12 @@ class kb.Factory
     for path, create_info of factories
       @paths[kb.utils.pathJoin(owner_path, path)] = create_info
     @
+
+  hasPathMappings: (factories, owner_path) ->
+    all_exist = true
+    for path, creator of factories
+      all_exist &= ((existing_creator = @creatorForPath(null, kb.utils.pathJoin(owner_path, path))) and (creator is existing_creator))
+    return all_exist
 
   # If possible, creates an observable for an object using a dot-deliminated path.
   #
