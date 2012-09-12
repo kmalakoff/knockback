@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.4
+
+* path release: incorrect version displayed in headers (was 0.16.2 instead of 0.16.3) and missing files from NuGet package.
+
 ## 0.16.3
 
 * **kb-app injection bugfix**: fixed 'NOT_FOUND_ERR: DOM Exception 8 error' (chrome warning) when app is bound multiple times.

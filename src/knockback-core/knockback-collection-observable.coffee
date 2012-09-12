@@ -77,7 +77,7 @@ class kb.CollectionObservable
       @sorted_index_fn = ko.observable(@_sortAttributeFn(options.sort_attribute))
     else
       if options.sorted_index
-        legacyWarning(this, '0.16.3', 'use sorted_index_fn instead')
+        legacyWarning(this, '0.16.4', 'use sorted_index_fn instead')
         options.sorted_index_fn = options.sorted_index
       @sorted_index_fn = ko.observable(options.sorted_index_fn)
     if options.filters

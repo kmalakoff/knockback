@@ -1,5 +1,5 @@
 ###
-  knockback-core.js 0.16.3
+  knockback-core.js 0.16.4
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -48,7 +48,7 @@
 class kb
 
   # Knockback library semantic version
-  @VERSION: '0.16.3'
+  @VERSION: '0.16.4'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -157,7 +157,7 @@ class kb
 
   # @deprecated Use kb.renderTemplate
   @renderAutoReleasedTemplate = (template, view_model, options={}) ->
-    legacyWarning('kb.renderAutoReleasedTemplate', '0.16.3', 'Please use kb.renderTemplate instead')
+    legacyWarning('kb.renderAutoReleasedTemplate', '0.16.4', 'Please use kb.renderTemplate instead')
     @renderTemplate(template, view_model, options={})
 
   # Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
