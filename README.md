@@ -32,7 +32,7 @@ Bundles advanced features including: localization, formatting, triggering, and d
 
 ###Core
 
-Removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
 * Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js)
 * Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js)
