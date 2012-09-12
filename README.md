@@ -27,19 +27,22 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/blob/maste
 
 Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* [Full Library (64k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.js)
-* [Full Library (8k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.min.js)
-* [Full Stack (330k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.js)
-* [Full Stack (32k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.min.js)
+* Full Library [(64k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.js) or [(8k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.min.js)
+* Full Stack [(330k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.js) or [(32k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.min.js)
 
 ###Core
 
 Removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* [Core Library (54k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js)
-* [Core Library (7k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js)
-* [Core Stack (315k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js)
-* [Core Stack (31k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js)
+* Core Library [(54k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js) or [(7k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js)
+* Core Stack [(315k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js) or [(31k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js)
+
+###Distributions
+
+You can also find Knockback on your favorite distributions:
+
+* [npm registry](http://search.npmjs.org/#/knockback)
+* [NuGet Gallery](http://nuget.org/packages/Knockback.js)
 
 ###Dependencies
 
