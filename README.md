@@ -27,15 +27,15 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/blob/maste
 
 Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* Full Library [(64k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.js) or [(8k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.min.js)
-* Full Stack [(330k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.js) or [(32k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.min.js)
+* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.min.js)
+* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.min.js)
 
 ###Core
 
 Removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* Core Library [(54k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js) or [(7k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js)
-* Core Stack [(315k dev)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js) or [(31k min+gzip)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js)
+* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js)
+* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js)
 
 ###Distributions
 
