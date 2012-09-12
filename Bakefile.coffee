@@ -188,6 +188,8 @@ module.exports =
         'cp lib/knockback-formatting.min.js packages/nuget/Content/Scripts/lib/knockback-formatting.min.js'
         'cp lib/knockback-localization.js packages/nuget/Content/Scripts/lib/knockback-localization.js'
         'cp lib/knockback-localization.min.js packages/nuget/Content/Scripts/lib/knockback-localization.min.js'
+        'cp lib/knockback-triggering.js packages/nuget/Content/Scripts/lib/knockback-triggering.js'
+        'cp lib/knockback-triggering.min.js packages/nuget/Content/Scripts/lib/knockback-triggering.min.js'
         'cp lib/knockback-validation.js packages/nuget/Content/Scripts/lib/knockback-validation.js'
         'cp lib/knockback-validation.min.js packages/nuget/Content/Scripts/lib/knockback-validation.min.js'
         'cp lib/knockback-statistics.js packages/nuget/Content/Scripts/lib/knockback-statistics.js'
