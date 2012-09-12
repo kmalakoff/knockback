@@ -78,7 +78,7 @@ kb.defaultObservable = function(target, default_value) {
 };
 
 kb.defaultWrapper = function(target, default_value) {
-  legacyWarning('ko.defaultWrapper', '0.16.2', 'Please use kb.defaultObservable instead');
+  legacyWarning('ko.defaultWrapper', '0.16.3', 'Please use kb.defaultObservable instead');
   return new kb.DefaultObservable(target, default_value);
 };
 
