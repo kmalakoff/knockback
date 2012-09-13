@@ -26,7 +26,7 @@ ko.bindingHandlers['inject'] =
     # wrap to avoid dependencies propagating to the template
     wrapper = ko.dependentObservable(->
       if _.isFunction(data)
-        data(view_model, element, value_accessor, all_bindings_accessor)
+        new data(view_model, element, value_accessor, all_bindings_accessor) # use 'new' to allow for classes in addition to functions
       else if _.isObject(data)
         for key, value of data
           # resolve like a function
@@ -63,8 +63,19 @@ kb.injectApps = (root) ->
     options.afterBinding(options.view_model, app[0], options) if options.afterBinding
   return
 
-(onReady = ->
-  return setTimeout(onReady, 1) unless document.body # keep waiting
-  kb.injectApps()
-  return
-)()
+#############################
+# Auto Inject Apps
+#############################
+# use DOM library ready function
+if @$
+  @$ -> kb.injectApps()
+
+# use simple ready check
+else
+  (onReady = ->
+    # keep waiting for the document to load
+    return setTimeout(onReady, 0) unless document.readyState is "complete"
+
+    # the document is loaded
+    kb.injectApps()
+  )()

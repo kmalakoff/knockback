@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.16.4
+  knockback.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -29,7 +29,7 @@ Backbone = kb.Backbone;
 ko = kb.ko;
 
 /*
-  knockback_default_wrapper.js
+  knockback_default_wrapper.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:
@@ -78,7 +78,7 @@ kb.defaultObservable = function(target, default_value) {
 };
 
 kb.defaultWrapper = function(target, default_value) {
-  legacyWarning('ko.defaultWrapper', '0.16.4', 'Please use kb.defaultObservable instead');
+  legacyWarning('ko.defaultWrapper', '0.16.3', 'Please use kb.defaultObservable instead');
   return new kb.DefaultObservable(target, default_value);
 };
 

@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.16.4
+  knockback.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -29,7 +29,7 @@ Backbone = kb.Backbone;
 ko = kb.ko;
 
 /*
-  knockback-triggered-observable.js
+  knockback-triggered-observable.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:

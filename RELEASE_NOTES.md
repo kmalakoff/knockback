@@ -1,5 +1,10 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.5
+
+* fixed case where kb.injectApps could be called before page scripts loaded.
+* use new on the inject function to permit classes to be used
+
 ## 0.16.4
 
 * path release: incorrect version displayed in headers (was 0.16.2 instead of 0.16.3) and missing files from NuGet package.

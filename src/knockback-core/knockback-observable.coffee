@@ -149,16 +149,20 @@ class kb.Observable
   #   Sets the model or model reference
   #   @param [Backbone.Model|Backbone.ModelRef] new_model the model whose attribute by key will be observed (can be null)
   model: (new_model) ->
+    return if @__kb_destroyed # destroyed, nothing to do
+
     # get or no change
     return @m if (arguments.length == 0) or (@m is new_model)
     @m = new_model
-    @__kb_destroyed or @update() # update if we aren't being destroyed
+    @update()
 
   ####################################################
   # Internal
   ####################################################
   # @private
   update: (new_value) ->
+    return if @__kb_destroyed # destroyed, nothing to do
+
     # determine the new type
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
     new_value or= null # ensure null instead of undefined
