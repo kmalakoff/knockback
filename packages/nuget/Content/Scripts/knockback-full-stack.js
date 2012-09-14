@@ -1,3 +1,9 @@
+/*
+  knockback-full-stack.js 0.16.5
+  (c) 2011, 2012 Kevin Malakoff - http://kmalakoff.github.com/knockback/
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
+*/
 //     Underscore.js 1.3.3
 //     (c) 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
@@ -5932,14 +5938,11 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 });
 })(window,document,navigator);
 /*
-  knockback.js 0.16.5
-  (c) 2011, 2012 Kevin Malakoff.
-  Knockback.js is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  knockback.js 0.16.5 (full version)
+  (c) 2011, 2012 Kevin Malakoff - http://kmalakoff.github.com/knockback/
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
-
 (function() {
   return (function(factory) {
     // AMD
@@ -7737,7 +7740,7 @@ if (this.$) {
 }
 
 /*
-  knockback_default_wrapper.js 0.16.5
+  knockback_default_observable.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:

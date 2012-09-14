@@ -3,7 +3,9 @@ Please refer to the following release notes when upgrading your version of Knock
 ## 0.16.5
 
 * fixed case where kb.injectApps could be called before page scripts loaded.
-* use new on the inject function to permit classes to be used
+* use 'new' on the data-bind 'inject' for functions to permit class hierachies to be used.
+* added headers to all components and stack versions.
+* added AMD loader to all components.
 
 ## 0.16.4
 

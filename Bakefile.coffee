@@ -2,7 +2,7 @@ module.exports =
   library:
     join: 'knockback.js'
     compress: true
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-loader-full.js'
     files: [
       'src/knockback-core/knockback-core.coffee'
       'src/knockback-core/knockback-utils.coffee'
@@ -22,7 +22,7 @@ module.exports =
 
   knockback_core:
     join: 'knockback-core.js'
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-core/knockback-loader.js'
     compress: true
     files: [
       'src/knockback-core/knockback-core.coffee'
@@ -38,7 +38,7 @@ module.exports =
 
   knockback_defaults:
     join: 'knockback-defaults.js'
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-defaults/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -49,7 +49,7 @@ module.exports =
 
   knockback_formatting:
     join: 'knockback-formatting.js'
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-formatting/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -59,7 +59,7 @@ module.exports =
 
   knockback_localization:
     join: 'knockback-localization.js'
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-localization/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -70,7 +70,7 @@ module.exports =
 
   knockback_triggering:
     join: 'knockback-triggering.js'
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-triggering/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -80,7 +80,7 @@ module.exports =
 
   knockback_validation:
     join: 'knockback-validation.js'
-    wrapper: 'src/knockback-loader.js'
+    wrapper: 'src/knockback-validation/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -90,6 +90,7 @@ module.exports =
 
   knockback_statistics:
     join: 'knockback-statistics.js'
+    wrapper: 'src/knockback-statistics/knockback-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -139,10 +140,10 @@ module.exports =
         'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational.min.js'
 
         # full and core stack
-        'cat vendor/underscore-1.3.3.js vendor/backbone-0.9.2.js vendor/knockout-2.1.0.js knockback.js > knockback-full-stack.js'
-        'cat vendor/underscore-1.3.3.min.js vendor/backbone-0.9.2.min.js vendor/knockout-2.1.0.min.js knockback.min.js > knockback-full-stack.min.js'
-        'cat vendor/underscore-1.3.3.js vendor/backbone-0.9.2.js vendor/knockout-2.1.0.js knockback-core.js > knockback-core-stack.js'
-        'cat vendor/underscore-1.3.3.min.js vendor/backbone-0.9.2.min.js vendor/knockout-2.1.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
+        'cat src/license-header-full-stack.js vendor/underscore-1.3.3.js vendor/backbone-0.9.2.js vendor/knockout-2.1.0.js knockback.js > knockback-full-stack.js'
+        'cat src/license-header-full-stack.js vendor/underscore-1.3.3.min.js vendor/backbone-0.9.2.min.js vendor/knockout-2.1.0.min.js knockback.min.js > knockback-full-stack.min.js'
+        'cat src/license-header-core-stack.js vendor/underscore-1.3.3.js vendor/backbone-0.9.2.js vendor/knockout-2.1.0.js knockback-core.js > knockback-core-stack.js'
+        'cat src/license-header-core-stack.js vendor/underscore-1.3.3.min.js vendor/backbone-0.9.2.min.js vendor/knockout-2.1.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
 
         # npm
         'cp README.md packages/npm/README.md'

@@ -19,7 +19,7 @@ These resources can help you get started:
 * [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators) (***new!***): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 
-#Download Latest (0.16.4):
+#Download Latest (0.16.5):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
@@ -27,15 +27,15 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/blob/maste
 
 Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.min.js)
-* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.min.js)
+* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback.min.js)
+* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-full-stack.min.js)
 
 ###Core
 
 Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js)
-* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js)
+* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core.min.js)
+* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core-stack.min.js)
 
 ###Distributions
 

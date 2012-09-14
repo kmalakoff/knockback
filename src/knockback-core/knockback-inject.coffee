@@ -68,7 +68,7 @@ kb.injectApps = (root) ->
 #############################
 # use DOM library ready function
 if @$
-  @$ -> kb.injectApps()
+  @$(->kb.injectApps())
 
 # use simple ready check
 else

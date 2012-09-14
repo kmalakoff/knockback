@@ -1,12 +1,9 @@
 /*
-  knockback.js 0.16.5
-  (c) 2011, 2012 Kevin Malakoff.
-  Knockback.js is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  knockback-defaults.js 0.16.5
+  (c) 2011, 2012 Kevin Malakoff - http://kmalakoff.github.com/knockback/
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
-
 (function() {
   return (function(factory) {
     // AMD
@@ -29,7 +26,7 @@ Backbone = kb.Backbone;
 ko = kb.ko;
 
 /*
-  knockback_default_wrapper.js 0.16.5
+  knockback_default_observable.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:

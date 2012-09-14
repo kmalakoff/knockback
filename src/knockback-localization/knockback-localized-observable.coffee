@@ -1,4 +1,3 @@
-
 ###
   knockback-localized-observable.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
