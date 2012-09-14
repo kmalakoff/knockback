@@ -44,6 +44,18 @@ You can also find Knockback on your favorite distributions:
 * [npm registry](http://search.npmjs.org/#/knockback)
 * [NuGet Gallery](http://nuget.org/packages/Knockback.js)
 
+###Module Loading
+
+Knockback.js is compatible with Require.js and AMD module loading. Module names:
+
+* 'knockback' - knockback.js full, full stack, core, and core stack. If you use a knockback-core.js variant, you can check post-loading whether the module included optional extensions.
+* 'knockback-defaults' - knockback-defaults.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-formatting' - knockback-formatting.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-localization' - knockback-localization.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-triggering' - knockback-triggering.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-validation' - knockback-validation.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-statistics' - knockback-statistics.js module. Not bundled with any library nor component.
+
 ###Dependencies
 
 * [Backbone.js](http://backbonejs.org/)

@@ -165,7 +165,7 @@ class kb.Observable
 
     # determine the new type
     new_value = @m.get(ko.utils.unwrapObservable(@key)) if @m and not arguments.length
-    new_value or= null # ensure null instead of undefined
+    (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
     # SHARED NULL MODEL - update reference

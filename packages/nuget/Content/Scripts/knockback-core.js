@@ -1061,7 +1061,7 @@ kb.Observable = (function() {
     if (this.m && !arguments.length) {
       new_value = this.m.get(ko.utils.unwrapObservable(this.key));
     }
-    new_value || (new_value = null);
+    (new_value !== void 0) || (new_value = null);
     new_type = kb.utils.valueType(new_value);
     if (!this.__kb_value || (this.__kb_value.__kb_destroyed || (this.__kb_value.__kb_null && new_value))) {
       this.__kb_value = null;
