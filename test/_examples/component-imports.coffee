@@ -1,7 +1,4 @@
-module_name = 'knockback-localization'
-module_name = 'knockback' if (require.toUrl(module_name).split('./..').length is 1)
-
-kb = if not @kb and (typeof(require) isnt 'undefined') then require(module_name) else @kb
+if not @kb then (try kb = require('knockback-localization') catch e then kb = require('knockback')) else (kb = @kb)
 _ = kb._
 Backbone = kb.Backbone
 ko = kb.ko
