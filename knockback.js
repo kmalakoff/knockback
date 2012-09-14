@@ -1855,6 +1855,59 @@ kb.defaultWrapper = function(target, default_value) {
 };
 
 /*
+  knockback-extensions.js (knockback-defaults)
+  (c) 2011, 2012 Kevin Malakoff.
+  Knockback.js is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
+    Optional dependency: Backbone.ModelRef.js.
+*/
+
+
+kb.Observable.prototype.setToDefault = function() {
+  var _ref;
+  if ((_ref = this.__kb_value) != null) {
+    if (typeof _ref.setToDefault === "function") {
+      _ref.setToDefault();
+    }
+  }
+  return this;
+};
+
+kb.ViewModel.prototype.setToDefault = function() {
+  var vm_key, _ref;
+  for (vm_key in this.__kb.vm_keys) {
+    if ((_ref = this[vm_key]) != null) {
+      if (typeof _ref.setToDefault === "function") {
+        _ref.setToDefault();
+      }
+    }
+  }
+  return this;
+};
+
+kb.utils.setToDefault = function(obj) {
+  var key, value;
+  if (!obj) {
+    return;
+  }
+  if (ko.isObservable(obj)) {
+    if (typeof obj.setToDefault === "function") {
+      obj.setToDefault();
+    }
+  } else if (_.isObject(obj)) {
+    for (key in obj) {
+      value = obj[key];
+      if (value && (ko.isObservable(value) || (typeof value !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) {
+        this.setToDefault(value);
+      }
+    }
+  }
+  return obj;
+};
+
+/*
   knockback-formatted-observable.js 0.16.5
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.FormattedObservable is freely distributable under the MIT license.
@@ -2077,6 +2130,19 @@ kb.LocalizedObservable = (function() {
 kb.localizedObservable = function(value, options, view_model) {
   return new kb.LocalizedObservable(value, options, view_model);
 };
+
+/*
+  knockback-extensions.js (knockback-localization)
+  (c) 2011, 2012 Kevin Malakoff.
+  Knockback.js is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
+    Optional dependency: Backbone.ModelRef.js.
+*/
+
+
+kb.locale_manager = void 0;
 
 /*
   knockback-triggered-observable.js 0.16.5

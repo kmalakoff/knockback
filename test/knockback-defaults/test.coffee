@@ -7,7 +7,6 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
-  require('knockback-examples-contact') if (typeof(require) isnt 'undefined')
   require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
 
   test("TEST DEPENDENCY MISSING", ->
@@ -16,6 +15,9 @@ $(document).ready( ->
     ok(!!Backbone, 'Backbone')
     ok(!!kb, 'kb')
   )
+
+  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
 
   locale_manager = new kb.LocaleManager('en', {
     'en': {loading: "Loading dude"}

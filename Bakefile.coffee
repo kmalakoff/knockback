@@ -14,8 +14,10 @@ module.exports =
       'src/knockback-core/knockback-collection-observable.coffee'
       'src/knockback-core/knockback-inject.coffee'
       'src/knockback-defaults/knockback-default-observable.coffee'
+      'src/knockback-defaults/knockback-extensions.coffee'
       'src/knockback-formatting/knockback-formatted-observable.coffee'
       'src/knockback-localization/knockback-localized-observable.coffee'
+      'src/knockback-localization/knockback-extensions.coffee'
       'src/knockback-triggering/knockback-triggered-observable.coffee'
       'src/knockback-validation/knockback-validators.coffee'
     ]
@@ -100,20 +102,13 @@ module.exports =
 
   test_localization_examples:
     join: '_localization_examples.js'
+    wrapper: 'test/_examples/module-loader.js'
     output: 'test/_examples/build'
     files: [
-      'src/component-imports.coffee'
+      'test/_examples/component-imports.coffee'
       'test/_examples/locale_manager.coffee'
       'test/_examples/localized_observables.coffee'
       'test/_examples/localized_string.coffee'
-    ]
-
-  test_contact_examples:
-    join: '_contact_examples.js'
-    output: 'test/_examples/build'
-    files: [
-      'src/component-imports.coffee'
-      'test/_examples/contact.coffee'
     ]
 
   publishing:

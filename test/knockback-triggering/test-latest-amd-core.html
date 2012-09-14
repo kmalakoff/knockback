@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<head>
+  <title>Knockback Triggering Test Suite (Core AMD)</title>
+
+  <script src="../vendor/require.js"></script>
+  <script type="text/javascript">
+    require.config({
+      paths: {
+        'underscore': "../../vendor/underscore-1.3.3",
+        'backbone': "../../vendor/backbone-0.9.2",
+        'knockout': "../../vendor/knockout-2.1.0",
+        'knockback': "../../knockback-core",
+        'knockback-triggering': "../../lib/knockback-triggering",
+        'knockback-examples-localization': "../_examples/build/_localization_examples",
+        'knockback-statistics': "../../lib/knockback-statistics"
+      }
+    });
+  </script>
+
+  <!-- TESTS -->
+  <link rel="stylesheet" href="../vendor/qunit/qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../vendor/qunit/jquery.js"></script>
+  <script type="text/javascript" src="../vendor/qunit/qunit.js"></script>
+  <script type="text/javascript" src="../vendor/qunit/jslitmus.js"></script>
+
+  <script type="text/javascript" src="build/test-amd.js"></script>
+</head>
+<body>
+  <div>
+    <h1 id="qunit-header">Knockback Triggering Test Suite (Core AMD)</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+  </div>
+  <script type="text/javascript">QUnit.done = function(failures, total) {if (!total) { $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail'); throw 'Warning: no tests run'}}</script>
+</body>
+</html>

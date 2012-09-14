@@ -7,7 +7,6 @@ $(document).ready( ->
   Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
-  require('knockback-examples-contact') if (typeof(require) isnt 'undefined')
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
@@ -16,6 +15,9 @@ $(document).ready( ->
     ok(!!kb, 'kb')
     ok(!!kb, 'kb')
   )
+
+  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
 
   test("1. Standard use case: read and write", ->
     kb.statistics = new kb.Statistics() # turn on stats

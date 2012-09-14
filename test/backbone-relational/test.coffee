@@ -8,7 +8,6 @@ $(document).ready( ->
   require('backbone-relational') if not Backbone.Relational and (typeof(require) isnt 'undefined')
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
-  require('knockback-examples-contact') if (typeof(require) isnt 'undefined')
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
