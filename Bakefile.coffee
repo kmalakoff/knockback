@@ -2,7 +2,7 @@ module.exports =
   library:
     join: 'knockback.js'
     compress: true
-    wrapper: 'src/knockback-loader-full.js'
+    wrapper: 'src/module-loader-full.js'
     files: [
       'src/knockback-core/knockback-core.coffee'
       'src/knockback-core/knockback-utils.coffee'
@@ -22,7 +22,7 @@ module.exports =
 
   knockback_core:
     join: 'knockback-core.js'
-    wrapper: 'src/knockback-core/knockback-loader.js'
+    wrapper: 'src/knockback-core/module-loader.js'
     compress: true
     files: [
       'src/knockback-core/knockback-core.coffee'
@@ -38,7 +38,7 @@ module.exports =
 
   knockback_defaults:
     join: 'knockback-defaults.js'
-    wrapper: 'src/knockback-defaults/knockback-loader.js'
+    wrapper: 'src/knockback-defaults/module-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -49,7 +49,7 @@ module.exports =
 
   knockback_formatting:
     join: 'knockback-formatting.js'
-    wrapper: 'src/knockback-formatting/knockback-loader.js'
+    wrapper: 'src/knockback-formatting/module-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -59,7 +59,7 @@ module.exports =
 
   knockback_localization:
     join: 'knockback-localization.js'
-    wrapper: 'src/knockback-localization/knockback-loader.js'
+    wrapper: 'src/knockback-localization/module-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -70,7 +70,7 @@ module.exports =
 
   knockback_triggering:
     join: 'knockback-triggering.js'
-    wrapper: 'src/knockback-triggering/knockback-loader.js'
+    wrapper: 'src/knockback-triggering/module-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -80,7 +80,7 @@ module.exports =
 
   knockback_validation:
     join: 'knockback-validation.js'
-    wrapper: 'src/knockback-validation/knockback-loader.js'
+    wrapper: 'src/knockback-validation/module-loader.js'
     output: 'lib'
     compress: true
     files: [
@@ -90,7 +90,7 @@ module.exports =
 
   knockback_statistics:
     join: 'knockback-statistics.js'
-    wrapper: 'src/knockback-statistics/knockback-loader.js'
+    wrapper: 'src/knockback-statistics/module-loader.js'
     output: 'lib'
     compress: true
     files: [

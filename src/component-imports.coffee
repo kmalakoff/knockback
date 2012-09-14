@@ -1,4 +1,4 @@
-kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+kb = if not @kb and (typeof(require) isnt 'undefined') then require('knockback') else @kb
 _ = kb._
 Backbone = kb.Backbone
 ko = kb.ko
