@@ -3,8 +3,8 @@ $(document).ready( ->
 
   # Knockback and depdenencies
   require(['underscore', 'backbone', 'knockout', 'knockback', 'knockback-statistics'], (_, Backbone, ko, kb, kbs) ->
-    _ or (_ = kb._)
-    Backbone or (Backbone = kb.Backbone)
+    _ or= @_
+    Backbone or= @Backbone
     test("TEST DEPENDENCY MISSING", ->
       ok(!!ko, 'ko')
       ok(!!_, '_')
