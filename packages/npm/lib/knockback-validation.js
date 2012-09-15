@@ -84,7 +84,16 @@ kb.valueValidator = function(value, checks) {
 };
 
 kb.inputValidator = function(view_model, el, value_accessor) {
-  var $input_el, bindings, checks, input_name, options, result, skip_attach;
+  var $input_el, bindings, buildEvalWithinScopeFunction, checks, input_name, options, result, skip_attach;
+  buildEvalWithinScopeFunction = function(expression, scopeLevels) {
+    var functionBody, i;
+    functionBody = "return ( " + expression + " )";
+    i = -1;
+    while (++i < scopeLevels) {
+      functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
+    }
+    return new Function("sc", functionBody);
+  };
   $input_el = $(el);
   if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
     input_name = null;
@@ -93,7 +102,7 @@ kb.inputValidator = function(view_model, el, value_accessor) {
   if (!(bindings = $input_el.attr('data-bind'))) {
     return null;
   }
-  options = ko.utils.buildEvalWithinScopeFunction("{" + bindings + "}", 1)([view_model]);
+  options = buildEvalWithinScopeFunction("{" + bindings + "}", 1)([view_model]);
   if (!(options && options.value)) {
     return null;
   }

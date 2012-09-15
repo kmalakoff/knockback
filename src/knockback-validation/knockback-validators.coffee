@@ -38,13 +38,21 @@ kb.valueValidator = (value, checks) ->
   )
 
 kb.inputValidator = (view_model, el, value_accessor) ->
+  # helper from Knockout.js (function gets lost in minimization): http://knockoutjs.com/
+  buildEvalWithinScopeFunction = (expression, scopeLevels) ->
+    functionBody = "return ( #{expression} )"
+    i = -1
+    while (++i < scopeLevels)
+      functionBody = "with(sc[#{i}]) { #{functionBody} }"
+    return new Function("sc", functionBody)
+
   $input_el = $(el)
   input_name = null if (input_name = $input_el.attr('name')) and not _.isString(input_name)
   skip_attach = value_accessor and value_accessor.skip_attach
 
   # only set up form elements with a value bindings
   return null unless (bindings = $input_el.attr('data-bind'))
-  options = ko.utils.buildEvalWithinScopeFunction("{#{bindings}}", 1)([view_model])
+  options = buildEvalWithinScopeFunction("{#{bindings}}", 1)([view_model])
   return null if not (options and options.value)
 
   # collect the types to check

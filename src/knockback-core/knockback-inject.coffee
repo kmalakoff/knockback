@@ -11,6 +11,9 @@
 # @example Auto binding using kb-app attribute.
 #   TODO
 #
+# @example Auto binding using kb-app attribute.
+#   TODO
+#
 # @example Injecting by view model.
 #   TODO
 #
@@ -22,46 +25,82 @@
 #
 ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
-    data = ko.utils.unwrapObservable(value_accessor())
-    # wrap to avoid dependencies propagating to the template
-    wrapper = ko.dependentObservable(->
-      if _.isFunction(data)
-        new data(view_model, element, value_accessor, all_bindings_accessor) # use 'new' to allow for classes in addition to functions
-      else if _.isObject(data)
-        for key, value of data
-          # resolve like a function
-          if _.isObject(value) and value.resolve and _.isFunction(value.resolve)
-            view_model[key] = value.resolve(view_model, element, value_accessor, all_bindings_accessor)
-          else
-            view_model[key] = value
-    )
-    wrapper.dispose() # done with the wrapper
+    kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor)
 
-# bind app if it exists after the document body has been loaded
+# inject
+kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor) ->
+  # wrap to avoid dependencies propagating to the template
+  wrapper = ko.dependentObservable(->
+    if _.isFunction(data)
+      result = new data(view_model, element, value_accessor, all_bindings_accessor) # use 'new' to allow for classes in addition to functions
+    else
+      for key, value of data
+
+        # view_model function
+        if (key is 'view_model')
+          # constructor
+          if _.isFunction(value)
+            result = view_model[key] = new value(view_model, element, value_accessor, all_bindings_accessor)
+
+          # mixin
+          else
+            kb.inject(value, view_model, element, value_accessor, all_bindings_accessor)
+
+        # create function
+        else if (key is 'create')
+          value(view_model, element, value_accessor, all_bindings_accessor)
+
+        # resolve nested
+        else if _.isObject(value) and not _.isFunction(value)
+            view_model[key] = kb.inject(value, view_model, element, value_accessor, all_bindings_accessor)
+
+        # simple set
+        else
+            view_model[key] = value
+    return result or view_model
+  )
+  result = wrapper()
+  wrapper.dispose() # done with the wrapper
+  return result
+
+# inject apps only once if they exist
 kb.injectApps = (root) ->
-  # find all of the app elements
-  apps = []
+  # helper
   getAppElements = (el) ->
     unless el.__kb_injected # already injected -> skip, but still process children in case they were added afterwards
       if el.attributes and (attr = _.find(el.attributes, (attr)-> attr.name is 'kb-app'))
         el.__kb_injected = true # mark injected
-        apps.push([el, attr])
+        apps.push({el: el, view_model: {}, binding: attr.value})
     getAppElements(child_el) for child_el in el.childNodes
     return
+
+  # helper from Knockout.js (function gets lost in minimization): http://knockoutjs.com/
+  buildEvalWithinScopeFunction = (expression, scopeLevels) ->
+    functionBody = "return ( #{expression} )"
+    i = -1
+    while (++i < scopeLevels)
+      functionBody = "with(sc[#{i}]) { #{functionBody} }"
+    return new Function("sc", functionBody)
+
+  # find all of the app elements
+  apps = []
   getAppElements(root or document)
 
   # create the apps
   for app in apps
-    # evaluate the options
-    if app[1].value
-      options = ko.utils.buildEvalWithinScopeFunction("{#{app[1].value}}", 0)()
-    options or= {}
-    options.view_model or= {}
+    # evaluate the app data
+    if expression = app.binding
+      (expression.search(/[:]/) < 0) or (expression = "{#{expression}}") # wrap if is an object
+      data = buildEvalWithinScopeFunction(expression, 0)()
+      data or (data = {}) # no data
+      (not data.options) or (options = data.options; delete data.options) # extract options
+      app.view_model = kb.inject(data, app.view_model, app.el, null, null)
 
-    options.beforeBinding(options.view_model, app[0], options) if options.beforeBinding
-    kb.applyBindings(options.view_model, app[0], {})
-    options.afterBinding(options.view_model, app[0], options) if options.afterBinding
-  return
+    # auto-bind
+    options.beforeBinding(app.view_model, app.el, options) if options and options.beforeBinding
+    kb.applyBindings(app.view_model, app.el, options)
+    options.afterBinding(app.view_model, app.el, options) if options and options.afterBinding
+  return apps
 
 #############################
 # Auto Inject Apps
