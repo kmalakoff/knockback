@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knockback.js Home</title>
     <link rel="stylesheet" href="vendor/css/normalize.css">
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
@@ -43,7 +45,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">Application Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -106,7 +108,7 @@
             </div>
             <div class="content row">
               <div class="span7 wrapped">
-                <h2>Download Latest <small>0.16.4</small></h2>
+                <h2>Download Latest <small>0.16.5</small></h2>
                 <table class="table">
                   <thead>
                     <tr>
@@ -120,14 +122,14 @@
                       <td>Full</td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.js'>Development</a> <small>(dev, 64k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback.min.js'>Production</a> <small>(min+gzip, 8k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback.js'>Development</a> <small>(dev, 64k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback.min.js'>Production</a> <small>(min+gzip, 8k)</small></li>
                         </ul>
                       </td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.js'>Development</a> <small>(dev, 330k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-full-stack.min.js'>Production</a> <small>(min+gzip, 32k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-full-stack.js'>Development</a> <small>(dev, 330k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-full-stack.min.js'>Production</a> <small>(min+gzip, 32k)</small></li>
                         </ul>
                       </td>
                     </tr>
@@ -135,14 +137,14 @@
                       <td>Core</td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.js'>Development</a> <small>(dev, 54k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core.min.js'>Production</a> <small>(min+gzip, 7k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core.js'>Development</a> <small>(dev, 54k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core.min.js'>Production</a> <small>(min+gzip, 7k)</small></li>
                         </ul>
                       </td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.js'>Development</a> <small>(dev, 315k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.4/knockback-core-stack.min.js'>Production</a> <small>(min+gzip, 31k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core-stack.js'>Development</a> <small>(dev, 315k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.16.5/knockback-core-stack.min.js'>Production</a> <small>(min+gzip, 31k)</small></li>
                         </ul>
                       </td>
                     </tr>
@@ -150,7 +152,7 @@
                 </table>
                 <p>
                   <div><strong>*Stack</strong> provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.</div><br>
-                  <div><strong>*Core</strong> removes advanced features that can be included separately: localization, formatting, triggering, defaults, and statistics.</div>
+                  <div><strong>*Core</strong> removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics.</div>
                 </p>
               </div>
               <div class="span3"><h2>Distributions</h2>

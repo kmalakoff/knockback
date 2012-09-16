@@ -1,5 +1,4 @@
 $(function(){
-
   var codestyle;
   var languages = ['cs','js'];
   (codestyle = $('.selection.codestyle')).on('change', 'input', function(){
@@ -11,5 +10,4 @@ $(function(){
     }
   });
   codestyle.find('.auto').removeClass('auto').click();
-
 });

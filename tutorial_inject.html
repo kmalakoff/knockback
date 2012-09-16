@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Tutorial: Application Injection (like Angular.js)</title><>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial: ViewModel Injection (like Angular.js)</title><>
     <link rel="stylesheet" href="vendor/css/normalize.css">
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap-responsive.min.css">
@@ -14,7 +16,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.5.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -46,7 +48,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">Application Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -73,24 +75,24 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1>Tutorial: Application Injection (like Angular.js)</h1>
-<p><a href="index.html">Knockback.js</a> provides an a few helpers to inject application code in a similar way to <a href="http://angularjs.org/">Angular.js</a> so you can build up an application by dynamically adding observables to your ViewModel directly from your HTML.
+      <content class="page"><h1>Tutorial: ViewModel Injection (like Angular.js)</h1>
+<p><a href="index.html">Knockback.js</a> provides an a few helpers to inject ViewModels into your HTML Views in a similar way to <a href="http://angularjs.org/">Angular.js&#39;s ng-app</a> so you can build up an application by dynamically binding observables directly from your HTML.
 
 </p>
-<p>The following examples show how you might port Angular.js samples to Knockback to help you compare approaches. There&#39;s nothing complicated here, just a &#39;kb-app&#39; attribute and a custom &#39;inject&#39; Knockout binding to add observables to your ViewModel.
+<p>The following examples show how you might port Angular.js samples to Knockback to help you compare approaches. There&#39;s nothing complicated here, just a &#39;kb-inject&#39; attribute and a custom &#39;inject&#39; Knockout binding to add observables to your ViewModel.
 
 </p>
-<p>The main way to bind an application when you page is loaded, is to use a &#39;kb-app&#39; attribute on your HTML elements. You can optionally provide some hooks if you like:
+<p>The main way to bind a View when your page is loaded, is to use a &#39;kb-inject&#39; attribute on your HTML elements. You can optionally provide some hooks if you like:
 </p>
 
         <pre>&lt;!-- BIND WITHOUT PARAMETERS - create a new view model and bind the hierachy --&gt;
-&lt;html kb-app&gt;
-  &lt;!-- YOUR APP HERE !! --&gt;
+&lt;html kb-inject&gt;
+  &lt;!-- YOUR VIEW HERE !! --&gt;
 &lt;/html&gt;
 
 &lt;!-- BIND WITH PARAMETERS - create a custom view model and callback after bind --&gt;
-&lt;html kb-app=&quot;view_model: {name: ko.observable('')}, afterBinding: yourFunction&quot;&gt;
-  &lt;!-- YOUR APP HERE !! --&gt;
+&lt;html kb-inject=&quot;view_model: {name: ko.observable('')}, afterBinding: yourFunction&quot;&gt;
+  &lt;!-- YOUR VIEW HERE !! --&gt;
 &lt;/html&gt;
 </pre><p>In addition to help you inject observables to your ViewModel, you can use the &#39;inject&#39; custom binding. It accepts an object to extend your ViewModel or a function of the form yourFunction(view_model, element) to allow you to extend the view model by hand:
 </p>
@@ -148,13 +150,13 @@ window.loadUrlFn = function(url) {
   };
 };
 </pre><h2>Hello Example</h2>
-<p>This example uses the &#39;kb-app&#39; attribute to seed the application view model with a yourName observable (sort of a more simple ng-model binding).
+<p>This example uses the &#39;kb-inject&#39; attribute to seed a root application ViewModel with a yourName observable (like a more flexible ng-model binding).
 </p>
 
         <div class="row-fluid">
           <div class="span8">
             <h4>View (HTML)</h4>
-            <pre>&lt;div kb-app=&quot;view_model: {yourName: ko.observable('')}&quot;&gt;
+            <pre>&lt;div kb-inject=&quot;yourName: ko.observable('')&quot;&gt;
   &lt;label&gt;Name:&lt;/label&gt;
   &lt;input type=&quot;text&quot; data-bind=&quot;value: yourName, valueUpdate: 'keyup'&quot; placeholder=&quot;Enter a name here&quot;&gt;
   &lt;hr&gt;
@@ -163,7 +165,7 @@ window.loadUrlFn = function(url) {
           </div>
           <div class="span4">
             <h4>Live Result</h4>
-            <div class="demos_result_box"><div kb-app="view_model: {yourName: ko.observable('')}">
+            <div class="demos_result_box"><div kb-inject="yourName: ko.observable('')">
   <label>Name:</label>
   <input type="text" data-bind="value: yourName, valueUpdate: 'keyup'" placeholder="Enter a name here">
   <hr>
@@ -173,7 +175,7 @@ window.loadUrlFn = function(url) {
           </div>
         </div><p>You could have just as easily written the first line like:</p>
 
-        <pre>&lt;div data-bind=&quot;inject: {yourName: ko.observable('')}&quot; kb-app&gt;
+        <pre>&lt;div data-bind=&quot;inject: {yourName: ko.observable('')}&quot; kb-inject&gt;
 </pre><h2>Todo Example</h2>
 <p>The todo example uses a custom &#39;TodoCtrl&#39; inject function to add some functions and observables to your view model. Then you can bind them to your HTML using standard Knockout bindings.
 </p>
@@ -187,7 +189,7 @@ window.loadUrlFn = function(url) {
             </ul>
             <div class="tab-content">
               <div id="kbi_todo_view" class="tab-pane active">
-                <pre>&lt;div kb-app&gt;
+                <pre>&lt;div kb-inject&gt;
   &lt;h2&gt;Todo&lt;/h2&gt;
   &lt;div data-bind=&quot;inject: TodoCtrl&quot;&gt;
     &lt;span data-bind=&quot;text: remaining() + ' of ' + todos().length + ' remaining'&quot;&gt;&lt;/span&gt;
@@ -270,7 +272,7 @@ TodoCtrl = function(view_model) {
             <h4>Live Result</h4>
             <div class="demos_result_box">
               <link rel="stylesheet" href="tutorials/inject/kbi_todo.css">
-              <script type="application/javascript" src="tutorials/inject/kbi_todo_controller.js"></script><div kb-app>
+              <script type="application/javascript" src="tutorials/inject/kbi_todo_controller.js"></script><div kb-inject>
   <h2>Todo</h2>
   <div data-bind="inject: TodoCtrl">
     <span data-bind="text: remaining() + ' of ' + todos().length + ' remaining'"></span>
@@ -330,7 +332,7 @@ TodoCtrl = function(view_model) {
 
 </p>
 <ul>
-<li>how you can set up a Backbone.Router to control an embedded page using the &#39;kb-app&#39; afterBinding callback</li>
+<li>how you can set up a Backbone.Router to control an embedded page using the &#39;kb-inject&#39; afterBinding callback</li>
 <li>how to inject Knockback-Validation&#39;s kb.formValidator which will look for named inputs and other keywords to create an observable that will update when form state changes.</li>
 </ul>
 
@@ -405,7 +407,7 @@ TodoCtrl = function(view_model) {
             </ul>
             <div class="tab-content">
               <div id="kbi_project_app_view" class="tab-pane active">
-                <pre>&lt;div kb-app=&quot;afterBinding: projectAppStartRouting&quot;&gt;
+                <pre>&lt;div kb-inject=&quot;options: {afterBinding: projectAppStartRouting}&quot;&gt;
   &lt;h2&gt;JavaScript Projects&lt;/h2&gt;
   &lt;div data-bind=&quot;inject: ProjectAppController&quot;&gt;&lt;/div&gt;
 &lt;div&gt;</pre>
@@ -682,13 +684,12 @@ ProjectViewModel = kb.ViewModel.extend({
           </div>
           <div class="span4">
             <h4>Live Result</h4>
-            <div class="demos_result_box"><div kb-app="afterBinding: projectAppStartRouting">
+            <div class="demos_result_box"><div kb-inject="options: {afterBinding: projectAppStartRouting}">
   <h2>JavaScript Projects</h2>
   <div data-bind="inject: ProjectAppController"></div>
 <div>
             </div>
           </div>
-          <script type="application/javascript">kb.injectApps();</script>
         </div>
       </content>
       <footer class="page">
