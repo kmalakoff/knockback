@@ -64,6 +64,22 @@ $(document).ready( ->
     equal(apps[0].view_model.app, true, "ViewModel Solo: app is true")
     ko.removeNode(app_el)
 
+    # mutiliple ViewModel solos
+    app_el = $("""
+      <div>
+        <div kb-app="app"><span data-bind="visible: app"></span></div>
+        <div kb-app="app"><span data-bind="visible: app"></span></div>
+      </div>""")[0]
+    $('body').append(app_el)
+    apps = kb.injectApps()
+    equal(apps[0].el, app_el.children[0], "ViewModel Solo: app was injected")
+    ok(apps[0].view_model instanceof window.app, "ViewModel Solo: view_model type app")
+    equal(apps[0].view_model.app, true, "ViewModel Solo: app is true")
+    equal(apps[1].el, app_el.children[1], "ViewModel Solo: app was injected")
+    ok(apps[1].view_model instanceof window.app, "ViewModel Solo: view_model type app")
+    equal(apps[1].view_model.app, true, "ViewModel Solo: app is true")
+    ko.removeNode(app_el)
+
     # Create function with callbacks
     app_el = $('<div kb-app="create: appCreate"><span data-bind="visible: app_create"></span></div>')[0]
     $('body').append(app_el)
@@ -271,7 +287,6 @@ $(document).ready( ->
         </div>""")[0]
     view_model = {}
     kb.applyBindings(view_model, app_el)
-    view_model = ko.dataFor(app_el)
     ok((view_model.new_context instanceof SuperClass), "Mix: is SuperClass")
     equal(view_model.new_context.super_class, true, "Mix: has super_class")
     ok((view_model.new_context.sub_class instanceof SubClass), "Mix: is SubClass")

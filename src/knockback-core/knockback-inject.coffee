@@ -39,7 +39,7 @@ ko.bindingHandlers['inject'] =
     (result is view_model) or (throwUnexpected('inject', 'changing the view model'))
 
 # inject
-kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor, skip_wrap) ->
+kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor, nested) ->
   inject = (data) ->
     if _.isFunction(data)
       view_model = new data(view_model, element, value_accessor, all_bindings_accessor) # use 'new' to allow for classes in addition to functions
@@ -61,7 +61,7 @@ kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor, s
 
         # resolve nested with assign or not
         else if _.isObject(value) and not _.isFunction(value)
-          target = if value and value.create then {} else view_model
+          target = if nested or (value and value.create) then {} else view_model
           view_model[key] = kb.inject(value, target, element, value_accessor, all_bindings_accessor, true)
 
         # simple set
@@ -71,7 +71,7 @@ kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor, s
     return view_model
 
   # in recursive calls, we are already protected from propagating dependencies to the template
-  if skip_wrap
+  if nested
     return inject(data)
 
   # wrap to avoid dependencies propagating to the template since we are editing a ViewModel not binding
@@ -101,7 +101,7 @@ kb.injectApps = (root) ->
       data = buildEvalWithinScopeFunction(expression, 0)()
       data or (data = {}) # no data
       (not data.options) or (options = data.options; delete data.options) # extract options
-      app.view_model = kb.inject(data, app.view_model, app.el, null, null)
+      app.view_model = kb.inject(data, app.view_model, app.el, null, null, true)
 
     # auto-bind
     options.beforeBinding(app.view_model, app.el, options) if options and options.beforeBinding
