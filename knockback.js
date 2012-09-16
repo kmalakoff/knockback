@@ -24,7 +24,7 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, buildEvalWithinScopeFunction, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -161,11 +161,11 @@ kb.Backbone = Backbone = !this.Backbone && (typeof require !== 'undefined') ? re
 kb.ko = ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 
 throwMissing = function(instance, message) {
-  throw "" + instance.constructor.name + ": " + message + " is missing";
+  throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
 };
 
 throwUnexpected = function(instance, message) {
-  throw "" + instance.constructor.name + ": " + message + " is unexpected";
+  throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is unexpected";
 };
 
 legacyWarning = function(identifier, last_version, message) {
@@ -1725,45 +1725,67 @@ kb.sortedIndexWrapAttr = kb.siwa = function(attribute_name, wrapper_constructor)
 */
 
 
+buildEvalWithinScopeFunction = function(expression, scopeLevels) {
+  var functionBody, i;
+  functionBody = "return ( " + expression + " )";
+  i = -1;
+  while (++i < scopeLevels) {
+    functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
+  }
+  return new Function("sc", functionBody);
+};
+
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
-    return kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+    var result;
+    result = kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+    return (result === view_model) || (throwUnexpected('inject', 'changing the view model'));
   }
 };
 
-kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor) {
-  var result, wrapper;
-  wrapper = ko.dependentObservable(function() {
-    var key, result, value;
+kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, skip_wrap) {
+  var inject, result, wrapper;
+  inject = function(data) {
+    var key, target, value;
     if (_.isFunction(data)) {
-      result = new data(view_model, element, value_accessor, all_bindings_accessor);
+      view_model = new data(view_model, element, value_accessor, all_bindings_accessor);
+      kb.releaseOnNodeRemove(view_model, element);
     } else {
+      if (data.view_model) {
+        view_model = new data.view_model(view_model, element, value_accessor, all_bindings_accessor);
+        kb.releaseOnNodeRemove(view_model, element);
+      }
       for (key in data) {
         value = data[key];
         if (key === 'view_model') {
-          if (_.isFunction(value)) {
-            result = view_model[key] = new value(view_model, element, value_accessor, all_bindings_accessor);
-          } else {
-            kb.inject(value, view_model, element, value_accessor, all_bindings_accessor);
-          }
-        } else if (key === 'create') {
+          continue;
+        }
+        if (key === 'create') {
           value(view_model, element, value_accessor, all_bindings_accessor);
         } else if (_.isObject(value) && !_.isFunction(value)) {
-          view_model[key] = kb.inject(value, view_model, element, value_accessor, all_bindings_accessor);
+          target = value && value.create ? {} : view_model;
+          view_model[key] = kb.inject(value, target, element, value_accessor, all_bindings_accessor, true);
         } else {
           view_model[key] = value;
         }
       }
     }
-    return result || view_model;
-  });
-  result = wrapper();
-  wrapper.dispose();
-  return result;
+    return view_model;
+  };
+  if (skip_wrap) {
+    return inject(data);
+  } else {
+    result = (wrapper = ko.dependentObservable(function() {
+      return inject(data);
+    }))();
+    wrapper.dispose();
+    return result;
+  }
 };
 
 kb.injectApps = function(root) {
-  var app, apps, buildEvalWithinScopeFunction, data, expression, getAppElements, options, _i, _len;
+  var app, apps, data, expression, getAppElements, options, _i, _len;
+  apps = [];
   getAppElements = function(el) {
     var attr, child_el, _i, _len, _ref;
     if (!el.__kb_injected) {
@@ -1784,16 +1806,6 @@ kb.injectApps = function(root) {
       getAppElements(child_el);
     }
   };
-  buildEvalWithinScopeFunction = function(expression, scopeLevels) {
-    var functionBody, i;
-    functionBody = "return ( " + expression + " )";
-    i = -1;
-    while (++i < scopeLevels) {
-      functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
-    }
-    return new Function("sc", functionBody);
-  };
-  apps = [];
   getAppElements(root || document);
   for (_i = 0, _len = apps.length; _i < _len; _i++) {
     app = apps[_i];
@@ -2243,6 +2255,16 @@ kb.triggeredObservable = function(model, event_name) {
 */
 
 
+buildEvalWithinScopeFunction = function(expression, scopeLevels) {
+  var functionBody, i;
+  functionBody = "return ( " + expression + " )";
+  i = -1;
+  while (++i < scopeLevels) {
+    functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
+  }
+  return new Function("sc", functionBody);
+};
+
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 
 EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
@@ -2287,16 +2309,7 @@ kb.valueValidator = function(value, checks) {
 };
 
 kb.inputValidator = function(view_model, el, value_accessor) {
-  var $input_el, bindings, buildEvalWithinScopeFunction, checks, input_name, options, result, skip_attach;
-  buildEvalWithinScopeFunction = function(expression, scopeLevels) {
-    var functionBody, i;
-    functionBody = "return ( " + expression + " )";
-    i = -1;
-    while (++i < scopeLevels) {
-      functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
-    }
-    return new Function("sc", functionBody);
-  };
+  var $input_el, bindings, checks, input_name, options, result, skip_attach;
   $input_el = $(el);
   if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
     input_name = null;

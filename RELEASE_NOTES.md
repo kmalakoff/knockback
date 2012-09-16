@@ -2,8 +2,9 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.16.5
 
-* fixed case where kb.injectApps could be called before page scripts loaded.
-* use 'new' on the data-bind 'inject' for functions to permit class hierachies to be used.
+* bug fix: fixed case where kb.injectApps could be called before page scripts loaded.
+* bug fix: fixed case where kb.Observable set 0 to null (issue 44).
+* expanded the flexibilty and use cases for data-bind 'inject' amd kb.inject app: use 'new' on the  for functions to permit class hierachies to be used and recursively resolving view_model or create within the binding cycle.
 * added headers to all components and stack versions.
 * added AMD loader to all components.
 

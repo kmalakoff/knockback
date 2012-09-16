@@ -186,8 +186,8 @@ kb.ko = ko = if not @ko and (typeof(require) isnt 'undefined') then require('kno
 ####################################
 # INTERNAL HELPERS
 ####################################
-throwMissing = (instance, message) -> throw "#{instance.constructor.name}: #{message} is missing"
-throwUnexpected = (instance, message) -> throw "#{instance.constructor.name}: #{message} is unexpected"
+throwMissing = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
+throwUnexpected = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is unexpected"
 
 legacyWarning = (identifier, last_version, message) ->
   @_legacy_warnings or= {}

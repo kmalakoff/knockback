@@ -7670,35 +7670,38 @@ ko.bindingHandlers['inject'] = {
   }
 };
 
-kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor) {
-  var result, wrapper;
-  wrapper = ko.dependentObservable(function() {
-    var key, result, value;
+kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, skip_wrap) {
+  var inject, result, wrapper;
+  inject = function(data) {
+    var key, result, target, value;
     if (_.isFunction(data)) {
-      result = new data(view_model, element, value_accessor, all_bindings_accessor);
+      return new data(view_model, element, value_accessor, all_bindings_accessor);
     } else {
       for (key in data) {
         value = data[key];
         if (key === 'view_model') {
-          if (_.isFunction(value)) {
-            result = view_model[key] = new value(view_model, element, value_accessor, all_bindings_accessor);
-          } else {
-            kb.inject(value, view_model, element, value_accessor, all_bindings_accessor);
-          }
+          result = view_model[key] = new value(view_model, element, value_accessor, all_bindings_accessor);
         } else if (key === 'create') {
           value(view_model, element, value_accessor, all_bindings_accessor);
         } else if (_.isObject(value) && !_.isFunction(value)) {
-          view_model[key] = kb.inject(value, view_model, element, value_accessor, all_bindings_accessor);
+          target = value.create ? {} : view_model;
+          view_model[key] = kb.inject(value, target, element, value_accessor, all_bindings_accessor, true);
         } else {
           view_model[key] = value;
         }
       }
     }
     return result || view_model;
-  });
-  result = wrapper();
-  wrapper.dispose();
-  return result;
+  };
+  if (skip_wrap) {
+    return inject(data);
+  } else {
+    result = (wrapper = ko.dependentObservable(function() {
+      return inject(data);
+    }))();
+    wrapper.dispose();
+    return result;
+  }
 };
 
 kb.injectApps = function(root) {
