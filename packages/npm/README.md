@@ -4,6 +4,15 @@
 
 Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
+Some great advantages to using Knockback.js:
+
+* make amazingly dynamic applications by applying a small number of simple principles
+
+* leverage the wonderful work from both the Backbone and Knockout communities
+
+* (optional) simplify program control flow by configuring your application from your HTML Views (***new!***): think of it like Angular.js without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.htm) for live examples!
+
+
 These resources can help you get started:
 
 * [Knockback.js Website](http://kmalakoff.github.com/knockback/)
@@ -46,7 +55,7 @@ You can also find Knockback on your favorite distributions:
 
 ###Module Loading
 
-Knockback.js is compatible with Require.js and AMD module loading. Module names:
+Knockback.js is compatible with RequireJS, CommonJS, Brunch and AMD module loading. Module names:
 
 * 'knockback' - knockback.js full, full stack, core, and core stack. If you use a knockback-core.js variant, you can check post-loading whether the module included optional extensions.
 * 'knockback-defaults' - knockback-defaults.js module. Comes bundled with knockback.js and knockback-full-stack.js.

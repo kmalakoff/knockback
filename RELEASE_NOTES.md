@@ -2,9 +2,10 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.16.5
 
-* bug fix: fixed case where kb.injectApps could be called before page scripts loaded.
+* renamed kb-app to kb-inject and kb.injectApps to kb.injectViewModels to better reflect the general nature of the injection mechanism: expanded the flexibilty and use cases for data-bind 'inject' amd kb-inject: use 'new' on the  for functions to permit class hierachies to be used and recursively resolving view_model or create within the binding cycle.
+* **afterBinding and beforeBinding**: put into a special options property to simplify the kb-inject attribute syntax (eg. no need to specify view_model: for the properties to seed your view model with) and allow to be included on the view_model
+* bug fix: fixed case where kb.injectViewModels (formerly kb.injectApps) could be called before page scripts loaded.
 * bug fix: fixed case where kb.Observable set 0 to null (issue 44).
-* expanded the flexibilty and use cases for data-bind 'inject' amd kb.inject app: use 'new' on the  for functions to permit class hierachies to be used and recursively resolving view_model or create within the binding cycle.
 * added headers to all components and stack versions.
 * added AMD loader to all components.
 

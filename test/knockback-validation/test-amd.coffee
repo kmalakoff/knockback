@@ -216,5 +216,79 @@ $(document).ready( ->
 
       equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     )
+
+    test("kb.formValidator with inject", ->
+      kb.statistics = new kb.Statistics() # turn on stats
+
+      window.MyViewModel = kb.ViewModel.extend({
+        constructor: ->
+          model = new Backbone.Model({name: '', site: ''})
+          kb.ViewModel.prototype.constructor.call(this, model)
+          return
+      })
+
+      HTML = """
+      <div kb-inject="MyViewModel">
+         <form name="my_form" data-bind="inject: kb.formValidator">
+           <div class="control-group">
+            <label>Name</label>
+            <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
+          </div>
+          <div class="control-group">
+            <label>Website</label>
+            <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+          </div>
+        </form>
+      </div>
+      """
+
+      inject_el = $(HTML)[0]
+      injected = kb.injectViewModels(inject_el)
+      equal(injected[0].el, inject_el, "app was injected")
+      view_model = injected[0].view_model
+
+      # check name
+      validator = view_model.$my_form.name
+      ok(validator().hasOwnProperty('required'), "has required")
+      ok(!validator().hasOwnProperty('url'), "has url")
+      ok(validator().hasOwnProperty('valid'), "has valid")
+      ok(validator().hasOwnProperty('invalid'), "has invalid")
+
+      ok(validator().required, "required is invalid")
+      ok(!validator().valid, "validator not valid")
+      ok(validator().invalid, "validator is invalid")
+
+      view_model.name('bob')
+      ok(!validator().required, "required is valid")
+      ok(validator().valid, "validator valid")
+      ok(!validator().invalid, "validator is not invalid")
+
+      validator = view_model.$my_form.site
+      ok(validator().hasOwnProperty('required'), "has required")
+      ok(validator().hasOwnProperty('url'), "has url")
+      ok(validator().hasOwnProperty('valid'), "has valid")
+      ok(validator().hasOwnProperty('invalid'), "has invalid")
+
+      ok(validator().required, "required is invalid")
+      ok(validator().url, "url is invalid")
+      ok(!validator().valid, "validator not valid")
+      ok(validator().invalid, "validator is invalid")
+
+      view_model.site('bob')
+      ok(!validator().required, "required is valid")
+      ok(validator().url, "url is invalid")
+      ok(!validator().valid, "validator not valid")
+      ok(validator().invalid, "validator is invalid")
+
+      view_model.site('http://bob')
+      ok(!validator().required, "required is valid")
+      ok(!validator().url, "url is valid")
+      ok(validator().valid, "validator is valid")
+      ok(!validator().invalid, "validator is not invalid")
+
+      ko.removeNode(inject_el)
+
+      equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    )
   )
 )

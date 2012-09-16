@@ -2,7 +2,7 @@ $(document).ready( ->
   module("knockback-observable.js")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  if (typeof(require) isnt 'undefined') then _ = require('underscore') else _ = window._
+  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
   _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
   Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko

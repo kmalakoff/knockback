@@ -2,7 +2,7 @@ $(document).ready( ->
   module("knockback.js with Backbone.ModelRef.js")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  if (typeof(require) isnt 'undefined') then _ = require('underscore') else _ = window._
+  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
   _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
   Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   Backbone.ModelRef = if not Backbone.ModelRef and (typeof(require) isnt 'undefined') then require('backbone-modelref') else window.Backbone.ModelRef

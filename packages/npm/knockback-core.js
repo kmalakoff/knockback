@@ -24,7 +24,7 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, arraySplice, buildEvalWithinScopeFunction, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -161,11 +161,11 @@ kb.Backbone = Backbone = !this.Backbone && (typeof require !== 'undefined') ? re
 kb.ko = ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 
 throwMissing = function(instance, message) {
-  throw "" + instance.constructor.name + ": " + message + " is missing";
+  throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
 };
 
 throwUnexpected = function(instance, message) {
-  throw "" + instance.constructor.name + ": " + message + " is unexpected";
+  throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is unexpected";
 };
 
 legacyWarning = function(identifier, last_version, message) {
@@ -1725,36 +1725,52 @@ kb.sortedIndexWrapAttr = kb.siwa = function(attribute_name, wrapper_constructor)
 */
 
 
+buildEvalWithinScopeFunction = function(expression, scopeLevels) {
+  var functionBody, i;
+  functionBody = "return ( " + expression + " )";
+  i = -1;
+  while (++i < scopeLevels) {
+    functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
+  }
+  return new Function("sc", functionBody);
+};
+
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
     return kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
   }
 };
 
-kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, skip_wrap) {
+kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
   var inject, result, wrapper;
   inject = function(data) {
-    var key, result, target, value;
+    var key, target, value;
     if (_.isFunction(data)) {
-      return new data(view_model, element, value_accessor, all_bindings_accessor);
+      view_model = new data(view_model, element, value_accessor, all_bindings_accessor);
+      kb.releaseOnNodeRemove(view_model, element);
     } else {
+      if (data.view_model) {
+        view_model = new data.view_model(view_model, element, value_accessor, all_bindings_accessor);
+        kb.releaseOnNodeRemove(view_model, element);
+      }
       for (key in data) {
         value = data[key];
         if (key === 'view_model') {
-          result = view_model[key] = new value(view_model, element, value_accessor, all_bindings_accessor);
-        } else if (key === 'create') {
+          continue;
+        }
+        if (key === 'create') {
           value(view_model, element, value_accessor, all_bindings_accessor);
         } else if (_.isObject(value) && !_.isFunction(value)) {
-          target = value.create ? {} : view_model;
+          target = nested || (value && value.create) ? {} : view_model;
           view_model[key] = kb.inject(value, target, element, value_accessor, all_bindings_accessor, true);
         } else {
           view_model[key] = value;
         }
       }
     }
-    return result || view_model;
+    return view_model;
   };
-  if (skip_wrap) {
+  if (nested) {
     return inject(data);
   } else {
     result = (wrapper = ko.dependentObservable(function() {
@@ -1765,16 +1781,17 @@ kb.inject = function(data, view_model, element, value_accessor, all_bindings_acc
   }
 };
 
-kb.injectApps = function(root) {
-  var app, apps, buildEvalWithinScopeFunction, data, expression, getAppElements, options, _i, _len;
-  getAppElements = function(el) {
+kb.injectViewModels = function(root) {
+  var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _i, _len;
+  results = [];
+  findElements = function(el) {
     var attr, child_el, _i, _len, _ref;
     if (!el.__kb_injected) {
       if (el.attributes && (attr = _.find(el.attributes, function(attr) {
-        return attr.name === 'kb-app';
+        return attr.name === 'kb-inject';
       }))) {
         el.__kb_injected = true;
-        apps.push({
+        results.push({
           el: el,
           view_model: {},
           binding: attr.value
@@ -1784,50 +1801,43 @@ kb.injectApps = function(root) {
     _ref = el.childNodes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       child_el = _ref[_i];
-      getAppElements(child_el);
+      findElements(child_el);
     }
   };
-  buildEvalWithinScopeFunction = function(expression, scopeLevels) {
-    var functionBody, i;
-    functionBody = "return ( " + expression + " )";
-    i = -1;
-    while (++i < scopeLevels) {
-      functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
-    }
-    return new Function("sc", functionBody);
-  };
-  apps = [];
-  getAppElements(root || document);
-  for (_i = 0, _len = apps.length; _i < _len; _i++) {
-    app = apps[_i];
+  findElements(root || document);
+  for (_i = 0, _len = results.length; _i < _len; _i++) {
+    app = results[_i];
     if (expression = app.binding) {
       (expression.search(/[:]/) < 0) || (expression = "{" + expression + "}");
       data = buildEvalWithinScopeFunction(expression, 0)();
       data || (data = {});
       (!data.options) || (options = data.options, delete data.options);
-      app.view_model = kb.inject(data, app.view_model, app.el, null, null);
+      options || (options = {});
+      app.view_model = kb.inject(data, app.view_model, app.el, null, null, true);
+      afterBinding = app.view_model.afterBinding || options.afterBinding;
+      beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
     }
-    if (options && options.beforeBinding) {
-      options.beforeBinding(app.view_model, app.el, options);
+    if (beforeBinding) {
+      beforeBinding(app.view_model, app.el, options);
     }
     kb.applyBindings(app.view_model, app.el, options);
-    if (options && options.afterBinding) {
-      options.afterBinding(app.view_model, app.el, options);
+    if (afterBinding) {
+      afterBinding(app.view_model, app.el, options);
     }
   }
-  return apps;
+  return results;
 };
 
 if (this.$) {
   this.$(function() {
-    return kb.injectApps();
+    return kb.injectViewModels();
   });
 } else {
   (onReady = function() {
     if (document.readyState !== "complete") {
       return setTimeout(onReady, 0);
     }
-    return kb.injectApps();
+    return kb.injectViewModels();
   })();
 }
 ; return kb;});

@@ -84,8 +84,7 @@ kb.formValidator = (view_model, el) ->
   # add the valid state and inverse
   results.valid = ko.dependentObservable(->
     valid = true
-    for validator in validators
-      valid &= validator().valid
+    valid &= validator().valid for validator in validators
     return valid
   )
   results.invalid = ko.dependentObservable(-> not results.valid())

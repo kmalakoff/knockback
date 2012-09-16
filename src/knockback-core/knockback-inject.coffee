@@ -14,31 +14,11 @@ buildEvalWithinScopeFunction = (expression, scopeLevels) ->
     functionBody = "with(sc[#{i}]) { #{functionBody} }"
   return new Function("sc", functionBody)
 
-# Helpers for building single page apps using injection.
-#
-# @example Auto binding using kb-app attribute.
-#   TODO
-#
-# @example Auto binding using kb-app attribute.
-#   TODO
-#
-# @example Injecting by view model.
-#   TODO
-#
-# @example Injecting by function.
-#   TODO
-#
-# @example Injecting with resolve.
-#   TODO
-#
 ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
-    result = kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor)
+    kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor)
 
-    # not allowed to replace the view model on inject -> currently not possible for Knockout to pick up and use the context
-    (result is view_model) or (throwUnexpected('inject', 'changing the view model'))
-
-# inject
+# inject data
 kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor, nested) ->
   inject = (data) ->
     if _.isFunction(data)
@@ -80,41 +60,44 @@ kb.inject = (data, view_model, element, value_accessor, all_bindings_accessor, n
     wrapper.dispose() # done with the wrapper
     return result
 
-# inject apps only once if they exist
-kb.injectApps = (root) ->
+# inject ViewModels only once if they exist
+kb.injectViewModels = (root) ->
   # find all of the app elements
-  apps = []
-  getAppElements = (el) ->
+  results = []
+  findElements = (el) ->
     unless el.__kb_injected # already injected -> skip, but still process children in case they were added afterwards
-      if el.attributes and (attr = _.find(el.attributes, (attr)-> attr.name is 'kb-app'))
+      if el.attributes and (attr = _.find(el.attributes, (attr)-> attr.name is 'kb-inject'))
         el.__kb_injected = true # mark injected
-        apps.push({el: el, view_model: {}, binding: attr.value})
-    getAppElements(child_el) for child_el in el.childNodes
+        results.push({el: el, view_model: {}, binding: attr.value})
+    findElements(child_el) for child_el in el.childNodes
     return
-  getAppElements(root or document)
+  findElements(root or document)
 
-  # create the apps
-  for app in apps
+  # bind the view models
+  for app in results
     # evaluate the app data
     if expression = app.binding
       (expression.search(/[:]/) < 0) or (expression = "{#{expression}}") # wrap if is an object
       data = buildEvalWithinScopeFunction(expression, 0)()
       data or (data = {}) # no data
       (not data.options) or (options = data.options; delete data.options) # extract options
+      options or (options={})
       app.view_model = kb.inject(data, app.view_model, app.el, null, null, true)
+      afterBinding = app.view_model.afterBinding or options.afterBinding
+      beforeBinding = app.view_model.beforeBinding or options.beforeBinding
 
     # auto-bind
-    options.beforeBinding(app.view_model, app.el, options) if options and options.beforeBinding
+    beforeBinding(app.view_model, app.el, options) if beforeBinding
     kb.applyBindings(app.view_model, app.el, options)
-    options.afterBinding(app.view_model, app.el, options) if options and options.afterBinding
-  return apps
+    afterBinding(app.view_model, app.el, options) if afterBinding
+  return results
 
 #############################
-# Auto Inject Apps
+# Auto Inject results
 #############################
 # use DOM library ready function
 if @$
-  @$(->kb.injectApps())
+  @$(->kb.injectViewModels())
 
 # use simple ready check
 else
@@ -123,5 +106,5 @@ else
     return setTimeout(onReady, 0) unless document.readyState is "complete"
 
     # the document is loaded
-    kb.injectApps()
+    kb.injectViewModels()
   )()

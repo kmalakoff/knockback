@@ -2,7 +2,7 @@ $(document).ready( ->
   module("knockback.js with Backbone-Relational.js")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  if (typeof(require) isnt 'undefined') then _ = require('underscore') else _ = window._
+  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
   _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
   Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   require('backbone-relational') if not Backbone.Relational and (typeof(require) isnt 'undefined')
@@ -644,10 +644,22 @@ $(document).ready( ->
     collection_observable1 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]))
     collection_observable2 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]), collection_observable1.shareOptions())
 
-    ok(!collection_observable2.__kb.factory.parent_factory, "the factory should be shared")
+    equal(collection_observable1.__kb.factory, collection_observable2.__kb.factory, "the factory should be shared")
 
-    kb.release(collection_observable1)
-    kb.release(collection_observable2)
+    kb.release([collection_observable1, collection_observable2])
+
+    view_model_george = new PersonViewModel(george)
+    view_model_john = new PersonViewModel(john, view_model_george.shareOptions())
+    view_model_paul = new PersonViewModel(john, view_model_john.shareOptions())
+    view_model_ringo = new PersonViewModel(ringo, view_model_paul.shareOptions())
+
+    view_model_george_john = view_model_george.friends()[0]
+    equal(view_model_george.__kb.factory, view_model_george_john.__kb.factory.parent_factory.parent_factory, "the factory should be shared: george")
+    equal(view_model_george.__kb.factory, view_model_john.__kb.factory, "the factory should be shared: john")
+    equal(view_model_george.__kb.factory, view_model_paul.__kb.factory, "the factory should be shared: paul")
+    equal(view_model_george.__kb.factory, view_model_ringo.__kb.factory, "the factory should be shared: ringo")
+
+    kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo])
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )

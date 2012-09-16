@@ -1737,9 +1737,7 @@ buildEvalWithinScopeFunction = function(expression, scopeLevels) {
 
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
-    var result;
-    result = kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
-    return (result === view_model) || (throwUnexpected('inject', 'changing the view model'));
+    return kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
   }
 };
 
@@ -1783,17 +1781,17 @@ kb.inject = function(data, view_model, element, value_accessor, all_bindings_acc
   }
 };
 
-kb.injectApps = function(root) {
-  var app, apps, data, expression, getAppElements, options, _i, _len;
-  apps = [];
-  getAppElements = function(el) {
+kb.injectViewModels = function(root) {
+  var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _i, _len;
+  results = [];
+  findElements = function(el) {
     var attr, child_el, _i, _len, _ref;
     if (!el.__kb_injected) {
       if (el.attributes && (attr = _.find(el.attributes, function(attr) {
-        return attr.name === 'kb-app';
+        return attr.name === 'kb-inject';
       }))) {
         el.__kb_injected = true;
-        apps.push({
+        results.push({
           el: el,
           view_model: {},
           binding: attr.value
@@ -1803,40 +1801,43 @@ kb.injectApps = function(root) {
     _ref = el.childNodes;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       child_el = _ref[_i];
-      getAppElements(child_el);
+      findElements(child_el);
     }
   };
-  getAppElements(root || document);
-  for (_i = 0, _len = apps.length; _i < _len; _i++) {
-    app = apps[_i];
+  findElements(root || document);
+  for (_i = 0, _len = results.length; _i < _len; _i++) {
+    app = results[_i];
     if (expression = app.binding) {
       (expression.search(/[:]/) < 0) || (expression = "{" + expression + "}");
       data = buildEvalWithinScopeFunction(expression, 0)();
       data || (data = {});
       (!data.options) || (options = data.options, delete data.options);
+      options || (options = {});
       app.view_model = kb.inject(data, app.view_model, app.el, null, null, true);
+      afterBinding = app.view_model.afterBinding || options.afterBinding;
+      beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
     }
-    if (options && options.beforeBinding) {
-      options.beforeBinding(app.view_model, app.el, options);
+    if (beforeBinding) {
+      beforeBinding(app.view_model, app.el, options);
     }
     kb.applyBindings(app.view_model, app.el, options);
-    if (options && options.afterBinding) {
-      options.afterBinding(app.view_model, app.el, options);
+    if (afterBinding) {
+      afterBinding(app.view_model, app.el, options);
     }
   }
-  return apps;
+  return results;
 };
 
 if (this.$) {
   this.$(function() {
-    return kb.injectApps();
+    return kb.injectViewModels();
   });
 } else {
   (onReady = function() {
     if (document.readyState !== "complete") {
       return setTimeout(onReady, 0);
     }
-    return kb.injectApps();
+    return kb.injectViewModels();
   })();
 }
 ; return kb;});
