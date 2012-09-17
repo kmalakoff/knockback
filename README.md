@@ -10,6 +10,8 @@ Some great advantages to using Knockback.js:
 
 * leverage the wonderful work from both the Backbone and Knockout communities
 
+* easily view and edit relationships between Models using [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/)
+
 * (optional) simplify program control flow by configuring your application from your HTML Views (***new!***): think of it like Angular.js without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!
 
 
