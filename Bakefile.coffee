@@ -1,8 +1,8 @@
 module.exports =
   library:
     join: 'knockback.js'
-    compress: true
     wrapper: 'src/module-loader-full.js'
+    compress: true
     files: [
       'src/knockback-core/knockback-core.coffee'
       'src/knockback-core/knockback-utils.coffee'

@@ -4,7 +4,7 @@ $(document).ready( ->
   module_name = 'knockback-defaults'
   module_name = 'knockback' if (require.toUrl(module_name).split('./..').length is 1)
 
-  # Knockback and depdenencies
+  # library and dependencies
   require(['underscore', 'backbone', 'knockout', module_name, 'knockback-statistics', 'knockback-examples-localization', 'backbone-modelref'], (_, Backbone, ko, kb, kbs) ->
     _ or= @_
     Backbone or= @Backbone
