@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-localization-amd.js")
 
   module_name = 'knockback-localization'

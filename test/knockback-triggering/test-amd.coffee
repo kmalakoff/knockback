@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-triggering-amd.js")
 
   module_name = 'knockback-triggering'

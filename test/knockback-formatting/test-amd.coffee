@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-formatting-amd.js")
 
   module_name = 'knockback-formatting'

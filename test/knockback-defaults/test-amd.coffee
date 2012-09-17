@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-defaults-amd.js")
 
   module_name = 'knockback-defaults'

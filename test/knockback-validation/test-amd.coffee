@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-validation-amd.js")
 
   module_name = 'knockback-validation'

@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback.js with Backbone.ModelRef.js")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback

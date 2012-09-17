@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-observable-amd.js")
 
   # library and dependencies

@@ -1,4 +1,4 @@
-$(document).ready( ->
+$(->
   module("knockback-validation.js")
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
