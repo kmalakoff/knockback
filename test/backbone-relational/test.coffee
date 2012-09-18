@@ -328,6 +328,7 @@ $(->
       for authored_book in author.books()
         authored_book.editMode(true)
         equal(authored_book.editMode(), true, 'edit mode set')
+    return
   )
 
   test("6. Infering observable types: from the start", ->
@@ -569,6 +570,7 @@ $(->
             found = true
             validateFriend(vm, name)
         ok(found, "#{name} was found")
+      return
     validateFriend = (vm, name) ->
       equal(vm.type(), 'friend', "friend type matches for #{name}")
       equal(vm.name(), name, "friend name matches for #{name}")

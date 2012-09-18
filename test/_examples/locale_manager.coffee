@@ -20,7 +20,7 @@ class kb.LocaleManager
     culture_map = @translations_by_locale[@locale_identifier]
     return if not culture_map
     @trigger("change:#{key}", value) for key, value of culture_map
-    @
+    return
   getLocales: ->
     locales = []
     locales.push(string_id) for string_id, value of @translations_by_locale

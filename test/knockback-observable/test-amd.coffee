@@ -25,7 +25,7 @@ $(->
         @maybe_null_name = kb.observable(model, 'maybe_null_name')
         @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferingViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
         @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
-        @
+        return
 
       parent = new Backbone.Model({name: 'Daddy'})
       children_child = new Backbone.Model({name: 'Baby'})

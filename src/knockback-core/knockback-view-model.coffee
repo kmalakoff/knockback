@@ -193,7 +193,7 @@ class kb.ViewModel
       # create
       create_options.key = key
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
-    @
+    return
 
   # @private
   _mapObservables: (model, mappings) ->
@@ -208,7 +208,7 @@ class kb.ViewModel
 
       # create
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), @)
-    @
+    return
 
 # Factory function to create a kb.ViewModel.
 #

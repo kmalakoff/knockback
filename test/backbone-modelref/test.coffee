@@ -29,7 +29,7 @@ $(->
         number:   {key:'number'}
         date:     {key:'date'}
       }}, this)
-      @
+      return
 
     collection = new kb.ContactsCollection()
     model_ref = new Backbone.ModelRef(collection, 'b4')

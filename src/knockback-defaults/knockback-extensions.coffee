@@ -10,12 +10,11 @@
 
 kb.Observable::setToDefault = ->
   @__kb_value?.setToDefault?()
-  @
+  return
 
 kb.ViewModel::setToDefault = ->
-  for vm_key of @__kb.vm_keys
-    @[vm_key]?.setToDefault?()
-  @
+  @[vm_key]?.setToDefault?() for vm_key of @__kb.vm_keys
+  return
 
 # @example
 #   var model = new Backbone.Model({name: 'Bob'});

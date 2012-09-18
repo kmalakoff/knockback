@@ -123,7 +123,6 @@ kb.LocalizedObservable = (function() {
     }
     this.value = value;
     this._onLocaleChange();
-    return this;
   };
 
   LocalizedObservable.prototype._onLocaleChange = function() {

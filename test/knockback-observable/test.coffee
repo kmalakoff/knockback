@@ -25,7 +25,7 @@ $(->
     ContactViewModel = (model) ->
       @name = kb.observable(model, 'name')
       @number = kb.observable(model, {key:'number'})
-      @
+      return
 
     model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModel(model)
@@ -62,7 +62,7 @@ $(->
         read: -> return "#: #{model.get('number')}"
         write: (value) -> model.set({number: value.substring(3)})
       })
-      @
+      return
 
     model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
@@ -96,7 +96,7 @@ $(->
     ContactViewModelCustom = (model) ->
       @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
       @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
-      @
+      return
 
     model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
@@ -115,7 +115,7 @@ $(->
         write: ((value) -> @name($.trim(value))),
         owner: @
       })
-      @           # must return this or Coffeescript will return the last statement which is not what we want!
+      return
 
     model = new kb.Contact({name: 'Ringo'})
     view_model = new ContactViewModel(model)
@@ -218,7 +218,7 @@ $(->
       @maybe_null_name = kb.observable(model, 'maybe_null_name')
       @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferingViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
       @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
-      @
+      return
 
     parent = new Backbone.Model({name: 'Daddy'})
     children_child = new Backbone.Model({name: 'Baby'})

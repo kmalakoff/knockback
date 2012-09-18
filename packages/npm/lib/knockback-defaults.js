@@ -103,7 +103,6 @@ kb.Observable.prototype.setToDefault = function() {
       _ref.setToDefault();
     }
   }
-  return this;
 };
 
 kb.ViewModel.prototype.setToDefault = function() {
@@ -115,7 +114,6 @@ kb.ViewModel.prototype.setToDefault = function() {
       }
     }
   }
-  return this;
 };
 
 kb.utils.setToDefault = function(obj) {

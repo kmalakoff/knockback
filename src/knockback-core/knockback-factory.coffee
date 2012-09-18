@@ -41,7 +41,7 @@ class kb.Factory
   addPathMappings: (factories, owner_path) ->
     for path, create_info of factories
       @paths[kb.utils.pathJoin(owner_path, path)] = create_info
-    @
+    return
 
   hasPathMappings: (factories, owner_path) ->
     all_exist = true

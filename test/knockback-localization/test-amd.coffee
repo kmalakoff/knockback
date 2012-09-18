@@ -548,7 +548,7 @@ $(->
           date:     {key:'date', localizer: kb.LongDateLocalizer}
           name2:    {key: 'name'}
         }}, this)
-        @
+        return
 
       model = new kb.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
       view_model = new ContactViewModel(model)

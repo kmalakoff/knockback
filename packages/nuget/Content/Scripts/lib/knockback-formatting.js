@@ -138,7 +138,6 @@ kb.FormattedObservable = (function() {
           observable_args[index](matches[index]);
           index++;
         }
-        return this;
       }
     }));
     return observable;

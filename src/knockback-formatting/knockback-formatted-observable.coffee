@@ -87,7 +87,7 @@ class kb.FormattedObservable
         while (index<max_count)
           observable_args[index](matches[index])
           index++
-        @
+        return
     }))
 
     return observable

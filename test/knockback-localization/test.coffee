@@ -156,7 +156,7 @@ $(->
     ContactViewModelGreeting = (model) ->
       @greeting_key = ko.observable('hello_greeting')
       @greeting = kb.observable(model, {key:@greeting_key, localizer: kb.LocalizedStringLocalizer})
-      @
+      return
 
     model = new kb.Contact({hello_greeting: new kb.LocalizedString('formal_hello'), goodbye_greeting: new kb.LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
@@ -257,7 +257,7 @@ $(->
           else
             return if not @_email() then 'your.name@yourplace.com' else @_email()
         @date = new kb.LongDateLocalizer(@_date)
-        @
+        return
     })
 
     birthdate = new Date(1940, 10, 9)
@@ -549,7 +549,7 @@ $(->
         date:     {key:'date', localizer: kb.LongDateLocalizer}
         name2:    {key: 'name'}
       }}, this)
-      @
+      return
 
     model = new kb.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)

@@ -131,7 +131,7 @@ class kb.ModelWatcher
 
       # trigger now
       info.model(@m) and info.model
-    @
+    return
 
   releaseCallbacks: (obj) ->
     return unless @__kb.callbacks # already destroyed
@@ -164,7 +164,7 @@ class kb.ModelWatcher
       for info in list
         @_modelBindRelatationalInfo(event_name, info) if is_relational
         (info.model(model) if info.model)
-    @
+    return
 
   # @private
   _onModelUnloaded: (model) =>
@@ -179,7 +179,7 @@ class kb.ModelWatcher
       for info in list
         @_modelUnbindRelatationalInfo(event_name, info) if info.rel_fn
         info.model(null) if info.model
-    @
+    return
 
   # @private
   _modelBindRelatationalInfo: (event_name, info) ->
@@ -196,7 +196,7 @@ class kb.ModelWatcher
         @m.bind("remove:#{info.key}", info.rel_fn)
       else
         @m.bind("update:#{info.key}", info.rel_fn)
-    @
+    return
 
   # @private
   _modelUnbindRelatationalInfo: (event_name, info) ->
@@ -207,7 +207,7 @@ class kb.ModelWatcher
     else
       @m.unbind("update:#{info.key}", info.rel_fn)
     info.rel_fn = null
-    @
+    return
 
 # factory function
 kb.modelObservable = (model, observable) -> return new kb.ModelWatcher(model, observable)

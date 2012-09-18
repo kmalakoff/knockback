@@ -27,14 +27,14 @@ $(->
     refCount: -> return @ref_count
     retain: ->
       @ref_count++
-      @
+      return @
     release: ->
       --@ref_count
       throw "ref count is corrupt" if @ref_count < 0
       unless @ref_count
         @is_destroyed = true
         @__destroy()
-      @
+      return @
 
     __destroy: ->
       RefCountableViewModel.view_models.splice(_.indexOf(RefCountableViewModel.view_models, this), 1)
@@ -80,7 +80,7 @@ $(->
       @prop7 = kb.collectionObservable(new Backbone.Collection(), {models_only: true})
       @prop8 = kb.viewModel(new Backbone.Model({name: 'name1'}))
       @prop9 = kb.collectionObservable(new Backbone.Collection())
-      @
+      return
     view_model = new ViewModel()
     kb.release(view_model)
 
@@ -135,14 +135,14 @@ $(->
       refCount: -> return @ref_count
       retain: ->
         @ref_count++
-        @
+        return @
       release: ->
         --@ref_count
         throw "ref count is corrupt" if @ref_count < 0
         unless @ref_count
           @is_destroyed = true
           @__destroy()
-        @
+        return @
 
       __destroy: ->
         kb.release(@prop); @prop = null

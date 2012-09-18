@@ -382,7 +382,7 @@ class kb.CollectionObservable
     @in_edit++
     collection.reset(models)
     @in_edit--
-    @
+    return
 
   # @private
   _sortAttributeFn: (sort_attribute) ->
