@@ -170,7 +170,7 @@ class kb.Observable
 
     # SHARED NULL MODEL - update reference
     if not @__kb_value or (@__kb_value.__kb_destroyed or (@__kb_value.__kb_null and new_value))
-      @__kb_value = null
+      @__kb_value = undefined
       @value_type = undefined
     value = @__kb_value
 
@@ -207,7 +207,7 @@ class kb.Observable
     creator = create_options.creator
 
     # release the previous value
-    previous_value = @__kb_value; @__kb_value = null
+    previous_value = @__kb_value; @__kb_value = undefined
     kb.release(previous_value) if previous_value # release previous
 
     # found a creator
@@ -228,10 +228,11 @@ class kb.Observable
 
     # create and cache the type
     else
-      @value_type = KB_TYPE_SIMPLE
       if _.isArray(new_value)
+        @value_type = KB_TYPE_ARRAY
         value = ko.observableArray(new_value)
       else
+        @value_type = KB_TYPE_SIMPLE
         value = ko.observable(new_value)
 
     # determine the type

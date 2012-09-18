@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.6
+
+* bug fix for array attribute types ([issue #45](https://github.com/kmalakoff/knockback/issues/45))
+
 ## 0.16.5
 
 * renamed kb-app to kb-inject and kb.injectApps to kb.injectViewModels to better reflect the general nature of the injection mechanism: expanded the flexibilty and use cases for data-bind 'inject' amd kb-inject: use 'new' on the  for functions to permit class hierachies to be used and recursively resolving view_model or create within the binding cycle.

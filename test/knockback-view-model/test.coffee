@@ -436,4 +436,24 @@ $(->
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
+
+  test("16. array attributes", ->
+
+    model = new Backbone.Model
+      text: ["heading.get these rewards"]
+      widget: ["sign_up", "rewards"]
+      model_data:
+        reward:
+          top_rewards:
+            properties: ["title", "description", "num_points"]
+            query:
+              type: "active"
+              limit: 6
+
+    view_model = kb.viewModel model
+
+    ok(_.isEqual(view_model.text(), ["heading.get these rewards"]), 'text observable matches')
+    ok(_.isEqual(view_model.widget(), ["sign_up", "rewards"]), 'widget observable matches')
+    ok(_.isEqual(view_model.model_data().reward.top_rewards.properties, ["title", "description", "num_points"]), 'model_data observable matches')
+  )
 )

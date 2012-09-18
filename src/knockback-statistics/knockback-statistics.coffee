@@ -1,5 +1,5 @@
 ###
-  knockback_statistics.js 0.16.5
+  knockback_statistics.js 0.16.6
   (c) 2012 Kevin Malakoff.
   Knockback.Stats is freely distributable under the MIT license.
   See the following for full license details:

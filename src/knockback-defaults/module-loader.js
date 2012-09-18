@@ -1,5 +1,5 @@
 /*
-  knockback-defaults.js 0.16.5
+  knockback-defaults.js 0.16.6
   (c) 2011, 2012 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
