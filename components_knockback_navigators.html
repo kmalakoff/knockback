@@ -44,7 +44,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -146,7 +146,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
 </p>
 <pre><code>&lt;button class=&#39;btn btn-small&#39; data-bind=&quot;click: function(){ kb.loadUrl(&#39;#page1&#39;, {name: &#39;NavigationSlide&#39;, inverse: true}) }&quot;&gt;&lt;span&gt; Back&lt;/span&gt;&lt;/button&gt;</code></pre>
 <h1>Embedding using Knockout.js bindings:</h1>
-<p>If you are using KnockoutJS or KnockbackJS, you can actually bind a page navigator in the HTML using &#39;ko.bindings&#39; and receive a callback to set up routing.
+<p>If you are using KnockoutJS or Knockback.js, you can actually bind a page navigator in the HTML using &#39;ko.bindings&#39; and receive a callback to set up routing.
 
 </p>
 <pre><code>&lt;div data-bind=&quot;PageNavigatorPanes: {loaded: loaded}&quot;&gt;&lt;/div&gt;

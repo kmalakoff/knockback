@@ -4,7 +4,6 @@ var fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([b
 var FriendViewModel = function(model) {
   this.name = kb.observable(model, 'name');
   this.type = ko.observable('friend');
-  return this;
 };
 
 var PersonViewModel = kb.ViewModel.extend({

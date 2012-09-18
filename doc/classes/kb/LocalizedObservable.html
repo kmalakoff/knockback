@@ -123,9 +123,9 @@
       class
       is abstract.
     </strong>
-    You must provide the following two methods:
+    You must provide the following two methods: <em> read: function(value, observable) called to get the value and each time the locale changes </em> write: function(localized_string, value, observable) called to set the value (optional)
   </div>
-  <ul><li>read: function(value, observable) called to get the value and each time the locale changes</li><li>write: function(localized_string, value, observable) called to set the value (optional)</li></ul><p>Base class for observing localized data that changes when the locale changes.</p>
+  <p>Base class for observing localized data that changes when the locale changes.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -305,7 +305,7 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
   </ul>
   <h3>
     Options Hash:
-    (options):
+    (option):
   </h3>
   <ul class='options'>
     <li>
@@ -373,10 +373,10 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     </div>
     <div id='footer'>
   Generated on
-  Sun Sep 16 2012 23:11:17 GMT+0900 (JST)
+  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.1
+  v1.4.2
   (Node.js v0.8.7).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

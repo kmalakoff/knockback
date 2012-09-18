@@ -6,7 +6,6 @@ var FriendViewModel = function(model, options) {
   this.type = 'friend';
   this.name = kb.observable(model, 'name');
   this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));
-  return this;
 };
 
 var PersonViewModel = kb.ViewModel.extend({

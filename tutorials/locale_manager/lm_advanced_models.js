@@ -11,9 +11,7 @@ var LocaleManager = function() {
 
     // add arguments
     arguments = Array.prototype.slice.call(arguments, 1);
-    for (var index = _i = 0; _i < arguments.length; index = ++_i) {
-      string = string.replace("{" + index + "}", arguments[index]);
-    }
+    for (var index = _i = 0; _i < arguments.length; index = ++_i) { string = string.replace("{" + index + "}", arguments[index]); }
     return string;
   };
 
@@ -22,9 +20,7 @@ var LocaleManager = function() {
     this.current_locale(locale_identifier);
     this.trigger('change', this);
     var map = this.translations_by_locale[this.current_locale()];
-    for (key in map) {
-      this.trigger("change:" + key, map[key]);
-    }
+    for (key in map) { this.trigger("change:" + key, map[key]); }
   };
 
   this.getLocales = function() {

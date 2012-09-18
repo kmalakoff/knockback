@@ -16,7 +16,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.5.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.6.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -48,7 +48,7 @@
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection (like Angular.js)</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -108,52 +108,31 @@ kb.releaseOnNodeRemove(view_model, el);</pre><p>This means you can use a Backbon
   constructor: -&gt;
     Backbone.Router.prototype.constructor.apply(@, arguments)
     
-    @route('', null, =&gt;
-      ko.removeNode(@active_el) if @active_el # remove previous
-      
-      @active_el = kb.renderTemplate('home', new HomeViewModel())
-      $('body').append(@active_el)
-    )
+    loadPage = function(el) {
+      ko.removeNode(@active_el) if @active_el
+      $('body').append(@active_el = el)
+      $(el).addClass('active')
+    }
     
-    @route('things', null, =&gt;
-      ko.removeNode(@active_el) if @active_el # remove previous
-      
-      @active_el = kb.renderTemplate('things_page', new ThingsPageViewModel())
-      $('body').append(@active_el)
-    )
-    
-    @route('things/:id', null, (id) =&gt;
-      ko.removeNode(@active_el) if @active_el # remove previous
-      
-      @active_el = kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))
-      $('body').append(@active_el)
-    )
+    @route('', null, -&gt; loadPage(kb.renderTemplate('home', new HomeViewModel())))
+    @route('things', null, -&gt; loadUrl(kb.renderTemplate('things_page', new ThingsPageViewModel())))
+    @route('things/:id', null, (id) -&gt; loadPage(kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))))
 })</pre>
           <pre data-for="js">window.RouterBackboneJS = Backbone.Router.extend({
 
   constructor: function() {
+    var _this = this;
     Backbone.Router.prototype.constructor.apply(this, arguments);
     
-    this.route('', null, function() {
-      if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
-      
-      this.active_el = kb.renderTemplate('home', new HomeViewModel());
-      $('body').append(this.active_el);
-    });
+    var loadPage = function(el) {
+      if (_this.active_el) {ko.removeNode(this.active_el); }
+      $('body').append(_this.active_el = el);
+      $(el).addClass('active');
+    }
     
-    this.route('things', null, function() {
-      if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
-      
-      this.active_el = kb.renderTemplate('things_page', new ThingsPageViewModel());
-      $('body').append(this.active_el);
-    });
-    
-    this.route('things/:id', null, function(id) {
-      if (this.active_el) { ko.removeNode(this.active_el); } // remove previous
-      
-      this.active_el = kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)));
-      $('body').append(this.active_el);
-    });
+    this.route('', null, function() { loadPage(kb.renderTemplate('home', new HomeViewModel())); });
+    this.route('things', null, function() { loadPage(kb.renderTemplate('things_page', new ThingsPageViewModel())); });
+    this.route('things/:id', null, function(id) { loadPage(kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))); });
   }
 });</pre>
         </section>
