@@ -6,14 +6,6 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-# helper from Knockout.js (function gets lost in minimization): http://knockoutjs.com/
-buildEvalWithinScopeFunction = (expression, scopeLevels) ->
-  functionBody = "return ( #{expression} )"
-  i = -1
-  while (++i < scopeLevels)
-    functionBody = "with(sc[#{i}]) { #{functionBody} }"
-  return new Function("sc", functionBody)
-
 ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
     kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor)
@@ -78,7 +70,7 @@ kb.injectViewModels = (root) ->
     # evaluate the app data
     if expression = app.binding
       (expression.search(/[:]/) < 0) or (expression = "{#{expression}}") # wrap if is an object
-      data = buildEvalWithinScopeFunction(expression, 0)()
+      data = (new Function("", "return ( #{expression} )"))()
       data or (data = {}) # no data
       (not data.options) or (options = data.options; delete data.options) # extract options
       options or (options={})

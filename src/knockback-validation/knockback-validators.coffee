@@ -6,14 +6,6 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-# helper from Knockout.js (function gets lost in minimization): http://knockoutjs.com/
-buildEvalWithinScopeFunction = (expression, scopeLevels) ->
-  functionBody = "return ( #{expression} )"
-  i = -1
-  while (++i < scopeLevels)
-    functionBody = "with(sc[#{i}]) { #{functionBody} }"
-  return new Function("sc", functionBody)
-
 # Helpers for validating forms, inputs, and values.
 
 # Regular expressions from Angular.js: https://github.com/angular/angular.js
@@ -52,7 +44,7 @@ kb.inputValidator = (view_model, el, value_accessor) ->
 
   # only set up form elements with a value bindings
   return null unless (bindings = $input_el.attr('data-bind'))
-  options = buildEvalWithinScopeFunction("{#{bindings}}", 1)([view_model])
+  options = (new Function("sc", "with(sc[0]) { return { #{bindings} } }"))([view_model])
   return null if not (options and options.value)
 
   # collect the types to check

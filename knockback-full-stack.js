@@ -5963,7 +5963,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, buildEvalWithinScopeFunction, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -7656,16 +7656,6 @@ kb.sortedIndexWrapAttr = kb.siwa = function(attribute_name, wrapper_constructor)
 */
 
 
-buildEvalWithinScopeFunction = function(expression, scopeLevels) {
-  var functionBody, i;
-  functionBody = "return ( " + expression + " )";
-  i = -1;
-  while (++i < scopeLevels) {
-    functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
-  }
-  return new Function("sc", functionBody);
-};
-
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
     return kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
@@ -7740,7 +7730,7 @@ kb.injectViewModels = function(root) {
     app = results[_i];
     if (expression = app.binding) {
       (expression.search(/[:]/) < 0) || (expression = "{" + expression + "}");
-      data = buildEvalWithinScopeFunction(expression, 0)();
+      data = (new Function("", "return ( " + expression + " )"))();
       data || (data = {});
       (!data.options) || (options = data.options, delete data.options);
       options || (options = {});
@@ -8183,16 +8173,6 @@ kb.triggeredObservable = function(model, event_name) {
 */
 
 
-buildEvalWithinScopeFunction = function(expression, scopeLevels) {
-  var functionBody, i;
-  functionBody = "return ( " + expression + " )";
-  i = -1;
-  while (++i < scopeLevels) {
-    functionBody = "with(sc[" + i + "]) { " + functionBody + " }";
-  }
-  return new Function("sc", functionBody);
-};
-
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 
 EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
@@ -8246,7 +8226,7 @@ kb.inputValidator = function(view_model, el, value_accessor) {
   if (!(bindings = $input_el.attr('data-bind'))) {
     return null;
   }
-  options = buildEvalWithinScopeFunction("{" + bindings + "}", 1)([view_model]);
+  options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
   if (!(options && options.value)) {
     return null;
   }
