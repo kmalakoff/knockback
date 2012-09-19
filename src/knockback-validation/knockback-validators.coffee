@@ -27,7 +27,7 @@ kb.valueValidator = (value, bindings) ->
     results = {valid: true}
     current_value = ko.utils.unwrapObservable(value)
     for identifier, validator of bindings
-      results[identifier]= !validator(current_value) # update validity
+      results[identifier]= !ko.utils.unwrapObservable(validator)(current_value) # update validity
       results.valid &= !results[identifier]
 
     # add the inverse and ensure a boolean
