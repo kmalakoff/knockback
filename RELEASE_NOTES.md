@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.7
+
+* added extensibility to knockback-validation.js through data-bind on input elements.
+
 ## 0.16.6
 
 * bug fix for array attribute types ([issue #45](https://github.com/kmalakoff/knockback/issues/45))
