@@ -22,19 +22,17 @@ kb.validators =
   email: (value) -> !!EMAIL_REGEXP.test(value)
   number: (value) -> !!NUMBER_REGEXP.test(value)
 
-kb.bindValueValidators = (value, bindings) ->
-  results = {valid: ko.observable(true), invalid: ko.observable(false)}
-  results[identifier] = ko.observable() for identifier, validator of bindings # set up all observables
-
+kb.valueValidator = (value, bindings) ->
   return ko.dependentObservable(->
+    results = {valid: true}
     current_value = ko.utils.unwrapObservable(value)
-    valid = true
     for identifier, validator of bindings
-      results[identifier](!validator(current_value)) # update validity
-      valid &= !results[identifier]()
+      results[identifier]= !validator(current_value) # update validity
+      results.valid &= !results[identifier]
 
-    # add the inverse and wrap both
-    results.valid(!!valid); results.invalid(!valid)
+    # add the inverse and ensure a boolean
+    results.valid = !!results.valid
+    results.invalid = !results.valid
     return results
   )
 
@@ -54,7 +52,7 @@ kb.inputValidator = (view_model, el, value_accessor) ->
   bindings.required = kb.validators.required if $input_el.attr('required')
   for identifier, validator of options # check all of the bindings for recognized bindings
     bindings[identifier] = validator if not _.contains(INPUT_RESERVED_IDENTIFIERS, identifier) and (typeof(validator) is 'function')
-  result = kb.bindValueValidators(options.value, bindings)
+  result = kb.valueValidator(options.value, bindings)
 
   # if there is a name, add to the view_model with $scoping
   view_model["$#{input_name}"] = result if input_name and not skip_attach

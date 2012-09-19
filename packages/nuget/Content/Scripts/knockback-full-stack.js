@@ -8196,27 +8196,20 @@ kb.validators = {
   }
 };
 
-kb.bindValueValidators = function(value, bindings) {
-  var identifier, results, validator;
-  results = {
-    valid: ko.observable(true),
-    invalid: ko.observable(false)
-  };
-  for (identifier in bindings) {
-    validator = bindings[identifier];
-    results[identifier] = ko.observable();
-  }
+kb.valueValidator = function(value, bindings) {
   return ko.dependentObservable(function() {
-    var current_value, valid;
+    var current_value, identifier, results, validator;
+    results = {
+      valid: true
+    };
     current_value = ko.utils.unwrapObservable(value);
-    valid = true;
     for (identifier in bindings) {
       validator = bindings[identifier];
-      results[identifier](!validator(current_value));
-      valid &= !results[identifier]();
+      results[identifier] = !validator(current_value);
+      results.valid &= !results[identifier];
     }
-    results.valid(!!valid);
-    results.invalid(!valid);
+    results.valid = !!results.valid;
+    results.invalid = !results.valid;
     return results;
   });
 };
@@ -8248,7 +8241,7 @@ kb.inputValidator = function(view_model, el, value_accessor) {
       bindings[identifier] = validator;
     }
   }
-  result = kb.bindValueValidators(options.value, bindings);
+  result = kb.valueValidator(options.value, bindings);
   if (input_name && !skip_attach) {
     view_model["$" + input_name] = result;
   }
