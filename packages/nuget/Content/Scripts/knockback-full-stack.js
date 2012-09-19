@@ -5963,7 +5963,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, EMAIL_REGEXP, INPUT_RESERVED_IDENTIFIERS, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -8179,45 +8179,50 @@ EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
 
 NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
+INPUT_RESERVED_IDENTIFIERS = ['value', 'valueUpdate', 'inject'];
+
 kb.validators = {
   required: function(value) {
-    return !value;
+    return !!value;
   },
   url: function(value) {
-    return !URL_REGEXP.test(value);
+    return !!URL_REGEXP.test(value);
   },
   email: function(value) {
-    return !EMAIL_REGEXP.test(value);
+    return !!EMAIL_REGEXP.test(value);
   },
   number: function(value) {
-    return !NUMBER_REGEXP.test(value);
+    return !!NUMBER_REGEXP.test(value);
   }
 };
 
-kb.valueValidator = function(value, checks) {
-  _.isArray(checks) || (checks = [checks]);
+kb.bindValueValidators = function(value, bindings) {
+  var identifier, results, validator;
+  results = {
+    valid: ko.observable(true),
+    invalid: ko.observable(false)
+  };
+  for (identifier in bindings) {
+    validator = bindings[identifier];
+    results[identifier] = ko.observable();
+  }
   return ko.dependentObservable(function() {
-    var check, current_value, results, validator, _i, _len;
-    results = {
-      invalid: false
-    };
+    var current_value, valid;
     current_value = ko.utils.unwrapObservable(value);
-    for (_i = 0, _len = checks.length; _i < _len; _i++) {
-      check = checks[_i];
-      validator = kb.validators[check];
-      if (!validator) {
-        continue;
-      }
-      results[check] = validator(current_value);
-      results.invalid |= results[check];
+    valid = true;
+    for (identifier in bindings) {
+      validator = bindings[identifier];
+      results[identifier](!validator(current_value));
+      valid &= !results[identifier]();
     }
-    results.valid = !results.invalid;
+    results.valid(!!valid);
+    results.invalid(!valid);
     return results;
   });
 };
 
 kb.inputValidator = function(view_model, el, value_accessor) {
-  var $input_el, bindings, checks, input_name, options, result, skip_attach;
+  var $input_el, bindings, identifier, input_name, options, result, skip_attach, type, validator;
   $input_el = $(el);
   if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
     input_name = null;
@@ -8230,21 +8235,20 @@ kb.inputValidator = function(view_model, el, value_accessor) {
   if (!(options && options.value)) {
     return null;
   }
-  checks = [];
-  switch ($input_el.attr('type')) {
-    case 'url':
-      checks.push('url');
-      break;
-    case 'email':
-      checks.push('email');
-      break;
-    case 'number':
-      checks.push('number');
+  bindings = {};
+  if (kb.validators[type = $input_el.attr('type')]) {
+    bindings[type] = kb.validators[type];
   }
   if ($input_el.attr('required')) {
-    checks.push('required');
+    bindings.required = kb.validators.required;
   }
-  result = kb.valueValidator(options.value, checks);
+  for (identifier in options) {
+    validator = options[identifier];
+    if (!_.contains(INPUT_RESERVED_IDENTIFIERS, identifier) && (typeof validator === 'function')) {
+      bindings[identifier] = validator;
+    }
+  }
+  result = kb.bindValueValidators(options.value, bindings);
   if (input_name && !skip_attach) {
     view_model["$" + input_name] = result;
   }
