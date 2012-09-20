@@ -57,6 +57,122 @@ callOrGet = function(value) {
 
 arraySlice = Array.prototype.slice;
 
+kb.Validation = (function() {
+
+  function Validation() {}
+
+  Validation.valueValidator = function(value, bindings, validation_options) {
+    if (validation_options == null) {
+      validation_options = {};
+    }
+    (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
+    return ko.dependentObservable(function() {
+      var active_index, current_value, disable, identifier, identifier_index, priorities, results, validator;
+      results = {
+        error_count: 0
+      };
+      current_value = ko.utils.unwrapObservable(value);
+      (!validation_options.disable) || (disable = callOrGet(validation_options.disable));
+      priorities = validation_options.priorities || [];
+      _.isArray(priorities) || (priorities = [priorities]);
+      active_index = priorities.length;
+      for (identifier in bindings) {
+        validator = bindings[identifier];
+        results[identifier] = !disable && callOrGet(validator, current_value);
+        if (results[identifier]) {
+          results.error_count++;
+          if (results.active_error && priorities.length && (identifier_index = _.indexOf(priorities, identifier)) >= 0) {
+            (active_index < identifier_index) || (active_index = identifier_index, results.active_error = identifier);
+          } else {
+            results.active_error || (results.active_error = identifier);
+          }
+        }
+      }
+      results.valid = results.error_count === 0;
+      return results;
+    });
+  };
+
+  Validation.inputValidator = function(view_model, el, validation_options) {
+    var $input_el, bindings, identifier, input_name, options, result, type, validator, validators;
+    (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
+    validators = kb.validators;
+    $input_el = $(el);
+    if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
+      input_name = null;
+    }
+    if (!(bindings = $input_el.attr('data-bind'))) {
+      return null;
+    }
+    options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
+    if (!(options && options.value)) {
+      return null;
+    }
+    (!options.validation_options) || (_.defaults(options.validation_options, validation_options), validation_options = options.validation_options);
+    bindings = {};
+    (!validators[type = $input_el.attr('type')]) || (bindings[type] = validators[type]);
+    (!$input_el.attr('required')) || (bindings.required = validators.required);
+    (!validation_options.disable) || (bindings.disable = validation_options.disable);
+    (!options.validations) || ((function() {
+      var _ref, _results;
+      _ref = options.validations;
+      _results = [];
+      for (identifier in _ref) {
+        validator = _ref[identifier];
+        _results.push(bindings[identifier] = validator);
+      }
+      return _results;
+    })());
+    result = kb.valueValidator(options.value, bindings, validation_options);
+    (!input_name && !validation_options.skip_attach) || (view_model["$" + input_name] = result);
+    return result;
+  };
+
+  Validation.formValidator = function(view_model, el) {
+    var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _i, _len, _ref;
+    results = {
+      error_count: 0
+    };
+    validators = [];
+    $root_el = $(el);
+    if ((form_name = $root_el.attr('name')) && !_.isString(form_name)) {
+      form_name = null;
+    }
+    if ((bindings = $root_el.attr('data-bind'))) {
+      options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
+      validation_options = options.validation_options;
+    }
+    validation_options || (validation_options = {});
+    validation_options.skip_attach = !!form_name;
+    _ref = $root_el.find('input');
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      input_el = _ref[_i];
+      if (!(name = $(input_el).attr('name'))) {
+        continue;
+      }
+      validator = kb.inputValidator(view_model, input_el, validation_options);
+      !validator || validators.push(results[name] = validator);
+    }
+    results.valid = ko.dependentObservable(function() {
+      var valid, _j, _len1;
+      valid = true;
+      for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
+        validator = validators[_j];
+        results.error_count += validator().error_count;
+        valid &= validator().valid;
+      }
+      return valid;
+    });
+    if (form_name) {
+      view_model["$" + form_name] = results;
+    }
+    return results;
+  };
+
+  return Validation;
+
+})();
+
 kb.validators = {
   required: function(value) {
     return !value;
@@ -72,111 +188,10 @@ kb.validators = {
   }
 };
 
-kb.valueValidator = function(value, bindings, validation_options) {
-  if (validation_options == null) {
-    validation_options = {};
-  }
-  (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
-  return ko.dependentObservable(function() {
-    var active_index, current_value, disable, identifier, identifier_index, priorities, results, validator;
-    results = {
-      error_count: 0
-    };
-    current_value = ko.utils.unwrapObservable(value);
-    (!validation_options.disable) || (disable = callOrGet(validation_options.disable));
-    priorities = validation_options.priorities || [];
-    _.isArray(priorities) || (priorities = [priorities]);
-    active_index = priorities.length;
-    for (identifier in bindings) {
-      validator = bindings[identifier];
-      results[identifier] = !disable && callOrGet(validator, current_value);
-      if (results[identifier]) {
-        results.error_count++;
-        if (results.active_error && priorities.length && (identifier_index = _.indexOf(priorities, identifier)) >= 0) {
-          (active_index < identifier_index) || (active_index = identifier_index, results.active_error = identifier);
-        } else {
-          results.active_error || (results.active_error = identifier);
-        }
-      }
-    }
-    results.valid = results.error_count === 0;
-    return results;
-  });
-};
+kb.valueValidator = kb.Validation.valueValidator;
 
-kb.inputValidator = function(view_model, el, validation_options) {
-  var $input_el, bindings, identifier, input_name, options, result, type, validator;
-  (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
-  $input_el = $(el);
-  if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
-    input_name = null;
-  }
-  if (!(bindings = $input_el.attr('data-bind'))) {
-    return null;
-  }
-  options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
-  if (!(options && options.value)) {
-    return null;
-  }
-  (!options.validation_options) || (_.defaults(options.validation_options, validation_options), validation_options = options.validation_options);
-  bindings = {};
-  (!kb.validators[type = $input_el.attr('type')]) || (bindings[type] = kb.validators[type]);
-  (!$input_el.attr('required')) || (bindings.required = kb.validators.required);
-  (!validation_options.disable) || (bindings.disable = validation_options.disable);
-  (!options.validations) || ((function() {
-    var _ref, _results;
-    _ref = options.validations;
-    _results = [];
-    for (identifier in _ref) {
-      validator = _ref[identifier];
-      _results.push(bindings[identifier] = validator);
-    }
-    return _results;
-  })());
-  result = kb.valueValidator(options.value, bindings, validation_options);
-  (!input_name && !validation_options.skip_attach) || (view_model["$" + input_name] = result);
-  return result;
-};
+kb.inputValidator = kb.Validation.inputValidator;
 
-kb.formValidator = function(view_model, el) {
-  var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _i, _len, _ref;
-  results = {
-    error_count: 0
-  };
-  validators = [];
-  $root_el = $(el);
-  if ((form_name = $root_el.attr('name')) && !_.isString(form_name)) {
-    form_name = null;
-  }
-  if ((bindings = $root_el.attr('data-bind'))) {
-    options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
-    validation_options = options.validation_options;
-  }
-  validation_options || (validation_options = {});
-  validation_options.skip_attach = !!form_name;
-  _ref = $root_el.find('input');
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    input_el = _ref[_i];
-    if (!(name = $(input_el).attr('name'))) {
-      continue;
-    }
-    validator = kb.inputValidator(view_model, input_el, validation_options);
-    !validator || validators.push(results[name] = validator);
-  }
-  results.valid = ko.dependentObservable(function() {
-    var valid, _j, _len1;
-    valid = true;
-    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
-      validator = validators[_j];
-      results.error_count += validator().error_count;
-      valid &= validator().valid;
-    }
-    return valid;
-  });
-  if (form_name) {
-    view_model["$" + form_name] = results;
-  }
-  return results;
-};
+kb.formValidator = kb.Validation.formValidator;
 ; return kb;});
 }).call(this);

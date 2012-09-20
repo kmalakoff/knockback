@@ -1719,96 +1719,106 @@ kb.sortedIndexWrapAttr = kb.siwa = function(attribute_name, wrapper_constructor)
 
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
-    return kb.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+    return kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
   }
 };
 
-kb.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-  var inject, result, wrapper;
-  inject = function(data) {
-    var key, target, value;
-    if (_.isFunction(data)) {
-      view_model = new data(view_model, element, value_accessor, all_bindings_accessor);
-      kb.releaseOnNodeRemove(view_model, element);
-    } else {
-      if (data.view_model) {
-        view_model = new data.view_model(view_model, element, value_accessor, all_bindings_accessor);
+kb.Inject = (function() {
+
+  function Inject() {}
+
+  Inject.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
+    var inject, result, wrapper;
+    inject = function(data) {
+      var key, target, value;
+      if (_.isFunction(data)) {
+        view_model = new data(view_model, element, value_accessor, all_bindings_accessor);
         kb.releaseOnNodeRemove(view_model, element);
-      }
-      for (key in data) {
-        value = data[key];
-        if (key === 'view_model') {
-          continue;
+      } else {
+        if (data.view_model) {
+          view_model = new data.view_model(view_model, element, value_accessor, all_bindings_accessor);
+          kb.releaseOnNodeRemove(view_model, element);
         }
-        if (key === 'create') {
-          value(view_model, element, value_accessor, all_bindings_accessor);
-        } else if (_.isObject(value) && !_.isFunction(value)) {
-          target = nested || (value && value.create) ? {} : view_model;
-          view_model[key] = kb.inject(value, target, element, value_accessor, all_bindings_accessor, true);
-        } else {
-          view_model[key] = value;
+        for (key in data) {
+          value = data[key];
+          if (key === 'view_model') {
+            continue;
+          }
+          if (key === 'create') {
+            value(view_model, element, value_accessor, all_bindings_accessor);
+          } else if (_.isObject(value) && !_.isFunction(value)) {
+            target = nested || (value && value.create) ? {} : view_model;
+            view_model[key] = kb.Inject.inject(value, target, element, value_accessor, all_bindings_accessor, true);
+          } else {
+            view_model[key] = value;
+          }
         }
       }
-    }
-    return view_model;
-  };
-  if (nested) {
-    return inject(data);
-  } else {
-    result = (wrapper = ko.dependentObservable(function() {
+      return view_model;
+    };
+    if (nested) {
       return inject(data);
-    }))();
-    wrapper.dispose();
-    return result;
-  }
-};
-
-kb.injectViewModels = function(root) {
-  var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _i, _len;
-  results = [];
-  findElements = function(el) {
-    var attr, child_el, _i, _len, _ref;
-    if (!el.__kb_injected) {
-      if (el.attributes && (attr = _.find(el.attributes, function(attr) {
-        return attr.name === 'kb-inject';
-      }))) {
-        el.__kb_injected = true;
-        results.push({
-          el: el,
-          view_model: {},
-          binding: attr.value
-        });
-      }
-    }
-    _ref = el.childNodes;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      child_el = _ref[_i];
-      findElements(child_el);
+    } else {
+      result = (wrapper = ko.dependentObservable(function() {
+        return inject(data);
+      }))();
+      wrapper.dispose();
+      return result;
     }
   };
-  findElements(root || document);
-  for (_i = 0, _len = results.length; _i < _len; _i++) {
-    app = results[_i];
-    if (expression = app.binding) {
-      (expression.search(/[:]/) < 0) || (expression = "{" + expression + "}");
-      data = (new Function("", "return ( " + expression + " )"))();
-      data || (data = {});
-      (!data.options) || (options = data.options, delete data.options);
-      options || (options = {});
-      app.view_model = kb.inject(data, app.view_model, app.el, null, null, true);
-      afterBinding = app.view_model.afterBinding || options.afterBinding;
-      beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
+
+  Inject.injectViewModels = function(root) {
+    var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _i, _len;
+    results = [];
+    findElements = function(el) {
+      var attr, child_el, _i, _len, _ref;
+      if (!el.__kb_injected) {
+        if (el.attributes && (attr = _.find(el.attributes, function(attr) {
+          return attr.name === 'kb-inject';
+        }))) {
+          el.__kb_injected = true;
+          results.push({
+            el: el,
+            view_model: {},
+            binding: attr.value
+          });
+        }
+      }
+      _ref = el.childNodes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        child_el = _ref[_i];
+        findElements(child_el);
+      }
+    };
+    findElements(root || document);
+    for (_i = 0, _len = results.length; _i < _len; _i++) {
+      app = results[_i];
+      if (expression = app.binding) {
+        (expression.search(/[:]/) < 0) || (expression = "{" + expression + "}");
+        data = (new Function("", "return ( " + expression + " )"))();
+        data || (data = {});
+        (!data.options) || (options = data.options, delete data.options);
+        options || (options = {});
+        app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
+        afterBinding = app.view_model.afterBinding || options.afterBinding;
+        beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
+      }
+      if (beforeBinding) {
+        beforeBinding(app.view_model, app.el, options);
+      }
+      kb.applyBindings(app.view_model, app.el, options);
+      if (afterBinding) {
+        afterBinding(app.view_model, app.el, options);
+      }
     }
-    if (beforeBinding) {
-      beforeBinding(app.view_model, app.el, options);
-    }
-    kb.applyBindings(app.view_model, app.el, options);
-    if (afterBinding) {
-      afterBinding(app.view_model, app.el, options);
-    }
-  }
-  return results;
-};
+    return results;
+  };
+
+  return Inject;
+
+})();
+
+kb.injectViewModels = kb.Inject.injectViewModels;
 
 if (this.$) {
   this.$(function() {
