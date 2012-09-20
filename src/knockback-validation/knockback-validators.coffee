@@ -26,46 +26,53 @@ kb.validators =
   email: (value) -> !EMAIL_REGEXP.test(value)
   number: (value) -> !NUMBER_REGEXP.test(value)
 
-kb.valueValidator = (value, bindings) ->
+kb.valueValidator = (value, bindings, validation_options={}) ->
+  (validation_options and not (typeof(validation_options) is 'function')) or (validation_options = {})
   return ko.dependentObservable(->
     results = {error_count: 0}
     current_value = ko.utils.unwrapObservable(value)
-    disable = callOrGet(bindings.disable) if 'disable' of bindings
+    (not validation_options.disable) or (disable = callOrGet(validation_options.disable))
+    priorities = validation_options.priorities or []
+    _.isArray(priorities) or (priorities = [priorities]) # ensure priorities is an array
+
+    # then add the rest
+    active_index = priorities.length
     for identifier, validator of bindings
-      continue if identifier is 'disable'
       results[identifier] = not disable and callOrGet(validator, current_value) # update validity
       if results[identifier]
         results.error_count++
-        results.active_error = identifier unless results.active_error
+
+        if results.active_error and priorities.length and (identifier_index = _.indexOf(priorities, identifier)) >= 0
+          (active_index < identifier_index) or (active_index = identifier_index; results.active_error = identifier)
+        else
+          results.active_error or (results.active_error = identifier)
 
     # add the inverse and ensure a boolean
     results.valid = results.error_count is 0
     return results
   )
 
-kb.inputValidator = (view_model, el, value_accessor) ->
+kb.inputValidator = (view_model, el, validation_options) ->
+  (validation_options and not (typeof(validation_options) is 'function')) or (validation_options = {})
   $input_el = $(el)
   input_name = null if (input_name = $input_el.attr('name')) and not _.isString(input_name)
-  if value_accessor
-    skip_attach = value_accessor.skip_attach
-    disable = value_accessor.disable
 
   # only set up form elements with a value bindings
   return null unless (bindings = $input_el.attr('data-bind'))
   options = (new Function("sc", "with(sc[0]) { return { #{bindings} } }"))([view_model])
   return null if not (options and options.value)
+  (not options.validation_options) or (_.defaults(options.validation_options, validation_options); validation_options = options.validation_options)
 
   # collect the types to identifier
   bindings = {}
-  bindings[type] = kb.validators[type] if kb.validators[type = $input_el.attr('type')]
-  bindings.required = kb.validators.required if $input_el.attr('required')
-  bindings.disable = disable if disable # global disable
-  if options.validations
-    bindings[identifier] = validator for identifier, validator of options.validations
-  result = kb.valueValidator(options.value, bindings)
+  (not kb.validators[type = $input_el.attr('type')]) or (bindings[type] = kb.validators[type])
+  (not $input_el.attr('required')) or (bindings.required = kb.validators.required)
+  (not validation_options.disable) or (bindings.disable = validation_options.disable) # global disable
+  (not options.validations) or (bindings[identifier] = validator for identifier, validator of options.validations)
+  result = kb.valueValidator(options.value, bindings, validation_options)
 
   # if there is a name, add to the view_model with $scoping
-  view_model["$#{input_name}"] = result if input_name and not skip_attach
+  (not input_name and not validation_options.skip_attach) or (view_model["$#{input_name}"] = result)
   return result
 
 kb.formValidator = (view_model, el) ->
@@ -76,12 +83,14 @@ kb.formValidator = (view_model, el) ->
 
   if (bindings = $root_el.attr('data-bind'))
     options = (new Function("sc", "with(sc[0]) { return { #{bindings} } }"))([view_model])
-    disable = options.validations.disable if options and options.validations and options.validations.disable
+    validation_options = options.validation_options
+  validation_options or= {}
+  validation_options.skip_attach = !!form_name
 
   # build up the results
   for input_el in $root_el.find('input')
     continue unless (name = $(input_el).attr('name')) # need named inputs to set up an object
-    validator = kb.inputValidator(view_model, input_el, if form_name then {skip_attach: true, disable: disable} else {disable: disable})
+    validator = kb.inputValidator(view_model, input_el, validation_options)
     not validator or validators.push(results[name] = validator)
 
   # add the valid state and inverse

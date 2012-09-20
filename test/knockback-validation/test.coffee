@@ -141,13 +141,13 @@ $(->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("kb.inputValidator with disable", ->
+  test("kb.inputValidator with validation_options", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
       name: ko.observable()
     window.disable = ko.observable(true)
-    el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {disable: disable}" required>')[0]
+    el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: \'url\'}" required>')[0]
     ko.applyBindings(view_model, el)
 
     validator = view_model.$name
@@ -167,7 +167,7 @@ $(->
     ok(validator().url, "obs: url is invalid")
     ok(!validator().valid, "obs: validator not valid")
     ok(validator().error_count, "obs: validator is invalid")
-    ok(validator().active_error, "obs: active error exists")
+    equal(validator().active_error, 'url', "obs: active error is url")
 
     window.disable(-> return true)
     ok(!validator().required, "obs fn: required is valid")
@@ -181,14 +181,14 @@ $(->
     ok(validator().url, "obs fn: url is invalid")
     ok(!validator().valid, "obs fn: validator not valid")
     ok(validator().error_count, "obs fn: validator is invalid")
-    ok(validator().active_error, "obs fn: active error exists")
+    equal(validator().active_error, 'url', "obs fn: active error is url")
 
     kb.release(view_model)
 
     view_model =
       name: ko.observable()
     window.disable = -> return true
-    el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {disable: disable}" required>')[0]
+    el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable}" required>')[0]
     ko.applyBindings(view_model, el)
 
     validator = view_model.$name
@@ -216,7 +216,7 @@ $(->
       site: ko.observable()
 
     HTML = """
-    <form name='my_form' data-bind="inject: kb.formValidator">
+    <form name='my_form' data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
       <div class="control-group">
         <input type="text" name="name" data-bind="value: name" required>
       </div>
@@ -257,14 +257,14 @@ $(->
     ok(validator().url, "url is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
-    ok(validator().active_error, "active error exists")
+    equal(validator().active_error, 'required', "active error is url")
 
     view_model.site('Bob')
     ok(!validator().required, "required is valid")
     ok(validator().url, "url is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
-    ok(validator().active_error, "active error exists")
+    equal(validator().active_error, 'url', "active error is url")
 
     view_model.site('http://Bob')
     ok(!validator().required, "required is valid")
@@ -278,7 +278,7 @@ $(->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("kb.formValidator no name with disable", ->
+  test("kb.formValidator no name with validation_options", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
@@ -286,7 +286,7 @@ $(->
       site: ko.observable()
 
     HTML = """
-    <form data-bind="inject: kb.formValidator, validations: {disable: disable}">
+    <form data-bind="inject: kb.formValidator, validation_options: {disable: disable, priorities: 'url'}">
       <div class="control-group">
         <input type="text" name="name" data-bind="value: name" required>
       </div>
@@ -334,14 +334,14 @@ $(->
     ok(validator().url, "url is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
-    ok(validator().active_error, "active error exists")
+    equal(validator().active_error, 'url', "active error is url")
 
     view_model.site('Bob')
     ok(!validator().required, "required is valid")
     ok(validator().url, "url is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
-    ok(validator().active_error, "active error exists")
+    equal(validator().active_error, 'url', "active error is url")
 
     view_model.site('http://Bob')
     ok(!validator().required, "required is valid")
@@ -367,7 +367,7 @@ $(->
 
     HTML = """
     <div kb-inject="MyViewModel">
-       <form name="my_form" data-bind="inject: kb.formValidator, validations: {disable: disable}">
+       <form name="my_form" data-bind="inject: kb.formValidator, validation_options: {disable: disable, priorities: ['url']}">
          <div class="control-group">
           <label>Name</label>
           <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
@@ -403,11 +403,13 @@ $(->
     ok(validator().required, "required is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
+    equal(validator().active_error, 'required', "active error is required")
 
     view_model.name('Bob')
     ok(!validator().required, "required is valid")
     ok(validator().valid, "validator valid")
     ok(!validator().error_count, "validator is not invalid")
+    ok(!validator().active_error, "no active error")
 
     validator = view_model.$my_form.site
     ok(validator().hasOwnProperty('required'), "has required")
@@ -419,18 +421,21 @@ $(->
     ok(validator().url, "url is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
+    equal(validator().active_error, 'url', "active error is url")
 
     view_model.site('Bob')
     ok(!validator().required, "required is valid")
     ok(validator().url, "url is invalid")
     ok(!validator().valid, "validator not valid")
     ok(validator().error_count, "validator is invalid")
+    equal(validator().active_error, 'url', "active error is url")
 
     view_model.site('http://Bob')
     ok(!validator().required, "required is valid")
     ok(!validator().url, "url is valid")
     ok(validator().valid, "validator is valid")
     ok(!validator().error_count, "validator is not invalid")
+    ok(!validator().active_error, "no active error")
 
     ko.removeNode(inject_el)
 
