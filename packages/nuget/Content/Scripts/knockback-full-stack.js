@@ -5963,7 +5963,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, EMAIL_REGEXP, INPUT_RESERVED_IDENTIFIERS, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, arraySplice, callOrGet, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -8179,48 +8179,70 @@ EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
 
 NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
-INPUT_RESERVED_IDENTIFIERS = ['value', 'valueUpdate', 'inject'];
+callOrGet = function(value) {
+  value = ko.utils.unwrapObservable(value);
+  if (typeof value === 'function') {
+    return value.apply(null, arraySlice.call(arguments, 1));
+  } else {
+    return value;
+  }
+};
+
+arraySlice = Array.prototype.slice;
 
 kb.validators = {
   required: function(value) {
-    return !!value;
+    return !value;
   },
   url: function(value) {
-    return !!URL_REGEXP.test(value);
+    return !URL_REGEXP.test(value);
   },
   email: function(value) {
-    return !!EMAIL_REGEXP.test(value);
+    return !EMAIL_REGEXP.test(value);
   },
   number: function(value) {
-    return !!NUMBER_REGEXP.test(value);
+    return !NUMBER_REGEXP.test(value);
   }
 };
 
 kb.valueValidator = function(value, bindings) {
   return ko.dependentObservable(function() {
-    var current_value, identifier, results, validator;
+    var current_value, disable, identifier, results, validator;
     results = {
-      valid: true
+      error_count: 0
     };
     current_value = ko.utils.unwrapObservable(value);
+    if ('disable' in bindings) {
+      disable = callOrGet(bindings.disable);
+    }
     for (identifier in bindings) {
       validator = bindings[identifier];
-      results[identifier] = !ko.utils.unwrapObservable(validator)(current_value);
-      results.valid &= !results[identifier];
+      if (identifier === 'disable') {
+        continue;
+      }
+      results[identifier] = !disable && callOrGet(validator, current_value);
+      if (results[identifier]) {
+        results.error_count++;
+        if (!results.active_error) {
+          results.active_error = identifier;
+        }
+      }
     }
-    results.valid = !!results.valid;
-    results.invalid = !results.valid;
+    results.valid = results.error_count === 0;
     return results;
   });
 };
 
 kb.inputValidator = function(view_model, el, value_accessor) {
-  var $input_el, bindings, identifier, input_name, options, result, skip_attach, type, validator;
+  var $input_el, bindings, disable, identifier, input_name, options, result, skip_attach, type, validator, _ref;
   $input_el = $(el);
   if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
     input_name = null;
   }
-  skip_attach = value_accessor && value_accessor.skip_attach;
+  if (value_accessor) {
+    skip_attach = value_accessor.skip_attach;
+    disable = value_accessor.disable;
+  }
   if (!(bindings = $input_el.attr('data-bind'))) {
     return null;
   }
@@ -8235,9 +8257,13 @@ kb.inputValidator = function(view_model, el, value_accessor) {
   if ($input_el.attr('required')) {
     bindings.required = kb.validators.required;
   }
-  for (identifier in options) {
-    validator = options[identifier];
-    if (!_.contains(INPUT_RESERVED_IDENTIFIERS, identifier) && (typeof validator === 'function')) {
+  if (disable) {
+    bindings.disable = disable;
+  }
+  if (options.validations) {
+    _ref = options.validations;
+    for (identifier in _ref) {
+      validator = _ref[identifier];
       bindings[identifier] = validator;
     }
   }
@@ -8249,12 +8275,20 @@ kb.inputValidator = function(view_model, el, value_accessor) {
 };
 
 kb.formValidator = function(view_model, el) {
-  var $root_el, form_name, input_el, name, results, validator, validators, _i, _len, _ref;
-  results = {};
+  var $root_el, bindings, disable, form_name, input_el, name, options, results, validator, validators, _i, _len, _ref;
+  results = {
+    error_count: 0
+  };
   validators = [];
   $root_el = $(el);
   if ((form_name = $root_el.attr('name')) && !_.isString(form_name)) {
     form_name = null;
+  }
+  if ((bindings = $root_el.attr('data-bind'))) {
+    options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
+    if (options && options.validations && options.validations.disable) {
+      disable = options.validations.disable;
+    }
   }
   _ref = $root_el.find('input');
   for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -8263,8 +8297,11 @@ kb.formValidator = function(view_model, el) {
       continue;
     }
     validator = kb.inputValidator(view_model, input_el, form_name ? {
-      skip_attach: true
-    } : null);
+      skip_attach: true,
+      disable: disable
+    } : {
+      disable: disable
+    });
     !validator || validators.push(results[name] = validator);
   }
   results.valid = ko.dependentObservable(function() {
@@ -8272,12 +8309,10 @@ kb.formValidator = function(view_model, el) {
     valid = true;
     for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
       validator = validators[_j];
+      results.error_count += validator().error_count;
       valid &= validator().valid;
     }
     return valid;
-  });
-  results.invalid = ko.dependentObservable(function() {
-    return !results.valid();
   });
   if (form_name) {
     view_model["$" + form_name] = results;
