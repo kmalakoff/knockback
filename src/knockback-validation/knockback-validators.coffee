@@ -68,7 +68,7 @@ class kb.Validation
     result = kb.valueValidator(options.value, bindings, validation_options)
 
     # if there is a name, add to the view_model with $scoping
-    (not input_name and not validation_options.skip_attach) or (view_model["$#{input_name}"] = result)
+    (not input_name and not validation_options.no_attach) or (view_model["$#{input_name}"] = result)
     return result
 
   @formValidator: (view_model, el) ->
@@ -81,7 +81,7 @@ class kb.Validation
       options = (new Function("sc", "with(sc[0]) { return { #{bindings} } }"))([view_model])
       validation_options = options.validation_options
     validation_options or= {}
-    validation_options.skip_attach = !!form_name
+    validation_options.no_attach = !!form_name
 
     # build up the results
     for input_el in $root_el.find('input')

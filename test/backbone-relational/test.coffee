@@ -331,7 +331,7 @@ $(->
     return
   )
 
-  test("6. Infering observable types: from the start", ->
+  test("6. Inferring observable types: from the start", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     person1 = new Person({id: 'person-6-1', name: 'Daddy'})
@@ -359,7 +359,7 @@ $(->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("7. Infering observable types: late binding", ->
+  test("7. Inferring observable types: late binding", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     person1 = new Person({id: 'person-7-1', name: 'Daddy'})

@@ -3,10 +3,12 @@ Please refer to the following release notes when upgrading your version of Knock
 ## 0.16.7
 
 * added extensibility to knockback-validation.js through data-bind on input elements.
+* bug fix: registering of shared null observables when not shared using kb.Store.findOrCreate. Introduced `'no_share'` flag for the case where a null shouldn't be shared.
+* bug fix: added dispose of kb.CollectionObservable _mapping
 
 ## 0.16.6
 
-* bug fix for array attribute types ([issue #45](https://github.com/kmalakoff/knockback/issues/45))
+* bug fix: ko.obseravbleArray not created for simple array attribute types ([issue #45](https://github.com/kmalakoff/knockback/issues/45))
 
 ## 0.16.5
 

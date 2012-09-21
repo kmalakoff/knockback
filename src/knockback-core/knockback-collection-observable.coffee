@@ -163,6 +163,7 @@ class kb.CollectionObservable
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
       array = observable(); array.splice(0, array.length) # clear the view models or models
+    @_mapper.dispose()
     kb.release(@filters); @filters = @_col = @sorted_index_fn = @_mapper = @create_options = null
     kb.utils.wrappedDestroy(@)
 

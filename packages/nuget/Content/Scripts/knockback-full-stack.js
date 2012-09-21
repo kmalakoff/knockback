@@ -6475,9 +6475,7 @@ kb.Store = (function() {
       return;
     }
     kb.utils.wrappedObject(observable, obj);
-    if (!obj) {
-      observable.__kb_null = true;
-    }
+    options.no_share || obj || (observable.__kb_null = true);
     creator = options.creator ? options.creator : (options.path && options.factory ? options.factory.creatorForPath(obj, options.path) : null);
     if (!creator) {
       creator = observable.constructor;
@@ -7374,6 +7372,7 @@ kb.CollectionObservable = (function() {
       array = observable();
       array.splice(0, array.length);
     }
+    this._mapper.dispose();
     kb.release(this.filters);
     this.filters = this._col = this.sorted_index_fn = this._mapper = this.create_options = null;
     kb.utils.wrappedDestroy(this);
@@ -8267,7 +8266,7 @@ kb.Validation = (function() {
       return _results;
     })());
     result = kb.valueValidator(options.value, bindings, validation_options);
-    (!input_name && !validation_options.skip_attach) || (view_model["$" + input_name] = result);
+    (!input_name && !validation_options.no_attach) || (view_model["$" + input_name] = result);
     return result;
   };
 
@@ -8286,7 +8285,7 @@ kb.Validation = (function() {
       validation_options = options.validation_options;
     }
     validation_options || (validation_options = {});
-    validation_options.skip_attach = !!form_name;
+    validation_options.no_attach = !!form_name;
     _ref = $root_el.find('input');
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       input_el = _ref[_i];

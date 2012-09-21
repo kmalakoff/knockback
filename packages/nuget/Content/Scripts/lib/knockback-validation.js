@@ -124,7 +124,7 @@ kb.Validation = (function() {
       return _results;
     })());
     result = kb.valueValidator(options.value, bindings, validation_options);
-    (!input_name && !validation_options.skip_attach) || (view_model["$" + input_name] = result);
+    (!input_name && !validation_options.no_attach) || (view_model["$" + input_name] = result);
     return result;
   };
 
@@ -143,7 +143,7 @@ kb.Validation = (function() {
       validation_options = options.validation_options;
     }
     validation_options || (validation_options = {});
-    validation_options.skip_attach = !!form_name;
+    validation_options.no_attach = !!form_name;
     _ref = $root_el.find('input');
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       input_el = _ref[_i];
