@@ -51,6 +51,14 @@
 #     });
 #     var view_model = new ViewModel(model);
 #
+# @method #model()
+#   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
+#   @return [Backbone.Model|Backbone.ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
+#   @example
+#     var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
+#     var the_model = view_model.model(); // get
+#     view_model.model(new Backbone.Model({name: 'fred'})); // set
+#
 class kb.ViewModel
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
@@ -69,18 +77,6 @@ class kb.ViewModel
   # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  #
-  # @method .model Dual-purpose getter/setter for the observed model.
-  # @overload model()
-  #   Gets the model or model reference
-  #   @return [Backbone.Model|Backbone.ModelRef] the model whose attributes are being observed (can be null)
-  # @overload model(new_model)
-  #   Sets the model or model reference
-  #   @param [Backbone.Model|Backbone.ModelRef] new_model the model whose attributes will be observed (can be null)
-  # @example
-  #   var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
-  #   var the_model = view_model.model(); // get
-  #   view_model.model(new Backbone.Model({name: 'fred'})); // set
   constructor: (model, options, view_model) ->
     not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or throwUnexpected(@, 'not a model')
 
@@ -107,25 +103,26 @@ class kb.ViewModel
     kb.Factory.useOptionsOrCreate(options, @, options.path)
 
     # create an observable model function and use watcher
+    _mdl = _wrappedKey(@, '_mdl', ko.observable())
     @model = ko.dependentObservable(
-      read: => return kb.utils.wrappedObject(@)
-      write: (model) =>
-        return if (kb.utils.wrappedObject(@) is model) # no change
+      read: => _mdl(); return kb.utils.wrappedObject(@)
+      write: (new_model) =>
+        return if (kb.utils.wrappedObject(@) is new_model) # no change
 
         # SHARED NULL MODEL - keep it that way
-        (not model or throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
+        (not new_model or throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
 
         # update references
-        kb.utils.wrappedObject(@, model)
+        kb.utils.wrappedObject(@, new_model); _mdl(new_model)
         model_watcher = kb.utils.wrappedModelWatcher(@)
         return unless model_watcher # not yet initialized
-        model_watcher.model(model) # sync with model_watcher
+        model_watcher.model(new_model) # sync with model_watcher
 
         # sync missing attributes
-        return if @__kb.keys or not model or not model.attributes # only allow specific keys or nothing to add
+        return if @__kb.keys or not new_model or not new_model.attributes # only allow specific keys or nothing to add
         # NOTE: this does not remove keys that are different between the models
-        missing = _.difference(_.keys(model.attributes), _.keys(@__kb.model_keys))
-        @_createObservables(model, missing) if missing
+        missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
+        @_createObservables(new_model, missing) if missing
     )
     model_watcher = kb.utils.wrappedModelWatcher(@, new kb.ModelWatcher(model, @, {model: @model}))
 

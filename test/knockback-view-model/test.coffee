@@ -456,4 +456,21 @@ $(->
     ok(_.isEqual(view_model.widget(), ["sign_up", "rewards"]), 'widget observable matches')
     ok(_.isEqual(view_model.model_data().reward.top_rewards.properties, ["title", "description", "num_points"]), 'model_data observable matches')
   )
+
+  test("17. model change is observable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    model = new Backbone.Model({id: 1, name: 'Bob'})
+
+    view_model = kb.viewModel(model)
+
+    count = 0
+    ko.dependentObservable(-> view_model.model(); count++)
+
+    view_model.model(null)
+    view_model.model(model)
+    equal(count, 3, "model change was observed")
+    kb.release(view_model)
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
 )

@@ -581,4 +581,21 @@ $(->
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
+
+  test("14. collection change is observable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    collection = new Backbone.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+
+    collection_observable = kb.collectionObservable(collection)
+
+    count = 0
+    ko.dependentObservable(-> collection_observable.collection(); count++)
+
+    collection_observable.collection(null)
+    collection_observable.collection(collection)
+    equal(count, 3, "collection change was observed")
+    kb.release(collection_observable)
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
 )

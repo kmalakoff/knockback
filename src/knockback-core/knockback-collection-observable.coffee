@@ -33,6 +33,11 @@
 #            options: options
 #        });
 #     });
+#
+# @method #collection()
+#   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.
+#   @return [Backbone.Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
+#
 class kb.CollectionObservable
   @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
@@ -98,15 +103,28 @@ class kb.CollectionObservable
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
     observable.shareOptions = _.bind(@shareOptions, @)
-    observable.collection = _.bind(@collection, @)
     observable.viewModelByModel = _.bind(@viewModelByModel, @)
     observable.sortedIndex = _.bind(@sortedIndex, @)
     observable.sortAttribute = _.bind(@sortAttribute, @)
     observable.hasViewModels = _.bind(@hasViewModels, @)
 
     # start the processing
-    @_col = ko.observable() # use for sorting dependencies
-    @collection(collection)
+    @_col = ko.observable(collection)
+    observable.collection = @collection = ko.dependentObservable(
+      read: => return @_col()
+      write: (new_collection) =>
+        return if ((previous_collection = @_col()) is new_collection) # no change
+
+        # update references
+        @_col(new_collection)
+
+        # clean up
+        previous_collection.unbind('all', @__kb._onCollectionChange) if previous_collection
+
+        # store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
+        new_collection.bind('all', @__kb._onCollectionChange) if new_collection
+    )
+    collection.bind('all', @__kb._onCollectionChange) if collection # bind now
 
     # observable that will re-trigger when sort or filters or collection changes
     @_mapper = ko.dependentObservable(=>
@@ -114,13 +132,13 @@ class kb.CollectionObservable
       observable = kb.utils.wrappedObservable(@)
 
       # get the filters, sorting, models and create a dependency
-      collection = @_col()
-      models = collection.models if collection
+      current_collection = @_col()
+      models = current_collection.models if current_collection
       sorted_index_fn = @sorted_index_fn()
       filters = @filters()
 
       # no models
-      if not models or (collection.models.length is 0)
+      if not models or (current_collection.models.length is 0)
         view_models = []
 
       # process filters, sorting, etc
@@ -163,9 +181,8 @@ class kb.CollectionObservable
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
       array = observable(); array.splice(0, array.length) # clear the view models or models
-    @_mapper.dispose()
-    kb.release(@filters); @filters = @_col = @sorted_index_fn = @_mapper = @create_options = null
-    kb.utils.wrappedDestroy(@)
+    @_mapper.dispose(); @collection.dispose(); kb.release(@filters)
+    observable.collection = null; kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
 
@@ -179,30 +196,6 @@ class kb.CollectionObservable
   shareOptions: ->
     observable = kb.utils.wrappedObservable(@)
     return {store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable)}
-
-  # Dual-purpose getter/setter for the observed collection.
-  #
-  # @overload collection()
-  #   Gets the collection from a kb.CollectionObservable
-  #   @return [Backbone.Collection] the collection
-  # @overload collection(collection)
-  #   Sets the collection on a kb.CollectionObservable
-  #   @param [Backbone.Collection] collection the collection
-  collection: (collection) ->
-    observable = kb.utils.wrappedObservable(@)
-    previous_collection = @_col()
-    if (arguments.length is 0) or (collection == previous_collection)
-      observable() # force a dependency
-      return previous_collection
-
-    # clean up
-    previous_collection.unbind('all', @__kb._onCollectionChange) if previous_collection
-
-    # store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
-    collection.bind('all', @__kb._onCollectionChange) if collection
-    @_col(collection) # update the observed collection to trigger a resync
-
-    return collection
 
   # Setter for the filters array for excluding models in the collection observable.
   #
@@ -376,7 +369,7 @@ class kb.CollectionObservable
       # ensure we have the right view models in the store and extract them
       if has_view_models
         @create_options.store.findOrReplace(kb.utils.wrappedObject(value), @create_options.creator, value) for value in models
-        models = _.map(models, (test) -> return kb.utils.wrappedModel(test))
+        models = _.map(models, (test) -> return kb.utils.wrappedObject(test))
 
     # filter the models
     models = _.filter(models, (model) => not @_modelIsFiltered(model)) if @filters().length

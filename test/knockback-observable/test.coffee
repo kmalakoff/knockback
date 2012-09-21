@@ -100,7 +100,8 @@ $(->
 
     model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
-    ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
+    # ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
+    ok(_.isEqual(args, ['name', 1, 'number', 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number', 'number', 'number']), "got the args") # TODO: optimize
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
@@ -269,6 +270,22 @@ $(->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  )
+  test("7. model change is observable", ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    model = new Backbone.Model({id: 1, name: 'Bob'})
+
+    observable = kb.observable(model, 'name')
+
+    count = 0
+    ko.dependentObservable(-> observable.model(); count++)
+
+    observable.model(null)
+    observable.model(model)
+    equal(count, 3, "model change was observed")
+    kb.release(observable)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
