@@ -233,7 +233,8 @@ _unwrapModels = function(obj) {
   var key, result, value;
   if (!obj) {
     return obj;
-  } else if (obj.__kb) {
+  }
+  if (obj.__kb) {
     if ('object' in obj.__kb) {
       return obj.__kb.object;
     } else {
@@ -243,16 +244,15 @@ _unwrapModels = function(obj) {
     return _.map(obj, function(test) {
       return _unwrapModels(test);
     });
-  } else if (_.isObject(obj) && !ko.isObservable(obj) && !_.isDate(obj) && !_.isString(obj)) {
+  } else if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
     result = {};
     for (key in obj) {
       value = obj[key];
       result[key] = _unwrapModels(value);
     }
     return result;
-  } else {
-    return obj;
   }
+  return obj;
 };
 
 kb.utils = (function() {

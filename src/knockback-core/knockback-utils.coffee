@@ -28,19 +28,21 @@ _argumentsAddKey = (args, key) ->
 
 # used for attribute setting to ensure all model attributes have their underlying models
 _unwrapModels = (obj) ->
-  if not obj
-    return obj
-  else if obj.__kb
+  return obj if not obj
+
+  if obj.__kb
     return if ('object' of obj.__kb) then obj.__kb.object else obj
+
   else if _.isArray(obj)
     return _.map(obj, (test) -> return _unwrapModels(test))
-  else if _.isObject(obj) and not ko.isObservable(obj) and not _.isDate(obj) and not _.isString(obj)
+
+  else if _.isObject(obj) and (obj.constructor is {}.constructor) # a simple object
     result = {}
     for key, value of obj
       result[key] = _unwrapModels(value)
     return result
-  else
-    return obj
+
+  return obj
 
 ####################################################
 # Public API
