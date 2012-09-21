@@ -1611,43 +1611,44 @@ kb.CollectionObservable = (function() {
     return this.in_edit--;
   };
 
-  CollectionObservable.prototype._onObservableArrayChange = function(values) {
-    var collection, has_view_model, models, observable, value, _i, _j, _len, _len1,
+  CollectionObservable.prototype._onObservableArrayChange = function(models) {
+    var collection, has_view_models, observable, value, _i, _j, _len, _len1,
       _this = this;
     if (this.in_edit) {
       return;
     }
     observable = kb.utils.wrappedObservable(this);
     collection = this._col();
-    if (!collection) {
+    if (!collection || (collection.models === models)) {
       return;
     }
     if (!this.models_only) {
-      for (_i = 0, _len = values.length; _i < _len; _i++) {
-        value = values[_i];
-        if (value && !(value instanceof Backbone.Model)) {
-          has_view_model = true;
-          break;
+      for (_i = 0, _len = models.length; _i < _len; _i++) {
+        value = models[_i];
+        if (!value) {
+          continue;
         }
+        has_view_models = !(value instanceof Backbone.Model);
+        break;
       }
-      if (has_view_model) {
-        for (_j = 0, _len1 = values.length; _j < _len1; _j++) {
-          value = values[_j];
+      if (has_view_models) {
+        for (_j = 0, _len1 = models.length; _j < _len1; _j++) {
+          value = models[_j];
           this.create_options.store.findOrReplace(kb.utils.wrappedObject(value), this.create_options.creator, value);
         }
+        models = _.map(models, function(test) {
+          return kb.utils.wrappedModel(test);
+        });
       }
     }
-    models = _.map(values, function(test) {
-      return kb.utils.wrappedModel(test);
-    });
     if (this.filters().length) {
       models = _.filter(models, function(model) {
         return !_this._modelIsFiltered(model);
       });
     }
-    this.in_edit++;
+    !has_view_models || this.in_edit++;
     collection.reset(models);
-    this.in_edit--;
+    !has_view_models || this.in_edit--;
   };
 
   CollectionObservable.prototype._sortAttributeFn = function(sort_attribute) {

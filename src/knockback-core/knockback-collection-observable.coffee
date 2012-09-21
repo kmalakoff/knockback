@@ -360,29 +360,31 @@ class kb.CollectionObservable
     @in_edit--
 
   # @private
-  _onObservableArrayChange: (values) ->
+  _onObservableArrayChange: (models) ->
     return if @in_edit # we are doing the editing
     observable = kb.utils.wrappedObservable(@)
     collection = @_col()
-    return unless collection # no collection
+    return if not collection or (collection.models is models) # no collection or we are updating ourselves
 
     # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
     if not @models_only
-      for value in values
-        (has_view_model = true; break) if value and not (value instanceof Backbone.Model)
-      # ensure we have the right view models in the store
-      if has_view_model
-        @create_options.store.findOrReplace(kb.utils.wrappedObject(value), @create_options.creator, value) for value in values
+      for value in models
+        continue unless value
+        has_view_models = not (value instanceof Backbone.Model)
+        break
 
-    # get the new models
-    models = _.map(values, (test) -> return kb.utils.wrappedModel(test))
-    if @filters().length
-      models = _.filter(models, (model) => not @_modelIsFiltered(model))
+      # ensure we have the right view models in the store and extract them
+      if has_view_models
+        @create_options.store.findOrReplace(kb.utils.wrappedObject(value), @create_options.creator, value) for value in models
+        models = _.map(models, (test) -> return kb.utils.wrappedModel(test))
 
-    # update models
-    @in_edit++
+    # filter the models
+    models = _.filter(models, (model) => not @_modelIsFiltered(model)) if @filters().length
+
+    # a change, update models
+    not has_view_models or @in_edit++
     collection.reset(models)
-    @in_edit--
+    not has_view_models or @in_edit--
     return
 
   # @private
