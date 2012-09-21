@@ -59,28 +59,31 @@ kb.Validation = (function() {
     }
     (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
     return ko.dependentObservable(function() {
-      var active_index, current_value, disable, identifier, identifier_index, priorities, results, validator;
+      var active_index, current_value, disabled, identifier, identifier_index, priorities, results, validator;
       results = {
-        error_count: 0
+        $error_count: 0
       };
       current_value = ko.utils.unwrapObservable(value);
-      (!validation_options.disable) || (disable = callOrGet(validation_options.disable));
+      !('disable' in validation_options) || (disabled = callOrGet(validation_options.disable));
+      !('enable' in validation_options) || (disabled = !callOrGet(validation_options.enable));
       priorities = validation_options.priorities || [];
       _.isArray(priorities) || (priorities = [priorities]);
       active_index = priorities.length;
       for (identifier in bindings) {
         validator = bindings[identifier];
-        results[identifier] = !disable && callOrGet(validator, current_value);
+        results[identifier] = !disabled && callOrGet(validator, current_value);
         if (results[identifier]) {
-          results.error_count++;
-          if (results.active_error && priorities.length && (identifier_index = _.indexOf(priorities, identifier)) >= 0) {
-            (active_index < identifier_index) || (active_index = identifier_index, results.active_error = identifier);
+          results.$error_count++;
+          if (results.$active_error && priorities.length && (identifier_index = _.indexOf(priorities, identifier)) >= 0) {
+            (active_index < identifier_index) || (active_index = identifier_index, results.$active_error = identifier);
           } else {
-            results.active_error || (results.active_error = identifier);
+            results.$active_error || (results.$active_error = identifier);
           }
         }
       }
-      results.valid = results.error_count === 0;
+      results.$enabled = !disabled;
+      results.$disable = !!disabled;
+      results.$valid = results.$error_count === 0;
       return results;
     });
   };
@@ -104,7 +107,6 @@ kb.Validation = (function() {
     bindings = {};
     (!validators[type = $input_el.attr('type')]) || (bindings[type] = validators[type]);
     (!$input_el.attr('required')) || (bindings.required = validators.required);
-    (!validation_options.disable) || (bindings.disable = validation_options.disable);
     (!options.validations) || ((function() {
       var _ref, _results;
       _ref = options.validations;
@@ -122,9 +124,7 @@ kb.Validation = (function() {
 
   Validation.formValidator = function(view_model, el) {
     var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _i, _len, _ref;
-    results = {
-      error_count: 0
-    };
+    results = {};
     validators = [];
     $root_el = $(el);
     if ((form_name = $root_el.attr('name')) && !_.isString(form_name)) {
@@ -145,15 +145,29 @@ kb.Validation = (function() {
       validator = kb.inputValidator(view_model, input_el, validation_options);
       !validator || validators.push(results[name] = validator);
     }
-    results.valid = ko.dependentObservable(function() {
-      var valid, _j, _len1;
-      valid = true;
+    results.$error_count = ko.dependentObservable(function() {
+      var error_count, _j, _len1;
+      error_count = 0;
       for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
         validator = validators[_j];
-        results.error_count += validator().error_count;
-        valid &= validator().valid;
+        error_count += validator().$error_count;
       }
-      return valid;
+      return error_count;
+    });
+    results.$valid = ko.dependentObservable(function() {
+      return results.$error_count() === 0;
+    });
+    results.$enabled = ko.dependentObservable(function() {
+      var enabled, _j, _len1;
+      enabled = true;
+      for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
+        validator = validators[_j];
+        enabled &= validator().$enabled;
+      }
+      return enabled;
+    });
+    results.$disabled = ko.dependentObservable(function() {
+      return !results.$enabled();
     });
     if (form_name) {
       view_model["$" + form_name] = results;
@@ -199,6 +213,82 @@ kb.valid = {
   number: function(value) {
     return !NUMBER_REGEXP.test(value);
   }
+};
+
+kb.hasChangedFn = function(model) {
+  var attributes, m;
+  m = null;
+  attributes = null;
+  return function() {
+    var current_model;
+    if (m !== (current_model = ko.utils.unwrapObservable(model))) {
+      m = current_model;
+      attributes = (m ? m.toJSON() : null);
+      return false;
+    }
+    if (!(m && attributes)) {
+      return false;
+    }
+    return !_.isEqual(m.toJSON(), attributes);
+  };
+};
+
+kb.minLengthFn = function(length) {
+  return function(value) {
+    return !value || value.length < length;
+  };
+};
+
+kb.uniqueValueFn = function(model, key, collection) {
+  return function(value) {
+    var c, k, m,
+      _this = this;
+    m = ko.utils.unwrapObservable(model);
+    k = ko.utils.unwrapObservable(key);
+    c = ko.utils.unwrapObservable(collection);
+    if (!(m && k && c)) {
+      return false;
+    }
+    return !!_.find(c.models, function(test) {
+      return (test !== m) && test.get(k) === value;
+    });
+  };
+};
+
+kb.untilTrueFn = function(stand_in, fn, model) {
+  var was_true;
+  was_true = false;
+  if (model && ko.isObservable(model)) {
+    model.subscribe(function() {
+      return was_true = false;
+    });
+  }
+  return function(value) {
+    var f, result;
+    if (!(f = ko.utils.unwrapObservable(fn))) {
+      return stand_in;
+    }
+    was_true |= !!(result = f(ko.utils.unwrapObservable(value)));
+    return (was_true ? result : stand_in);
+  };
+};
+
+kb.untilFalseFn = function(stand_in, fn, model) {
+  var was_false;
+  was_false = false;
+  if (model && ko.isObservable(model)) {
+    model.subscribe(function() {
+      return was_false = false;
+    });
+  }
+  return function(value) {
+    var f, result;
+    if (!(f = ko.utils.unwrapObservable(fn))) {
+      return stand_in;
+    }
+    was_false |= !(result = f(ko.utils.unwrapObservable(value)));
+    return (was_false ? result : stand_in);
+  };
 };
 ; return kb;});
 }).call(this);

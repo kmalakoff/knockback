@@ -16,26 +16,29 @@ class kb.Validation
   @valueValidator: (value, bindings, validation_options={}) ->
     (validation_options and not (typeof(validation_options) is 'function')) or (validation_options = {})
     return ko.dependentObservable(->
-      results = {error_count: 0}
+      results = {$error_count: 0}
       current_value = ko.utils.unwrapObservable(value)
-      (not validation_options.disable) or (disable = callOrGet(validation_options.disable))
+      not ('disable' of validation_options) or (disabled = callOrGet(validation_options.disable))
+      not ('enable' of validation_options) or (disabled = not callOrGet(validation_options.enable))
       priorities = validation_options.priorities or []
       _.isArray(priorities) or (priorities = [priorities]) # ensure priorities is an array
 
       # then add the rest
       active_index = priorities.length
       for identifier, validator of bindings
-        results[identifier] = not disable and callOrGet(validator, current_value) # update validity
+        results[identifier] = not disabled and callOrGet(validator, current_value) # update validity
         if results[identifier]
-          results.error_count++
+          results.$error_count++
 
-          if results.active_error and priorities.length and (identifier_index = _.indexOf(priorities, identifier)) >= 0
-            (active_index < identifier_index) or (active_index = identifier_index; results.active_error = identifier)
+          if results.$active_error and priorities.length and (identifier_index = _.indexOf(priorities, identifier)) >= 0
+            (active_index < identifier_index) or (active_index = identifier_index; results.$active_error = identifier)
           else
-            results.active_error or (results.active_error = identifier)
+            results.$active_error or (results.$active_error = identifier)
 
       # add the inverse and ensure a boolean
-      results.valid = results.error_count is 0
+      results.$enabled = not disabled
+      results.$disable = !!disabled
+      results.$valid = results.$error_count is 0
       return results
     )
 
@@ -55,7 +58,6 @@ class kb.Validation
     bindings = {}
     (not validators[type = $input_el.attr('type')]) or (bindings[type] = validators[type])
     (not $input_el.attr('required')) or (bindings.required = validators.required)
-    (not validation_options.disable) or (bindings.disable = validation_options.disable) # global disable
     (not options.validations) or (bindings[identifier] = validator for identifier, validator of options.validations)
     result = kb.valueValidator(options.value, bindings, validation_options)
 
@@ -64,7 +66,7 @@ class kb.Validation
     return result
 
   @formValidator: (view_model, el) ->
-    results = {error_count: 0}
+    results = {}
     validators = []
     $root_el = $(el)
     form_name = null if (form_name = $root_el.attr('name')) and not _.isString(form_name)
@@ -81,14 +83,23 @@ class kb.Validation
       validator = kb.inputValidator(view_model, input_el, validation_options)
       not validator or validators.push(results[name] = validator)
 
-    # add the valid state and inverse
-    results.valid = ko.dependentObservable(->
-      valid = true
+    # collect stats, error count and valid
+    results.$error_count = ko.dependentObservable(->
+      error_count = 0
       for validator in validators
-        results.error_count += validator().error_count
-        valid &= validator().valid
-      return valid
+        error_count += validator().$error_count
+      return error_count
     )
+    results.$valid = ko.dependentObservable(-> return results.$error_count() is 0)
+
+    # enabled and disabled
+    results.$enabled = ko.dependentObservable(->
+      enabled = true
+      for validator in validators
+        enabled &= validator().$enabled
+      return enabled
+    )
+    results.$disabled = ko.dependentObservable(-> return not results.$enabled())
 
     # if there is a name, add to the view_model with $scoping
     view_model["$#{form_name}"] = results if form_name

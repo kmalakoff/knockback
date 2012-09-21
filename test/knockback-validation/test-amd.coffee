@@ -25,25 +25,25 @@ $(->
       validator = kb.valueValidator(view_model.value, {required: kb.valid.required, url: kb.valid.url})
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
 
       view_model.value('Bob')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
 
       view_model.value('http://Bob')
       ok(!validator().required, "required is valid")
       ok(!validator().url, "url is valid")
-      ok(validator().valid, "validator is valid")
-      ok(!validator().error_count, "validator is not invalid")
+      ok(validator().$valid, "validator is valid")
+      ok(!validator().$error_count, "validator is not invalid")
 
       kb.release(view_model)
 
@@ -62,28 +62,28 @@ $(->
       validator = view_model.$name
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      ok(validator().active_error, "active error exists")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      ok(validator().$active_error, "active error exists")
 
       view_model.name('Bob')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      ok(validator().active_error, "active error exists")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      ok(validator().$active_error, "active error exists")
 
       view_model.name('http://Bob')
       ok(!validator().required, "required is valid")
       ok(!validator().url, "url is valid")
-      ok(validator().valid, "validator is valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "active error does not exist")
+      ok(validator().$valid, "validator is valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "active error does not exist")
 
       kb.release(view_model)
 
@@ -103,39 +103,39 @@ $(->
       validator = view_model.$name
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
       ok(validator().url, "url is invalid")
       ok(!validator().unique, "unique is valid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      ok(validator().active_error, "active error exists")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      ok(validator().$active_error, "active error exists")
 
       view_model.name('Bob')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
       ok(validator().unique, "unique is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      ok(validator().active_error, "active error exists")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      ok(validator().$active_error, "active error exists")
 
       view_model.name('Fred')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
       ok(!validator().unique, "unique is valid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      ok(validator().active_error, "active error exists")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      ok(validator().$active_error, "active error exists")
 
       view_model.name('http://Bob')
       ok(!validator().required, "required is valid")
       ok(!validator().url, "url is valid")
       ok(!validator().unique, "unique is valid")
-      ok(validator().valid, "validator is valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "active error does not exist")
+      ok(validator().$valid, "validator is valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "active error does not exist")
 
       kb.release(view_model)
 
@@ -154,35 +154,35 @@ $(->
       validator = view_model.$name
       ok(validator().hasOwnProperty('required'), "obs: has required")
       ok(validator().hasOwnProperty('url'), "obs: has url")
-      ok(validator().hasOwnProperty('valid'), "obs: has valid")
-      ok(validator().hasOwnProperty('error_count'), "obs: has error_count")
+      ok(validator().hasOwnProperty('$valid'), "obs: has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "obs: has $error_count")
 
       ok(!validator().required, "obs: required is valid")
       ok(!validator().url, "obs: url is valid")
-      ok(validator().valid, "obs: validator is valid")
-      ok(!validator().error_count, "obs: validator is not invalid")
-      ok(!validator().active_error, "obs: active error does not exist")
+      ok(validator().$valid, "obs: validator is valid")
+      ok(!validator().$error_count, "obs: validator is not invalid")
+      ok(!validator().$active_error, "obs: active error does not exist")
 
       window.disable(false)
       ok(validator().required, "obs: required is invalid")
       ok(validator().url, "obs: url is invalid")
-      ok(!validator().valid, "obs: validator not valid")
-      ok(validator().error_count, "obs: validator is invalid")
-      equal(validator().active_error, 'url', "obs: active error is url")
+      ok(!validator().$valid, "obs: validator not valid")
+      ok(validator().$error_count, "obs: validator is invalid")
+      equal(validator().$active_error, 'url', "obs: active error is url")
 
       window.disable(-> return true)
       ok(!validator().required, "obs fn: required is valid")
       ok(!validator().url, "obs fn: url is valid")
-      ok(validator().valid, "obs fn: validator is valid")
-      ok(!validator().error_count, "obs fn: validator is not invalid")
-      ok(!validator().active_error, "obs fn: error does not exist")
+      ok(validator().$valid, "obs fn: validator is valid")
+      ok(!validator().$error_count, "obs fn: validator is not invalid")
+      ok(!validator().$active_error, "obs fn: error does not exist")
 
       window.disable(-> return false)
       ok(validator().required, "obs fn: required is invalid")
       ok(validator().url, "obs fn: url is invalid")
-      ok(!validator().valid, "obs fn: validator not valid")
-      ok(validator().error_count, "obs fn: validator is invalid")
-      equal(validator().active_error, 'url', "obs fn: active error is url")
+      ok(!validator().$valid, "obs fn: validator not valid")
+      ok(validator().$error_count, "obs fn: validator is invalid")
+      equal(validator().$active_error, 'url', "obs fn: active error is url")
 
       kb.release(view_model)
 
@@ -195,14 +195,14 @@ $(->
       validator = view_model.$name
       ok(validator().hasOwnProperty('required'), "fn: has required")
       ok(validator().hasOwnProperty('url'), "fn: has url")
-      ok(validator().hasOwnProperty('valid'), "fn: has valid")
-      ok(validator().hasOwnProperty('error_count'), "fn: has error_count")
+      ok(validator().hasOwnProperty('$valid'), "fn: has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "fn: has $error_count")
 
       ok(!validator().required, "fn: required is valid")
       ok(!validator().url, "fn: url is valid")
-      ok(validator().valid, "fn: validator is valid")
-      ok(!validator().error_count, "fn: validator is not invalid")
-      ok(!validator().active_error, "fn: active error does not exist")
+      ok(validator().$valid, "fn: validator is valid")
+      ok(!validator().$error_count, "fn: validator is not invalid")
+      ok(!validator().$active_error, "fn: active error does not exist")
 
       kb.release(view_model)
 
@@ -234,45 +234,45 @@ $(->
       validator = view_model.$my_form.name
       ok(validator().hasOwnProperty('required'), "has required")
       ok(!validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      ok(validator().active_error, "active error exists")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      ok(validator().$active_error, "active error exists")
 
       view_model.name('Bob')
       ok(!validator().required, "required is valid")
-      ok(validator().valid, "validator valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "active error does not exist")
+      ok(validator().$valid, "validator valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "active error does not exist")
 
       validator = view_model.$my_form.site
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'required', "active error is url")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'required', "active error is url")
 
       view_model.site('Bob')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'url', "active error is url")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'url', "active error is url")
 
       view_model.site('http://Bob')
       ok(!validator().required, "required is valid")
       ok(!validator().url, "url is valid")
-      ok(validator().valid, "validator is valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "active error does not exist")
+      ok(validator().$valid, "validator is valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "active error does not exist")
 
       kb.release(view_model)
 
@@ -287,7 +287,7 @@ $(->
         site: ko.observable()
 
       HTML = """
-      <form data-bind="inject: kb.formValidator, validation_options: {disable: disable, priorities: 'url'}">
+      <form data-bind="inject: kb.formValidator, validation_options: {enable: enable, priorities: 'url'}">
         <div class="control-group">
           <input type="text" name="name" data-bind="value: name" required>
         </div>
@@ -297,7 +297,7 @@ $(->
       </form>
       """
 
-      window.disable = ko.observable(true)
+      window.enable = ko.observable(false)
       el = $(HTML)[0]
       ko.applyBindings(view_model, el)
 
@@ -305,51 +305,51 @@ $(->
       validator = view_model.$name
       ok(validator().hasOwnProperty('required'), "has required")
       ok(!validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       # disabled
       ok(!validator().required, "required is valid")
-      ok(validator().valid, "validator valid")
-      ok(!validator().error_count, "validator is not invalid")
+      ok(validator().$valid, "validator valid")
+      ok(!validator().$error_count, "validator is not invalid")
 
       # enabled
-      window.disable(-> return false)
+      window.enable(-> return true)
       ok(validator().required, "required is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
 
       view_model.name('Bob')
       ok(!validator().required, "required is valid")
-      ok(validator().valid, "validator valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "active error does not exist")
+      ok(validator().$valid, "validator valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "active error does not exist")
 
       validator = view_model.$site
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'url', "active error is url")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'url', "active error is url")
 
       view_model.site('Bob')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'url', "active error is url")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'url', "active error is url")
 
       view_model.site('http://Bob')
       ok(!validator().required, "required is valid")
       ok(!validator().url, "url is valid")
-      ok(validator().valid, "validator is valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "active error does not exist")
+      ok(validator().$valid, "validator is valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "active error does not exist")
 
       kb.release(view_model)
 
@@ -391,52 +391,52 @@ $(->
       validator = view_model.$my_form.name
       ok(validator().hasOwnProperty('required'), "has required")
       ok(!validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       # disabled
       ok(!validator().required, "required is valid")
-      ok(validator().valid, "validator valid")
-      ok(!validator().error_count, "validator is not invalid")
+      ok(validator().$valid, "validator valid")
+      ok(!validator().$error_count, "validator is not invalid")
 
       # enabled
       window.disable(-> return false)
       ok(validator().required, "required is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'required', "active error is required")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'required', "active error is required")
 
       view_model.name('Bob')
       ok(!validator().required, "required is valid")
-      ok(validator().valid, "validator valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "no active error")
+      ok(validator().$valid, "validator valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "no active error")
 
       validator = view_model.$my_form.site
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
-      ok(validator().hasOwnProperty('valid'), "has valid")
-      ok(validator().hasOwnProperty('error_count'), "has error_count")
+      ok(validator().hasOwnProperty('$valid'), "has $valid")
+      ok(validator().hasOwnProperty('$error_count'), "has $error_count")
 
       ok(validator().required, "required is invalid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'url', "active error is url")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'url', "active error is url")
 
       view_model.site('Bob')
       ok(!validator().required, "required is valid")
       ok(validator().url, "url is invalid")
-      ok(!validator().valid, "validator not valid")
-      ok(validator().error_count, "validator is invalid")
-      equal(validator().active_error, 'url', "active error is url")
+      ok(!validator().$valid, "validator not valid")
+      ok(validator().$error_count, "validator is invalid")
+      equal(validator().$active_error, 'url', "active error is url")
 
       view_model.site('http://Bob')
       ok(!validator().required, "required is valid")
       ok(!validator().url, "url is valid")
-      ok(validator().valid, "validator is valid")
-      ok(!validator().error_count, "validator is not invalid")
-      ok(!validator().active_error, "no active error")
+      ok(validator().$valid, "validator is valid")
+      ok(!validator().$error_count, "validator is not invalid")
+      ok(!validator().$active_error, "no active error")
 
       ko.removeNode(inject_el)
 
