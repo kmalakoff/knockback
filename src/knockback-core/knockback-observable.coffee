@@ -20,6 +20,14 @@
 #   var model = Backbone.Model({name: 'Bob'});
 #   var name = kb.observable(model, {key:'name', default: '(none)'}); // name is Bob
 #   name.setToDefault(); // name is (none)
+#
+# @method .model Dual-purpose getter/setter for the observed model.
+#   @overload model()
+#     Gets the model or model reference
+#     @return [Backbone.Model|Backbone.ModelRef] the model whose attribute by key is being observed (can be null)
+#   @overload model(new_model)
+#     Sets the model or model reference
+#     @param [Backbone.Model|Backbone.ModelRef] new_model the model whose attribute by key will be observed (can be null)
 class kb.Observable
 
   # Used to create a new kb.Observable.
@@ -106,7 +114,15 @@ class kb.Observable
     observable.destroy = _.bind(@destroy, @)
 
     # use external model observable or create
-    kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: _.bind(@model, @), update: _.bind(@update, @), key: @key, path: create_options.path})
+    @model = ko.dependentObservable(
+      read: => return @m
+      write: (model) =>
+        return if @__kb_destroyed or (@m is model) # destroyed or no change
+
+        # update references
+        @m = model; @update()
+    )
+    kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
 
     # wrap ourselves with a localizer
@@ -126,8 +142,7 @@ class kb.Observable
   destroy: ->
     @__kb_destroyed = true
     kb.release(@__kb_value); @__kb_value = null
-    @vm = null
-    @create_options = null
+    @model.dispose()
     kb.utils.wrappedDestroy(@)
 
   # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Backbone.Collection, it will hold a kb.CollectionObservable.
@@ -139,22 +154,6 @@ class kb.Observable
     new_value = if @m then @m.get(@key) else null
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
-
-  # Dual-purpose getter/setter for the observed model.
-  #
-  # @overload model()
-  #   Gets the model or model reference
-  #   @return [Backbone.Model|Backbone.ModelRef] the model whose attribute by key is being observed (can be null)
-  # @overload model(new_model)
-  #   Sets the model or model reference
-  #   @param [Backbone.Model|Backbone.ModelRef] new_model the model whose attribute by key will be observed (can be null)
-  model: (new_model) ->
-    return if @__kb_destroyed # destroyed, nothing to do
-
-    # get or no change
-    return @m if (arguments.length == 0) or (@m is new_model)
-    @m = new_model
-    @update()
 
   ####################################################
   # Internal

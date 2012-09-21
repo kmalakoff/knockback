@@ -19,6 +19,7 @@ module.exports =
       'src/knockback-localization/knockback-localized-observable.coffee'
       'src/knockback-localization/knockback-extensions.coffee'
       'src/knockback-triggering/knockback-triggered-observable.coffee'
+      'src/knockback-validation/knockback-validation.coffee'
       'src/knockback-validation/knockback-validators.coffee'
     ]
 
@@ -87,6 +88,7 @@ module.exports =
     compress: true
     files: [
       'src/component-imports.coffee'
+      'src/knockback-validation/knockback-validation.coffee'
       'src/knockback-validation/knockback-validators.coffee'
     ]
 

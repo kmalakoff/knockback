@@ -6933,10 +6933,22 @@ kb.Observable = (function() {
     observable.value = _.bind(this.value, this);
     observable.valueType = _.bind(this.valueType, this);
     observable.destroy = _.bind(this.destroy, this);
+    this.model = ko.dependentObservable({
+      read: function() {
+        return _this.m;
+      },
+      write: function(model) {
+        if (_this.__kb_destroyed || (_this.m === model)) {
+          return;
+        }
+        _this.m = model;
+        return _this.update();
+      }
+    });
     kb.ModelWatcher.useOptionsOrCreate({
       model_watcher: model_watcher
     }, model, this, {
-      model: _.bind(this.model, this),
+      model: this.model,
       update: _.bind(this.update, this),
       key: this.key,
       path: create_options.path
@@ -6957,8 +6969,7 @@ kb.Observable = (function() {
     this.__kb_destroyed = true;
     kb.release(this.__kb_value);
     this.__kb_value = null;
-    this.vm = null;
-    this.create_options = null;
+    this.model.dispose();
     return kb.utils.wrappedDestroy(this);
   };
 
@@ -6971,17 +6982,6 @@ kb.Observable = (function() {
     new_value = this.m ? this.m.get(this.key) : null;
     this.value_type || this._updateValueObservable(new_value);
     return this.value_type;
-  };
-
-  Observable.prototype.model = function(new_model) {
-    if (this.__kb_destroyed) {
-      return;
-    }
-    if ((arguments.length === 0) || (this.m === new_model)) {
-      return this.m;
-    }
-    this.m = new_model;
-    return this.update();
   };
 
   Observable.prototype.update = function(new_value) {
@@ -7095,7 +7095,8 @@ kb.ViewModel = (function() {
   ViewModel.extend = Backbone.Model.extend;
 
   function ViewModel(model, options, view_model) {
-    var attribute_keys, bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref;
+    var attribute_keys, bb_model, keys, mapped_keys, mapping_info, model_watcher, vm_key, _ref,
+      _this = this;
     !model || (model instanceof Backbone.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || throwUnexpected(this, 'not a model');
     options || (options = {});
     view_model || (view_model = {});
@@ -7115,8 +7116,36 @@ kb.ViewModel = (function() {
     kb.Store.useOptionsOrCreate(options, model, this);
     this.__kb.path = options.path;
     kb.Factory.useOptionsOrCreate(options, this, options.path);
+    this.model = ko.dependentObservable({
+      read: function() {
+        return kb.utils.wrappedObject(_this);
+      },
+      write: function(model) {
+        var missing, model_watcher;
+        if (kb.utils.wrappedObject(_this) === model) {
+          return;
+        }
+        if (_this.__kb_null) {
+          !model || throwUnexpected(_this, 'model set on shared null');
+          return;
+        }
+        kb.utils.wrappedObject(_this, model);
+        model_watcher = kb.utils.wrappedModelWatcher(_this);
+        if (!model_watcher) {
+          return;
+        }
+        model_watcher.model(model);
+        if (_this.__kb.keys || !model || !model.attributes) {
+          return;
+        }
+        missing = _.difference(_.keys(model.attributes), _.keys(_this.__kb.model_keys));
+        if (missing) {
+          return _this._createObservables(model, missing);
+        }
+      }
+    });
     model_watcher = kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
-      model: _.bind(this.model, this)
+      model: this.model
     }));
     if (options.requires && _.isArray(options.requires)) {
       keys = _.clone(options.requires);
@@ -7176,31 +7205,6 @@ kb.ViewModel = (function() {
       store: kb.utils.wrappedStore(this),
       factory: kb.utils.wrappedFactory(this)
     };
-  };
-
-  ViewModel.prototype.model = function(new_model) {
-    var missing, model, model_watcher;
-    model = kb.utils.wrappedObject(this);
-    if ((arguments.length === 0) || (model === new_model)) {
-      return model;
-    }
-    if (this.__kb_null) {
-      !new_model || throwUnexpected(this, 'model set on shared null');
-      return;
-    }
-    kb.utils.wrappedObject(this, new_model);
-    model_watcher = kb.utils.wrappedModelWatcher(this);
-    if (!model_watcher) {
-      return;
-    }
-    model_watcher.model(new_model);
-    if (this.__kb.keys || !new_model || !new_model.attributes) {
-      return;
-    }
-    missing = _.difference(_.keys(new_model.attributes), _.keys(this.__kb.model_keys));
-    if (missing) {
-      return this._createObservables(new_model, missing);
-    }
   };
 
   ViewModel.prototype._createObservables = function(model, keys) {
@@ -8175,7 +8179,7 @@ kb.triggeredObservable = function(model, event_name) {
 };
 
 /*
-  knockback-validators.js 0.16.7
+  knockback-validation.js 0.16.7
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
@@ -8183,22 +8187,14 @@ kb.triggeredObservable = function(model, event_name) {
 */
 
 
-URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
-
-EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
-
-NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
-
 callOrGet = function(value) {
   value = ko.utils.unwrapObservable(value);
   if (typeof value === 'function') {
-    return value.apply(null, arraySlice.call(arguments, 1));
+    return value.apply(null, Array.prototype.slice.call(arguments, 1));
   } else {
     return value;
   }
 };
-
-arraySlice = Array.prototype.slice;
 
 kb.Validation = (function() {
 
@@ -8239,7 +8235,7 @@ kb.Validation = (function() {
   Validation.inputValidator = function(view_model, el, validation_options) {
     var $input_el, bindings, identifier, input_name, options, result, type, validator, validators;
     (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
-    validators = kb.validators;
+    validators = kb.valid;
     $input_el = $(el);
     if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
       input_name = null;
@@ -8316,7 +8312,28 @@ kb.Validation = (function() {
 
 })();
 
-kb.validators = {
+kb.valueValidator = kb.Validation.valueValidator;
+
+kb.inputValidator = kb.Validation.inputValidator;
+
+kb.formValidator = kb.Validation.formValidator;
+
+/*
+  knockback-validators.js 0.16.7
+  (c) 2011, 2012 Kevin Malakoff.
+  Knockback.Observable is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+*/
+
+
+URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+
+EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
+
+NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
+
+kb.valid = {
   required: function(value) {
     return !value;
   },
@@ -8330,11 +8347,5 @@ kb.validators = {
     return !NUMBER_REGEXP.test(value);
   }
 };
-
-kb.valueValidator = kb.Validation.valueValidator;
-
-kb.inputValidator = kb.Validation.inputValidator;
-
-kb.formValidator = kb.Validation.formValidator;
 ; return kb;});
 }).call(this);

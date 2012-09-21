@@ -22,7 +22,7 @@ $(->
       view_model =
         value: ko.observable()
 
-      validator = kb.valueValidator(view_model.value, {required: kb.validators.required, url: kb.validators.url})
+      validator = kb.valueValidator(view_model.value, {required: kb.valid.required, url: kb.valid.url})
       ok(validator().hasOwnProperty('required'), "has required")
       ok(validator().hasOwnProperty('url'), "has url")
       ok(validator().hasOwnProperty('valid'), "has valid")
