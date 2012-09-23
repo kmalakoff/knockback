@@ -6475,7 +6475,7 @@ kb.Store = (function() {
       return;
     }
     kb.utils.wrappedObject(observable, obj);
-    options.no_share || obj || (observable.__kb_null = true);
+    obj || (observable.__kb_null = true);
     creator = options.creator ? options.creator : (options.path && options.factory ? options.factory.creatorForPath(obj, options.path) : null);
     if (!creator) {
       creator = observable.constructor;
@@ -6871,7 +6871,7 @@ kb.Observable = (function() {
     model_watcher = create_options.model_watcher;
     delete create_options.model_watcher;
     this.vo = ko.observable(null);
-    this._mdl = ko.observable();
+    this._model = ko.observable();
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: function() {
         var arg, args, current_model, new_value, _i, _len, _ref;
@@ -6887,7 +6887,7 @@ kb.Observable = (function() {
             args.push(ko.utils.unwrapObservable(_this.args));
           }
         }
-        if ((current_model = _this._mdl())) {
+        if ((current_model = _this._model())) {
           new_value = _this.read ? _this.read.apply(_this.vm, args) : current_model.get.apply(current_model, args);
           _this.update(new_value);
         }
@@ -6910,7 +6910,7 @@ kb.Observable = (function() {
             args.push(ko.utils.unwrapObservable(_this.args));
           }
         }
-        if ((current_model = _this._mdl())) {
+        if ((current_model = _this._model())) {
           if (_this.write) {
             _this.write.apply(_this.vm, args);
           } else {
@@ -6936,13 +6936,13 @@ kb.Observable = (function() {
     observable.destroy = _.bind(this.destroy, this);
     observable.model = this.model = ko.dependentObservable({
       read: function() {
-        return _this._mdl();
+        return _this._model();
       },
       write: function(new_model) {
-        if (_this.__kb_destroyed || (_this._mdl() === new_model)) {
+        if (_this.__kb_destroyed || (_this._model() === new_model)) {
           return;
         }
-        _this._mdl(new_model);
+        _this._model(new_model);
         return _this.update();
       }
     });
@@ -6983,7 +6983,7 @@ kb.Observable = (function() {
 
   Observable.prototype.valueType = function() {
     var model, new_value;
-    new_value = (model = this._mdl()) ? model.get(this.key) : null;
+    new_value = (model = this._model()) ? model.get(this.key) : null;
     this.value_type || this._updateValueObservable(new_value);
     return this.value_type;
   };
@@ -6993,7 +6993,7 @@ kb.Observable = (function() {
     if (this.__kb_destroyed) {
       return;
     }
-    if ((model = this._mdl()) && !arguments.length) {
+    if ((model = this._model()) && !arguments.length) {
       new_value = model.get(ko.utils.unwrapObservable(this.key));
     }
     (new_value !== void 0) || (new_value = null);
@@ -7031,7 +7031,7 @@ kb.Observable = (function() {
   Observable.prototype._updateValueObservable = function(new_value) {
     var create_options, creator, previous_value, value;
     create_options = this.create_options;
-    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, this._mdl(), this.key);
+    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, this._model(), this.key);
     this.value_type = KB_TYPE_UNKNOWN;
     creator = create_options.creator;
     previous_value = this.__kb_value;
@@ -7296,18 +7296,18 @@ kb.CollectionObservable = (function() {
     this.__kb._onCollectionChange = _.bind(this._onCollectionChange, this);
     options = collapseOptions(options);
     if (options.sort_attribute) {
-      this.sorted_index_fn = ko.observable(this._sortAttributeFn(options.sort_attribute));
+      this._sorted_index = ko.observable(this._sortAttributeFn(options.sort_attribute));
     } else {
       if (options.sorted_index) {
         legacyWarning(this, '0.16.3', 'use sorted_index_fn instead');
         options.sorted_index_fn = options.sorted_index;
       }
-      this.sorted_index_fn = ko.observable(options.sorted_index_fn);
+      this._sorted_index = ko.observable(options.sorted_index_fn);
     }
     if (options.filters) {
-      this.filters = ko.observableArray(_.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : void 0);
+      this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : void 0);
     } else {
-      this.filters = ko.observableArray([]);
+      this._filters = ko.observableArray([]);
     }
     create_options = this.create_options = {
       store: kb.Store.useOptionsOrCreate(options, collection, observable)
@@ -7321,21 +7321,22 @@ kb.CollectionObservable = (function() {
     }
     observable.destroy = _.bind(this.destroy, this);
     observable.shareOptions = _.bind(this.shareOptions, this);
-    observable.viewModelByModel = _.bind(this.viewModelByModel, this);
+    observable.filters = _.bind(this.filters, this);
     observable.sortedIndex = _.bind(this.sortedIndex, this);
     observable.sortAttribute = _.bind(this.sortAttribute, this);
+    observable.viewModelByModel = _.bind(this.viewModelByModel, this);
     observable.hasViewModels = _.bind(this.hasViewModels, this);
-    this._col = ko.observable(collection);
+    this._collection = ko.observable(collection);
     observable.collection = this.collection = ko.dependentObservable({
       read: function() {
-        return _this._col();
+        return _this._collection();
       },
       write: function(new_collection) {
         var previous_collection;
-        if ((previous_collection = _this._col()) === new_collection) {
+        if ((previous_collection = _this._collection()) === new_collection) {
           return;
         }
-        _this._col(new_collection);
+        _this._collection(new_collection);
         if (previous_collection) {
           previous_collection.unbind('all', _this.__kb._onCollectionChange);
         }
@@ -7353,12 +7354,12 @@ kb.CollectionObservable = (function() {
         return;
       }
       observable = kb.utils.wrappedObservable(_this);
-      current_collection = _this._col();
+      current_collection = _this._collection();
       if (current_collection) {
         models = current_collection.models;
       }
-      sorted_index_fn = _this.sorted_index_fn();
-      filters = _this.filters();
+      sorted_index_fn = _this._sorted_index();
+      filters = _this._filters();
       if (!models || (current_collection.models.length === 0)) {
         view_models = [];
       } else {
@@ -7396,7 +7397,7 @@ kb.CollectionObservable = (function() {
   CollectionObservable.prototype.destroy = function() {
     var array, collection, observable;
     observable = kb.utils.wrappedObservable(this);
-    collection = this._col();
+    collection = this._collection();
     if (collection) {
       collection.unbind('all', this.__kb._onCollectionChange);
       array = observable();
@@ -7404,7 +7405,7 @@ kb.CollectionObservable = (function() {
     }
     this._mapper.dispose();
     this.collection.dispose();
-    kb.release(this.filters);
+    kb.release(this._filters);
     observable.collection = null;
     kb.utils.wrappedDestroy(this);
     return !kb.statistics || kb.statistics.unregister('CollectionObservable', this);
@@ -7421,18 +7422,18 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype.filters = function(filters) {
     if (filters) {
-      return this.filters(_.isArray(filters) ? filters : [filters]);
+      return this._filters(_.isArray(filters) ? filters : [filters]);
     } else {
-      return this.filters([]);
+      return this._filters([]);
     }
   };
 
   CollectionObservable.prototype.sortedIndex = function(sorted_index_fn) {
-    return this.sorted_index_fn(sorted_index_fn);
+    return this._sorted_index(sorted_index_fn);
   };
 
   CollectionObservable.prototype.sortAttribute = function(sort_attribute) {
-    return this.sorted_index_fn(sort_attribute ? this._sortAttributeFn(sort_attribute) : null);
+    return this._sorted_index(sort_attribute ? this._sortAttributeFn(sort_attribute) : null);
   };
 
   CollectionObservable.prototype.viewModelByModel = function(model) {
@@ -7498,19 +7499,19 @@ kb.CollectionObservable = (function() {
     switch (event) {
       case 'reset':
       case 'resort':
-        if (event === 'resort' && !this.sorted_index_fn()) {
+        if (event === 'resort' && !this._sorted_index()) {
           return;
         }
-        return this._col.notifySubscribers(this._col());
+        return this._collection.notifySubscribers(this._collection());
       case 'new':
       case 'add':
         if (this._modelIsFiltered(arg)) {
           return;
         }
         observable = kb.utils.wrappedObservable(this);
-        collection = this._col();
+        collection = this._collection();
         view_model = this._createViewModel(arg);
-        if ((sorted_index_fn = this.sorted_index_fn())) {
+        if ((sorted_index_fn = this._sorted_index())) {
           add_index = sorted_index_fn(observable(), view_model);
         } else {
           add_index = collection.indexOf(arg);
@@ -7524,7 +7525,7 @@ kb.CollectionObservable = (function() {
       case 'change':
         if (this._modelIsFiltered(arg)) {
           return this._onModelRemove(arg);
-        } else if (this.sorted_index_fn()) {
+        } else if (this._sorted_index()) {
           return this._onModelResort(arg);
         }
     }
@@ -7547,12 +7548,12 @@ kb.CollectionObservable = (function() {
     observable = kb.utils.wrappedObservable(this);
     view_model = this.models_only ? model : this.viewModelByModel(model);
     previous_index = observable.indexOf(view_model);
-    if ((sorted_index_fn = this.sorted_index_fn())) {
+    if ((sorted_index_fn = this._sorted_index())) {
       sorted_view_models = _.clone(observable());
       sorted_view_models.splice(previous_index, 1);
       new_index = sorted_index_fn(sorted_view_models, view_model);
     } else {
-      new_index = this._col().indexOf(model);
+      new_index = this._collection().indexOf(model);
     }
     if (previous_index === new_index) {
       return;
@@ -7570,7 +7571,7 @@ kb.CollectionObservable = (function() {
       return;
     }
     observable = kb.utils.wrappedObservable(this);
-    collection = this._col();
+    collection = this._collection();
     if (!collection || (collection.models === models)) {
       return;
     }
@@ -7593,7 +7594,7 @@ kb.CollectionObservable = (function() {
         });
       }
     }
-    if (this.filters().length) {
+    if (this._filters().length) {
       models = _.filter(models, function(model) {
         return !_this._modelIsFiltered(model);
       });
@@ -7633,7 +7634,7 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype._modelIsFiltered = function(model) {
     var filter, filters, _i, _len;
-    filters = this.filters();
+    filters = this._filters();
     for (_i = 0, _len = filters.length; _i < _len; _i++) {
       filter = filters[_i];
       filter = ko.utils.unwrapObservable(filter);

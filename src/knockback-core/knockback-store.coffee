@@ -53,7 +53,6 @@ class kb.Store
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
-  # @option options [Boolean] no_share does not share the model (for example, ).
   #
   # @example register an observable with th store
   #   store.registerObservable(obj, observable, {creator: creator});
@@ -65,7 +64,7 @@ class kb.Store
 
     # prepare the observable
     kb.utils.wrappedObject(observable, obj)
-    options.no_share or obj or (observable.__kb_null = true) # register as shared null (unless requested not to using the `no_share` options)
+    obj or (observable.__kb_null = true) # register as shared null
 
     # register the observable
     creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)

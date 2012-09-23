@@ -79,16 +79,16 @@ class kb.CollectionObservable
     # options
     options = collapseOptions(options)
     if options.sort_attribute
-      @sorted_index_fn = ko.observable(@_sortAttributeFn(options.sort_attribute))
+      @_sorted_index = ko.observable(@_sortAttributeFn(options.sort_attribute))
     else
       if options.sorted_index
         legacyWarning(this, '0.16.3', 'use sorted_index_fn instead')
         options.sorted_index_fn = options.sorted_index
-      @sorted_index_fn = ko.observable(options.sorted_index_fn)
+      @_sorted_index = ko.observable(options.sorted_index_fn)
     if options.filters
-      @filters = ko.observableArray(if _.isArray(options.filters) then options.filters else [options.filters] if options.filters)
+      @_filters = ko.observableArray(if _.isArray(options.filters) then options.filters else [options.filters] if options.filters)
     else
-      @filters = ko.observableArray([])
+      @_filters = ko.observableArray([])
     create_options = @create_options = {store:  kb.Store.useOptionsOrCreate(options, collection, observable)} # create options
 
     # view model factory create factories
@@ -103,20 +103,21 @@ class kb.CollectionObservable
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
     observable.shareOptions = _.bind(@shareOptions, @)
-    observable.viewModelByModel = _.bind(@viewModelByModel, @)
+    observable.filters = _.bind(@filters, @)
     observable.sortedIndex = _.bind(@sortedIndex, @)
     observable.sortAttribute = _.bind(@sortAttribute, @)
+    observable.viewModelByModel = _.bind(@viewModelByModel, @)
     observable.hasViewModels = _.bind(@hasViewModels, @)
 
     # start the processing
-    @_col = ko.observable(collection)
+    @_collection = ko.observable(collection)
     observable.collection = @collection = ko.dependentObservable(
-      read: => return @_col()
+      read: => return @_collection()
       write: (new_collection) =>
-        return if ((previous_collection = @_col()) is new_collection) # no change
+        return if ((previous_collection = @_collection()) is new_collection) # no change
 
         # update references
-        @_col(new_collection)
+        @_collection(new_collection)
 
         # clean up
         previous_collection.unbind('all', @__kb._onCollectionChange) if previous_collection
@@ -132,10 +133,10 @@ class kb.CollectionObservable
       observable = kb.utils.wrappedObservable(@)
 
       # get the filters, sorting, models and create a dependency
-      current_collection = @_col()
+      current_collection = @_collection()
       models = current_collection.models if current_collection
-      sorted_index_fn = @sorted_index_fn()
-      filters = @filters()
+      sorted_index_fn = @_sorted_index()
+      filters = @_filters()
 
       # no models
       if not models or (current_collection.models.length is 0)
@@ -177,11 +178,11 @@ class kb.CollectionObservable
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     observable = kb.utils.wrappedObservable(@)
-    collection = @_col()
+    collection = @_collection()
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
       array = observable(); array.splice(0, array.length) # clear the view models or models
-    @_mapper.dispose(); @collection.dispose(); kb.release(@filters)
+    @_mapper.dispose(); @collection.dispose(); kb.release(@_filters)
     observable.collection = null; kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
@@ -210,9 +211,9 @@ class kb.CollectionObservable
   #    );
   filters: (filters) ->
     if filters
-      @filters(if _.isArray(filters) then filters else [filters])
+      @_filters(if _.isArray(filters) then filters else [filters])
     else
-      @filters([])
+      @_filters([])
 
   # Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
@@ -225,7 +226,7 @@ class kb.CollectionObservable
   #        return _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
   #      }
   #    );
-  sortedIndex: (sorted_index_fn) -> @sorted_index_fn(sorted_index_fn)
+  sortedIndex: (sorted_index_fn) -> @_sorted_index(sorted_index_fn)
 
   # Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
@@ -236,7 +237,7 @@ class kb.CollectionObservable
   #    // in order of Zanadu then Alex
   #    todos.sortAttribute('name');
   #    // in order of Alex then Zanadu
-  sortAttribute: (sort_attribute) -> @sorted_index_fn(if sort_attribute then @_sortAttributeFn(sort_attribute) else null)
+  sortAttribute: (sort_attribute) -> @_sorted_index(if sort_attribute then @_sortAttributeFn(sort_attribute) else null)
 
   # Reverse lookup for a view model by model. If created with models_only option, will return null.
   viewModelByModel: (model) ->
@@ -296,16 +297,16 @@ class kb.CollectionObservable
 
     switch event
       when 'reset', 'resort'
-        return if event is 'resort' and not @sorted_index_fn() # no sorting
-        @_col.notifySubscribers(@_col())
+        return if event is 'resort' and not @_sorted_index() # no sorting
+        @_collection.notifySubscribers(@_collection())
 
       when 'new', 'add'
         return if @_modelIsFiltered(arg) # filtered
 
         observable = kb.utils.wrappedObservable(@)
-        collection = @_col()
+        collection = @_collection()
         view_model = @_createViewModel(arg)
-        if (sorted_index_fn = @sorted_index_fn())
+        if (sorted_index_fn = @_sorted_index())
           add_index = sorted_index_fn(observable(), view_model)
         else
           add_index = collection.indexOf(arg)
@@ -321,7 +322,7 @@ class kb.CollectionObservable
           @_onModelRemove(arg)
 
         # resort if needed
-        else if @sorted_index_fn()
+        else if @_sorted_index()
           @_onModelResort(arg)
 
   # @private
@@ -339,12 +340,12 @@ class kb.CollectionObservable
     observable = kb.utils.wrappedObservable(@)
     view_model = if @models_only then model else @viewModelByModel(model)
     previous_index = observable.indexOf(view_model)
-    if (sorted_index_fn = @sorted_index_fn())
+    if (sorted_index_fn = @_sorted_index())
       sorted_view_models = _.clone(observable())
       sorted_view_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
       new_index = sorted_index_fn(sorted_view_models, view_model)
     else
-      new_index = @_col().indexOf(model)
+      new_index = @_collection().indexOf(model)
     return if previous_index == new_index # no change
 
     # either remove a view model or a model
@@ -356,7 +357,7 @@ class kb.CollectionObservable
   _onObservableArrayChange: (models) ->
     return if @in_edit # we are doing the editing
     observable = kb.utils.wrappedObservable(@)
-    collection = @_col()
+    collection = @_collection()
     return if not collection or (collection.models is models) # no collection or we are updating ourselves
 
     # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
@@ -372,7 +373,7 @@ class kb.CollectionObservable
         models = _.map(models, (test) -> return kb.utils.wrappedObject(test))
 
     # filter the models
-    models = _.filter(models, (model) => not @_modelIsFiltered(model)) if @filters().length
+    models = _.filter(models, (model) => not @_modelIsFiltered(model)) if @_filters().length
 
     # a change, update models
     not has_view_models or @in_edit++
@@ -397,7 +398,7 @@ class kb.CollectionObservable
 
   # @private
   _modelIsFiltered: (model) ->
-    filters = @filters()
+    filters = @_filters()
     for filter in filters
       filter = ko.utils.unwrapObservable(filter)
       if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
