@@ -241,6 +241,24 @@ class kb.utils
     return ko.observableArray(obj)                      if _.isArray(obj)
     return ko.observable(obj)
 
+  # Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from Backbone.Model
+  #
+  # @param [Object] obj the object to test
+  #
+  # @example
+  #   kb.utils.hasModelSignature(new Backbone.Model());
+  @hasModelSignature = (obj) ->
+    return obj and (obj.attributes and not obj.models) and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
+
+  # Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from Backbone.Model
+  #
+  # @param [Object] obj the object to test
+  #
+  # @example
+  #   kb.utils.hasModelSignature(new Backbone.Model());
+  @hasCollectionSignature = (obj) ->
+    return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
+
   # @deprecated please use kb.release instead
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   @release = (obj) ->

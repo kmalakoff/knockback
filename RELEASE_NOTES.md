@@ -4,6 +4,8 @@ Please refer to the following release notes when upgrading your version of Knock
 
 * added extensibility to knockback-validation.js through data-bind on input elements. Added $enabled and $disabled and renamed internal helpers ($error_count, $valid, and $active_error) with '$' prefix
 * published filters function on kb.CollectionObservable
+* added stricted checking for compatible type setting on a kn.CollectionObservable's ko.observableArray
+* added kb.utils.hasModelSignature and kb.utils.hasCollectionSignature to simplify signature checking.
 * bug fix: added dispose of kb.CollectionObservable _mapping
 * bug fix: implemented general-purpose basic object test
 

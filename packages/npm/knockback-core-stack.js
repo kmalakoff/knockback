@@ -6340,6 +6340,14 @@ kb.utils = (function() {
     return ko.observable(obj);
   };
 
+  utils.hasModelSignature = function(obj) {
+    return obj && (obj.attributes && !obj.models) && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
+  };
+
+  utils.hasCollectionSignature = function(obj) {
+    return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
+  };
+
   utils.release = function(obj) {
     legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead');
     return kb.release(obj);
@@ -7564,44 +7572,48 @@ kb.CollectionObservable = (function() {
     return this.in_edit--;
   };
 
-  CollectionObservable.prototype._onObservableArrayChange = function(models) {
-    var collection, has_view_models, observable, value, _i, _j, _len, _len1,
+  CollectionObservable.prototype._onObservableArrayChange = function(models_or_view_models) {
+    var collection, has_filters, model, models, observable, view_model, view_models, _i, _len,
       _this = this;
     if (this.in_edit) {
       return;
     }
+    (this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || throwUnexpected(this, 'incorrect type passed');
     observable = kb.utils.wrappedObservable(this);
     collection = this._collection();
-    if (!collection || (collection.models === models)) {
+    if (!collection || (collection.models === models_or_view_models)) {
       return;
     }
-    if (!this.models_only) {
-      for (_i = 0, _len = models.length; _i < _len; _i++) {
-        value = models[_i];
-        if (!value) {
-          continue;
-        }
-        has_view_models = !(value instanceof Backbone.Model);
-        break;
-      }
-      if (has_view_models) {
-        for (_j = 0, _len1 = models.length; _j < _len1; _j++) {
-          value = models[_j];
-          this.create_options.store.findOrReplace(kb.utils.wrappedObject(value), this.create_options.creator, value);
-        }
-        models = _.map(models, function(test) {
-          return kb.utils.wrappedObject(test);
+    has_filters = this._filters().length;
+    view_models = models_or_view_models;
+    if (this.models_only) {
+      if (has_filters) {
+        models = _.filter(models_or_view_models, function(model) {
+          return !_this._modelIsFiltered(model);
         });
       }
+    } else {
+      !has_filters || (view_models = []);
+      models = [];
+      for (_i = 0, _len = models_or_view_models.length; _i < _len; _i++) {
+        view_model = models_or_view_models[_i];
+        model = kb.utils.wrappedObject(view_model);
+        if (has_filters) {
+          if (this._modelIsFiltered(model)) {
+            continue;
+          }
+          view_models.push(view_model);
+        }
+        this.create_options.store.findOrReplace(model, this.create_options.creator, view_model);
+        models.push(model);
+      }
     }
-    if (this._filters().length) {
-      models = _.filter(models, function(model) {
-        return !_this._modelIsFiltered(model);
-      });
+    this.in_edit++;
+    if (models_or_view_models.length !== view_models.length) {
+      observable(view_models);
     }
-    !has_view_models || this.in_edit++;
     collection.reset(models);
-    !has_view_models || this.in_edit--;
+    this.in_edit--;
   };
 
   CollectionObservable.prototype._sortAttributeFn = function(sort_attribute) {

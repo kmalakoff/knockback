@@ -354,31 +354,41 @@ class kb.CollectionObservable
     @in_edit--
 
   # @private
-  _onObservableArrayChange: (models) ->
+  _onObservableArrayChange: (models_or_view_models) ->
     return if @in_edit # we are doing the editing
+
+    # validate input
+    (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or throwUnexpected(@, 'incorrect type passed')
+
     observable = kb.utils.wrappedObservable(@)
     collection = @_collection()
-    return if not collection or (collection.models is models) # no collection or we are updating ourselves
+    return if not collection or (collection.models is models_or_view_models) # no collection or we are updating ourselves
+    has_filters = @_filters().length
+    view_models = models_or_view_models
 
-    # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
-    if not @models_only
-      for value in models
-        continue unless value
-        has_view_models = not (value instanceof Backbone.Model)
-        break
+    # set Models
+    if @models_only
+      models = _.filter(models_or_view_models, (model) => not @_modelIsFiltered(model)) if has_filters # filter the models
 
-      # ensure we have the right view models in the store and extract them
-      if has_view_models
-        @create_options.store.findOrReplace(kb.utils.wrappedObject(value), @create_options.creator, value) for value in models
-        models = _.map(models, (test) -> return kb.utils.wrappedObject(test))
+    # set ViewModels
+    else
+      not has_filters or (view_models = []) # check for filtering of ViewModels
+      models = []
+      for view_model in models_or_view_models
+        model = kb.utils.wrappedObject(view_model)
+        if has_filters
+          continue if @_modelIsFiltered(model) # filtered so skip
+          view_models.push(view_model)
 
-    # filter the models
-    models = _.filter(models, (model) => not @_modelIsFiltered(model)) if @_filters().length
+        # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
+        @create_options.store.findOrReplace(model, @create_options.creator, view_model)
+        models.push(model)
 
     # a change, update models
-    not has_view_models or @in_edit++
+    @in_edit++
+    observable(view_models) if models_or_view_models.length isnt view_models.length # replace the ViewModels because they were filtered
     collection.reset(models)
-    not has_view_models or @in_edit--
+    @in_edit--
     return
 
   # @private
