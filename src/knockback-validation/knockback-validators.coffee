@@ -42,14 +42,14 @@ kb.untilTrueFn = (stand_in, fn, model) ->
   was_true = false
   model.subscribe(-> was_true = false) if model and ko.isObservable(model) # reset if the model changes
   return (value) ->
-    return stand_in unless (f = ko.utils.unwrapObservable(fn))
+    return ko.utils.unwrapObservable(stand_in) unless (f = ko.utils.unwrapObservable(fn))
     was_true |= !!(result = f(ko.utils.unwrapObservable(value)))
-    return (if was_true then result else stand_in)
+    return (if was_true then result else ko.utils.unwrapObservable(stand_in))
 
 kb.untilFalseFn = (stand_in, fn, model) ->
   was_false = false
   model.subscribe(-> was_false = false) if model and ko.isObservable(model) # reset if the model changes
   return (value) ->
-    return stand_in unless (f = ko.utils.unwrapObservable(fn))
+    return ko.utils.unwrapObservable(stand_in) unless (f = ko.utils.unwrapObservable(fn))
     was_false |= !(result = f(ko.utils.unwrapObservable(value)))
-    return (if was_false then result else stand_in)
+    return (if was_false then result else ko.utils.unwrapObservable(stand_in))

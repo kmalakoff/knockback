@@ -2298,16 +2298,18 @@ kb.Validation = (function() {
       !('enable' in validation_options) || (disabled = !callOrGet(validation_options.enable));
       priorities = validation_options.priorities || [];
       _.isArray(priorities) || (priorities = [priorities]);
-      active_index = priorities.length;
+      active_index = priorities.length + 1;
       for (identifier in bindings) {
         validator = bindings[identifier];
         results[identifier] = !disabled && callOrGet(validator, current_value);
         if (results[identifier]) {
           results.$error_count++;
-          if (results.$active_error && priorities.length && (identifier_index = _.indexOf(priorities, identifier)) >= 0) {
-            (active_index < identifier_index) || (active_index = identifier_index, results.$active_error = identifier);
+          (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
+          if (results.$active_error && identifier_index < active_index) {
+            results.$active_error = identifier;
+            active_index = identifier_index;
           } else {
-            results.$active_error || (results.$active_error = identifier);
+            results.$active_error || (results.$active_error = identifier, active_index = identifier_index);
           }
         }
       }
@@ -2496,10 +2498,10 @@ kb.untilTrueFn = function(stand_in, fn, model) {
   return function(value) {
     var f, result;
     if (!(f = ko.utils.unwrapObservable(fn))) {
-      return stand_in;
+      return ko.utils.unwrapObservable(stand_in);
     }
     was_true |= !!(result = f(ko.utils.unwrapObservable(value)));
-    return (was_true ? result : stand_in);
+    return (was_true ? result : ko.utils.unwrapObservable(stand_in));
   };
 };
 
@@ -2514,10 +2516,10 @@ kb.untilFalseFn = function(stand_in, fn, model) {
   return function(value) {
     var f, result;
     if (!(f = ko.utils.unwrapObservable(fn))) {
-      return stand_in;
+      return ko.utils.unwrapObservable(stand_in);
     }
     was_false |= !(result = f(ko.utils.unwrapObservable(value)));
-    return (was_false ? result : stand_in);
+    return (was_false ? result : ko.utils.unwrapObservable(stand_in));
   };
 };
 ; return kb;});

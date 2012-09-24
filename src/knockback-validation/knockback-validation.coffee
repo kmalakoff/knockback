@@ -24,16 +24,18 @@ class kb.Validation
       _.isArray(priorities) or (priorities = [priorities]) # ensure priorities is an array
 
       # then add the rest
-      active_index = priorities.length
+      active_index = priorities.length + 1
       for identifier, validator of bindings
         results[identifier] = not disabled and callOrGet(validator, current_value) # update validity
         if results[identifier]
           results.$error_count++
 
-          if results.$active_error and priorities.length and (identifier_index = _.indexOf(priorities, identifier)) >= 0
-            (active_index < identifier_index) or (active_index = identifier_index; results.$active_error = identifier)
+          # check priorities
+          (identifier_index = _.indexOf(priorities, identifier)>=0) or (identifier_index = priorities.length)
+          if results.$active_error and identifier_index < active_index
+            results.$active_error = identifier; active_index = identifier_index
           else
-            results.$active_error or (results.$active_error = identifier)
+            results.$active_error or (results.$active_error = identifier; active_index = identifier_index)
 
       # add the inverse and ensure a boolean
       results.$enabled = not disabled
