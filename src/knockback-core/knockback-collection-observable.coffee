@@ -116,14 +116,14 @@ class kb.CollectionObservable
       write: (new_collection) =>
         return if ((previous_collection = @_collection()) is new_collection) # no change
 
-        # update references
-        @_collection(new_collection)
-
         # clean up
         previous_collection.unbind('all', @__kb._onCollectionChange) if previous_collection
 
         # store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
         new_collection.bind('all', @__kb._onCollectionChange) if new_collection
+
+        # update references (including notification)
+        @_collection(new_collection)
     )
     collection.bind('all', @__kb._onCollectionChange) if collection # bind now
 
@@ -386,7 +386,7 @@ class kb.CollectionObservable
 
     # a change, update models
     @in_edit++
-    observable(view_models) if models_or_view_models.length isnt view_models.length # replace the ViewModels because they were filtered
+    (models_or_view_models.length is view_models.length) or observable(view_models) # replace the ViewModels because they were filtered
     collection.reset(models)
     @in_edit--
     return

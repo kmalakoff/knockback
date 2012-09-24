@@ -76,8 +76,8 @@ class kb.Observable
           if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
 
         # read and update
-        if (current_model = @_model()) # maybe not yet initialized
-          new_value = if @read then @read.apply(@vm, args) else current_model.get.apply(current_model, args)
+        if (@_mdl is @_model() and @_mdl) # maybe not yet initialized
+          new_value = if @read then @read.apply(@vm, args) else @_mdl.get.apply(@_mdl, args)
           @update(new_value)
 
         # get the observable
@@ -92,8 +92,8 @@ class kb.Observable
           if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
 
         # write
-        if (current_model = @_model()) # maybe not yet initialized
-          if @write then @write.apply(@vm, args) else current_model.set.apply(current_model, args)
+        if @_mdl # maybe not yet initialized
+          if @write then @write.apply(@vm, args) else @_mdl.set.apply(@_mdl, args)
 
         # update the observable
         @update(new_value)
@@ -117,13 +117,14 @@ class kb.Observable
 
     # use external model observable or create
     observable.model = @model = ko.dependentObservable(
-      read: => return @_model()
+      read: => @_model(); return @_mdl
       write: (new_model) =>
-        return if @__kb_destroyed or (@_model() is new_model) # destroyed or no change
+        return if @__kb_destroyed or (@_mdl is new_model) # destroyed or no change
 
         # update references
+        @_mdl = new_model
+        @update(null)
         @_model(new_model)
-        @update()
     )
     kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
@@ -155,7 +156,7 @@ class kb.Observable
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: ->
-    new_value = if (model = @_model()) then model.get(@key) else null
+    new_value = if @_mdl then @_mdl.get(@key) else null
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
@@ -167,7 +168,7 @@ class kb.Observable
     return if @__kb_destroyed # destroyed, nothing to do
 
     # determine the new type
-    new_value = model.get(ko.utils.unwrapObservable(@key)) if (model = @_model()) and not arguments.length
+    new_value = @_mdl.get(ko.utils.unwrapObservable(@key)) if @_mdl and not arguments.length
     (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
@@ -205,7 +206,7 @@ class kb.Observable
   # @private
   _updateValueObservable: (new_value) ->
     create_options = @create_options
-    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, @_model(), @key)
+    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, @_mdl, @key)
     @value_type = KB_TYPE_UNKNOWN
     creator = create_options.creator
 

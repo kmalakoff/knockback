@@ -113,16 +113,18 @@ class kb.ViewModel
         (not new_model or throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
 
         # update references
-        kb.utils.wrappedObject(@, new_model); _mdl(new_model)
+        kb.utils.wrappedObject(@, new_model)
         model_watcher = kb.utils.wrappedModelWatcher(@)
-        return unless model_watcher # not yet initialized
+        (_mdl(new_model); return) unless model_watcher # not yet initialized
         model_watcher.model(new_model) # sync with model_watcher
 
         # sync missing attributes
-        return if @__kb.keys or not new_model or not new_model.attributes # only allow specific keys or nothing to add
-        # NOTE: this does not remove keys that are different between the models
-        missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
-        @_createObservables(new_model, missing) if missing
+        if not (@__kb.keys or not new_model or not new_model.attributes) # only allow specific keys or nothing to add
+          # NOTE: this does not remove keys that are different between the models
+          missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
+          @_createObservables(new_model, missing) if missing
+        _mdl(new_model)
+        return
     )
     model_watcher = kb.utils.wrappedModelWatcher(@, new kb.ModelWatcher(model, @, {model: @model}))
 

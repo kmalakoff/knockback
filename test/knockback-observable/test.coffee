@@ -100,8 +100,7 @@ $(->
 
     model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
-    # ok(_.isEqual(args, ['name', 1, 'number']), "got the args")
-    ok(_.isEqual(args, ['name', 1, 'number', 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number', 'number', 'number']), "got the args") # TODO: optimize
+    ok(_.isEqual(args, ['name', 1, 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']) , "got the args: #{args.join(', ')}") # TODO: reduce number of calls on old Backbone?
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
