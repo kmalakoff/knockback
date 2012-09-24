@@ -62,8 +62,8 @@ class kb.Observable
     not create_options.args or (@args = create_options.args; delete create_options.args)
     not create_options.read or (@read = create_options.read; delete create_options.read)
     not create_options.write or (@write = create_options.write; delete create_options.write)
-    model_watcher = create_options.model_watcher
-    delete create_options.model_watcher
+    event_watcher = create_options.event_watcher
+    delete create_options.event_watcher
 
     # set up basics
     @vo = ko.observable(null) # create a value observable for the first dependency
@@ -126,7 +126,7 @@ class kb.Observable
         @update(null)
         @_model(new_model)
     )
-    kb.ModelWatcher.useOptionsOrCreate({model_watcher: model_watcher}, model, @, {model: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
+    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
 
     # wrap ourselves with a localizer

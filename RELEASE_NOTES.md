@@ -6,6 +6,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * published filters function on kb.CollectionObservable
 * added stricted checking for compatible type setting on a kn.CollectionObservable's ko.observableArray
 * added kb.utils.hasModelSignature and kb.utils.hasCollectionSignature to simplify signature checking.
+* made the kb.ModelWatcher into a general-purpose kb.EventWatcher so it could also watch collection events.
 * bug fix: added dispose of kb.CollectionObservable _mapping
 * bug fix: implemented general-purpose basic object test
 

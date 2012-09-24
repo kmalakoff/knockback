@@ -147,33 +147,33 @@ class kb.utils
   #   @param [kb.Factory] factory the factory
   @wrappedFactory = (obj, value)              -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
 
-  # Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.
+  # Dual-purpose getter/setter for retrieving and storing a kb.EventWatcher on an owner.
   #
-  # @overload wrappedModelWatcher(obj)
-  #   Gets the model_watcher from an object
+  # @overload wrappedEventWatcher(obj)
+  #   Gets the event_watcher from an object
   #   @param [Any] obj the owner
-  #   @return [kb.ModelWatcher] the model_watcher
-  # @overload wrappedModelWatcher(obj, model_watcher)
-  #   Sets the model_watcher on an object
+  #   @return [kb.EventWatcher] the event_watcher
+  # @overload wrappedEventWatcher(obj, event_watcher)
+  #   Sets the event_watcher on an object
   #   @param [Any] obj the owner
-  #   @param [kb.ModelWatcher] model_watcher the model_watcher
-  @wrappedModelWatcher = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher'))
+  #   @param [kb.EventWatcher] event_watcher the event_watcher
+  @wrappedEventWatcher = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher'))
 
   # @private
-  @wrappedModelWatcherIsOwned = (obj, value)  -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'model_watcher_is_owned'))
+  @wrappedEventWatcherIsOwned = (obj, value)  -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher_is_owned'))
 
   # Clean up function that releases all of the wrapped values on an owner.
   @wrappedDestroy = (obj) ->
     return unless obj.__kb
-    obj.__kb.model_watcher.releaseCallbacks(obj) if obj.__kb.model_watcher
+    obj.__kb.event_watcher.releaseCallbacks(obj) if obj.__kb.event_watcher
     __kb = obj.__kb; obj.__kb = null # clear now to break cycles
     if __kb.observable
       __kb.observable.destroy = __kb.observable.release = null
       @wrappedDestroy(__kb.observable)
       __kb.observable = null
     __kb.factory = null
-    __kb.model_watcher.destroy() if __kb.model_watcher_is_owned # release the model_watcher
-    __kb.model_watcher = null
+    __kb.event_watcher.destroy() if __kb.event_watcher_is_owned # release the event_watcher
+    __kb.event_watcher = null
     __kb.store.destroy() if __kb.store_is_owned # release the store
     __kb.store = null
     # kb.release(__kb, true) # release everything that remains

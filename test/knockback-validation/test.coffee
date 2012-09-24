@@ -257,7 +257,7 @@ $(->
     ok(validator().url, "url is invalid")
     ok(!validator().$valid, "validator not valid")
     ok(validator().$error_count, "validator is invalid")
-    equal(validator().$active_error, 'required', "active error is url")
+    equal(validator().$active_error, 'url', "active error is url")
 
     view_model.site('Bob')
     ok(!validator().required, "required is valid")

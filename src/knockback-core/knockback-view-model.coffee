@@ -72,7 +72,7 @@ class kb.ViewModel
   # @option options [Object|Array] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
-  # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
+  # @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions. Signature: `{'some.path': function(object, options)}`
   # @option options [kb.Factory] factory a factory used to create view models.
   # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
@@ -114,9 +114,9 @@ class kb.ViewModel
 
         # update references
         kb.utils.wrappedObject(@, new_model)
-        model_watcher = kb.utils.wrappedModelWatcher(@)
-        (_mdl(new_model); return) unless model_watcher # not yet initialized
-        model_watcher.model(new_model) # sync with model_watcher
+        event_watcher = kb.utils.wrappedEventWatcher(@)
+        (_mdl(new_model); return) unless event_watcher # not yet initialized
+        event_watcher.emitter(new_model) # sync with event_watcher
 
         # sync missing attributes
         if not (@__kb.keys or not new_model or not new_model.attributes) # only allow specific keys or nothing to add
@@ -126,7 +126,7 @@ class kb.ViewModel
         _mdl(new_model)
         return
     )
-    model_watcher = kb.utils.wrappedModelWatcher(@, new kb.ModelWatcher(model, @, {model: @model}))
+    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @model}))
 
     # collect requires and internls first because they could be used to define the include order
     (keys = _.clone(options.requires)) if options.requires and _.isArray(options.requires)
@@ -143,7 +143,7 @@ class kb.ViewModel
           mapped_keys[if _.isString(mapping_info) then mapping_info else (if mapping_info.key then mapping_info.key else vm_key)] = true
         @__kb.keys = _.keys(mapped_keys)
     else
-      bb_model = model_watcher.model()
+      bb_model = event_watcher.emitter()
       if bb_model and bb_model.attributes
         attribute_keys = _.keys(bb_model.attributes)
         keys = if keys then _.union(keys, attribute_keys) else attribute_keys
@@ -179,7 +179,7 @@ class kb.ViewModel
 
   # @private
   _createObservables: (model, keys) ->
-    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
+    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
     for key in keys
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
       continue if @[vm_key] # already exists, skip
@@ -194,7 +194,7 @@ class kb.ViewModel
 
   # @private
   _mapObservables: (model, mappings) ->
-    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, model_watcher: kb.utils.wrappedModelWatcher(@)}
+    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
     for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)

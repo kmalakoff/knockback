@@ -6,34 +6,34 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-# Class for observing model events.
+# Class for observing emitter events.
 #
 # @example create an observable whose subscriptions are notified with the change event is triggered.
 #   var triggered_observable = kb.triggeredObservable(name, 'change');
 #
-# @example How to watch a model for events.
+# @example How to watch a emitter for events.
 #   var trigger_count = 0;
-#   var model = new Backbone.Model();
-#   var view_model = {
-#     triggered_observable: kb.triggeredObservable(model, 'change')
+#   var emitter = new Backbone.Model();
+#   var view_emitter = {
+#     triggered_observable: kb.triggeredObservable(emitter, 'change')
 #   };
-#   view_model.counter = ko.dependentObservable(function() {
-#     view_model.triggered_observable() // add a dependency
+#   view_emitter.counter = ko.dependentObservable(function() {
+#     view_emitter.triggered_observable() // add a dependency
 #     return trigger_count++
 #   });
-#   model.set(name: 'bob');       # trigger_count: 1
-#   model.set(name: 'george');    # trigger_count: 2
-#   model.set(last: 'smith');     # trigger_count: 3
+#   emitter.set(name: 'bob');       # trigger_count: 1
+#   emitter.set(name: 'george');    # trigger_count: 2
+#   emitter.set(last: 'smith');     # trigger_count: 3
 class kb.TriggeredObservable
 
   # Used to create a new kb.Observable.
   #
-  # @param [Backbone.Model] model the model to observe (can be null)
+  # @param [Backbone.Model] emitter the emitter to observe (can be null)
   # @param [String] event_name the event name to trigger Knockout subscriptions on.
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
-  constructor: (model, @event_name) ->
-    model or throwMissing(this, 'model')
+  constructor: (emitter, @event_name) ->
+    emitter or throwMissing(this, 'emitter')
     @event_name or throwMissing(this, 'event_name')
 
     # internal state
@@ -43,8 +43,8 @@ class kb.TriggeredObservable
     # publish public interface on the observable and return instead of this
     observable.destroy = _.bind(@destroy, @)
 
-    # create model observable
-    kb.utils.wrappedModelWatcher(@, new kb.ModelWatcher(model, @, {model: _.bind(@model, @), update: _.bind(@update, @), event_name: @event_name}))
+    # create emitter observable
+    kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(emitter, @, {emitter: _.bind(@emitter, @), update: _.bind(@update, @), event_name: @event_name}))
 
     return observable
 
@@ -52,26 +52,26 @@ class kb.TriggeredObservable
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: -> kb.utils.wrappedDestroy(@)
 
-  # Dual-purpose getter/setter for the observed model.
+  # Dual-purpose getter/setter for the observed emitter.
   #
-  # @overload model()
-  #   Gets the model or model reference
-  #   @return [Backbone.Model|Backbone.ModelRef] the model whose events are being bound (can be null)
-  # @overload model(new_model)
-  #   Sets the model or model reference
-  #   @param [Backbone.Model|Backbone.ModelRef] new_model the model whose events will be bound (can be null)
-  model: (new_model) ->
+  # @overload emitter()
+  #   Gets the emitter or emitter reference
+  #   @return [Backbone.Model|Backbone.ModelRef|Backbone.Collection] the emitter whose events are being bound (can be null)
+  # @overload emitter(new_emitter)
+  #   Sets the emitter or emitter reference
+  #   @param [Backbone.Model|Backbone.ModelRef|Backbone.Collection] new_emitter the emitter whose events will be bound (can be null)
+  emitter: (new_emitter) ->
     # get or no change
-    return @m if (arguments.length == 0) or (@m is new_model)
-    @update() if (@m = new_model)
+    return @ee if (arguments.length == 0) or (@ee is new_emitter)
+    @update() if (@ee = new_emitter)
 
   ####################################################
   # Internal
   ####################################################
   # @private
   update: ->
-    return unless @m # do not trigger if there is no model
-    if @vo() isnt @m then @vo(@m) else @vo.valueHasMutated() # manually trigger the dependable
+    return unless @ee # do not trigger if there is no emitter
+    if @vo() isnt @ee then @vo(@ee) else @vo.valueHasMutated() # manually trigger the dependable
 
 # factory function
-kb.triggeredObservable = (model, event_name) -> return new kb.TriggeredObservable(model, event_name)
+kb.triggeredObservable = (emitter, event_name) -> return new kb.TriggeredObservable(emitter, event_name)
