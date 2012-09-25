@@ -520,6 +520,10 @@ kb.Store = (function() {
   }
 
   Store.prototype.destroy = function() {
+    return this.clear();
+  };
+
+  Store.prototype.clear = function() {
     var observable, record, _i, _j, _len, _len1, _ref, _ref1;
     _ref = this.observable_records;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -531,8 +535,8 @@ kb.Store = (function() {
       observable = _ref1[_j];
       kb.release(observable);
     }
-    this.observable_records = null;
-    return this.replaced_observables = null;
+    this.observable_records = [];
+    return this.replaced_observables = [];
   };
 
   Store.prototype.register = function(obj, observable, options) {

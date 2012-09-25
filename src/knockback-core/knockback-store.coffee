@@ -36,13 +36,16 @@ class kb.Store
 
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
-  destroy: ->
+  destroy: -> @clear()
+
+  # Manually clear the store.
+  clear: ->
     for record in @observable_records
       kb.release(record.observable)
     for observable in @replaced_observables
       kb.release(observable)
-    @observable_records = null
-    @replaced_observables = null
+    @observable_records = []
+    @replaced_observables = []
 
   # Used to register a new view model with the store.
   #
