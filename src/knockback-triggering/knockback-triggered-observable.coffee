@@ -29,12 +29,12 @@ class kb.TriggeredObservable
   # Used to create a new kb.Observable.
   #
   # @param [Backbone.Model] emitter the emitter to observe (can be null)
-  # @param [String] event_name the event name to trigger Knockout subscriptions on.
+  # @param [String] event_selector the event name to trigger Knockout subscriptions on.
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
-  constructor: (emitter, @event_name) ->
+  constructor: (emitter, @event_selector) ->
     emitter or throwMissing(this, 'emitter')
-    @event_name or throwMissing(this, 'event_name')
+    @event_selector or throwMissing(this, 'event_selector')
 
     # internal state
     @vo = ko.observable()
@@ -44,7 +44,7 @@ class kb.TriggeredObservable
     observable.destroy = _.bind(@destroy, @)
 
     # create emitter observable
-    kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(emitter, @, {emitter: _.bind(@emitter, @), update: _.bind(@update, @), event_name: @event_name}))
+    kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(emitter, @, {emitter: _.bind(@emitter, @), update: _.bind(@update, @), event_selector: @event_selector}))
 
     return observable
 
@@ -74,4 +74,4 @@ class kb.TriggeredObservable
     if @vo() isnt @ee then @vo(@ee) else @vo.valueHasMutated() # manually trigger the dependable
 
 # factory function
-kb.triggeredObservable = (emitter, event_name) -> return new kb.TriggeredObservable(emitter, event_name)
+kb.triggeredObservable = (emitter, event_selector) -> return new kb.TriggeredObservable(emitter, event_selector)

@@ -89,6 +89,8 @@
           label_date: "Date de Naissance:"
         }
       });
+      kb.Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+      kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact });
       var collection = new kb.ContactsCollection([
         {name: 'Moe',   email: 'moe@3s.com',    date: new Date(1897, 6, 19)},
         {name: 'Larry', email: 'larry@3s.com',  date: new Date(1902, 10, 5)},

@@ -42,12 +42,12 @@ if (typeof exports !== 'undefined') {
 
 kb.TriggeredObservable = (function() {
 
-  function TriggeredObservable(emitter, event_name) {
+  function TriggeredObservable(emitter, event_selector) {
     var observable,
       _this = this;
-    this.event_name = event_name;
+    this.event_selector = event_selector;
     emitter || throwMissing(this, 'emitter');
-    this.event_name || throwMissing(this, 'event_name');
+    this.event_selector || throwMissing(this, 'event_selector');
     this.vo = ko.observable();
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable(function() {
       return _this.vo();
@@ -56,7 +56,7 @@ kb.TriggeredObservable = (function() {
     kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, {
       emitter: _.bind(this.emitter, this),
       update: _.bind(this.update, this),
-      event_name: this.event_name
+      event_selector: this.event_selector
     }));
     return observable;
   }
@@ -89,8 +89,8 @@ kb.TriggeredObservable = (function() {
 
 })();
 
-kb.triggeredObservable = function(emitter, event_name) {
-  return new kb.TriggeredObservable(emitter, event_name);
+kb.triggeredObservable = function(emitter, event_selector) {
+  return new kb.TriggeredObservable(emitter, event_selector);
 };
 ; return kb;});
 }).call(this);

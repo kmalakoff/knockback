@@ -21,7 +21,7 @@ class kb.EventWatcher
   # @param [Object] callback_options information about the event and callback to register
   # @option options [Function] emitter callback for when the emitter changes (eg. is loaded). Signature: function(new_emitter)
   # @option options [Function] update callback for when the registered event is triggered. Signature: function(new_value)
-  # @option options [String] event_name the name of the event.
+  # @option options [String] event_selector the name or names of events.
   # @option options [String] key the optional key to filter update attribute events.
   @useOptionsOrCreate: (options, emitter, obj, callback_options) ->
     if options.event_watcher
@@ -97,37 +97,41 @@ class kb.EventWatcher
   registerCallbacks: (obj, callback_info) ->
     obj or throwMissing(this, 'obj')
     callback_info or throwMissing(this, 'info')
-    event_name = if callback_info.event_name then callback_info.event_name else 'change'
-    callbacks = @__kb.callbacks[event_name]
+    event_selector = if callback_info.event_selector then callback_info.event_selector else 'change'
+    event_names = event_selector.split(' ')
+    for event_name in event_names
+      continue unless event_name # extra spaces
+      callbacks = @__kb.callbacks[event_name]
 
-    # register new
-    unless callbacks
-      list = []
-      callbacks = {
-        list: list
-        fn: (emitter) ->
-          for info in list
-            if info.update and not info.rel_fn
+      # register new
+      unless callbacks
+        list = []
+        callbacks = {
+          list: list
+          fn: (emitter) =>
+            for info in list
+              if info.update and not info.rel_fn
 
-              # key doesn't match
-              continue if emitter and info.key and (emitter.hasChanged and not emitter.hasChanged(ko.utils.unwrapObservable(info.key)))
+                # key doesn't match
+                continue if emitter and info.key and (emitter.hasChanged and not emitter.hasChanged(ko.utils.unwrapObservable(info.key)))
 
-              # trigger update
-              not kb.statistics or addStatisticsEvent(emitter, event_name, info)
-              info.update()
+                # trigger update
+                not kb.statistics or addStatisticsEvent(emitter, event_name, info)
+                info.update()
 
-          return null
-      }
-      @__kb.callbacks[event_name] = callbacks
-      @ee.bind(event_name, callbacks.fn) if @ee # register for the new event type
+            return null
+        }
+        @__kb.callbacks[event_name] = callbacks
+        @ee.bind(event_name, callbacks.fn) if @ee # register for the new event type
 
-    # add the callback information
-    info = _.defaults({obj: obj}, callback_info)
-    callbacks.list.push(info)
+      # add the callback information
+      info = _.defaults({obj: obj}, callback_info)
+      callbacks.list.push(info)
 
     if @ee # loaded
       # bind relational updates
-      @_modelBindRelatationalInfo(event_name, info) if Backbone.RelationalModel and (@ee instanceof Backbone.RelationalModel)
+      if Backbone.RelationalModel and (@ee instanceof Backbone.RelationalModel) and _.contains(event_names, 'change')
+        @_modelBindRelatationalInfo('change', info)
 
       # trigger now
       info.emitter(@ee) and info.emitter

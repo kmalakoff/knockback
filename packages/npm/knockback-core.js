@@ -759,42 +759,50 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.registerCallbacks = function(obj, callback_info) {
-    var callbacks, event_name, info, list;
+    var callbacks, event_name, event_names, event_selector, info, list, _i, _len,
+      _this = this;
     obj || throwMissing(this, 'obj');
     callback_info || throwMissing(this, 'info');
-    event_name = callback_info.event_name ? callback_info.event_name : 'change';
-    callbacks = this.__kb.callbacks[event_name];
-    if (!callbacks) {
-      list = [];
-      callbacks = {
-        list: list,
-        fn: function(emitter) {
-          var info, _i, _len;
-          for (_i = 0, _len = list.length; _i < _len; _i++) {
-            info = list[_i];
-            if (info.update && !info.rel_fn) {
-              if (emitter && info.key && (emitter.hasChanged && !emitter.hasChanged(ko.utils.unwrapObservable(info.key)))) {
-                continue;
-              }
-              !kb.statistics || addStatisticsEvent(emitter, event_name, info);
-              info.update();
-            }
-          }
-          return null;
-        }
-      };
-      this.__kb.callbacks[event_name] = callbacks;
-      if (this.ee) {
-        this.ee.bind(event_name, callbacks.fn);
+    event_selector = callback_info.event_selector ? callback_info.event_selector : 'change';
+    event_names = event_selector.split(' ');
+    for (_i = 0, _len = event_names.length; _i < _len; _i++) {
+      event_name = event_names[_i];
+      if (!event_name) {
+        continue;
       }
+      callbacks = this.__kb.callbacks[event_name];
+      if (!callbacks) {
+        list = [];
+        callbacks = {
+          list: list,
+          fn: function(emitter) {
+            var info, _j, _len1;
+            for (_j = 0, _len1 = list.length; _j < _len1; _j++) {
+              info = list[_j];
+              if (info.update && !info.rel_fn) {
+                if (emitter && info.key && (emitter.hasChanged && !emitter.hasChanged(ko.utils.unwrapObservable(info.key)))) {
+                  continue;
+                }
+                !kb.statistics || addStatisticsEvent(emitter, event_name, info);
+                info.update();
+              }
+            }
+            return null;
+          }
+        };
+        this.__kb.callbacks[event_name] = callbacks;
+        if (this.ee) {
+          this.ee.bind(event_name, callbacks.fn);
+        }
+      }
+      info = _.defaults({
+        obj: obj
+      }, callback_info);
+      callbacks.list.push(info);
     }
-    info = _.defaults({
-      obj: obj
-    }, callback_info);
-    callbacks.list.push(info);
     if (this.ee) {
-      if (Backbone.RelationalModel && (this.ee instanceof Backbone.RelationalModel)) {
-        this._modelBindRelatationalInfo(event_name, info);
+      if (Backbone.RelationalModel && (this.ee instanceof Backbone.RelationalModel) && _.contains(event_names, 'change')) {
+        this._modelBindRelatationalInfo('change', info);
       }
       info.emitter(this.ee) && info.emitter;
     }
