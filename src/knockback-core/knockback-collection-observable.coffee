@@ -303,6 +303,7 @@ class kb.CollectionObservable
 
         observable = kb.utils.wrappedObservable(@)
         collection = @_collection()
+        return if (view_model = @viewModelByModel(arg)) # it may have already been added by a change event
         view_model = @_createViewModel(arg)
         @in_edit++
         if (comparator = @_comparator())
@@ -318,12 +319,20 @@ class kb.CollectionObservable
         if @_modelIsFiltered(arg)
           @_onModelRemove(arg)
 
-        # resort if needed
-        else if comparator = @_comparator()
-          observable = kb.utils.wrappedObservable(@)
-          @in_edit++
-          observable.sort(comparator)
-          @in_edit--
+        # not filtered, add
+        else
+          view_model = @viewModelByModel(arg)
+          if view_model # arleady exists
+            if (comparator = @_comparator())
+              observable = kb.utils.wrappedObservable(@)
+              @in_edit++
+              observable.sort(comparator)
+              @in_edit--
+
+          # add new
+          else
+            @_onCollectionChange('add', arg)
+    return
 
   # @private
   _onModelRemove: (model) ->

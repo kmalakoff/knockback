@@ -7527,7 +7527,8 @@ kb.CollectionObservable = (function() {
     switch (event) {
       case 'reset':
       case 'resort':
-        return this._collection.notifySubscribers(this._collection());
+        this._collection.notifySubscribers(this._collection());
+        break;
       case 'new':
       case 'add':
         if (this._modelIsFiltered(arg)) {
@@ -7535,6 +7536,9 @@ kb.CollectionObservable = (function() {
         }
         observable = kb.utils.wrappedObservable(this);
         collection = this._collection();
+        if ((view_model = this.viewModelByModel(arg))) {
+          return;
+        }
         view_model = this._createViewModel(arg);
         this.in_edit++;
         if ((comparator = this._comparator())) {
@@ -7543,18 +7547,27 @@ kb.CollectionObservable = (function() {
         } else {
           observable.splice(collection.indexOf(arg), 0, view_model);
         }
-        return this.in_edit--;
+        this.in_edit--;
+        break;
       case 'remove':
       case 'destroy':
-        return this._onModelRemove(arg);
+        this._onModelRemove(arg);
+        break;
       case 'change':
         if (this._modelIsFiltered(arg)) {
-          return this._onModelRemove(arg);
-        } else if (comparator = this._comparator()) {
-          observable = kb.utils.wrappedObservable(this);
-          this.in_edit++;
-          observable.sort(comparator);
-          return this.in_edit--;
+          this._onModelRemove(arg);
+        } else {
+          view_model = this.viewModelByModel(arg);
+          if (view_model) {
+            if ((comparator = this._comparator())) {
+              observable = kb.utils.wrappedObservable(this);
+              this.in_edit++;
+              observable.sort(comparator);
+              this.in_edit--;
+            }
+          } else {
+            this._onCollectionChange('add', arg);
+          }
         }
     }
   };
