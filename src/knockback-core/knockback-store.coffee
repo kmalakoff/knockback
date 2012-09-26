@@ -40,12 +40,9 @@ class kb.Store
 
   # Manually clear the store.
   clear: ->
-    for record in @observable_records
-      kb.release(record.observable)
-    for observable in @replaced_observables
-      kb.release(observable)
-    @observable_records = []
-    @replaced_observables = []
+    kb.release(record.observable) for record in @observable_records.splice(0, @observable_records.length)
+    kb.release(@replaced_observables)
+    return
 
   # Used to register a new view model with the store.
   #

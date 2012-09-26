@@ -43,7 +43,7 @@ callOrGet = (value) ->
 #   @param [Object] validation_options the validation options
 #   @option validation_options [Boolean|Function] disable the test for disabling validations
 #   @option validation_options [Boolean|Function] enable the test for enabling validations
-#   @option validation_options [String|Array] priorities the priotiry order of the validators (used to set $active_error in the case of multiple being active simulateously)
+#   @option validation_options [String|Array] priorities the priority order of the validators (used to set $active_error in the case of multiple being active simulateously)
 #   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
 #
 # @method .inputValidator(view_model, el, validation_options={})

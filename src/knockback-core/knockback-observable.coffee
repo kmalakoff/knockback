@@ -147,8 +147,8 @@ class kb.Observable
     observable = kb.utils.wrappedObservable(@)
     @__kb_destroyed = true
     kb.release(@__kb_value); @__kb_value = null
-    @model.dispose()
-    observable.model = null; kb.utils.wrappedDestroy(@)
+    @model.dispose(); @_mdl = @model = observable.model = null
+    kb.utils.wrappedDestroy(@)
 
   # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Backbone.Collection, it will hold a kb.CollectionObservable.
   value: ->

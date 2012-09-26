@@ -6465,19 +6465,13 @@ kb.Store = (function() {
   };
 
   Store.prototype.clear = function() {
-    var observable, record, _i, _j, _len, _len1, _ref, _ref1;
-    _ref = this.observable_records;
+    var record, _i, _len, _ref;
+    _ref = this.observable_records.splice(0, this.observable_records.length);
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       record = _ref[_i];
       kb.release(record.observable);
     }
-    _ref1 = this.replaced_observables;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      observable = _ref1[_j];
-      kb.release(observable);
-    }
-    this.observable_records = [];
-    return this.replaced_observables = [];
+    kb.release(this.replaced_observables);
   };
 
   Store.prototype.register = function(obj, observable, options) {
@@ -6998,7 +6992,7 @@ kb.Observable = (function() {
     kb.release(this.__kb_value);
     this.__kb_value = null;
     this.model.dispose();
-    observable.model = null;
+    this._mdl = this.model = observable.model = null;
     return kb.utils.wrappedDestroy(this);
   };
 
@@ -7431,8 +7425,11 @@ kb.CollectionObservable = (function() {
       array.splice(0, array.length);
     }
     this._mapper.dispose();
-    this.collection.dispose();
+    this._mapper = null;
     kb.release(this._filters);
+    this._comparator(null);
+    this.collection.dispose();
+    observable.collection = this.collection = null;
     observable.collection = null;
     kb.utils.wrappedDestroy(this);
     return !kb.statistics || kb.statistics.unregister('CollectionObservable', this);
@@ -7623,6 +7620,12 @@ kb.CollectionObservable = (function() {
       attribute_name = _unwrapObservable(sort_attribute);
       value_a = model_a.get(attribute_name);
       value_b = model_b.get(attribute_name);
+      if (_.isString(value_a)) {
+        return value_a.localeCompare(value_b);
+      }
+      if (_.isString(value_b)) {
+        return value_b.localeCompare(value_a);
+      }
       if (typeof value_a !== "object") {
         return (value_a === value_b ? COMPARE_EQUAL : (value_a < value_b ? COMPARE_ASCENDING : COMPARE_DESCENDING));
       }
