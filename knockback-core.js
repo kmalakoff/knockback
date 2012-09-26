@@ -1641,10 +1641,10 @@ kb.CollectionObservable = (function() {
     (this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || _throwUnexpected(this, 'incorrect type passed');
     observable = kb.utils.wrappedObservable(this);
     collection = this._collection();
-    if (!collection || (collection.models === models_or_view_models)) {
+    has_filters = this._filters().length;
+    if (!collection) {
       return;
     }
-    has_filters = this._filters().length;
     view_models = models_or_view_models;
     if (this.models_only) {
       if (has_filters) {
@@ -1670,7 +1670,7 @@ kb.CollectionObservable = (function() {
     }
     this.in_edit++;
     (models_or_view_models.length === view_models.length) || observable(view_models);
-    collection.reset(models);
+    _.isEqual(collection.models, models) || collection.reset(models);
     this.in_edit--;
   };
 

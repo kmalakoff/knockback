@@ -343,8 +343,8 @@ class kb.CollectionObservable
 
     observable = kb.utils.wrappedObservable(@)
     collection = @_collection()
-    return if not collection or (collection.models is models_or_view_models) # no collection or we are updating ourselves
     has_filters = @_filters().length
+    return if not collection # no collection or we are updating ourselves
     view_models = models_or_view_models
 
     # set Models
@@ -368,7 +368,7 @@ class kb.CollectionObservable
     # a change, update models
     @in_edit++
     (models_or_view_models.length is view_models.length) or observable(view_models) # replace the ViewModels because they were filtered
-    collection.reset(models)
+    _.isEqual(collection.models, models) or collection.reset(models)
     @in_edit--
     return
 
