@@ -21,7 +21,7 @@ class kb.DefaultObservable
   constructor: (target_observable, @dv) -> # @dv is default value
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        return if (current_target = ko.utils.unwrapObservable(target_observable())) then current_target else ko.utils.unwrapObservable(@dv)
+        return if (current_target = _unwrapObservable(target_observable())) then current_target else _unwrapObservable(@dv)
       write: (value) -> target_observable(value)
     }))
 
@@ -41,5 +41,5 @@ class kb.DefaultObservable
 
 kb.defaultObservable = (target, default_value) -> return new kb.DefaultObservable(target, default_value)
 kb.defaultWrapper = (target, default_value) ->
-  legacyWarning('ko.defaultWrapper', '0.16.3', 'Please use kb.defaultObservable instead')
+  _legacyWarning('ko.defaultWrapper', '0.16.3', 'Please use kb.defaultObservable instead')
   return new kb.DefaultObservable(target, default_value)

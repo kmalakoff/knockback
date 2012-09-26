@@ -153,9 +153,9 @@ class kb.Store
       return @register(obj, observable, {creator: creator})
     else
       record = @observable_records[index]
-      (kb.utils.wrappedObject(record.observable) is obj) or throwUnexpected(@, 'different object') # same object
+      (kb.utils.wrappedObject(record.observable) is obj) or _throwUnexpected(@, 'different object') # same object
       if (record.observable isnt observable) # a change
-        (record.observable.constructor is observable.constructor) or throwUnexpected(@, 'replacing different type')
+        (record.observable.constructor is observable.constructor) or _throwUnexpected(@, 'replacing different type')
 
         # put the previous observable on the destroy list (but don't release until the store is released)
         @replaced_observables.push(record.observable)

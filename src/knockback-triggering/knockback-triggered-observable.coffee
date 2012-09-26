@@ -33,8 +33,8 @@ class kb.TriggeredObservable
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (emitter, @event_selector) ->
-    emitter or throwMissing(this, 'emitter')
-    @event_selector or throwMissing(this, 'event_selector')
+    emitter or _throwMissing(this, 'emitter')
+    @event_selector or _throwMissing(this, 'event_selector')
 
     # internal state
     @vo = ko.observable()

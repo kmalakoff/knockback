@@ -22,7 +22,7 @@ kb.valid =
 kb.hasChangedFn = (model) ->
   m = null; attributes = null
   return ->
-    if m isnt (current_model = ko.utils.unwrapObservable(model)) # change in model
+    if m isnt (current_model = _unwrapObservable(model)) # change in model
       m = current_model
       attributes = (if m then m.toJSON() else null)
       return false
@@ -34,7 +34,7 @@ kb.minLengthFn = (length) ->
 
 kb.uniqueValueFn = (model, key, collection) ->
   return (value) ->
-    m = ko.utils.unwrapObservable(model); k = ko.utils.unwrapObservable(key); c = ko.utils.unwrapObservable(collection)
+    m = _unwrapObservable(model); k = _unwrapObservable(key); c = _unwrapObservable(collection)
     return false if not (m and k and c)
     return !!_.find(c.models, (test) => (test isnt m) and test.get(k) is value)
 
@@ -42,14 +42,14 @@ kb.untilTrueFn = (stand_in, fn, model) ->
   was_true = false
   model.subscribe(-> was_true = false) if model and ko.isObservable(model) # reset if the model changes
   return (value) ->
-    return ko.utils.unwrapObservable(stand_in) unless (f = ko.utils.unwrapObservable(fn))
-    was_true |= !!(result = f(ko.utils.unwrapObservable(value)))
-    return (if was_true then result else ko.utils.unwrapObservable(stand_in))
+    return _unwrapObservable(stand_in) unless (f = _unwrapObservable(fn))
+    was_true |= !!(result = f(_unwrapObservable(value)))
+    return (if was_true then result else _unwrapObservable(stand_in))
 
 kb.untilFalseFn = (stand_in, fn, model) ->
   was_false = false
   model.subscribe(-> was_false = false) if model and ko.isObservable(model) # reset if the model changes
   return (value) ->
-    return ko.utils.unwrapObservable(stand_in) unless (f = ko.utils.unwrapObservable(fn))
-    was_false |= !(result = f(ko.utils.unwrapObservable(value)))
-    return (if was_false then result else ko.utils.unwrapObservable(stand_in))
+    return _unwrapObservable(stand_in) unless (f = _unwrapObservable(fn))
+    was_false |= !(result = f(_unwrapObservable(value)))
+    return (if was_false then result else _unwrapObservable(stand_in))

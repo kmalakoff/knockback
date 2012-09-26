@@ -25,7 +25,7 @@ class kb.EventWatcher
   # @option options [String] key the optional key to filter update attribute events.
   @useOptionsOrCreate: (options, emitter, obj, callback_options) ->
     if options.event_watcher
-      throwUnexpected(@, 'emitter not matching') unless (options.event_watcher.emitter() is emitter or (options.event_watcher.model_ref is emitter))
+      _throwUnexpected(@, 'emitter not matching') unless (options.event_watcher.emitter() is emitter or (options.event_watcher.model_ref is emitter))
       return kb.utils.wrappedEventWatcher(obj, options.event_watcher).registerCallbacks(obj, callback_options)
     else
       kb.utils.wrappedEventWatcherIsOwned(obj, true)
@@ -95,8 +95,8 @@ class kb.EventWatcher
   # @option options [String] emitter_name the name of the emitter.
   # @option options [String] key the optional key to filter update attribute events.
   registerCallbacks: (obj, callback_info) ->
-    obj or throwMissing(this, 'obj')
-    callback_info or throwMissing(this, 'info')
+    obj or _throwMissing(this, 'obj')
+    callback_info or _throwMissing(this, 'info')
     event_selector = if callback_info.event_selector then callback_info.event_selector else 'change'
     event_names = event_selector.split(' ')
     for event_name in event_names
@@ -113,7 +113,7 @@ class kb.EventWatcher
               if info.update and not info.rel_fn
 
                 # key doesn't match
-                continue if emitter and info.key and (emitter.hasChanged and not emitter.hasChanged(ko.utils.unwrapObservable(info.key)))
+                continue if emitter and info.key and (emitter.hasChanged and not emitter.hasChanged(_unwrapObservable(info.key)))
 
                 # trigger update
                 not kb.statistics or addStatisticsEvent(emitter, event_name, info)
@@ -188,7 +188,7 @@ class kb.EventWatcher
   # @private
   _modelBindRelatationalInfo: (event_name, info) ->
     if (event_name is 'change') and info.key and info.update
-      key = ko.utils.unwrapObservable(info.key)
+      key = _unwrapObservable(info.key)
       relation = _.find(@ee.getRelations(), (test) -> return test.key is key)
       return unless relation
       info.rel_fn = (emitter) ->

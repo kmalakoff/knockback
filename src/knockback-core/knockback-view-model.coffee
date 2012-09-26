@@ -78,7 +78,7 @@ class kb.ViewModel
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) ->
-    not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or throwUnexpected(@, 'not a model')
+    not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
 
     options or= {}
     view_model or= {}
@@ -110,7 +110,7 @@ class kb.ViewModel
         return if (kb.utils.wrappedObject(@) is new_model) # no change
 
         # SHARED NULL MODEL - keep it that way
-        (not new_model or throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
+        (not new_model or _throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
 
         # update references
         kb.utils.wrappedObject(@, new_model)
@@ -214,5 +214,5 @@ class kb.ViewModel
 #
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
 kb.observables = (model, binding_info, view_model) ->
-  legacyWarning('kb.observables', '0.16.0', 'Please use kb.viewModel instead')
+  _legacyWarning('kb.observables', '0.16.0', 'Please use kb.viewModel instead')
   return new kb.ViewModel(model, binding_info, view_model)

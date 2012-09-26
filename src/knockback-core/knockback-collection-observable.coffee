@@ -69,7 +69,7 @@ class kb.CollectionObservable
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
   constructor: (collection, options) ->
-    not collection or (collection instanceof Backbone.Collection) or throwUnexpected(@, 'not a collection')
+    not collection or (collection instanceof Backbone.Collection) or _throwUnexpected(@, 'not a collection')
 
     options or= {}
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
@@ -86,7 +86,7 @@ class kb.CollectionObservable
       @_comparator = ko.observable(@_attributeComparator(options.sort_attribute))
     else
       if options.sorted_index
-        legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
+        _legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
       @_comparator = ko.observable(options.comparator)
     if options.filters
       @_filters = ko.observableArray(if _.isArray(options.filters) then options.filters else [options.filters] if options.filters)
@@ -224,7 +224,7 @@ class kb.CollectionObservable
   comparator: (comparator) -> @_comparator(comparator)
 
   # @deprecated
-  sortedIndex: -> legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
+  sortedIndex: -> _legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
 
   # Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
@@ -338,7 +338,7 @@ class kb.CollectionObservable
     return if @in_edit # we are doing the editing
 
     # validate input
-    (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or throwUnexpected(@, 'incorrect type passed')
+    (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or _throwUnexpected(@, 'incorrect type passed')
 
     observable = kb.utils.wrappedObservable(@)
     collection = @_collection()
@@ -374,7 +374,7 @@ class kb.CollectionObservable
   # @private
   _attributeComparator: (sort_attribute) ->
     modelAttributeCompare = (model_a, model_b) ->
-      attribute_name = ko.utils.unwrapObservable(sort_attribute)
+      attribute_name = _unwrapObservable(sort_attribute)
       value_a = model_a.get(attribute_name); value_b = model_b.get(attribute_name)
 
       # Non-object compare just comparing raw values
@@ -394,7 +394,7 @@ class kb.CollectionObservable
   _modelIsFiltered: (model) ->
     filters = @_filters()
     for filter in filters
-      filter = ko.utils.unwrapObservable(filter)
+      filter = _unwrapObservable(filter)
       if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
         return true
     return false

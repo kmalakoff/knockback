@@ -12,7 +12,7 @@ kb.toFormattedString = (format) ->
   result = format.slice()
   args = arraySlice.call(arguments, 1)
   for index, arg of args
-    value = ko.utils.unwrapObservable(arg)
+    value = _unwrapObservable(arg)
     value or= ''
 
     parameter_index = format.indexOf("\{#{index}\}")
@@ -78,11 +78,11 @@ class kb.FormattedObservable
 
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: ->
-        args = [ko.utils.unwrapObservable(format)]
-        args.push(ko.utils.unwrapObservable(arg)) for arg in observable_args
+        args = [_unwrapObservable(format)]
+        args.push(_unwrapObservable(arg)) for arg in observable_args
         return kb.toFormattedString.apply(null, args)
       write: (value) ->
-        matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format))
+        matches = kb.parseFormattedString(value, _unwrapObservable(format))
         max_count = Math.min(observable_args.length, matches.length); index = 0
         while (index<max_count)
           observable_args[index](matches[index])

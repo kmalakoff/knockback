@@ -17,13 +17,13 @@ _wrappedKey = (obj, key, value) ->
     return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
 
   # set
-  obj or throwUnexpected(@, "no obj for wrapping #{key}")
+  obj or _throwUnexpected(@, "no obj for wrapping #{key}")
   obj.__kb or= {}
   obj.__kb[key] = value
   return value
 
 _argumentsAddKey = (args, key) ->
-  arraySplice.call(args, 1, 0, key)
+  _arraySplice.call(args, 1, 0, key)
   return args
 
 # used for attribute setting to ensure all model attributes have their underlying models
@@ -223,7 +223,7 @@ class kb.utils
 
     # infer Backbone.Relational types
     if owner and Backbone.RelationalModel and (owner instanceof Backbone.RelationalModel)
-      key = ko.utils.unwrapObservable(key)
+      key = _unwrapObservable(key)
       relation = _.find(owner.getRelations(), (test) -> return test.key is key)
       if relation
         return if (relation.collectionType or _.isArray(relation.keyContents)) then kb.CollectionObservable else kb.ViewModel
@@ -262,5 +262,5 @@ class kb.utils
   # @deprecated please use kb.release instead
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   @release = (obj) ->
-    legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
+    _legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
     return kb.release(obj)

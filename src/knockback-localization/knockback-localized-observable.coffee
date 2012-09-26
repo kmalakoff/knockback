@@ -64,8 +64,8 @@ class kb.LocalizedObservable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (@value, options, @vm) -> # @vm is view_model
     options or= {}; @vm or= {}
-    @read or throwMissing(this, 'read')
-    kb.locale_manager or throwMissing(this, 'kb.locale_manager')
+    @read or _throwMissing(this, 'read')
+    kb.locale_manager or _throwMissing(this, 'kb.locale_manager')
 
     # bind callbacks
     @__kb or= {}
@@ -73,17 +73,17 @@ class kb.LocalizedObservable
     @__kb._onChange = options.onChange
 
     # internal state
-    value = ko.utils.unwrapObservable(@value) if @value
+    value = _unwrapObservable(@value) if @value
     @vo = ko.observable(if not value then null else @read(value, null))
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        ko.utils.unwrapObservable(@value) if @value
+        _unwrapObservable(@value) if @value
         @vo() # create a depdenency
-        return @read(ko.utils.unwrapObservable(@value))
+        return @read(_unwrapObservable(@value))
 
       write: (value) =>
-        @write or throwUnexpected(@, 'writing to read-only')
-        @write(value, ko.utils.unwrapObservable(@value))
+        @write or _throwUnexpected(@, 'writing to read-only')
+        @write(value, _unwrapObservable(@value))
         @vo(value)
         @__kb._onChange(value) if @__kb._onChange
 
@@ -113,7 +113,7 @@ class kb.LocalizedObservable
   # Used to reset the value if localization is not possible.
   resetToCurrent: ->
     observable = kb.utils.wrappedObservable(@)
-    current_value = if @value then @read(ko.utils.unwrapObservable(@value)) else null
+    current_value = if @value then @read(_unwrapObservable(@value)) else null
     return if observable() is current_value
     observable(current_value)
 
@@ -129,7 +129,7 @@ class kb.LocalizedObservable
 
   # @private
   _onLocaleChange: ->
-    value = @read(ko.utils.unwrapObservable(@value))
+    value = @read(_unwrapObservable(@value))
     @vo(value)
     @__kb._onChange(value) if @__kb._onChange
 

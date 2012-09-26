@@ -48,7 +48,7 @@ class kb.Observable
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (model, options, @vm) ->
-    options or throwMissing(this, 'options')
+    options or _throwMissing(this, 'options')
     @vm or = {}
 
     # copy create options
@@ -58,7 +58,7 @@ class kb.Observable
       create_options = @create_options = collapseOptions(options)
 
     # extract options
-    @key = create_options.key; delete create_options.key; @key or throwMissing(this, 'key')
+    @key = create_options.key; delete create_options.key; @key or _throwMissing(this, 'key')
     not create_options.args or (@args = create_options.args; delete create_options.args)
     not create_options.read or (@read = create_options.read; delete create_options.read)
     not create_options.write or (@write = create_options.write; delete create_options.write)
@@ -71,9 +71,9 @@ class kb.Observable
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
         # create dependencies if needed
-        args = [ko.utils.unwrapObservable(@key)]
+        args = [_unwrapObservable(@key)]
         if @args
-          if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
+          if _.isArray(@args) then (args.push(_unwrapObservable(arg)) for arg in @args) else args.push(_unwrapObservable(@args))
 
         # read and update
         if (@_mdl is @_model() and @_mdl) # maybe not yet initialized
@@ -81,15 +81,15 @@ class kb.Observable
           @update(new_value)
 
         # get the observable
-        return ko.utils.unwrapObservable(@vo())
+        return _unwrapObservable(@vo())
 
       write: (new_value) =>
         # set on model
         unwrapped_new_value = _unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
-        set_info = {}; set_info[ko.utils.unwrapObservable(@key)] = unwrapped_new_value
+        set_info = {}; set_info[_unwrapObservable(@key)] = unwrapped_new_value
         args = if @write then [unwrapped_new_value] else [set_info]
         if @args
-          if _.isArray(@args) then (args.push(ko.utils.unwrapObservable(arg)) for arg in @args) else args.push(ko.utils.unwrapObservable(@args))
+          if _.isArray(@args) then (args.push(_unwrapObservable(arg)) for arg in @args) else args.push(_unwrapObservable(@args))
 
         # write
         if @_mdl # maybe not yet initialized
@@ -168,7 +168,7 @@ class kb.Observable
     return if @__kb_destroyed # destroyed, nothing to do
 
     # determine the new type
-    new_value = @_mdl.get(ko.utils.unwrapObservable(@key)) if @_mdl and not arguments.length
+    new_value = @_mdl.get(_unwrapObservable(@key)) if @_mdl and not arguments.length
     (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 

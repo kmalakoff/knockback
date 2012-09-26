@@ -136,8 +136,8 @@ class kb
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @releaseOnNodeRemove = (view_model, node) ->
-    view_model or throwUnexpected(@, 'missing view model')
-    node or throwUnexpected(@, 'missing node')
+    view_model or _throwUnexpected(@, 'missing view model')
+    node or _throwUnexpected(@, 'missing node')
     ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
 
   # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
@@ -156,7 +156,7 @@ class kb
 
   # @deprecated Use kb.renderTemplate
   @renderAutoReleasedTemplate = (template, view_model, options={}) ->
-    legacyWarning('kb.renderAutoReleasedTemplate', '0.16.3', 'Please use kb.renderTemplate instead')
+    _legacyWarning('kb.renderAutoReleasedTemplate', '0.16.3', 'Please use kb.renderTemplate instead')
     @renderTemplate(template, view_model, options={})
 
   # Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
@@ -185,16 +185,18 @@ kb.ko = ko = if not @ko and (typeof(require) isnt 'undefined') then require('kno
 ####################################
 # INTERNAL HELPERS
 ####################################
-throwMissing = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
-throwUnexpected = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is unexpected"
+_throwMissing = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
+_throwUnexpected = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is unexpected"
 
-legacyWarning = (identifier, last_version, message) ->
+_legacyWarning = (identifier, last_version, message) ->
   @_legacy_warnings or= {}
   @_legacy_warnings[identifier] or= 0
   @_legacy_warnings[identifier]++
   console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
 
-arraySplice = Array.prototype.splice
+_arraySplice = Array.prototype.splice
+
+_unwrapObservable = ko.utils.unwrapObservable
 
 collapseOptions = (options) ->
   result = _.clone(options)

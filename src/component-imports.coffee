@@ -5,3 +5,5 @@ ko = kb.ko
 
 # module
 @Knockback = @kb = kb; module.exports = kb if (typeof(exports) isnt 'undefined')
+
+_unwrapObservable = ko.utils.unwrapObservable
