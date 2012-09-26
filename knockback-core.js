@@ -1684,6 +1684,12 @@ kb.CollectionObservable = (function() {
       attribute_name = _unwrapObservable(sort_attribute);
       value_a = model_a.get(attribute_name);
       value_b = model_b.get(attribute_name);
+      if (_.isString(value_a)) {
+        return value_a.localeCompare(value_b);
+      }
+      if (_.isString(value_b)) {
+        return value_b.localeCompare(value_a);
+      }
       if (typeof value_a !== "object") {
         return (value_a === value_b ? COMPARE_EQUAL : (value_a < value_b ? COMPARE_ASCENDING : COMPARE_DESCENDING));
       }

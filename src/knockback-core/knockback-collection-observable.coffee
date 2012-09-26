@@ -377,6 +377,10 @@ class kb.CollectionObservable
       attribute_name = _unwrapObservable(sort_attribute)
       value_a = model_a.get(attribute_name); value_b = model_b.get(attribute_name)
 
+      # String compare
+      return value_a.localeCompare(value_b) if _.isString(value_a)
+      return value_b.localeCompare(value_a) if _.isString(value_b)
+
       # Non-object compare just comparing raw values
       if typeof (value_a) isnt "object"
         return (if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING))
