@@ -228,24 +228,23 @@ $(->
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   )
 
-  test("7. Collection sync sorting with sorted_index_fn", ->
+  test("7. Collection sync sorting with comparator", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    class SortWrapper
-      constructor: (value) ->
-        @parts = value.split('-')
-      compare: (that) ->
-        return (that.parts.length-@parts.length) if @parts.length != that.parts.length
-        for index, part of @parts
-          diff = that.parts[index] - Math.parseInt(part, 10)
-          return diff unless diff is 0
-        return 0
+    sortNumber = (model_a, model_b) ->
+      parts_a = kb.utils.wrappedModel(model_a).get('number').split('-')
+      parts_b = kb.utils.wrappedModel(model_b).get('number').split('-')
+
+      return (parts_a.length-parts_b.length) if parts_a.length isnt parts_b.length
+      for index, part of parts_b
+        return delta unless (delta = parts_a[index] - parseInt(part, 10)) is 0
+      return 0
 
     # without view models
     collection = new kb.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      models_only:              true
-      sorted_index_fn:          kb.siwa('number', SortWrapper)
+      models_only:  true
+      comparator:   sortNumber
     })
     collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
     collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
@@ -262,8 +261,8 @@ $(->
     # with view models
     collection = new kb.ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
-      view_model:         ContactViewModelClass
-      sorted_index_fn:       kb.siwa('number', SortWrapper)
+      view_model:   ContactViewModelClass
+      comparator:   sortNumber
     })
     collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
     collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
@@ -351,7 +350,7 @@ $(->
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'Ringo', "Ringo is first - no sorting")
     equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'George', "George is first - no sorting")
 
-    collection_observable.sortedIndex(((view_models, vm) -> _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'))), 'name')
+    collection_observable.sortAttribute('name')
     equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     equal(collection.models[1].get('name'), 'George', "George is second")
     equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")

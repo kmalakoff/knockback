@@ -24,7 +24,7 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
+var Backbone, COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, arraySplice, collapseOptions, kb, ko, legacyWarning, onReady, throwMissing, throwUnexpected, _, _argumentsAddKey, _unwrapModels, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -1364,6 +1364,12 @@ kb.observables = function(model, binding_info, view_model) {
 */
 
 
+COMPARE_EQUAL = 0;
+
+COMPARE_ASCENDING = -1;
+
+COMPARE_DESCENDING = 1;
+
 kb.CollectionObservable = (function() {
 
   CollectionObservable.extend = Backbone.Model.extend;
@@ -1380,13 +1386,12 @@ kb.CollectionObservable = (function() {
     this.__kb._onCollectionChange = _.bind(this._onCollectionChange, this);
     options = collapseOptions(options);
     if (options.sort_attribute) {
-      this._sorted_index = ko.observable(this._sortAttributeFn(options.sort_attribute));
+      this._comparator = ko.observable(this._attributeComparator(options.sort_attribute));
     } else {
       if (options.sorted_index) {
-        legacyWarning(this, '0.16.3', 'use sorted_index_fn instead');
-        options.sorted_index_fn = options.sorted_index;
+        legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead');
       }
-      this._sorted_index = ko.observable(options.sorted_index_fn);
+      this._comparator = ko.observable(options.comparator);
     }
     if (options.filters) {
       this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : void 0);
@@ -1406,7 +1411,7 @@ kb.CollectionObservable = (function() {
     observable.destroy = _.bind(this.destroy, this);
     observable.shareOptions = _.bind(this.shareOptions, this);
     observable.filters = _.bind(this.filters, this);
-    observable.sortedIndex = _.bind(this.sortedIndex, this);
+    observable.comparator = _.bind(this.comparator, this);
     observable.sortAttribute = _.bind(this.sortAttribute, this);
     observable.viewModelByModel = _.bind(this.viewModelByModel, this);
     observable.hasViewModels = _.bind(this.hasViewModels, this);
@@ -1433,17 +1438,17 @@ kb.CollectionObservable = (function() {
       collection.bind('all', this.__kb._onCollectionChange);
     }
     this._mapper = ko.dependentObservable(function() {
-      var current_collection, filters, model, models, sorted_index_fn, view_model, view_models, _i, _len;
+      var comparator, current_collection, filters, models, view_models;
+      comparator = _this._comparator();
+      filters = _this._filters();
+      current_collection = _this._collection();
       if (_this.in_edit) {
         return;
       }
       observable = kb.utils.wrappedObservable(_this);
-      current_collection = _this._collection();
       if (current_collection) {
         models = current_collection.models;
       }
-      sorted_index_fn = _this._sorted_index();
-      filters = _this._filters();
       if (!models || (current_collection.models.length === 0)) {
         view_models = [];
       } else {
@@ -1452,13 +1457,10 @@ kb.CollectionObservable = (function() {
             return !_this._modelIsFiltered(model);
           });
         }
-        if (sorted_index_fn) {
-          view_models = [];
-          for (_i = 0, _len = models.length; _i < _len; _i++) {
-            model = models[_i];
-            view_model = _this._createViewModel(model);
-            view_models.splice(sorted_index_fn(view_models, view_model), 0, view_model);
-          }
+        if (comparator) {
+          view_models = _.map(models, function(model) {
+            return _this._createViewModel(model);
+          }).sort(comparator);
         } else {
           if (_this.models_only) {
             view_models = filters.length ? models : models.slice();
@@ -1512,12 +1514,16 @@ kb.CollectionObservable = (function() {
     }
   };
 
-  CollectionObservable.prototype.sortedIndex = function(sorted_index_fn) {
-    return this._sorted_index(sorted_index_fn);
+  CollectionObservable.prototype.comparator = function(comparator) {
+    return this._comparator(comparator);
+  };
+
+  CollectionObservable.prototype.sortedIndex = function() {
+    return legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead');
   };
 
   CollectionObservable.prototype.sortAttribute = function(sort_attribute) {
-    return this._sorted_index(sort_attribute ? this._sortAttributeFn(sort_attribute) : null);
+    return this._comparator(sort_attribute ? this._attributeComparator(sort_attribute) : null);
   };
 
   CollectionObservable.prototype.viewModelByModel = function(model) {
@@ -1576,16 +1582,13 @@ kb.CollectionObservable = (function() {
   };
 
   CollectionObservable.prototype._onCollectionChange = function(event, arg) {
-    var add_index, collection, observable, sorted_index_fn, view_model;
+    var collection, comparator, observable, view_model;
     if (this.in_edit) {
       return;
     }
     switch (event) {
       case 'reset':
       case 'resort':
-        if (event === 'resort' && !this._sorted_index()) {
-          return;
-        }
         return this._collection.notifySubscribers(this._collection());
       case 'new':
       case 'add':
@@ -1595,13 +1598,13 @@ kb.CollectionObservable = (function() {
         observable = kb.utils.wrappedObservable(this);
         collection = this._collection();
         view_model = this._createViewModel(arg);
-        if ((sorted_index_fn = this._sorted_index())) {
-          add_index = sorted_index_fn(observable(), view_model);
-        } else {
-          add_index = collection.indexOf(arg);
-        }
         this.in_edit++;
-        observable.splice(add_index, 0, view_model);
+        if ((comparator = this._comparator())) {
+          observable().push(view_model);
+          observable.sort(comparator);
+        } else {
+          observable.splice(collection.indexOf(arg), 0, view_model);
+        }
         return this.in_edit--;
       case 'remove':
       case 'destroy':
@@ -1609,8 +1612,11 @@ kb.CollectionObservable = (function() {
       case 'change':
         if (this._modelIsFiltered(arg)) {
           return this._onModelRemove(arg);
-        } else if (this._sorted_index()) {
-          return this._onModelResort(arg);
+        } else if (comparator = this._comparator()) {
+          observable = kb.utils.wrappedObservable(this);
+          this.in_edit++;
+          observable.sort(comparator);
+          return this.in_edit--;
         }
     }
   };
@@ -1624,27 +1630,6 @@ kb.CollectionObservable = (function() {
     observable = kb.utils.wrappedObservable(this);
     this.in_edit++;
     observable.remove(view_model);
-    return this.in_edit--;
-  };
-
-  CollectionObservable.prototype._onModelResort = function(model) {
-    var new_index, observable, previous_index, sorted_index_fn, sorted_view_models, view_model;
-    observable = kb.utils.wrappedObservable(this);
-    view_model = this.models_only ? model : this.viewModelByModel(model);
-    previous_index = observable.indexOf(view_model);
-    if ((sorted_index_fn = this._sorted_index())) {
-      sorted_view_models = _.clone(observable());
-      sorted_view_models.splice(previous_index, 1);
-      new_index = sorted_index_fn(sorted_view_models, view_model);
-    } else {
-      new_index = this._collection().indexOf(model);
-    }
-    if (previous_index === new_index) {
-      return;
-    }
-    this.in_edit++;
-    observable.splice(previous_index, 1);
-    observable.splice(new_index, 0, view_model);
     return this.in_edit--;
   };
 
@@ -1690,24 +1675,29 @@ kb.CollectionObservable = (function() {
     this.in_edit--;
   };
 
-  CollectionObservable.prototype._sortAttributeFn = function(sort_attribute) {
-    if (this.models_only) {
-      return function(models, model) {
-        var attribute_name;
-        attribute_name = ko.utils.unwrapObservable(sort_attribute);
-        return _.sortedIndex(models, model, function(test) {
-          return test.get(attribute_name);
-        });
-      };
-    } else {
-      return function(view_models, model) {
-        var attribute_name;
-        attribute_name = ko.utils.unwrapObservable(sort_attribute);
-        return _.sortedIndex(view_models, model, function(test) {
-          return kb.utils.wrappedModel(test).get(attribute_name);
-        });
-      };
-    }
+  CollectionObservable.prototype._attributeComparator = function(sort_attribute) {
+    var modelAttributeCompare;
+    modelAttributeCompare = function(model_a, model_b) {
+      var attribute_name, value_a, value_b;
+      attribute_name = ko.utils.unwrapObservable(sort_attribute);
+      value_a = model_a.get(attribute_name);
+      value_b = model_b.get(attribute_name);
+      if (typeof value_a !== "object") {
+        return (value_a === value_b ? COMPARE_EQUAL : (value_a < value_b ? COMPARE_ASCENDING : COMPARE_DESCENDING));
+      }
+      if (value_a === value_b) {
+        return COMPARE_EQUAL;
+      } else {
+        if (value_a < value_b) {
+          return COMPARE_ASCENDING;
+        } else {
+          return COMPARE_DESCENDING;
+        }
+      }
+    };
+    return (this.models_only ? modelAttributeCompare : function(model_a, model_b) {
+      return modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b));
+    });
   };
 
   CollectionObservable.prototype._createViewModel = function(model) {
@@ -1737,14 +1727,6 @@ kb.CollectionObservable = (function() {
 
 kb.collectionObservable = function(collection, options) {
   return new kb.CollectionObservable(collection, options);
-};
-
-kb.sortedIndexWrapAttr = kb.siwa = function(attribute_name, wrapper_constructor) {
-  return function(models, model) {
-    return _.sortedIndex(models, model, function(test) {
-      return new wrapper_constructor(kb.utils.wrappedModel(test).get(attribute_name));
-    });
-  };
 };
 
 /*

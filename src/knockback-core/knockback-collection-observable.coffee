@@ -6,6 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+COMPARE_EQUAL = 0
+COMPARE_ASCENDING = -1
+COMPARE_DESCENDING = 1
+
 # Base class for observing collections.
 #
 # @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
@@ -55,7 +59,7 @@ class kb.CollectionObservable
   # @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
   # @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
   # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
-  # @option options [Function] sorted_index_fn a function that returns an index where to insert the model. Signature: function(models, model)
+  # @option options [Function] comparator a function that is used to sort an object. Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
   # @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
   # @option options [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
   # @option options [String] path the path to the value (used to create related observables from the factory).
@@ -79,12 +83,11 @@ class kb.CollectionObservable
     # options
     options = collapseOptions(options)
     if options.sort_attribute
-      @_sorted_index = ko.observable(@_sortAttributeFn(options.sort_attribute))
+      @_comparator = ko.observable(@_attributeComparator(options.sort_attribute))
     else
       if options.sorted_index
-        legacyWarning(this, '0.16.3', 'use sorted_index_fn instead')
-        options.sorted_index_fn = options.sorted_index
-      @_sorted_index = ko.observable(options.sorted_index_fn)
+        legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
+      @_comparator = ko.observable(options.comparator)
     if options.filters
       @_filters = ko.observableArray(if _.isArray(options.filters) then options.filters else [options.filters] if options.filters)
     else
@@ -104,7 +107,7 @@ class kb.CollectionObservable
     observable.destroy = _.bind(@destroy, @)
     observable.shareOptions = _.bind(@shareOptions, @)
     observable.filters = _.bind(@filters, @)
-    observable.sortedIndex = _.bind(@sortedIndex, @)
+    observable.comparator = _.bind(@comparator, @)
     observable.sortAttribute = _.bind(@sortAttribute, @)
     observable.viewModelByModel = _.bind(@viewModelByModel, @)
     observable.hasViewModels = _.bind(@hasViewModels, @)
@@ -129,16 +132,14 @@ class kb.CollectionObservable
 
     # observable that will re-trigger when sort or filters or collection changes
     @_mapper = ko.dependentObservable(=>
+      comparator = @_comparator() # create dependency
+      filters = @_filters() # create dependency
+      current_collection = @_collection() # create dependency
       return if @in_edit # we are doing the editing
-      observable = kb.utils.wrappedObservable(@)
-
-      # get the filters, sorting, models and create a dependency
-      current_collection = @_collection()
-      models = current_collection.models if current_collection
-      sorted_index_fn = @_sorted_index()
-      filters = @_filters()
 
       # no models
+      observable = kb.utils.wrappedObservable(@)
+      models = current_collection.models if current_collection
       if not models or (current_collection.models.length is 0)
         view_models = []
 
@@ -148,16 +149,13 @@ class kb.CollectionObservable
         models = _.filter(models, (model) => not @_modelIsFiltered(model)) if filters.length
 
         # apply sorting
-        if sorted_index_fn
-          view_models = []
-          for model in models
-            view_model = @_createViewModel(model)
-            view_models.splice(sorted_index_fn(view_models, view_model), 0, view_model)
+        if comparator
+          view_models = _.map(models, (model) => @_createViewModel(model)).sort(comparator)
 
         # no sorting
         else
           if @models_only
-            view_models = if filters.length then models else models.slice() # may need to clone so array isn't shared
+            view_models = if filters.length then models else models.slice() # clone the array if it wasn't filtered
           else
             view_models = _.map(models, (model) => @_createViewModel(model))
 
@@ -203,12 +201,8 @@ class kb.CollectionObservable
   # @param [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
   #
   # @example
-  #    // change the sorting function
-  #    collection_observable.sortedIndex(
-  #      function(view_models, vm){
-  #        return _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
-  #      }
-  #    );
+  #    // exclude a single model by id
+  #    collection_observable.filters(model.id);
   filters: (filters) ->
     if filters
       @_filters(if _.isArray(filters) then filters else [filters])
@@ -217,16 +211,20 @@ class kb.CollectionObservable
 
   # Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
-  # @param [Function] sorted_index_fn a function that returns an index where to insert the model. Signature: function(models, model)
+  # @param [Function] comparator a function that returns an index where to insert the model. Signature: function(models, model)
+  # @param [Function] comparator a function that is used to sort an object. Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
   #
   # @example
   #    // change the sorting function
-  #    collection_observable.sortedIndex(
+  #    collection_observable.comparator(
   #      function(view_models, vm){
-  #        return _.sortedIndex(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
+  #        return _.comparator(view_models, vm, (test) -> kb.utils.wrappedModel(test).get('name'));
   #      }
   #    );
-  sortedIndex: (sorted_index_fn) -> @_sorted_index(sorted_index_fn)
+  comparator: (comparator) -> @_comparator(comparator)
+
+  # @deprecated
+  sortedIndex: -> legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
 
   # Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
@@ -237,7 +235,7 @@ class kb.CollectionObservable
   #    // in order of Zanadu then Alex
   #    todos.sortAttribute('name');
   #    // in order of Alex then Zanadu
-  sortAttribute: (sort_attribute) -> @_sorted_index(if sort_attribute then @_sortAttributeFn(sort_attribute) else null)
+  sortAttribute: (sort_attribute) -> @_comparator(if sort_attribute then @_attributeComparator(sort_attribute) else null)
 
   # Reverse lookup for a view model by model. If created with models_only option, will return null.
   viewModelByModel: (model) ->
@@ -297,7 +295,6 @@ class kb.CollectionObservable
 
     switch event
       when 'reset', 'resort'
-        return if event is 'resort' and not @_sorted_index() # no sorting
         @_collection.notifySubscribers(@_collection())
 
       when 'new', 'add'
@@ -306,13 +303,12 @@ class kb.CollectionObservable
         observable = kb.utils.wrappedObservable(@)
         collection = @_collection()
         view_model = @_createViewModel(arg)
-        if (sorted_index_fn = @_sorted_index())
-          add_index = sorted_index_fn(observable(), view_model)
-        else
-          add_index = collection.indexOf(arg)
-
         @in_edit++
-        observable.splice(add_index, 0, view_model)
+        if (comparator = @_comparator())
+          observable().push(view_model)
+          observable.sort(comparator)
+        else
+          observable.splice(collection.indexOf(arg), 0, view_model)
         @in_edit--
 
       when 'remove', 'destroy' then @_onModelRemove(arg)
@@ -322,8 +318,11 @@ class kb.CollectionObservable
           @_onModelRemove(arg)
 
         # resort if needed
-        else if @_sorted_index()
-          @_onModelResort(arg)
+        else if comparator = @_comparator()
+          observable = kb.utils.wrappedObservable(@)
+          @in_edit++
+          observable.sort(comparator)
+          @in_edit--
 
   # @private
   _onModelRemove: (model) ->
@@ -332,25 +331,6 @@ class kb.CollectionObservable
     observable = kb.utils.wrappedObservable(@)
     @in_edit++
     observable.remove(view_model)
-    @in_edit--
-
-  # @private
-  _onModelResort: (model) ->
-    # either move a view model or a model
-    observable = kb.utils.wrappedObservable(@)
-    view_model = if @models_only then model else @viewModelByModel(model)
-    previous_index = observable.indexOf(view_model)
-    if (sorted_index_fn = @_sorted_index())
-      sorted_view_models = _.clone(observable())
-      sorted_view_models.splice(previous_index, 1)  # it is assumed that it is cheaper to copy the array during the test rather than redrawing the views multiple times if it didn't move
-      new_index = sorted_index_fn(sorted_view_models, view_model)
-    else
-      new_index = @_collection().indexOf(model)
-    return if previous_index == new_index # no change
-
-    # either remove a view model or a model
-    @in_edit++
-    observable.splice(previous_index, 1); observable.splice(new_index, 0, view_model) # move
     @in_edit--
 
   # @private
@@ -392,15 +372,19 @@ class kb.CollectionObservable
     return
 
   # @private
-  _sortAttributeFn: (sort_attribute) ->
-    if @models_only
-      return (models, model) ->
-        attribute_name = ko.utils.unwrapObservable(sort_attribute)
-        _.sortedIndex(models, model, (test) -> test.get(attribute_name))
-    else
-      return (view_models, model) ->
-        attribute_name = ko.utils.unwrapObservable(sort_attribute)
-        _.sortedIndex(view_models, model, (test) -> kb.utils.wrappedModel(test).get(attribute_name))
+  _attributeComparator: (sort_attribute) ->
+    modelAttributeCompare = (model_a, model_b) ->
+      attribute_name = ko.utils.unwrapObservable(sort_attribute)
+      value_a = model_a.get(attribute_name); value_b = model_b.get(attribute_name)
+
+      # Non-object compare just comparing raw values
+      if typeof (value_a) isnt "object"
+        return (if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING))
+
+      # object compare
+      return if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING)
+
+    return (if @models_only then modelAttributeCompare else (model_a, model_b) -> modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b)))
 
   # @private
   _createViewModel: (model) ->
@@ -417,7 +401,3 @@ class kb.CollectionObservable
 
 # factory function
 kb.collectionObservable = (collection, options) -> return new kb.CollectionObservable(collection, options)
-
-# helpers
-kb.sortedIndexWrapAttr = kb.siwa = (attribute_name, wrapper_constructor) ->
-  return (models, model) -> return _.sortedIndex(models, model, (test) -> return new wrapper_constructor(kb.utils.wrappedModel(test).get(attribute_name)))
