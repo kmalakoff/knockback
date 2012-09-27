@@ -14,7 +14,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ### Deprecations
 
-* **ko.collectionObservable sortedIndex has been replaced by comparator so you can resort in custom ways rather than reducing the sorting down to an index.
+* **ko.collectionObservable `sortedIndex` has been replaced by `comparator` so you can resort in custom ways rather than reducing the sorting down to an index.
 
 ## 0.16.6
 
