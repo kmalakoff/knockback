@@ -16,7 +16,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.6.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.7.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -116,37 +116,24 @@
 ko.bindingHandlers['classes'] =
   update: (element, value_accessor) ->
     for key, state of ko.utils.unwrapObservable(value_accessor())
-      if state then $(element).addClass(key) else $(element).removeClass(key)
+      $(element)[if ko.utils.unwrapObservable(state) then 'addClass' else 'removeClass'](key)
     return
 
 # helpers to manage push state
-window.loadUrl = (url) ->
-  Backbone.history.loadUrl(url)
-
-window.loadUrlFn = (url) ->
-  return ->
-    Backbone.history.loadUrl(url)</pre>
-        <pre data-for="js">ko.bindingHandlers['classes'] = {
+window.loadUrl = (url) -> Backbone.history.loadUrl(url)
+window.loadUrlFn = (url) -> return -> Backbone.history.loadUrl(url)</pre>
+        <pre data-for="js">// helper to toggle classes
+ko.bindingHandlers['classes'] = {
   update: function(element, value_accessor) {
-    classes = ko.utils.unwrapObservable(value_accessor());
+    var classes = ko.utils.unwrapObservable(value_accessor());
     for (var key in classes) {
-      var state = classes[key];
-      if (state) {
-        $(element).addClass(key);
-      } else {
-        $(element).removeClass(key);
-      }
-}}};
+      $(element)[ko.utils.unwrapObservable(classes[key]) ? 'addClass' : 'removeClass'](key);
+    }
+}};
 
-window.loadUrl = function(url) {
-  return Backbone.history.loadUrl(url);
-};
-
-window.loadUrlFn = function(url) {
-  return function() {
-    return Backbone.history.loadUrl(url);
-  };
-};</pre><h2>Hello Example</h2>
+// helpers to manage push state
+window.loadUrl = function(url) { return Backbone.history.loadUrl(url); };
+window.loadUrlFn = function(url) { return function() { return Backbone.history.loadUrl(url); }; };</pre><h2>Hello Example</h2>
 <p>This example uses the &#39;kb-inject&#39; attribute to seed a root application ViewModel with a yourName observable (like a more flexible ng-model binding).
 </p>
 
@@ -278,42 +265,8 @@ window.loadUrlFn = function(url) {
             </div>
           </div>
         </div><h2>Project Example</h2>
-<p>Before we start the example, we&#39;ll explain the form validations. Currently the following is the best documentation on the Knockback form validations. We will improve the documentation after the library has been enhanced with more common functionality.
-
-</p>
-<p>When you bind a form, Knockback will put &#39;$&#39; in front of the names of your inputs directly on your ViewModel or if you provide a form name, it will attached them to a &#39;$&#39; form observable without the &#39;$&#39;s.
-
-</p>
-<p><strong>Variant 1: Named Form</strong>
-</p>
-
-        <pre>&lt;form name=&quot;myForm&quot;&gt;
-  &lt;input name=&quot;input1&quot;, data-bind=&quot;value: input1&quot; required&gt;
-  &lt;input type=&quot;url&quot; name=&quot;input2&quot;, data-bind=&quot;value: input2&quot;&gt;
-&lt;/form&gt;</pre><p>Because there is a form name, it will add the following property to your ViewModel (wrapped in an observable):
-</p>
-
-        <pre>$myForm: {
-  input1: {required: boolean, valid: boolean, invalid: boolean},
-  input2: {url: boolean, valid: boolean, invalid: boolean},
-  valid: boolean,
-  invalid: boolean
-}
-</pre><p><strong>Variant 2: Unnamed Form</strong>
-</p>
-
-        <pre>&lt;form&gt;
-  &lt;input name=&quot;input1&quot;, data-bind=&quot;value: input1&quot; required&gt;
-  &lt;input type=&quot;url&quot; name=&quot;input2&quot;, data-bind=&quot;value: input2&quot;&gt;
-&lt;/form&gt;
-</pre><p>Because there is not a form name, it will extend the following on your ViewModel (each wrapped in an observable):
-</p>
-
-        <pre>{
-  $input1: {required: boolean, valid: boolean, invalid: boolean},
-  $input2: {url: boolean, valid: boolean, invalid: boolean}
-}
-</pre><p>Now on with the example! This example shows:
+<p>Before we start the example, you should review the <a href="doc/classes/kb/Validation.html">validations documentation</a>.
+Now on with the example! This example shows:
 
 </p>
 <ul>
@@ -352,14 +305,14 @@ window.loadUrlFn = function(url) {
   </div>
 </script><script type="text/x-jquery-tmpl" id="detail.html">
   <form name="myForm" data-bind="inject: kb.formValidator">
-    <div class="control-group" data-bind="classes: {error: $myForm.name().invalid}">
+    <div class="control-group" data-bind="classes: {error: $myForm.name().$error_count}">
       <label>Name</label>
       <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
       <span data-bind="visible: $myForm.name().required" class="help-inline">
           Required</span>
     </div>
 
-    <div class="control-group" data-bind="classes: {error: $myForm.site().invalid}">
+    <div class="control-group" data-bind="classes: {error: $myForm.site().$error_count}">
       <label>Website</label>
       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
       <span data-bind="visible: $myForm.site().required" class="help-inline">
@@ -373,7 +326,7 @@ window.loadUrlFn = function(url) {
 
     <br>
     <a class="btn" data-bind="click: loadUrlFn('')">Cancel</a>
-    <button data-bind="click: save, disable: isClean() || $myForm.invalid()"
+    <button data-bind="click: save, disable: isClean() || $myForm.$error_count()"
             class="btn btn-primary">Save</button>
     <button data-bind="click: onDelete"
             class="btn btn-danger">Delete</button>
@@ -427,14 +380,14 @@ window.loadUrlFn = function(url) {
               <div id="kbi_project_detail_view" class="tab-pane">
                 <pre>&lt;script type=&quot;text/x-jquery-tmpl&quot; id=&quot;detail.html&quot;&gt;
   &lt;form name=&quot;myForm&quot; data-bind=&quot;inject: kb.formValidator&quot;&gt;
-    &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.name().invalid}&quot;&gt;
+    &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.name().$error_count}&quot;&gt;
       &lt;label&gt;Name&lt;/label&gt;
       &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name, valueUpdate: 'keyup'&quot; required&gt;
       &lt;span data-bind=&quot;visible: $myForm.name().required&quot; class=&quot;help-inline&quot;&gt;
           Required&lt;/span&gt;
     &lt;/div&gt;
 
-    &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.site().invalid}&quot;&gt;
+    &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.site().$error_count}&quot;&gt;
       &lt;label&gt;Website&lt;/label&gt;
       &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site, valueUpdate: 'keyup'&quot; required&gt;
       &lt;span data-bind=&quot;visible: $myForm.site().required&quot; class=&quot;help-inline&quot;&gt;
@@ -448,7 +401,7 @@ window.loadUrlFn = function(url) {
 
     &lt;br&gt;
     &lt;a class=&quot;btn&quot; data-bind=&quot;click: loadUrlFn('')&quot;&gt;Cancel&lt;/a&gt;
-    &lt;button data-bind=&quot;click: save, disable: isClean() || $myForm.invalid()&quot;
+    &lt;button data-bind=&quot;click: save, disable: isClean() || $myForm.$error_count()&quot;
             class=&quot;btn btn-primary&quot;&gt;Save&lt;/button&gt;
     &lt;button data-bind=&quot;click: onDelete&quot;
             class=&quot;btn btn-danger&quot;&gt;Delete&lt;/button&gt;

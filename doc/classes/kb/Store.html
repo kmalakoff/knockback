@@ -168,6 +168,16 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   </li>
   <li>
     <span class='signature'>
+      <a href='#clear-instance'>
+        - (void) <strong>clear</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Manually clear the store.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#register-instance'>
         - (void) <strong>register</strong>(obj, observable, options)
       </a>
@@ -256,6 +266,16 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
     </p>
     <div class='docstring'>
   <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='clear-instance'>
+      - (void) <strong>clear</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Manually clear the store.</p>
 </div>
 <div class='tags'>
 </div>
@@ -422,11 +442,11 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

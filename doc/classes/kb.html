@@ -130,7 +130,7 @@
 </div>
         </dt>
         <dd>
-          <pre><code class='coffee'>'0.16.6'</code></pre>
+          <pre><code class='coffee'>'0.16.7'</code></pre>
         </dd>
         <dt id='TYPE_UNKNOWN-constant'>
           TYPE_UNKNOWN
@@ -253,16 +253,6 @@
     </span>
     <span class='desc'>
       Factory to create a new kb.LocalizedObservable.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#injectViewModels-class'>
-        + (Array) <strong>injectViewModels</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      Searches the DOM from root or document for elements with the &#39;kb-inject&#39; attribute and create/customizes ViewModels for the DOM tree when encountered.
     </span>
   </li>
   <li>
@@ -559,95 +549,6 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='injectViewModels-class'>
-      + (Array) <strong>injectViewModels</strong>()
-    </p>
-    <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    For both the <code>&#39;kb-inject&#39;</code> attribute and the data-bind <code>&#39;inject&#39;</code> custom binding, the following properties are reserved: <code>&#39;view_model&#39;</code> class used to create a new ViewModel instance, <code>&#39;create&#39;</code> function used to manually add observables to a view model, <code>&#39;options&#39;</code> to pass to ko.applyBindings, <code>&#39;afterBinding&#39;</code> callback (can alternatively be in the options), <code>&#39;beforeBinding&#39;</code> callback (can alternatively be in the options). Each function/constructor gets called with the following signature <code>&#39;function(view_model, element)&#39;</code>.
-  </div>
-  <p>Searches the DOM from root or document for elements with the &#39;kb-inject&#39; attribute and create/customizes ViewModels for the DOM tree when encountered. Also, used with the data-bind <code>inject</code> custom binding.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      Bind your application automatically when the DOM is loaded.
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject&gt;&lt;span data-bind=&quot;text: &#39;Hello World!&#39;&quot;&gt;&lt;/span&gt;&lt;/div&gt;</code></pre>
-    <h4>
-      Bind your application with properties.
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject=&quot;message: ko.observable(&#39;Hello World!&#39;)&quot;&gt;&lt;input data-bind=&quot;value: message&quot;&gt;&lt;/input&gt;&lt;/div&gt;</code></pre>
-    <h4>
-      Bind your application creating a specific ViewModel instance when the DOM is loaded.
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject=&quot;MyViewModel&quot;&gt;&lt;input data-bind=&quot;value: message&quot;&gt;&lt;/input&gt;&lt;/div&gt;
-var MyViewModel = function(view_model, el) {
-  this.message = ko.observable(&#39;Hello World!&#39;);
-}</code></pre>
-    <h4>
-      Bind your application using a function when the DOM is loaded (like Angular.js controllers).
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject=&quot;create: MyController&quot;&gt;&lt;input data-bind=&quot;value: message&quot;&gt;&lt;/input&gt;&lt;/div&gt;
-var MyController = function(view_model, el) {
-  view_model.message = ko.observable(&#39;Hello World!&#39;);
-}</code></pre>
-    <h4>
-      Bind your application with a specific ViewModel instance and a callback before and after the binding.
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject=&quot;MyViewModel&quot;&gt;&lt;input data-bind=&quot;value: message&quot;&gt;&lt;/input&gt;&lt;/div&gt;
-var MyViewModel = function(view_model, el) {
-  this.message = ko.observable(&#39;Hello World!&#39;);
-  this.beforeBinding = function() {alert(&#39;before&#39;); };
-  this.afterBinding = function() {alert(&#39;after&#39;); };
-}</code></pre>
-    <h4>
-      Dynamically inject new properties into your ViewModel.
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject=&quot;MyViewModel&quot;&gt;
-  &lt;div class=&quot;control-group&quot; data-bind=&quot;inject: {site: ko.observable(&#39;http://your.url.com&#39;)}&quot;&gt;
-    &lt;label&gt;Website&lt;/label&gt;
-    &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site, valueUpdate: &#39;keyup&#39;&quot; required&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-var MyViewModel = function(view_model, el) {
-  // site will be dynamically attached to this ViewModel
-}</code></pre>
-    <h4>
-      Dynamically bind a form.
-    </h4>
-    <pre><code class='coffee'>&lt;div kb-inject=&quot;MyViewModel&quot;&gt;
-   &lt;form name=&quot;my_form&quot; data-bind=&quot;inject: kb.formValidator&quot;&gt;
-     &lt;div class=&quot;control-group&quot;&gt;
-      &lt;label&gt;Name&lt;/label&gt;
-      &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot; required&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;control-group&quot;&gt;
-      &lt;label&gt;Website&lt;/label&gt;
-      &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site, valueUpdate: &#39;keyup&#39;&quot; required&gt;
-    &lt;/div&gt;
-  &lt;/form&gt;
-&lt;/div&gt;
-var MyViewModel = kb.ViewModel.extend({
-  constructor: -&gt;
-    model = new Backbone.Model({name: &#39;&#39;, site: &#39;http://your.url.com&#39;});
-    kb.ViewModel.prototype.constructor.call(this, model);
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Array</tt>)
-      &mdash;
-      <span class='desc'>array of Objects with the DOM elements and ViewModels that were bound in the form <code>{el: DOM element, view_model: ViewModel}</code>.</span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='release-class'>
       + (void) <strong>release</strong>(obj, pre_release_fn)
     </p>
@@ -739,11 +640,11 @@ ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

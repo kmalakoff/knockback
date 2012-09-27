@@ -151,28 +151,18 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#buildEvalWithinScopeFunction-file'>
-        ? (void) <strong>buildEvalWithinScopeFunction</strong>(expression, scopeLevels)
+      <a href='#kb.hasChangedFn-file'>
+        ? (void) <strong>kb.hasChangedFn</strong>(model)
       </a>
     </span>
     <span class='desc'>
-      helper from Knockout.js (function gets lost in minimization): <a href="http://knockoutjs.com/">http://knockoutjs.com/</a>
+      Convention is that if they end in Fn then returns a function pointer based on parameters passed.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.valueValidator-file'>
-        ? (void) <strong>kb.valueValidator</strong>(value, checks)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#kb.inputValidator-file'>
-        ? (void) <strong>kb.inputValidator</strong>(view_model, el, value_accessor)
+      <a href='#kb.minLengthFn-file'>
+        ? (void) <strong>kb.minLengthFn</strong>(length)
       </a>
     </span>
     <span class='desc'>
@@ -181,8 +171,28 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.formValidator-file'>
-        ? (void) <strong>kb.formValidator</strong>(view_model, el)
+      <a href='#kb.uniqueValueFn-file'>
+        ? (void) <strong>kb.uniqueValueFn</strong>(model, key, collection)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#kb.untilTrueFn-file'>
+        ? (void) <strong>kb.untilTrueFn</strong>(stand_in, fn, model)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#kb.untilFalseFn-file'>
+        ? (void) <strong>kb.untilFalseFn</strong>(stand_in, fn, model)
       </a>
     </span>
     <span class='desc'>
@@ -193,32 +203,39 @@
       <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='buildEvalWithinScopeFunction-file'>
-      ? (void) <strong>buildEvalWithinScopeFunction</strong>(expression, scopeLevels)
+    <p class='signature' id='kb.hasChangedFn-file'>
+      ? (void) <strong>kb.hasChangedFn</strong>(model)
     </p>
     <div class='docstring'>
-  <p>helper from Knockout.js (function gets lost in minimization): <a href="http://knockoutjs.com/">http://knockoutjs.com/</a> </p>
+  <p>Convention is that if they end in Fn then returns a function pointer based on parameters passed.</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.valueValidator-file'>
-      ? (void) <strong>kb.valueValidator</strong>(value, checks)
+    <p class='signature' id='kb.minLengthFn-file'>
+      ? (void) <strong>kb.minLengthFn</strong>(length)
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.inputValidator-file'>
-      ? (void) <strong>kb.inputValidator</strong>(view_model, el, value_accessor)
+    <p class='signature' id='kb.uniqueValueFn-file'>
+      ? (void) <strong>kb.uniqueValueFn</strong>(model, key, collection)
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.formValidator-file'>
-      ? (void) <strong>kb.formValidator</strong>(view_model, el)
+    <p class='signature' id='kb.untilTrueFn-file'>
+      ? (void) <strong>kb.untilTrueFn</strong>(stand_in, fn, model)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='kb.untilFalseFn-file'>
+      ? (void) <strong>kb.untilFalseFn</strong>(stand_in, fn, model)
     </p>
     <div class='tags'>
 </div>
@@ -227,11 +244,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

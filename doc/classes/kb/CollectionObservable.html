@@ -153,6 +153,16 @@ var view_model = {
       <ul class='summary'>
   <li>
     <span class='signature'>
+      <a href='#collection-instance'>
+        - (Backbone.Collection|void) <strong>collection</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#constructor-instance'>
         - (ko.observableArray) <strong>constructor</strong>(collection, options)
       </a>
@@ -184,16 +194,6 @@ var view_model = {
   </li>
   <li>
     <span class='signature'>
-      <a href='#collection-instance'>
-        - (void) <strong>collection</strong>(collection)
-      </a>
-    </span>
-    <span class='desc'>
-      Dual-purpose getter/setter for the observed collection.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#filters-instance'>
         - (void) <strong>filters</strong>(filters)
       </a>
@@ -204,12 +204,22 @@ var view_model = {
   </li>
   <li>
     <span class='signature'>
-      <a href='#sortedIndex-instance'>
-        - (void) <strong>sortedIndex</strong>(sorted_index_fn)
+      <a href='#comparator-instance'>
+        - (void) <strong>comparator</strong>(comparator)
       </a>
     </span>
     <span class='desc'>
       Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#sortedIndex-instance'>
+        - (void) <strong>sortedIndex</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      @deprecated
     </span>
   </li>
   <li>
@@ -369,12 +379,12 @@ var view_model = {
       <span class='desc'>a map of dot-deliminated paths; for example &#39;models.owner&#39;: kb.ViewModel to either constructors or create functions. Signature: &#39;some.path&#39;: function(object, options)</span>
     </li>
     <li>
-      <span class='name'>sorted_index_fn</span>
+      <span class='name'>comparator</span>
       <span class='type'>
         (<tt>Function</tt>)
       </span>
       &mdash;
-      <span class='desc'>a function that returns an index where to insert the model. Signature: function(models, model)</span>
+      <span class='desc'>a function that is used to sort an object. Signature: <code>function(model_a, model_b)</code> returns negative value for ascending, 0 for equal, and positive for descending</span>
     </li>
     <li>
       <span class='name'>sort_attribute</span>
@@ -440,6 +450,25 @@ var view_model = {
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
+    <p class='signature' id='collection-instance'>
+      - (Backbone.Collection|void) <strong>collection</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Backbone.Collection|void</tt>)
+      &mdash;
+      <span class='desc'>getter: the collection whose models are being observed (can be null) OR setter: void</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
@@ -471,62 +500,6 @@ var available = kb.collectionObservable(available_collection, available_collecti
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='collection-instance'>
-      - (Backbone.Collection) <strong>collection</strong>()
-      <br>
-      - (void) <strong>collection</strong>(collection)
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed collection.</p>
-</div>
-<div class='tags'>
-  <div class='overloads'>
-    <h3>Overloads:</h3>
-    <div class='overload'>
-      <p class='signature'>
-        - (Backbone.Collection) <strong>collection</strong>()
-      </p>
-      <div class='docstring'>
-  <p>Gets the collection from a kb.CollectionObservable</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Backbone.Collection</tt>)
-      &mdash;
-      <span class='desc'>the collection</span>
-    </li>
-  </ul>
-</div>
-    </div>
-    <div class='overload'>
-      <p class='signature'>
-        - (void) <strong>collection</strong>(collection)
-      </p>
-      <div class='docstring'>
-  <p>Sets the collection on a kb.CollectionObservable</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>collection</span>
-      <span class='type'>
-        (<tt>Backbone.Collection</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the collection</span>
-    </li>
-  </ul>
-</div>
-    </div>
-  </div>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='filters-instance'>
       - (void) <strong>filters</strong>(filters)
     </p>
@@ -537,12 +510,8 @@ var available = kb.collectionObservable(available_collection, available_collecti
     <h4>
       
     </h4>
-    <pre><code class='coffee'> // change the sorting function
- collection_observable.sortedIndex(
-   function(view_models, vm){
-     return _.sortedIndex(view_models, vm, (test) -&gt; kb.utils.wrappedModel(test).get(&#39;name&#39;));
-   }
- );
+    <pre><code class='coffee'> // exclude a single model by id
+ collection_observable.filters(model.id);
 </code></pre>
   </div>
 </div>
@@ -561,8 +530,8 @@ var available = kb.collectionObservable(available_collection, available_collecti
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='sortedIndex-instance'>
-      - (void) <strong>sortedIndex</strong>(sorted_index_fn)
+    <p class='signature' id='comparator-instance'>
+      - (void) <strong>comparator</strong>(comparator)
     </p>
     <div class='docstring'>
   <p>Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.</p>
@@ -572,9 +541,9 @@ var available = kb.collectionObservable(available_collection, available_collecti
       
     </h4>
     <pre><code class='coffee'> // change the sorting function
- collection_observable.sortedIndex(
+ collection_observable.comparator(
    function(view_models, vm){
-     return _.sortedIndex(view_models, vm, (test) -&gt; kb.utils.wrappedModel(test).get(&#39;name&#39;));
+     return _.comparator(view_models, vm, (test) -&gt; kb.utils.wrappedModel(test).get(&#39;name&#39;));
    }
  );
 </code></pre>
@@ -584,14 +553,32 @@ var available = kb.collectionObservable(available_collection, available_collecti
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>sorted_index_fn</span>
+      <span class='name'>comparator</span>
       <span class='type'>
         (<tt>Function</tt>)
       </span>
       &mdash;
       <span class='desc'>a function that returns an index where to insert the model. Signature: function(models, model)</span>
     </li>
+    <li>
+      <span class='name'>comparator</span>
+      <span class='type'>
+        (<tt>Function</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a function that is used to sort an object. Signature: <code>function(model_a, model_b)</code> returns negative value for ascending, 0 for equal, and positive for descending</span>
+    </li>
   </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='sortedIndex-instance'>
+      - (void) <strong>sortedIndex</strong>()
+    </p>
+    <div class='docstring'>
+  <p>@deprecated</p>
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -661,11 +648,11 @@ todos2.hasViewModels();     // true
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

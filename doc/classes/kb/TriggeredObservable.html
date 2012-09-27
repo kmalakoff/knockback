@@ -116,7 +116,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Class for observing model events.</p>
+  <p>Class for observing emitter events.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -124,20 +124,20 @@
     </h4>
     <pre><code class='coffee'>var triggered_observable = kb.triggeredObservable(name, &#39;change&#39;);</code></pre>
     <h4>
-      How to watch a model for events.
+      How to watch a emitter for events.
     </h4>
     <pre><code class='coffee'>var trigger_count = 0;
-var model = new Backbone.Model();
-var view_model = {
-  triggered_observable: kb.triggeredObservable(model, &#39;change&#39;)
+var emitter = new Backbone.Model();
+var view_emitter = {
+  triggered_observable: kb.triggeredObservable(emitter, &#39;change&#39;)
 };
-view_model.counter = ko.dependentObservable(function() {
-  view_model.triggered_observable() // add a dependency
+view_emitter.counter = ko.dependentObservable(function() {
+  view_emitter.triggered_observable() // add a dependency
   return trigger_count++
 });
-model.set(name: &#39;bob&#39;);       # trigger_count: 1
-model.set(name: &#39;george&#39;);    # trigger_count: 2
-model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
+emitter.set(name: &#39;bob&#39;);       # trigger_count: 1
+emitter.set(name: &#39;george&#39;);    # trigger_count: 2
+emitter.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -147,7 +147,7 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
-        - (ko.observable) <strong>constructor</strong>(model, event_name)
+        - (ko.observable) <strong>constructor</strong>(emitter, event_selector)
       </a>
     </span>
     <span class='constructor note title'>Constructor</span>
@@ -167,12 +167,12 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
   </li>
   <li>
     <span class='signature'>
-      <a href='#model-instance'>
-        - (void) <strong>model</strong>(new_model)
+      <a href='#emitter-instance'>
+        - (void) <strong>emitter</strong>(new_emitter)
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter for the observed model.
+      Dual-purpose getter/setter for the observed emitter.
     </span>
   </li>
 </ul>
@@ -180,7 +180,7 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-instance'>
-      - (ko.observable) <strong>constructor</strong>(model, event_name)
+      - (ko.observable) <strong>constructor</strong>(emitter, event_selector)
     </p>
     <div class='docstring'>
   <div class='note'>
@@ -193,15 +193,15 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>model</span>
+      <span class='name'>emitter</span>
       <span class='type'>
         (<tt>Backbone.Model</tt>)
       </span>
       &mdash;
-      <span class='desc'>the model to observe (can be null)</span>
+      <span class='desc'>the emitter to observe (can be null)</span>
     </li>
     <li>
-      <span class='name'>event_name</span>
+      <span class='name'>event_selector</span>
       <span class='type'>
         (<tt>String</tt>)
       </span>
@@ -234,54 +234,54 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='model-instance'>
-      - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+    <p class='signature' id='emitter-instance'>
+      - (Backbone.Model|Backbone.ModelRef|Backbone.Collection) <strong>emitter</strong>()
       <br>
-      - (void) <strong>model</strong>(new_model)
+      - (void) <strong>emitter</strong>(new_emitter)
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed model.</p>
+  <p>Dual-purpose getter/setter for the observed emitter.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
     <h3>Overloads:</h3>
     <div class='overload'>
       <p class='signature'>
-        - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+        - (Backbone.Model|Backbone.ModelRef|Backbone.Collection) <strong>emitter</strong>()
       </p>
       <div class='docstring'>
-  <p>Gets the model or model reference</p>
+  <p>Gets the emitter or emitter reference</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'></span>
-      (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+      (<tt>Backbone.Model|Backbone.ModelRef|Backbone.Collection</tt>)
       &mdash;
-      <span class='desc'>the model whose events are being bound (can be null)</span>
+      <span class='desc'>the emitter whose events are being bound (can be null)</span>
     </li>
   </ul>
 </div>
     </div>
     <div class='overload'>
       <p class='signature'>
-        - (void) <strong>model</strong>(new_model)
+        - (void) <strong>emitter</strong>(new_emitter)
       </p>
       <div class='docstring'>
-  <p>Sets the model or model reference</p>
+  <p>Sets the emitter or emitter reference</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>new_model</span>
+      <span class='name'>new_emitter</span>
       <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+        (<tt>Backbone.Model|Backbone.ModelRef|Backbone.Collection</tt>)
       </span>
       &mdash;
-      <span class='desc'>the model whose events will be bound (can be null)</span>
+      <span class='desc'>the emitter whose events will be bound (can be null)</span>
     </li>
   </ul>
 </div>
@@ -293,11 +293,11 @@ model.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

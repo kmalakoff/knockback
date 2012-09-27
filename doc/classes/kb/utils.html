@@ -174,12 +174,12 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#wrappedModelWatcher-class'>
-        + (void) <strong>wrappedModelWatcher</strong>(obj, value)
+      <a href='#wrappedEventWatcher-class'>
+        + (void) <strong>wrappedEventWatcher</strong>(obj, value)
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.
+      Dual-purpose getter/setter for retrieving and storing a kb.EventWatcher on an owner.
     </span>
   </li>
   <li>
@@ -240,6 +240,26 @@
     </span>
     <span class='desc'>
       Creates an observable based on a value&#39;s type.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasModelSignature-class'>
+        + (void) <strong>hasModelSignature</strong>(obj)
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to check an object for having a Backbone.Model signature.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasCollectionSignature-class'>
+        + (void) <strong>hasCollectionSignature</strong>(obj)
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to check an object for having a Backbone.Model signature.
     </span>
   </li>
   <li deprecated>
@@ -674,24 +694,24 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='wrappedModelWatcher-class'>
-      + (kb.ModelWatcher) <strong>wrappedModelWatcher</strong>(obj)
+    <p class='signature' id='wrappedEventWatcher-class'>
+      + (kb.EventWatcher) <strong>wrappedEventWatcher</strong>(obj)
       <br>
-      + (void) <strong>wrappedModelWatcher</strong>(obj, model_watcher)
+      + (void) <strong>wrappedEventWatcher</strong>(obj, event_watcher)
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for retrieving and storing a kb.ModelWatcher on an owner.</p>
+  <p>Dual-purpose getter/setter for retrieving and storing a kb.EventWatcher on an owner.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
     <h3>Overloads:</h3>
     <div class='overload'>
       <p class='signature'>
-        + (kb.ModelWatcher) <strong>wrappedModelWatcher</strong>(obj)
+        + (kb.EventWatcher) <strong>wrappedEventWatcher</strong>(obj)
       </p>
       <div class='docstring'>
-  <p>Gets the model_watcher from an object</p>
+  <p>Gets the event_watcher from an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -709,19 +729,19 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   <ul class='return'>
     <li>
       <span class='type'></span>
-      (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
+      (<tt><a href='../../classes/kb/EventWatcher.html'>kb.EventWatcher</a></tt>)
       &mdash;
-      <span class='desc'>the model_watcher</span>
+      <span class='desc'>the event_watcher</span>
     </li>
   </ul>
 </div>
     </div>
     <div class='overload'>
       <p class='signature'>
-        + (void) <strong>wrappedModelWatcher</strong>(obj, model_watcher)
+        + (void) <strong>wrappedEventWatcher</strong>(obj, event_watcher)
       </p>
       <div class='docstring'>
-  <p>Sets the model_watcher on an object</p>
+  <p>Sets the event_watcher on an object</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -735,12 +755,12 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       <span class='desc'>the owner</span>
     </li>
     <li>
-      <span class='name'>model_watcher</span>
+      <span class='name'>event_watcher</span>
       <span class='type'>
-        (<tt><a href='../../classes/kb/ModelWatcher.html'>kb.ModelWatcher</a></tt>)
+        (<tt><a href='../../classes/kb/EventWatcher.html'>kb.EventWatcher</a></tt>)
       </span>
       &mdash;
-      <span class='desc'>the model_watcher</span>
+      <span class='desc'>the event_watcher</span>
     </li>
   </ul>
 </div>
@@ -897,6 +917,64 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
 </div>
   </div>
   <div class='method_details'>
+    <p class='signature' id='hasModelSignature-class'>
+      + (void) <strong>hasModelSignature</strong>(obj)
+    </p>
+    <div class='docstring'>
+  <p>Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don&#39;t need to derive from Backbone.Model</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>kb.utils.hasModelSignature(new Backbone.Model());
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the object to test</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasCollectionSignature-class'>
+      + (void) <strong>hasCollectionSignature</strong>(obj)
+    </p>
+    <div class='docstring'>
+  <p>Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don&#39;t need to derive from Backbone.Model</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>kb.utils.hasModelSignature(new Backbone.Model());
+</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the object to test</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='release-class'>
       + (void) <strong>release</strong>(obj)
     </p>
@@ -914,11 +992,11 @@ kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

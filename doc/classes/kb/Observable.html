@@ -142,6 +142,16 @@ name.setToDefault(); // name is (none)</code></pre>
       <ul class='summary'>
   <li>
     <span class='signature'>
+      <a href='#model-instance'>
+        - (Backbone.Model|Backbone.ModelRef|void) <strong>model</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#constructor-instance'>
         - (ko.observable) <strong>constructor</strong>(model, options, vm)
       </a>
@@ -179,16 +189,6 @@ name.setToDefault(); // name is (none)</code></pre>
     </span>
     <span class='desc'>
       
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#model-instance'>
-        - (void) <strong>model</strong>(new_model)
-      </a>
-    </span>
-    <span class='desc'>
-      Dual-purpose getter/setter for the observed model.
     </span>
   </li>
 </ul>
@@ -326,6 +326,34 @@ name.setToDefault(); // name is (none)</code></pre>
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
+    <p class='signature' id='model-instance'>
+      - (Backbone.Model|Backbone.ModelRef|void) <strong>model</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>var observable = kb.observable(new Backbone.Model({name: &#39;bob&#39;}), &#39;name&#39;);
+var the_model = observable.model(); // get
+observable.model(new Backbone.Model({name: &#39;fred&#39;})); // set</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Backbone.Model|Backbone.ModelRef|void</tt>)
+      &mdash;
+      <span class='desc'>getter: the model whose attributes are being observed (can be null) OR setter: void</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='destroy-instance'>
       - (void) <strong>destroy</strong>()
     </p>
@@ -367,71 +395,15 @@ name.setToDefault(); // name is (none)</code></pre>
   </ul>
 </div>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='model-instance'>
-      - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
-      <br>
-      - (void) <strong>model</strong>(new_model)
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed model.</p>
-</div>
-<div class='tags'>
-  <div class='overloads'>
-    <h3>Overloads:</h3>
-    <div class='overload'>
-      <p class='signature'>
-        - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
-      </p>
-      <div class='docstring'>
-  <p>Gets the model or model reference</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (<tt>Backbone.Model|Backbone.ModelRef</tt>)
-      &mdash;
-      <span class='desc'>the model whose attribute by key is being observed (can be null)</span>
-    </li>
-  </ul>
-</div>
-    </div>
-    <div class='overload'>
-      <p class='signature'>
-        - (void) <strong>model</strong>(new_model)
-      </p>
-      <div class='docstring'>
-  <p>Sets the model or model reference</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>new_model</span>
-      <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>the model whose attribute by key will be observed (can be null)</span>
-    </li>
-  </ul>
-</div>
-    </div>
-  </div>
-</div>
-  </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Tue Sep 18 2012 19:47:15 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

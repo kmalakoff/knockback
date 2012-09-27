@@ -15,7 +15,7 @@
     &raquo;
     <a href='../../classes/kb.html' title='kb'>kb</a>
     &raquo;
-    <span class='title'>ModelWatcher</span>
+    <span class='title'>EventWatcher</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -106,12 +106,12 @@
     <div id='content'>
       <h1>
         Class:
-        kb.ModelWatcher
+        kb.EventWatcher
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-core/knockback-model-watcher.coffee</td>
+          <td>src/knockback-core/knockback-event-watcher.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -125,11 +125,11 @@
   <li>
     <span class='signature'>
       <a href='#useOptionsOrCreate-class'>
-        + (void) <strong>useOptionsOrCreate</strong>(options, model, obj, callback_options)
+        + (void) <strong>useOptionsOrCreate</strong>(options, emitter, obj, callback_options)
       </a>
     </span>
     <span class='desc'>
-      Used to either register yourself with the existing model watcher or to create a new one.
+      Used to either register yourself with the existing emitter watcher or to create a new one.
     </span>
   </li>
 </ul>
@@ -138,7 +138,7 @@
   <li>
     <span class='signature'>
       <a href='#constructor-instance'>
-        - (void) <strong>constructor</strong>(model, obj, callback_options)
+        - (void) <strong>constructor</strong>(emitter, obj, callback_options)
       </a>
     </span>
     <span class='constructor note title'>Constructor</span>
@@ -153,17 +153,17 @@
       </a>
     </span>
     <span class='desc'>
-      Required clean up function to break cycles, release view models, etc.
+      Required clean up function to break cycles, release view emitters, etc.
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#model-instance'>
-        - (void) <strong>model</strong>(new_model)
+      <a href='#emitter-instance'>
+        - (void) <strong>emitter</strong>(new_emitter)
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter for the observed model.
+      Dual-purpose getter/setter for the observed emitter.
     </span>
   </li>
   <li>
@@ -173,7 +173,7 @@
       </a>
     </span>
     <span class='desc'>
-      Used to register callbacks for an owner.
+      Used to register callbacks for an emitter.
     </span>
   </li>
   <li>
@@ -191,10 +191,10 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='useOptionsOrCreate-class'>
-      + (void) <strong>useOptionsOrCreate</strong>(options, model, obj, callback_options)
+      + (void) <strong>useOptionsOrCreate</strong>(options, emitter, obj, callback_options)
     </p>
     <div class='docstring'>
-  <p>Used to either register yourself with the existing model watcher or to create a new one.</p>
+  <p>Used to either register yourself with the existing emitter watcher or to create a new one.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -205,7 +205,7 @@
         (<tt>Object</tt>)
       </span>
       &mdash;
-      <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(model, options)</span>
+      <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(emitter, options)</span>
     </li>
     <li>
       <span class='name'>obj</span>
@@ -216,12 +216,12 @@
       <span class='desc'>the Model that will own or register with the store</span>
     </li>
     <li>
-      <span class='name'>owner</span>
+      <span class='name'>emitter</span>
       <span class='type'>
         (<tt>ko.observable|Object</tt>)
       </span>
       &mdash;
-      <span class='desc'>the owners of the model watcher</span>
+      <span class='desc'>the emitters of the event watcher</span>
     </li>
     <li>
       <span class='name'>callback_options</span>
@@ -238,12 +238,12 @@
   </h3>
   <ul class='options'>
     <li>
-      <span class='name'>model</span>
+      <span class='name'>emitter</span>
       <span class='type'>
         (<tt>Function</tt>)
       </span>
       &mdash;
-      <span class='desc'>callback for when the model changes (eg. is loaded). Signature: function(new_model)</span>
+      <span class='desc'>callback for when the emitter changes (eg. is loaded). Signature: function(new_emitter)</span>
     </li>
     <li>
       <span class='name'>update</span>
@@ -254,12 +254,12 @@
       <span class='desc'>callback for when the registered event is triggered. Signature: function(new_value)</span>
     </li>
     <li>
-      <span class='name'>event_name</span>
+      <span class='name'>event_selector</span>
       <span class='type'>
         (<tt>String</tt>)
       </span>
       &mdash;
-      <span class='desc'>the name of the event.</span>
+      <span class='desc'>the name or names of events.</span>
     </li>
     <li>
       <span class='name'>key</span>
@@ -277,7 +277,7 @@
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-instance'>
-      - (void) <strong>constructor</strong>(model, obj, callback_options)
+      - (void) <strong>constructor</strong>(emitter, obj, callback_options)
     </p>
     <div class='tags'>
 </div>
@@ -290,30 +290,30 @@
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
+  <p>Required clean up function to break cycles, release view emitters, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='model-instance'>
-      - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+    <p class='signature' id='emitter-instance'>
+      - (Backbone.Model|Backbone.ModelRef) <strong>emitter</strong>()
       <br>
-      - (void) <strong>model</strong>(new_model)
+      - (void) <strong>emitter</strong>(new_emitter)
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter for the observed model.</p>
+  <p>Dual-purpose getter/setter for the observed emitter.</p>
 </div>
 <div class='tags'>
   <div class='overloads'>
     <h3>Overloads:</h3>
     <div class='overload'>
       <p class='signature'>
-        - (Backbone.Model|Backbone.ModelRef) <strong>model</strong>()
+        - (Backbone.Model|Backbone.ModelRef) <strong>emitter</strong>()
       </p>
       <div class='docstring'>
-  <p>Gets the model or model reference</p>
+  <p>Gets the emitter or emitter reference</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -322,28 +322,28 @@
       <span class='type'></span>
       (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       &mdash;
-      <span class='desc'>the model whose attributes are being observed (can be null)</span>
+      <span class='desc'>the emitter whose attributes are being observed (can be null)</span>
     </li>
   </ul>
 </div>
     </div>
     <div class='overload'>
       <p class='signature'>
-        - (void) <strong>model</strong>(new_model)
+        - (void) <strong>emitter</strong>(new_emitter)
       </p>
       <div class='docstring'>
-  <p>Sets the model or model reference</p>
+  <p>Sets the emitter or emitter reference</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>new_model</span>
+      <span class='name'>new_emitter</span>
       <span class='type'>
         (<tt>Backbone.Model|Backbone.ModelRef</tt>)
       </span>
       &mdash;
-      <span class='desc'>the model whose attributes will be observed (can be null)</span>
+      <span class='desc'>the emitter whose attributes will be observed (can be null)</span>
     </li>
   </ul>
 </div>
@@ -356,7 +356,7 @@
       - (void) <strong>registerCallbacks</strong>(obj, callback_info)
     </p>
     <div class='docstring'>
-  <p>Used to register callbacks for an owner.</p>
+  <p>Used to register callbacks for an emitter.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -384,12 +384,12 @@
   </h3>
   <ul class='options'>
     <li>
-      <span class='name'>model</span>
+      <span class='name'>emitter</span>
       <span class='type'>
         (<tt>Function</tt>)
       </span>
       &mdash;
-      <span class='desc'>callback for when the model changes (eg. is loaded). Signature: function(new_model)</span>
+      <span class='desc'>callback for when the emitter changes (eg. is loaded). Signature: function(new_emitter)</span>
     </li>
     <li>
       <span class='name'>update</span>
@@ -397,15 +397,15 @@
         (<tt>Function</tt>)
       </span>
       &mdash;
-      <span class='desc'>callback for when the registered event is triggered. Signature: function(new_value)</span>
+      <span class='desc'>callback for when the registered emitter is triggered. Signature: function(new_value)</span>
     </li>
     <li>
-      <span class='name'>event_name</span>
+      <span class='name'>emitter_name</span>
       <span class='type'>
         (<tt>String</tt>)
       </span>
       &mdash;
-      <span class='desc'>the name of the event.</span>
+      <span class='desc'>the name of the emitter.</span>
     </li>
     <li>
       <span class='name'>key</span>
@@ -429,11 +429,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Mon Sep 24 2012 15:20:11 GMT+0900 (JST)
+  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.2
-  (Node.js v0.8.7).
+  v1.4.4
+  (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;
