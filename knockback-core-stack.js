@@ -7305,6 +7305,27 @@ COMPARE_ASCENDING = -1;
 
 COMPARE_DESCENDING = 1;
 
+kb.compare = function(value_a, value_b) {
+  if (_.isString(value_a)) {
+    return value_a.localeCompare(value_b);
+  }
+  if (_.isString(value_b)) {
+    return value_b.localeCompare(value_a);
+  }
+  if (typeof value_a !== "object") {
+    return (value_a === value_b ? COMPARE_EQUAL : (value_a < value_b ? COMPARE_ASCENDING : COMPARE_DESCENDING));
+  }
+  if (value_a === value_b) {
+    return COMPARE_EQUAL;
+  } else {
+    if (value_a < value_b) {
+      return COMPARE_ASCENDING;
+    } else {
+      return COMPARE_DESCENDING;
+    }
+  }
+};
+
 kb.CollectionObservable = (function() {
 
   CollectionObservable.extend = Backbone.Model.extend;
@@ -7629,28 +7650,9 @@ kb.CollectionObservable = (function() {
   CollectionObservable.prototype._attributeComparator = function(sort_attribute) {
     var modelAttributeCompare;
     modelAttributeCompare = function(model_a, model_b) {
-      var attribute_name, value_a, value_b;
+      var attribute_name;
       attribute_name = _unwrapObservable(sort_attribute);
-      value_a = model_a.get(attribute_name);
-      value_b = model_b.get(attribute_name);
-      if (_.isString(value_a)) {
-        return value_a.localeCompare(value_b);
-      }
-      if (_.isString(value_b)) {
-        return value_b.localeCompare(value_a);
-      }
-      if (typeof value_a !== "object") {
-        return (value_a === value_b ? COMPARE_EQUAL : (value_a < value_b ? COMPARE_ASCENDING : COMPARE_DESCENDING));
-      }
-      if (value_a === value_b) {
-        return COMPARE_EQUAL;
-      } else {
-        if (value_a < value_b) {
-          return COMPARE_ASCENDING;
-        } else {
-          return COMPARE_DESCENDING;
-        }
-      }
+      return kb.compare(model_a.get(attribute_name), model_b.get(attribute_name));
     };
     return (this.models_only ? modelAttributeCompare : function(model_a, model_b) {
       return modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b));

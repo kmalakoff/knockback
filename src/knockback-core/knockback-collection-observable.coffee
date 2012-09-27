@@ -10,6 +10,18 @@ COMPARE_EQUAL = 0
 COMPARE_ASCENDING = -1
 COMPARE_DESCENDING = 1
 
+kb.compare = (value_a, value_b) ->
+  # String compare
+  return value_a.localeCompare(value_b) if _.isString(value_a)
+  return value_b.localeCompare(value_a) if _.isString(value_b)
+
+  # Non-object compare just comparing raw values
+  if typeof (value_a) isnt "object"
+    return (if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING))
+
+  # object compare
+  return if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING)
+
 # Base class for observing collections.
 #
 # @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
@@ -385,19 +397,7 @@ class kb.CollectionObservable
   _attributeComparator: (sort_attribute) ->
     modelAttributeCompare = (model_a, model_b) ->
       attribute_name = _unwrapObservable(sort_attribute)
-      value_a = model_a.get(attribute_name); value_b = model_b.get(attribute_name)
-
-      # String compare
-      return value_a.localeCompare(value_b) if _.isString(value_a)
-      return value_b.localeCompare(value_a) if _.isString(value_b)
-
-      # Non-object compare just comparing raw values
-      if typeof (value_a) isnt "object"
-        return (if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING))
-
-      # object compare
-      return if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING)
-
+      kb.compare(model_a.get(attribute_name), model_b.get(attribute_name))
     return (if @models_only then modelAttributeCompare else (model_a, model_b) -> modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b)))
 
   # @private
