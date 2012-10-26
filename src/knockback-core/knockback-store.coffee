@@ -145,7 +145,7 @@ class kb.Store
 
   # @private
   findOrReplace: (obj, creator, observable) ->
-    obj or raiseUnexpected('obj missing')
+    obj or _throwUnexpected(@, 'obj missing')
     if (index = @findIndex(obj, creator)) < 0
       return @register(obj, observable, {creator: creator})
     else
