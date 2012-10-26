@@ -25,7 +25,7 @@ module.exports =
       ko: 'knockout'
 
   'test/full-stack/build/bundle-lodash-core.js':
-    lodash: 'vendor/optional/lodash-0.8.1.min.js'
+    lodash: 'vendor/optional/lodash-0.9.0.min.js'
     backbone: 'vendor/backbone-0.9.2.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
@@ -39,7 +39,7 @@ module.exports =
       ko: 'knockout'
 
   'test/full-stack/build/bundle-lodash.js':
-    lodash: 'vendor/optional/lodash-0.8.1.min.js'
+    lodash: 'vendor/optional/lodash-0.9.0.min.js'
     backbone: 'vendor/backbone-0.9.2.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
