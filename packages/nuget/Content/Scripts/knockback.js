@@ -635,7 +635,7 @@ kb.Store = (function() {
 
   Store.prototype.findOrReplace = function(obj, creator, observable) {
     var index, record;
-    obj || raiseUnexpected('obj missing');
+    obj || _throwUnexpected(this, 'obj missing');
     if ((index = this.findIndex(obj, creator)) < 0) {
       return this.register(obj, observable, {
         creator: creator

@@ -1,0 +1,41 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Knockback Issue 46 Test</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+
+<div id="view">
+
+    <ul data-bind="foreach: people">
+        <li data-bind="click: $parent.setSelection">
+            <span>*</span>
+            <label data-bind="text: name"></label>
+            has age:
+            <span data-bind="text: age"></span>
+        </li>
+    </ul>
+
+    <br/>
+    <a href="#" data-bind="click: clearSelection">Clear Selection</a>
+    <br><br>
+
+    <div data-bind="with: invite, visible: invite().model" style='background-color:yellow'>
+        You have selected: <span data-bind="text:name"></span>
+        and his age is <span data-bind="text:age"></span>
+    </div>
+
+</div>
+
+  <script src="../../vendor/qunit/jquery.js"></script>
+  <script src="../../../knockback-core-stack.js"></script>
+  <script src="issue46.js"></script>
+
+</body>
+</html>
