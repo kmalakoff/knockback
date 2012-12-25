@@ -258,9 +258,3 @@ class kb.utils
   #   kb.utils.hasModelSignature(new Backbone.Model());
   @hasCollectionSignature = (obj) ->
     return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
-
-  # @deprecated please use kb.release instead
-  # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
-  @release = (obj) ->
-    _legacyWarning('kb.utils.release', '0.16.0', 'Please use kb.release instead')
-    return kb.release(obj)

@@ -1,5 +1,11 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.8
+
+* updated knockback-full-stack for latest Underscore.js, Backbone.js, and Knockout.js
+* bugfix for viewModelByModel if the ViewModel has not yet been initialized
+* removed legacy functionality that had been previously warned for removal: kb.utils.release, kb.renderAutoReleasedTemplate, ko.defaultWrapper, kb.CollectionObservable::sorted_index/sortedIndex
+
 ## 0.16.7
 
 * replaced `sortedIndex` by `comparator` for sorting a kb.collectionObservable

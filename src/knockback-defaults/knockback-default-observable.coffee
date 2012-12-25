@@ -1,5 +1,5 @@
 ###
-  knockback_default_observable.js 0.16.7
+  knockback_default_observable.js 0.16.8
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:
@@ -40,6 +40,3 @@ class kb.DefaultObservable
   setToDefault: -> kb.utils.wrappedObservable(@)(@dv)
 
 kb.defaultObservable = (target, default_value) -> return new kb.DefaultObservable(target, default_value)
-kb.defaultWrapper = (target, default_value) ->
-  _legacyWarning('ko.defaultWrapper', '0.16.3', 'Please use kb.defaultObservable instead')
-  return new kb.DefaultObservable(target, default_value)

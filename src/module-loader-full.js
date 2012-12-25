@@ -1,5 +1,5 @@
 /*
-  knockback.js 0.16.7 (full version)
+  knockback.js 0.16.8 (full version)
   (c) 2011, 2012 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.

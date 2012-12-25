@@ -1,5 +1,5 @@
 ###
-  knockback-triggered-observable.js 0.16.7
+  knockback-triggered-observable.js 0.16.8
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:

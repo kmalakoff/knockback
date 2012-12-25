@@ -97,8 +97,6 @@ class kb.CollectionObservable
     if options.sort_attribute
       @_comparator = ko.observable(@_attributeComparator(options.sort_attribute))
     else
-      if options.sorted_index
-        _legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
       @_comparator = ko.observable(options.comparator)
     if options.filters
       @_filters = ko.observableArray(if _.isArray(options.filters) then options.filters else [options.filters] if options.filters)
@@ -236,9 +234,6 @@ class kb.CollectionObservable
   #    );
   comparator: (comparator) -> @_comparator(comparator)
 
-  # @deprecated
-  sortedIndex: -> _legacyWarning('sortedIndex no longer supported', '0.16.7', 'please use comparator instead')
-
   # Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   #
   # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
@@ -254,7 +249,7 @@ class kb.CollectionObservable
   viewModelByModel: (model) ->
     return null if @models_only
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(kb.utils.wrappedObservable(@)(), (test) -> return (test.__kb.object[id_attribute] == model[id_attribute]))
+    return _.find(kb.utils.wrappedObservable(@)(), (test) -> return if test?.__kb?.object then (test.__kb.object[id_attribute] == model[id_attribute]) else false)
 
   # Will return true unless created with models_only option.
   #

@@ -3083,7 +3083,7 @@
    */
   function result(object, property) {
     // based on Backbone's private `getValue` function
-    // https://github.com/documentcloud/backbone/blob/0.9.2/backbone.js#L1419-1424
+    // https://github.com/documentcloud/backbone/blob/0.9.9/backbone.js#L1419-1424
     if (!object) {
       return null;
     }

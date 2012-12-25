@@ -213,6 +213,3 @@ class kb.ViewModel
 # @author Rockstar Ninja
 #
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
-kb.observables = (model, binding_info, view_model) ->
-  _legacyWarning('kb.observables', '0.16.0', 'Please use kb.viewModel instead')
-  return new kb.ViewModel(model, binding_info, view_model)
