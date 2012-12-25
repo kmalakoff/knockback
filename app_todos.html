@@ -16,7 +16,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.7.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.8.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -147,11 +147,11 @@
 </ul>
 
         <pre data-for="cs">@trigger('change', @)
-@trigger(&quot;change:\#{key}&quot;, value) for key, value of @translations_by_locale[@locale_identifier]
+@trigger(&quot;change:#{key}&quot;, value) for key, value of @translations_by_locale[@locale_identifier]
 </pre>
         <pre data-for="js">this.trigger('change', @);
 for (var key in this.translations_by_locale[this.locale_identifier]) {
-  this.trigger(&quot;change:\#{key}&quot;, this.translations_by_locale[this.locale_identifier][key]);
+  this.trigger(&quot;change:#{key}&quot;, this.translations_by_locale[this.locale_identifier][key]);
 }
 </pre><p>Register your custom locale manager like:
 </p>

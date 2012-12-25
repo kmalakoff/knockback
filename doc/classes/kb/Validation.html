@@ -3,17 +3,19 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
-  <script src='../../assets/codo.js'></script>
-  <script src='../../assets/search_data.js'></script>
+  <link rel='stylesheet' href='..&#47;..&#47;assets/codo.css' type='text/css'>
+  <script src='..&#47;..&#47;assets/codo.js'></script>
+  <script src='..&#47;..&#47;assets/search_data.js'></script>
 </head>
   <body>
-    <div id='base' data-path='../../'></div>
+    <div id='base' data-path='..&#47;..&#47;'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../class_index.html' title='Index'>Index</a>
+    <a href='..&#47;..&#47;README.md.html' title='Knockback'>Knockback</a>
     &raquo;
-    <a href='../../classes/kb.html' title='kb'>kb</a>
+    <a href='..&#47;..&#47;class_index.html' title='Index'>Index</a>
+    &raquo;
+    <a href='..&#47;..&#47;classes&#47;kb.html' title='kb'>kb</a>
     &raquo;
     <span class='title'>Validation</span>
     <nav>
@@ -24,10 +26,10 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='../../class_list.html'>Classes</a>
-      <a id='file_list_link' href='../../file_list.html'>Files</a>
-      <a id='method_list_link' href='../../method_list.html'>Methods</a>
-      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
+      <a id='class_list_link' href='..&#47;..&#47;class_list.html'>Classes</a>
+      <a id='file_list_link' href='..&#47;..&#47;file_list.html'>Files</a>
+      <a id='method_list_link' href='..&#47;..&#47;method_list.html'>Methods</a>
+      <a id='extra_list_link' href='..&#47;..&#47;extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -111,7 +113,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-validation/knockback-validation.coffee</td>
+          <td>src&#47;knockback-validation&#47;knockback-validation.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -125,7 +127,7 @@
     <pre><code class='coffee'>&lt;form name=&quot;myForm&quot;&gt;
    &lt;input name=&quot;input1&quot;, data-bind=&quot;value: input1&quot; required&gt;
    &lt;input type=&quot;url&quot; name=&quot;input2&quot;, data-bind=&quot;value: input2&quot;&gt;
- &lt;/form&gt;
+ &lt;&#47;form&gt;
 Because there is a form name, it will add the following property to your ViewModel (wrapped in an observable):
  $myForm: {
    input1: {required: boolean, valid: boolean, invalid: boolean},
@@ -139,7 +141,7 @@ Because there is a form name, it will add the following property to your ViewMod
     <pre><code class='coffee'>&lt;form&gt;
   &lt;input name=&quot;input1&quot;, data-bind=&quot;value: input1&quot; required&gt;
   &lt;input type=&quot;url&quot; name=&quot;input2&quot;, data-bind=&quot;value: input2&quot;&gt;
-&lt;/form&gt;
+&lt;&#47;form&gt;
 Because there is not a form name, it will extend the following on your ViewModel (each wrapped separately in an observable):
 {
   $input1: {required: boolean, valid: boolean, invalid: boolean},
@@ -293,7 +295,11 @@ Because there is not a form name, it will extend the following on your ViewModel
     <strong>Note:</strong>
     Called using <code>kb.inputValidator</code> (not  kb.Validation.inputValidator)
   </div>
-  <p>Used to create an observable that wraps all of the validators for an HTML input element using <code>kb.valueValidator</code>. See kb.valueValidator for shared options.<br />In addition, you can add custom bindings by including a <code>validations</code> Object in your data-bind statement where each property has a function(value) that returns true if there are errors.<br />It will automatically generate validators from the input for the following attributes: <em> type: for url, email, and number</em> required: must have a length or a value</p>
+  <p>Used to create an observable that wraps all of the validators for an HTML input element using <code>kb.valueValidator</code>. See kb.valueValidator for shared options.
+In addition, you can add custom bindings by including a <code>validations</code> Object in your data-bind statement where each property has a function(value) that returns true if there are errors.
+It will automatically generate validators from the input for the following attributes:
+<em> type: for url, email, and number
+</em> required: must have a length or a value</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -337,7 +343,8 @@ Adds the following to your ViewModel:
     <strong>Note:</strong>
     Called using <code>kb.formValidator</code> (not  kb.Validation.formValidator)
   </div>
-  <p>Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using <code>kb.inputValidator</code>. See kb.inputValidator for per input options.<br />In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled. Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.</p>
+  <p>Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using <code>kb.inputValidator</code>. See kb.inputValidator for per input options.
+In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled. Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -346,7 +353,7 @@ Adds the following to your ViewModel:
     <pre><code class='coffee'>&lt;form name=&#39;my_form&#39; data-bind=&quot;inject: kb.formValidator, validation_options: {priorities: [&#39;required&#39;, &#39;url&#39;]}&quot;&gt;
   &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name&quot; required&gt;
   &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site&quot; required&gt;
-&lt;/form&gt;
+&lt;&#47;form&gt;
 Adds the following to your ViewModel:
 $my_form: {
   name: kb.observable({required: Boolean, $valid: Boolean, $error_count: Number, $active_error: String}),
@@ -358,7 +365,7 @@ $my_form: {
     <pre><code class='coffee'>&lt;form data-bind=&quot;inject: kb.formValidator, validation_options: {priorities: [&#39;required&#39;, &#39;url&#39;]}&quot;&gt;
   &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name&quot; required&gt;
   &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site&quot; required&gt;
-&lt;/form&gt;
+&lt;&#47;form&gt;
 Extends your ViewModel with the following Object:
 {
   $name: kb.observable({required: Boolean, $valid: Boolean, $error_count: Number, $active_error: String}),
@@ -525,10 +532,10 @@ Extends your ViewModel with the following Object:
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
+  Tue Dec 25 2012 08:23:06 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.4
+  v1.5.4
   (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts

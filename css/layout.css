@@ -13,6 +13,7 @@ body div.page.github_fork_me {
   position: fixed;
   top: 0px;
   right: 0px;
+  z-index: 9999;
 }
 .animated {
   -webkit-animation-fill-mode: both;

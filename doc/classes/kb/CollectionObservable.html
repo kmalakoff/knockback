@@ -3,17 +3,19 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
-  <script src='../../assets/codo.js'></script>
-  <script src='../../assets/search_data.js'></script>
+  <link rel='stylesheet' href='..&#47;..&#47;assets/codo.css' type='text/css'>
+  <script src='..&#47;..&#47;assets/codo.js'></script>
+  <script src='..&#47;..&#47;assets/search_data.js'></script>
 </head>
   <body>
-    <div id='base' data-path='../../'></div>
+    <div id='base' data-path='..&#47;..&#47;'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../class_index.html' title='Index'>Index</a>
+    <a href='..&#47;..&#47;README.md.html' title='Knockback'>Knockback</a>
     &raquo;
-    <a href='../../classes/kb.html' title='kb'>kb</a>
+    <a href='..&#47;..&#47;class_index.html' title='Index'>Index</a>
+    &raquo;
+    <a href='..&#47;..&#47;classes&#47;kb.html' title='kb'>kb</a>
     &raquo;
     <span class='title'>CollectionObservable</span>
     <nav>
@@ -24,10 +26,10 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='../../class_list.html'>Classes</a>
-      <a id='file_list_link' href='../../file_list.html'>Files</a>
-      <a id='method_list_link' href='../../method_list.html'>Methods</a>
-      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
+      <a id='class_list_link' href='..&#47;..&#47;class_list.html'>Classes</a>
+      <a id='file_list_link' href='..&#47;..&#47;file_list.html'>Files</a>
+      <a id='method_list_link' href='..&#47;..&#47;method_list.html'>Methods</a>
+      <a id='extra_list_link' href='..&#47;..&#47;extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -111,7 +113,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src/knockback-core/knockback-collection-observable.coffee</td>
+          <td>src&#47;knockback-core&#47;knockback-collection-observable.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -130,8 +132,8 @@ var view_model = {
       How to access and change the observed collection.
     </h4>
     <pre><code class='coffee'> var todos = new kb.CollectionObservable(new Backbone.Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
- var current_collection = todos.collection(); // get
- todos.collection(new Backbone.Collection([{name: &#39;name3&#39;}, {name: &#39;name4&#39;}])); // set</code></pre>
+ var current_collection = todos.collection(); &#47;&#47; get
+ todos.collection(new Backbone.Collection([{name: &#39;name3&#39;}, {name: &#39;name4&#39;}])); &#47;&#47; set</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -214,16 +216,6 @@ var view_model = {
   </li>
   <li>
     <span class='signature'>
-      <a href='#sortedIndex-instance'>
-        - (void) <strong>sortedIndex</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      @deprecated
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#sortAttribute-instance'>
         - (void) <strong>sortAttribute</strong>(sort_attribute)
       </a>
@@ -268,7 +260,7 @@ var view_model = {
     </h4>
     <pre><code class='coffee'>var MyCollectionObservable = kb.CollectionObservable.extend({
    constructor: function(collection, options) {
-     // the constructor does not return &#39;this&#39; but a ko.observableArray
+     &#47;&#47; the constructor does not return &#39;this&#39; but a ko.observableArray
      return kb.CollectionObservable.prototype.constructor.call(this, collection, {
        view_model: MyViewModel,
        options: options
@@ -319,7 +311,12 @@ var view_model = {
     <strong>Note:</strong>
     the constructor does not return &#39;this&#39; but a ko.observableArray
   </div>
-  <p>Used to create a new kb.CollectionObservable.</p><p>When the observable is updated, the following Backbone.Events are triggered:</p> <ul><li><strong><em>add</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li> <li><strong><em>resort</em></strong>: (view_model, collection_observable, new_index) or if batch: (collection_observable)</li> <li><strong><em>remove</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li> </ul>
+  <p>Used to create a new kb.CollectionObservable.</p><p>When the observable is updated, the following Backbone.Events are triggered:</p><ul>
+<li><strong><em>add</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li>
+<li><strong><em>resort</em></strong>: (view_model, collection_observable, new_index) or if batch: (collection_observable)</li>
+<li><strong><em>remove</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li>
+</ul>
+
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
@@ -473,7 +470,8 @@ var view_model = {
       - (void) <strong>destroy</strong>()
     </p>
     <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc.<br />Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
+  <p>Required clean up function to break cycles, release view models, etc.
+Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
@@ -492,7 +490,7 @@ var view_model = {
     <pre><code class='coffee'>var selected_collection = new Backbone.Collection();
 var available_collection = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Fred&#39;}]);
 var selected = kb.collectionObservable(available_collection);
-var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); // view models shared with selected collection observable
+var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); &#47;&#47; view models shared with selected collection observable
 </code></pre>
   </div>
 </div>
@@ -510,7 +508,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
     <h4>
       
     </h4>
-    <pre><code class='coffee'> // exclude a single model by id
+    <pre><code class='coffee'> &#47;&#47; exclude a single model by id
  collection_observable.filters(model.id);
 </code></pre>
   </div>
@@ -540,7 +538,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
     <h4>
       
     </h4>
-    <pre><code class='coffee'> // change the sorting function
+    <pre><code class='coffee'> &#47;&#47; change the sorting function
  collection_observable.comparator(
    function(view_models, vm){
      return _.comparator(view_models, vm, (test) -&gt; kb.utils.wrappedModel(test).get(&#39;name&#39;));
@@ -572,16 +570,6 @@ var available = kb.collectionObservable(available_collection, available_collecti
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='sortedIndex-instance'>
-      - (void) <strong>sortedIndex</strong>()
-    </p>
-    <div class='docstring'>
-  <p>@deprecated</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='sortAttribute-instance'>
       - (void) <strong>sortAttribute</strong>(sort_attribute)
     </p>
@@ -593,9 +581,9 @@ var available = kb.collectionObservable(available_collection, available_collecti
       
     </h4>
     <pre><code class='coffee'> var todos = new kb.CollectionObservable(new Backbone.Collection([{name: &#39;Zanadu&#39;, name: &#39;Alex&#39;}]));
- // in order of Zanadu then Alex
+ &#47;&#47; in order of Zanadu then Alex
  todos.sortAttribute(&#39;name&#39;);
- // in order of Alex then Zanadu
+ &#47;&#47; in order of Alex then Zanadu
 </code></pre>
   </div>
 </div>
@@ -635,9 +623,9 @@ var available = kb.collectionObservable(available_collection, available_collecti
       
     </h4>
     <pre><code class='coffee'>var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
-todos1.hasViewModels();     // false
+todos1.hasViewModels();     &#47;&#47; false
 var todos2 = new kb.CollectionObservable(new Backbone.Collection());
-todos2.hasViewModels();     // true
+todos2.hasViewModels();     &#47;&#47; true
 </code></pre>
   </div>
 </div>
@@ -648,10 +636,10 @@ todos2.hasViewModels();     // true
     </div>
     <div id='footer'>
   Generated on
-  Wed Sep 26 2012 22:07:49 GMT-0700 (PDT)
+  Tue Dec 25 2012 08:23:06 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.4.4
+  v1.5.4
   (Node.js v0.8.10).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
