@@ -1,5 +1,10 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.16.9
+
+* added kb.wasReleased helper function
+* bug fix for recursive view model create: https://github.com/kmalakoff/knockback/issues/53
+
 ## 0.16.8
 
 * updated knockback-full-stack for latest Underscore.js, Backbone.js, and Knockout.js
