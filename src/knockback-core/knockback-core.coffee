@@ -1,5 +1,5 @@
 ###
-  knockback-core.js 0.16.8
+  knockback-core.js 0.16.9
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -47,7 +47,7 @@
 class kb
 
   # Knockback library semantic version
-  @VERSION: '0.16.8'
+  @VERSION: '0.16.9'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -64,6 +64,10 @@ class kb
   # Stored value type is a Backbone.Collection -> observable type: kb.CollectionObservable
   @TYPE_COLLECTION: 4
 
+  # Checks if an object has been released.
+  # @param [Any] obj the object to release and also release its keys
+  @wasReleased = (obj) -> return not obj or obj.__kb_released
+
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   # @param [Any] obj the object to release and also release its keys
   # @param [Function] pre_release_fn an optional function to clear the key on the object before the key's value is released. Used by kb.releaseKeys.
@@ -78,7 +82,7 @@ class kb
     if (
       (not obj or (obj isnt Object(obj))) or # must be an object
       ((typeof(obj) is 'function') and not ko.isObservable(obj)) or # not a simple function
-      obj.__kb_destroyed or # already destroyed
+      obj.__kb_released or # already destroyed
       ((obj instanceof Backbone.Model) or (obj instanceof Backbone.Collection)) # not a model or collection
     )
       return @
@@ -90,7 +94,7 @@ class kb
       return @
 
     # release object
-    obj.__kb_destroyed = true
+    obj.__kb_released = true
     not pre_release_fn or pre_release_fn()
 
     # observable or lifecycle managed

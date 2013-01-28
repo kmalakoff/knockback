@@ -147,7 +147,7 @@ class kb.EventWatcher
 
         # unbind relational updates
         @_modelUnbindRelatationalInfo(event_name, info) if info.rel_fn
-        info.emitter(null) if info.emitter
+        info.emitter(null) if not kb.wasReleased(obj) and info.emitter # not desirable if an object has been released
         return
 
   ####################################################

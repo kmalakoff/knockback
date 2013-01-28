@@ -119,7 +119,7 @@ class kb.Observable
     observable.model = @model = ko.dependentObservable(
       read: => @_model(); return @_mdl
       write: (new_model) =>
-        return if @__kb_destroyed or (@_mdl is new_model) # destroyed or no change
+        return if @__kb_released or (@_mdl is new_model) # destroyed or no change
 
         # update references
         @_mdl = new_model
@@ -145,7 +145,7 @@ class kb.Observable
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     observable = kb.utils.wrappedObservable(@)
-    @__kb_destroyed = true
+    @__kb_released = true
     kb.release(@__kb_value); @__kb_value = null
     @model.dispose(); @_mdl = @model = observable.model = null
     kb.utils.wrappedDestroy(@)
@@ -165,7 +165,7 @@ class kb.Observable
   ####################################################
   # @private
   update: (new_value) ->
-    return if @__kb_destroyed # destroyed, nothing to do
+    return if @__kb_released # destroyed, nothing to do
 
     # determine the new type
     new_value = @_mdl.get(_unwrapObservable(@key)) if @_mdl and not arguments.length
@@ -173,7 +173,7 @@ class kb.Observable
     new_type = kb.utils.valueType(new_value)
 
     # SHARED NULL MODEL - update reference
-    if not @__kb_value or (@__kb_value.__kb_destroyed or (@__kb_value.__kb_null and new_value))
+    if not @__kb_value or (@__kb_value.__kb_released or (@__kb_value.__kb_null and new_value))
       @__kb_value = undefined
       @value_type = undefined
     value = @__kb_value

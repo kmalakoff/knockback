@@ -79,7 +79,7 @@ class kb.Store
         continue unless record.observable
 
         # already released, release our references
-        if record.observable.__kb_destroyed
+        if record.observable.__kb_released
           record.obj = null
           record.observable = null
           continue
