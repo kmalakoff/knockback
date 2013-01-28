@@ -311,8 +311,8 @@ class kb.CollectionObservable
         observable = kb.utils.wrappedObservable(@)
         collection = @_collection()
         return if (view_model = @viewModelByModel(arg)) # it may have already been added by a change event
-        view_model = @_createViewModel(arg)
         @in_edit++
+        view_model = @_createViewModel(arg)
         if (comparator = @_comparator())
           observable().push(view_model)
           observable.sort(comparator)
