@@ -16,5 +16,6 @@ $(->
   )
 
   test("0.16.0 deprecations", ->
+    ok(true)
   )
 )

@@ -398,39 +398,39 @@ $(->
 
     # keys - array
     view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: ['name', 'date'])
-    equals(view_model.name(), 'Bob', 'keys: Bob')
+    equal(view_model.name(), 'Bob', 'keys: Bob')
     ok(view_model.date, 'keys: date')
     equal(view_model.date(), null, 'keys: date fn')
     kb.release(view_model)
 
     # keys - object
     view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: {name: {}, date: {}})
-    equals(view_model.name(), 'Bob', 'keys: Bob')
+    equal(view_model.name(), 'Bob', 'keys: Bob')
     ok(view_model.date, 'keys: date')
     equal(view_model.date(), null, 'keys: date fn')
     kb.release(view_model)
 
     # excludes
     view_model = kb.viewModel(new Backbone.Model({name: 'Bob', date: new Date()}), excludes: ['date'])
-    equals(view_model.name(), 'Bob', 'excludes: Bob')
+    equal(view_model.name(), 'Bob', 'excludes: Bob')
     ok(not view_model.date, 'excludes: date')
     kb.release(view_model)
 
     # requires
     view_model = kb.viewModel(new Backbone.Model(), requires: ['name'])
-    equals(view_model.name(), null, 'requires: name')
+    equal(view_model.name(), null, 'requires: name')
     ok(not view_model.date, 'requires: date')
     kb.release(view_model)
 
     # internals
     view_model = kb.viewModel(new Backbone.Model(), internals: ['name'])
-    equals(view_model._name(), null, 'internals: name')
+    equal(view_model._name(), null, 'internals: name')
     ok(not view_model.date, 'internals: date')
     kb.release(view_model)
 
     # mappings
     view_model = kb.viewModel(new Backbone.Model(), mappings: {name: {}})
-    equals(view_model.name(), null, 'mappings: name')
+    equal(view_model.name(), null, 'mappings: name')
     ok(not view_model.date, 'mappings: date')
     kb.release(view_model)
 

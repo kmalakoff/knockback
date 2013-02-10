@@ -136,6 +136,11 @@ module.exports =
         'cp -v backbone-relational vendor/optional/backbone-relational.js'
         'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational.min.js'
 
+        # knockback test dependencies
+        # 'cp -v jquery.js vendor/test/jquery.js'
+        # 'cp -v jqunitjs/qunit/qunit.js vendor/test/qunit.js'
+        # 'cp -v jqunitjs/qunit/qunit.css vendor/test/qunit.css'
+
         # full and core stack
         'cat src/license-header-full-stack.js vendor/underscore-1.4.4.js vendor/backbone-0.9.10.js vendor/knockout-2.2.1.js knockback.js > knockback-full-stack.js'
         'cat src/license-header-full-stack.js vendor/underscore-1.4.4.min.js vendor/backbone-0.9.10.min.js vendor/knockout-2.2.1.min.js knockback.min.js > knockback-full-stack.min.js'
