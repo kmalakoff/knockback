@@ -6337,7 +6337,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, collapseOptions, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _legacyWarning, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var Backbone, COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, collapseOptions, copyProps, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _legacyWarning, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -6362,7 +6362,7 @@ kb = (function() {
 
   kb.release = function(obj, pre_release_fn) {
     var array, item, view_model, view_models, _i, _j, _len, _len1;
-    if ((!obj || (obj !== Object(obj))) || ((typeof obj === 'function') && !ko.isObservable(obj)) || obj.__kb_released || ((obj instanceof Backbone.Model) || (obj instanceof Backbone.Collection))) {
+    if ((!obj || (obj !== Object(obj))) || ((typeof obj === 'function') && !ko.isObservable(obj)) || obj.__kb_released || ((obj instanceof kb.Model) || (obj instanceof kb.Collection))) {
       return this;
     }
     if (_.isArray(obj)) {
@@ -6453,19 +6453,29 @@ if (typeof exports !== 'undefined') {
   module.exports = kb;
 }
 
-if (!this._ && (typeof require !== 'undefined')) {
-  try {
-    _ = require('lodash');
-  } catch (e) {
-    _ = require('underscore');
-  }
+if (this.Parse) {
+  kb._ = _ = this.Parse._;
+  kb.PARSE = true;
+  kb.Collection = this.Parse.Collection;
+  kb.Model = this.Parse.Object;
+  kb.Events = this.Parse.Events;
 } else {
-  _ = this._;
+  if (!this._ && (typeof require !== 'undefined')) {
+    try {
+      _ = require('lodash');
+    } catch (e) {
+      _ = require('underscore');
+    }
+  } else {
+    _ = this._;
+  }
+  kb._ = _ = _.hasOwnProperty('_') ? _._ : _;
+  kb.BACKBONE = true;
+  Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
+  kb.Collection = Backbone.Collection;
+  kb.Model = Backbone.Model;
+  kb.Events = Backbone.Events;
 }
-
-kb._ = _ = _.hasOwnProperty('_') ? _._ : _;
-
-kb.Backbone = Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
 
 kb.ko = ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
 
@@ -6499,6 +6509,68 @@ collapseOptions = function(options) {
   delete result.options;
   return result;
 };
+
+copyProps = function(dest, source) {
+  var key, value;
+  for (key in source) {
+    value = source[key];
+    dest[key] = value;
+  }
+  return dest;
+};
+
+// Shared empty constructor function to aid in prototype-chain creation.
+var ctor = function(){};
+
+// Helper function to correctly set up the prototype chain, for subclasses.
+// Similar to 'goog.inherits', but uses a hash of prototype properties and
+// class properties to be extended.
+var inherits = function(parent, protoProps, staticProps) {
+  var child;
+
+  // The constructor function for the new subclass is either defined by you
+  // (the "constructor" property in your extend definition), or defaulted
+  // by us to simply call the parent's constructor.
+  if (protoProps && protoProps.hasOwnProperty('constructor')) {
+    child = protoProps.constructor;
+  } else {
+    child = function(){ parent.apply(this, arguments); };
+  }
+
+  // Inherit class (static) properties from parent.
+  copyProps(child, parent);
+
+  // Set the prototype chain to inherit from parent, without calling
+  // parent's constructor function.
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor();
+
+  // Add prototype properties (instance properties) to the subclass,
+  // if supplied.
+  if (protoProps) copyProps(child.prototype, protoProps);
+
+  // Add static properties to the constructor function, if supplied.
+  if (staticProps) copyProps(child, staticProps);
+
+  // Correctly set child's 'prototype.constructor'.
+  child.prototype.constructor = child;
+
+  // Set a convenience property in case the parent's prototype is needed later.
+  child.__super__ = parent.prototype;
+
+  return child;
+};
+
+// The self-propagating extend function that BacLCone classes use.
+var extend = function (protoProps, classProps) {
+  var child = inherits(this, protoProps, classProps);
+  child.extend = this.extend;
+  return child;
+};
+;
+
+
+kb.extend = extend;
 
 KB_TYPE_UNKNOWN = kb.TYPE_UNKNOWN;
 
@@ -6644,10 +6716,10 @@ kb.utils = (function() {
     if (observable.__kb_is_o) {
       return observable.valueType();
     }
-    if (observable.__kb_is_co || (observable instanceof Backbone.Collection)) {
+    if (observable.__kb_is_co || (observable instanceof kb.Collection)) {
       return KB_TYPE_COLLECTION;
     }
-    if ((observable instanceof kb.ViewModel) || (observable instanceof Backbone.Model)) {
+    if ((observable instanceof kb.ViewModel) || (observable instanceof kb.Model)) {
       return KB_TYPE_MODEL;
     }
     if (_.isArray(observable)) {
@@ -6674,7 +6746,7 @@ kb.utils = (function() {
     if (creator) {
       return creator;
     }
-    if (owner && Backbone.RelationalModel && (owner instanceof Backbone.RelationalModel)) {
+    if (owner && kb.BACKBONE && Backbone.RelationalModel && (owner instanceof Backbone.RelationalModel)) {
       key = _unwrapObservable(key);
       relation = _.find(owner.getRelations(), function(test) {
         return test.key === key;
@@ -6690,20 +6762,20 @@ kb.utils = (function() {
     if (!value) {
       return null;
     }
-    if (value instanceof Backbone.Model) {
+    if (value instanceof kb.Model) {
       return kb.ViewModel;
     }
-    if (value instanceof Backbone.Collection) {
+    if (value instanceof kb.Collection) {
       return kb.CollectionObservable;
     }
     return null;
   };
 
   utils.createFromDefaultCreator = function(obj, options) {
-    if (obj instanceof Backbone.Model) {
+    if (obj instanceof kb.Model) {
       return kb.viewModel(obj, options);
     }
-    if (obj instanceof Backbone.Collection) {
+    if (obj instanceof kb.Collection) {
       return kb.collectionObservable(obj, options);
     }
     if (_.isArray(obj)) {
@@ -6863,7 +6935,7 @@ kb.Store = (function() {
 
   Store.prototype.findIndex = function(obj, creator) {
     var index, record, _ref;
-    if (!obj || (obj instanceof Backbone.Model)) {
+    if (!obj || (obj instanceof kb.Model)) {
       _ref = this.observable_records;
       for (index in _ref) {
         record = _ref[index];
@@ -6910,7 +6982,7 @@ kb.Store = (function() {
     var creator, observable;
     options.store = this;
     options.creator || (options.creator = kb.utils.inferCreator(obj, options.factory, options.path));
-    if (!options.creator && (obj instanceof Backbone.Model)) {
+    if (!options.creator && (obj instanceof kb.Model)) {
       options.creator = kv.ViewModel;
     }
     creator = options.creator;
@@ -7027,7 +7099,7 @@ kb.EventWatcher = (function() {
       this.model_ref.release();
       this.model_ref = null;
     }
-    if (Backbone.ModelRef && (new_emitter instanceof Backbone.ModelRef)) {
+    if (kb.BACKBONE && Backbone.ModelRef && (new_emitter instanceof Backbone.ModelRef)) {
       this.model_ref = new_emitter;
       this.model_ref.retain();
       this.model_ref.bind('loaded', this.__kb._onModelLoaded);
@@ -7101,7 +7173,7 @@ kb.EventWatcher = (function() {
       callbacks.list.push(info);
     }
     if (this.ee) {
-      if (Backbone.RelationalModel && (this.ee instanceof Backbone.RelationalModel) && _.contains(event_names, 'change')) {
+      if (kb.BACKBONE && Backbone.RelationalModel && (this.ee instanceof Backbone.RelationalModel) && _.contains(event_names, 'change')) {
         this._modelBindRelatationalInfo('change', info);
       }
       info.emitter(this.ee) && info.emitter;
@@ -7136,7 +7208,7 @@ kb.EventWatcher = (function() {
 
   EventWatcher.prototype._onModelLoaded = function(model) {
     var callbacks, event_name, info, is_relational, list, _i, _len, _ref;
-    is_relational = Backbone.RelationalModel && (model instanceof Backbone.RelationalModel);
+    is_relational = kb.BACKBONE && Backbone.RelationalModel && (model instanceof Backbone.RelationalModel);
     this.ee = model;
     _ref = this.__kb.callbacks;
     for (event_name in _ref) {
@@ -7480,12 +7552,12 @@ kb.observable = function(model, options, view_model) {
 
 kb.ViewModel = (function() {
 
-  ViewModel.extend = Backbone.Model.extend;
+  ViewModel.extend = kb.extend;
 
   function ViewModel(model, options, view_model) {
     var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, vm_key, _mdl, _ref,
       _this = this;
-    !model || (model instanceof Backbone.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(this, 'not a model');
+    !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(this, 'not a model');
     options || (options = {});
     view_model || (view_model = {});
     if (_.isArray(options)) {
@@ -7688,12 +7760,12 @@ kb.compare = function(value_a, value_b) {
 
 kb.CollectionObservable = (function() {
 
-  CollectionObservable.extend = Backbone.Model.extend;
+  CollectionObservable.extend = kb.extend;
 
   function CollectionObservable(collection, options) {
     var create_options, observable,
       _this = this;
-    !collection || (collection instanceof Backbone.Collection) || _throwUnexpected(this, 'not a collection');
+    !collection || (collection instanceof kb.Collection) || _throwUnexpected(this, 'not a collection');
     options || (options = {});
     observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
     observable.__kb_is_co = true;

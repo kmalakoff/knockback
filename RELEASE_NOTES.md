@@ -4,6 +4,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 * added kb.wasReleased helper function
 * bug fix for recursive view model create: https://github.com/kmalakoff/knockback/issues/53
+* added support for Parse framework (no-AMD support)
 
 ## 0.16.8
 

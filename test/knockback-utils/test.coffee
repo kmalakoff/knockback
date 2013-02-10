@@ -1,18 +1,15 @@
 $(->
   module("knockback_core utils")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
-    ok(!!kb, 'kb')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
@@ -30,7 +27,7 @@ $(->
   test("kb.utils.wrappedModel", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    model = new Backbone.Model({name: 'Bob'})
+    model = new kb.Model({name: 'Bob'})
     instance = {}
     equal(kb.utils.wrappedModel(instance), instance, "no model was wrapped so return the instance") # get
 
@@ -43,19 +40,19 @@ $(->
   test("kb.utils.wrappedStore", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection_observable = kb.collectionObservable(new Backbone.Collection())
+    collection_observable = kb.collectionObservable(new kb.Collection())
     ok(!!kb.utils.wrappedStore(collection_observable), 'Store is available on a collection observable')
 
     # can get and share store
-    collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), {store: kb.utils.wrappedStore(collection_observable)})
+    collection_observable_shared = kb.collectionObservable(new kb.Collection(), {store: kb.utils.wrappedStore(collection_observable)})
     equal(kb.utils.wrappedStore(collection_observable), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observables')
     kb.release(collection_observable_shared) # clean up
 
-    view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}))
+    view_model = kb.viewModel(new kb.Model({name: 'Bob'}))
     ok(!!kb.utils.wrappedStore(view_model), 'Store is available on a view model')
 
     # can get and share store
-    collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), {store: kb.utils.wrappedStore(view_model)})
+    collection_observable_shared = kb.collectionObservable(new kb.Collection(), {store: kb.utils.wrappedStore(view_model)})
 
     equal(kb.utils.wrappedStore(view_model), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observable and view model')
 
@@ -70,15 +67,15 @@ $(->
   test("kb.utils.valueType", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    co = kb.collectionObservable(new Backbone.Collection())
+    co = kb.collectionObservable(new kb.Collection())
     equal(kb.utils.valueType(co), kb.TYPE_COLLECTION, "kb.CollectionObservable is a collection type")
     kb.release(co) # clean up
 
-    o = kb.observable(new Backbone.Model({name: 'name1'}), 'name')
+    o = kb.observable(new kb.Model({name: 'name1'}), 'name')
     equal(kb.utils.valueType(o), kb.TYPE_SIMPLE, "kb.Observable is a kb.TYPE_SIMPLE")
     kb.release(o) # clean up
 
-    model = new Backbone.Model({simple_type: 3, model_type: new Backbone.Model(), collection_type: new Backbone.Collection})
+    model = new kb.Model({simple_type: 3, model_type: new kb.Model(), collection_type: new kb.Collection})
     view_model = kb.viewModel(model)
 
     equal(kb.utils.valueType(view_model.simple_type), kb.TYPE_SIMPLE, "simple is kb.TYPE_SIMPLE")
@@ -86,7 +83,7 @@ $(->
     equal(kb.utils.valueType(view_model.collection_type), kb.TYPE_COLLECTION, "collection is kb.TYPE_COLLECTION")
     kb.release(view_model) # clean up
 
-    view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: model_attr: kb.ViewModel})
+    view_model = kb.viewModel(new kb.Model({simple_attr: null, model_attr: null}), {factories: model_attr: kb.ViewModel})
     equal(kb.utils.valueType(view_model.simple_attr), kb.TYPE_SIMPLE, 'simple_attr is kb.TYPE_SIMPLE')
     equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL')
     kb.release(view_model) # clean up

@@ -11,19 +11,19 @@
 #
 # @method .collectionObservable(collection, options)
 #   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
-#   @param [Backbone.Collection] collection the collection to observe (can be null)
+#   @param [kb.Collection] collection the collection to observe (can be null)
 #   @param [Object] options the create options
 #   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
 #
 # @method .observable(model, options, view_model)
 #   Factory to create a new kb.Observable. See {kb.Observable#constructor} for information on options
-#   @param [Backbone.Model] model the model to observe (can be null)
+#   @param [kb.Model] model the model to observe (can be null)
 #   @param [String|Array|Object] options the create options. String is a single attribute name, Array is an array of attribute names.
 #   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 #
 # @method .viewModel(model, options, view_model)
 #   Factory to create a new kb.ViewModel. See {kb.ViewModel#constructor} for information on options
-#   @param [Backbone.Model|Backbone.ModelRef] model the model to observe (can be null)
+#   @param [kb.Model|Backbone.ModelRef] model the model to observe (can be null)
 #   @param [Object] options the create options
 #   @return [ko.observable] the constructor returns 'this'
 #
@@ -53,15 +53,15 @@ class kb
   # OBSERVABLE STORAGE TYPES
   ####################################
 
-  # Stored value type is not known like null/undefined (could be observed as a Backbone.Model or a Backbone.Collection or a simple type)
+  # Stored value type is not known like null/undefined (could be observed as a kb.Model or a kb.Collection or a simple type)
   @TYPE_UNKNOWN: 0
   # Stored value type is simple like a String or Number -> observable type: ko.observable
   @TYPE_SIMPLE: 1
   # Stored value type is an Array -> observable type: ko.observableArray
   @TYPE_ARRAY: 2
-  # Stored value type is a Backbone.Model -> observable type: ViewModel
+  # Stored value type is a kb.Model -> observable type: ViewModel
   @TYPE_MODEL: 3
-  # Stored value type is a Backbone.Collection -> observable type: kb.CollectionObservable
+  # Stored value type is a kb.Collection -> observable type: kb.CollectionObservable
   @TYPE_COLLECTION: 4
 
   # Checks if an object has been released.
@@ -83,7 +83,7 @@ class kb
       (not obj or (obj isnt Object(obj))) or # must be an object
       ((typeof(obj) is 'function') and not ko.isObservable(obj)) or # not a simple function
       obj.__kb_released or # already destroyed
-      ((obj instanceof Backbone.Model) or (obj instanceof Backbone.Collection)) # not a model or collection
+      ((obj instanceof kb.Model) or (obj instanceof kb.Collection)) # not a model or collection
     )
       return @
 
@@ -134,7 +134,7 @@ class kb
   # ```
   # @example The hard way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
   #   var el = $('<div data-bind="name: name"></div>')[0];
-  #   var view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}));
+  #   var view_model = kb.viewModel(new kb.Model({name: 'Bob'}));
   #   ko.applyBindings(view_model, el);
   #   kb.releaseOnNodeRemove(view_model, el);
   #   ...
@@ -147,7 +147,7 @@ class kb
   # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   #
   # @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
-  #   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
+  #   var el = kb.renderTemplate('my_template', kb.viewModel(new kb.Model({name: 'Bob'})));
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @renderTemplate = (template, view_model, options={}) ->
@@ -162,7 +162,7 @@ class kb
   #
   # @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
   #   var el = $('<div data-bind="name: name"></div>')[0];
-  #   kb.applyBindings(kb.viewModel(new Backbone.Model({name: 'Bob'})), el);
+  #   kb.applyBindings(kb.viewModel(new kb.Model({name: 'Bob'})), el);
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @applyBindings = (view_model, node) ->
@@ -175,10 +175,22 @@ class kb
 # export Knockback and kb namespcaes globally and to modules
 @Knockback = @kb = kb; module.exports = kb if (typeof(exports) isnt 'undefined')
 
-# import and re-export Underscore (or Lo-Dash with precedence), Backbone, and Knockout
-if not @_ and (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
-kb._ = _ = if _.hasOwnProperty('_') then _._ else _ # LEGACY
-kb.Backbone = Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
+# use Parse
+if (@Parse)
+  kb._ = _ = @Parse._
+  kb.PARSE = true
+  kb.Collection = @Parse.Collection
+  kb.Model = @Parse.Object
+  kb.Events = @Parse.Events
+else
+  # import and re-export Underscore (or Lo-Dash with precedence), Backbone, and Knockout
+  if not @_ and (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
+  kb._ = _ = if _.hasOwnProperty('_') then _._ else _ # LEGACY
+  kb.BACKBONE = true
+  Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
+  kb.Collection = Backbone.Collection
+  kb.Model = Backbone.Model
+  kb.Events = Backbone.Events
 kb.ko = ko = if not @ko and (typeof(require) isnt 'undefined') then require('knockout') else @ko
 
 ####################################
@@ -204,6 +216,62 @@ collapseOptions = (options) ->
     options = options.options
   delete result.options
   return result
+
+# From Backbone.js (https:github.com/documentcloud/backbone)
+copyProps = (dest, source) ->
+  (dest[key] = value) for key, value of source
+  return dest
+
+`// Shared empty constructor function to aid in prototype-chain creation.
+var ctor = function(){};
+
+// Helper function to correctly set up the prototype chain, for subclasses.
+// Similar to 'goog.inherits', but uses a hash of prototype properties and
+// class properties to be extended.
+var inherits = function(parent, protoProps, staticProps) {
+  var child;
+
+  // The constructor function for the new subclass is either defined by you
+  // (the "constructor" property in your extend definition), or defaulted
+  // by us to simply call the parent's constructor.
+  if (protoProps && protoProps.hasOwnProperty('constructor')) {
+    child = protoProps.constructor;
+  } else {
+    child = function(){ parent.apply(this, arguments); };
+  }
+
+  // Inherit class (static) properties from parent.
+  copyProps(child, parent);
+
+  // Set the prototype chain to inherit from parent, without calling
+  // parent's constructor function.
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor();
+
+  // Add prototype properties (instance properties) to the subclass,
+  // if supplied.
+  if (protoProps) copyProps(child.prototype, protoProps);
+
+  // Add static properties to the constructor function, if supplied.
+  if (staticProps) copyProps(child, staticProps);
+
+  // Correctly set child's 'prototype.constructor'.
+  child.prototype.constructor = child;
+
+  // Set a convenience property in case the parent's prototype is needed later.
+  child.__super__ = parent.prototype;
+
+  return child;
+};
+
+// The self-propagating extend function that BacLCone classes use.
+var extend = function (protoProps, classProps) {
+  var child = inherits(this, protoProps, classProps);
+  child.extend = this.extend;
+  return child;
+};
+`
+kb.extend = extend
 
 ####################################
 # OBSERVABLE STORAGE TYPES

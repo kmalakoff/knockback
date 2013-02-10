@@ -13,12 +13,13 @@ $(->
       ok(!!ko, 'ko')
       ok(!!_, '_')
       ok(!!Backbone, 'Backbone')
+      ok(!!Backbone.ModelRef, 'Backbone.ModelRef')
       ok(!!kb, 'kb')
       ok(!!kbs, 'kbs')
     )
 
-    kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-    kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+    kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+    kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
     locale_manager = new kb.LocaleManager('en', {
       'en': {loading: "Loading dude"}
@@ -26,7 +27,7 @@ $(->
       'fr-FR': {loading: "Chargement"}
     })
 
-    test("Standard use case: just enough to get the picture", ->
+    test("1. Standard use case: just enough to get the picture", ->
       kb.statistics = new kb.Statistics() # turn on stats
       kb.locale_manager = locale_manager
 
@@ -103,7 +104,7 @@ $(->
 
       equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     )
-    test("Standard use case with kb.ViewModels", ->
+    test("2. Standard use case with kb.ViewModels", ->
       kb.statistics = new kb.Statistics() # turn on stats
       kb.locale_manager = locale_manager
 
@@ -177,7 +178,8 @@ $(->
 
       equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     )
-    test("2. internals test (Coffeescript inheritance)", ->
+
+    test("3. internals test (Coffeescript inheritance)", ->
       kb.statistics = new kb.Statistics() # turn on stats
       kb.locale_manager = locale_manager
 

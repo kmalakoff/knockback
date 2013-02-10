@@ -1,24 +1,21 @@
 $(->
   module("knockback-triggered-observable.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
-    ok(!!kb, 'kb')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
   test("Standard use case: simple events notifications", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    model = new Backbone.Model
+    model = new kb.Model
     model.setLocale = -> model.trigger('change', model)
 
     trigger_count = 0

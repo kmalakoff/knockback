@@ -1,23 +1,21 @@
 $(->
   module("knockback-formatted-observable.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
     ok(!!kb, 'kb')
   )
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   test("Various scenarios", ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -173,7 +171,7 @@ $(->
         super(model, {requires: ['first', 'last']})
         @full_name = kb.formattedObservable('Last: {1}, First: {0}', @first, @last)
 
-    model = new Backbone.Model()
+    model = new kb.Model()
     view_model = new ContactViewModelFullName(model)
     equal(view_model.full_name(), 'Last: , First: ', "full name is good")
 
@@ -201,7 +199,7 @@ $(->
         super(model, {internals: ['first', 'last']})
         @full_name = kb.formattedObservable('Last: {1}, First: {0}', @_first, @_last)
 
-    model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
+    model = new kb.Model({first: 'Ringo', last: 'Starr'})
     view_model = new ContactViewModelFullName(model)
     equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
 

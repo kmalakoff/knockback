@@ -1,23 +1,20 @@
 $(->
   module("knockback-view-model.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
-    ok(!!kb, 'kb')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   test("1. Standard use case: read and write", ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -125,7 +122,7 @@ $(->
         super(model, {requires: ['first', 'last']})
         @full_name = ko.dependentObservable(=> "Last: #{@last()}, First: #{@first()}")
 
-    model = new Backbone.Model()
+    model = new kb.Model()
     view_model = new ContactViewModelFullName(model)
     equal(view_model.full_name(), 'Last: null, First: null', "full name is good")
 
@@ -164,7 +161,7 @@ $(->
         @is_destroyed = true
         @super_destroy()
 
-    model = new Backbone.Model({first: "Hello"})
+    model = new kb.Model({first: "Hello"})
     view_model = new ContactViewModelFullName(model)
 
     equal(view_model.first(), "Hello", "Hello exists")
@@ -209,7 +206,7 @@ $(->
         @super_destroy()
     })
 
-    model = new Backbone.Model({first: "Hello"})
+    model = new kb.Model({first: "Hello"})
     view_model = new ContactViewModelFullName(model)
 
     equal(view_model.first(), "Hello", "Hello exists")
@@ -247,9 +244,9 @@ $(->
     george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
     ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
-    major_duo = new Backbone.Collection([john, paul])
-    minor_duo = new Backbone.Collection([george, ringo])
-    nested_model = new Backbone.Model({
+    major_duo = new kb.Collection([john, paul])
+    minor_duo = new kb.Collection([george, ringo])
+    nested_model = new kb.Model({
       john: john
       paul: paul
       george: george
@@ -338,14 +335,14 @@ $(->
   test("11. Changing attribute types", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    model = new Backbone.Model({reused: null})
+    model = new kb.Model({reused: null})
     view_model = kb.viewModel(model)
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_SIMPLE, 'reused is kb.TYPE_SIMPLE')
 
-    model.set({reused: new Backbone.Model()})
+    model.set({reused: new kb.Model()})
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
-    model.set({reused: new Backbone.Collection()})
+    model.set({reused: new kb.Collection()})
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
 
     model.set({reused: null})
@@ -356,14 +353,14 @@ $(->
 
     # add custom mapping
     view_model = kb.viewModel(model, {factories:
-      reused: (obj, options) -> return if obj instanceof Backbone.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
+      reused: (obj, options) -> return if obj instanceof kb.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
     })
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
-    model.set({reused: new Backbone.Model()})
+    model.set({reused: new kb.Model()})
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
-    model.set({reused: new Backbone.Collection()})
+    model.set({reused: new kb.Collection()})
     equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
 
     model.set({reused: null})
@@ -377,9 +374,9 @@ $(->
 
   test("14. Shared Options", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    model1 = new Backbone.Model({id: 1, name: 'Bob'})
-    model2 = new Backbone.Model({id: 1, name: 'Bob'})
-    model3 = new Backbone.Model({id: 1, name: 'Bob'})
+    model1 = new kb.Model({id: 1, name: 'Bob'})
+    model2 = new kb.Model({id: 1, name: 'Bob'})
+    model3 = new kb.Model({id: 1, name: 'Bob'})
 
     view_model1 = kb.viewModel(model1)
     view_model2 = kb.viewModel(model2)
@@ -397,39 +394,39 @@ $(->
     kb.statistics = new kb.Statistics() # turn on stats
 
     # keys - array
-    view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: ['name', 'date'])
+    view_model = kb.viewModel(new kb.Model({name: 'Bob'}), keys: ['name', 'date'])
     equal(view_model.name(), 'Bob', 'keys: Bob')
     ok(view_model.date, 'keys: date')
     equal(view_model.date(), null, 'keys: date fn')
     kb.release(view_model)
 
     # keys - object
-    view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), keys: {name: {}, date: {}})
+    view_model = kb.viewModel(new kb.Model({name: 'Bob'}), keys: {name: {}, date: {}})
     equal(view_model.name(), 'Bob', 'keys: Bob')
     ok(view_model.date, 'keys: date')
     equal(view_model.date(), null, 'keys: date fn')
     kb.release(view_model)
 
     # excludes
-    view_model = kb.viewModel(new Backbone.Model({name: 'Bob', date: new Date()}), excludes: ['date'])
+    view_model = kb.viewModel(new kb.Model({name: 'Bob', date: new Date()}), excludes: ['date'])
     equal(view_model.name(), 'Bob', 'excludes: Bob')
     ok(not view_model.date, 'excludes: date')
     kb.release(view_model)
 
     # requires
-    view_model = kb.viewModel(new Backbone.Model(), requires: ['name'])
+    view_model = kb.viewModel(new kb.Model(), requires: ['name'])
     equal(view_model.name(), null, 'requires: name')
     ok(not view_model.date, 'requires: date')
     kb.release(view_model)
 
     # internals
-    view_model = kb.viewModel(new Backbone.Model(), internals: ['name'])
+    view_model = kb.viewModel(new kb.Model(), internals: ['name'])
     equal(view_model._name(), null, 'internals: name')
     ok(not view_model.date, 'internals: date')
     kb.release(view_model)
 
     # mappings
-    view_model = kb.viewModel(new Backbone.Model(), mappings: {name: {}})
+    view_model = kb.viewModel(new kb.Model(), mappings: {name: {}})
     equal(view_model.name(), null, 'mappings: name')
     ok(not view_model.date, 'mappings: date')
     kb.release(view_model)
@@ -439,7 +436,7 @@ $(->
 
   test("16. array attributes", ->
 
-    model = new Backbone.Model
+    model = new kb.Model
       text: ["heading.get these rewards"]
       widget: ["sign_up", "rewards"]
       model_data:
@@ -459,7 +456,7 @@ $(->
 
   test("17. model change is observable", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    model = new Backbone.Model({id: 1, name: 'Bob'})
+    model = new kb.Model({id: 1, name: 'Bob'})
 
     view_model = kb.viewModel(model)
 

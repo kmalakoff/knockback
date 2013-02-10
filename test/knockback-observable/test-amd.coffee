@@ -27,10 +27,10 @@ $(->
         @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
         return
 
-      parent = new Backbone.Model({name: 'Daddy'})
-      children_child = new Backbone.Model({name: 'Baby'})
-      children = new Backbone.Collection([{name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child])}])
-      model = new Backbone.Model({})
+      parent = new kb.Model({name: 'Daddy'})
+      children_child = new kb.Model({name: 'Baby'})
+      children = new kb.Collection([{name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
+      model = new kb.Model({})
 
       view_model = new InferringViewModel(model)
       equal(view_model.name(), null, 'inferred name as simple null')

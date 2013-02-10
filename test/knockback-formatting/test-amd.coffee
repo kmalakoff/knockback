@@ -16,8 +16,8 @@ $(->
       ok(!!kbs, 'kbs')
     )
 
-    kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-    kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+    kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+    kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
     test("Various scenarios", ->
       kb.statistics = new kb.Statistics() # turn on stats
@@ -173,7 +173,7 @@ $(->
           super(model, {requires: ['first', 'last']})
           @full_name = kb.formattedObservable('Last: {1}, First: {0}', @first, @last)
 
-      model = new Backbone.Model()
+      model = new kb.Model()
       view_model = new ContactViewModelFullName(model)
       equal(view_model.full_name(), 'Last: , First: ', "full name is good")
 
@@ -201,7 +201,7 @@ $(->
           super(model, {internals: ['first', 'last']})
           @full_name = kb.formattedObservable('Last: {1}, First: {0}', @_first, @_last)
 
-      model = new Backbone.Model({first: 'Ringo', last: 'Starr'})
+      model = new kb.Model({first: 'Ringo', last: 'Starr'})
       view_model = new ContactViewModelFullName(model)
       equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
 

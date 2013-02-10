@@ -18,7 +18,7 @@ $(->
 
     test("Standard use case: simple events notifications", ->
       kb.statistics = new kb.Statistics() # turn on stats
-      model = new Backbone.Model
+      model = new kb.Model
       model.setLocale = -> model.trigger('change', model)
 
       trigger_count = 0

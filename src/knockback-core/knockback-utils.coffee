@@ -83,12 +83,12 @@ class kb.utils
   #
   # @overload wrappedObject(obj)
   #   Gets the observable from an object
-  #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
-  #   @return [Backbone.Model|Backbone.Collection] the model/collection
+  #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
+  #   @return [kb.Model|kb.Collection] the model/collection
   # @overload wrappedObject(obj, value)
   #   Sets the observable on an object
-  #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
-  #   @param [Backbone.Model|Backbone.Collection] value the model/collection
+  #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
+  #   @param [kb.Model|kb.Collection] value the model/collection
   #
   # @example
   #   var model = kb.utils.wrappedObject(view_model);
@@ -100,12 +100,12 @@ class kb.utils
   #
   # @overload wrappedModel(view_model)
   #   Gets the model from a ViewModel
-  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Backbone.Model.
-  #   @return [Backbone.Model|ViewModel] the Model or ViewModel itself if there is no Model
+  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the kb.Model.
+  #   @return [kb.Model|ViewModel] the Model or ViewModel itself if there is no Model
   # @overload wrappedModel(view_model, model)
   #   Sets the observable on an object
-  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Backbone.Model.
-  #   @param [Backbone.Model] model the Model
+  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the kb.Model.
+  #   @param [kb.Model] model the Model
   @wrappedModel = (obj, value) ->
     # get
     if (arguments.length is 1)
@@ -126,8 +126,8 @@ class kb.utils
   #   @param [kb.Store] store the store
   #
   # @example
-  #   var co = kb.collectionObservable(new Backbone.Collection());
-  #   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
+  #   var co = kb.collectionObservable(new kb.Collection());
+  #   var co_selected_options = kb.collectionObservable(new kb.Collection(), {
   #     store: kb.utils.wrappedStore(co)
   #   });
   @wrappedStore = (obj, value)                -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
@@ -183,14 +183,14 @@ class kb.utils
   # @see kb.Observable valueType
   #
   # @example
-  #   var view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
+  #   var view_model = kb.viewModel(new kb.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
   #   kb.utils.valueType(view_model.simple_attr); // kb.TYPE_SIMPLE
   #   kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   @valueType = (observable) ->
     return KB_TYPE_UNKNOWN        unless observable
     return observable.valueType() if observable.__kb_is_o
-    return KB_TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof Backbone.Collection)
-    return KB_TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof Backbone.Model)
+    return KB_TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof kb.Collection)
+    return KB_TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof kb.Model)
     return KB_TYPE_ARRAY          if _.isArray(observable)
     return KB_TYPE_SIMPLE
 
@@ -222,7 +222,7 @@ class kb.utils
     return creator if creator
 
     # infer Backbone.Relational types
-    if owner and Backbone.RelationalModel and (owner instanceof Backbone.RelationalModel)
+    if owner and kb.BACKBONE and Backbone.RelationalModel and (owner instanceof Backbone.RelationalModel)
       key = _unwrapObservable(key)
       relation = _.find(owner.getRelations(), (test) -> return test.key is key)
       if relation
@@ -230,31 +230,31 @@ class kb.utils
 
     # try fallbacks
     return null                         unless value
-    return kb.ViewModel                 if value instanceof Backbone.Model
-    return kb.CollectionObservable      if value instanceof Backbone.Collection
+    return kb.ViewModel                 if value instanceof kb.Model
+    return kb.CollectionObservable      if value instanceof kb.Collection
     return null
 
   # Creates an observable based on a value's type.
   @createFromDefaultCreator = (obj, options) ->
-    return kb.viewModel(obj, options)                   if obj instanceof Backbone.Model
-    return kb.collectionObservable(obj, options)        if obj instanceof Backbone.Collection
+    return kb.viewModel(obj, options)                   if obj instanceof kb.Model
+    return kb.collectionObservable(obj, options)        if obj instanceof kb.Collection
     return ko.observableArray(obj)                      if _.isArray(obj)
     return ko.observable(obj)
 
-  # Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from Backbone.Model
+  # Helper to check an object for having a kb.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from kb.Model
   #
   # @param [Object] obj the object to test
   #
   # @example
-  #   kb.utils.hasModelSignature(new Backbone.Model());
+  #   kb.utils.hasModelSignature(new kb.Model());
   @hasModelSignature = (obj) ->
     return obj and (obj.attributes and not obj.models) and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
 
-  # Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from Backbone.Model
+  # Helper to check an object for having a kb.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from kb.Model
   #
   # @param [Object] obj the object to test
   #
   # @example
-  #   kb.utils.hasModelSignature(new Backbone.Model());
+  #   kb.utils.hasModelSignature(new kb.Model());
   @hasCollectionSignature = (obj) ->
     return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')

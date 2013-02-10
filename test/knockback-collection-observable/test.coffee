@@ -1,23 +1,20 @@
 $(->
   module("knockback-collection-observable.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
-    ok(!!kb, 'kb')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   ContactViewModel = (model) ->
     @name = kb.observable(model, 'name')
@@ -282,7 +279,7 @@ $(->
   test("8. Collection sorting with callbacks", ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    kb.NameSortedContactsCollection = Backbone.Collection.extend({
+    kb.NameSortedContactsCollection = kb.Collection.extend({
       model: kb.Contact
       comparator: (model) -> return model.get('name')
     })
@@ -406,8 +403,8 @@ $(->
     george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
     ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
-    major_duo = new Backbone.Collection([john, paul])
-    minor_duo = new Backbone.Collection([george, ringo])
+    major_duo = new kb.Collection([john, paul])
+    minor_duo = new kb.Collection([george, ringo])
 
     nested_view_model = {
       major_duo1: kb.collectionObservable(major_duo)
@@ -495,7 +492,7 @@ $(->
 
   test("11. Shared Options", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    collection = new Backbone.Collection({id: 1, name: 'Bob'})
+    collection = new kb.Collection({id: 1, name: 'Bob'})
 
     collection_observable1 = kb.collectionObservable(collection)
     collection_observable2 = kb.collectionObservable(collection)
@@ -511,7 +508,7 @@ $(->
 
   test("12. Filters option", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    collection = new Backbone.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+    collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
     collection_observable1 = kb.collectionObservable(collection)
     collection_observable2 = kb.collectionObservable(collection, {filters: 1})
@@ -549,7 +546,7 @@ $(->
 
   test("13. Setting view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    collection = new Backbone.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+    collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
     # set the viewmodels (simulating a selectOptions)
     collection_observable = kb.collectionObservable(collection)
@@ -583,7 +580,7 @@ $(->
 
   test("14. collection change is observable", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    collection = new Backbone.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+    collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
     collection_observable = kb.collectionObservable(collection)
 

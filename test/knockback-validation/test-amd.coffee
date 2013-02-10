@@ -361,7 +361,7 @@ $(->
 
       window.MyViewModel = kb.ViewModel.extend({
         constructor: ->
-          model = new Backbone.Model({name: '', site: ''})
+          model = new kb.Model({name: '', site: ''})
           kb.ViewModel.prototype.constructor.call(this, model)
           return
       })

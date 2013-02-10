@@ -1,23 +1,21 @@
 $(->
   module("knockback-defaults.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
   require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   locale_manager = new kb.LocaleManager('en', {
     'en': {loading: "Loading dude"}
@@ -25,158 +23,160 @@ $(->
     'fr-FR': {loading: "Chargement"}
   })
 
-  test("Standard use case: just enough to get the picture", ->
-    kb.statistics = new kb.Statistics() # turn on stats
-    kb.locale_manager = locale_manager
+  if kb.BACKBONE
+    test("1. Standard use case: just enough to get the picture", ->
+      kb.statistics = new kb.Statistics() # turn on stats
+      kb.locale_manager = locale_manager
 
-    ContactViewModel = (model) ->
-      @loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString('loading'))
-      @_auto = kb.viewModel(model, {keys: {
-        name:     {key:'name', default: @loading_message}
-        number:   {key:'number', default: @loading_message}
-        date:     {key:'date', default: @loading_message, localizer: kb.ShortDateLocalizer}
-      }}, this)
-      @
-
-    collection = new kb.ContactsCollection()
-    model_ref = new Backbone.ModelRef(collection, 'b4')
-    view_model = new ContactViewModel(model_ref)
-
-    kb.locale_manager.setLocale('en')
-    equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.name(), 'Loading sir', "Maybe too formal")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
-
-    collection.add(collection.parse({id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)}))
-    model = collection.get('b4')
-
-    # get
-    equal(view_model.name(), 'John', "It is a name")
-    equal(view_model.number(), '555-555-5558', "Not so interesting number")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.date(), '09/11/1940', "John's birthdate in Great Britain format")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
-
-    # set from the view model
-    equal(model.get('name'), 'John', "Name not changed")
-    equal(view_model.name(), 'John', "Name not changed")
-    view_model.number('9222-222-222')
-    equal(model.get('number'), '9222-222-222', "Number was changed")
-    equal(view_model.number(), '9222-222-222', "Number was changed")
-    kb.locale_manager.setLocale('en-GB')
-    view_model.date('10/12/1963')
-    current_date = model.get('date')
-    equal(current_date.getFullYear(), 1963, "year is good")
-    equal(current_date.getMonth(), 11, "month is good")
-    equal(current_date.getDate(), 10, "day is good")
-
-    # set from the model
-    model.set({name: 'Yoko', number: '818-818-8181'})
-    equal(view_model.name(), 'Yoko', "Name changed")
-    equal(view_model.number(), '818-818-8181', "Number was changed")
-    model.set({date: new Date(1940, 10, 9)})
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
-    view_model.date('10/11/1940')
-    current_date = model.get('date')
-    equal(current_date.getFullYear(), 1940, "year is good")
-    equal(current_date.getMonth(), 10, "month is good")
-    equal(current_date.getDate(), 10, "day is good")
-
-    # go back to loading state
-    collection.reset()
-    equal(view_model.name(), 'Chargement', "Resets to default")
-    view_model._auto.setToDefault() # override default behavior and go back to loading state
-    kb.locale_manager.setLocale('en')
-    equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.name(), 'Loading sir', "Maybe too formal")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
-
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
-
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
-  test("Standard use case with kb.ViewModels", ->
-    kb.statistics = new kb.Statistics() # turn on stats
-    kb.locale_manager = locale_manager
-
-    class ContactViewModel extends kb.ViewModel
-      constructor: (model) ->
-        super(model, {internals: ['name', 'number', 'date']})
+      ContactViewModel = (model) ->
         @loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString('loading'))
-        @name = kb.defaultObservable(@_name, @loading_message)
-        @number = kb.defaultObservable(@_number, @loading_message)
-        @date = kb.defaultObservable(new kb.LongDateLocalizer(@_date), @loading_message)
+        @_auto = kb.viewModel(model, {keys: {
+          name:     {key:'name', default: @loading_message}
+          number:   {key:'number', default: @loading_message}
+          date:     {key:'date', default: @loading_message, localizer: kb.ShortDateLocalizer}
+        }}, this)
+        @
 
-    collection = new kb.ContactsCollection()
-    model_ref = new Backbone.ModelRef(collection, 'b4')
-    view_model = new ContactViewModel(model_ref)
+      collection = new kb.ContactsCollection()
+      model_ref = new Backbone.ModelRef(collection, 'b4')
+      view_model = new ContactViewModel(model_ref)
 
-    kb.locale_manager.setLocale('en')
-    equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.name(), 'Loading sir', "Maybe too formal")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+      kb.locale_manager.setLocale('en')
+      equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
-    collection.add(collection.parse({id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)}))
-    model = collection.get('b4')
+      collection.add(collection.parse({id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)}))
+      model = collection.get('b4')
 
-    # get
-    equal(view_model.name(), 'John', "It is a name")
-    equal(view_model.number(), '555-555-5558', "Not so interesting number")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+      # get
+      equal(view_model.name(), 'John', "It is a name")
+      equal(view_model.number(), '555-555-5558', "Not so interesting number")
+      kb.locale_manager.setLocale('en-GB')
+      equal(view_model.date(), '09/11/1940', "John's birthdate in Great Britain format")
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
 
-    # set from the view model
-    view_model.number('9222-222-222')
-    equal(model.get('number'), '9222-222-222', "Number was changed")
-    equal(view_model.number(), '9222-222-222', "Number was changed")
-    kb.locale_manager.setLocale('en-GB')
-    view_model.date('10 December 1963')
-    current_date = model.get('date')
-    equal(current_date.getFullYear(), 1963, "year is good")
-    equal(current_date.getMonth(), 11, "month is good")
-    equal(current_date.getDate(), 10, "day is good")
+      # set from the view model
+      equal(model.get('name'), 'John', "Name not changed")
+      equal(view_model.name(), 'John', "Name not changed")
+      view_model.number('9222-222-222')
+      equal(model.get('number'), '9222-222-222', "Number was changed")
+      equal(view_model.number(), '9222-222-222', "Number was changed")
+      kb.locale_manager.setLocale('en-GB')
+      view_model.date('10/12/1963')
+      current_date = model.get('date')
+      equal(current_date.getFullYear(), 1963, "year is good")
+      equal(current_date.getMonth(), 11, "month is good")
+      equal(current_date.getDate(), 10, "day is good")
 
-    # set from the model
-    model.set({name: 'Yoko', number: '818-818-8181'})
-    equal(view_model.name(), 'Yoko', "Name changed")
-    equal(view_model.number(), '818-818-8181', "Number was changed")
-    model.set({date: new Date(1940, 10, 9)})
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
-    view_model.date('10 novembre 1940')
-    current_date = model.get('date')
-    equal(current_date.getFullYear(), 1940, "year is good")
-    equal(current_date.getMonth(), 10, "month is good")
-    equal(current_date.getDate(), 10, "day is good")
+      # set from the model
+      model.set({name: 'Yoko', number: '818-818-8181'})
+      equal(view_model.name(), 'Yoko', "Name changed")
+      equal(view_model.number(), '818-818-8181', "Number was changed")
+      model.set({date: new Date(1940, 10, 9)})
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
+      view_model.date('10/11/1940')
+      current_date = model.get('date')
+      equal(current_date.getFullYear(), 1940, "year is good")
+      equal(current_date.getMonth(), 10, "month is good")
+      equal(current_date.getDate(), 10, "day is good")
 
-    # go back to loading state
-    collection.reset()
-    equal(view_model.name(), 'Chargement', "Resets to default")
-    kb.utils.setToDefault(view_model)
-    kb.locale_manager.setLocale('en')
-    equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
-    kb.locale_manager.setLocale('en-GB')
-    equal(view_model.name(), 'Loading sir', "Maybe too formal")
-    kb.locale_manager.setLocale('fr-FR')
-    equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+      # go back to loading state
+      collection.reset()
+      equal(view_model.name(), 'Chargement', "Resets to default")
+      view_model._auto.setToDefault() # override default behavior and go back to loading state
+      kb.locale_manager.setLocale('en')
+      equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
 
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
+      # and cleanup after yourself when you are done.
+      kb.release(view_model)
 
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
-  test("2. internals test (Coffeescript inheritance)", ->
+      equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    )
+    test("2. Standard use case with kb.ViewModels", ->
+      kb.statistics = new kb.Statistics() # turn on stats
+      kb.locale_manager = locale_manager
+
+      class ContactViewModel extends kb.ViewModel
+        constructor: (model) ->
+          super(model, {internals: ['name', 'number', 'date']})
+          @loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString('loading'))
+          @name = kb.defaultObservable(@_name, @loading_message)
+          @number = kb.defaultObservable(@_number, @loading_message)
+          @date = kb.defaultObservable(new kb.LongDateLocalizer(@_date), @loading_message)
+
+      collection = new kb.ContactsCollection()
+      model_ref = new Backbone.ModelRef(collection, 'b4')
+      view_model = new ContactViewModel(model_ref)
+
+      kb.locale_manager.setLocale('en')
+      equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+      collection.add(collection.parse({id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)}))
+      model = collection.get('b4')
+
+      # get
+      equal(view_model.name(), 'John', "It is a name")
+      equal(view_model.number(), '555-555-5558', "Not so interesting number")
+      kb.locale_manager.setLocale('en-GB')
+      equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+
+      # set from the view model
+      view_model.number('9222-222-222')
+      equal(model.get('number'), '9222-222-222', "Number was changed")
+      equal(view_model.number(), '9222-222-222', "Number was changed")
+      kb.locale_manager.setLocale('en-GB')
+      view_model.date('10 December 1963')
+      current_date = model.get('date')
+      equal(current_date.getFullYear(), 1963, "year is good")
+      equal(current_date.getMonth(), 11, "month is good")
+      equal(current_date.getDate(), 10, "day is good")
+
+      # set from the model
+      model.set({name: 'Yoko', number: '818-818-8181'})
+      equal(view_model.name(), 'Yoko', "Name changed")
+      equal(view_model.number(), '818-818-8181', "Number was changed")
+      model.set({date: new Date(1940, 10, 9)})
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+      view_model.date('10 novembre 1940')
+      current_date = model.get('date')
+      equal(current_date.getFullYear(), 1940, "year is good")
+      equal(current_date.getMonth(), 10, "month is good")
+      equal(current_date.getDate(), 10, "day is good")
+
+      # go back to loading state
+      collection.reset()
+      equal(view_model.name(), 'Chargement', "Resets to default")
+      kb.utils.setToDefault(view_model)
+      kb.locale_manager.setLocale('en')
+      equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+      # and cleanup after yourself when you are done.
+      kb.release(view_model)
+
+      equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    )
+
+  test("3. internals test (Coffeescript inheritance)", ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
 

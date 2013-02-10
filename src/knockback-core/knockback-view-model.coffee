@@ -6,10 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-# Base class for ViewModels for Backbone.Models.
+# Base class for ViewModels for kb.Models.
 #
 # @example How to create a ViewModel with first_name and last_name observables.
-#   var view_model = kb.viewModel(new Backbone.Model({first_name: "Planet", last_name: "Earth"}));
+#   var view_model = kb.viewModel(new kb.Model({first_name: "Planet", last_name: "Earth"}));
 #
 # @example Bulk kb.Observable create using 'key' Object to customize the kb.Observable created per attribute.
 #   var ContactViewModel = function(model) {
@@ -53,22 +53,22 @@
 #
 # @method #model()
 #   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
-#   @return [Backbone.Model|Backbone.ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
+#   @return [kb.Model|Backbone.ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
 #   @example
-#     var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
+#     var view_model = kb.viewModel(new kb.Model({name: 'bob'}));
 #     var the_model = view_model.model(); // get
-#     view_model.model(new Backbone.Model({name: 'fred'})); // set
+#     view_model.model(new kb.Model({name: 'fred'})); // set
 #
 class kb.ViewModel
-  @extend = Backbone.Model.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+  @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.ViewModel.
   #
-  # @param [Backbone.Model|Backbone.ModelRef] model the model to observe (can be null)
+  # @param [kb.Model|Backbone.ModelRef] model the model to observe (can be null)
   # @param [Object] options the create options
   # @option options [Array] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
-  # @option options [Array] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Backbone.Model. Useful for binding Views that require specific observables to exist
-  # @option options [Array] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Backbone.Model attributes
+  # @option options [Array] requires an array of atttributes that will have kb.Observables created even if they do not exist on the kb.Model. Useful for binding Views that require specific observables to exist
+  # @option options [Array] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of kb.Model attributes
   # @option options [Object|Array] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
@@ -78,7 +78,7 @@ class kb.ViewModel
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) ->
-    not model or (model instanceof Backbone.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
+    not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
 
     options or= {}
     view_model or= {}

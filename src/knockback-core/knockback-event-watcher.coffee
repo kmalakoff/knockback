@@ -9,14 +9,14 @@
 addStatisticsEvent = (emitter, event_name, info) ->
   not kb.statistics or kb.statistics.addModelEvent({name: event_name, emitter: emitter, key: info.key, path: info.path})
 
-# Used to provide a central place to aggregate registered Backbone.Model events rather than having all kb.Observables register for updates independently.
+# Used to provide a central place to aggregate registered kb.Model events rather than having all kb.Observables register for updates independently.
 #
 class kb.EventWatcher
 
   # Used to either register yourself with the existing emitter watcher or to create a new one.
   #
   # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(emitter, options)
-  # @param [Backbone.Model|Backbone.ModelRef] obj the Model that will own or register with the store
+  # @param [kb.Model|Backbone.ModelRef] obj the Model that will own or register with the store
   # @param [ko.observable|Object] emitter the emitters of the event watcher
   # @param [Object] callback_options information about the event and callback to register
   # @option options [Function] emitter callback for when the emitter changes (eg. is loaded). Signature: function(new_emitter)
@@ -51,10 +51,10 @@ class kb.EventWatcher
   #
   # @overload emitter()
   #   Gets the emitter or emitter reference
-  #   @return [Backbone.Model|Backbone.ModelRef] the emitter whose attributes are being observed (can be null)
+  #   @return [kb.Model|Backbone.ModelRef] the emitter whose attributes are being observed (can be null)
   # @overload emitter(new_emitter)
   #   Sets the emitter or emitter reference
-  #   @param [Backbone.Model|Backbone.ModelRef] new_emitter the emitter whose attributes will be observed (can be null)
+  #   @param [kb.Model|Backbone.ModelRef] new_emitter the emitter whose attributes will be observed (can be null)
   emitter: (new_emitter) ->
     # get or no change
     return @ee if (arguments.length is 0) or (@ee == new_emitter)
@@ -66,7 +66,7 @@ class kb.EventWatcher
       @model_ref.release(); @model_ref = null
 
     # set up current
-    if Backbone.ModelRef and (new_emitter instanceof Backbone.ModelRef)
+    if kb.BACKBONE and Backbone.ModelRef and (new_emitter instanceof Backbone.ModelRef)
       @model_ref = new_emitter; @model_ref.retain()
       @model_ref.bind('loaded', @__kb._onModelLoaded)
       @model_ref.bind('unloaded', @__kb._onModelUnloaded)
@@ -130,7 +130,7 @@ class kb.EventWatcher
 
     if @ee # loaded
       # bind relational updates
-      if Backbone.RelationalModel and (@ee instanceof Backbone.RelationalModel) and _.contains(event_names, 'change')
+      if kb.BACKBONE and Backbone.RelationalModel and (@ee instanceof Backbone.RelationalModel) and _.contains(event_names, 'change')
         @_modelBindRelatationalInfo('change', info)
 
       # trigger now
@@ -156,7 +156,7 @@ class kb.EventWatcher
 
   # @private
   _onModelLoaded: (model) =>
-    is_relational = Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+    is_relational = kb.BACKBONE and Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
     @ee = model
 
     # bind all events

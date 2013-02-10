@@ -11,7 +11,7 @@
 # @example Create an instance by path.
 #   var factory = new kb.Factory();
 #   factory.addPathMapping('bob.the.builder', kb.ViewModel);
-#   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
+#   view_model = factory.createForPath(new kb.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
 class kb.Factory
 
   # Used to either register yourself with the existing factory or to create a new factory.
@@ -54,7 +54,7 @@ class kb.Factory
   # @example Create an instance by path.
   #   var factory = new kb.Factory();
   #   factory.addPathMapping('bob.the.builder', kb.ViewModel);
-  #   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
+  #   view_model = factory.createForPath(new kb.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
   creatorForPath: (obj, path) ->
     if (creator = @paths[path])
       return if creator.view_model then creator.view_model else creator

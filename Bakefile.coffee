@@ -250,5 +250,7 @@ module.exports =
         'test/deprecated'
         'test/full-stack'
         'test/packaging'
+
         'test/lodash'
+        'test/parse'
       ]

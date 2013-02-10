@@ -1,6 +1,7 @@
 if not @kb then (try kb = require('knockback-localization') catch e then kb = require('knockback')) else (kb = @kb)
 _ = kb._
-Backbone = kb.Backbone
+Model = kb.Model
+Collection = kb.Collection
 ko = kb.ko
 
 # module

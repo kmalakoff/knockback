@@ -13,12 +13,12 @@ $(->
     ok(!!ko, 'ko')
     ok(!!_, '_')
     ok(!!Backbone, 'Backbone')
-    ok(!!Backbone.ModelRef, 'Backbone.ModelRef'); ok(!!kb, 'kb')
+    ok(!!Backbone.ModelRef, 'Backbone.ModelRef')
     ok(!!kb, 'kb')
   )
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   test("Standard use case: just enough to get the picture", ->
     kb.statistics = new kb.Statistics() # turn on stats

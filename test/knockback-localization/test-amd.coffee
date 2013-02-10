@@ -34,8 +34,8 @@ $(->
         formal_goodbye: 'Au revoir'
     })
 
-    kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-    kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+    kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+    kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
     class LocalizedStringLocalizer extends kb.LocalizedObservable
       constructor: (value, options, view_model) ->
@@ -445,9 +445,9 @@ $(->
       george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
       ringo_birthdate = new Date(1940, 7, 7)
       ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
-      major_duo = new Backbone.Collection([john, paul])
-      minor_duo = new Backbone.Collection([george, ringo])
-      nested_model = new Backbone.Model({
+      major_duo = new kb.Collection([john, paul])
+      minor_duo = new kb.Collection([george, ringo])
+      nested_model = new kb.Model({
         john: john
         paul: paul
         george: george

@@ -1,23 +1,20 @@
 $(->
   module("knockback-observable.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
-    ok(!!kb, 'kb')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   test("1. Standard use case: direct attributes with read and write", ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -153,10 +150,10 @@ $(->
           options: options
         })
 
-    parent = new Backbone.Model({name: 'Daddy'})
-    children_child = new Backbone.Model({name: 'Baby'})
-    children = new Backbone.Collection([{name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child])}])
-    model = new Backbone.Model({})
+    parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
+    children_child = new kb.Model({id: _.uniqueId(), name: 'Baby'})
+    children = new kb.Collection([{id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
+    model = new kb.Model({id: _.uniqueId()})
 
     view_model = new InferringViewModel(model)
     equal(view_model.name(), null, 'inferred name as simple null')
@@ -220,10 +217,10 @@ $(->
       @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
       return
 
-    parent = new Backbone.Model({name: 'Daddy'})
-    children_child = new Backbone.Model({name: 'Baby'})
-    children = new Backbone.Collection([{name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child])}])
-    model = new Backbone.Model({})
+    parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
+    children_child = new kb.Model({id: _.uniqueId(), name: 'Baby'})
+    children = new kb.Collection([{id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
+    model = new kb.Model({id: _.uniqueId()})
 
     view_model = new InferringViewModel(model)
     equal(view_model.name(), null, 'inferred name as simple null')
@@ -274,7 +271,7 @@ $(->
   )
   test("7. model change is observable", ->
     kb.statistics = new kb.Statistics() # turn on stats
-    model = new Backbone.Model({id: 1, name: 'Bob'})
+    model = new kb.Model({id: 1, name: 'Bob'})
 
     observable = kb.observable(model, 'name')
 

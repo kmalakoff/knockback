@@ -115,7 +115,7 @@ $(->
     })
 
     # check the set up state
-    places = new Backbone.Collection([abbey_flats, abbey_studios])
+    places = new kb.Collection([abbey_flats, abbey_studios])
     places_observable = kb.collectionObservable(places, {view_model: kb.ViewModel})
     for place_view_model in places_observable()
       if place_view_model.id() == 'house-2-1'
@@ -241,7 +241,7 @@ $(->
 
     house = new House({
       location: 'In the middle of our street'
-      occupants: new Backbone.Collection()
+      occupants: new kb.Collection()
     })
 
     # confirm no occupants
@@ -415,7 +415,7 @@ $(->
 
     person1 = new Person({id: 'person-8-1', name: 'Daddy'})
     person2 = new Person({id: 'person-8-2', name: 'Mommy'})
-    family = new Backbone.Collection([person1, person2])
+    family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: ['person-8-1', 'person-8-2']})
     person1.get('friends').add(person2); person2.set({best_friend: person1})
 
@@ -471,7 +471,7 @@ $(->
 
     person1 = new Person({id: 'person-9-1', name: 'Daddy'})
     person2 = new Person({id: 'person-9-2', name: 'Mommy'})
-    family = new Backbone.Collection([person1, person2])
+    family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-9-1', name: 'Home Sweet Home'})
 
     view_model_person1 = new PersonViewModel(person1)
@@ -555,7 +555,7 @@ $(->
         super
         @type = ko.observable('band_member')
 
-    collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
+    collection_observable = kb.collectionObservable(new kb.Collection([john, paul, george, ringo]), {
       factories:
         models: BandMemberViewModel
         'models.best_friend': {create: (model, options) -> return if model then new BestFriendViewModel(model) else null}
@@ -643,8 +643,8 @@ $(->
           options: options
         })
 
-    collection_observable1 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]))
-    collection_observable2 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]), collection_observable1.shareOptions())
+    collection_observable1 = new PersonCollection(new kb.Collection([george, john, paul, ringo]))
+    collection_observable2 = new PersonCollection(new kb.Collection([george, john, paul, ringo]), collection_observable1.shareOptions())
 
     equal(collection_observable1.__kb.factory, collection_observable2.__kb.factory, "the factory should be shared")
 

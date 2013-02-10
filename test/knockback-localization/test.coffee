@@ -1,19 +1,16 @@
 $(->
   module("knockback-localized-observable.js")
 
-  # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
   ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
   kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = kb._
   require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
 
   test("TEST DEPENDENCY MISSING", ->
     ok(!!ko, 'ko')
     ok(!!_, '_')
-    ok(!!Backbone, 'Backbone')
-    ok(!!kb, 'kb')
+    ok(!!kb.Model, 'kb.Model')
+    ok(!!kb.Collection, 'kb.Collection')
     ok(!!kb, 'kb')
   )
 
@@ -35,8 +32,8 @@ $(->
       formal_goodbye: 'Au revoir'
   })
 
-  kb.Contact = Backbone.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact })
+  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
   class LocalizedStringLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
@@ -446,9 +443,9 @@ $(->
     george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
     ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
-    major_duo = new Backbone.Collection([john, paul])
-    minor_duo = new Backbone.Collection([george, ringo])
-    nested_model = new Backbone.Model({
+    major_duo = new kb.Collection([john, paul])
+    minor_duo = new kb.Collection([george, ringo])
+    nested_model = new kb.Model({
       john: john
       paul: paul
       george: george
