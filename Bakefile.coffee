@@ -129,7 +129,7 @@ module.exports =
 
         # knockback optional dependencies
         'cp -v lodash vendor/optional/lodash.js'
-        'uglifyjs -o vendor/optional/lodash-0.9.0.min.js vendor/optional/lodash-0.9.0.js'
+        'uglifyjs -o vendor/optional/lodash-1.0.0-rc.3.min.js vendor/optional/lodash-1.0.0-rc.3.js'
 #        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js' # packaged lodash.min.js doesn't concatenate properly
         'cp -v backbone-modelref vendor/optional/backbone-modelref.js'
         'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref.min.js'
@@ -137,10 +137,10 @@ module.exports =
         'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational.min.js'
 
         # full and core stack
-        'cat src/license-header-full-stack.js vendor/underscore-1.4.3.js vendor/backbone-0.9.9.js vendor/knockout-2.2.0.js knockback.js > knockback-full-stack.js'
-        'cat src/license-header-full-stack.js vendor/underscore-1.4.3.min.js vendor/backbone-0.9.9.min.js vendor/knockout-2.2.0.min.js knockback.min.js > knockback-full-stack.min.js'
-        'cat src/license-header-core-stack.js vendor/underscore-1.4.3.js vendor/backbone-0.9.9.js vendor/knockout-2.2.0.js knockback-core.js > knockback-core-stack.js'
-        'cat src/license-header-core-stack.js vendor/underscore-1.4.3.min.js vendor/backbone-0.9.9.min.js vendor/knockout-2.2.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
+        'cat src/license-header-full-stack.js vendor/underscore-1.4.4.js vendor/backbone-0.9.10.js vendor/knockout-2.2.1.js knockback.js > knockback-full-stack.js'
+        'cat src/license-header-full-stack.js vendor/underscore-1.4.4.min.js vendor/backbone-0.9.10.min.js vendor/knockout-2.2.1.min.js knockback.min.js > knockback-full-stack.min.js'
+        'cat src/license-header-core-stack.js vendor/underscore-1.4.4.js vendor/backbone-0.9.10.js vendor/knockout-2.2.1.js knockback-core.js > knockback-core-stack.js'
+        'cat src/license-header-core-stack.js vendor/underscore-1.4.4.min.js vendor/backbone-0.9.10.min.js vendor/knockout-2.2.1.min.js knockback-core.min.js > knockback-core-stack.min.js'
 
         # npm
         'cp README.md packages/npm/README.md'
