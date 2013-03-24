@@ -73,6 +73,11 @@ Knockback.js is compatible with RequireJS, CommonJS, Brunch and AMD module loadi
 * [Underscore.js](http://underscorejs.org/)
 * [Knockout.js](http://knockoutjs.com/)
 
+###Replaceable Dependencies
+
+* [LoDash](http://lodash.com/) - it you prefer LoDash, we've got support for it!
+* [Parse](https://www.parse.com/) - instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
+
 ###Compatible Components
 
 * [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/) - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.
