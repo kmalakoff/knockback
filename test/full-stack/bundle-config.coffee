@@ -1,7 +1,7 @@
 module.exports =
   'test/full-stack/build/bundle-underscore-core.js':
     underscore: 'vendor/underscore-1.4.4.min.js'
-    backbone: 'vendor/backbone-0.9.10.min.js'
+    backbone: 'vendor/backbone-1.0.0.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
     knockout: 'vendor/knockout-2.2.1.min.js'
@@ -13,7 +13,7 @@ module.exports =
 
   'test/full-stack/build/bundle-underscore.js':
     underscore: 'vendor/underscore-1.4.4.min.js'
-    backbone: 'vendor/backbone-0.9.10.min.js'
+    backbone: 'vendor/backbone-1.0.0.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
     knockout: 'vendor/knockout-2.2.1.min.js'
@@ -25,8 +25,8 @@ module.exports =
       ko: 'knockout'
 
   'test/full-stack/build/bundle-lodash-core.js':
-    lodash: 'vendor/optional/lodash-1.0.0-rc.3.min.js'
-    backbone: 'vendor/backbone-0.9.10.min.js'
+    lodash: 'vendor/optional/lodash-1.0.1.min.js'
+    backbone: 'vendor/backbone-1.0.0.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
     knockout: 'vendor/knockout-2.2.1.min.js'
@@ -39,8 +39,8 @@ module.exports =
       ko: 'knockout'
 
   'test/full-stack/build/bundle-lodash.js':
-    lodash: 'vendor/optional/lodash-1.0.0-rc.3.min.js'
-    backbone: 'vendor/backbone-0.9.10.min.js'
+    lodash: 'vendor/optional/lodash-1.0.1.min.js'
+    backbone: 'vendor/backbone-1.0.0.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
     knockout: 'vendor/knockout-2.2.1.min.js'

@@ -1,5 +1,5 @@
 ###
-  knockback-formatted-observable.js 0.16.9
+  knockback-formatted-observable.js 0.17.0
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.FormattedObservable is freely distributable under the MIT license.
   See the following for full license details:

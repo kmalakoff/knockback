@@ -200,6 +200,7 @@ class kb.EventWatcher
         @ee.bind("remove:#{info.key}", info.rel_fn)
       else
         @ee.bind("update:#{info.key}", info.rel_fn)
+        @ee.bind("change:#{info.key}", info.rel_fn)
     return
 
   # @private
@@ -210,6 +211,7 @@ class kb.EventWatcher
       @ee.unbind("remove:#{info.key}", info.rel_fn)
     else
       @ee.unbind("update:#{info.key}", info.rel_fn)
+      @ee.unbind("change:#{info.key}", info.rel_fn)
     info.rel_fn = null
     return
 

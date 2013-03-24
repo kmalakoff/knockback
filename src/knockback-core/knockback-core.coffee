@@ -1,5 +1,5 @@
 ###
-  knockback-core.js 0.16.9
+  knockback-core.js 0.17.0
   (c) 2011, 2012 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -47,7 +47,7 @@
 class kb
 
   # Knockback library semantic version
-  @VERSION: '0.16.9'
+  @VERSION: '0.17.0'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -186,6 +186,7 @@ else
   # import and re-export Underscore (or Lo-Dash with precedence), Backbone, and Knockout
   if not @_ and (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
   kb._ = _ = if _.hasOwnProperty('_') then _._ else _ # LEGACY
+  _.mixin({findWhere: (obj, attrs) -> result = _.where(obj, attrs); if result.length then result[0] else null}) if _.where and not _.findWhere # PATCH: lo-dash REMOVE AFTER _.findWhere IS ADDED
   kb.BACKBONE = true
   Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
   kb.Collection = Backbone.Collection

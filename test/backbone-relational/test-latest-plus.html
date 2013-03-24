@@ -1,16 +1,19 @@
 <!DOCTYPE HTML>
 <html>
-<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <head>
-  <title>Knockback Utils Test Suite</title>
+  <title>Knockback with Backbone.Relational Test Suite</title>
   <!-- LIBRARY DEPENDENCIES -->
   <script type="text/javascript" src="../../vendor/knockout-2.2.1.js"></script>
   <script type="text/javascript" src="../../vendor/underscore-1.4.4.js"></script>
   <script type="text/javascript" src="../../vendor/backbone-1.0.0.js"></script>
 
   <!-- LIBRARY -->
-  <script type="text/javascript" src="../../knockback-core.js"></script>
+  <script type="text/javascript" src="../../knockback.js"></script>
   <script type="text/javascript" src="../../lib/knockback-statistics.js"></script>
+
+  <!-- HELPERS -->
+  <script type="text/javascript" src="../../vendor/optional/backbone-relational-0.8.0plus.js"></script>
 
   <!-- TESTS -->
   <link rel="stylesheet" href="../../vendor/test/qunit-1.11.0.css" type="text/css" media="screen" />
@@ -22,7 +25,7 @@
 </head>
 <body>
   <div>
-    <h1 id="qunit-header">Knockback Utils Test Suite</h1>
+    <h1 id="qunit-header">Knockback with Backbone.Relational Test Suite</h1>
     <h2 id="qunit-banner"></h2>
     <h2 id="qunit-userAgent"></h2>
     <ol id="qunit-tests"></ol>

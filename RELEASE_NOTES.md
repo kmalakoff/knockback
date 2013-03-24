@@ -1,6 +1,6 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
-## 0.16.9
+## 0.17.0
 
 * added kb.wasReleased helper function
 * bug fix for recursive view model create: https://github.com/kmalakoff/knockback/issues/53
@@ -8,6 +8,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * bug fix for nested filter dependencies: https://github.com/addyosmani/todomvc/issues/381
 * bug fix for filtering notifications: https://github.com/kmalakoff/knockback/issues/53
 * bug fix for models_only on change event: https://github.com/kmalakoff/knockback/issues/59
+* added support for Backbone 1.0.0. Note: needed to patch Backbone-relational to 0.8.0plus and to add _.findWhere to lodash.
 
 ## 0.16.8
 
