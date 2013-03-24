@@ -1,6 +1,6 @@
 ###
   knockback-extensions.js (knockback-defaults)
-  (c) 2011, 2012 Kevin Malakoff.
+  (c) 2011-2013 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE

@@ -1,6 +1,6 @@
 /*
   knockback-defaults.js 0.17.0
-  (c) 2011, 2012 Kevin Malakoff - http://kmalakoff.github.com/knockback/
+  (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
@@ -37,7 +37,7 @@ _unwrapObservable = ko.utils.unwrapObservable;
 
 /*
   knockback_default_observable.js 0.17.0
-  (c) 2011, 2012 Kevin Malakoff.
+  (c) 2011-2013 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
@@ -87,7 +87,7 @@ kb.defaultObservable = function(target, default_value) {
 
 /*
   knockback-extensions.js (knockback-defaults)
-  (c) 2011, 2012 Kevin Malakoff.
+  (c) 2011-2013 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
