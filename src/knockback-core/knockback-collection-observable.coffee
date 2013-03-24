@@ -12,14 +12,10 @@ COMPARE_DESCENDING = 1
 
 kb.compare = (value_a, value_b) ->
   # String compare
-  return value_a.localeCompare(value_b) if _.isString(value_a)
-  return value_b.localeCompare(value_a) if _.isString(value_b)
+  return value_a.localeCompare("#{value_b}") if _.isString(value_a)
+  return value_b.localeCompare("#{value_a}") if _.isString(value_b)
 
-  # Non-object compare just comparing raw values
-  if typeof (value_a) isnt "object"
-    return (if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING))
-
-  # object compare
+  # compare raw values
   return if (value_a is value_b) then COMPARE_EQUAL else (if (value_a < value_b) then COMPARE_ASCENDING else COMPARE_DESCENDING)
 
 # Base class for observing collections.
@@ -144,6 +140,7 @@ class kb.CollectionObservable
     @_mapper = ko.dependentObservable(=>
       comparator = @_comparator() # create dependency
       filters = @_filters() # create dependency
+      (_unwrapObservable(filter) for filter in filters) if filters # create a dependency
       current_collection = @_collection() # create dependency
       return if @in_edit # we are doing the editing
 
@@ -328,7 +325,7 @@ class kb.CollectionObservable
 
         # not filtered, add
         else
-          view_model = @viewModelByModel(arg)
+          view_model = if @models_only then arg else @viewModelByModel(arg)
           if view_model # arleady exists
             if (comparator = @_comparator())
               observable = kb.utils.wrappedObservable(@)

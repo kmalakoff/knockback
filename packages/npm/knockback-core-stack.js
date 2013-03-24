@@ -7739,13 +7739,10 @@ COMPARE_DESCENDING = 1;
 
 kb.compare = function(value_a, value_b) {
   if (_.isString(value_a)) {
-    return value_a.localeCompare(value_b);
+    return value_a.localeCompare("" + value_b);
   }
   if (_.isString(value_b)) {
-    return value_b.localeCompare(value_a);
-  }
-  if (typeof value_a !== "object") {
-    return (value_a === value_b ? COMPARE_EQUAL : (value_a < value_b ? COMPARE_ASCENDING : COMPARE_DESCENDING));
+    return value_b.localeCompare("" + value_a);
   }
   if (value_a === value_b) {
     return COMPARE_EQUAL;
@@ -7823,9 +7820,15 @@ kb.CollectionObservable = (function() {
       collection.bind('all', this.__kb._onCollectionChange);
     }
     this._mapper = ko.dependentObservable(function() {
-      var comparator, current_collection, filters, models, view_models;
+      var comparator, current_collection, filter, filters, models, view_models, _i, _len;
       comparator = _this._comparator();
       filters = _this._filters();
+      if (filters) {
+        for (_i = 0, _len = filters.length; _i < _len; _i++) {
+          filter = filters[_i];
+          _unwrapObservable(filter);
+        }
+      }
       current_collection = _this._collection();
       if (_this.in_edit) {
         return;
@@ -8008,7 +8011,7 @@ kb.CollectionObservable = (function() {
         if (this._modelIsFiltered(arg)) {
           this._onModelRemove(arg);
         } else {
-          view_model = this.viewModelByModel(arg);
+          view_model = this.models_only ? arg : this.viewModelByModel(arg);
           if (view_model) {
             if ((comparator = this._comparator())) {
               observable = kb.utils.wrappedObservable(this);
