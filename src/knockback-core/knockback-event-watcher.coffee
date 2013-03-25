@@ -199,8 +199,8 @@ class kb.EventWatcher
         @ee.bind("add:#{info.key}", info.rel_fn)
         @ee.bind("remove:#{info.key}", info.rel_fn)
       else
-        @ee.bind("update:#{info.key}", info.rel_fn)
-        @ee.bind("change:#{info.key}", info.rel_fn)
+        # REMOVE: signature check for Backbone-Relational version for update -> change in 0.8.0
+        @ee.bind((if Backbone.Relation.prototype.sanitizeOptions then "update:#{info.key}" else "change:#{info.key}"), info.rel_fn)
     return
 
   # @private
@@ -210,8 +210,8 @@ class kb.EventWatcher
       @ee.unbind("add:#{info.key}", info.rel_fn)
       @ee.unbind("remove:#{info.key}", info.rel_fn)
     else
-      @ee.unbind("update:#{info.key}", info.rel_fn)
-      @ee.unbind("change:#{info.key}", info.rel_fn)
+      # REMOVE: signature check for Backbone-Relational version for update -> change in 0.8.0
+      @ee.unbind((if Backbone.Relation.prototype.sanitizeOptions then "update:#{info.key}" else "change:#{info.key}"), info.rel_fn)
     info.rel_fn = null
     return
 

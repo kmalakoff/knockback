@@ -7412,8 +7412,7 @@ kb.EventWatcher = (function() {
         this.ee.bind("add:" + info.key, info.rel_fn);
         this.ee.bind("remove:" + info.key, info.rel_fn);
       } else {
-        this.ee.bind("update:" + info.key, info.rel_fn);
-        this.ee.bind("change:" + info.key, info.rel_fn);
+        this.ee.bind((Backbone.Relation.prototype.sanitizeOptions ? "update:" + info.key : "change:" + info.key), info.rel_fn);
       }
     }
   };
@@ -7426,8 +7425,7 @@ kb.EventWatcher = (function() {
       this.ee.unbind("add:" + info.key, info.rel_fn);
       this.ee.unbind("remove:" + info.key, info.rel_fn);
     } else {
-      this.ee.unbind("update:" + info.key, info.rel_fn);
-      this.ee.unbind("change:" + info.key, info.rel_fn);
+      this.ee.unbind((Backbone.Relation.prototype.sanitizeOptions ? "update:" + info.key : "change:" + info.key), info.rel_fn);
     }
     info.rel_fn = null;
   };
