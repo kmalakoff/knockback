@@ -1,5 +1,5 @@
 /*
-  knockback-formatting.js 0.17.0
+  knockback-formatting.js 0.17.0pre
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
@@ -36,7 +36,7 @@ if (typeof exports !== 'undefined') {
 _unwrapObservable = ko.utils.unwrapObservable;
 
 /*
-  knockback-formatted-observable.js 0.17.0
+  knockback-formatted-observable.js 0.17.0pre
   (c) 2011-2013 Kevin Malakoff.
   Knockback.FormattedObservable is freely distributable under the MIT license.
   See the following for full license details:

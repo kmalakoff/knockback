@@ -18,5 +18,5 @@
   },
 
   "main"          : "knockback.js",
-  "version"       : "0.17.0"
+  "version"       : "0.17.0pre"
 }
