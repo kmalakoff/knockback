@@ -124,8 +124,8 @@ module.exports =
         'cp -v underscore/underscore-min.js vendor/underscore.min.js'
         'cp -v backbone vendor/backbone.js'
         'cp -v backbone/backbone-min.js vendor/backbone.min.js'
-        'cp -v knockout-client/knockout.debug.js vendor/knockout.js'
-        'cp -v knockout-client/knockout.js vendor/knockout.min.js'
+        'cp knockout/build/output/knockout-latest.debug.js vendor/knockout-2.2.1.js'
+        'cp knockout/build/output/knockout-latest.js vendor/knockout-2.2.1.min.js'
 
         # knockback optional dependencies
         'cp -v lodash vendor/optional/lodash.js'

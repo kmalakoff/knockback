@@ -28,7 +28,7 @@
     "backbone": ">=0.9.10",
     "backbone-relational": "0.8.0plus",
     "backbone-modelref": ">=0.1.5",
-    "knockout-client": ">=2.2.1",
+    "knockout": "2.2.1",
     "lodash": ">=1.0.1"
   },
 
