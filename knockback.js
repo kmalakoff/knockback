@@ -2466,7 +2466,7 @@ kb.valueValidator = function(value, bindings, validation_options) {
 };
 
 kb.inputValidator = function(view_model, el, validation_options) {
-  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators;
+  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators, _ref;
 
   if (validation_options == null) {
     validation_options = {};
@@ -2488,17 +2488,13 @@ kb.inputValidator = function(view_model, el, validation_options) {
   bindings = {};
   (!validators[type = $input_el.attr('type')]) || (bindings[type] = validators[type]);
   (!$input_el.attr('required')) || (bindings.required = validators.required);
-  (!options.validations) || ((function() {
-    var _ref, _results;
-
+  if (options.validations) {
     _ref = options.validations;
-    _results = [];
     for (identifier in _ref) {
       validator = _ref[identifier];
-      _results.push(bindings[identifier] = validator);
+      bindings[identifier] = validator;
     }
-    return _results;
-  })());
+  }
   result = kb.valueValidator(options.value, bindings, validation_options);
   (!input_name && !validation_options.no_attach) || (view_model["$" + input_name] = result);
   return result;

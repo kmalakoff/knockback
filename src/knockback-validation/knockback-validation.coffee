@@ -172,7 +172,8 @@ kb.inputValidator = (view_model, el, validation_options={}) ->
   bindings = {}
   (not validators[type = $input_el.attr('type')]) or (bindings[type] = validators[type])
   (not $input_el.attr('required')) or (bindings.required = validators.required)
-  (not options.validations) or (bindings[identifier] = validator for identifier, validator of options.validations)
+  if options.validations
+    bindings[identifier] = validator for identifier, validator of options.validations
   result = kb.valueValidator(options.value, bindings, validation_options)
 
   # if there is a name, add to the view_model with $scoping
