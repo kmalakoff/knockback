@@ -29,7 +29,7 @@
     "backbone-relational": "0.8.0plus",
     "backbone-modelref": ">=0.1.5",
     "knockout": "2.2.1",
-    "lodash": ">=1.0.1"
+    "lodash": ">=1.1.0"
   },
 
   "version"       : "0.17.0pre"
