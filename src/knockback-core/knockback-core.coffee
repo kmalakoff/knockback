@@ -156,6 +156,8 @@ class kb
     el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
     kb.releaseOnNodeRemove(view_model, el)
     observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
+
+    view_model.afterRender(el) if not options.afterRender and view_model.afterRender # call afterRender for custom setup unless provided in options (so doesn't get double called)
     return el
 
   # Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
