@@ -222,7 +222,7 @@ class kb.utils
     return creator if creator
 
     # infer Backbone.Relational types
-    if owner and kb.BACKBONE and Backbone.RelationalModel and (owner instanceof Backbone.RelationalModel)
+    if owner and kb.Backbone and kb.Backbone.RelationalModel and (owner instanceof kb.Backbone.RelationalModel)
       key = _unwrapObservable(key)
       relation = _.find(owner.getRelations(), (test) -> return test.key is key)
       if relation

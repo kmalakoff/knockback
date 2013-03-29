@@ -6,6 +6,12 @@ try
       'knockout': "../../vendor/knockout-2.2.1",
       'knockback': "../../knockback",
       'knockback-statistics': "../../lib/knockback-statistics"
+    shim:
+      underscore:
+        exports: '_'
+      backbone:
+        exports: 'Backbone'
+        deps: ['underscore']
   })
 
   module_name = 'knockback-defaults'
@@ -13,11 +19,8 @@ try
 
   # library and dependencies
   require ['underscore', 'backbone', 'knockout', module_name, 'knockback-statistics', 'qunit_test_runner'], (_, Backbone, ko, kb, kbs, runner) ->
-    # window._ = window.Backbone = null # force each test to require dependencies synchronously
-    window.ko = window.kb = null
-
-    require ['./build/test'], ->
-      runner.start()
+    window._ = window.Backbone = window.ko = window.kb = null # force each test to require dependencies synchronously
+    require ['./build/test'], -> runner.start()
 
 catch error
   alert("AMD tests failed: '#{error}'")

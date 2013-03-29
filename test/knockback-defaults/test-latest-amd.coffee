@@ -9,6 +9,12 @@ try
       'knockback-localization': "../../lib/knockback-localization"
       'knockback-examples-localization': "../_examples/build/_localization_examples"
       'knockback-statistics': "../../lib/knockback-statistics"
+    shim:
+      underscore:
+        exports: '_'
+      backbone:
+        exports: 'Backbone'
+        deps: ['underscore']
   })
 
   module_name = 'knockback-defaults'
@@ -16,11 +22,8 @@ try
 
   # library and dependencies
   require ['underscore', 'backbone', 'knockout', module_name, 'knockback-statistics', 'knockback-examples-localization', 'backbone-modelref', 'qunit_test_runner'], (_, Backbone, ko, kb, kbs, kbe, bbmr, runner) ->
-    # window._ = window.Backbone = null # force each test to require dependencies synchronously
-    window.ko = window.kb = null
-
-    require ['./build/test'], ->
-      runner.start()
+    window._ = window.Backbone = window.ko = window.kb = null # force each test to require dependencies synchronously
+    require ['./build/test'], -> runner.start()
 
 catch error
   alert("AMD tests failed: '#{error}'")

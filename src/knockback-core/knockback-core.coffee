@@ -180,7 +180,7 @@ class kb
 # use Parse
 if (@Parse)
   kb._ = _ = @Parse._
-  kb.PARSE = true
+  kb.Parse = @Parse
   kb.Collection = @Parse.Collection
   kb.Model = @Parse.Object
   kb.Events = @Parse.Events
@@ -189,11 +189,10 @@ else
   if not @_ and (typeof(require) isnt 'undefined') then (try _ = require('lodash') catch e then _ = require('underscore')) else _ = @_
   kb._ = _ = if _.hasOwnProperty('_') then _._ else _ # LEGACY
   _.mixin({findWhere: (obj, attrs) -> result = _.where(obj, attrs); if result.length then result[0] else null}) if _.where and not _.findWhere # PATCH: lo-dash REMOVE AFTER _.findWhere IS ADDED
-  kb.BACKBONE = true
-  Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
-  kb.Collection = Backbone.Collection
-  kb.Model = Backbone.Model
-  kb.Events = Backbone.Events
+  kb.Backbone = if not @Backbone and (typeof(require) isnt 'undefined') then require('backbone') else @Backbone
+  kb.Collection = kb.Backbone.Collection
+  kb.Model = kb.Backbone.Model
+  kb.Events = kb.Backbone.Events
 kb.ko = ko = if not @ko and (typeof(require) isnt 'undefined') then require('knockout') else @ko
 
 ####################################

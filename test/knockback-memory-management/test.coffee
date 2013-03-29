@@ -55,7 +55,7 @@ class SimpleViewModel
 
   @view_models: []
 
-if kb.BACKBONE
+if kb.Backbone
   class Person extends Backbone.RelationalModel
     relations: [{
       type: Backbone.HasMany
@@ -245,7 +245,7 @@ test("kb.CollectionObservable with external store", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
-if kb.BACKBONE
+if kb.Backbone
   test("kb.CollectionObservable with recursive view models", ->
     kb.statistics = new kb.Statistics() # turn on stats
 

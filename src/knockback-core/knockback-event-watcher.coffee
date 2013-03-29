@@ -66,7 +66,7 @@ class kb.EventWatcher
       @model_ref.release(); @model_ref = null
 
     # set up current
-    if kb.BACKBONE and Backbone.ModelRef and (new_emitter instanceof Backbone.ModelRef)
+    if kb.Backbone and kb.Backbone.ModelRef and (new_emitter instanceof kb.Backbone.ModelRef)
       @model_ref = new_emitter; @model_ref.retain()
       @model_ref.bind('loaded', @__kb._onModelLoaded)
       @model_ref.bind('unloaded', @__kb._onModelUnloaded)
@@ -130,7 +130,7 @@ class kb.EventWatcher
 
     if @ee # loaded
       # bind relational updates
-      if kb.BACKBONE and Backbone.RelationalModel and (@ee instanceof Backbone.RelationalModel) and _.contains(event_names, 'change')
+      if kb.Backbone and kb.Backbone.RelationalModel and (@ee instanceof kb.Backbone.RelationalModel) and _.contains(event_names, 'change')
         @_modelBindRelatationalInfo('change', info)
 
       # trigger now
@@ -156,7 +156,7 @@ class kb.EventWatcher
 
   # @private
   _onModelLoaded: (model) =>
-    is_relational = kb.BACKBONE and Backbone.RelationalModel and (model instanceof Backbone.RelationalModel)
+    is_relational = kb.Backbone and kb.Backbone.RelationalModel and (model instanceof kb.Backbone.RelationalModel)
     @ee = model
 
     # bind all events

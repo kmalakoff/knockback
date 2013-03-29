@@ -31,7 +31,7 @@ locale_manager = new kb.LocaleManager('en', {
     formal_goodbye: 'Au revoir'
 })
 
-kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
 class LocalizedStringLocalizer extends kb.LocalizedObservable

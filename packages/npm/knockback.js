@@ -24,7 +24,7 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var Backbone, COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, collapseOptions, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _legacyWarning, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, collapseOptions, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _legacyWarning, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -147,7 +147,7 @@ if (typeof exports !== 'undefined') {
 
 if (this.Parse) {
   kb._ = _ = this.Parse._;
-  kb.PARSE = true;
+  kb.Parse = this.Parse;
   kb.Collection = this.Parse.Collection;
   kb.Model = this.Parse.Object;
   kb.Events = this.Parse.Events;
@@ -177,11 +177,10 @@ if (this.Parse) {
       }
     });
   }
-  kb.BACKBONE = true;
-  Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
-  kb.Collection = Backbone.Collection;
-  kb.Model = Backbone.Model;
-  kb.Events = Backbone.Events;
+  kb.Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
+  kb.Collection = kb.Backbone.Collection;
+  kb.Model = kb.Backbone.Model;
+  kb.Events = kb.Backbone.Events;
 }
 
 kb.ko = ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
@@ -457,7 +456,7 @@ kb.utils = (function() {
     if (creator) {
       return creator;
     }
-    if (owner && kb.BACKBONE && Backbone.RelationalModel && (owner instanceof Backbone.RelationalModel)) {
+    if (owner && kb.Backbone && kb.Backbone.RelationalModel && (owner instanceof kb.Backbone.RelationalModel)) {
       key = _unwrapObservable(key);
       relation = _.find(owner.getRelations(), function(test) {
         return test.key === key;
@@ -817,7 +816,7 @@ kb.EventWatcher = (function() {
       this.model_ref.release();
       this.model_ref = null;
     }
-    if (kb.BACKBONE && Backbone.ModelRef && (new_emitter instanceof Backbone.ModelRef)) {
+    if (kb.Backbone && kb.Backbone.ModelRef && (new_emitter instanceof kb.Backbone.ModelRef)) {
       this.model_ref = new_emitter;
       this.model_ref.retain();
       this.model_ref.bind('loaded', this.__kb._onModelLoaded);
@@ -893,7 +892,7 @@ kb.EventWatcher = (function() {
       callbacks.list.push(info);
     }
     if (this.ee) {
-      if (kb.BACKBONE && Backbone.RelationalModel && (this.ee instanceof Backbone.RelationalModel) && _.contains(event_names, 'change')) {
+      if (kb.Backbone && kb.Backbone.RelationalModel && (this.ee instanceof kb.Backbone.RelationalModel) && _.contains(event_names, 'change')) {
         this._modelBindRelatationalInfo('change', info);
       }
       info.emitter(this.ee) && info.emitter;
@@ -930,7 +929,7 @@ kb.EventWatcher = (function() {
   EventWatcher.prototype._onModelLoaded = function(model) {
     var callbacks, event_name, info, is_relational, list, _i, _len, _ref;
 
-    is_relational = kb.BACKBONE && Backbone.RelationalModel && (model instanceof Backbone.RelationalModel);
+    is_relational = kb.Backbone && kb.Backbone.RelationalModel && (model instanceof kb.Backbone.RelationalModel);
     this.ee = model;
     _ref = this.__kb.callbacks;
     for (event_name in _ref) {

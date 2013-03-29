@@ -3,6 +3,7 @@ module("knockback-defaults.js")
 ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
+Backbone = kb.Backbone
 require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
 
 test("TEST DEPENDENCY MISSING", ->
@@ -13,7 +14,7 @@ test("TEST DEPENDENCY MISSING", ->
   ok(!!kb, 'kb')
 )
 
-kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
 locale_manager = new kb.LocaleManager('en', {
@@ -22,7 +23,7 @@ locale_manager = new kb.LocaleManager('en', {
   'fr-FR': {loading: "Chargement"}
 })
 
-if kb.BACKBONE
+if kb.Backbone
   test("1. Standard use case: just enough to get the picture", ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
