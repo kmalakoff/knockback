@@ -124,7 +124,7 @@ kb = (function() {
     }
     kb.releaseOnNodeRemove(view_model, el);
     observable.dispose();
-    if (!options.afterRender && view_model.afterRender) {
+    if (view_model.afterRender && !options.afterRender) {
       view_model.afterRender(el);
     }
     return el;

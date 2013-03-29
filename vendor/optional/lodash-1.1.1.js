@@ -1,6 +1,6 @@
 /**
  * @license
- * Lo-Dash 1.1.0 (Custom Build) <http://lodash.com/>
+ * Lo-Dash 1.1.1 (Custom Build) <http://lodash.com/>
  * Build: `lodash modern -o ./dist/lodash.js`
  * Copyright 2012-2013 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.4.4 <http://underscorejs.org/>
@@ -2346,15 +2346,15 @@
       var index = -1,
           length = collection ? collection.length : 0;
 
+      callback = callback && typeof thisArg == 'undefined' ? callback : lodash.createCallback(callback, thisArg);
       if (typeof length == 'number') {
-        callback = callback && typeof thisArg == 'undefined' ? callback : lodash.createCallback(callback, thisArg);
         while (++index < length) {
           if (callback(collection[index], index, collection) === false) {
             break;
           }
         }
       } else {
-        forOwn(collection, callback, thisArg);
+        forOwn(collection, callback);
       }
       return collection;
     }
@@ -5145,7 +5145,7 @@
      * @memberOf _
      * @type String
      */
-    lodash.VERSION = '1.1.0';
+    lodash.VERSION = '1.1.1';
 
     // add "Chaining" functions to the wrapper
     lodash.prototype.toString = wrapperToString;
