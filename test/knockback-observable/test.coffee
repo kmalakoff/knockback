@@ -1,288 +1,286 @@
-$(->
-  module("knockback-observable.js")
+module("knockback-observable.js")
 
-  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
-  _ = kb._
+ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
+kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+_ = kb._
 
-  test("TEST DEPENDENCY MISSING", ->
-    ok(!!ko, 'ko')
-    ok(!!_, '_')
-    ok(!!kb.Model, 'kb.Model')
-    ok(!!kb.Collection, 'kb.Collection')
-    ok(!!kb, 'kb')
-  )
+test("TEST DEPENDENCY MISSING", ->
+  ok(!!ko, 'ko')
+  ok(!!_, '_')
+  ok(!!kb.Model, 'kb.Model')
+  ok(!!kb.Collection, 'kb.Collection')
+  ok(!!kb, 'kb')
+)
 
-  kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+kb.Contact = if kb.PARSE then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
-  test("1. Standard use case: direct attributes with read and write", ->
-    kb.statistics = new kb.Statistics() # turn on stats
+test("1. Standard use case: direct attributes with read and write", ->
+  kb.statistics = new kb.Statistics() # turn on stats
 
-    ContactViewModel = (model) ->
-      @name = kb.observable(model, 'name')
-      @number = kb.observable(model, {key:'number'})
-      return
+  ContactViewModel = (model) ->
+    @name = kb.observable(model, 'name')
+    @number = kb.observable(model, {key:'number'})
+    return
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
-    view_model = new ContactViewModel(model)
+  model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+  view_model = new ContactViewModel(model)
 
-    # get
-    equal(view_model.name(), 'Ringo', "Interesting name")
-    equal(view_model.number(), '555-555-5556', "Not so interesting number")
+  # get
+  equal(view_model.name(), 'Ringo', "Interesting name")
+  equal(view_model.number(), '555-555-5556', "Not so interesting number")
 
-    # set from the view model
-    view_model.name('Paul')
-    equal(model.get('name'), 'Paul', "Name changed")
-    equal(view_model.name(), 'Paul', "Name changed")
-    equal(model.get('number'), '555-555-5556', "Number not changed")
-    equal(view_model.number(), '555-555-5556', "Number not changed")
+  # set from the view model
+  view_model.name('Paul')
+  equal(model.get('name'), 'Paul', "Name changed")
+  equal(view_model.name(), 'Paul', "Name changed")
+  equal(model.get('number'), '555-555-5556', "Number not changed")
+  equal(view_model.number(), '555-555-5556', "Number not changed")
 
-    # set from the model
-    model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
-    equal(view_model.name(), 'Starr', "Name changed")
-    equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
+  # set from the model
+  model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
+  equal(view_model.name(), 'Starr', "Name changed")
+  equal(view_model.number(), 'XXX-XXX-XXXX', "Number was changed")
 
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
+  # and cleanup after yourself when you are done.
+  kb.release(view_model)
 
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
 
-  test("2. Standard use case: direct attributes with custom read and write", ->
-    kb.statistics = new kb.Statistics() # turn on stats
+test("2. Standard use case: direct attributes with custom read and write", ->
+  kb.statistics = new kb.Statistics() # turn on stats
 
-    ContactViewModelCustom = (model) ->
-      @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
-      @number = kb.observable(model, {
-        key:'number'
-        read: -> return "#: #{model.get('number')}"
-        write: (value) -> model.set({number: value.substring(3)})
+  ContactViewModelCustom = (model) ->
+    @name = kb.observable(model, {key:'name', read: -> return "First: #{model.get('name')}" })
+    @number = kb.observable(model, {
+      key:'number'
+      read: -> return "#: #{model.get('number')}"
+      write: (value) -> model.set({number: value.substring(3)})
+    })
+    return
+
+  model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+  view_model = new ContactViewModelCustom(model)
+
+  # get
+  equal(view_model.name(), 'First: Ringo', "Interesting name")
+  equal(view_model.number(), '#: 555-555-5556', "Not so interesting number")
+
+  # set from the view model
+  equal(model.get('name'), 'Ringo', "Name not changed")
+  equal(view_model.name(), 'First: Ringo', "Name not changed")
+  view_model.number('#: 9222-222-222')
+  equal(model.get('number'), '9222-222-222', "Number was changed")
+  equal(view_model.number(), '#: 9222-222-222', "Number was changed")
+
+  # set from the model
+  model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
+  equal(view_model.name(), 'First: Starr', "Name changed")
+  equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
+
+  # and cleanup after yourself when you are done.
+  kb.release(view_model)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("3. Read args", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  args = []
+  ContactViewModelCustom = (model) ->
+    @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
+    @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
+    return
+
+  model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+  view_model = new ContactViewModelCustom(model)
+  ok(_.isEqual(args, ['name', 1, 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']) , "got the args: #{args.join(', ')}") # TODO: reduce number of calls on old Backbone?
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("4. Standard use case: ko.dependentObservable", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  ContactViewModel = (model) ->
+    @name = kb.observable(model, {key: 'name'})
+    @formatted_name = ko.dependentObservable({
+      read: @name,
+      write: ((value) -> @name($.trim(value))),
+      owner: @
+    })
+    return
+
+  model = new kb.Contact({name: 'Ringo'})
+  view_model = new ContactViewModel(model)
+
+  # get
+  equal(view_model.name(), 'Ringo', "Interesting name")
+  equal(view_model.formatted_name(), 'Ringo', "Interesting name")
+
+  # set from the model
+  view_model.formatted_name(' John ')
+  equal(view_model.name(), 'John', "Name changed")
+  equal(view_model.formatted_name(), 'John', "Name changed")
+
+  # and cleanup after yourself when you are done.
+  kb.release(view_model)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("5. Inferring observable types: the easy way", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  class ChildrenCollection extends kb.CollectionObservable
+    constructor: (collection, options) ->
+      return super(collection, {view_model: InferringViewModel, options: options}) # return the observable instead of this
+
+  class InferringViewModel extends kb.ViewModel
+    constructor: (model, options) ->
+      super(model, {
+        keys: ['name', 'parent', 'children', 'maybe_null_name', 'maybe_null_parent', 'maybe_null_children']
+        factories: {
+          'maybe_null_parent': InferringViewModel
+          'maybe_null_children': ChildrenCollection
+        }
+        options: options
       })
-      return
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
-    view_model = new ContactViewModelCustom(model)
+  parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
+  children_child = new kb.Model({id: _.uniqueId(), name: 'Baby'})
+  children = new kb.Collection([{id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
+  model = new kb.Model({id: _.uniqueId()})
 
-    # get
-    equal(view_model.name(), 'First: Ringo', "Interesting name")
-    equal(view_model.number(), '#: 555-555-5556', "Not so interesting number")
+  view_model = new InferringViewModel(model)
+  equal(view_model.name(), null, 'inferred name as simple null')
+  equal(view_model.parent(), null, 'inferred parent as simple null')
+  equal(view_model.children(), null, 'inferred children as simple null')
+  equal(view_model.maybe_null_name(), null, 'name is null')
+  equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
+  ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is inferring')
+  equal(view_model.maybe_null_children().length, 0, 'no children yet')
 
-    # set from the view model
-    equal(model.get('name'), 'Ringo', "Name not changed")
-    equal(view_model.name(), 'First: Ringo', "Name not changed")
-    view_model.number('#: 9222-222-222')
-    equal(model.get('number'), '9222-222-222', "Number was changed")
-    equal(view_model.number(), '#: 9222-222-222', "Number was changed")
+  # update the model
+  model.set({
+    name: 'Fred'
+    parent: parent
+    children: children
+  })
+  equal(view_model.name(), 'Fred', 'name is Fred')
+  equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy')
+  ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel')
+  equal(view_model.children()[0].name(), 'Bob', 'child name is Bob')
+  ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel')
+  equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
+  ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
+  equal(view_model.maybe_null_name(), null, 'name is null')
+  equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
+  equal(view_model.maybe_null_children().length, 0, 'no children yet')
 
-    # set from the model
-    model.set({name: 'Starr', number: 'XXX-XXX-XXXX'})
-    equal(view_model.name(), 'First: Starr', "Name changed")
-    equal(view_model.number(), '#: XXX-XXX-XXXX', "Number was changed")
+  # update the model
+  model.set({
+    maybe_null_name: model.get('name')
+    maybe_null_parent: model.get('parent')
+    maybe_null_children: model.get('children')
+  })
+  equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred')
+  equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy')
+  ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is InferringViewModel')
+  equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob')
+  ok(view_model.maybe_null_children()[0] instanceof InferringViewModel, 'child type is InferringViewModel')
+  equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
+  ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
+  equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby')
+  ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel, 'maybe_null_children maybe_null_children type is InferringViewModel')
 
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
+  # and cleanup after yourself when you are done.
+  kb.release(view_model)
 
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
 
-  test("3. Read args", ->
-    kb.statistics = new kb.Statistics() # turn on stats
+test("6. Inferring observable types: the hard way", ->
+  kb.statistics = new kb.Statistics() # turn on stats
 
-    args = []
-    ContactViewModelCustom = (model) ->
-      @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
-      @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
-      return
+  class ChildrenCollection extends kb.CollectionObservable
+    constructor: (collection, options) ->
+      return super(collection, {view_model: InferringViewModel, options: options}) # return the observable instead of this
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
-    view_model = new ContactViewModelCustom(model)
-    ok(_.isEqual(args, ['name', 1, 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']) , "got the args: #{args.join(', ')}") # TODO: reduce number of calls on old Backbone?
+  InferringViewModel = (model, options) ->
+    @_auto = kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
+    @maybe_null_name = kb.observable(model, 'maybe_null_name')
+    @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferringViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+    @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+    return
 
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
+  parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
+  children_child = new kb.Model({id: _.uniqueId(), name: 'Baby'})
+  children = new kb.Collection([{id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
+  model = new kb.Model({id: _.uniqueId()})
 
-  test("4. Standard use case: ko.dependentObservable", ->
-    kb.statistics = new kb.Statistics() # turn on stats
+  view_model = new InferringViewModel(model)
+  equal(view_model.name(), null, 'inferred name as simple null')
+  equal(view_model.parent(), null, 'inferred parent as simple null')
+  equal(view_model.children(), null, 'inferred children as simple null')
+  equal(view_model.maybe_null_name(), null, 'name is null')
+  equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
+  ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is inferring')
+  equal(view_model.maybe_null_children().length, 0, 'no children yet')
 
-    ContactViewModel = (model) ->
-      @name = kb.observable(model, {key: 'name'})
-      @formatted_name = ko.dependentObservable({
-        read: @name,
-        write: ((value) -> @name($.trim(value))),
-        owner: @
-      })
-      return
+  # update the model
+  model.set({
+    name: 'Fred'
+    parent: parent
+    children: children
+  })
+  equal(view_model.name(), 'Fred', 'name is Fred')
+  equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy')
+  ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel')
+  equal(view_model.children()[0].name(), 'Bob', 'child name is Bob')
+  ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel')
+  equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
+  ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
+  equal(view_model.maybe_null_name(), null, 'name is null')
+  equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
+  equal(view_model.maybe_null_children().length, 0, 'no children yet')
 
-    model = new kb.Contact({name: 'Ringo'})
-    view_model = new ContactViewModel(model)
+  # update the model
+  model.set({
+    maybe_null_name: model.get('name')
+    maybe_null_parent: model.get('parent')
+    maybe_null_children: model.get('children')
+  })
+  equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred')
+  equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy')
+  ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is InferringViewModel')
+  equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob')
+  ok(view_model.maybe_null_children()[0] instanceof InferringViewModel, 'child type is InferringViewModel')
+  equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
+  ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
+  equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby')
+  ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel, 'maybe_null_children maybe_null_children type is InferringViewModel')
 
-    # get
-    equal(view_model.name(), 'Ringo', "Interesting name")
-    equal(view_model.formatted_name(), 'Ringo', "Interesting name")
+  # and cleanup after yourself when you are done.
+  kb.release(view_model)
 
-    # set from the model
-    view_model.formatted_name(' John ')
-    equal(view_model.name(), 'John', "Name changed")
-    equal(view_model.formatted_name(), 'John', "Name changed")
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+test("7. model change is observable", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+  model = new kb.Model({id: 1, name: 'Bob'})
 
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
+  observable = kb.observable(model, 'name')
 
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
+  count = 0
+  ko.dependentObservable(-> observable.model(); count++)
 
-  test("5. Inferring observable types: the easy way", ->
-    kb.statistics = new kb.Statistics() # turn on stats
+  observable.model(null)
+  observable.model(model)
+  equal(count, 3, "model change was observed")
+  kb.release(observable)
 
-    class ChildrenCollection extends kb.CollectionObservable
-      constructor: (collection, options) ->
-        return super(collection, {view_model: InferringViewModel, options: options}) # return the observable instead of this
-
-    class InferringViewModel extends kb.ViewModel
-      constructor: (model, options) ->
-        super(model, {
-          keys: ['name', 'parent', 'children', 'maybe_null_name', 'maybe_null_parent', 'maybe_null_children']
-          factories: {
-            'maybe_null_parent': InferringViewModel
-            'maybe_null_children': ChildrenCollection
-          }
-          options: options
-        })
-
-    parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
-    children_child = new kb.Model({id: _.uniqueId(), name: 'Baby'})
-    children = new kb.Collection([{id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
-    model = new kb.Model({id: _.uniqueId()})
-
-    view_model = new InferringViewModel(model)
-    equal(view_model.name(), null, 'inferred name as simple null')
-    equal(view_model.parent(), null, 'inferred parent as simple null')
-    equal(view_model.children(), null, 'inferred children as simple null')
-    equal(view_model.maybe_null_name(), null, 'name is null')
-    equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
-    ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is inferring')
-    equal(view_model.maybe_null_children().length, 0, 'no children yet')
-
-    # update the model
-    model.set({
-      name: 'Fred'
-      parent: parent
-      children: children
-    })
-    equal(view_model.name(), 'Fred', 'name is Fred')
-    equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy')
-    ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel')
-    equal(view_model.children()[0].name(), 'Bob', 'child name is Bob')
-    ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel')
-    equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
-    ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
-    equal(view_model.maybe_null_name(), null, 'name is null')
-    equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
-    equal(view_model.maybe_null_children().length, 0, 'no children yet')
-
-    # update the model
-    model.set({
-      maybe_null_name: model.get('name')
-      maybe_null_parent: model.get('parent')
-      maybe_null_children: model.get('children')
-    })
-    equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred')
-    equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy')
-    ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is InferringViewModel')
-    equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob')
-    ok(view_model.maybe_null_children()[0] instanceof InferringViewModel, 'child type is InferringViewModel')
-    equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
-    ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
-    equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby')
-    ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel, 'maybe_null_children maybe_null_children type is InferringViewModel')
-
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
-
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
-
-  test("6. Inferring observable types: the hard way", ->
-    kb.statistics = new kb.Statistics() # turn on stats
-
-    class ChildrenCollection extends kb.CollectionObservable
-      constructor: (collection, options) ->
-        return super(collection, {view_model: InferringViewModel, options: options}) # return the observable instead of this
-
-    InferringViewModel = (model, options) ->
-      @_auto = kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
-      @maybe_null_name = kb.observable(model, 'maybe_null_name')
-      @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferringViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
-      @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
-      return
-
-    parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
-    children_child = new kb.Model({id: _.uniqueId(), name: 'Baby'})
-    children = new kb.Collection([{id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child])}])
-    model = new kb.Model({id: _.uniqueId()})
-
-    view_model = new InferringViewModel(model)
-    equal(view_model.name(), null, 'inferred name as simple null')
-    equal(view_model.parent(), null, 'inferred parent as simple null')
-    equal(view_model.children(), null, 'inferred children as simple null')
-    equal(view_model.maybe_null_name(), null, 'name is null')
-    equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
-    ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is inferring')
-    equal(view_model.maybe_null_children().length, 0, 'no children yet')
-
-    # update the model
-    model.set({
-      name: 'Fred'
-      parent: parent
-      children: children
-    })
-    equal(view_model.name(), 'Fred', 'name is Fred')
-    equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy')
-    ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel')
-    equal(view_model.children()[0].name(), 'Bob', 'child name is Bob')
-    ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel')
-    equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
-    ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
-    equal(view_model.maybe_null_name(), null, 'name is null')
-    equal(view_model.maybe_null_parent().name(), null, 'parent name is null')
-    equal(view_model.maybe_null_children().length, 0, 'no children yet')
-
-    # update the model
-    model.set({
-      maybe_null_name: model.get('name')
-      maybe_null_parent: model.get('parent')
-      maybe_null_children: model.get('children')
-    })
-    equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred')
-    equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy')
-    ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is InferringViewModel')
-    equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob')
-    ok(view_model.maybe_null_children()[0] instanceof InferringViewModel, 'child type is InferringViewModel')
-    equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby')
-    ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel')
-    equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby')
-    ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel, 'maybe_null_children maybe_null_children type is InferringViewModel')
-
-    # and cleanup after yourself when you are done.
-    kb.release(view_model)
-
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
-  test("7. model change is observable", ->
-    kb.statistics = new kb.Statistics() # turn on stats
-    model = new kb.Model({id: 1, name: 'Bob'})
-
-    observable = kb.observable(model, 'name')
-
-    count = 0
-    ko.dependentObservable(-> observable.model(); count++)
-
-    observable.model(null)
-    observable.model(model)
-    equal(count, 3, "model change was observed")
-    kb.release(observable)
-
-    equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
