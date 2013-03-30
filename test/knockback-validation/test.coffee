@@ -4,6 +4,8 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
+window.kb = kb unless window.kb # make kb global for bindings
+
 test("TEST DEPENDENCY MISSING", ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
