@@ -20,7 +20,7 @@ try
   # library and dependencies
   require ['underscore', 'backbone', 'knockout', module_name, 'knockback-statistics', 'qunit_test_runner'], (_, Backbone, ko, kb, kbs, runner) ->
     window._ = window.Backbone = window.ko = window.kb = null # force each test to require dependencies synchronously
-    runner.start(); require ['./build/test'], ->
+    require ['./build/test'], -> runner.start()
 
 catch error
   alert("AMD tests failed: '#{error}'")

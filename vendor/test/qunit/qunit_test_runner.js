@@ -1,9 +1,20 @@
 (function() {
+  var started = false,
+    interval = null;
+  QUnit.done(function(details) {
+    if (!started) return;
+    clearInterval(interval);
+    if (!details.total) {
+      $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail');
+      throw new Error('Warning: no tests run');
+    }
+  });
 
   var startRunner = function() {
+    started = true;
     var start = Date.now();
     var timeout = 60000;
-    var interval = setInterval((function() {
+    interval = setInterval((function() {
       var code, stats;
       if (Date.now() > start + timeout) {
         // TIMEOUT
@@ -11,14 +22,6 @@
         throw 'Warning: tests timed out';
       }
     }), 500);
-
-    QUnit.done(function(details) {
-      clearInterval(interval);
-      if (!details.total) {
-        $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail');
-        throw new Error('Warning: no tests run');
-      }
-    });
   };
 
   // AMD
