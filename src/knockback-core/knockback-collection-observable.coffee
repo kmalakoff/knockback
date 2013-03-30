@@ -21,7 +21,7 @@ kb.compare = (value_a, value_b) ->
 # Base class for observing collections.
 #
 # @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
-#   var collection = new kb.Collection([{name: 'name1'}, {name: 'name2'}]);
+#   var collection = new Collection([{name: 'name1'}, {name: 'name2'}]);
 #   var view_model = {
 #     todos: kb.collectionObservable(collection)
 #   };
@@ -29,7 +29,7 @@ kb.compare = (value_a, value_b) ->
 # @example How to access and change the observed collection.
 #    var todos = new kb.CollectionObservable(new kb.Collection([{name: 'name1'}, {name: 'name2'}]);
 #    var current_collection = todos.collection(); // get
-#    todos.collection(new kb.Collection([{name: 'name3'}, {name: 'name4'}])); // set
+#    todos.collection(new Backbone.Collection([{name: 'name3'}, {name: 'name4'}])); // set
 #
 # @method .extend(prototype_properties, class_properties)
 #   Class method for JavaScript inheritance.
@@ -48,7 +48,7 @@ kb.compare = (value_a, value_b) ->
 #
 # @method #collection()
 #   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.
-#   @return [kb.Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
+#   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 #
 class kb.CollectionObservable
   @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
@@ -61,7 +61,7 @@ class kb.CollectionObservable
   # * ***resort***: (view_model, collection_observable, new_index) or if batch: (collection_observable)
   # * ***remove***: (view_model, collection_observable) or if batch: (collection_observable)
   #
-  # @param [kb.Collection] collection the collection to observe (can be null)
+  # @param [Collection] collection the collection to observe (can be null)
   # @param [Object] options the create options
   # @option options [Boolean] models_only flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.
   # @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
@@ -196,8 +196,8 @@ class kb.CollectionObservable
   # Get the options for a new collection that can be used for sharing view models.
   #
   # @example Sharing view models for an HTML select element.
-  #   var selected_collection = new kb.Collection();
-  #   var available_collection = new kb.Collection([{name: 'Bob'}, {name: 'Fred'}]);
+  #   var selected_collection = new Backbone.Collection();
+  #   var available_collection = new Backbone.Collection([{name: 'Bob'}, {name: 'Fred'}]);
   #   var selected = kb.collectionObservable(available_collection);
   #   var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); // view models shared with selected collection observable
   shareOptions: ->
@@ -236,7 +236,7 @@ class kb.CollectionObservable
   # @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
   #
   # @example
-  #    var todos = new kb.CollectionObservable(new kb.Collection([{name: 'Zanadu', name: 'Alex'}]));
+  #    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
   #    // in order of Zanadu then Alex
   #    todos.sortAttribute('name');
   #    // in order of Alex then Zanadu
@@ -251,9 +251,9 @@ class kb.CollectionObservable
   # Will return true unless created with models_only option.
   #
   # @example
-  #   var todos1 = new kb.CollectionObservable(new kb.Collection(), {models_only: true});
+  #   var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
   #   todos1.hasViewModels();     // false
-  #   var todos2 = new kb.CollectionObservable(new kb.Collection());
+  #   var todos2 = new kb.CollectionObservable(new Backbone.Collection());
   #   todos2.hasViewModels();     // true
   hasViewModels: -> return not @models_only
 

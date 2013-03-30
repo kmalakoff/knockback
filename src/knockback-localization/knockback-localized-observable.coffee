@@ -37,7 +37,7 @@
 #       localizer: ShortDateLocalizer
 #     }, this);
 #   };
-#   var view_model = new ViewModel(new kb.Model({date: new Date()}));
+#   var view_model = new ViewModel(new Backbone.Model({date: new Date()}));
 #
 # @method .extend(prototype_properties, class_properties)
 #   Class method for JavaScript inheritance.

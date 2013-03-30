@@ -9,8 +9,8 @@
 # Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 #
 # @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
-#   var co = kb.collectionObservable(new kb.Collection());
-#   var co_selected_options = kb.collectionObservable(new kb.Collection(), {
+#   var co = kb.collectionObservable(new Backbone.Collection());
+#   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 #     store: kb.utils.wrappedStore(co)
 #   });
 class kb.Store
@@ -46,8 +46,8 @@ class kb.Store
 
   # Used to register a new view model with the store.
   #
-  # @param [kb.Model] obj the kb.Model
-  # @param [ko.observable] observable the observable to share for the kb.Model
+  # @param [Model] obj the Model
+  # @param [ko.observable] observable the observable to share for the Model
   # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
   # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
   # @option options [String] path the path to the value (used to create related observables from the factory).
@@ -105,7 +105,7 @@ class kb.Store
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
   #
-  # @param [kb.Model|kb.Collection|Data] obj the object to create the observable for. Only kb.Models are cached in the store.
+  # @param [Model|Collection|Data] obj the object to create the observable for. Only Models are cached in the store.
   # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
   # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
   # @option options [String] path the path to the value (used to create related observables from the factory).

@@ -17,23 +17,23 @@
 #   var view_model = new ContactViewModel(model);
 #
 # @example How to create a kb.Observable with a default value.
-#   var model = kb.Model({name: 'Bob'});
+#   var model = Backbone.Model({name: 'Bob'});
 #   var name = kb.observable(model, {key:'name', default: '(none)'}); // name is Bob
 #   name.setToDefault(); // name is (none)
 #
 # @method #model()
 #   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
-#   @return [kb.Model|Backbone.ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
+#   @return [Model|ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
 #   @example
-#     var observable = kb.observable(new kb.Model({name: 'bob'}), 'name');
+#     var observable = kb.observable(new Backbone.Model({name: 'bob'}), 'name');
 #     var the_model = observable.model(); // get
-#     observable.model(new kb.Model({name: 'fred'})); // set
+#     observable.model(new Backbone.Model({name: 'fred'})); // set
 #
 class kb.Observable
 
   # Used to create a new kb.Observable.
   #
-  # @param [kb.Model] model the model to observe (can be null)
+  # @param [Model] model the model to observe (can be null)
   # @param [String|Array|Object] options the create options. String is a single attribute name, Array is an array of attribute names.
   # @option options [String] key the name of the attribute.
   # @option options [Function] read a function used to provide transform the attribute value before passing it to the caller. Signature: read()
@@ -150,7 +150,7 @@ class kb.Observable
     @model.dispose(); @_mdl = @model = observable.model = null
     kb.utils.wrappedDestroy(@)
 
-  # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a kb.Collection, it will hold a kb.CollectionObservable.
+  # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Collection, it will hold a CollectionObservable.
   value: ->
     return @__kb_value
 

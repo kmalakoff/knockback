@@ -13,7 +13,7 @@
 #
 # @example How to watch a emitter for events.
 #   var trigger_count = 0;
-#   var emitter = new kb.Model();
+#   var emitter = new Backbone.Model();
 #   var view_emitter = {
 #     triggered_observable: kb.triggeredObservable(emitter, 'change')
 #   };
@@ -28,7 +28,7 @@ class kb.TriggeredObservable
 
   # Used to create a new kb.Observable.
   #
-  # @param [kb.Model] emitter the emitter to observe (can be null)
+  # @param [Model] emitter the emitter to observe (can be null)
   # @param [String] event_selector the event name to trigger Knockout subscriptions on.
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
@@ -56,10 +56,10 @@ class kb.TriggeredObservable
   #
   # @overload emitter()
   #   Gets the emitter or emitter reference
-  #   @return [kb.Model|Backbone.ModelRef|kb.Collection] the emitter whose events are being bound (can be null)
+  #   @return [Model|ModelRef|Collection] the emitter whose events are being bound (can be null)
   # @overload emitter(new_emitter)
   #   Sets the emitter or emitter reference
-  #   @param [kb.Model|Backbone.ModelRef|kb.Collection] new_emitter the emitter whose events will be bound (can be null)
+  #   @param [Model|ModelRef|Collection] new_emitter the emitter whose events will be bound (can be null)
   emitter: (new_emitter) ->
     # get or no change
     return @ee if (arguments.length == 0) or (@ee is new_emitter)

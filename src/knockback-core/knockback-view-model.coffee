@@ -6,10 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-# Base class for ViewModels for kb.Models.
+# Base class for ViewModels for Models.
 #
 # @example How to create a ViewModel with first_name and last_name observables.
-#   var view_model = kb.viewModel(new kb.Model({first_name: "Planet", last_name: "Earth"}));
+#   var view_model = kb.viewModel(new Backbone.Model({first_name: "Planet", last_name: "Earth"}));
 #
 # @example Bulk kb.Observable create using 'key' Object to customize the kb.Observable created per attribute.
 #   var ContactViewModel = function(model) {
@@ -53,22 +53,22 @@
 #
 # @method #model()
 #   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
-#   @return [kb.Model|Backbone.ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
+#   @return [Model|ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
 #   @example
-#     var view_model = kb.viewModel(new kb.Model({name: 'bob'}));
+#     var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
 #     var the_model = view_model.model(); // get
-#     view_model.model(new kb.Model({name: 'fred'})); // set
+#     view_model.model(new Backbone.Model({name: 'fred'})); // set
 #
 class kb.ViewModel
   @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.ViewModel.
   #
-  # @param [kb.Model|Backbone.ModelRef] model the model to observe (can be null)
+  # @param [Model|ModelRef] model the model to observe (can be null)
   # @param [Object] options the create options
   # @option options [Array] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
-  # @option options [Array] requires an array of atttributes that will have kb.Observables created even if they do not exist on the kb.Model. Useful for binding Views that require specific observables to exist
-  # @option options [Array] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of kb.Model attributes
+  # @option options [Array] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model. Useful for binding Views that require specific observables to exist
+  # @option options [Array] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
   # @option options [Object|Array] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.

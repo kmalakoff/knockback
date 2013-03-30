@@ -76,13 +76,13 @@ Knockback.js is compatible with RequireJS, CommonJS, Brunch and AMD module loadi
 ###Replaceable Dependencies
 
 * [LoDash](http://lodash.com/) - it you prefer LoDash, we've got support for it!
-* [Parse](https://www.parse.com/) - instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
+* [Parse](https://www.parse.com/) - (***new!***) instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
 
 ###Compatible Components
 
 * [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/) - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.
 * [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
-* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) (***new!***) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
+* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
 * [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
 
 

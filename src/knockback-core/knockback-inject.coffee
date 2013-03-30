@@ -67,7 +67,7 @@ ko.bindingHandlers['inject'] =
 #   </div>
 #   var MyViewModel = kb.ViewModel.extend({
 #     constructor: ->
-#       model = new kb.Model({name: '', site: 'http://your.url.com'});
+#       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
 #       kb.ViewModel.prototype.constructor.call(this, model);
 #   });
 class kb.Inject

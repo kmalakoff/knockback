@@ -84,11 +84,11 @@ class kb.utils
   # @overload wrappedObject(obj)
   #   Gets the observable from an object
   #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
-  #   @return [kb.Model|kb.Collection] the model/collection
+  #   @return [Model|Collection] the model/collection
   # @overload wrappedObject(obj, value)
   #   Sets the observable on an object
   #   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
-  #   @param [kb.Model|kb.Collection] value the model/collection
+  #   @param [Model|Collection] value the model/collection
   #
   # @example
   #   var model = kb.utils.wrappedObject(view_model);
@@ -100,12 +100,12 @@ class kb.utils
   #
   # @overload wrappedModel(view_model)
   #   Gets the model from a ViewModel
-  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the kb.Model.
-  #   @return [kb.Model|ViewModel] the Model or ViewModel itself if there is no Model
+  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Model.
+  #   @return [Model|ViewModel] the Model or ViewModel itself if there is no Model
   # @overload wrappedModel(view_model, model)
   #   Sets the observable on an object
-  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the kb.Model.
-  #   @param [kb.Model] model the Model
+  #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Model.
+  #   @param [Model] model the Model
   @wrappedModel = (obj, value) ->
     # get
     if (arguments.length is 1)
@@ -126,8 +126,8 @@ class kb.utils
   #   @param [kb.Store] store the store
   #
   # @example
-  #   var co = kb.collectionObservable(new kb.Collection());
-  #   var co_selected_options = kb.collectionObservable(new kb.Collection(), {
+  #   var co = kb.collectionObservable(new Backbone.Collection());
+  #   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   #     store: kb.utils.wrappedStore(co)
   #   });
   @wrappedStore = (obj, value)                -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
@@ -183,7 +183,7 @@ class kb.utils
   # @see kb.Observable valueType
   #
   # @example
-  #   var view_model = kb.viewModel(new kb.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
+  #   var view_model = kb.viewModel(new Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
   #   kb.utils.valueType(view_model.simple_attr); // kb.TYPE_SIMPLE
   #   kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   @valueType = (observable) ->
@@ -241,20 +241,20 @@ class kb.utils
     return ko.observableArray(obj)                      if _.isArray(obj)
     return ko.observable(obj)
 
-  # Helper to check an object for having a kb.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from kb.Model
+  # Helper to check an object for having a Model signature. For example, locale managers and ModelRef don't need to derive from Model
   #
   # @param [Object] obj the object to test
   #
   # @example
-  #   kb.utils.hasModelSignature(new kb.Model());
+  #   kb.utils.hasModelSignature(new Model());
   @hasModelSignature = (obj) ->
     return obj and (obj.attributes and not obj.models) and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
 
-  # Helper to check an object for having a kb.Model signature. For example, locale managers and Backbone.ModelRef don't need to derive from kb.Model
+  # Helper to check an object for having a Model signature. For example, locale managers and ModelRef don't need to derive from Model
   #
   # @param [Object] obj the object to test
   #
   # @example
-  #   kb.utils.hasModelSignature(new kb.Model());
+  #   kb.utils.hasModelSignature(new Model());
   @hasCollectionSignature = (obj) ->
     return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')

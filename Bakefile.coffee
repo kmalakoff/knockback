@@ -203,6 +203,7 @@ module.exports =
     _build:
       output: 'build'
       directories: [
+        'test/knockback-core'
         'test/knockback-utils'
         'test/knockback-memory-management'
         'test/knockback-observable'
@@ -231,6 +232,7 @@ module.exports =
       runner: 'phantomjs-qunit-runner.js'
       files: '**/*.html'
       directories: [
+        'test/knockback-core'
         'test/knockback-utils'
         'test/knockback-memory-management'
         'test/knockback-observable'

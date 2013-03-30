@@ -9,14 +9,14 @@
 addStatisticsEvent = (emitter, event_name, info) ->
   not kb.statistics or kb.statistics.addModelEvent({name: event_name, emitter: emitter, key: info.key, path: info.path})
 
-# Used to provide a central place to aggregate registered kb.Model events rather than having all kb.Observables register for updates independently.
+# Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 #
 class kb.EventWatcher
 
   # Used to either register yourself with the existing emitter watcher or to create a new one.
   #
   # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(emitter, options)
-  # @param [kb.Model|Backbone.ModelRef] obj the Model that will own or register with the store
+  # @param [Model|ModelRef] obj the Model that will own or register with the store
   # @param [ko.observable|Object] emitter the emitters of the event watcher
   # @param [Object] callback_options information about the event and callback to register
   # @option options [Function] emitter callback for when the emitter changes (eg. is loaded). Signature: function(new_emitter)
@@ -51,10 +51,10 @@ class kb.EventWatcher
   #
   # @overload emitter()
   #   Gets the emitter or emitter reference
-  #   @return [kb.Model|Backbone.ModelRef] the emitter whose attributes are being observed (can be null)
+  #   @return [Model|ModelRef] the emitter whose attributes are being observed (can be null)
   # @overload emitter(new_emitter)
   #   Sets the emitter or emitter reference
-  #   @param [kb.Model|Backbone.ModelRef] new_emitter the emitter whose attributes will be observed (can be null)
+  #   @param [Model|ModelRef] new_emitter the emitter whose attributes will be observed (can be null)
   emitter: (new_emitter) ->
     # get or no change
     return @ee if (arguments.length is 0) or (@ee == new_emitter)

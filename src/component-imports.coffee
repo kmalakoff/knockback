@@ -1,7 +1,5 @@
 kb = if not @kb and (typeof(require) isnt 'undefined') then require('knockback') else @kb
 _ = kb._
-Model = kb.Model
-Collection = kb.Collection
 ko = kb.ko
 
 # module
