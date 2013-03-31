@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.8.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.17.0.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -32,23 +32,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -76,12 +80,9 @@
       <header class="page">
       </header>
       <content class="page"><h1>Tutorial: kb.CollectionObservable</h1>
-<p><a href="index.html">Knockback.js</a> provides an <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a> that watches Backbone.Collections when models are added, removed, and changed. In addition, kb.CollectionObservables can be used to sort models independently from the Backbone.Collection order, to bind HTML select elements, to render/edit <a href="tutorial_relational_models.html">model relationships</a>, and to filter collections.
-
-</p>
+<p><a href="index.html">Knockback.js</a> provides an <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a> that watches Backbone.Collections when models are added, removed, and changed. In addition, kb.CollectionObservables can be used to sort models independently from the Backbone.Collection order, to bind HTML select elements, to render/edit <a href="tutorial_relational_models.html">model relationships</a>, and to filter collections.</p>
 <h2>Sorting Models</h2>
-<p>You can sort models using an <a href="doc/classes/kb/CollectionObservable.html#sortAttribute-instance">attribute name</a> or by providing a <a href="doc/classes/kb/CollectionObservable.html#sortedIndex-instance">sorted_index function</a>.
-</p>
+<p>You can sort models using an <a href="doc/classes/kb/CollectionObservable.html#sortAttribute-instance">attribute name</a> or by providing a <a href="doc/classes/kb/CollectionObservable.html#sortedIndex-instance">sorted_index function</a>.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -155,8 +156,7 @@ ko.applyBindings(view_model, $('#kbco_sorting')[0]);</pre>
             </div>
           </div>
         </div><h2>Filtering Models</h2>
-<p>You can use kb.CollectionObservables to filter both ViewModels or Models (using the &#39;models_only&#39; option) using the filters constructor option. Filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
-</p>
+<p>You can use kb.CollectionObservables to filter both ViewModels or Models (using the &#39;models_only&#39; option) using the filters constructor option. Filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -190,8 +190,8 @@ filtered_names = ko.observableArray(['Kevin'])
 
 view_model =
   filtered_names: filtered_names
-  available_names: ko.observableArray(people.map((model) -> return model.get('first')))
-  people: kb.collectionObservable(people, {filters: (model) -> return model.get('first') is filtered_names()[0]})
+  available_names: ko.observableArray(people.map((model) -&gt; return model.get('first')))
+  people: kb.collectionObservable(people, {filters: (model) -&gt; return model.get('first') is filtered_names()[0]})
 
 ko.applyBindings(view_model, $('#kbco_filtering')[0])</pre>
                 <pre data-for="js">var people = new Backbone.Collection([{first: 'Jeremy', last: 'Ashkenas'}, {first: 'Steven', last: 'Sanderson'}, {first: 'Kevin', last: 'Malakoff'}]);
@@ -230,8 +230,7 @@ ko.applyBindings(view_model, $('#kbco_filtering')[0]);</pre>
             </div>
           </div>
         </div><h2>HTML Select Statements</h2>
-<p>You can use kb.CollectionObservables to bind HTML select statements using <a href="http://knockoutjs.com/">Knockout.js selectOptions</a>.
-</p>
+<p>You can use kb.CollectionObservables to bind HTML select statements using <a href="http://knockoutjs.com/">Knockout.js selectOptions</a>.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -286,11 +285,8 @@ ko.applyBindings(view_model, $('#kbco_html_select')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_collection_observable/kbco_html_select_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><p>One important constraint is that in order for <a href="http://knockoutjs.com/documentation/selectedOptions-binding.html">Knockout.js select bindings</a> to work, the same ViewModel instance needs to be included in each kb.CollectionObservable. You can use <a href="doc/classes/kb/CollectionObservable.html#shareOptions-instance">shareOptions</a> to share the kb.Store and hence ViewModels between kb.CollectionObservables.
-
-</p>
-<p>Here is an adapted sample from <a href="http://kmalakoff.github.com/knockback-reference-app">Knockback Reference App</a>.
-</p>
+        </div><p>One important constraint is that in order for <a href="http://knockoutjs.com/documentation/selectedOptions-binding.html">Knockout.js select bindings</a> to work, the same ViewModel instance needs to be included in each kb.CollectionObservable. You can use <a href="doc/classes/kb/CollectionObservable.html#shareOptions-instance">shareOptions</a> to share the kb.Store and hence ViewModels between kb.CollectionObservables.</p>
+<p>Here is an adapted sample from <a href="http://kmalakoff.github.com/knockback-reference-app">Knockback Reference App</a>.</p>
 
         <div class="row-fluid">
           <div class="span8">

@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
@@ -28,23 +28,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -58,36 +62,22 @@
       <header class="page">
       </header>
       <content class="page"><h1>Compatible Components: Knockback-Navigators.js</h1>
-<p>Knockback-Navigators.js provides page navigators, a pane navigator, and transition animations to help you make dynamic, single-page applications. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
-
-</p>
-<p><a href="http://kmalakoff.github.com/knockback-navigators/">Try the demo</a>
-
-</p>
+<p>Knockback-Navigators.js provides page navigators, a pane navigator, and transition animations to help you make dynamic, single-page applications. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!</p>
+<p><a href="http://kmalakoff.github.com/knockback-navigators/">Try the demo</a></p>
 <h2>kb.PageNavigatorPanes</h2>
-<p>This component provides a page navigator with history and optional transition animations. If you are using Knockout.js or Knockback.js, you can observe changes to the active page (for example, to update menu links).
-
-</p>
+<p>This component provides a page navigator with history and optional transition animations. If you are using Knockout.js or Knockback.js, you can observe changes to the active page (for example, to update menu links).</p>
 <h1>Usage</h1>
-<p>In order to filter loading of page URLs (eg. not reloading the active page if the URL hasn&#39;t changed) and to manage history (eg. going back if the previous page matches the URL), kb.PageNavigatorPanes provides a &#39;dispatcher(callback)&#39; that is only called when a cached page is not available.
-
-</p>
+<p>In order to filter loading of page URLs (eg. not reloading the active page if the URL hasn&#39;t changed) and to manage history (eg. going back if the previous page matches the URL), kb.PageNavigatorPanes provides a &#39;dispatcher(callback)&#39; that is only called when a cached page is not available.</p>
 <h3>Basic Usage (Static Pages)</h3>
-<p>If you want to bind  to a static page, you should provide the &#39;{no_remove: true}&#39; option so if only hides, but does not detach elements when a page is deactivated.
-
-</p>
-<p>BackboneJS:
-
-</p>
+<p>If you want to bind  to a static page, you should provide the &#39;{no_remove: true}&#39; option so if only hides, but does not detach elements when a page is deactivated.</p>
+<p>BackboneJS:</p>
 <pre><code>var page_navigator = new kb.PageNavigatorPanes($(&#39;#app&#39;)[0], {no_remove: true});
 var router = new Backbone.Router()
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){ page_navigator.loadPage($(&#39;#main&#39;)[0]); }));
 router.route(&#39;page1&#39;, null, page_navigator.dispatcher(function(){ page_navigator.loadPage($(&#39;#page1&#39;)[0]); }));
 router.route(&#39;page2&#39;, null, page_navigator.dispatcher(function(){ page_navigator.loadPage($(&#39;#page2&#39;)[0]); }));
 Backbone.history.start({hashChange: true});</code></pre>
-<p>PathJS:
-
-</p>
+<p>PathJS:</p>
 <pre><code>var page_navigator = new kb.PageNavigatorPanes($(&#39;#app&#39;)[0], {no_remove: true});
 Path.map(&#39;&#39;).to(page_navigator.dispatcher(function(){ page_navigator.loadPage($(&#39;#main&#39;)[0]); }));
 Path.map(&#39;#page1&#39;).to(page_navigator.dispatcher(function(){ page_navigator.loadPage($(&#39;#page1&#39;)[0]); }));
@@ -95,29 +85,21 @@ Path.map(&#39;#page2&#39;).to(page_navigator.dispatcher(function(){ page_navigat
 Path.listen();
 Path.dispatch(window.location.hash);</code></pre>
 <h3>Dynamic Pages using Knockback.js</h3>
-<p>You can dynamic pages either by hand or using Knockback.js&#39;s &#39;kb.renderTemplate(template_name, view_model, options)&#39; function.
-
-</p>
+<p>You can dynamic pages either by hand or using Knockback.js&#39;s &#39;kb.renderTemplate(template_name, view_model, options)&#39; function.</p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   page_navigator.loadPage( kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;main&#39;))) );
 }));
 ...</code></pre>
-<p>You can also force pages to unload when they are not active, but supplying a &#39;create&#39; function rather than an element.
-
-</p>
+<p>You can also force pages to unload when they are not active, but supplying a &#39;create&#39; function rather than an element.</p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   create: function() { return kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;page1&#39;))) }
 }));
 ...</code></pre>
 <h1>Adding Transition Animations</h1>
-<p>You can provide transition animations either during routing (assymetic reverse transitions will not work if the page can be reloaded) or during button clicks.
-
-</p>
-<p>Transitions during routing:
-
-</p>
+<p>You can provide transition animations either during routing (assymetic reverse transitions will not work if the page can be reloaded) or during button clicks.</p>
+<p>Transitions during routing:</p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   page_navigator.loadPage({
@@ -126,9 +108,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   });
 }));
 ...</code></pre>
-<p>With options:
-
-</p>
+<p>With options:</p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   page_navigator.loadPage({
@@ -137,18 +117,12 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   });
 }));
 ...</code></pre>
-<p>With buttons (HTML):
-
-</p>
+<p>With buttons (HTML):</p>
 <pre><code>&lt;button class=&#39;btn btn-small&#39; onclick=&quot;kb.loadUrl(&#39;#page1&#39;, {name: &#39;NavigationSlide&#39;, inverse: true})&quot;&gt; Back&lt;/button&gt;</code></pre>
-<p>With buttons (Knockout):
-
-</p>
+<p>With buttons (Knockout):</p>
 <pre><code>&lt;button class=&#39;btn btn-small&#39; data-bind=&quot;click: function(){ kb.loadUrl(&#39;#page1&#39;, {name: &#39;NavigationSlide&#39;, inverse: true}) }&quot;&gt;&lt;span&gt; Back&lt;/span&gt;&lt;/button&gt;</code></pre>
 <h1>Embedding using Knockout.js bindings:</h1>
-<p>If you are using KnockoutJS or Knockback.js, you can actually bind a page navigator in the HTML using &#39;ko.bindings&#39; and receive a callback to set up routing.
-
-</p>
+<p>If you are using KnockoutJS or Knockback.js, you can actually bind a page navigator in the HTML using &#39;ko.bindings&#39; and receive a callback to set up routing.</p>
 <pre><code>&lt;div data-bind=&quot;PageNavigatorPanes: {loaded: loaded}&quot;&gt;&lt;/div&gt;
 
 ko.applyBindings({
@@ -161,22 +135,13 @@ ko.applyBindings({
 });
 Backbone.history.start({hashChange: true});</code></pre>
 <h2>kb.PageNavigatorSimple</h2>
-<p>This component provides a page navigator with no history and no transitions. In addition to adding a little structure to your application, if you are using Knockout.js or Knockback.js, you can observe changes to the active page (for example, to update menu links).
-
-</p>
+<p>This component provides a page navigator with no history and no transitions. In addition to adding a little structure to your application, if you are using Knockout.js or Knockback.js, you can observe changes to the active page (for example, to update menu links).</p>
 <h1>Usage</h1>
-<p>The usage is similar to kb.PageNavigatorSimple except you cannot supply transition animations and create functions (there is no history).
-
-
-</p>
+<p>The usage is similar to kb.PageNavigatorSimple except you cannot supply transition animations and create functions (there is no history).</p>
 <h2>kb.PaneNavigator</h2>
-<p>This component provides a way to embed moveable panes within you HTML (for example, sliding between items one at a time) with or without transition animations and provides the page transition functionality to kb.PageNavigatorPanes.
-
-</p>
+<p>This component provides a way to embed moveable panes within you HTML (for example, sliding between items one at a time) with or without transition animations and provides the page transition functionality to kb.PageNavigatorPanes.</p>
 <h1>Usage</h1>
-<p>You can manually bind a pane-navigator:
-
-</p>
+<p>You can manually bind a pane-navigator:</p>
 <pre><code>&lt;div class=&#39;pane-navigator&#39;&gt;
   &lt;div class=&#39;pane cell&#39;&gt;
     &lt;p&gt;Pane1&lt;/p&gt;
@@ -208,16 +173,12 @@ pane_navigator.push(new kb.Pane(pane_navigator_el.children[0]));</code></pre>
 
 ko.applyBindings({});</code></pre>
 <h2>Transition Animations</h2>
-<p>If you would like to have great transition animations between your panes or pages, you need to expose add them to the kb.transitions object.
-
-</p>
+<p>If you would like to have great transition animations between your panes or pages, you need to expose add them to the kb.transitions object.</p>
 <pre><code># info [Object] provides the following properties: container_el, to_el, from_el
 # options [Object] along with your custom options, it provides the following properties: forward
 kb.transitions[&#39;YourTransition&#39;] = function(info, options) {
 };</code></pre>
-<p>You can use kb.TransitionSavedState to store and restore element classes and css classes before and after your animation.
-
-</p>
+<p>You can use kb.TransitionSavedState to store and restore element classes and css classes before and after your animation.</p>
 <pre><code>// save to_el and container_el element classes and css &#39;min-height&#39; and &#39;overflow&#39; properties.
 state = new kb.TransitionSavedState(info, {to_el: [&#39;min-height&#39;], container_el: [&#39;overflow&#39;]});
 
@@ -225,19 +186,13 @@ state = new kb.TransitionSavedState(info, {to_el: [&#39;min-height&#39;], contai
 
 // all saved state will be restored when fadeIn is done
 $(info.to_el).hide().fadeIn(500, state.callback);</code></pre>
-<p>If you have some production quality transitions that you&#39;d like to submit to the library, please <a href="http://kmalakoff.github.com/knockback/issues">let me know</a>.
-
-</p>
+<p>If you have some production quality transitions that you&#39;d like to submit to the library, please <a href="http://kmalakoff.github.com/knockback/issues">let me know</a>.</p>
 <h2>Note on Lifecycle Management</h2>
 <h1>Auto-Releasing View Models</h1>
-<p>Knockback-Navigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:
-
-</p>
+<p>Knockback-Navigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:</p>
 <pre><code>// binds a callback to the node that releases the view model when the node is removed using ko.removeNode
 ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );</code></pre>
-<p>There are three ways to do this in Knockback:
-
-</p>
+<p>There are three ways to do this in Knockback:</p>
 <pre><code>// Auto-released Template
 var el = kb.renderTemplate(&#39;template_name&#39;, view_model, options);
 
@@ -247,9 +202,7 @@ kb.applyBindings(view_model, el);
 // OR: Manually
 kb.releaseOnNodeRemove(view_model, el);</code></pre>
 <h1>Notifications</h1>
-<p>Knockback-Navigators.js provides hooks to receive notifications when an element is activated and deactivated so you can have fine-grained control (for example, to stop background page processing) when your element is detached ($(el).detach()) rather than removed (ko.removeNode(el)). It uses two conventions to provide the notifications:
-
-</p>
+<p>Knockback-Navigators.js provides hooks to receive notifications when an element is activated and deactivated so you can have fine-grained control (for example, to stop background page processing) when your element is detached ($(el).detach()) rather than removed (ko.removeNode(el)). It uses two conventions to provide the notifications:</p>
 <pre><code>// created manually or through page_navigator.loadPaga({el: el, view_model: view_model})
 var pane = kb.Pane({el: el, view_model: view_model});
 ...
@@ -261,14 +214,10 @@ var pane = kb.Pane({el: el});
 var view_model = ko.dataFor(pane.el); // get the ViewModel from the bound element
 view_model.activate(el);</code></pre>
 <h1>Not Using Knockback.js nor Knockout.js</h1>
-<p>If you do not use Knockback.js or Knockout.js, you may want to provide custom memory management hooks instead of these defaults:
-
-</p>
+<p>If you do not use Knockback.js or Knockout.js, you may want to provide custom memory management hooks instead of these defaults:</p>
 <pre><code>ko.dataFor = function(el) { return null; };
 ko.removeNode = function(el) { $(el).remove(); };</code></pre>
-<p>For example:
-
-</p>
+<p>For example:</p>
 <pre><code>ko.dataFor = function(el) { return {activate: function(el) { /* do something with el */ }}; };</code></pre>
 
       </content>

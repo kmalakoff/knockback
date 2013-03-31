@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
@@ -28,23 +28,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -58,12 +62,8 @@
       <header class="page">
       </header>
       <content class="page"><h1>Compatible Components: Backbone-Relational.js</h1>
-<p><a href="https://github.com/PaulUithol/Backbone-relational/">Backbone-Relational.js</a> is an extension to Backbone.js that provides a solution to manage dependencies between Models. Knockback.js has been developed with support for relationships in mind.
-
-</p>
-<p>You should take a look at the <a href="tutorial_relational_models.html">Relational-Model Tutorial</a> and also the <a href="http://kmalakoff.github.com/knockback-reference-app">Knockback.js Reference App</a> for examples of using relationships in your apps including:
-
-</p>
+<p><a href="https://github.com/PaulUithol/Backbone-relational/">Backbone-Relational.js</a> is an extension to Backbone.js that provides a solution to manage dependencies between Models. Knockback.js has been developed with support for relationships in mind.</p>
+<p>You should take a look at the <a href="tutorial_relational_models.html">Relational-Model Tutorial</a> and also the <a href="http://kmalakoff.github.com/knockback-reference-app">Knockback.js Reference App</a> for examples of using relationships in your apps including:</p>
 <ul>
 <li>rendering custom Views for each relationship</li>
 <li>selecting relationships using an HTML select element and Knockout.js</li>

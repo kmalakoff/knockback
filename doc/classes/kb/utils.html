@@ -3,19 +3,19 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <link rel='stylesheet' href='..&#47;..&#47;assets/codo.css' type='text/css'>
-  <script src='..&#47;..&#47;assets/codo.js'></script>
-  <script src='..&#47;..&#47;assets/search_data.js'></script>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+  <script src='../../assets/search_data.js'></script>
 </head>
   <body>
-    <div id='base' data-path='..&#47;..&#47;'></div>
+    <div id='base' data-path='../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='..&#47;..&#47;README.md.html' title='Knockback'>Knockback</a>
+    <a href='../../README.md.html' title='Knockback'>Knockback</a>
     &raquo;
-    <a href='..&#47;..&#47;class_index.html' title='Index'>Index</a>
+    <a href='../../class_index.html' title='Index'>Index</a>
     &raquo;
-    <a href='..&#47;..&#47;classes&#47;kb.html' title='kb'>kb</a>
+    <a href='../../classes/kb.html' title='kb'>kb</a>
     &raquo;
     <span class='title'>utils</span>
     <nav>
@@ -26,10 +26,10 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='..&#47;..&#47;class_list.html'>Classes</a>
-      <a id='file_list_link' href='..&#47;..&#47;file_list.html'>Files</a>
-      <a id='method_list_link' href='..&#47;..&#47;method_list.html'>Methods</a>
-      <a id='extra_list_link' href='..&#47;..&#47;extra_list.html'>Extras</a>
+      <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
+      <a id='method_list_link' href='../../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -251,7 +251,7 @@
       </a>
     </span>
     <span class='desc'>
-      Helper to check an object for having a Backbone.Model signature.
+      Helper to check an object for having a Model signature.
     </span>
   </li>
   <li>
@@ -261,7 +261,7 @@
       </a>
     </span>
     <span class='desc'>
-      Helper to check an object for having a Backbone.Model signature.
+      Helper to check an object for having a Model signature.
     </span>
   </li>
 </ul>
@@ -287,8 +287,7 @@
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
     return kb.utils.wrappedObservable(this);
   }
-});
-</code></pre>
+});</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -358,7 +357,7 @@
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedObject-class'>
-      + (Backbone.Model|Backbone.Collection) <strong>wrappedObject</strong>(obj)
+      + (Model|Collection) <strong>wrappedObject</strong>(obj)
       <br>
       + (void) <strong>wrappedObject</strong>(obj, value)
       <br>
@@ -375,8 +374,7 @@
       
     </h4>
     <pre><code class='coffee'>var model = kb.utils.wrappedObject(view_model);
-var collection = kb.utils.wrappedObject(collection_observable);
-</code></pre>
+var collection = kb.utils.wrappedObject(collection_observable);</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -384,7 +382,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
     <h3>Overloads:</h3>
     <div class='overload'>
       <p class='signature'>
-        + (Backbone.Model|Backbone.Collection) <strong>wrappedObject</strong>(obj)
+        + (Model|Collection) <strong>wrappedObject</strong>(obj)
       </p>
       <div class='docstring'>
   <p>Gets the observable from an object</p>
@@ -398,14 +396,14 @@ var collection = kb.utils.wrappedObject(collection_observable);
         (<tt>Object|kb.ViewModel|kb.CollectionObservable</tt>)
       </span>
       &mdash;
-      <span class='desc'>owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.</span>
+      <span class='desc'>owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.</span>
     </li>
   </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'></span>
-      (<tt>Backbone.Model|Backbone.Collection</tt>)
+      (<tt>Model|Collection</tt>)
       &mdash;
       <span class='desc'>the model/collection</span>
     </li>
@@ -428,12 +426,12 @@ var collection = kb.utils.wrappedObject(collection_observable);
         (<tt>Object|kb.ViewModel|kb.CollectionObservable</tt>)
       </span>
       &mdash;
-      <span class='desc'>owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.</span>
+      <span class='desc'>owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.</span>
     </li>
     <li>
       <span class='name'>value</span>
       <span class='type'>
-        (<tt>Backbone.Model|Backbone.Collection</tt>)
+        (<tt>Model|Collection</tt>)
       </span>
       &mdash;
       <span class='desc'>the model/collection</span>
@@ -446,7 +444,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
   </div>
   <div class='method_details'>
     <p class='signature' id='wrappedModel-class'>
-      + (Backbone.Model|ViewModel) <strong>wrappedModel</strong>(view_model)
+      + (Model|ViewModel) <strong>wrappedModel</strong>(view_model)
       <br>
       + (void) <strong>wrappedModel</strong>(view_model, model)
       <br>
@@ -463,7 +461,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
     <h3>Overloads:</h3>
     <div class='overload'>
       <p class='signature'>
-        + (Backbone.Model|ViewModel) <strong>wrappedModel</strong>(view_model)
+        + (Model|ViewModel) <strong>wrappedModel</strong>(view_model)
       </p>
       <div class='docstring'>
   <p>Gets the model from a ViewModel</p>
@@ -477,14 +475,14 @@ var collection = kb.utils.wrappedObject(collection_observable);
         (<tt>Object|kb.ViewModel</tt>)
       </span>
       &mdash;
-      <span class='desc'>the owning ViewModel for the Backbone.Model.</span>
+      <span class='desc'>the owning ViewModel for the Model.</span>
     </li>
   </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'></span>
-      (<tt>Backbone.Model|ViewModel</tt>)
+      (<tt>Model|ViewModel</tt>)
       &mdash;
       <span class='desc'>the Model or ViewModel itself if there is no Model</span>
     </li>
@@ -507,12 +505,12 @@ var collection = kb.utils.wrappedObject(collection_observable);
         (<tt>Object|kb.ViewModel</tt>)
       </span>
       &mdash;
-      <span class='desc'>the owning ViewModel for the Backbone.Model.</span>
+      <span class='desc'>the owning ViewModel for the Model.</span>
     </li>
     <li>
       <span class='name'>model</span>
       <span class='type'>
-        (<tt>Backbone.Model</tt>)
+        (<tt>Model</tt>)
       </span>
       &mdash;
       <span class='desc'>the Model</span>
@@ -540,8 +538,7 @@ var collection = kb.utils.wrappedObject(collection_observable);
     <pre><code class='coffee'>var co = kb.collectionObservable(new Backbone.Collection());
 var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   store: kb.utils.wrappedStore(co)
-});
-</code></pre>
+});</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -780,17 +777,16 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
     <h4>
       
     </h4>
-    <pre><code class='coffee'>var view_model = kb.viewModel(new Backbone.Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
+    <pre><code class='coffee'>var view_model = kb.viewModel(new Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
 kb.utils.valueType(view_model.simple_attr); &#47;&#47; kb.TYPE_SIMPLE
-kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL
-</code></pre>
+kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL</code></pre>
   </div>
 </div>
 <div class='tags'>
   <h3>See also:</h3>
   <ul class='see'>
     <li>
-      <a href='..&#47;..&#47;classes&#47;kb&#47;Observable.html'>valueType</a>
+      <a href='../../classes/kb/Observable.html'>valueType</a>
     </li>
   </ul>
 </div>
@@ -806,8 +802,7 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL
     <h4>
       
     </h4>
-    <pre><code class='coffee'>kb.utils.pathJoin(&#39;models&#39;, &#39;name&#39;); &#47;&#47; &#39;models.name&#39;
-</code></pre>
+    <pre><code class='coffee'>kb.utils.pathJoin(&#39;models&#39;, &#39;name&#39;); &#47;&#47; &#39;models.name&#39;</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -852,8 +847,7 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL
     <h4>
       
     </h4>
-    <pre><code class='coffee'>this.friends = kb.collectionObservable(model.get(&#39;friends&#39;), kb.utils.optionsPathJoin(options, &#39;friends&#39;));
-</code></pre>
+    <pre><code class='coffee'>this.friends = kb.collectionObservable(model.get(&#39;friends&#39;), kb.utils.optionsPathJoin(options, &#39;friends&#39;));</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -912,14 +906,13 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL
       + (void) <strong>hasModelSignature</strong>(obj)
     </p>
     <div class='docstring'>
-  <p>Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don&#39;t need to derive from Backbone.Model</p>
+  <p>Helper to check an object for having a Model signature. For example, locale managers and ModelRef don&#39;t need to derive from Model</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
       
     </h4>
-    <pre><code class='coffee'>kb.utils.hasModelSignature(new Backbone.Model());
-</code></pre>
+    <pre><code class='coffee'>kb.utils.hasModelSignature(new Model());</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -941,14 +934,13 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL
       + (void) <strong>hasCollectionSignature</strong>(obj)
     </p>
     <div class='docstring'>
-  <p>Helper to check an object for having a Backbone.Model signature. For example, locale managers and Backbone.ModelRef don&#39;t need to derive from Backbone.Model</p>
+  <p>Helper to check an object for having a Model signature. For example, locale managers and ModelRef don&#39;t need to derive from Model</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
       
     </h4>
-    <pre><code class='coffee'>kb.utils.hasModelSignature(new Backbone.Model());
-</code></pre>
+    <pre><code class='coffee'>kb.utils.hasModelSignature(new Model());</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -969,11 +961,11 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL
     </div>
     <div id='footer'>
   Generated on
-  Tue Dec 25 2012 08:23:06 GMT-0800 (PST)
+  Sat Mar 30 2013 16:57:14 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.5.4
-  (Node.js v0.8.10).
+  v1.6.0
+  (Node.js v0.10.0).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

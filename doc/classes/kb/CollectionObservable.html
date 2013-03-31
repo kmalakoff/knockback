@@ -3,19 +3,19 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <link rel='stylesheet' href='..&#47;..&#47;assets/codo.css' type='text/css'>
-  <script src='..&#47;..&#47;assets/codo.js'></script>
-  <script src='..&#47;..&#47;assets/search_data.js'></script>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+  <script src='../../assets/search_data.js'></script>
 </head>
   <body>
-    <div id='base' data-path='..&#47;..&#47;'></div>
+    <div id='base' data-path='../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='..&#47;..&#47;README.md.html' title='Knockback'>Knockback</a>
+    <a href='../../README.md.html' title='Knockback'>Knockback</a>
     &raquo;
-    <a href='..&#47;..&#47;class_index.html' title='Index'>Index</a>
+    <a href='../../class_index.html' title='Index'>Index</a>
     &raquo;
-    <a href='..&#47;..&#47;classes&#47;kb.html' title='kb'>kb</a>
+    <a href='../../classes/kb.html' title='kb'>kb</a>
     &raquo;
     <span class='title'>CollectionObservable</span>
     <nav>
@@ -26,10 +26,10 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='..&#47;..&#47;class_list.html'>Classes</a>
-      <a id='file_list_link' href='..&#47;..&#47;file_list.html'>Files</a>
-      <a id='method_list_link' href='..&#47;..&#47;method_list.html'>Methods</a>
-      <a id='extra_list_link' href='..&#47;..&#47;extra_list.html'>Extras</a>
+      <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
+      <a id='method_list_link' href='../../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -124,14 +124,14 @@
     <h4>
       How to create a ko.CollectionObservable using the ko.collectionObservable factory.
     </h4>
-    <pre><code class='coffee'>var collection = new Backbone.Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
+    <pre><code class='coffee'>var collection = new Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
 var view_model = {
   todos: kb.collectionObservable(collection)
 };</code></pre>
     <h4>
       How to access and change the observed collection.
     </h4>
-    <pre><code class='coffee'> var todos = new kb.CollectionObservable(new Backbone.Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
+    <pre><code class='coffee'> var todos = new kb.CollectionObservable(new kb.Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
  var current_collection = todos.collection(); &#47;&#47; get
  todos.collection(new Backbone.Collection([{name: &#39;name3&#39;}, {name: &#39;name4&#39;}])); &#47;&#47; set</code></pre>
   </div>
@@ -156,7 +156,7 @@ var view_model = {
   <li>
     <span class='signature'>
       <a href='#collection-instance'>
-        - (Backbone.Collection|void) <strong>collection</strong>()
+        - (Collection|void) <strong>collection</strong>()
       </a>
     </span>
     <span class='desc'>
@@ -324,7 +324,7 @@ var view_model = {
     <li>
       <span class='name'>collection</span>
       <span class='type'>
-        (<tt>Backbone.Collection</tt>)
+        (<tt>Collection</tt>)
       </span>
       &mdash;
       <span class='desc'>the collection to observe (can be null)</span>
@@ -448,7 +448,7 @@ var view_model = {
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='collection-instance'>
-      - (Backbone.Collection|void) <strong>collection</strong>()
+      - (Collection|void) <strong>collection</strong>()
     </p>
     <div class='docstring'>
   <p>Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.</p>
@@ -458,7 +458,7 @@ var view_model = {
   <ul class='return'>
     <li>
       <span class='type'></span>
-      (<tt>Backbone.Collection|void</tt>)
+      (<tt>Collection|void</tt>)
       &mdash;
       <span class='desc'>getter: the collection whose models are being observed (can be null) OR setter: void</span>
     </li>
@@ -490,8 +490,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     <pre><code class='coffee'>var selected_collection = new Backbone.Collection();
 var available_collection = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Fred&#39;}]);
 var selected = kb.collectionObservable(available_collection);
-var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); &#47;&#47; view models shared with selected collection observable
-</code></pre>
+var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); &#47;&#47; view models shared with selected collection observable</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -509,8 +508,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
       
     </h4>
     <pre><code class='coffee'> &#47;&#47; exclude a single model by id
- collection_observable.filters(model.id);
-</code></pre>
+ collection_observable.filters(model.id);</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -543,8 +541,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
    function(view_models, vm){
      return _.comparator(view_models, vm, (test) -&gt; kb.utils.wrappedModel(test).get(&#39;name&#39;));
    }
- );
-</code></pre>
+ );</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -583,8 +580,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
     <pre><code class='coffee'> var todos = new kb.CollectionObservable(new Backbone.Collection([{name: &#39;Zanadu&#39;, name: &#39;Alex&#39;}]));
  &#47;&#47; in order of Zanadu then Alex
  todos.sortAttribute(&#39;name&#39;);
- &#47;&#47; in order of Alex then Zanadu
-</code></pre>
+ &#47;&#47; in order of Alex then Zanadu</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -625,8 +621,7 @@ var available = kb.collectionObservable(available_collection, available_collecti
     <pre><code class='coffee'>var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
 todos1.hasViewModels();     &#47;&#47; false
 var todos2 = new kb.CollectionObservable(new Backbone.Collection());
-todos2.hasViewModels();     &#47;&#47; true
-</code></pre>
+todos2.hasViewModels();     &#47;&#47; true</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -636,11 +631,11 @@ todos2.hasViewModels();     &#47;&#47; true
     </div>
     <div id='footer'>
   Generated on
-  Tue Dec 25 2012 08:23:06 GMT-0800 (PST)
+  Sat Mar 30 2013 16:57:14 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.5.4
-  (Node.js v0.8.10).
+  v1.6.0
+  (Node.js v0.10.0).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

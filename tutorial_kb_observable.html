@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.8.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.17.0.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -32,23 +32,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -76,15 +80,10 @@
       <header class="page">
       </header>
       <content class="page"><h1>Tutorial: kb.Observable</h1>
-<p><a href="index.html">Knockback.js</a> provides ways to customize a kb.Observable when it is created. This tutorial provides working examples of using these options.
-
-</p>
+<p><a href="index.html">Knockback.js</a> provides ways to customize a kb.Observable when it is created. This tutorial provides working examples of using these options.</p>
 <h2>Create Options: {read: function(), write: function(value)}</h2>
-<p>Instead of performing a simple Backbone.Model get or set to synchronize with a kb.Observable, you can provide a custom read or write method like for a ko.observable.
-
-</p>
-<p><strong>Note</strong>: just like in Knockout.js, if you require access to the owning view model, it provided as &#39;this&#39; in read and write methods if you provide it as a parameter to the kb.observable&#39;s create method: (model, options, owning_view_model)
-</p>
+<p>Instead of performing a simple Backbone.Model get or set to synchronize with a kb.Observable, you can provide a custom read or write method like for a ko.observable.</p>
+<p><strong>Note</strong>: just like in Knockout.js, if you require access to the owning view model, it provided as &#39;this&#39; in read and write methods if you provide it as a parameter to the kb.observable&#39;s create method: (model, options, owning_view_model)</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -102,12 +101,12 @@
               <div id="kboo_read_write_view_model" class="tab-pane">
                 <pre data-for="cs">model = new Backbone.Model({number: 33})
 
-ViewModel = (model) ->
+ViewModel = (model) -&gt;
   @number = kb.observable(model, 'number')
   @formatted_number = kb.observable(model, {
     key:'number'
-    read: -> return "#: #{@number()}"
-    write: (value) -> @number(value.substring(3))
+    read: -&gt; return &quot;#: #{@number()}&quot;
+    write: (value) -&gt; @number(value.substring(3))
   }, @)
   return
 
@@ -120,7 +119,7 @@ var ViewModel = function(model) {
   this.number = kb.observable(model, 'number');
   this.formatted_number = kb.observable(model, {
     key: 'number',
-    read: function() { return "#: " + (this.number()); },
+    read: function() { return &quot;#: &quot; + (this.number()); },
     write: function(value) { return this.number(value.substring(3)); }
   }, this);
 };
@@ -141,9 +140,7 @@ ko.applyBindings(view_model, $('#kboo_read_write')[0]);</pre>
             </div>
           </div>
         </div><h2>Create Options: {localizer: constructor(value)}</h2>
-<p>Instead of a read and/or write option, you can provide a kb.LocalizedObservable derived class for custom localized of an attribute. Please see the <a href="tutorial_kb_localized_observable.html#localized_input">kb.LocalizedObservable tutorial</a> an explanation of the following:
-
-</p>
+<p>Instead of a read and/or write option, you can provide a kb.LocalizedObservable derived class for custom localized of an attribute. Please see the <a href="tutorial_kb_localized_observable.html#localized_input">kb.LocalizedObservable tutorial</a> an explanation of the following:</p>
 <h3>ViewModel and Bindings:</h3>
 
         <pre data-for="cs">model = new Backbone.Model({date: new Date()})
@@ -155,8 +152,7 @@ view_model =
   var view_model = {
     date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})
   };</pre><h2>Create Options: {default: value or observable}</h2>
-<p>You can pass a default function or parameter to provide a value when there is no value available.
-</p>
+<p>You can pass a default function or parameter to provide a value when there is no value available.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -174,19 +170,19 @@ view_model =
               <div id="kboo_default_view_model" class="tab-pane">
                 <pre data-for="cs">model = new Backbone.Model({})
 
-ViewModel = (model) ->
+ViewModel = (model) -&gt;
   @name = kb.observable(model, 'name')
   @name_with_default = kb.observable(model, {key: 'name', default: '(no name)'})
   return
 
 view_model = new ViewModel(model)
 
-ko.applyBindings(view_model, $('#kboo_default')[0])</pre>
+ko.applyBindings(view_model, $('#kboo_default_view_model')[0])</pre>
                 <pre data-for="js">var model = new Backbone.Model({});
 
 var ViewModel = function(model) {
   this.name = kb.observable(model, 'name');
-  this.name_with_default = kb.observable(model, {key: 'name', "default": '(no name)'});
+  this.name_with_default = kb.observable(model, {key: 'name', &quot;default&quot;: '(no name)'});
 };
 
 var view_model = new ViewModel(model);
@@ -205,8 +201,7 @@ ko.applyBindings(view_model, $('#kboo_default')[0]);</pre>
             </div>
           </div>
         </div><h2>Dynamic Attribute Types</h2>
-<p>Since Knockback.js version 0.16.0, a kb.Observable can be created using the correct type before the attribute is loaded using the <a href="doc/classes/kb/ViewModel.html#constructor-instance">factories options</a> and change types when the attribute value changes.
-</p>
+<p>Since Knockback.js version 0.16.0, a kb.Observable can be created using the correct type before the attribute is loaded using the <a href="doc/classes/kb/ViewModel.html#constructor-instance">factories options</a> and change types when the attribute value changes.</p>
 
         <pre data-for="cs">model = new Backbone.Model({reused: null})
 view_model = kb.viewModel(model)

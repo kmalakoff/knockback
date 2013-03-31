@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.8.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.17.0.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -32,23 +32,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -77,12 +81,8 @@
       </header>
       <content class="page">
         <section><h1>Getting Started with Knockback.js</h1>
-<p>In essence, <a href="index.html">Knockback.js</a> bridges the dynamic DOM bindings of <a href="http://knockoutjs.com/">Knockout.js</a> with the models, computeds, and routers of <a href="http://documentcloud.github.com/backbone/">Backbone.js</a>. It also brings some other cool features like localization, default values, and nested view models!
-
-</p>
-<p>If you are more of JavaScript developer than a CoffeeScript hipster, check out the JavaScript language toggle for the site (at the top right) on many pages with code and live examples.
-
-</p>
+<p>In essence, <a href="index.html">Knockback.js</a> bridges the dynamic DOM bindings of <a href="http://knockoutjs.com/">Knockout.js</a> with the models, computeds, and routers of <a href="http://documentcloud.github.com/backbone/">Backbone.js</a>. It also brings some other cool features like localization, default values, and nested view models!</p>
+<p>If you are more of JavaScript developer than a CoffeeScript hipster, check out the JavaScript language toggle for the site (at the top right) on many pages with code and live examples.</p>
 <h1>Tidbits</h1>
 <ul>
 <li><p>&#39;kb&#39; and &#39;Knockback&#39; can be used interchangeably</p>
@@ -91,31 +91,23 @@
 </li>
 </ul>
 <h1>Classes vs Factory Functions</h1>
-<p>You will soon notice that there are different capitalizations for things like kb.viewModel(model, options) and kb.ViewModel. The reason is that to reduce the need of using <code>new</code> and to be more familiar with Knockout, there are factory methods that create the underlying classes.
-
-</p>
-<p>A factory function uses new to create a new instance:
-</p>
+<p>You will soon notice that there are different capitalizations for things like kb.viewModel(model, options) and kb.ViewModel. The reason is that to reduce the need of using <code>new</code> and to be more familiar with Knockout, there are factory methods that create the underlying classes.</p>
+<p>A factory function uses new to create a new instance:</p>
 
           <pre data-for="cs">Knockback.viewModel = (model, options) -&gt; return new Knockback.ViewModel(model, options)
 </pre>
           <pre data-for="js">Knockback.viewModel = function(model, options) { return new Knockback.ViewModel(model, options); };
 </pre><h1>Useful Resources</h1>
-<p>Before you start with Knockback.js, we recommend you first get acquainted with Backbone.js and Knockout.js by reviewing their websites (above) and you could also look at these resources:
-
-</p>
+<p>Before you start with Knockback.js, we recommend you first get acquainted with Backbone.js and Knockout.js by reviewing their websites (above) and you could also look at these resources:</p>
 <ul>
 <li><a href="http://documentcloud.github.com/backbone/docs/todos.html">Documentation of Backbone.js Todos app</a>: but skip the section on views</li>
 <li><a href="http://knockoutjs.com/examples/">Live examples of Knockout.js</a></li>
 <li><a href="http://channel9.msdn.com/Events/MIX/MIX11/FRM08">Excellent video walking through Knockout.js</a>:</li>
+<li><a href="http://www.syncfusion.com/resources/techportal/ebooks/knockoutjs">Free eBook on Knockout.js</a>:</li>
 </ul>
-<p>For Knockback.js, also take a look at this <a href="index.html#comparison_table">comparison table</a> between the libraries or this <a href="http://www.geekdave.com/?p=79">blog entry</a> which provides a good introduction.
-
-</p>
+<p>For Knockback.js, also take a look at this <a href="index.html#comparison_table">comparison table</a> between the libraries or this <a href="http://www.geekdave.com/?p=79">blog entry</a> which provides a good introduction.</p>
 <h1>Topics</h1>
-<p>You can find the various &#39;Getting Started&#39; topics in the navigation bar above:
-
-</p>
+<p>You can find the various &#39;Getting Started&#39; topics in the navigation bar above:</p>
 <ul>
 <li><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a>: quick overview of Backbone.js and Knockout.js topics relevant to Knockback.js</li>
 <li><a href="getting_started_knockback_basics.html">Knockback Basics</a>: shows you how to bind a Backbone.Model and Backbone.Collection to DOM elements</li>

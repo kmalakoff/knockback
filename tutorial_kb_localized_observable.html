@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.8.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.17.0.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -32,23 +32,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -83,16 +87,16 @@
           <p><span><span class='label label-important'>warning</span> This is one of the few cases where you are likely to derive from a Knockback class and where you need to know about <span class='label label-warning'>observable returned</span>. Basically, when you derive your own type of kb.LocalizedObservable, you need to return the wrapped observable rather than the instance itself from the constructor using</span><a href="doc/classes/kb/utils.html#wrapped_observable">kb.utils.wrappedObservable</a></p>
           <p><span>We'll use the following Locale Manager for these examples:</span>
             <pre data-for="cs">class LocaleManager
-  constructor: (locale_identifier, @translations_by_locale) ->
+  constructor: (locale_identifier, @translations_by_locale) -&gt;
     @current_locale = ko.observable(locale_identifier)
 
-  get: (string_id) ->
+  get: (string_id) -&gt;
     return '(no translation)' unless @translations_by_locale[@current_locale()]
     return '(no translation)' unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
     return @translations_by_locale[@current_locale()][string_id]
 
-  getLocale: -> return @current_locale()
-  setLocale: (locale_identifier) ->
+  getLocale: -&gt; return @current_locale()
+  setLocale: (locale_identifier) -&gt;
     @current_locale(locale_identifier)
     @trigger('change', @)
 
@@ -149,11 +153,11 @@ kb.locale_manager = new LocaleManager('en-GB', {
               <div class="tab-content">
                 <div id="kblo_string_id_custom" class="tab-pane active">
                   <pre data-for="cs">LocalizedStringLocalizer = kb.LocalizedObservable.extend({
-  constructor: (value, options, view_model) ->
+  constructor: (value, options, view_model) -&gt;
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments)
     return kb.utils.wrappedObservable(@)
 
-  read: (string_id) ->
+  read: (string_id) -&gt;
     return if (string_id) then kb.locale_manager.get(string_id) else ''
 })</pre>
                   <pre data-for="js">var LocalizedStringLocalizer = kb.LocalizedObservable.extend({
@@ -182,7 +186,7 @@ kb.locale_manager = new LocaleManager('en-GB', {
 
 view_model =
   main_text: kb.observable(texts, {key: 'main_text_id', localizer: LocalizedStringLocalizer})
-  toggleLocale: ->
+  toggleLocale: -&gt;
     kb.locale_manager.setLocale(if kb.locale_manager.getLocale() is 'en-GB' then 'fr-FR' else 'en-GB')
 
 ko.applyBindings(view_model, $('#kblo_read_only')[0])</pre>
@@ -229,14 +233,14 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
               <div class="tab-content">
                 <div id="kblo_localized_input_custom" class="tab-pane active">
                   <pre data-for="cs">LongDateLocalizer = kb.LocalizedObservable.extend({
-  constructor: (value, options, view_model) ->
+  constructor: (value, options, view_model) -&gt;
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments)
     return kb.utils.wrappedObservable(@)
 
-  read: (value) ->
+  read: (value) -&gt;
     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())
 
-  write: (localized_string, value) ->
+  write: (localized_string, value) -&gt;
     # reset if invalid
     new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale())
     if not (new_value and _.isDate(new_value))
@@ -255,7 +259,7 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
   write: function(localized_string, value) {
     // reset if invalid
     var new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale());
-    if (!(new_value && _.isDate(new_value))) {
+    if (!(new_value &amp;&amp; _.isDate(new_value))) {
       return kb.utils.wrappedObservable(this).resetToCurrent();
     }
     return value.setTime(new_value.valueOf());
@@ -278,7 +282,7 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
 
 view_model =
   date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})
-  toggleLocale: ->
+  toggleLocale: -&gt;
     kb.locale_manager.setLocale(if kb.locale_manager.getLocale() is 'en-GB' then 'fr-FR' else 'en-GB')
 
 ko.applyBindings(view_model, $('#kblo_read_write')[0])</pre>

@@ -62,6 +62,9 @@ section#content ul li {
   margin: 0px;
   margin-left: 1em;
 }
+section#content .skip-cell {
+  visibility: hidden;
+}
 @media (max-width: 510px) {
   section#content .content {
     padding: 0px 0px;

@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="vendor/google-code-prettify/prettify.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/layout_components.css">
-    <script type="application/javascript" src="vendor/js/jquery-1.8.0.js"></script>
+    <script type="application/javascript" src="vendor/js/jquery-1.9.1.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.16.8.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.17.0.js"></script>
     <script type="application/javascript" src="vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="js/stylecode.js"></script>
@@ -32,23 +32,27 @@
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                    </li>
                   </ul>
                 </li>
                 <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li></li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                  <ul role="menu" class="dropdown-menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                    </li>
                   </ul>
                 </li>
                 <li><a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">Release Notes</a></li>
@@ -84,16 +88,16 @@
           <h3>A Simple Implementation</h3>
           <p><span>Because Knockback actually only requires a</span><a href="docs.html#backbone_model_signature"> Backbone.Model-like signature</a><span>, a custom locale manager can be implemented quite easily. Here is an example:</span></p>
           <pre data-for="cs">class LocaleManager
-  constructor: (locale_identifier, @translations_by_locale) ->
+  constructor: (locale_identifier, @translations_by_locale) -&gt;
     @current_locale = ko.observable(locale_identifier)
 
-  get: (string_id) ->
+  get: (string_id) -&gt;
     return '(no translation)' unless @translations_by_locale[@current_locale()]
     return '(no translation)' unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
     return @translations_by_locale[@current_locale()][string_id]
 
-  getLocale: -> return @current_locale()
-  setLocale: (locale_identifier) ->
+  getLocale: -&gt; return @current_locale()
+  setLocale: (locale_identifier) -&gt;
     @current_locale(locale_identifier)
     @trigger('change', @)
 
@@ -173,7 +177,7 @@ view_model = kb.viewModel(bob)
 
 # add a localized label for 'name' and a function for toggling the current locale
 view_model.label_name = kb.observable(simple_locale_manager, 'name')
-view_model.toggleLocale = ->
+view_model.toggleLocale = -&gt;
   simple_locale_manager.setLocale(if (simple_locale_manager.getLocale() is 'en') then 'fr' else 'en')
 
 ko.applyBindings(view_model, $('#lm_simple')[0])</pre>
@@ -225,11 +229,11 @@ ko.applyBindings(view_model, $('#lm_simple')[0]);</pre>
           <p></p>
           <p><span>To make a more advanced version of the locale manager, you will want to add error checking and might choose to add parameters to the get() function, trigger on each string, and allow to query for all available locales (among other possible enhancements!):</span></p>
           <pre data-for="cs">class LocaleManager
-  constructor: (locale_identifier, @translations_by_locale) ->
+  constructor: (locale_identifier, @translations_by_locale) -&gt;
     @current_locale = ko.observable()
     @setLocale(locale_identifier)
 
-  get: (string_id) ->
+  get: (string_id) -&gt;
     return '(no translation)' unless @translations_by_locale[@current_locale()]
     return '(no translation)' unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
 
@@ -237,16 +241,16 @@ ko.applyBindings(view_model, $('#lm_simple')[0]);</pre>
     return string if arguments == 1     # no arguments
 
     # add arguments
-    string = string.replace("{#{index}}", arg) for arg, index in Array.prototype.slice.call(arguments, 1)
+    string = string.replace(&quot;{#{index}}&quot;, arg) for arg, index in Array.prototype.slice.call(arguments, 1)
     return string
 
-  getLocale: -> return @current_locale()
-  setLocale: (locale_identifier) ->
+  getLocale: -&gt; return @current_locale()
+  setLocale: (locale_identifier) -&gt;
     @current_locale(locale_identifier)
     @trigger('change', @)
-    @trigger("change:#{key}", value) for key, value of @translations_by_locale[@current_locale()]
+    @trigger(&quot;change:#{key}&quot;, value) for key, value of @translations_by_locale[@current_locale()]
 
-  getLocales: ->
+  getLocales: -&gt;
     locales = []
     locales.push(string_id) for string_id, value of @translations_by_locale
     return locales
@@ -265,7 +269,7 @@ _.extend(LocaleManager.prototype, Backbone.Events)</pre>
 
     // add arguments
     arguments = Array.prototype.slice.call(arguments, 1);
-    for (var index = _i = 0; _i < arguments.length; index = ++_i) { string = string.replace("{" + index + "}", arguments[index]); }
+    for (var index = _i = 0; _i &lt; arguments.length; index = ++_i) { string = string.replace(&quot;{&quot; + index + &quot;}&quot;, arguments[index]); }
     return string;
   };
 
@@ -274,7 +278,7 @@ _.extend(LocaleManager.prototype, Backbone.Events)</pre>
     this.current_locale(locale_identifier);
     this.trigger('change', this);
     var map = this.translations_by_locale[this.current_locale()];
-    for (key in map) { this.trigger("change:" + key, map[key]); }
+    for (key in map) { this.trigger(&quot;change:&quot; + key, map[key]); }
   };
 
   this.getLocales = function() {
@@ -331,7 +335,7 @@ view_model = kb.viewModel(new Backbone.Model({name: 'Bob', start_date: '1/1/2012
 
 # use ko.observable to create multiple labels quickly
 view_model.labels = kb.viewModel(bulk_locale_manager, ['name', 'start_date', 'end_date'])
-view_model.toggleLocale = ->
+view_model.toggleLocale = -&gt;
   bulk_locale_manager.setLocale(if (bulk_locale_manager.getLocale() is 'en') then 'fr' else 'en')
 
 ko.applyBindings(view_model, $('#lm_bulk_labels')[0])</pre>

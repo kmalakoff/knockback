@@ -3,19 +3,19 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <link rel='stylesheet' href='..&#47;..&#47;assets/codo.css' type='text/css'>
-  <script src='..&#47;..&#47;assets/codo.js'></script>
-  <script src='..&#47;..&#47;assets/search_data.js'></script>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+  <script src='../../assets/search_data.js'></script>
 </head>
   <body>
-    <div id='base' data-path='..&#47;..&#47;'></div>
+    <div id='base' data-path='../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='..&#47;..&#47;README.md.html' title='Knockback'>Knockback</a>
+    <a href='../../README.md.html' title='Knockback'>Knockback</a>
     &raquo;
-    <a href='..&#47;..&#47;class_index.html' title='Index'>Index</a>
+    <a href='../../class_index.html' title='Index'>Index</a>
     &raquo;
-    <a href='..&#47;..&#47;classes&#47;kb.html' title='kb'>kb</a>
+    <a href='../../classes/kb.html' title='kb'>kb</a>
     &raquo;
     <span class='title'>EventWatcher</span>
     <nav>
@@ -26,10 +26,10 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='..&#47;..&#47;class_list.html'>Classes</a>
-      <a id='file_list_link' href='..&#47;..&#47;file_list.html'>Files</a>
-      <a id='method_list_link' href='..&#47;..&#47;method_list.html'>Methods</a>
-      <a id='extra_list_link' href='..&#47;..&#47;extra_list.html'>Extras</a>
+      <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
+      <a id='method_list_link' href='../../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -118,7 +118,7 @@
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Used to provide a central place to aggregate registered Backbone.Model events rather than having all kb.Observables register for updates independently.</p>
+  <p>Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.</p>
 </div>
 <div class='tags'>
 </div>
@@ -212,7 +212,7 @@
     <li>
       <span class='name'>obj</span>
       <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+        (<tt>Model|ModelRef</tt>)
       </span>
       &mdash;
       <span class='desc'>the Model that will own or register with the store</span>
@@ -300,7 +300,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
   </div>
   <div class='method_details'>
     <p class='signature' id='emitter-instance'>
-      - (Backbone.Model|Backbone.ModelRef) <strong>emitter</strong>()
+      - (Model|ModelRef) <strong>emitter</strong>()
       <br>
       - (void) <strong>emitter</strong>(new_emitter)
       <br>
@@ -313,7 +313,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     <h3>Overloads:</h3>
     <div class='overload'>
       <p class='signature'>
-        - (Backbone.Model|Backbone.ModelRef) <strong>emitter</strong>()
+        - (Model|ModelRef) <strong>emitter</strong>()
       </p>
       <div class='docstring'>
   <p>Gets the emitter or emitter reference</p>
@@ -323,7 +323,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
   <ul class='return'>
     <li>
       <span class='type'></span>
-      (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+      (<tt>Model|ModelRef</tt>)
       &mdash;
       <span class='desc'>the emitter whose attributes are being observed (can be null)</span>
     </li>
@@ -343,7 +343,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     <li>
       <span class='name'>new_emitter</span>
       <span class='type'>
-        (<tt>Backbone.Model|Backbone.ModelRef</tt>)
+        (<tt>Model|ModelRef</tt>)
       </span>
       &mdash;
       <span class='desc'>the emitter whose attributes will be observed (can be null)</span>
@@ -432,11 +432,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     </div>
     <div id='footer'>
   Generated on
-  Tue Dec 25 2012 08:23:06 GMT-0800 (PST)
+  Sat Mar 30 2013 16:57:14 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.5.4
-  (Node.js v0.8.10).
+  v1.6.0
+  (Node.js v0.10.0).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;
