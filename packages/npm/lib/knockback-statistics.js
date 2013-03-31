@@ -1,5 +1,5 @@
 /*
-  knockback-statistics.js 0.17.0pre
+  knockback-statistics.js 0.17.0
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
@@ -32,7 +32,7 @@ if (typeof exports !== 'undefined') {
 _unwrapObservable = ko.utils.unwrapObservable;
 
 /*
-  knockback_statistics.js 0.17.0pre
+  knockback_statistics.js 0.17.0
   (c) 2012 Kevin Malakoff.
   Knockback.Stats is freely distributable under the MIT license.
   See the following for full license details:

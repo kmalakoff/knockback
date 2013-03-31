@@ -1,5 +1,5 @@
 ###
-  knockback_default_observable.js 0.17.0pre
+  knockback_default_observable.js 0.17.0
   (c) 2011-2013 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:

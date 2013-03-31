@@ -1,6 +1,6 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
-## 0.17.0pre
+## 0.17.0
 
 * added kb.wasReleased helper function
 * bug fix for recursive view model create: https://github.com/kmalakoff/knockback/issues/53
@@ -11,7 +11,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * added support for Backbone 1.0.0. Note: needed to patch Backbone-relational to 0.8.0plus and to add _.findWhere to lodash.
 * added automatic call of afterRender on a view model in kb.renderTemplate unless afterRender is also provided in the options (to avoid multiple calls).
 
-## 0.16.8
+## 0.17.0
 
 * updated knockback-full-stack for latest Underscore.js, Backbone.js, and Knockout.js
 * bugfix for viewModelByModel if the ViewModel has not yet been initialized

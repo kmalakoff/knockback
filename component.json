@@ -1,0 +1,12 @@
+{
+  "name": "knockback",
+  "version": "0.17.0",
+  "main": "knockback.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "packages",
+    "media"
+  ],
+}
