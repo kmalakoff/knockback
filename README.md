@@ -54,6 +54,7 @@ You can also find Knockback on your favorite distributions:
 
 * [npm registry](http://search.npmjs.org/#/knockback)
 * [NuGet Gallery](http://nuget.org/packages/Knockback.js)
+* [Bower](http://sindresorhus.com/bower-components/)
 
 ###Module Loading
 
