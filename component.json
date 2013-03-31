@@ -4,9 +4,12 @@
   "main": "knockback.js",
   "ignore": [
     "**/.*",
-    "node_modules",
     "components",
+    "doc",
+    "media",
+    "node_modules",
     "packages",
-    "media"
+    "test",
+    "vendor"
   ],
 }
