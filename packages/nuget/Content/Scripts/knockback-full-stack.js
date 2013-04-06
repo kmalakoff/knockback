@@ -6449,7 +6449,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, collapseOptions, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _legacyWarning, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, collapseOptions, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _ko_applyBindings, _legacyWarning, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -7725,8 +7725,8 @@ kb.ViewModel = (function() {
     this.__kb.vm_keys = {};
     this.__kb.model_keys = {};
     this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
-    !options.internals || (this.__kb.internals = options.internals);
-    !options.excludes || (this.__kb.excludes = options.excludes);
+    !options.internals || (this.__kb.internals = (_.isArray(options.internals) ? options.internals : [options.internals]));
+    !options.excludes || (this.__kb.excludes = (_.isArray(options.excludes) ? options.excludes : [options.excludes]));
     kb.Store.useOptionsOrCreate(options, model, this);
     this.__kb.path = options.path;
     kb.Factory.useOptionsOrCreate(options, this, options.path);
@@ -7765,17 +7765,14 @@ kb.ViewModel = (function() {
     event_watcher = kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(model, this, {
       emitter: this.model
     }));
-    if (options.requires && _.isArray(options.requires)) {
-      keys = _.clone(options.requires);
+    if (options.requires) {
+      keys = _.isArray(options.requires) ? _.clone(options.requires) : [options.requires];
     }
     if (this.__kb.internals) {
       keys = keys ? _.union(keys, this.__kb.internals) : _.clone(this.__kb.internals);
     }
     if (options.keys) {
-      if (_.isArray(options.keys)) {
-        this.__kb.keys = options.keys;
-        keys = keys ? _.union(keys, options.keys) : _.clone(options.keys);
-      } else {
+      if (_.isObject(options.keys) && !_.isArray(options.keys)) {
         mapped_keys = {};
         _ref = options.keys;
         for (vm_key in _ref) {
@@ -7783,6 +7780,9 @@ kb.ViewModel = (function() {
           mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
         }
         this.__kb.keys = _.keys(mapped_keys);
+      } else {
+        this.__kb.keys = _.isArray(options.keys) ? options.keys : [options.keys];
+        keys = keys ? _.union(keys, this.__kb.keys) : _.clone(this.__kb.keys);
       }
     } else {
       bb_model = event_watcher.emitter();
@@ -8301,6 +8301,8 @@ kb.collectionObservable = function(collection, options) {
 */
 
 
+kb.RECUSIVE_AUTO_INJECT = true;
+
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
     return kb.Inject.inject(_unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
@@ -8404,6 +8406,17 @@ kb.Inject = (function() {
   return Inject;
 
 })();
+
+_ko_applyBindings = ko.applyBindings;
+
+ko.applyBindings = function(context, element) {
+  var results;
+
+  results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(element) : [];
+  if (!results.length) {
+    return _ko_applyBindings.apply(this, arguments);
+  }
+};
 
 kb.injectViewModels = kb.Inject.injectViewModels;
 

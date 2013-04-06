@@ -232,7 +232,28 @@ test("1. kb-inject", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
-test("2. data-bind inject", ->
+test("2. data-bind inject recusive", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  was_auto_injected = false
+  class window.AutoInject
+    constructor: ->
+      was_auto_injected = true
+    destroy: ->
+      was_auto_injected = false
+
+  # no attributes
+  ok(!was_auto_injected, "Not auto injected")
+  inject_el = $('<div kb-inject="AutoInject"></div>')[0]
+  ko.applyBindings({}, inject_el)
+  ok(was_auto_injected, "Was auto injected")
+  ko.removeNode(inject_el)
+  ok(!was_auto_injected, "Not auto injected")
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("3. data-bind inject", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # properties

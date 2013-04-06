@@ -6,6 +6,8 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb.RECUSIVE_AUTO_INJECT = true
+
 # custom Knockout `inject` binding
 ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
@@ -146,6 +148,12 @@ class kb.Inject
       kb.applyBindings(app.view_model, app.el, options)
       afterBinding(app.view_model, app.el, options) if afterBinding
     return results
+
+# auto-inject recursively
+_ko_applyBindings = ko.applyBindings
+ko.applyBindings = (context, element) ->
+  results = if kb.RECUSIVE_AUTO_INJECT then kb.injectViewModels(element) else []
+  _ko_applyBindings.apply(@, arguments) unless results.length
 
 #############################
 # Aliases
