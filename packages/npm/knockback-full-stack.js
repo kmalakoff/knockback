@@ -7725,8 +7725,8 @@ kb.ViewModel = (function() {
     this.__kb.vm_keys = {};
     this.__kb.model_keys = {};
     this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
-    !options.internals || (this.__kb.internals = options.internals);
-    !options.excludes || (this.__kb.excludes = options.excludes);
+    !options.internals || (this.__kb.internals = (_.isArray(options.internals) ? options.internals : [options.internals]));
+    !options.excludes || (this.__kb.excludes = (_.isArray(options.excludes) ? options.excludes : [options.excludes]));
     kb.Store.useOptionsOrCreate(options, model, this);
     this.__kb.path = options.path;
     kb.Factory.useOptionsOrCreate(options, this, options.path);
@@ -7765,8 +7765,8 @@ kb.ViewModel = (function() {
     event_watcher = kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(model, this, {
       emitter: this.model
     }));
-    if (options.requires && _.isArray(options.requires)) {
-      keys = _.clone(options.requires);
+    if (options.requires) {
+      keys = _.isArray(options.requires) ? _.clone(options.requires) : [options.requires];
     }
     if (this.__kb.internals) {
       keys = keys ? _.union(keys, this.__kb.internals) : _.clone(this.__kb.internals);

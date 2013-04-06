@@ -92,8 +92,8 @@ class kb.ViewModel
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
-    not options.internals or @__kb.internals = options.internals
-    not options.excludes or @__kb.excludes = options.excludes
+    not options.internals or @__kb.internals = (if _.isArray(options.internals) then options.internals else [options.internals])
+    not options.excludes or @__kb.excludes = (if _.isArray(options.excludes) then options.excludes else [options.excludes])
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
@@ -129,7 +129,7 @@ class kb.ViewModel
     event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @model}))
 
     # collect requires and internls first because they could be used to define the include order
-    (keys = _.clone(options.requires)) if options.requires and _.isArray(options.requires)
+    (keys = if _.isArray(options.requires) then _.clone(options.requires) else [options.requires]) if options.requires
     (keys = if keys then _.union(keys, @__kb.internals) else _.clone(@__kb.internals)) if @__kb.internals
 
     # collect the important keys

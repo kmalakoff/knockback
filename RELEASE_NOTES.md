@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.17.1
+
+* allow kb.CollectionObservable options for internals, excludes, and requires be either arrays or individual strings
+
 ## 0.17.0
 
 * added kb.wasReleased helper function
