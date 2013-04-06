@@ -66,10 +66,10 @@ class kb.ViewModel
   #
   # @param [Model|ModelRef] model the model to observe (can be null)
   # @param [Object] options the create options
-  # @option options [Array] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
-  # @option options [Array] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model. Useful for binding Views that require specific observables to exist
-  # @option options [Array] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
-  # @option options [Object|Array] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
+  # @option options [Array|String] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
+  # @option options [Array|String] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model. Useful for binding Views that require specific observables to exist
+  # @option options [Array|String] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
+  # @option options [Object|Array|String] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions. Signature: `{'some.path': function(object, options)}`
@@ -134,14 +134,14 @@ class kb.ViewModel
 
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified
-      if _.isArray(options.keys)
-        @__kb.keys = options.keys
-        (keys = if keys then _.union(keys, options.keys) else _.clone(options.keys))
-      else
+      if _.isObject(options.keys) and not _.isArray(options.keys)
         mapped_keys = {}
         for vm_key, mapping_info of options.keys
           mapped_keys[if _.isString(mapping_info) then mapping_info else (if mapping_info.key then mapping_info.key else vm_key)] = true
         @__kb.keys = _.keys(mapped_keys)
+      else
+        @__kb.keys = if _.isArray(options.keys) then options.keys else [options.keys]
+        (keys = if keys then _.union(keys, @__kb.keys) else _.clone(@__kb.keys))
     else
       bb_model = event_watcher.emitter()
       if bb_model and bb_model.attributes

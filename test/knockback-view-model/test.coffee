@@ -134,9 +134,27 @@ test("6. requires", ->
   # clean up
   kb.release(view_model)
 
+  class ContactViewModelFullName2 extends kb.ViewModel
+    constructor: (model) ->
+      super(model, {requires: 'first'})
+      @last = kb.observable(model, 'last')
+      @full_name = ko.dependentObservable(=> "Last: #{@last()}, First: #{@first()}")
+
+  model = new kb.Model()
+  view_model = new ContactViewModelFullName2(model)
+  equal(view_model.full_name(), 'Last: null, First: null', "full name is good")
+
+  model.set({first: 'Ringo', last: 'Starr'})
+  equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
+
+  model.set({first: 'Bongo'})
+  equal(view_model.full_name(), 'Last: Starr, First: Bongo', "full name is good")
+
+  # clean up
+  kb.release(view_model)
+
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
-
 
 test("8. reference counting and custom __destroy (Coffeescript inheritance)", ->
   kb.statistics = new kb.Statistics() # turn on stats
@@ -399,6 +417,12 @@ test("15. Options", ->
   equal(view_model.date(), null, 'keys: date fn')
   kb.release(view_model)
 
+  # keys - no array
+  view_model = kb.viewModel(new kb.Model({name: 'Bob'}), keys: 'date')
+  ok(view_model.date, 'keys: date')
+  equal(view_model.date(), null, 'keys: date fn')
+  kb.release(view_model)
+
   # keys - object
   view_model = kb.viewModel(new kb.Model({name: 'Bob'}), keys: {name: {}, date: {}})
   equal(view_model.name(), 'Bob', 'keys: Bob')
@@ -412,14 +436,32 @@ test("15. Options", ->
   ok(not view_model.date, 'excludes: date')
   kb.release(view_model)
 
+  # excludes - no array
+  view_model = kb.viewModel(new kb.Model({name: 'Bob', date: new Date()}), excludes: 'date')
+  equal(view_model.name(), 'Bob', 'excludes: Bob')
+  ok(not view_model.date, 'excludes: date')
+  kb.release(view_model)
+
   # requires
   view_model = kb.viewModel(new kb.Model(), requires: ['name'])
   equal(view_model.name(), null, 'requires: name')
   ok(not view_model.date, 'requires: date')
   kb.release(view_model)
 
+  # requires - no array
+  view_model = kb.viewModel(new kb.Model(), requires: 'name')
+  equal(view_model.name(), null, 'requires: name')
+  ok(not view_model.date, 'requires: date')
+  kb.release(view_model)
+
   # internals
   view_model = kb.viewModel(new kb.Model(), internals: ['name'])
+  equal(view_model._name(), null, 'internals: name')
+  ok(not view_model.date, 'internals: date')
+  kb.release(view_model)
+
+  # internals - no array
+  view_model = kb.viewModel(new kb.Model(), internals: 'name')
   equal(view_model._name(), null, 'internals: name')
   ok(not view_model.date, 'internals: date')
   kb.release(view_model)
