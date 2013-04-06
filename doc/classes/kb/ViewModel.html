@@ -315,7 +315,7 @@ var view_model = new ViewModel(model);</code></pre>
     <li>
       <span class='name'>internals</span>
       <span class='type'>
-        (<tt>Array</tt>)
+        (<tt>Array|String</tt>)
       </span>
       &mdash;
       <span class='desc'>an array of atttributes that should be scoped with an underscore, eg. name -&gt; _name</span>
@@ -323,7 +323,7 @@ var view_model = new ViewModel(model);</code></pre>
     <li>
       <span class='name'>requires</span>
       <span class='type'>
-        (<tt>Array</tt>)
+        (<tt>Array|String</tt>)
       </span>
       &mdash;
       <span class='desc'>an array of atttributes that will have kb.Observables created even if they do not exist on the Model. Useful for binding Views that require specific observables to exist</span>
@@ -331,7 +331,7 @@ var view_model = new ViewModel(model);</code></pre>
     <li>
       <span class='name'>keys</span>
       <span class='type'>
-        (<tt>Array</tt>)
+        (<tt>Array|String</tt>)
       </span>
       &mdash;
       <span class='desc'>restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes</span>
@@ -339,7 +339,7 @@ var view_model = new ViewModel(model);</code></pre>
     <li>
       <span class='name'>if</span>
       <span class='type'>
-        (<tt>Object|Array</tt>)
+        (<tt>Object|Array|String</tt>)
       </span>
       &mdash;
       <span class='desc'>an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.</span>
@@ -452,11 +452,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     </div>
     <div id='footer'>
   Generated on
-  Sat Mar 30 2013 16:57:14 GMT-0700 (PDT)
+  Sat Apr 06 2013 14:48:48 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.6.0
-  (Node.js v0.10.0).
+  (Node.js v0.10.2).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

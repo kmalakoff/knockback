@@ -132,7 +132,7 @@
 </div>
         </dt>
         <dd>
-          <pre><code class='coffee'>'0.17.0'</code></pre>
+          <pre><code class='coffee'>'0.17.1'</code></pre>
         </dd>
         <dt id='TYPE_UNKNOWN-constant'>
           TYPE_UNKNOWN
@@ -269,8 +269,18 @@
   </li>
   <li>
     <span class='signature'>
+      <a href='#isReleaseable-class'>
+        + (void) <strong>isReleaseable</strong>(obj, depth = 0)
+      </a>
+    </span>
+    <span class='desc'>
+      Checks if an object can be released.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#release-class'>
-        + (void) <strong>release</strong>(obj, pre_release_fn)
+        + (void) <strong>release</strong>(obj)
       </a>
     </span>
     <span class='desc'>
@@ -570,8 +580,29 @@
 </div>
   </div>
   <div class='method_details'>
+    <p class='signature' id='isReleaseable-class'>
+      + (void) <strong>isReleaseable</strong>(obj, depth = 0)
+    </p>
+    <div class='docstring'>
+  <p>Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Any</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the object to release and also release its keys</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='release-class'>
-      + (void) <strong>release</strong>(obj, pre_release_fn)
+      + (void) <strong>release</strong>(obj)
     </p>
     <div class='docstring'>
   <p>Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().</p>
@@ -599,14 +630,6 @@ kb.utils.release(todos); todos = null;</code></pre>
       </span>
       &mdash;
       <span class='desc'>the object to release and also release its keys</span>
-    </li>
-    <li>
-      <span class='name'>pre_release_fn</span>
-      <span class='type'>
-        (<tt>Function</tt>)
-      </span>
-      &mdash;
-      <span class='desc'>an optional function to clear the key on the object before the key&#39;s value is released. Used by kb.releaseKeys.</span>
     </li>
   </ul>
 </div>
@@ -687,11 +710,11 @@ ko.removeNode(el); &#47;&#47; removes el from the DOM and calls kb.release(view_
     </div>
     <div id='footer'>
   Generated on
-  Sat Mar 30 2013 16:57:14 GMT-0700 (PDT)
+  Sat Apr 06 2013 14:48:48 GMT-0700 (PDT)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.6.0
-  (Node.js v0.10.0).
+  (Node.js v0.10.2).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;
