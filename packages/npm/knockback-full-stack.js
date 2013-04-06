@@ -8062,12 +8062,15 @@ kb.CollectionObservable = (function() {
       array = observable();
       array.splice(0, array.length);
     }
+    this.collection.dispose();
+    this._collection = observable.collection = this.collection = null;
     this._mapper.dispose();
     this._mapper = null;
     kb.release(this._filters);
+    this._filters = null;
     this._comparator(null);
-    this.collection.dispose();
-    observable.collection = this.collection = null;
+    this._comparator = null;
+    this.create_options = null;
     observable.collection = null;
     kb.utils.wrappedDestroy(this);
     return !kb.statistics || kb.statistics.unregister('CollectionObservable', this);

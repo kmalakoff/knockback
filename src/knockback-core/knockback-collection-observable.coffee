@@ -187,8 +187,11 @@ class kb.CollectionObservable
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
       array = observable(); array.splice(0, array.length) # clear the view models or models
-    @_mapper.dispose(); @_mapper = null; kb.release(@_filters); @_comparator(null)
-    @collection.dispose(); observable.collection = @collection = null
+    @collection.dispose(); @_collection = observable.collection = @collection = null
+    @_mapper.dispose(); @_mapper = null
+    kb.release(@_filters); @_filters = null
+    @_comparator(null); @_comparator = null
+    @create_options = null
     observable.collection = null; kb.utils.wrappedDestroy(@)
 
     not kb.statistics or kb.statistics.unregister('CollectionObservable', @)     # collect memory management statistics
