@@ -235,18 +235,26 @@ test("1. kb-inject", ->
 test("2. data-bind inject recusive", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
-  was_auto_injected = false
+  was_auto_injected = 0
   class window.AutoInject
     constructor: ->
-      was_auto_injected = true
+      was_auto_injected++
     destroy: ->
-      was_auto_injected = false
+      was_auto_injected--
 
   # no attributes
   ok(!was_auto_injected, "Not auto injected")
   inject_el = $('<div kb-inject="AutoInject"></div>')[0]
   ko.applyBindings({}, inject_el)
-  ok(was_auto_injected, "Was auto injected")
+  equal(was_auto_injected, 1, "Was auto injected")
+  ko.removeNode(inject_el)
+  ok(!was_auto_injected, "Not auto injected")
+
+  # no attributes
+  ok(!was_auto_injected, "Not auto injected")
+  inject_el = $('<div kb-inject="AutoInject"><div><div kb-inject="AutoInject"></div></div></div>')[0]
+  ko.applyBindings({}, inject_el)
+  equal(was_auto_injected, 2, "Was auto injected")
   ko.removeNode(inject_el)
   ok(!was_auto_injected, "Not auto injected")
 
