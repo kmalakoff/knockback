@@ -68,9 +68,34 @@ class kb
   # @param [Any] obj the object to release and also release its keys
   @wasReleased = (obj) -> return not obj or obj.__kb_released
 
+  # Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.
+  # @param [Any] obj the object to release and also release its keys
+  @isReleaseable = (obj, depth=0) ->
+    # must be an object and not already released
+    if (not obj or (obj isnt Object(obj))) or obj.__kb_released
+      return false
+
+    # a known type that is releasable
+    else if ko.isObservable(obj) or (obj instanceof kb.ViewModel)
+      return true
+
+    # a known type that is not releaseable
+    else if (typeof(obj) is 'function') or (obj instanceof kb.Model) or (obj instanceof kb.Collection)
+      return false
+
+    # a releaseable signature
+    else if (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
+      return true
+
+    # max depth check for ViewModel inside of ViewModel
+    else if depth < 1
+      for key, value of obj
+        return true if (key isnt '__kb') and kb.isReleaseable(value, depth+1)
+
+    return false
+
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
   # @param [Any] obj the object to release and also release its keys
-  # @param [Function] pre_release_fn an optional function to clear the key on the object before the key's value is released. Used by kb.releaseKeys.
   #
   # @example
   #   var view_model = kb.viewModel(model);
@@ -78,55 +103,44 @@ class kb
   # @example
   #   var todos = kb.collectionObservable(collection);
   #   kb.utils.release(todos); todos = null;
-  @release = (obj, pre_release_fn) ->
-    if (
-      (not obj or (obj isnt Object(obj))) or # must be an object
-      ((typeof(obj) is 'function') and not ko.isObservable(obj)) or # not a simple function
-      obj.__kb_released or # already destroyed
-      ((obj instanceof kb.Model) or (obj instanceof kb.Collection)) # not a model or collection
-    )
-      return @
+  @release = (obj) ->
+    return unless kb.isReleaseable(obj)
 
-    # release array
+    # release array's items
     if _.isArray(obj)
-      array = obj.splice(0, obj.length)
-      kb.release(item) for item in array
-      return @
+      ((obj[index] = null; kb.release(value)) if kb.isReleaseable(value)) for index, value of obj
+      return
 
-    # release object
-    obj.__kb_released = true
-    not pre_release_fn or pre_release_fn()
+    obj.__kb_released = true # mark as released
 
     # observable or lifecycle managed
-    if ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
-      if ko.isObservable(obj) and _.isArray(array = obj())
-        if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is KB_TYPE_COLLECTION))
-          if obj.destroy
-            obj.destroy()
-          else if obj.dispose # we may be releasing our observable
-            obj.dispose()
-        else if array.length
-          view_models = array.slice(0)
-          array.splice(0, array.length)
-          kb.release(view_model) for view_model in view_models
-      else if obj.release
-        obj.release()
-      else if obj.destroy
-        obj.destroy()
-      else if obj.dispose
-        obj.dispose()
+    if ko.isObservable(obj) and _.isArray(array = obj())
+      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is KB_TYPE_COLLECTION))
+        if obj.destroy
+          obj.destroy()
+        else if obj.dispose # we may be releasing our observable
+          obj.dispose()
+      else if array.length
+        ((array[index] = null; kb.release(value)) if kb.isReleaseable(value)) for index, value of array
+
+    # releaseable signature
+    else if (typeof(obj.release) is 'function')
+      obj.release()
+    else if (typeof(obj.destroy) is 'function')
+      obj.destroy()
+    else if (typeof(obj.dispose) is 'function')
+      obj.dispose()
 
     # view model
-    else
+    else if not ko.isObservable(obj)
       @releaseKeys(obj)
 
-    return @
+    return
 
   # Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
   @releaseKeys = (obj) ->
-    for key, value of obj
-      (key is '__kb') or kb.release(value, (-> obj[key] = null))
-    return @
+    ((obj[key] = null; kb.release(value)) if (key isnt '__kb') and kb.isReleaseable(value)) for key, value of obj
+    return
 
   # Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   # ```

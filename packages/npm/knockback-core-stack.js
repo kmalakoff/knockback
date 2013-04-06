@@ -6471,49 +6471,73 @@ kb = (function() {
     return !obj || obj.__kb_released;
   };
 
-  kb.release = function(obj, pre_release_fn) {
-    var array, item, view_model, view_models, _i, _j, _len, _len1;
+  kb.isReleaseable = function(obj, depth) {
+    var key, value;
 
-    if ((!obj || (obj !== Object(obj))) || ((typeof obj === 'function') && !ko.isObservable(obj)) || obj.__kb_released || ((obj instanceof kb.Model) || (obj instanceof kb.Collection))) {
-      return this;
+    if (depth == null) {
+      depth = 0;
+    }
+    if ((!obj || (obj !== Object(obj))) || obj.__kb_released) {
+      return false;
+    } else if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) {
+      return true;
+    } else if ((typeof obj === 'function') || (obj instanceof kb.Model) || (obj instanceof kb.Collection)) {
+      return false;
+    } else if ((typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
+      return true;
+    } else if (depth < 1) {
+      for (key in obj) {
+        value = obj[key];
+        if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  kb.release = function(obj) {
+    var array, index, value;
+
+    if (!kb.isReleaseable(obj)) {
+      return;
     }
     if (_.isArray(obj)) {
-      array = obj.splice(0, obj.length);
-      for (_i = 0, _len = array.length; _i < _len; _i++) {
-        item = array[_i];
-        kb.release(item);
+      for (index in obj) {
+        value = obj[index];
+        if (kb.isReleaseable(value)) {
+          obj[index] = null;
+          kb.release(value);
+        }
       }
-      return this;
+      return;
     }
     obj.__kb_released = true;
-    !pre_release_fn || pre_release_fn();
-    if (ko.isObservable(obj) || (typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
-      if (ko.isObservable(obj) && _.isArray(array = obj())) {
-        if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === KB_TYPE_COLLECTION))) {
-          if (obj.destroy) {
-            obj.destroy();
-          } else if (obj.dispose) {
-            obj.dispose();
-          }
-        } else if (array.length) {
-          view_models = array.slice(0);
-          array.splice(0, array.length);
-          for (_j = 0, _len1 = view_models.length; _j < _len1; _j++) {
-            view_model = view_models[_j];
-            kb.release(view_model);
+    if (ko.isObservable(obj) && _.isArray(array = obj())) {
+      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === KB_TYPE_COLLECTION))) {
+        if (obj.destroy) {
+          obj.destroy();
+        } else if (obj.dispose) {
+          obj.dispose();
+        }
+      } else if (array.length) {
+        for (index in array) {
+          value = array[index];
+          if (kb.isReleaseable(value)) {
+            array[index] = null;
+            kb.release(value);
           }
         }
-      } else if (obj.release) {
-        obj.release();
-      } else if (obj.destroy) {
-        obj.destroy();
-      } else if (obj.dispose) {
-        obj.dispose();
       }
-    } else {
+    } else if (typeof obj.release === 'function') {
+      obj.release();
+    } else if (typeof obj.destroy === 'function') {
+      obj.destroy();
+    } else if (typeof obj.dispose === 'function') {
+      obj.dispose();
+    } else if (!ko.isObservable(obj)) {
       this.releaseKeys(obj);
     }
-    return this;
   };
 
   kb.releaseKeys = function(obj) {
@@ -6521,11 +6545,11 @@ kb = (function() {
 
     for (key in obj) {
       value = obj[key];
-      (key === '__kb') || kb.release(value, (function() {
-        return obj[key] = null;
-      }));
+      if ((key !== '__kb') && kb.isReleaseable(value)) {
+        obj[key] = null;
+        kb.release(value);
+      }
     }
-    return this;
   };
 
   kb.releaseOnNodeRemove = function(view_model, node) {

@@ -74,7 +74,7 @@ test("kb.utils.valueType", ->
   equal(kb.utils.valueType(o), kb.TYPE_SIMPLE, "kb.Observable is a kb.TYPE_SIMPLE")
   kb.release(o) # clean up
 
-  model = new kb.Model({simple_type: 3, model_type: new kb.Model(), collection_type: new kb.Collection})
+  model = new kb.Model({simple_type: 3, model_type: new kb.Model(), collection_type: new kb.Collection()})
   view_model = kb.viewModel(model)
 
   equal(kb.utils.valueType(view_model.simple_type), kb.TYPE_SIMPLE, "simple is kb.TYPE_SIMPLE")

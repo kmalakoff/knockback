@@ -245,6 +245,39 @@ test("kb.CollectionObservable with external store", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
+test("kb.release destructiveness", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  array = ['Hello', 'Friend']
+  kb.release(array)
+  ok(_.isEqual(array, ['Hello', 'Friend']), 'preserves arrays')
+
+  obj = {name: 'Fred'}
+  kb.release(obj)
+  ok(_.isEqual(obj, {name: 'Fred'}), 'preserves objects')
+
+  view_model = {
+    array: ['Hello', 'Friend']
+    obj: {name: 'Fred'}
+    value: ko.observable('hi')
+    array_value1: ko.observable(['Hello', 'Friend'])
+    array_value2: ko.observableArray(['Hello', 'Friend'])
+    model_value: kb.viewModel(new kb.Model())
+    collection_value: kb.collectionObservable(new kb.Collection())
+  }
+
+  kb.release(view_model)
+  ok(_.isEqual(view_model.array, ['Hello', 'Friend']), 'preserves arrays')
+  ok(_.isEqual(view_model.obj, {name: 'Fred'}), 'preserves arrays')
+  ok(!view_model.value, 'releases observables: value')
+  ok(!view_model.array_value1, 'releases observables: array_value1')
+  ok(!view_model.array_value2, 'releases observables: array_value2')
+  ok(!view_model.model_value, 'releases observables: model_value')
+  ok(!view_model.collection_value, 'releases observables: collection_value')
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
 if kb.Backbone
   test("kb.CollectionObservable with recursive view models", ->
     kb.statistics = new kb.Statistics() # turn on stats

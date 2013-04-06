@@ -2,7 +2,8 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.17.1
 
-* enable recursive auto inject using RECUSIVE_AUTO_INJECT flags (default true): https://github.com/kmalakoff/knockback/issues/63
+* reduce the destructiveness of kb.release (and speed it up too): https://github.com/kmalakoff/knockback/issues/48
+* enable recursive auto inject using RECUSIVE_AUTO_INJECT flags (default enabled): https://github.com/kmalakoff/knockback/issues/63
 * allow kb.CollectionObservable options for internals, excludes, and requires be either arrays or individual strings
 
 ## 0.17.0
