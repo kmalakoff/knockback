@@ -138,7 +138,7 @@ class kb.EventWatcher
     return
 
   releaseCallbacks: (obj) ->
-    return unless @__kb.callbacks # already destroyed
+    return if not @__kb.callbacks or not @ee # already destroyed
 
     for event_name, callbacks of @__kb.callbacks
       for index, info of callbacks.list

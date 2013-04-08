@@ -235,6 +235,8 @@ test("1. kb-inject", ->
 test("2. data-bind inject recusive", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
+  previous = kb.RECUSIVE_AUTO_INJECT; kb.RECUSIVE_AUTO_INJECT = true
+
   was_auto_injected = 0
   class window.AutoInject
     constructor: ->
@@ -257,6 +259,8 @@ test("2. data-bind inject recusive", ->
   equal(was_auto_injected, 2, "Was auto injected")
   ko.removeNode(inject_el)
   ok(!was_auto_injected, "Not auto injected")
+
+  kb.RECUSIVE_AUTO_INJECT = previous
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )

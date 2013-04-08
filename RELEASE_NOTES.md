@@ -1,5 +1,10 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.17.2
+
+* auto-disable RECUSIVE_AUTO_INJECT flags (default disabled) until investigated: https://github.com/kmalakoff/knockback/issues/63
+* bug fix for relational release in EventWatcher
+
 ## 0.17.1
 
 * reduce the destructiveness of kb.release (and speed it up too): https://github.com/kmalakoff/knockback/issues/48
