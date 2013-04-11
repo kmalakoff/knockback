@@ -26,7 +26,7 @@
   "optionalDependencies": {
     "underscore": ">=1.4.4",
     "backbone": ">=0.9.10",
-    "backbone-relational": "0.8.0plus",
+    "backbone-relational": "0.8.5",
     "backbone-modelref": ">=0.1.5",
     "knockout": "2.2.1",
     "lodash": ">=1.1.0"
