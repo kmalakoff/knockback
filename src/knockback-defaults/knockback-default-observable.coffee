@@ -1,10 +1,12 @@
 ###
-  knockback_default_observable.js 0.17.2
+  knockback_default_observable.js 0.17.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
+
+_publishMethods = kb._publishMethods
 
 # Used to provide a default value when an observable is null, undefined, or the empty string.
 #
@@ -26,8 +28,7 @@ class kb.DefaultObservable
     }))
 
     # publish public interface on the observable and return instead of this
-    observable.destroy = _.bind(@destroy, @)
-    observable.setToDefault = _.bind(@setToDefault, @)
+    _publishMethods(observable, @, ['destroy', 'setToDefault'])
 
     return observable
 

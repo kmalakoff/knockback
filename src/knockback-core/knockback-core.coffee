@@ -1,5 +1,5 @@
 ###
-  knockback-core.js 0.17.2
+  knockback-core.js 0.17.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -47,7 +47,7 @@
 class kb
 
   # Knockback library semantic version
-  @VERSION: '0.17.2'
+  @VERSION: '0.17.3'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -227,13 +227,17 @@ _arraySplice = Array.prototype.splice
 
 _unwrapObservable = ko.utils.unwrapObservable
 
-collapseOptions = (options) ->
+_collapseOptions = (options) ->
   result = _.clone(options)
   while options.options
     _.defaults(result, options.options)
     options = options.options
   delete result.options
   return result
+
+_publishMethods = kb._publishMethods = (observable, instance, methods) ->
+  observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
+  return
 
 # From Backbone.js (https:github.com/documentcloud/backbone)
 copyProps = (dest, source) ->

@@ -117,7 +117,7 @@ class kb.Store
   findOrCreate: (obj, options) ->
     options.store = this
     options.creator or (options.creator = kb.utils.inferCreator(obj, options.factory, options.path))
-    options.creator = kv.ViewModel if not options.creator and (obj instanceof kb.Model)
+    options.creator = kb.ViewModel if not options.creator and (obj instanceof kb.Model)
     creator = options.creator
 
     # no creator, create default and don't store

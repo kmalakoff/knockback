@@ -194,24 +194,26 @@ class kb.EventWatcher
       info.rel_fn = (emitter) ->
         not kb.statistics or addStatisticsEvent(emitter, "#{event_name} (relational)", info)
         info.update()
+
+      # VERSIONING: pre Backbone-Relational 0.8.0
+      events = if Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
       if relation.collectionType or _.isArray(relation.keyContents)
         info.is_collection = true
-        @ee.bind("add:#{info.key}", info.rel_fn)
-        @ee.bind("remove:#{info.key}", info.rel_fn)
+        @ee.bind("#{event}:#{info.key}", info.rel_fn) for event in events
       else
-        # REMOVE: signature check for Backbone-Relational version for update -> change in 0.8.0
-        @ee.bind((if Backbone.Relation.prototype.sanitizeOptions then "update:#{info.key}" else "change:#{info.key}"), info.rel_fn)
+        @ee.bind("#{events[0]}:#{info.key}", info.rel_fn)
     return
 
   # @private
   _modelUnbindRelatationalInfo: (event_name, info) ->
     return unless info.rel_fn
-    if info.is_collection
-      @ee.unbind("add:#{info.key}", info.rel_fn)
-      @ee.unbind("remove:#{info.key}", info.rel_fn)
-    else
-      # REMOVE: signature check for Backbone-Relational version for update -> change in 0.8.0
-      @ee.unbind((if Backbone.Relation.prototype.sanitizeOptions then "update:#{info.key}" else "change:#{info.key}"), info.rel_fn)
+      # VERSIONING: pre Backbone-Relational 0.8.0
+      events = if Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
+      if relation.collectionType or _.isArray(relation.keyContents)
+        info.is_collection = true
+        @ee.unbind("#{event}:#{info.key}", info.rel_fn) for event in events
+      else
+        @ee.unbind("#{events[0]}:#{info.key}", info.rel_fn)
     info.rel_fn = null
     return
 

@@ -55,7 +55,7 @@ class kb.Observable
     if _.isString(options) or ko.isObservable(options)
       create_options = @create_options = {key: options}
     else
-      create_options = @create_options = collapseOptions(options)
+      create_options = @create_options = _collapseOptions(options)
 
     # extract options
     @key = create_options.key; delete create_options.key; @key or _throwMissing(this, 'key')
@@ -111,9 +111,7 @@ class kb.Observable
     delete create_options.factories
 
     # publish public interface on the observable and return instead of this
-    observable.value = _.bind(@value, @)
-    observable.valueType = _.bind(@valueType, @)
-    observable.destroy = _.bind(@destroy, @)
+    _publishMethods(observable, @, ['value', 'valueType', 'destroy'])
 
     # use external model observable or create
     observable.model = @model = ko.dependentObservable(

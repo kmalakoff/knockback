@@ -89,7 +89,7 @@ class kb.CollectionObservable
     @__kb._onCollectionChange = _.bind(@_onCollectionChange, @)
 
     # options
-    options = collapseOptions(options)
+    options = _collapseOptions(options)
     if options.sort_attribute
       @_comparator = ko.observable(@_attributeComparator(options.sort_attribute))
     else
@@ -110,13 +110,7 @@ class kb.CollectionObservable
     @models_only = create_options.creator.models_only if create_options.creator
 
     # publish public interface on the observable and return instead of this
-    observable.destroy = _.bind(@destroy, @)
-    observable.shareOptions = _.bind(@shareOptions, @)
-    observable.filters = _.bind(@filters, @)
-    observable.comparator = _.bind(@comparator, @)
-    observable.sortAttribute = _.bind(@sortAttribute, @)
-    observable.viewModelByModel = _.bind(@viewModelByModel, @)
-    observable.hasViewModels = _.bind(@hasViewModels, @)
+    _publishMethods(observable, @, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'])
 
     # start the processing
     @_collection = ko.observable(collection)
@@ -397,7 +391,8 @@ class kb.CollectionObservable
 
   # @private
   _createViewModel: (model) ->
-    return if @models_only then model else @create_options.store.findOrCreate(model, @create_options)
+    return model if @models_only
+    return @create_options.store.findOrCreate(model, @create_options)
 
   # @private
   _modelIsFiltered: (model) ->

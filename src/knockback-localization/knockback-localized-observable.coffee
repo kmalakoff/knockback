@@ -1,10 +1,12 @@
 ###
-  knockback-localized-observable.js 0.17.2
+  knockback-localized-observable.js 0.17.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.LocalizedObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
+
+_publishMethods = kb._publishMethods
 
 # @abstract You must provide the following two methods:
 #   * read: function(value, observable) called to get the value and each time the locale changes
@@ -91,9 +93,7 @@ class kb.LocalizedObservable
     }))
 
     # publish public interface on the observable and return instead of this
-    observable.destroy = _.bind(@destroy, @)
-    observable.observedValue = _.bind(@observedValue, @)
-    observable.resetToCurrent = _.bind(@resetToCurrent, @)
+    _publishMethods(observable, @, ['destroy', 'observedValue', 'resetToCurrent'])
 
     # start
     kb.locale_manager.bind('change', @__kb._onLocaleChange)

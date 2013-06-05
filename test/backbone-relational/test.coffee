@@ -358,7 +358,7 @@ test("6. Inferring observable types: from the start", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
-test("7. Inferring observable types: late binding", ->
+test("7a. Inferring observable types: late binding", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   person1 = new Person({id: 'person-7-1', name: 'Daddy'})
@@ -394,7 +394,44 @@ test("7. Inferring observable types: late binding", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
-test("8. Customizing observable types: from the start", ->
+test("7b. Inferring observable types: late binding (attribute setting)", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  person1 = new Person({id: 'person-7b-1', name: 'Daddy'})
+  person2 = new Person({id: 'person-7b-2', name: 'Mommy'})
+  house = new Building({id: 'house-7b-1', name: 'Home Sweet Home'})
+
+  view_model_person1 = kb.viewModel(person1)
+  view_model_house1 = kb.viewModel(house)
+
+  # inferred the relationship types
+  equal(view_model_person1.name(), 'Daddy', 'person1 name is Daddy')
+  equal(view_model_person1.friends().length, 0, 'person1 has no friends')
+  equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has not best_friends')
+  ok(view_model_person1.occupies() instanceof kb.ViewModel, 'person1 occupies is kb.ViewModel')
+  equal(view_model_house1.occupants().length, 0, 'house has no occupants')
+
+  # add some friends
+  friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({friends: friends})
+  person2.set({best_friend: person1})
+  equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+  equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+  equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+
+  # add some occupants
+  occupants = _.clone(house.get('occupants').models); occupants.push(person1); occupants.push(person2); house.set({occupants: occupants})
+  equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+  equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+  equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+
+  # release
+  kb.release(view_model_person1)
+  kb.release(view_model_house1)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("8a. Customizing observable types: from the start", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class FriendViewModel extends kb.ViewModel
@@ -416,7 +453,8 @@ test("8. Customizing observable types: from the start", ->
   person2 = new Person({id: 'person-8-2', name: 'Mommy'})
   family = new kb.Collection([person1, person2])
   house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: ['person-8-1', 'person-8-2']})
-  person1.get('friends').add(person2); person2.set({best_friend: person1})
+  person1.get('friends').add(person2)
+  person2.set({best_friend: person1})
 
   view_model_person1 = new PersonViewModel(person1)
   view_model_person2 = new PersonViewModel(person2)
@@ -450,7 +488,65 @@ test("8. Customizing observable types: from the start", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
-test("9. Customizing observable types: late binding", ->
+test("8b. Customizing observable types: from the start (attribute setting)", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  class FriendViewModel extends kb.ViewModel
+  class BestFriendViewModel extends kb.ViewModel
+  class PersonViewModel extends kb.ViewModel
+    constructor: (model, options) ->
+      super(model, {factories: {
+        'friends.models': FriendViewModel
+        'best_friend': BestFriendViewModel
+        'occupies': HouseViewModel
+      }, options: options})
+  class HouseViewModel extends kb.ViewModel
+    constructor: (model, options) ->
+      super(model, {factories: {
+        'occupants.models': PersonViewModel
+      }, options: options})
+
+  person1 = new Person({id: 'person-8b-1', name: 'Daddy'})
+  person2 = new Person({id: 'person-8b-2', name: 'Mommy'})
+  family = new kb.Collection([person1, person2])
+  house = new Building({id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()]})
+  house.set({occupants: [person1.toJSON(), person2.toJSON()]})
+  friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({friends: friends})
+  person2.set({best_friend: person1})
+
+  view_model_person1 = new PersonViewModel(person1)
+  view_model_person2 = new PersonViewModel(person2)
+  co_family = kb.collectionObservable(family, {view_model: PersonViewModel})
+  view_model_house1 = new HouseViewModel(house)
+
+  # check friends
+  equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+  ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
+  equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+  equal(view_model_person1.best_friends_with_me().length, 1, 'person1 has one best friends')
+  equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+  ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+  equal(view_model_person2.best_friend().name(), 'Daddy', 'person2 is best friends with Daddy')
+  ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+
+  # check occupants
+  equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+  equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+  ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
+  equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+  ok(view_model_house1.occupants()[0].occupies() instanceof HouseViewModel, 'person1 occupies has HouseViewModel')
+  equal(view_model_house1.occupants()[0].occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+
+  # release
+  kb.release(view_model_person1)
+  kb.release(view_model_person2)
+  kb.release(co_family)
+  kb.release(view_model_house1)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("9a. Customizing observable types: late binding", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class FriendViewModel extends kb.ViewModel
@@ -514,6 +610,70 @@ test("9. Customizing observable types: late binding", ->
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
+test("9b. Customizing observable types: late binding (atrributes setting)", ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  class FriendViewModel extends kb.ViewModel
+  class BestFriendViewModel extends kb.ViewModel
+  class PersonViewModel extends kb.ViewModel
+    constructor: (model, options) ->
+      super(model, {factories: {
+        'friends.models': FriendViewModel
+        'best_friend': BestFriendViewModel
+        'occupies': HouseViewModel
+      }, options: options})
+  class HouseViewModel extends kb.ViewModel
+    constructor: (model, options) ->
+      super(model, {factories: {
+        'occupants.models': PersonViewModel
+      }, options: options})
+
+  person1 = new Person({id: 'person-9b-1', name: 'Daddy'})
+  person2 = new Person({id: 'person-9b-2', name: 'Mommy'})
+  family = new kb.Collection([person1, person2])
+  house = new Building({id: 'house-9b-1', name: 'Home Sweet Home'})
+
+  view_model_person1 = new PersonViewModel(person1)
+  view_model_person2 = new PersonViewModel(person2)
+  co_family = kb.collectionObservable(family, {view_model: PersonViewModel})
+  view_model_house1 = new HouseViewModel(house)
+
+  # check initial state
+  equal(view_model_person1.friends().length, 0, 'person1 has no friends')
+  equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has no best friends')
+  ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+  ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+  equal(view_model_house1.occupants().length, 0, 'house has no occupants')
+
+  # check friends
+  friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({friends: friends})
+  person2.set({best_friend: person1})
+  equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+  ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
+  equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+  equal(view_model_person1.best_friends_with_me().length, 1, 'person1 has one best friends')
+  equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+  ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+  equal(view_model_person2.best_friend().name(), 'Daddy', 'person2 is best friends with Daddy')
+  ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+
+  # check occupants
+  occupants = _.clone(house.get('occupants').models); occupants.push(person1); occupants.push(person2); house.set({occupants: occupants})
+  equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+  equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+  ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
+  equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+  ok(view_model_house1.occupants()[0].occupies() instanceof HouseViewModel, 'person1 occupies has HouseViewModel')
+  equal(view_model_house1.occupants()[0].occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+
+  # release
+  kb.release(view_model_person1)
+  kb.release(view_model_person2)
+  kb.release(co_family)
+  kb.release(view_model_house1)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
 test("10. Nested custom view models", ->
   kb.statistics = new kb.Statistics() # turn on stats
 

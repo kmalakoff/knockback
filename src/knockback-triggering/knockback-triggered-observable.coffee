@@ -1,10 +1,12 @@
 ###
-  knockback-triggered-observable.js 0.17.2
+  knockback-triggered-observable.js 0.17.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
+
+_publishMethods = kb._publishMethods
 
 # Class for observing emitter events.
 #
@@ -41,7 +43,7 @@ class kb.TriggeredObservable
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> @vo()))
 
     # publish public interface on the observable and return instead of this
-    observable.destroy = _.bind(@destroy, @)
+    _publishMethods(observable, @, ['destroy'])
 
     # create emitter observable
     kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(emitter, @, {emitter: _.bind(@emitter, @), update: _.bind(@update, @), event_selector: @event_selector}))

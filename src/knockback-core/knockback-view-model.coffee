@@ -87,7 +87,7 @@ class kb.ViewModel
     if _.isArray(options)
       options = {keys: options}
     else
-      options = collapseOptions(options)
+      options = _collapseOptions(options)
     @__kb or= {}
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
