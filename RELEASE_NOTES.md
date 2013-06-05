@@ -2,7 +2,6 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.17.3
 * bug fix for findOrCreate refering to incorrect class
-* code size reductions
 * added tests for Knockout 2.3.0pre
 * updated tests for latest lodash
 
