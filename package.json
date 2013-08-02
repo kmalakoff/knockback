@@ -21,7 +21,8 @@
   "devDependencies": {
     "coffee-script": ">=1.3.3",
     "easy-bake": "0.1.8",
-    "codo": ">=1.4.0"
+    "codo": ">=1.4.0",
+    "phantomjs" : ">=1.9.1"
   },
   "optionalDependencies": {
     "underscore": ">=1.4.4",
