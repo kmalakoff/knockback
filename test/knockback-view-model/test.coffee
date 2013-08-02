@@ -511,3 +511,118 @@ test("17. model change is observable", ->
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
+
+test("18. model replacement", ->
+  kb.statistics = new kb.Statistics()
+  model_opts =
+    attributes:
+        prop: 1
+      defaults:
+        prop: 1
+  
+  Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
+  
+  model1 = new Model
+  view_model = kb.viewModel(model1)
+  
+  equal(view_model.prop(), 1, "sanity check")
+  model2 = new Model({ prop: 2 })
+  equal(model2.get('prop'), 2, "sanity check 2")
+  
+  view_model.model(model2)
+  
+  equal(model2.get('prop'), 2, "switched in model shouldn't inherit values from previous model")
+  equal(view_model.prop(), 2, "view model should have the value of the switched in model")
+  
+  kb.release(view_model)
+  
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("19. model replacement with select", ->
+  kb.statistics = new kb.Statistics()
+  
+  model_opts =
+    attributes:
+        prop: 1
+      defaults:
+        prop: 1
+  
+  Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
+  
+  model1 = new Model
+  view_model = kb.viewModel(model1)
+  
+  
+  el = $('''
+    <div id="the_template1">
+      <select data-bind="value: prop">
+          <option value="" selected>---</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+      </select>
+    </div>''')
+  $('body').append(el)
+  
+  widget = el.find('select')
+  
+  equal(widget.val(), "", "select should be empty to start with")
+  ko.applyBindings(view_model, el.get(0))
+  equal(widget.val(), "1", "select should be equal to the model after bindings applied")
+  
+  model2 = new Model({prop : 2})
+  equal(model2.get('prop'), 2, "sanity check 2")
+  view_model.model(model2)
+  
+  equal(widget.val(), 2, "model sets the select")
+  equal(model2.get('prop'), 2, "switched in model shouldn't inherit values from previous model")
+  equal(view_model.model(), model2, "view_model.model should be the same as the new model")
+  equal(view_model.prop(), 2, "view model should have the value of the switched in model")
+  
+  el.remove()
+  kb.release(view_model)
+  
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test("20. model replacement with input", ->
+  kb.statistics = new kb.Statistics()
+  
+  model_opts =
+    attributes:
+        prop: 1
+      defaults:
+        prop: 1
+  
+  Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
+  
+  model1 = new Model
+  view_model = kb.viewModel(model1)
+  
+  
+  el = $('''
+    <div id="the_template1">
+      <input data-bind="value: prop" />
+    </div>''')
+  $('body').append(el)
+  
+  widget = el.find('input')
+  
+  equal(widget.val(), "", "input should be empty to start with")
+  ko.applyBindings(view_model, el.get(0))
+  equal(widget.val(), "1", "input should be equal to the model after bindings applied")
+  
+  model2 = new Model({prop : 2})
+  equal(model2.get('prop'), 2, "sanity check 2")
+  view_model.model(model2)
+  
+  equal(widget.val(), 2, "model sets the select")
+  equal(model2.get('prop'), 2, "switched in model shouldn't inherit values from previous model")
+  equal(view_model.model(), model2, "view_model.model should be the same as the new model")
+  equal(view_model.prop(), 2, "view model should have the value of the switched in model")
+  
+  el.remove()
+  kb.release(view_model)
+  
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
