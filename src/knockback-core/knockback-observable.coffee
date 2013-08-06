@@ -121,13 +121,12 @@ class kb.Observable
 
         # update references
         @_mdl = new_model
+        previous = new_model?.get(@key)
         @update(null)
-        if new_model?.hasChanged?()
-          changed = _.clone(new_model.changedAttributes())
-          for k of changed
-            previous = new_model.previous(k)
-            if not @vm[k]?.setToDefault and kb.utils.valueType(previous) == KB_TYPE_SIMPLE
-              new_model.set(k, previous)
+        if new_model and not @vm[@key]?.setToDefault and kb.utils.valueType(@vm[@key]) == KB_TYPE_SIMPLE
+          arg = {}
+          arg[@key] = previous
+          new_model.set(arg)
         @_model(new_model)
     )
     kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
