@@ -626,3 +626,65 @@ test("20. model replacement with input", ->
   
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
+
+test("21. model replacement with multiple selects and weird backbone bug", ->
+  kb.statistics = new kb.Statistics()
+  
+  default_attrs =
+    prop1 : "p1-wrong"
+    prop2 : "p2-wrong"
+  
+  model_opts =
+    attributes: default_attrs
+    defaults: default_attrs
+  
+  Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
+  
+  model1 = new Model
+  view_model = kb.viewModel(model1)
+  
+  
+  el = $('''
+    <div id="the_template1">
+      <select id="prop1" data-bind="value: prop1">
+          <option value="p1-wrong" selected>WRONG</option>
+          <option value="p1-right">RIGHT</option>
+      </select>
+      <select id="prop2" data-bind="value: prop2">
+          <option value="p2-wrong" selected>WRONG</option>
+          <option value="p2-right">RIGHT</option>
+      </select>
+    </div>''')
+  $('body').append(el)
+  
+  widget1 = el.find('#prop1')
+  widget2 = el.find('#prop2')
+  
+  equal(widget1.val(), "p1-wrong", "select should be first value to start with")
+  equal(widget2.val(), "p2-wrong", "select should be first value to start with")
+  ko.applyBindings(view_model, el.get(0))
+  equal(widget1.val(), "p1-wrong", "select should be equal to the model after bindings applied")
+  equal(widget2.val(), "p2-wrong", "select should be equal to the model after bindings applied")
+  
+  model2 = new Model(
+    DUMMY : ""
+    prop1 : "p1-right"
+    prop2 : "p2-right"
+  )
+  equal(model2.get('prop1'), 'p1-right', "sanity check 2")
+  equal(model2.get('prop2'), 'p2-right', "sanity check 3")
+  view_model.model(model2)
+  
+  equal(widget1.val(), 'p1-right', "model sets the select")
+  equal(widget2.val(), 'p2-right', "model sets the select")
+  equal(model2.get('prop1'), 'p1-right', "switched in model shouldn't inherit values from previous model")
+  equal(model2.get('prop2'), 'p2-right', "switched in model shouldn't inherit values from previous model")
+  equal(view_model.model(), model2, "view_model.model should be the same as the new model")
+  equal(view_model.prop1(), 'p1-right', "view model should have the value of the switched in model")
+  equal(view_model.prop2(), 'p2-right', "view model should have the value of the switched in model")
+  
+  el.remove()
+  kb.release(view_model)
+  
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
