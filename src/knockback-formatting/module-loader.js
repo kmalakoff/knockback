@@ -8,7 +8,7 @@
   return (function(factory) {
     // AMD
     if (typeof define === 'function' && define.amd) {
-      return define('knockback-formatting', ['require', 'underscore', 'backbone', 'knockout', 'knockback'], factory);
+      return define(['require', 'underscore', 'backbone', 'knockout', 'knockback'], factory);
     }
     // CommonJS/NodeJS or No Loader
     else {
