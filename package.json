@@ -16,7 +16,8 @@
     "clean": "bake clean",
     "build": "bake build",
     "watch": "bake watch",
-    "test": "bake test -c"
+    "test": "bake test -c",
+    "docs": "codo -n Knockback.js -o doc src/."
   },
   "devDependencies": {
     "coffee-script": ">=1.3.3",
