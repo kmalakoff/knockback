@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <link rel='stylesheet' href='../../assets/codo.css' type='text/css'>
+  <script src='../../assets/codo.js'></script>
+  <script src='../../assets/search_data.js'></script>
+</head>
+  <body>
+    <div id='base' data-path='../../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../../README.md.html' title='Knockback.js'>Knockback.js</a>
+    &raquo;
+    <a href='../../class_index.html' title='Index'>Index</a>
+    &raquo;
+    <a href='../../classes/kb.html' title='kb'>kb</a>
+    &raquo;
+    <span class='title'>Statistics</span>
+    <nav>
+      <ul>
+        <li class='noframes'>
+          (<a class='noframes' href='#'>no frames</a>)
+        </li>
+      </ul>
+    </nav>
+    <div id='search'>
+      <a id='class_list_link' href='../../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../../file_list.html'>Files</a>
+      <a id='method_list_link' href='../../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../../extra_list.html'>Extras</a>
+    </div>
+  </div>
+  <iframe id='search_frame'></iframe>
+  <div id='fuzzySearch'>
+    <input type='text'>
+    <ol></ol>
+  </div>
+  <div id='help'>
+    <p>
+      Quickly fuzzy find classes, mixins, methods, file:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-T</span>
+        Open fuzzy finder dialog
+      </li>
+    </ul>
+    <p>
+      In frame mode you can toggle the list naviation frame on the left side:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-L</span>
+        Toggle list view
+      </li>
+    </ul>
+    <p>
+      You can focus a list in frame mode or toggle a tab in frameless mode:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-C</span>
+        Class list
+      </li>
+      <li>
+        <span>Ctrl-I</span>
+        Mixin list
+      </li>
+      <li>
+        <span>Ctrl-F</span>
+        File list
+      </li>
+      <li>
+        <span>Ctrl-M</span>
+        Method list
+      </li>
+      <li>
+        <span>Ctrl-E</span>
+        Extras list
+      </li>
+    </ul>
+    <p>
+      You can focus and blur the search input:
+    </p>
+    <ul>
+      <li>
+        <span>Ctrl-S</span>
+        Focus search input
+      </li>
+      <li>
+        <span>Esc</span>
+        Blur search input
+      </li>
+    </ul>
+    <p>
+      In frameless mode you can close the list tab:
+    </p>
+    <ul>
+      <li>
+        <span>Esc</span>
+        Close list tab
+      </li>
+    </ul>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        kb.Statistics
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src&#47;knockback-statistics&#47;knockback-statistics.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>kb.Statistics is an optional components that is useful for measuring your application&#39;s performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.</p><p>kb.Statistics is not included in <code>knockback.js</code> nor <code>knockback-core.js</code> so you need to manually include it from the <code>lib</code> directory.</p>
+</div>
+<div class='tags'>
+</div>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        - (void) <strong>constructor</strong>()
+      </a>
+    </span>
+    <span class='constructor note title'>Constructor</span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#clear-instance'>
+        - (void) <strong>clear</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Clear the tracked model events (but keep the registered objects intact)
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#addModelEvent-instance'>
+        - (void) <strong>addModelEvent</strong>(event)
+      </a>
+    </span>
+    <span class='desc'>
+      Register a model event
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#modelEventsStatsString-instance'>
+        - (void) <strong>modelEventsStatsString</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      A debug helper to summarize the registered events in human-readable form
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#register-instance'>
+        - (void) <strong>register</strong>(key, obj)
+      </a>
+    </span>
+    <span class='desc'>
+      Register an object by key
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#unregister-instance'>
+        - (void) <strong>unregister</strong>(key, obj)
+      </a>
+    </span>
+    <span class='desc'>
+      Unregister an object by key
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#registeredCount-instance'>
+        - (Integer) <strong>registeredCount</strong>(type)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#registeredStatsString-instance'>
+        - (String) <strong>registeredStatsString</strong>(success_message)
+      </a>
+    </span>
+    <span class='desc'>
+      A debug helper to summarize the current registered objects by key
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      - (void) <strong>constructor</strong>()
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='clear-instance'>
+      - (void) <strong>clear</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Clear the tracked model events (but keep the registered objects intact)</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='addModelEvent-instance'>
+      - (void) <strong>addModelEvent</strong>(event)
+    </p>
+    <div class='docstring'>
+  <p>Register a model event</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='modelEventsStatsString-instance'>
+      - (void) <strong>modelEventsStatsString</strong>()
+    </p>
+    <div class='docstring'>
+  <p>A debug helper to summarize the registered events in human-readable form</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='register-instance'>
+      - (void) <strong>register</strong>(key, obj)
+    </p>
+    <div class='docstring'>
+  <p>Register an object by key</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='unregister-instance'>
+      - (void) <strong>unregister</strong>(key, obj)
+    </p>
+    <div class='docstring'>
+  <p>Unregister an object by key</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='registeredCount-instance'>
+      - (Integer) <strong>registeredCount</strong>(type)
+    </p>
+    <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>Integer</tt>)
+      &mdash;
+      <span class='desc'>the number of registered objects by type</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='registeredStatsString-instance'>
+      - (String) <strong>registeredStatsString</strong>(success_message)
+    </p>
+    <div class='docstring'>
+  <p>A debug helper to summarize the current registered objects by key</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>success_message</span>
+      <span class='type'>
+        (<tt>String</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>a message to return if there are no registered objects</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>String</tt>)
+      &mdash;
+      <span class='desc'>a human readable string summarizing the currently registered objects or success_message</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  Generated on
+  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  by
+  <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
+  v1.7.2
+  (Node.js v0.10.21).
+  &#10034;
+  Press Ctrl-h to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/#!/netzpirat'>@netzpirat</a>
+  &#10034;
+  <a href='https://mksoft.ch'>mksoft.ch</a>
+</div>
+  </body>
+</html>

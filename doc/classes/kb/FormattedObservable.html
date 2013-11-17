@@ -11,13 +11,13 @@
     <div id='base' data-path='../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../README.md.html' title='Knockback'>Knockback</a>
+    <a href='../../README.md.html' title='Knockback.js'>Knockback.js</a>
     &raquo;
     <a href='../../class_index.html' title='Index'>Index</a>
     &raquo;
-    <span class='title'>knockback-defaults</span>
+    <a href='../../classes/kb.html' title='kb'>kb</a>
     &raquo;
-    <span class='title'>knockback-extensions.coffee</span>
+    <span class='title'>FormattedObservable</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -107,88 +107,106 @@
 </div>
     <div id='content'>
       <h1>
-        File:
-        knockback-extensions.coffee
+        Class:
+        kb.FormattedObservable
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>knockback-defaults</td>
+          <td>src&#47;knockback-formatting&#47;knockback-formatted-observable.coffee</td>
         </tr>
       </table>
-      <h2>Method Summary</h2>
-      <ul class='summary'>
-  <li>
-    <span class='signature'>
-      <a href='#kb.Observable.prototype.setToDefault-file'>
-        ? (void) <strong>kb.Observable.prototype.setToDefault</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      knockback-extensions.js (knockback-defaults) (c) 2011-2013 Kevin Malakoff.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#kb.ViewModel.prototype.setToDefault-file'>
-        ? (void) <strong>kb.ViewModel.prototype.setToDefault</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#kb.utils.setToDefault-file'>
-        ? (void) <strong>kb.utils.setToDefault</strong>(obj)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-</ul>
-      <h2>Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='kb.Observable.prototype.setToDefault-file'>
-      ? (void) <strong>kb.Observable.prototype.setToDefault</strong>()
-    </p>
-    <div class='docstring'>
-  <p>knockback-extensions.js (knockback-defaults)
-(c) 2011-2013 Kevin Malakoff.
-Knockback.js is freely distributable under the MIT license.
-See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a>
-Dependencies: Knockout.js, Backbone.js, and Underscore.js. Optional dependency: Backbone.ModelRef.js.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='kb.ViewModel.prototype.setToDefault-file'>
-      ? (void) <strong>kb.ViewModel.prototype.setToDefault</strong>()
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='kb.utils.setToDefault-file'>
-      ? (void) <strong>kb.utils.setToDefault</strong>(obj)
-    </p>
-    <div class='docstring'>
-  
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Handles two-way formatted string convertions and will reformat a string when any argument changes. The format string can also be an observable.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
-      
+      change the formatted name whenever a model's name attribute changes
     </h4>
-    <pre><code class='coffee'>var model = new Backbone.Model({name: &#39;Bob&#39;});
-var view_model = {
-  wrapped_name: kb.defaultWrapper(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;)
-}; &#47;&#47; view_model.wrapped name: Bob
-kb.utils.setToDefault(view_model); &#47;&#47; view_model.wrapped name: (no name)</code></pre>
+    <pre><code class='coffee'>var observable = kb.formattedObservable(&quot;{0} and {1}&quot;, arg1, arg2);</code></pre>
   </div>
+</div>
+<div class='tags'>
+</div>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#constructor-instance'>
+        - (ko.observable) <strong>constructor</strong>(format, args)
+      </a>
+    </span>
+    <span class='constructor note title'>Constructor</span>
+    <span class='desc'>
+      Used to create a new kb.FormattedObservable.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#destroy-instance'>
+        - (void) <strong>destroy</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Required clean up function to break cycles, release view models, etc.
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-instance'>
+      - (ko.observable) <strong>constructor</strong>(format, args)
+    </p>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    the constructor does not return &#39;this&#39; but a ko.observable
+  </div>
+  <p>Used to create a new kb.FormattedObservable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>format</span>
+      <span class='type'>
+        (<tt>String|ko.observable</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the format string. Format: <code>&quot;{0} and {1}&quot;</code> where <code>{0}</code> and <code>{1}</code> would be synchronized with the arguments (eg. &quot;Bob and Carol&quot; where <code>{0}</code> is Bob and <code>{1}</code> is Carol)</span>
+    </li>
+    <li>
+      <span class='name'>args</span>
+      <span class='type'>
+        (<tt>Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>arguments to be passed to the kb.LocaleManager&#39;s get() method</span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (<tt>ko.observable</tt>)
+      &mdash;
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable</span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='destroy-instance'>
+      - (void) <strong>destroy</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Required clean up function to break cycles, release view models, etc.
+Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
 </div>
 <div class='tags'>
 </div>
@@ -197,11 +215,11 @@ kb.utils.setToDefault(view_model); &#47;&#47; view_model.wrapped name: (no name)
     </div>
     <div id='footer'>
   Generated on
-  Sun Jul 14 2013 14:14:37 GMT-0700 (PDT)
+  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.0
-  (Node.js v0.10.12).
+  v1.7.2
+  (Node.js v0.10.21).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;
