@@ -11,7 +11,7 @@
       var module_name = 'knockback-localization';
       if (require.toUrl(module_name).split('./..').length === 1)
         module_name = 'knockback';
-      return define('knockback-examples-localization', ['underscore', 'backbone', 'knockout', module_name], factory);
+      return define(['underscore', 'backbone', 'knockout', module_name], factory);
     }
     // CommonJS/NodeJS or No Loader
     else {
