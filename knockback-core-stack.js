@@ -7096,7 +7096,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   return (function(factory) {
     // AMD
     if (typeof define === 'function' && define.amd) {
-      return define(['underscore', 'backbone', 'knockout'], factory);
+      return define(['require', 'underscore', 'backbone', 'knockout'], factory);
     }
     // CommonJS/NodeJS or No Loader
     else {
