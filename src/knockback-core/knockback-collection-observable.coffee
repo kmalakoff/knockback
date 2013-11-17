@@ -304,6 +304,7 @@ class kb.CollectionObservable
 
         observable = kb.utils.wrappedObservable(@)
         collection = @_collection()
+        return if (collection.indexOf(arg) == -1) # the model may have been removed before we got a chance to add it
         return if (view_model = @viewModelByModel(arg)) # it may have already been added by a change event
         @in_edit++
         view_model = @_createViewModel(arg)
