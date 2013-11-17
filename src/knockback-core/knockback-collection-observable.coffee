@@ -296,7 +296,7 @@ class kb.CollectionObservable
     return if @in_edit # we are doing the editing
 
     switch event
-      when 'reset', 'resort'
+      when 'reset', 'sort', 'resort'
         @_collection.notifySubscribers(@_collection())
 
       when 'new', 'add'
