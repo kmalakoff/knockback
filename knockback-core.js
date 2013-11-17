@@ -1719,6 +1719,9 @@ kb.CollectionObservable = (function() {
         }
         observable = kb.utils.wrappedObservable(this);
         collection = this._collection();
+        if (collection.indexOf(arg) === -1) {
+          return;
+        }
         if ((view_model = this.viewModelByModel(arg))) {
           return;
         }

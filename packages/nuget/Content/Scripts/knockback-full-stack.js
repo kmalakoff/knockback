@@ -4,9 +4,9 @@
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
-//     Underscore.js 1.4.4
+//     Underscore.js 1.5.2
 //     http://underscorejs.org
-//     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud Inc.
+//     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -14,7 +14,7 @@
   // Baseline setup
   // --------------
 
-  // Establish the root object, `window` in the browser, or `global` on the server.
+  // Establish the root object, `window` in the browser, or `exports` on the server.
   var root = this;
 
   // Save the previous value of the `_` variable.
@@ -27,11 +27,12 @@
   var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
 
   // Create quick reference variables for speed access to core prototypes.
-  var push             = ArrayProto.push,
-      slice            = ArrayProto.slice,
-      concat           = ArrayProto.concat,
-      toString         = ObjProto.toString,
-      hasOwnProperty   = ObjProto.hasOwnProperty;
+  var
+    push             = ArrayProto.push,
+    slice            = ArrayProto.slice,
+    concat           = ArrayProto.concat,
+    toString         = ObjProto.toString,
+    hasOwnProperty   = ObjProto.hasOwnProperty;
 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
@@ -70,7 +71,7 @@
   }
 
   // Current version.
-  _.VERSION = '1.4.4';
+  _.VERSION = '1.5.2';
 
   // Collection Functions
   // --------------------
@@ -83,14 +84,13 @@
     if (nativeForEach && obj.forEach === nativeForEach) {
       obj.forEach(iterator, context);
     } else if (obj.length === +obj.length) {
-      for (var i = 0, l = obj.length; i < l; i++) {
+      for (var i = 0, length = obj.length; i < length; i++) {
         if (iterator.call(context, obj[i], i, obj) === breaker) return;
       }
     } else {
-      for (var key in obj) {
-        if (_.has(obj, key)) {
-          if (iterator.call(context, obj[key], key, obj) === breaker) return;
-        }
+      var keys = _.keys(obj);
+      for (var i = 0, length = keys.length; i < length; i++) {
+        if (iterator.call(context, obj[keys[i]], keys[i], obj) === breaker) return;
       }
     }
   };
@@ -102,7 +102,7 @@
     if (obj == null) return results;
     if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
     each(obj, function(value, index, list) {
-      results[results.length] = iterator.call(context, value, index, list);
+      results.push(iterator.call(context, value, index, list));
     });
     return results;
   };
@@ -177,7 +177,7 @@
     if (obj == null) return results;
     if (nativeFilter && obj.filter === nativeFilter) return obj.filter(iterator, context);
     each(obj, function(value, index, list) {
-      if (iterator.call(context, value, index, list)) results[results.length] = value;
+      if (iterator.call(context, value, index, list)) results.push(value);
     });
     return results;
   };
@@ -244,7 +244,7 @@
   // Convenience version of a common use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
   _.where = function(obj, attrs, first) {
-    if (_.isEmpty(attrs)) return first ? null : [];
+    if (_.isEmpty(attrs)) return first ? void 0 : [];
     return _[first ? 'find' : 'filter'](obj, function(value) {
       for (var key in attrs) {
         if (attrs[key] !== value[key]) return false;
@@ -261,7 +261,7 @@
 
   // Return the maximum element or (element-based computation).
   // Can't optimize arrays of integers longer than 65,535 elements.
-  // See: https://bugs.webkit.org/show_bug.cgi?id=80797
+  // See [WebKit Bug 80797](https://bugs.webkit.org/show_bug.cgi?id=80797)
   _.max = function(obj, iterator, context) {
     if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
       return Math.max.apply(Math, obj);
@@ -270,7 +270,7 @@
     var result = {computed : -Infinity, value: -Infinity};
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed >= result.computed && (result = {value : value, computed : computed});
+      computed > result.computed && (result = {value : value, computed : computed});
     });
     return result.value;
   };
@@ -289,7 +289,8 @@
     return result.value;
   };
 
-  // Shuffle an array.
+  // Shuffle an array, using the modern version of the 
+  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
   _.shuffle = function(obj) {
     var rand;
     var index = 0;
@@ -302,6 +303,16 @@
     return shuffled;
   };
 
+  // Sample **n** random values from an array.
+  // If **n** is not specified, returns a single random element from the array.
+  // The internal `guard` argument allows it to work with `map`.
+  _.sample = function(obj, n, guard) {
+    if (arguments.length < 2 || guard) {
+      return obj[_.random(obj.length - 1)];
+    }
+    return _.shuffle(obj).slice(0, Math.max(0, n));
+  };
+
   // An internal function to generate lookup iterators.
   var lookupIterator = function(value) {
     return _.isFunction(value) ? value : function(obj){ return obj[value]; };
@@ -312,9 +323,9 @@
     var iterator = lookupIterator(value);
     return _.pluck(_.map(obj, function(value, index, list) {
       return {
-        value : value,
-        index : index,
-        criteria : iterator.call(context, value, index, list)
+        value: value,
+        index: index,
+        criteria: iterator.call(context, value, index, list)
       };
     }).sort(function(left, right) {
       var a = left.criteria;
@@ -323,38 +334,41 @@
         if (a > b || a === void 0) return 1;
         if (a < b || b === void 0) return -1;
       }
-      return left.index < right.index ? -1 : 1;
+      return left.index - right.index;
     }), 'value');
   };
 
   // An internal function used for aggregate "group by" operations.
-  var group = function(obj, value, context, behavior) {
-    var result = {};
-    var iterator = lookupIterator(value || _.identity);
-    each(obj, function(value, index) {
-      var key = iterator.call(context, value, index, obj);
-      behavior(result, key, value);
-    });
-    return result;
+  var group = function(behavior) {
+    return function(obj, value, context) {
+      var result = {};
+      var iterator = value == null ? _.identity : lookupIterator(value);
+      each(obj, function(value, index) {
+        var key = iterator.call(context, value, index, obj);
+        behavior(result, key, value);
+      });
+      return result;
+    };
   };
 
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
-  _.groupBy = function(obj, value, context) {
-    return group(obj, value, context, function(result, key, value) {
-      (_.has(result, key) ? result[key] : (result[key] = [])).push(value);
-    });
-  };
+  _.groupBy = group(function(result, key, value) {
+    (_.has(result, key) ? result[key] : (result[key] = [])).push(value);
+  });
+
+  // Indexes the object's values by a criterion, similar to `groupBy`, but for
+  // when you know that your index values will be unique.
+  _.indexBy = group(function(result, key, value) {
+    result[key] = value;
+  });
 
   // Counts instances of an object that group by a certain criterion. Pass
   // either a string attribute to count by, or a function that returns the
   // criterion.
-  _.countBy = function(obj, value, context) {
-    return group(obj, value, context, function(result, key) {
-      if (!_.has(result, key)) result[key] = 0;
-      result[key]++;
-    });
-  };
+  _.countBy = group(function(result, key) {
+    _.has(result, key) ? result[key]++ : result[key] = 1;
+  });
 
   // Use a comparator function to figure out the smallest index at which
   // an object should be inserted so as to maintain order. Uses binary search.
@@ -369,7 +383,7 @@
     return low;
   };
 
-  // Safely convert anything iterable into a real, live array.
+  // Safely create a real, live array from anything iterable.
   _.toArray = function(obj) {
     if (!obj) return [];
     if (_.isArray(obj)) return slice.call(obj);
@@ -391,7 +405,7 @@
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null) return void 0;
-    return (n != null) && !guard ? slice.call(array, 0, n) : array[0];
+    return (n == null) || guard ? array[0] : slice.call(array, 0, n);
   };
 
   // Returns everything but the last entry of the array. Especially useful on
@@ -406,10 +420,10 @@
   // values in the array. The **guard** check allows it to work with `_.map`.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
-    if ((n != null) && !guard) {
-      return slice.call(array, Math.max(array.length - n, 0));
-    } else {
+    if ((n == null) || guard) {
       return array[array.length - 1];
+    } else {
+      return slice.call(array, Math.max(array.length - n, 0));
     }
   };
 
@@ -428,8 +442,11 @@
 
   // Internal implementation of a recursive `flatten` function.
   var flatten = function(input, shallow, output) {
+    if (shallow && _.every(input, _.isArray)) {
+      return concat.apply(output, input);
+    }
     each(input, function(value) {
-      if (_.isArray(value)) {
+      if (_.isArray(value) || _.isArguments(value)) {
         shallow ? push.apply(output, value) : flatten(value, shallow, output);
       } else {
         output.push(value);
@@ -438,7 +455,7 @@
     return output;
   };
 
-  // Return a completely flattened version of an array.
+  // Flatten out an array, either recursively (by default), or just one level.
   _.flatten = function(array, shallow) {
     return flatten(array, shallow, []);
   };
@@ -472,7 +489,7 @@
   // Produce an array that contains the union: each distinct element from all of
   // the passed-in arrays.
   _.union = function() {
-    return _.uniq(concat.apply(ArrayProto, arguments));
+    return _.uniq(_.flatten(arguments, true));
   };
 
   // Produce an array that contains every item shared between all the
@@ -496,11 +513,10 @@
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
   _.zip = function() {
-    var args = slice.call(arguments);
-    var length = _.max(_.pluck(args, 'length'));
+    var length = _.max(_.pluck(arguments, "length").concat(0));
     var results = new Array(length);
     for (var i = 0; i < length; i++) {
-      results[i] = _.pluck(args, "" + i);
+      results[i] = _.pluck(arguments, '' + i);
     }
     return results;
   };
@@ -511,7 +527,7 @@
   _.object = function(list, values) {
     if (list == null) return {};
     var result = {};
-    for (var i = 0, l = list.length; i < l; i++) {
+    for (var i = 0, length = list.length; i < length; i++) {
       if (values) {
         result[list[i]] = values[i];
       } else {
@@ -529,17 +545,17 @@
   // for **isSorted** to use binary search.
   _.indexOf = function(array, item, isSorted) {
     if (array == null) return -1;
-    var i = 0, l = array.length;
+    var i = 0, length = array.length;
     if (isSorted) {
       if (typeof isSorted == 'number') {
-        i = (isSorted < 0 ? Math.max(0, l + isSorted) : isSorted);
+        i = (isSorted < 0 ? Math.max(0, length + isSorted) : isSorted);
       } else {
         i = _.sortedIndex(array, item);
         return array[i] === item ? i : -1;
       }
     }
     if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item, isSorted);
-    for (; i < l; i++) if (array[i] === item) return i;
+    for (; i < length; i++) if (array[i] === item) return i;
     return -1;
   };
 
@@ -565,11 +581,11 @@
     }
     step = arguments[2] || 1;
 
-    var len = Math.max(Math.ceil((stop - start) / step), 0);
+    var length = Math.max(Math.ceil((stop - start) / step), 0);
     var idx = 0;
-    var range = new Array(len);
+    var range = new Array(length);
 
-    while(idx < len) {
+    while(idx < length) {
       range[idx++] = start;
       start += step;
     }
@@ -580,14 +596,25 @@
   // Function (ahem) Functions
   // ------------------
 
+  // Reusable constructor function for prototype setting.
+  var ctor = function(){};
+
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
   // available.
   _.bind = function(func, context) {
-    if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    var args = slice.call(arguments, 2);
-    return function() {
-      return func.apply(context, args.concat(slice.call(arguments)));
+    var args, bound;
+    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
+    if (!_.isFunction(func)) throw new TypeError;
+    args = slice.call(arguments, 2);
+    return bound = function() {
+      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
+      ctor.prototype = func.prototype;
+      var self = new ctor;
+      ctor.prototype = null;
+      var result = func.apply(self, args.concat(slice.call(arguments)));
+      if (Object(result) === result) return result;
+      return self;
     };
   };
 
@@ -604,7 +631,7 @@
   // all callbacks defined on an object belong to it.
   _.bindAll = function(obj) {
     var funcs = slice.call(arguments, 1);
-    if (funcs.length === 0) funcs = _.functions(obj);
+    if (funcs.length === 0) throw new Error("bindAll must be passed function names");
     each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
     return obj;
   };
@@ -633,17 +660,23 @@
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
-  // during a given window of time.
-  _.throttle = function(func, wait) {
-    var context, args, timeout, result;
+  // during a given window of time. Normally, the throttled function will run
+  // as much as it can, without ever going more than once per `wait` duration;
+  // but if you'd like to disable the execution on the leading edge, pass
+  // `{leading: false}`. To disable execution on the trailing edge, ditto.
+  _.throttle = function(func, wait, options) {
+    var context, args, result;
+    var timeout = null;
     var previous = 0;
+    options || (options = {});
     var later = function() {
-      previous = new Date;
+      previous = options.leading === false ? 0 : new Date;
       timeout = null;
       result = func.apply(context, args);
     };
     return function() {
       var now = new Date;
+      if (!previous && options.leading === false) previous = now;
       var remaining = wait - (now - previous);
       context = this;
       args = arguments;
@@ -652,7 +685,7 @@
         timeout = null;
         previous = now;
         result = func.apply(context, args);
-      } else if (!timeout) {
+      } else if (!timeout && options.trailing !== false) {
         timeout = setTimeout(later, remaining);
       }
       return result;
@@ -664,16 +697,24 @@
   // N milliseconds. If `immediate` is passed, trigger the function on the
   // leading edge, instead of the trailing.
   _.debounce = function(func, wait, immediate) {
-    var timeout, result;
+    var timeout, args, context, timestamp, result;
     return function() {
-      var context = this, args = arguments;
+      context = this;
+      args = arguments;
+      timestamp = new Date();
       var later = function() {
-        timeout = null;
-        if (!immediate) result = func.apply(context, args);
+        var last = (new Date()) - timestamp;
+        if (last < wait) {
+          timeout = setTimeout(later, wait - last);
+        } else {
+          timeout = null;
+          if (!immediate) result = func.apply(context, args);
+        }
       };
       var callNow = immediate && !timeout;
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
+      if (!timeout) {
+        timeout = setTimeout(later, wait);
+      }
       if (callNow) result = func.apply(context, args);
       return result;
     };
@@ -718,7 +759,6 @@
 
   // Returns a function that will only be executed after being called N times.
   _.after = function(times, func) {
-    if (times <= 0) return func();
     return function() {
       if (--times < 1) {
         return func.apply(this, arguments);
@@ -734,28 +774,39 @@
   _.keys = nativeKeys || function(obj) {
     if (obj !== Object(obj)) throw new TypeError('Invalid object');
     var keys = [];
-    for (var key in obj) if (_.has(obj, key)) keys[keys.length] = key;
+    for (var key in obj) if (_.has(obj, key)) keys.push(key);
     return keys;
   };
 
   // Retrieve the values of an object's properties.
   _.values = function(obj) {
-    var values = [];
-    for (var key in obj) if (_.has(obj, key)) values.push(obj[key]);
+    var keys = _.keys(obj);
+    var length = keys.length;
+    var values = new Array(length);
+    for (var i = 0; i < length; i++) {
+      values[i] = obj[keys[i]];
+    }
     return values;
   };
 
   // Convert an object into a list of `[key, value]` pairs.
   _.pairs = function(obj) {
-    var pairs = [];
-    for (var key in obj) if (_.has(obj, key)) pairs.push([key, obj[key]]);
+    var keys = _.keys(obj);
+    var length = keys.length;
+    var pairs = new Array(length);
+    for (var i = 0; i < length; i++) {
+      pairs[i] = [keys[i], obj[keys[i]]];
+    }
     return pairs;
   };
 
   // Invert the keys and values of an object. The values must be serializable.
   _.invert = function(obj) {
     var result = {};
-    for (var key in obj) if (_.has(obj, key)) result[obj[key]] = key;
+    var keys = _.keys(obj);
+    for (var i = 0, length = keys.length; i < length; i++) {
+      result[obj[keys[i]]] = keys[i];
+    }
     return result;
   };
 
@@ -806,7 +857,7 @@
     each(slice.call(arguments, 1), function(source) {
       if (source) {
         for (var prop in source) {
-          if (obj[prop] == null) obj[prop] = source[prop];
+          if (obj[prop] === void 0) obj[prop] = source[prop];
         }
       }
     });
@@ -830,7 +881,7 @@
   // Internal recursive comparison function for `isEqual`.
   var eq = function(a, b, aStack, bStack) {
     // Identical objects are equal. `0 === -0`, but they aren't identical.
-    // See the Harmony `egal` proposal: http://wiki.ecmascript.org/doku.php?id=harmony:egal.
+    // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
     if (a === b) return a !== 0 || 1 / a == 1 / b;
     // A strict comparison is necessary because `null == undefined`.
     if (a == null || b == null) return a === b;
@@ -872,6 +923,13 @@
       // unique nested structures.
       if (aStack[length] == a) return bStack[length] == b;
     }
+    // Objects with different constructors are not equivalent, but `Object`s
+    // from different frames are.
+    var aCtor = a.constructor, bCtor = b.constructor;
+    if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
+                             _.isFunction(bCtor) && (bCtor instanceof bCtor))) {
+      return false;
+    }
     // Add the first object to the stack of traversed objects.
     aStack.push(a);
     bStack.push(b);
@@ -888,13 +946,6 @@
         }
       }
     } else {
-      // Objects with different constructors are not equivalent, but `Object`s
-      // from different frames are.
-      var aCtor = a.constructor, bCtor = b.constructor;
-      if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
-                               _.isFunction(bCtor) && (bCtor instanceof bCtor))) {
-        return false;
-      }
       // Deep compare objects.
       for (var key in a) {
         if (_.has(a, key)) {
@@ -1018,7 +1069,7 @@
 
   // Run a function **n** times.
   _.times = function(n, iterator, context) {
-    var accum = Array(n);
+    var accum = Array(Math.max(0, n));
     for (var i = 0; i < n; i++) accum[i] = iterator.call(context, i);
     return accum;
   };
@@ -1039,8 +1090,7 @@
       '<': '&lt;',
       '>': '&gt;',
       '"': '&quot;',
-      "'": '&#x27;',
-      '/': '&#x2F;'
+      "'": '&#x27;'
     }
   };
   entityMap.unescape = _.invert(entityMap.escape);
@@ -1061,17 +1111,17 @@
     };
   });
 
-  // If the value of the named property is a function then invoke it;
-  // otherwise, return it.
+  // If the value of the named `property` is a function then invoke it with the
+  // `object` as context; otherwise, return it.
   _.result = function(object, property) {
-    if (object == null) return null;
+    if (object == null) return void 0;
     var value = object[property];
     return _.isFunction(value) ? value.call(object) : value;
   };
 
   // Add your own custom functions to the Underscore object.
   _.mixin = function(obj) {
-    each(_.functions(obj), function(name){
+    each(_.functions(obj), function(name) {
       var func = _[name] = obj[name];
       _.prototype[name] = function() {
         var args = [this._wrapped];
@@ -1230,9 +1280,10 @@
   });
 
 }).call(this);
-//     Backbone.js 1.0.0
+//     Backbone.js 1.1.0
 
-//     (c) 2010-2013 Jeremy Ashkenas, DocumentCloud Inc.
+//     (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
+//     (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
@@ -1266,7 +1317,7 @@
   }
 
   // Current version of the library. Keep in sync with `package.json`.
-  Backbone.VERSION = '1.0.0';
+  Backbone.VERSION = '1.1.0';
 
   // Require Underscore, if we're on the server, and it's not already present.
   var _ = root._;
@@ -1284,7 +1335,7 @@
   };
 
   // Turn on `emulateHTTP` to support legacy HTTP servers. Setting this option
-  // will fake `"PUT"` and `"DELETE"` requests via the `_method` parameter and
+  // will fake `"PATCH"`, `"PUT"` and `"DELETE"` requests via the `_method` parameter and
   // set a `X-Http-Method-Override` header.
   Backbone.emulateHTTP = false;
 
@@ -1343,7 +1394,6 @@
         this._events = {};
         return this;
       }
-
       names = name ? [name] : _.keys(this._events);
       for (i = 0, l = names.length; i < l; i++) {
         name = names[i];
@@ -1383,14 +1433,15 @@
     // Tell this object to stop listening to either specific events ... or
     // to every object it's currently listening to.
     stopListening: function(obj, name, callback) {
-      var listeners = this._listeners;
-      if (!listeners) return this;
-      var deleteListener = !name && !callback;
-      if (typeof name === 'object') callback = this;
-      if (obj) (listeners = {})[obj._listenerId] = obj;
-      for (var id in listeners) {
-        listeners[id].off(name, callback, this);
-        if (deleteListener) delete this._listeners[id];
+      var listeningTo = this._listeningTo;
+      if (!listeningTo) return this;
+      var remove = !name && !callback;
+      if (!callback && typeof name === 'object') callback = this;
+      if (obj) (listeningTo = {})[obj._listenId] = obj;
+      for (var id in listeningTo) {
+        obj = listeningTo[id];
+        obj.off(name, callback, this);
+        if (remove || _.isEmpty(obj._events)) delete this._listeningTo[id];
       }
       return this;
     }
@@ -1447,10 +1498,10 @@
   // listening to.
   _.each(listenMethods, function(implementation, method) {
     Events[method] = function(obj, name, callback) {
-      var listeners = this._listeners || (this._listeners = {});
-      var id = obj._listenerId || (obj._listenerId = _.uniqueId('l'));
-      listeners[id] = obj;
-      if (typeof name === 'object') callback = this;
+      var listeningTo = this._listeningTo || (this._listeningTo = {});
+      var id = obj._listenId || (obj._listenId = _.uniqueId('l'));
+      listeningTo[id] = obj;
+      if (!callback && typeof name === 'object') callback = this;
       obj[implementation](name, callback, this);
       return this;
     };
@@ -1475,23 +1526,17 @@
   // Create a new model with the specified attributes. A client id (`cid`)
   // is automatically generated and assigned for you.
   var Model = Backbone.Model = function(attributes, options) {
-    var defaults;
     var attrs = attributes || {};
     options || (options = {});
     this.cid = _.uniqueId('c');
     this.attributes = {};
-    _.extend(this, _.pick(options, modelOptions));
+    if (options.collection) this.collection = options.collection;
     if (options.parse) attrs = this.parse(attrs, options) || {};
-    if (defaults = _.result(this, 'defaults')) {
-      attrs = _.defaults({}, attrs, defaults);
-    }
+    attrs = _.defaults({}, attrs, _.result(this, 'defaults'));
     this.set(attrs, options);
     this.changed = {};
     this.initialize.apply(this, arguments);
   };
-
-  // A list of options to be attached directly to the model, if provided.
-  var modelOptions = ['url', 'urlRoot', 'collection'];
 
   // Attach all inheritable methods to the Model prototype.
   _.extend(Model.prototype, Events, {
@@ -1688,13 +1733,16 @@
         (attrs = {})[key] = val;
       }
 
-      // If we're not waiting and attributes exist, save acts as `set(attr).save(null, opts)`.
-      if (attrs && (!options || !options.wait) && !this.set(attrs, options)) return false;
-
       options = _.extend({validate: true}, options);
 
-      // Do not persist invalid models.
-      if (!this._validate(attrs, options)) return false;
+      // If we're not waiting and attributes exist, save acts as
+      // `set(attr).save(null, opts)` with validation. Otherwise, check if
+      // the model will be valid when the attributes, if any, are set.
+      if (attrs && !options.wait) {
+        if (!this.set(attrs, options)) return false;
+      } else {
+        if (!this._validate(attrs, options)) return false;
+      }
 
       // Set temporary attributes if `{wait: true}`.
       if (attrs && options.wait) {
@@ -1795,7 +1843,7 @@
       attrs = _.extend({}, this.attributes, attrs);
       var error = this.validationError = this.validate(attrs, options) || null;
       if (!error) return true;
-      this.trigger('invalid', this, error, _.extend(options || {}, {validationError: error}));
+      this.trigger('invalid', this, error, _.extend(options, {validationError: error}));
       return false;
     }
 
@@ -1828,7 +1876,6 @@
   // its models in sort order, as they're added and removed.
   var Collection = Backbone.Collection = function(models, options) {
     options || (options = {});
-    if (options.url) this.url = options.url;
     if (options.model) this.model = options.model;
     if (options.comparator !== void 0) this.comparator = options.comparator;
     this._reset();
@@ -1838,7 +1885,7 @@
 
   // Default options for `Collection#set`.
   var setOptions = {add: true, remove: true, merge: true};
-  var addOptions = {add: true, merge: false, remove: false};
+  var addOptions = {add: true, remove: false};
 
   // Define the Collection's inheritable methods.
   _.extend(Collection.prototype, Events, {
@@ -1864,16 +1911,17 @@
 
     // Add a model, or list of models to the set.
     add: function(models, options) {
-      return this.set(models, _.defaults(options || {}, addOptions));
+      return this.set(models, _.extend({merge: false}, options, addOptions));
     },
 
     // Remove a model, or a list of models from the set.
     remove: function(models, options) {
-      models = _.isArray(models) ? models.slice() : [models];
+      var singular = !_.isArray(models);
+      models = singular ? [models] : _.clone(models);
       options || (options = {});
       var i, l, index, model;
       for (i = 0, l = models.length; i < l; i++) {
-        model = this.get(models[i]);
+        model = models[i] = this.get(models[i]);
         if (!model) continue;
         delete this._byId[model.id];
         delete this._byId[model.cid];
@@ -1886,7 +1934,7 @@
         }
         this._removeReference(model);
       }
-      return this;
+      return singular ? models[0] : models;
     },
 
     // Update a collection by `set`-ing a new list of models, adding new ones,
@@ -1894,31 +1942,45 @@
     // already exist in the collection, as necessary. Similar to **Model#set**,
     // the core operation for updating the data contained by the collection.
     set: function(models, options) {
-      options = _.defaults(options || {}, setOptions);
+      options = _.defaults({}, options, setOptions);
       if (options.parse) models = this.parse(models, options);
-      if (!_.isArray(models)) models = models ? [models] : [];
-      var i, l, model, attrs, existing, sort;
+      var singular = !_.isArray(models);
+      models = singular ? (models ? [models] : []) : _.clone(models);
+      var i, l, id, model, attrs, existing, sort;
       var at = options.at;
+      var targetModel = this.model;
       var sortable = this.comparator && (at == null) && options.sort !== false;
       var sortAttr = _.isString(this.comparator) ? this.comparator : null;
       var toAdd = [], toRemove = [], modelMap = {};
+      var add = options.add, merge = options.merge, remove = options.remove;
+      var order = !sortable && add && remove ? [] : false;
 
       // Turn bare objects into model references, and prevent invalid models
       // from being added.
       for (i = 0, l = models.length; i < l; i++) {
-        if (!(model = this._prepareModel(models[i], options))) continue;
+        attrs = models[i];
+        if (attrs instanceof Model) {
+          id = model = attrs;
+        } else {
+          id = attrs[targetModel.prototype.idAttribute];
+        }
 
         // If a duplicate is found, prevent it from being added and
         // optionally merge it into the existing model.
-        if (existing = this.get(model)) {
-          if (options.remove) modelMap[existing.cid] = true;
-          if (options.merge) {
-            existing.set(model.attributes, options);
+        if (existing = this.get(id)) {
+          if (remove) modelMap[existing.cid] = true;
+          if (merge) {
+            attrs = attrs === model ? model.attributes : attrs;
+            if (options.parse) attrs = existing.parse(attrs, options);
+            existing.set(attrs, options);
             if (sortable && !sort && existing.hasChanged(sortAttr)) sort = true;
           }
+          models[i] = existing;
 
-        // This is a new model, push it to the `toAdd` list.
-        } else if (options.add) {
+        // If this is a new, valid model, push it to the `toAdd` list.
+        } else if (add) {
+          model = models[i] = this._prepareModel(attrs, options);
+          if (!model) continue;
           toAdd.push(model);
 
           // Listen to added models' events, and index models for lookup by
@@ -1927,10 +1989,11 @@
           this._byId[model.cid] = model;
           if (model.id != null) this._byId[model.id] = model;
         }
+        if (order) order.push(existing || model);
       }
 
       // Remove nonexistent models if appropriate.
-      if (options.remove) {
+      if (remove) {
         for (i = 0, l = this.length; i < l; ++i) {
           if (!modelMap[(model = this.models[i]).cid]) toRemove.push(model);
         }
@@ -1938,29 +2001,35 @@
       }
 
       // See if sorting is needed, update `length` and splice in new models.
-      if (toAdd.length) {
+      if (toAdd.length || (order && order.length)) {
         if (sortable) sort = true;
         this.length += toAdd.length;
         if (at != null) {
-          splice.apply(this.models, [at, 0].concat(toAdd));
+          for (i = 0, l = toAdd.length; i < l; i++) {
+            this.models.splice(at + i, 0, toAdd[i]);
+          }
         } else {
-          push.apply(this.models, toAdd);
+          if (order) this.models.length = 0;
+          var orderedModels = order || toAdd;
+          for (i = 0, l = orderedModels.length; i < l; i++) {
+            this.models.push(orderedModels[i]);
+          }
         }
       }
 
       // Silently sort the collection if appropriate.
       if (sort) this.sort({silent: true});
 
-      if (options.silent) return this;
-
-      // Trigger `add` events.
-      for (i = 0, l = toAdd.length; i < l; i++) {
-        (model = toAdd[i]).trigger('add', model, this, options);
+      // Unless silenced, it's time to fire all appropriate add/sort events.
+      if (!options.silent) {
+        for (i = 0, l = toAdd.length; i < l; i++) {
+          (model = toAdd[i]).trigger('add', model, this, options);
+        }
+        if (sort || (order && order.length)) this.trigger('sort', this, options);
       }
-
-      // Trigger `sort` if the collection was sorted.
-      if (sort) this.trigger('sort', this, options);
-      return this;
+      
+      // Return the added (or merged) model (or models).
+      return singular ? models[0] : models;
     },
 
     // When you have more items than you want to add or remove individually,
@@ -1974,16 +2043,14 @@
       }
       options.previousModels = this.models;
       this._reset();
-      this.add(models, _.extend({silent: true}, options));
+      models = this.add(models, _.extend({silent: true}, options));
       if (!options.silent) this.trigger('reset', this, options);
-      return this;
+      return models;
     },
 
     // Add a model to the end of the collection.
     push: function(model, options) {
-      model = this._prepareModel(model, options);
-      this.add(model, _.extend({at: this.length}, options));
-      return model;
+      return this.add(model, _.extend({at: this.length}, options));
     },
 
     // Remove a model from the end of the collection.
@@ -1995,9 +2062,7 @@
 
     // Add a model to the beginning of the collection.
     unshift: function(model, options) {
-      model = this._prepareModel(model, options);
-      this.add(model, _.extend({at: 0}, options));
-      return model;
+      return this.add(model, _.extend({at: 0}, options));
     },
 
     // Remove a model from the beginning of the collection.
@@ -2008,14 +2073,14 @@
     },
 
     // Slice out a sub-array of models from the collection.
-    slice: function(begin, end) {
-      return this.models.slice(begin, end);
+    slice: function() {
+      return slice.apply(this.models, arguments);
     },
 
     // Get a model from the set by id.
     get: function(obj) {
       if (obj == null) return void 0;
-      return this._byId[obj.id != null ? obj.id : obj.cid || obj];
+      return this._byId[obj.id] || this._byId[obj.cid] || this._byId[obj];
     },
 
     // Get the model at the given index.
@@ -2059,16 +2124,6 @@
       return this;
     },
 
-    // Figure out the smallest index at which a model should be inserted so as
-    // to maintain order.
-    sortedIndex: function(model, value, context) {
-      value || (value = this.comparator);
-      var iterator = _.isFunction(value) ? value : function(model) {
-        return model.get(value);
-      };
-      return _.sortedIndex(this.models, model, iterator, context);
-    },
-
     // Pluck an attribute from each model in the collection.
     pluck: function(attr) {
       return _.invoke(this.models, 'get', attr);
@@ -2101,7 +2156,7 @@
       if (!options.wait) this.add(model, options);
       var collection = this;
       var success = options.success;
-      options.success = function(resp) {
+      options.success = function(model, resp, options) {
         if (options.wait) collection.add(model, options);
         if (success) success(model, resp, options);
       };
@@ -2135,14 +2190,12 @@
         if (!attrs.collection) attrs.collection = this;
         return attrs;
       }
-      options || (options = {});
+      options = options ? _.clone(options) : {};
       options.collection = this;
       var model = new this.model(attrs, options);
-      if (!model._validate(attrs, options)) {
-        this.trigger('invalid', this, attrs, options);
-        return false;
-      }
-      return model;
+      if (!model.validationError) return model;
+      this.trigger('invalid', this, model.validationError, options);
+      return false;
     },
 
     // Internal method to sever a model's ties to a collection.
@@ -2174,8 +2227,8 @@
     'inject', 'reduceRight', 'foldr', 'find', 'detect', 'filter', 'select',
     'reject', 'every', 'all', 'some', 'any', 'include', 'contains', 'invoke',
     'max', 'min', 'toArray', 'size', 'first', 'head', 'take', 'initial', 'rest',
-    'tail', 'drop', 'last', 'without', 'indexOf', 'shuffle', 'lastIndexOf',
-    'isEmpty', 'chain'];
+    'tail', 'drop', 'last', 'without', 'difference', 'indexOf', 'shuffle',
+    'lastIndexOf', 'isEmpty', 'chain'];
 
   // Mix in each Underscore method as a proxy to `Collection#models`.
   _.each(methods, function(method) {
@@ -2214,7 +2267,8 @@
   // if an existing element is not provided...
   var View = Backbone.View = function(options) {
     this.cid = _.uniqueId('view');
-    this._configure(options || {});
+    options || (options = {});
+    _.extend(this, _.pick(options, viewOptions));
     this._ensureElement();
     this.initialize.apply(this, arguments);
     this.delegateEvents();
@@ -2233,7 +2287,7 @@
     tagName: 'div',
 
     // jQuery delegate for element lookup, scoped to DOM elements within the
-    // current view. This should be prefered to global lookups where possible.
+    // current view. This should be preferred to global lookups where possible.
     $: function(selector) {
       return this.$el.find(selector);
     },
@@ -2273,7 +2327,7 @@
     //
     //     {
     //       'mousedown .title':  'edit',
-    //       'click .button':     'save'
+    //       'click .button':     'save',
     //       'click .open':       function(e) { ... }
     //     }
     //
@@ -2309,16 +2363,6 @@
     undelegateEvents: function() {
       this.$el.off('.delegateEvents' + this.cid);
       return this;
-    },
-
-    // Performs the initial configuration of a View with a set of options.
-    // Keys with special meaning *(e.g. model, collection, id, className)* are
-    // attached directly to the view.  See `viewOptions` for an exhaustive
-    // list.
-    _configure: function(options) {
-      if (this.options) options = _.extend({}, _.result(this, 'options'), options);
-      _.extend(this, _.pick(options, viewOptions));
-      this.options = options;
     },
 
     // Ensure that the View has a DOM element to render into.
@@ -2406,8 +2450,7 @@
     // If we're sending a `PATCH` request, and we're in an old Internet Explorer
     // that still has ActiveX enabled by default, override jQuery to use that
     // for XHR instead. Remove this line when jQuery supports `PATCH` on IE8.
-    if (params.type === 'PATCH' && window.ActiveXObject &&
-          !(window.external && window.external.msActiveXFilteringEnabled)) {
+    if (params.type === 'PATCH' && noXhrPatch) {
       params.xhr = function() {
         return new ActiveXObject("Microsoft.XMLHTTP");
       };
@@ -2418,6 +2461,8 @@
     model.trigger('request', model, xhr, options);
     return xhr;
   };
+
+  var noXhrPatch = typeof window !== 'undefined' && !!window.ActiveXObject && !(window.XMLHttpRequest && (new XMLHttpRequest).dispatchEvent);
 
   // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
   var methodMap = {
@@ -2507,7 +2552,7 @@
     _routeToRegExp: function(route) {
       route = route.replace(escapeRegExp, '\\$&')
                    .replace(optionalParam, '(?:$1)?')
-                   .replace(namedParam, function(match, optional){
+                   .replace(namedParam, function(match, optional) {
                      return optional ? match : '([^\/]+)';
                    })
                    .replace(splatParam, '(.*?)');
@@ -2557,6 +2602,9 @@
   // Cached regex for removing a trailing slash.
   var trailingSlash = /\/$/;
 
+  // Cached regex for stripping urls of hash and query.
+  var pathStripper = /[?#].*$/;
+
   // Has the history handling already been started?
   History.started = false;
 
@@ -2581,7 +2629,7 @@
         if (this._hasPushState || !this._wantsHashChange || forcePushState) {
           fragment = this.location.pathname;
           var root = this.root.replace(trailingSlash, '');
-          if (!fragment.indexOf(root)) fragment = fragment.substr(root.length);
+          if (!fragment.indexOf(root)) fragment = fragment.slice(root.length);
         } else {
           fragment = this.getHash();
         }
@@ -2597,7 +2645,7 @@
 
       // Figure out the initial configuration. Do we need an iframe?
       // Is pushState desired ... is it available?
-      this.options          = _.extend({}, {root: '/'}, this.options, options);
+      this.options          = _.extend({root: '/'}, this.options, options);
       this.root             = this.options.root;
       this._wantsHashChange = this.options.hashChange !== false;
       this._wantsPushState  = !!this.options.pushState;
@@ -2630,19 +2678,25 @@
       var loc = this.location;
       var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
 
-      // If we've started off with a route from a `pushState`-enabled browser,
-      // but we're currently in a browser that doesn't support it...
-      if (this._wantsHashChange && this._wantsPushState && !this._hasPushState && !atRoot) {
-        this.fragment = this.getFragment(null, true);
-        this.location.replace(this.root + this.location.search + '#' + this.fragment);
-        // Return immediately as browser will do redirect to new url
-        return true;
+      // Transition from hashChange to pushState or vice versa if both are
+      // requested.
+      if (this._wantsHashChange && this._wantsPushState) {
 
-      // Or if we've started out with a hash-based route, but we're currently
-      // in a browser where it could be `pushState`-based instead...
-      } else if (this._wantsPushState && this._hasPushState && atRoot && loc.hash) {
-        this.fragment = this.getHash().replace(routeStripper, '');
-        this.history.replaceState({}, document.title, this.root + this.fragment + loc.search);
+        // If we've started off with a route from a `pushState`-enabled
+        // browser, but we're currently in a browser that doesn't support it...
+        if (!this._hasPushState && !atRoot) {
+          this.fragment = this.getFragment(null, true);
+          this.location.replace(this.root + this.location.search + '#' + this.fragment);
+          // Return immediately as browser will do redirect to new url
+          return true;
+
+        // Or if we've started out with a hash-based route, but we're currently
+        // in a browser where it could be `pushState`-based instead...
+        } else if (this._hasPushState && atRoot && loc.hash) {
+          this.fragment = this.getHash().replace(routeStripper, '');
+          this.history.replaceState({}, document.title, this.root + this.fragment + loc.search);
+        }
+
       }
 
       if (!this.options.silent) return this.loadUrl();
@@ -2671,21 +2725,20 @@
       }
       if (current === this.fragment) return false;
       if (this.iframe) this.navigate(current);
-      this.loadUrl() || this.loadUrl(this.getHash());
+      this.loadUrl();
     },
 
     // Attempt to load the current URL fragment. If a route succeeds with a
     // match, returns `true`. If no defined routes matches the fragment,
     // returns `false`.
-    loadUrl: function(fragmentOverride) {
-      var fragment = this.fragment = this.getFragment(fragmentOverride);
-      var matched = _.any(this.handlers, function(handler) {
+    loadUrl: function(fragment) {
+      fragment = this.fragment = this.getFragment(fragment);
+      return _.any(this.handlers, function(handler) {
         if (handler.route.test(fragment)) {
           handler.callback(fragment);
           return true;
         }
       });
-      return matched;
     },
 
     // Save a fragment into the hash history, or replace the URL state if the
@@ -2697,11 +2750,18 @@
     // you wish to modify the current URL without adding an entry to the history.
     navigate: function(fragment, options) {
       if (!History.started) return false;
-      if (!options || options === true) options = {trigger: options};
-      fragment = this.getFragment(fragment || '');
+      if (!options || options === true) options = {trigger: !!options};
+
+      var url = this.root + (fragment = this.getFragment(fragment || ''));
+
+      // Strip the fragment of the query and hash for matching.
+      fragment = fragment.replace(pathStripper, '');
+
       if (this.fragment === fragment) return;
       this.fragment = fragment;
-      var url = this.root + fragment;
+
+      // Don't include a trailing slash on the root.
+      if (fragment === '' && url !== '/') url = url.slice(0, -1);
 
       // If pushState is available, we use it to set the fragment as a real URL.
       if (this._hasPushState) {
@@ -2724,7 +2784,7 @@
       } else {
         return this.location.assign(url);
       }
-      if (options.trigger) this.loadUrl(fragment);
+      if (options.trigger) return this.loadUrl(fragment);
     },
 
     // Update the hash location, either replacing the current entry, or adding
@@ -2792,7 +2852,7 @@
   };
 
   // Wrap an optional error callback with a fallback error event.
-  var wrapError = function (model, options) {
+  var wrapError = function(model, options) {
     var error = options.error;
     options.error = function(resp) {
       if (error) error(model, resp, options);
@@ -2801,7 +2861,7 @@
   };
 
 }).call(this);
-// Knockout JavaScript library v2.2.1
+// Knockout JavaScript library v3.0.0
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
@@ -2815,7 +2875,7 @@ var DEBUG=true;
         navigator = window['navigator'],
         jQuery = window["jQuery"],
         JSON = window["JSON"];
-!function(factory) {
+(function(factory) {
     // Support three module loading scenarios
     if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
         // [1] CommonJS/Node.js
@@ -2847,12 +2907,10 @@ ko.exportSymbol = function(koPath, object) {
 ko.exportProperty = function(owner, publicName, object) {
   owner[publicName] = object;
 };
-ko.version = "2.2.1";
+ko.version = "3.0.0";
 
 ko.exportSymbol('version', ko.version);
 ko.utils = (function () {
-    var stringTrimRegex = /^(\s|\u00A0)+|(\s|\u00A0)+$/g;
-
     var objectForEach = function(obj, action) {
         for (var prop in obj) {
             if (obj.hasOwnProperty(prop)) {
@@ -2885,7 +2943,7 @@ ko.utils = (function () {
         while (
             div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
             iElems[0]
-        );
+        ) {}
         return version > 4 ? version : undefined;
     }());
     var isIe6 = ieVersion === 6,
@@ -2965,7 +3023,7 @@ ko.utils = (function () {
         },
 
         addOrRemoveItem: function(array, value, included) {
-            var existingEntryIndex = array.indexOf ? array.indexOf(value) : utils.arrayIndexOf(array, value);
+            var existingEntryIndex = ko.utils.arrayIndexOf(ko.utils.peekObservable(array), value);
             if (existingEntryIndex < 0) {
                 if (included)
                     array.push(value);
@@ -2987,6 +3045,18 @@ ko.utils = (function () {
         },
 
         objectForEach: objectForEach,
+
+        objectMap: function(source, mapping) {
+            if (!source)
+                return source;
+            var target = {};
+            for (var prop in source) {
+                if (source.hasOwnProperty(prop)) {
+                    target[prop] = mapping(source[prop], prop, source);
+                }
+            }
+            return target;
+        },
 
         emptyDomNode: function (domNode) {
             while (domNode.firstChild) {
@@ -3035,6 +3105,45 @@ ko.utils = (function () {
             }
         },
 
+        fixUpContinuousNodeArray: function(continuousNodeArray, parentNode) {
+            // Before acting on a set of nodes that were previously outputted by a template function, we have to reconcile
+            // them against what is in the DOM right now. It may be that some of the nodes have already been removed, or that
+            // new nodes might have been inserted in the middle, for example by a binding. Also, there may previously have been
+            // leading comment nodes (created by rewritten string-based templates) that have since been removed during binding.
+            // So, this function translates the old "map" output array into its best guess of the set of current DOM nodes.
+            //
+            // Rules:
+            //   [A] Any leading nodes that have been removed should be ignored
+            //       These most likely correspond to memoization nodes that were already removed during binding
+            //       See https://github.com/SteveSanderson/knockout/pull/440
+            //   [B] We want to output a continuous series of nodes. So, ignore any nodes that have already been removed,
+            //       and include any nodes that have been inserted among the previous collection
+
+            if (continuousNodeArray.length) {
+                // The parent node can be a virtual element; so get the real parent node
+                parentNode = (parentNode.nodeType === 8 && parentNode.parentNode) || parentNode;
+
+                // Rule [A]
+                while (continuousNodeArray.length && continuousNodeArray[0].parentNode !== parentNode)
+                    continuousNodeArray.splice(0, 1);
+
+                // Rule [B]
+                if (continuousNodeArray.length > 1) {
+                    var current = continuousNodeArray[0], last = continuousNodeArray[continuousNodeArray.length - 1];
+                    // Replace with the actual new continuous node set
+                    continuousNodeArray.length = 0;
+                    while (current !== last) {
+                        continuousNodeArray.push(current);
+                        current = current.nextSibling;
+                        if (!current) // Won't happen, except if the developer has manually removed some DOM elements (then we're in an undefined scenario)
+                            return;
+                    }
+                    continuousNodeArray.push(last);
+                }
+            }
+            return continuousNodeArray;
+        },
+
         setOptionNodeSelectionState: function (optionNode, isSelected) {
             // IE6 sometimes throws "unknown error" if you try to write to .selected directly, whereas Firefox struggles with setAttribute. Pick one based on browser.
             if (ieVersion < 7)
@@ -3044,7 +3153,10 @@ ko.utils = (function () {
         },
 
         stringTrim: function (string) {
-            return (string || "").replace(stringTrimRegex, "");
+            return string === null || string === undefined ? '' :
+                string.trim ?
+                    string.trim() :
+                    string.toString().replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
         },
 
         stringTokenize: function (string, delimiter) {
@@ -3066,18 +3178,22 @@ ko.utils = (function () {
         },
 
         domNodeIsContainedBy: function (node, containedByNode) {
+            if (node === containedByNode)
+                return true;
+            if (node.nodeType === 11)
+                return false; // Fixes issue #1162 - can't use node.contains for document fragments on IE8
+            if (containedByNode.contains)
+                return containedByNode.contains(node.nodeType === 3 ? node.parentNode : node);
             if (containedByNode.compareDocumentPosition)
                 return (containedByNode.compareDocumentPosition(node) & 16) == 16;
-            while (node != null) {
-                if (node == containedByNode)
-                    return true;
+            while (node && node != containedByNode) {
                 node = node.parentNode;
             }
-            return false;
+            return !!node;
         },
 
         domNodeIsAttachedToDocument: function (node) {
-            return ko.utils.domNodeIsContainedBy(node, node.ownerDocument);
+            return ko.utils.domNodeIsContainedBy(node, node.ownerDocument.documentElement);
         },
 
         anyDomNodeIsAttachedToDocument: function(nodes) {
@@ -3111,11 +3227,17 @@ ko.utils = (function () {
                 jQuery(element)['bind'](eventType, handler);
             } else if (!mustUseAttachEvent && typeof element.addEventListener == "function")
                 element.addEventListener(eventType, handler, false);
-            else if (typeof element.attachEvent != "undefined")
-                element.attachEvent("on" + eventType, function (event) {
-                    handler.call(element, event);
+            else if (typeof element.attachEvent != "undefined") {
+                var attachEventHandler = function (event) { handler.call(element, event); },
+                    attachEventName = "on" + eventType;
+                element.attachEvent(attachEventName, attachEventHandler);
+
+                // IE does not dispose attachEvent handlers automatically (unlike with addEventListener)
+                // so to avoid leaks, we have to remove them manually. See bug #856
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                    element.detachEvent(attachEventName, attachEventHandler);
                 });
-            else
+            } else
                 throw new Error("Browser doesn't support addEventListener or attachEvent");
         },
 
@@ -3174,21 +3296,17 @@ ko.utils = (function () {
             if ((value === null) || (value === undefined))
                 value = "";
 
-            if (element.nodeType === 3) {
-                element.data = value;
+            // We need there to be exactly one child: a text node.
+            // If there are no children, more than one, or if it's not a text node,
+            // we'll clear everything and create a single text node.
+            var innerTextNode = ko.virtualElements.firstChild(element);
+            if (!innerTextNode || innerTextNode.nodeType != 3 || ko.virtualElements.nextSibling(innerTextNode)) {
+                ko.virtualElements.setDomNodeChildren(element, [document.createTextNode(value)]);
             } else {
-                // We need there to be exactly one child: a text node.
-                // If there are no children, more than one, or if it's not a text node,
-                // we'll clear everything and create a single text node.
-                var innerTextNode = ko.virtualElements.firstChild(element);
-                if (!innerTextNode || innerTextNode.nodeType != 3 || ko.virtualElements.nextSibling(innerTextNode)) {
-                    ko.virtualElements.setDomNodeChildren(element, [document.createTextNode(value)]);
-                } else {
-                    innerTextNode.data = value;
-                }
-
-                ko.utils.forceRefresh(element);
+                innerTextNode.data = value;
             }
+
+            ko.utils.forceRefresh(element);
         },
 
         setElementName: function(element, name) {
@@ -3218,7 +3336,8 @@ ko.utils = (function () {
         ensureSelectElementIsRenderedCorrectly: function(selectElement) {
             // Workaround for IE9 rendering bug - it doesn't reliably display all the text in dynamically-added select boxes unless you force it to re-render by updating the width.
             // (See https://github.com/SteveSanderson/knockout/issues/312, http://stackoverflow.com/questions/5908494/select-only-shows-first-char-of-selected-option)
-            if (ieVersion >= 9) {
+            // Also fixes IE7 and IE8 bug that causes selects to be zero width if enclosed by 'if' or 'with'. (See issue #839)
+            if (ieVersion) {
                 var originalWidth = selectElement.style.width;
                 selectElement.style.width = 0;
                 selectElement.style.width = originalWidth;
@@ -3340,6 +3459,9 @@ ko.exportSymbol('utils.range', ko.utils.range);
 ko.exportSymbol('utils.toggleDomNodeCssClass', ko.utils.toggleDomNodeCssClass);
 ko.exportSymbol('utils.triggerEvent', ko.utils.triggerEvent);
 ko.exportSymbol('utils.unwrapObservable', ko.utils.unwrapObservable);
+ko.exportSymbol('utils.objectForEach', ko.utils.objectForEach);
+ko.exportSymbol('utils.addOrRemoveItem', ko.utils.addOrRemoveItem);
+ko.exportSymbol('unwrap', ko.utils.unwrapObservable); // Convenient shorthand, because this is used so commonly
 
 if (!Function.prototype['bind']) {
     // Function.prototype.bind is a standard part of ECMAScript 5th Edition (December 2009, http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf)
@@ -3356,30 +3478,32 @@ ko.utils.domData = new (function () {
     var uniqueId = 0;
     var dataStoreKeyExpandoPropertyName = "__ko__" + (new Date).getTime();
     var dataStore = {};
+
+    function getAll(node, createIfNotFound) {
+        var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
+        var hasExistingDataStore = dataStoreKey && (dataStoreKey !== "null") && dataStore[dataStoreKey];
+        if (!hasExistingDataStore) {
+            if (!createIfNotFound)
+                return undefined;
+            dataStoreKey = node[dataStoreKeyExpandoPropertyName] = "ko" + uniqueId++;
+            dataStore[dataStoreKey] = {};
+        }
+        return dataStore[dataStoreKey];
+    }
+
     return {
         get: function (node, key) {
-            var allDataForNode = ko.utils.domData.getAll(node, false);
+            var allDataForNode = getAll(node, false);
             return allDataForNode === undefined ? undefined : allDataForNode[key];
         },
         set: function (node, key, value) {
             if (value === undefined) {
                 // Make sure we don't actually create a new domData key if we are actually deleting a value
-                if (ko.utils.domData.getAll(node, false) === undefined)
+                if (getAll(node, false) === undefined)
                     return;
             }
-            var allDataForNode = ko.utils.domData.getAll(node, true);
+            var allDataForNode = getAll(node, true);
             allDataForNode[key] = value;
-        },
-        getAll: function (node, createIfNotFound) {
-            var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
-            var hasExistingDataStore = dataStoreKey && (dataStoreKey !== "null") && dataStore[dataStoreKey];
-            if (!hasExistingDataStore) {
-                if (!createIfNotFound)
-                    return undefined;
-                dataStoreKey = node[dataStoreKeyExpandoPropertyName] = "ko" + uniqueId++;
-                dataStore[dataStoreKey] = {};
-            }
-            return dataStore[dataStoreKey];
         },
         clear: function (node) {
             var dataStoreKey = node[dataStoreKeyExpandoPropertyName];
@@ -3389,15 +3513,19 @@ ko.utils.domData = new (function () {
                 return true; // Exposing "did clean" flag purely so specs can infer whether things have been cleaned up as intended
             }
             return false;
+        },
+
+        nextKey: function () {
+            return (uniqueId++) + dataStoreKeyExpandoPropertyName;
         }
-    }
+    };
 })();
 
 ko.exportSymbol('utils.domData', ko.utils.domData);
 ko.exportSymbol('utils.domData.clear', ko.utils.domData.clear); // Exporting only so specs can clear up after themselves fully
 
 ko.utils.domNodeDisposal = new (function () {
-    var domDataKey = "__ko_domNodeDisposal__" + (new Date).getTime();
+    var domDataKey = ko.utils.domData.nextKey();
     var cleanableNodeTypes = { 1: true, 8: true, 9: true };       // Element, Comment, Document
     var cleanableNodeTypesWithDescendants = { 1: true, 9: true }; // Element, Document
 
@@ -3680,12 +3808,17 @@ ko.extenders = {
     },
 
     'notify': function(target, notifyWhen) {
-        target["equalityComparer"] = notifyWhen == "always"
-            ? function() { return false } // Treat all values as not equal
-            : ko.observable["fn"]["equalityComparer"];
-        return target;
+        target["equalityComparer"] = notifyWhen == "always" ?
+            null :  // null equalityComparer means to always notify
+            valuesArePrimitiveAndEqual;
     }
 };
+
+var primitiveTypes = { 'undefined':1, 'boolean':1, 'number':1, 'string':1 };
+function valuesArePrimitiveAndEqual(a, b) {
+    var oldValueIsPrimitive = (a === null) || (typeof(a) in primitiveTypes);
+    return oldValueIsPrimitive ? (a === b) : false;
+}
 
 function applyExtenders(requestedExtenders) {
     var target = this;
@@ -3693,7 +3826,7 @@ function applyExtenders(requestedExtenders) {
         ko.utils.objectForEach(requestedExtenders, function(key, value) {
             var extenderHandler = ko.extenders[key];
             if (typeof extenderHandler == 'function') {
-                target = extenderHandler(target, value);
+                target = extenderHandler(target, value) || target;
             }
         });
     }
@@ -3741,16 +3874,23 @@ ko.subscribable['fn'] = {
 
     "notifySubscribers": function (valueToNotify, event) {
         event = event || defaultEvent;
-        if (this._subscriptions[event]) {
-            ko.dependencyDetection.ignore(function() {
-                ko.utils.arrayForEach(this._subscriptions[event].slice(0), function (subscription) {
+        if (this.hasSubscriptionsForEvent(event)) {
+            try {
+                ko.dependencyDetection.begin();
+                for (var a = this._subscriptions[event].slice(0), i = 0, subscription; subscription = a[i]; ++i) {
                     // In case a subscription was disposed during the arrayForEach cycle, check
                     // for isDisposed on each subscription before invoking its callback
                     if (subscription && (subscription.isDisposed !== true))
                         subscription.callback(valueToNotify);
-                });
-            }, this);
+                }
+            } finally {
+                ko.dependencyDetection.end();
+            }
         }
+    },
+
+    hasSubscriptionsForEvent: function(event) {
+        return this._subscriptions[event] && this._subscriptions[event].length;
     },
 
     getSubscriptionsCount: function () {
@@ -3766,7 +3906,7 @@ ko.subscribable['fn'] = {
 
 
 ko.isSubscribable = function (instance) {
-    return typeof instance.subscribe == "function" && typeof instance["notifySubscribers"] == "function";
+    return instance != null && typeof instance.subscribe == "function" && typeof instance["notifySubscribers"] == "function";
 };
 
 ko.exportSymbol('subscribable', ko.subscribable);
@@ -3777,7 +3917,7 @@ ko.dependencyDetection = (function () {
 
     return {
         begin: function (callback) {
-            _frames.push({ callback: callback, distinctDependencies:[] });
+            _frames.push(callback && { callback: callback, distinctDependencies:[] });
         },
 
         end: function () {
@@ -3806,8 +3946,6 @@ ko.dependencyDetection = (function () {
         }
     };
 })();
-var primitiveTypes = { 'undefined':true, 'boolean':true, 'number':true, 'string':true };
-
 ko.observable = function (initialValue) {
     var _latestValue = initialValue;
 
@@ -3816,7 +3954,7 @@ ko.observable = function (initialValue) {
             // Write
 
             // Ignore writes if the value hasn't changed
-            if ((!observable['equalityComparer']) || !observable['equalityComparer'](_latestValue, arguments[0])) {
+            if (!observable['equalityComparer'] || !observable['equalityComparer'](_latestValue, arguments[0])) {
                 observable.valueWillMutate();
                 _latestValue = arguments[0];
                 if (DEBUG) observable._latestValue = _latestValue;
@@ -3845,10 +3983,7 @@ ko.observable = function (initialValue) {
 }
 
 ko.observable['fn'] = {
-    "equalityComparer": function valuesArePrimitiveAndEqual(a, b) {
-        var oldValueIsPrimitive = (a === null) || (typeof(a) in primitiveTypes);
-        return oldValueIsPrimitive ? (a === b) : false;
-    }
+    "equalityComparer": valuesArePrimitiveAndEqual
 };
 
 var protoProperty = ko.observable.protoProperty = "__ko_proto__";
@@ -3879,23 +4014,21 @@ ko.exportSymbol('observable', ko.observable);
 ko.exportSymbol('isObservable', ko.isObservable);
 ko.exportSymbol('isWriteableObservable', ko.isWriteableObservable);
 ko.observableArray = function (initialValues) {
-    if (arguments.length == 0) {
-        // Zero-parameter constructor initializes to empty array
-        initialValues = [];
-    }
-    if ((initialValues !== null) && (initialValues !== undefined) && !('length' in initialValues))
+    initialValues = initialValues || [];
+
+    if (typeof initialValues != 'object' || !('length' in initialValues))
         throw new Error("The argument passed when initializing an observable array must be an array, or null, or undefined.");
 
     var result = ko.observable(initialValues);
     ko.utils.extend(result, ko.observableArray['fn']);
-    return result;
-}
+    return result.extend({'trackArrayChanges':true});
+};
 
 ko.observableArray['fn'] = {
     'remove': function (valueOrPredicate) {
         var underlyingArray = this.peek();
         var removedValues = [];
-        var predicate = typeof valueOrPredicate == "function" ? valueOrPredicate : function (value) { return value === valueOrPredicate; };
+        var predicate = typeof valueOrPredicate == "function" && !ko.isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate; };
         for (var i = 0; i < underlyingArray.length; i++) {
             var value = underlyingArray[i];
             if (predicate(value)) {
@@ -3933,7 +4066,7 @@ ko.observableArray['fn'] = {
 
     'destroy': function (valueOrPredicate) {
         var underlyingArray = this.peek();
-        var predicate = typeof valueOrPredicate == "function" ? valueOrPredicate : function (value) { return value === valueOrPredicate; };
+        var predicate = typeof valueOrPredicate == "function" && !ko.isObservable(valueOrPredicate) ? valueOrPredicate : function (value) { return value === valueOrPredicate; };
         this.valueWillMutate();
         for (var i = underlyingArray.length - 1; i >= 0; i--) {
             var value = underlyingArray[i];
@@ -3969,7 +4102,7 @@ ko.observableArray['fn'] = {
             this.valueHasMutated();
         }
     }
-}
+};
 
 // Populate ko.observableArray.fn with read/write functions from native arrays
 // Important: Do not add any additional functions here that may reasonably be used to *read* data from the array
@@ -3980,6 +4113,7 @@ ko.utils.arrayForEach(["pop", "push", "reverse", "shift", "sort", "splice", "uns
         // (for consistency with mutating regular observables)
         var underlyingArray = this.peek();
         this.valueWillMutate();
+        this.cacheDiffForKnownOperation(underlyingArray, methodName, arguments);
         var methodCallResult = underlyingArray[methodName].apply(underlyingArray, arguments);
         this.valueHasMutated();
         return methodCallResult;
@@ -3995,10 +4129,134 @@ ko.utils.arrayForEach(["slice"], function (methodName) {
 });
 
 ko.exportSymbol('observableArray', ko.observableArray);
+var arrayChangeEventName = 'arrayChange';
+ko.extenders['trackArrayChanges'] = function(target) {
+    // Only modify the target observable once
+    if (target.cacheDiffForKnownOperation) {
+        return;
+    }
+    var trackingChanges = false,
+        cachedDiff = null,
+        pendingNotifications = 0,
+        underlyingSubscribeFunction = target.subscribe;
+
+    // Intercept "subscribe" calls, and for array change events, ensure change tracking is enabled
+    target.subscribe = target['subscribe'] = function(callback, callbackTarget, event) {
+        if (event === arrayChangeEventName) {
+            trackChanges();
+        }
+        return underlyingSubscribeFunction.apply(this, arguments);
+    };
+
+    function trackChanges() {
+        // Calling 'trackChanges' multiple times is the same as calling it once
+        if (trackingChanges) {
+            return;
+        }
+
+        trackingChanges = true;
+
+        // Intercept "notifySubscribers" to track how many times it was called.
+        var underlyingNotifySubscribersFunction = target['notifySubscribers'];
+        target['notifySubscribers'] = function(valueToNotify, event) {
+            if (!event || event === defaultEvent) {
+                ++pendingNotifications;
+            }
+            return underlyingNotifySubscribersFunction.apply(this, arguments);
+        };
+
+        // Each time the array changes value, capture a clone so that on the next
+        // change it's possible to produce a diff
+        var previousContents = [].concat(target.peek() || []);
+        cachedDiff = null;
+        target.subscribe(function(currentContents) {
+            // Make a copy of the current contents and ensure it's an array
+            currentContents = [].concat(currentContents || []);
+
+            // Compute the diff and issue notifications, but only if someone is listening
+            if (target.hasSubscriptionsForEvent(arrayChangeEventName)) {
+                var changes = getChanges(previousContents, currentContents);
+                if (changes.length) {
+                    target['notifySubscribers'](changes, arrayChangeEventName);
+                }
+            }
+
+            // Eliminate references to the old, removed items, so they can be GCed
+            previousContents = currentContents;
+            cachedDiff = null;
+            pendingNotifications = 0;
+        });
+    }
+
+    function getChanges(previousContents, currentContents) {
+        // We try to re-use cached diffs.
+        // The only scenario where pendingNotifications > 1 is when using the KO 'deferred updates' plugin,
+        // which without this check would not be compatible with arrayChange notifications. Without that
+        // plugin, notifications are always issued immediately so we wouldn't be queueing up more than one.
+        if (!cachedDiff || pendingNotifications > 1) {
+            cachedDiff = ko.utils.compareArrays(previousContents, currentContents, { 'sparse': true });
+        }
+
+        return cachedDiff;
+    }
+
+    target.cacheDiffForKnownOperation = function(rawArray, operationName, args) {
+        // Only run if we're currently tracking changes for this observable array
+        // and there aren't any pending deferred notifications.
+        if (!trackingChanges || pendingNotifications) {
+            return;
+        }
+        var diff = [],
+            arrayLength = rawArray.length,
+            argsLength = args.length,
+            offset = 0;
+
+        function pushDiff(status, value, index) {
+            diff.push({ 'status': status, 'value': value, 'index': index });
+        }
+        switch (operationName) {
+            case 'push':
+                offset = arrayLength;
+            case 'unshift':
+                for (var index = 0; index < argsLength; index++) {
+                    pushDiff('added', args[index], offset + index);
+                }
+                break;
+
+            case 'pop':
+                offset = arrayLength - 1;
+            case 'shift':
+                if (arrayLength) {
+                    pushDiff('deleted', rawArray[offset], offset);
+                }
+                break;
+
+            case 'splice':
+                // Negative start index means 'from end of array'. After that we clamp to [0...arrayLength].
+                // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+                var startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
+                    endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
+                    endAddIndex = startIndex + argsLength - 2,
+                    endIndex = Math.max(endDeleteIndex, endAddIndex);
+                for (var index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
+                    if (index < endDeleteIndex)
+                        pushDiff('deleted', rawArray[index], index);
+                    if (index < endAddIndex)
+                        pushDiff('added', args[argsIndex], index);
+                }
+                break;
+
+            default:
+                return;
+        }
+        cachedDiff = diff;
+    };
+};
 ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
     var _latestValue,
         _hasBeenEvaluated = false,
         _isBeingEvaluated = false,
+        _suppressDisposalUntilDisposeWhenReturnsFalse = false,
         readFunction = evaluatorFunctionOrOptions;
 
     if (readFunction && typeof readFunction == "object") {
@@ -4043,12 +4301,16 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
             return;
         }
 
-        // Don't dispose on first evaluation, because the "disposeWhen" callback might
-        // e.g., dispose when the associated DOM element isn't in the doc, and it's not
-        // going to be in the doc until *after* the first evaluation
-        if (_hasBeenEvaluated && disposeWhen()) {
-            dispose();
-            return;
+        if (disposeWhen && disposeWhen()) {
+            // See comment below about _suppressDisposalUntilDisposeWhenReturnsFalse
+            if (!_suppressDisposalUntilDisposeWhenReturnsFalse) {
+                dispose();
+                _hasBeenEvaluated = true;
+                return;
+            }
+        } else {
+            // It just did return false, so we can stop suppressing now
+            _suppressDisposalUntilDisposeWhenReturnsFalse = false;
         }
 
         _isBeingEvaluated = true;
@@ -4065,7 +4327,7 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
                     addSubscriptionToDependency(subscribable); // Brand new subscription - add it
             });
 
-            var newValue = readFunction.call(evaluatorFunctionTarget);
+            var newValue = evaluatorFunctionTarget ? readFunction.call(evaluatorFunctionTarget) : readFunction();
 
             // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
             for (var i = disposalCandidates.length - 1; i >= 0; i--) {
@@ -4074,15 +4336,18 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
             }
             _hasBeenEvaluated = true;
 
-            dependentObservable["notifySubscribers"](_latestValue, "beforeChange");
-            _latestValue = newValue;
-            if (DEBUG) dependentObservable._latestValue = _latestValue;
+            if (!dependentObservable['equalityComparer'] || !dependentObservable['equalityComparer'](_latestValue, newValue)) {
+                dependentObservable["notifySubscribers"](_latestValue, "beforeChange");
+
+                _latestValue = newValue;
+                if (DEBUG) dependentObservable._latestValue = _latestValue;
+                dependentObservable["notifySubscribers"](_latestValue);
+            }
         } finally {
             ko.dependencyDetection.end();
+            _isBeingEvaluated = false;
         }
 
-        dependentObservable["notifySubscribers"](_latestValue);
-        _isBeingEvaluated = false;
         if (!_subscriptionsToDependencies.length)
             dispose();
     }
@@ -4118,7 +4383,8 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
     // By here, "options" is always non-null
     var writeFunction = options["write"],
         disposeWhenNodeIsRemoved = options["disposeWhenNodeIsRemoved"] || options.disposeWhenNodeIsRemoved || null,
-        disposeWhen = options["disposeWhen"] || options.disposeWhen || function() { return false; },
+        disposeWhenOption = options["disposeWhen"] || options.disposeWhen,
+        disposeWhen = disposeWhenOption,
         dispose = disposeAllSubscriptionsToDependencies,
         _subscriptionsToDependencies = [],
         evaluationTimeoutInstance = null;
@@ -4140,24 +4406,37 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
     ko.exportProperty(dependentObservable, 'isActive', dependentObservable.isActive);
     ko.exportProperty(dependentObservable, 'getDependenciesCount', dependentObservable.getDependenciesCount);
 
+    // Add a "disposeWhen" callback that, on each evaluation, disposes if the node was removed without using ko.removeNode.
+    if (disposeWhenNodeIsRemoved) {
+        // Since this computed is associated with a DOM node, and we don't want to dispose the computed
+        // until the DOM node is *removed* from the document (as opposed to never having been in the document),
+        // we'll prevent disposal until "disposeWhen" first returns false.
+        _suppressDisposalUntilDisposeWhenReturnsFalse = true;
+
+        // Only watch for the node's disposal if the value really is a node. It might not be,
+        // e.g., { disposeWhenNodeIsRemoved: true } can be used to opt into the "only dispose
+        // after first false result" behaviour even if there's no specific node to watch. This
+        // technique is intended for KO's internal use only and shouldn't be documented or used
+        // by application code, as it's likely to change in a future version of KO.
+        if (disposeWhenNodeIsRemoved.nodeType) {
+            disposeWhen = function () {
+                return !ko.utils.domNodeIsAttachedToDocument(disposeWhenNodeIsRemoved) || (disposeWhenOption && disposeWhenOption());
+            };
+        }
+    }
+
     // Evaluate, unless deferEvaluation is true
     if (options['deferEvaluation'] !== true)
         evaluateImmediate();
 
-    // Build "disposeWhenNodeIsRemoved" and "disposeWhenNodeIsRemovedCallback" option values.
-    // But skip if isActive is false (there will never be any dependencies to dispose).
-    // (Note: "disposeWhenNodeIsRemoved" option both proactively disposes as soon as the node is removed using ko.removeNode(),
-    // plus adds a "disposeWhen" callback that, on each evaluation, disposes if the node was removed by some other means.)
+    // Attach a DOM node disposal callback so that the computed will be proactively disposed as soon as the node is
+    // removed using ko.removeNode. But skip if isActive is false (there will never be any dependencies to dispose).
     if (disposeWhenNodeIsRemoved && isActive()) {
         dispose = function() {
             ko.utils.domNodeDisposal.removeDisposeCallback(disposeWhenNodeIsRemoved, dispose);
             disposeAllSubscriptionsToDependencies();
         };
         ko.utils.domNodeDisposal.addDisposeCallback(disposeWhenNodeIsRemoved, dispose);
-        var existingDisposeWhenFunction = disposeWhen;
-        disposeWhen = function () {
-            return !ko.utils.domNodeIsAttachedToDocument(disposeWhenNodeIsRemoved) || existingDisposeWhenFunction();
-        }
     }
 
     return dependentObservable;
@@ -4170,7 +4449,9 @@ ko.isComputed = function(instance) {
 var protoProp = ko.observable.protoProperty; // == "__ko_proto__"
 ko.dependentObservable[protoProp] = ko.observable;
 
-ko.dependentObservable['fn'] = {};
+ko.dependentObservable['fn'] = {
+    "equalityComparer": valuesArePrimitiveAndEqual
+};
 ko.dependentObservable['fn'][protoProp] = ko.dependentObservable;
 
 ko.exportSymbol('dependentObservable', ko.dependentObservable);
@@ -4202,7 +4483,7 @@ ko.exportSymbol('isComputed', ko.isComputed);
         visitedObjects = visitedObjects || new objectLookup();
 
         rootObject = mapInputCallback(rootObject);
-        var canHaveProperties = (typeof rootObject == "object") && (rootObject !== null) && (rootObject !== undefined) && (!(rootObject instanceof Date));
+        var canHaveProperties = (typeof rootObject == "object") && (rootObject !== null) && (rootObject !== undefined) && (!(rootObject instanceof Date)) && (!(rootObject instanceof String)) && (!(rootObject instanceof Number)) && (!(rootObject instanceof Boolean));
         if (!canHaveProperties)
             return rootObject;
 
@@ -4248,21 +4529,25 @@ ko.exportSymbol('isComputed', ko.isComputed);
     };
 
     function objectLookup() {
-        var keys = [];
-        var values = [];
-        this.save = function(key, value) {
-            var existingIndex = ko.utils.arrayIndexOf(keys, key);
+        this.keys = [];
+        this.values = [];
+    };
+
+    objectLookup.prototype = {
+        constructor: objectLookup,
+        save: function(key, value) {
+            var existingIndex = ko.utils.arrayIndexOf(this.keys, key);
             if (existingIndex >= 0)
-                values[existingIndex] = value;
+                this.values[existingIndex] = value;
             else {
-                keys.push(key);
-                values.push(value);
+                this.keys.push(key);
+                this.values.push(value);
             }
-        };
-        this.get = function(key) {
-            var existingIndex = ko.utils.arrayIndexOf(keys, key);
-            return (existingIndex >= 0) ? values[existingIndex] : undefined;
-        };
+        },
+        get: function(key) {
+            var existingIndex = ko.utils.arrayIndexOf(this.keys, key);
+            return (existingIndex >= 0) ? this.values[existingIndex] : undefined;
+        }
     };
 })();
 
@@ -4281,7 +4566,7 @@ ko.exportSymbol('toJSON', ko.toJSON);
                     if (element[hasDomDataExpandoProperty] === true)
                         return ko.utils.domData.get(element, ko.bindingHandlers.options.optionValueDomDataKey);
                     return ko.utils.ieVersion <= 7
-                        ? (element.getAttributeNode('value').specified ? element.value : element.text)
+                        ? (element.getAttributeNode('value') && element.getAttributeNode('value').specified ? element.value : element.text)
                         : element.value;
                 case 'select':
                     return element.selectedIndex >= 0 ? ko.selectExtensions.readValue(element.options[element.selectedIndex]) : undefined;
@@ -4312,11 +4597,19 @@ ko.exportSymbol('toJSON', ko.toJSON);
                     }
                     break;
                 case 'select':
+                    if (value === "")
+                        value = undefined;
+                    if (value === null || value === undefined)
+                        element.selectedIndex = -1;
                     for (var i = element.options.length - 1; i >= 0; i--) {
                         if (ko.selectExtensions.readValue(element.options[i]) == value) {
                             element.selectedIndex = i;
                             break;
                         }
+                    }
+                    // for drop-down select, ensure first is selected
+                    if (!(element.size > 1) && element.selectedIndex === -1) {
+                        element.selectedIndex = 0;
                     }
                     break;
                 default:
@@ -4333,170 +4626,162 @@ ko.exportSymbol('selectExtensions', ko.selectExtensions);
 ko.exportSymbol('selectExtensions.readValue', ko.selectExtensions.readValue);
 ko.exportSymbol('selectExtensions.writeValue', ko.selectExtensions.writeValue);
 ko.expressionRewriting = (function () {
-    var restoreCapturedTokensRegex = /\@ko_token_(\d+)\@/g;
-    var javaScriptReservedWords = ["true", "false"];
+    var javaScriptReservedWords = ["true", "false", "null", "undefined"];
 
     // Matches something that can be assigned to--either an isolated identifier or something ending with a property accessor
     // This is designed to be simple and avoid false negatives, but could produce false positives (e.g., a+b.c).
+    // This also will not properly handle nested brackets (e.g., obj1[obj2['prop']]; see #911).
     var javaScriptAssignmentTarget = /^(?:[$_a-z][$\w]*|(.+)(\.\s*[$_a-z][$\w]*|\[.+\]))$/i;
 
-    function restoreTokens(string, tokens) {
-        var prevValue = null;
-        while (string != prevValue) { // Keep restoring tokens until it no longer makes a difference (they may be nested)
-            prevValue = string;
-            string = string.replace(restoreCapturedTokensRegex, function (match, tokenIndex) {
-                return tokens[tokenIndex];
-            });
-        }
-        return string;
-    }
-
     function getWriteableValue(expression) {
-        if (ko.utils.arrayIndexOf(javaScriptReservedWords, ko.utils.stringTrim(expression).toLowerCase()) >= 0)
+        if (ko.utils.arrayIndexOf(javaScriptReservedWords, expression) >= 0)
             return false;
         var match = expression.match(javaScriptAssignmentTarget);
         return match === null ? false : match[1] ? ('Object(' + match[1] + ')' + match[2]) : expression;
     }
 
-    function ensureQuoted(key) {
-        var trimmedKey = ko.utils.stringTrim(key);
-        switch (trimmedKey.length && trimmedKey.charAt(0)) {
-            case "'":
-            case '"':
-                return key;
-            default:
-                return "'" + trimmedKey + "'";
+    // The following regular expressions will be used to split an object-literal string into tokens
+
+        // These two match strings, either with double quotes or single quotes
+    var stringDouble = '"(?:[^"\\\\]|\\\\.)*"',
+        stringSingle = "'(?:[^'\\\\]|\\\\.)*'",
+        // Matches a regular expression (text enclosed by slashes), but will also match sets of divisions
+        // as a regular expression (this is handled by the parsing loop below).
+        stringRegexp = '/(?:[^/\\\\]|\\\\.)*/\w*',
+        // These characters have special meaning to the parser and must not appear in the middle of a
+        // token, except as part of a string.
+        specials = ',"\'{}()/:[\\]',
+        // Match text (at least two characters) that does not contain any of the above special characters,
+        // although some of the special characters are allowed to start it (all but the colon and comma).
+        // The text can contain spaces, but leading or trailing spaces are skipped.
+        everyThingElse = '[^\\s:,/][^' + specials + ']*[^\\s' + specials + ']',
+        // Match any non-space character not matched already. This will match colons and commas, since they're
+        // not matched by "everyThingElse", but will also match any other single character that wasn't already
+        // matched (for example: in "a: 1, b: 2", each of the non-space characters will be matched by oneNotSpace).
+        oneNotSpace = '[^\\s]',
+
+        // Create the actual regular expression by or-ing the above strings. The order is important.
+        bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRegexp + '|' + everyThingElse + '|' + oneNotSpace, 'g'),
+
+        // Match end of previous token to determine whether a slash is a division or regex.
+        divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/,
+        keywordRegexLookBehind = {'in':1,'return':1,'typeof':1};
+
+    function parseObjectLiteral(objectLiteralString) {
+        // Trim leading and trailing spaces from the string
+        var str = ko.utils.stringTrim(objectLiteralString);
+
+        // Trim braces '{' surrounding the whole object literal
+        if (str.charCodeAt(0) === 123) str = str.slice(1, -1);
+
+        // Split into tokens
+        var result = [], toks = str.match(bindingToken), key, values, depth = 0;
+
+        if (toks) {
+            // Append a comma so that we don't need a separate code block to deal with the last item
+            toks.push(',');
+
+            for (var i = 0, tok; tok = toks[i]; ++i) {
+                var c = tok.charCodeAt(0);
+                // A comma signals the end of a key/value pair if depth is zero
+                if (c === 44) { // ","
+                    if (depth <= 0) {
+                        if (key)
+                            result.push(values ? {key: key, value: values.join('')} : {'unknown': key});
+                        key = values = depth = 0;
+                        continue;
+                    }
+                // Simply skip the colon that separates the name and value
+                } else if (c === 58) { // ":"
+                    if (!values)
+                        continue;
+                // A set of slashes is initially matched as a regular expression, but could be division
+                } else if (c === 47 && i && tok.length > 1) {  // "/"
+                    // Look at the end of the previous token to determine if the slash is actually division
+                    var match = toks[i-1].match(divisionLookBehind);
+                    if (match && !keywordRegexLookBehind[match[0]]) {
+                        // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
+                        str = str.substr(str.indexOf(tok) + 1);
+                        toks = str.match(bindingToken);
+                        toks.push(',');
+                        i = -1;
+                        // Continue with just the slash
+                        tok = '/';
+                    }
+                // Increment depth for parentheses, braces, and brackets so that interior commas are ignored
+                } else if (c === 40 || c === 123 || c === 91) { // '(', '{', '['
+                    ++depth;
+                } else if (c === 41 || c === 125 || c === 93) { // ')', '}', ']'
+                    --depth;
+                // The key must be a single token; if it's a string, trim the quotes
+                } else if (!key && !values) {
+                    key = (c === 34 || c === 39) /* '"', "'" */ ? tok.slice(1, -1) : tok;
+                    continue;
+                }
+                if (values)
+                    values.push(tok);
+                else
+                    values = [tok];
+            }
         }
+        return result;
+    }
+
+    // Two-way bindings include a write function that allow the handler to update the value even if it's not an observable.
+    var twoWayBindings = {};
+
+    function preProcessBindings(bindingsStringOrKeyValueArray, bindingOptions) {
+        bindingOptions = bindingOptions || {};
+
+        function processKeyValue(key, val) {
+            var writableVal;
+            function callPreprocessHook(obj) {
+                return (obj && obj['preprocess']) ? (val = obj['preprocess'](val, key, processKeyValue)) : true;
+            }
+            if (!callPreprocessHook(ko['getBindingHandler'](key)))
+                return;
+
+            if (twoWayBindings[key] && (writableVal = getWriteableValue(val))) {
+                // For two-way bindings, provide a write method in case the value
+                // isn't a writable observable.
+                propertyAccessorResultStrings.push("'" + key + "':function(_z){" + writableVal + "=_z}");
+            }
+
+            // Values are wrapped in a function so that each value can be accessed independently
+            if (makeValueAccessors) {
+                val = 'function(){return ' + val + ' }';
+            }
+            resultStrings.push("'" + key + "':" + val);
+        }
+
+        var resultStrings = [],
+            propertyAccessorResultStrings = [],
+            makeValueAccessors = bindingOptions['valueAccessors'],
+            keyValueArray = typeof bindingsStringOrKeyValueArray === "string" ?
+                parseObjectLiteral(bindingsStringOrKeyValueArray) : bindingsStringOrKeyValueArray;
+
+        ko.utils.arrayForEach(keyValueArray, function(keyValue) {
+            processKeyValue(keyValue.key || keyValue['unknown'], keyValue.value);
+        });
+
+        if (propertyAccessorResultStrings.length)
+            processKeyValue('_ko_property_writers', "{" + propertyAccessorResultStrings.join(",") + "}");
+
+        return resultStrings.join(",");
     }
 
     return {
         bindingRewriteValidators: [],
 
-        parseObjectLiteral: function(objectLiteralString) {
-            // A full tokeniser+lexer would add too much weight to this library, so here's a simple parser
-            // that is sufficient just to split an object literal string into a set of top-level key-value pairs
+        twoWayBindings: twoWayBindings,
 
-            var str = ko.utils.stringTrim(objectLiteralString);
-            if (str.length < 3)
-                return [];
-            if (str.charAt(0) === "{")// Ignore any braces surrounding the whole object literal
-                str = str.substring(1, str.length - 1);
+        parseObjectLiteral: parseObjectLiteral,
 
-            // Pull out any string literals and regex literals
-            var tokens = [];
-            var tokenStart = null, tokenEndChar;
-            for (var position = 0; position < str.length; position++) {
-                var c = str.charAt(position);
-                if (tokenStart === null) {
-                    switch (c) {
-                        case '"':
-                        case "'":
-                        case "/":
-                            tokenStart = position;
-                            tokenEndChar = c;
-                            break;
-                    }
-                } else if ((c == tokenEndChar) && (str.charAt(position - 1) !== "\\")) {
-                    var token = str.substring(tokenStart, position + 1);
-                    tokens.push(token);
-                    var replacement = "@ko_token_" + (tokens.length - 1) + "@";
-                    str = str.substring(0, tokenStart) + replacement + str.substring(position + 1);
-                    position -= (token.length - replacement.length);
-                    tokenStart = null;
-                }
-            }
-
-            // Next pull out balanced paren, brace, and bracket blocks
-            tokenStart = null;
-            tokenEndChar = null;
-            var tokenDepth = 0, tokenStartChar = null;
-            for (var position = 0; position < str.length; position++) {
-                var c = str.charAt(position);
-                if (tokenStart === null) {
-                    switch (c) {
-                        case "{": tokenStart = position; tokenStartChar = c;
-                                  tokenEndChar = "}";
-                                  break;
-                        case "(": tokenStart = position; tokenStartChar = c;
-                                  tokenEndChar = ")";
-                                  break;
-                        case "[": tokenStart = position; tokenStartChar = c;
-                                  tokenEndChar = "]";
-                                  break;
-                    }
-                }
-
-                if (c === tokenStartChar)
-                    tokenDepth++;
-                else if (c === tokenEndChar) {
-                    tokenDepth--;
-                    if (tokenDepth === 0) {
-                        var token = str.substring(tokenStart, position + 1);
-                        tokens.push(token);
-                        var replacement = "@ko_token_" + (tokens.length - 1) + "@";
-                        str = str.substring(0, tokenStart) + replacement + str.substring(position + 1);
-                        position -= (token.length - replacement.length);
-                        tokenStart = null;
-                    }
-                }
-            }
-
-            // Now we can safely split on commas to get the key/value pairs
-            var result = [];
-            var keyValuePairs = str.split(",");
-            for (var i = 0, j = keyValuePairs.length; i < j; i++) {
-                var pair = keyValuePairs[i];
-                var colonPos = pair.indexOf(":");
-                if ((colonPos > 0) && (colonPos < pair.length - 1)) {
-                    var key = pair.substring(0, colonPos);
-                    var value = pair.substring(colonPos + 1);
-                    result.push({ 'key': restoreTokens(key, tokens), 'value': restoreTokens(value, tokens) });
-                } else {
-                    result.push({ 'unknown': restoreTokens(pair, tokens) });
-                }
-            }
-            return result;
-        },
-
-        preProcessBindings: function (objectLiteralStringOrKeyValueArray) {
-            var keyValueArray = typeof objectLiteralStringOrKeyValueArray === "string"
-                ? ko.expressionRewriting.parseObjectLiteral(objectLiteralStringOrKeyValueArray)
-                : objectLiteralStringOrKeyValueArray;
-            var resultStrings = [], propertyAccessorResultStrings = [];
-
-            var keyValueEntry;
-            for (var i = 0; keyValueEntry = keyValueArray[i]; i++) {
-                if (resultStrings.length > 0)
-                    resultStrings.push(",");
-
-                if (keyValueEntry['key']) {
-                    var quotedKey = ensureQuoted(keyValueEntry['key']), val = keyValueEntry['value'];
-                    resultStrings.push(quotedKey);
-                    resultStrings.push(":");
-                    resultStrings.push(val);
-
-                    if (val = getWriteableValue(ko.utils.stringTrim(val))) {
-                        if (propertyAccessorResultStrings.length > 0)
-                            propertyAccessorResultStrings.push(", ");
-                        propertyAccessorResultStrings.push(quotedKey + " : function(__ko_value) { " + val + " = __ko_value; }");
-                    }
-                } else if (keyValueEntry['unknown']) {
-                    resultStrings.push(keyValueEntry['unknown']);
-                }
-            }
-
-            var combinedResult = resultStrings.join("");
-            if (propertyAccessorResultStrings.length > 0) {
-                var allPropertyAccessors = propertyAccessorResultStrings.join("");
-                combinedResult = combinedResult + ", '_ko_property_writers' : { " + allPropertyAccessors + " } ";
-            }
-
-            return combinedResult;
-        },
+        preProcessBindings: preProcessBindings,
 
         keyValueArrayContainsKey: function(keyValueArray, key) {
             for (var i = 0; i < keyValueArray.length; i++)
-                if (ko.utils.stringTrim(keyValueArray[i]['key']) == key)
+                if (keyValueArray[i]['key'] == key)
                     return true;
             return false;
         },
@@ -4504,15 +4789,15 @@ ko.expressionRewriting = (function () {
         // Internal, private KO utility for updating model properties from within bindings
         // property:            If the property being updated is (or might be) an observable, pass it here
         //                      If it turns out to be a writable observable, it will be written to directly
-        // allBindingsAccessor: All bindings in the current execution context.
+        // allBindings:         An object with a get method to retrieve bindings in the current execution context.
         //                      This will be searched for a '_ko_property_writers' property in case you're writing to a non-observable
         // key:                 The key identifying the property to be written. Example: for { hasFocus: myValue }, write to 'myValue' by specifying the key 'hasFocus'
         // value:               The value to be written
         // checkIfDifferent:    If true, and if the property being written is a writable observable, the value will only be written if
         //                      it is !== existing value on that writable observable
-        writeValueToProperty: function(property, allBindingsAccessor, key, value, checkIfDifferent) {
+        writeValueToProperty: function(property, allBindings, key, value, checkIfDifferent) {
             if (!property || !ko.isObservable(property)) {
-                var propWriters = allBindingsAccessor()['_ko_property_writers'];
+                var propWriters = allBindings.get('_ko_property_writers');
                 if (propWriters && propWriters[key])
                     propWriters[key](value);
             } else if (ko.isWriteableObservable(property) && (!checkIfDifferent || property.peek() !== value)) {
@@ -4527,10 +4812,20 @@ ko.exportSymbol('expressionRewriting.bindingRewriteValidators', ko.expressionRew
 ko.exportSymbol('expressionRewriting.parseObjectLiteral', ko.expressionRewriting.parseObjectLiteral);
 ko.exportSymbol('expressionRewriting.preProcessBindings', ko.expressionRewriting.preProcessBindings);
 
+// Making bindings explicitly declare themselves as "two way" isn't ideal in the long term (it would be better if
+// all bindings could use an official 'property writer' API without needing to declare that they might). However,
+// since this is not, and has never been, a public API (_ko_property_writers was never documented), it's acceptable
+// as an internal implementation detail in the short term.
+// For those developers who rely on _ko_property_writers in their custom bindings, we expose _twoWayBindings as an
+// undocumented feature that makes it relatively easy to upgrade to KO 3.0. However, this is still not an official
+// public API, and we reserve the right to remove it at any time if we create a real public property writers API.
+ko.exportSymbol('expressionRewriting._twoWayBindings', ko.expressionRewriting.twoWayBindings);
+
 // For backward compatibility, define the following aliases. (Previously, these function names were misleading because
 // they referred to JSON specifically, even though they actually work with arbitrary JavaScript object literal expressions.)
 ko.exportSymbol('jsonExpressionRewriting', ko.expressionRewriting);
-ko.exportSymbol('jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko.expressionRewriting.preProcessBindings);(function() {
+ko.exportSymbol('jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko.expressionRewriting.preProcessBindings);
+(function() {
     // "Virtual elements" is an abstraction on top of the usual DOM API which understands the notion that comment nodes
     // may be used to represent hierarchy (in addition to the DOM's natural hierarchy).
     // If you call the DOM-manipulating functions on ko.virtualElements, you will be able to read and write the state
@@ -4544,16 +4839,16 @@ ko.exportSymbol('jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko.ex
     // So, use node.text where available, and node.nodeValue elsewhere
     var commentNodesHaveTextProperty = document && document.createComment("test").text === "<!--test-->";
 
-    var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+(.+\s*\:[\s\S]*))?\s*-->$/ : /^\s*ko(?:\s+(.+\s*\:[\s\S]*))?\s*$/;
+    var startCommentRegex = commentNodesHaveTextProperty ? /^<!--\s*ko(?:\s+([\s\S]+))?\s*-->$/ : /^\s*ko(?:\s+([\s\S]+))?\s*$/;
     var endCommentRegex =   commentNodesHaveTextProperty ? /^<!--\s*\/ko\s*-->$/ : /^\s*\/ko\s*$/;
     var htmlTagsWithOptionallyClosingChildren = { 'ul': true, 'ol': true };
 
     function isStartComment(node) {
-        return (node.nodeType == 8) && (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(startCommentRegex);
+        return (node.nodeType == 8) && startCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
     }
 
     function isEndComment(node) {
-        return (node.nodeType == 8) && (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(endCommentRegex);
+        return (node.nodeType == 8) && endCommentRegex.test(commentNodesHaveTextProperty ? node.text : node.nodeValue);
     }
 
     function getVirtualChildren(startComment, allowUnbalanced) {
@@ -4680,8 +4975,10 @@ ko.exportSymbol('jsonExpressionRewriting.insertPropertyAccessorsIntoJson', ko.ex
             return node.nextSibling;
         },
 
+        hasBindingValue: isStartComment,
+
         virtualNodeBindingValue: function(node) {
-            var regexMatch = isStartComment(node);
+            var regexMatch = (commentNodesHaveTextProperty ? node.text : node.nodeValue).match(startCommentRegex);
             return regexMatch ? regexMatch[1] : null;
         },
 
@@ -4734,7 +5031,7 @@ ko.exportSymbol('virtualElements.setDomNodeChildren', ko.virtualElements.setDomN
         'nodeHasBindings': function(node) {
             switch (node.nodeType) {
                 case 1: return node.getAttribute(defaultBindingAttributeName) != null;   // Element
-                case 8: return ko.virtualElements.virtualNodeBindingValue(node) != null; // Comment node
+                case 8: return ko.virtualElements.hasBindingValue(node); // Comment node
                 default: return false;
             }
         },
@@ -4742,6 +5039,11 @@ ko.exportSymbol('virtualElements.setDomNodeChildren', ko.virtualElements.setDomN
         'getBindings': function(node, bindingContext) {
             var bindingsString = this['getBindingsString'](node, bindingContext);
             return bindingsString ? this['parseBindingsString'](bindingsString, bindingContext, node) : null;
+        },
+
+        'getBindingAccessors': function(node, bindingContext) {
+            var bindingsString = this['getBindingsString'](node, bindingContext);
+            return bindingsString ? this['parseBindingsString'](bindingsString, bindingContext, node, {'valueAccessors':true}) : null;
         },
 
         // The following function is only used internally by this default provider.
@@ -4756,9 +5058,9 @@ ko.exportSymbol('virtualElements.setDomNodeChildren', ko.virtualElements.setDomN
 
         // The following function is only used internally by this default provider.
         // It's not part of the interface definition for a general binding provider.
-        'parseBindingsString': function(bindingsString, bindingContext, node) {
+        'parseBindingsString': function(bindingsString, bindingContext, node, options) {
             try {
-                var bindingFunction = createBindingsStringEvaluatorViaCache(bindingsString, this.bindingCache);
+                var bindingFunction = createBindingsStringEvaluatorViaCache(bindingsString, this.bindingCache, options);
                 return bindingFunction(bindingContext, node);
             } catch (ex) {
                 ex.message = "Unable to parse bindings.\nBindings value: " + bindingsString + "\nMessage: " + ex.message;
@@ -4769,17 +5071,17 @@ ko.exportSymbol('virtualElements.setDomNodeChildren', ko.virtualElements.setDomN
 
     ko.bindingProvider['instance'] = new ko.bindingProvider();
 
-    function createBindingsStringEvaluatorViaCache(bindingsString, cache) {
-        var cacheKey = bindingsString;
+    function createBindingsStringEvaluatorViaCache(bindingsString, cache, options) {
+        var cacheKey = bindingsString + (options && options['valueAccessors'] || '');
         return cache[cacheKey]
-            || (cache[cacheKey] = createBindingsStringEvaluator(bindingsString));
+            || (cache[cacheKey] = createBindingsStringEvaluator(bindingsString, options));
     }
 
-    function createBindingsStringEvaluator(bindingsString) {
+    function createBindingsStringEvaluator(bindingsString, options) {
         // Build the source for a function that evaluates "expression"
         // For each scope variable, add an extra level of "with" nesting
         // Example result: with(sc1) { with(sc0) { return (expression) } }
-        var rewrittenBindings = ko.expressionRewriting.preProcessBindings(bindingsString),
+        var rewrittenBindings = ko.expressionRewriting.preProcessBindings(bindingsString, options),
             functionBody = "with($context){with($data||{}){return{" + rewrittenBindings + "}}}";
         return new Function("$context", "$element", functionBody);
     }
@@ -4789,32 +5091,174 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
 (function () {
     ko.bindingHandlers = {};
 
-    ko.bindingContext = function(dataItem, parentBindingContext, dataItemAlias) {
-        if (parentBindingContext) {
-            ko.utils.extend(this, parentBindingContext); // Inherit $root and any custom properties
-            this['$parentContext'] = parentBindingContext;
-            this['$parent'] = parentBindingContext['$data'];
-            this['$parents'] = (parentBindingContext['$parents'] || []).slice(0);
-            this['$parents'].unshift(this['$parent']);
-        } else {
-            this['$parents'] = [];
-            this['$root'] = dataItem;
-            // Export 'ko' in the binding context so it will be available in bindings and templates
-            // even if 'ko' isn't exported as a global, such as when using an AMD loader.
-            // See https://github.com/SteveSanderson/knockout/issues/490
-            this['ko'] = ko;
+    // The following element types will not be recursed into during binding. In the future, we
+    // may consider adding <template> to this list, because such elements' contents are always
+    // intended to be bound in a different context from where they appear in the document.
+    var bindingDoesNotRecurseIntoElementTypes = {
+        // Don't want bindings that operate on text nodes to mutate <script> contents,
+        // because it's unexpected and a potential XSS issue
+        'script': true
+    };
+
+    // Use an overridable method for retrieving binding handlers so that a plugins may support dynamically created handlers
+    ko['getBindingHandler'] = function(bindingKey) {
+        return ko.bindingHandlers[bindingKey];
+    };
+
+    // The ko.bindingContext constructor is only called directly to create the root context. For child
+    // contexts, use bindingContext.createChildContext or bindingContext.extend.
+    ko.bindingContext = function(dataItemOrAccessor, parentContext, dataItemAlias, extendCallback) {
+
+        // The binding context object includes static properties for the current, parent, and root view models.
+        // If a view model is actually stored in an observable, the corresponding binding context object, and
+        // any child contexts, must be updated when the view model is changed.
+        function updateContext() {
+            // Most of the time, the context will directly get a view model object, but if a function is given,
+            // we call the function to retrieve the view model. If the function accesses any obsevables (or is
+            // itself an observable), the dependency is tracked, and those observables can later cause the binding
+            // context to be updated.
+            var dataItem = isFunc ? dataItemOrAccessor() : dataItemOrAccessor;
+
+            if (parentContext) {
+                // When a "parent" context is given, register a dependency on the parent context. Thus whenever the
+                // parent context is updated, this context will also be updated.
+                if (parentContext._subscribable)
+                    parentContext._subscribable();
+
+                // Copy $root and any custom properties from the parent context
+                ko.utils.extend(self, parentContext);
+
+                // Because the above copy overwrites our own properties, we need to reset them.
+                // During the first execution, "subscribable" isn't set, so don't bother doing the update then.
+                if (subscribable) {
+                    self._subscribable = subscribable;
+                }
+            } else {
+                self['$parents'] = [];
+                self['$root'] = dataItem;
+
+                // Export 'ko' in the binding context so it will be available in bindings and templates
+                // even if 'ko' isn't exported as a global, such as when using an AMD loader.
+                // See https://github.com/SteveSanderson/knockout/issues/490
+                self['ko'] = ko;
+            }
+            self['$rawData'] = dataItemOrAccessor;
+            self['$data'] = dataItem;
+            if (dataItemAlias)
+                self[dataItemAlias] = dataItem;
+
+            // The extendCallback function is provided when creating a child context or extending a context.
+            // It handles the specific actions needed to finish setting up the binding context. Actions in this
+            // function could also add dependencies to this binding context.
+            if (extendCallback)
+                extendCallback(self, parentContext, dataItem);
+
+            return self['$data'];
         }
-        this['$data'] = dataItem;
-        if (dataItemAlias)
-            this[dataItemAlias] = dataItem;
+        function disposeWhen() {
+            return nodes && !ko.utils.anyDomNodeIsAttachedToDocument(nodes);
+        }
+
+        var self = this,
+            isFunc = typeof(dataItemOrAccessor) == "function",
+            nodes,
+            subscribable = ko.dependentObservable(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true });
+
+        // At this point, the binding context has been initialized, and the "subscribable" computed observable is
+        // subscribed to any observables that were accessed in the process. If there is nothing to track, the
+        // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
+        // the context object.
+        if (subscribable.isActive()) {
+            self._subscribable = subscribable;
+
+            // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
+            subscribable['equalityComparer'] = null;
+
+            // We need to be able to dispose of this computed observable when it's no longer needed. This would be
+            // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
+            // we cannot assume that those nodes have any relation to each other. So instead we track any node that
+            // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
+
+            // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
+            nodes = [];
+            subscribable._addNode = function(node) {
+                nodes.push(node);
+                ko.utils.domNodeDisposal.addDisposeCallback(node, function(node) {
+                    ko.utils.arrayRemoveItem(nodes, node);
+                    if (!nodes.length) {
+                        subscribable.dispose();
+                        self._subscribable = subscribable = undefined;
+                    }
+                });
+            };
+        }
     }
-    ko.bindingContext.prototype['createChildContext'] = function (dataItem, dataItemAlias) {
-        return new ko.bindingContext(dataItem, this, dataItemAlias);
+
+    // Extend the binding context hierarchy with a new view model object. If the parent context is watching
+    // any obsevables, the new child context will automatically get a dependency on the parent context.
+    // But this does not mean that the $data value of the child context will also get updated. If the child
+    // view model also depends on the parent view model, you must provide a function that returns the correct
+    // view model on each update.
+    ko.bindingContext.prototype['createChildContext'] = function (dataItemOrAccessor, dataItemAlias, extendCallback) {
+        return new ko.bindingContext(dataItemOrAccessor, this, dataItemAlias, function(self, parentContext) {
+            // Extend the context hierarchy by setting the appropriate pointers
+            self['$parentContext'] = parentContext;
+            self['$parent'] = parentContext['$data'];
+            self['$parents'] = (parentContext['$parents'] || []).slice(0);
+            self['$parents'].unshift(self['$parent']);
+            if (extendCallback)
+                extendCallback(self);
+        });
     };
+
+    // Extend the binding context with new custom properties. This doesn't change the context hierarchy.
+    // Similarly to "child" contexts, provide a function here to make sure that the correct values are set
+    // when an observable view model is updated.
     ko.bindingContext.prototype['extend'] = function(properties) {
-        var clone = ko.utils.extend(new ko.bindingContext(), this);
-        return ko.utils.extend(clone, properties);
+        return new ko.bindingContext(this['$rawData'], this, null, function(self) {
+            ko.utils.extend(self, typeof(properties) == "function" ? properties() : properties);
+        });
     };
+
+    // Returns the valueAccesor function for a binding value
+    function makeValueAccessor(value) {
+        return function() {
+            return value;
+        };
+    }
+
+    // Returns the value of a valueAccessor function
+    function evaluateValueAccessor(valueAccessor) {
+        return valueAccessor();
+    }
+
+    // Given a function that returns bindings, create and return a new object that contains
+    // binding value-accessors functions. Each accessor function calls the original function
+    // so that it always gets the latest value and all dependencies are captured. This is used
+    // by ko.applyBindingsToNode and getBindingsAndMakeAccessors.
+    function makeAccessorsFromFunction(callback) {
+        return ko.utils.objectMap(ko.dependencyDetection.ignore(callback), function(value, key) {
+            return function() {
+                return callback()[key];
+            };
+        });
+    }
+
+    // Given a bindings function or object, create and return a new object that contains
+    // binding value-accessors functions. This is used by ko.applyBindingsToNode.
+    function makeBindingAccessors(bindings, context, node) {
+        if (typeof bindings === 'function') {
+            return makeAccessorsFromFunction(bindings.bind(null, context, node));
+        } else {
+            return ko.utils.objectMap(bindings, makeValueAccessor);
+        }
+    }
+
+    // This function is used if the binding provider doesn't include a getBindingAccessors function.
+    // It must be called with 'this' set to the provider instance.
+    function getBindingsAndMakeAccessors(node, context) {
+        return makeAccessorsFromFunction(this['getBindings'].bind(this, node, context));
+    }
 
     function validateThatBindingIsAllowedForVirtualElements(bindingName) {
         var validator = ko.virtualElements.allowedBindings[bindingName];
@@ -4822,16 +5266,33 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
             throw new Error("The binding '" + bindingName + "' cannot be used with virtual elements")
     }
 
-    function applyBindingsToDescendantsInternal (viewModel, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement) {
-        var currentChild, nextInQueue = ko.virtualElements.firstChild(elementOrVirtualElement);
+    function applyBindingsToDescendantsInternal (bindingContext, elementOrVirtualElement, bindingContextsMayDifferFromDomParentElement) {
+        var currentChild,
+            nextInQueue = ko.virtualElements.firstChild(elementOrVirtualElement),
+            provider = ko.bindingProvider['instance'],
+            preprocessNode = provider['preprocessNode'];
+
+        // Preprocessing allows a binding provider to mutate a node before bindings are applied to it. For example it's
+        // possible to insert new siblings after it, and/or replace the node with a different one. This can be used to
+        // implement custom binding syntaxes, such as {{ value }} for string interpolation, or custom element types that
+        // trigger insertion of <template> contents at that point in the document.
+        if (preprocessNode) {
+            while (currentChild = nextInQueue) {
+                nextInQueue = ko.virtualElements.nextSibling(currentChild);
+                preprocessNode.call(provider, currentChild);
+            }
+            // Reset nextInQueue for the next loop
+            nextInQueue = ko.virtualElements.firstChild(elementOrVirtualElement);
+        }
+
         while (currentChild = nextInQueue) {
             // Keep a record of the next child *before* applying bindings, in case the binding removes the current child from its position
             nextInQueue = ko.virtualElements.nextSibling(currentChild);
-            applyBindingsToNodeAndDescendantsInternal(viewModel, currentChild, bindingContextsMayDifferFromDomParentElement);
+            applyBindingsToNodeAndDescendantsInternal(bindingContext, currentChild, bindingContextsMayDifferFromDomParentElement);
         }
     }
 
-    function applyBindingsToNodeAndDescendantsInternal (viewModel, nodeVerified, bindingContextMayDifferFromDomParentElement) {
+    function applyBindingsToNodeAndDescendantsInternal (bindingContext, nodeVerified, bindingContextMayDifferFromDomParentElement) {
         var shouldBindDescendants = true;
 
         // Perf optimisation: Apply bindings only if...
@@ -4845,137 +5306,218 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
         var shouldApplyBindings = (isElement && bindingContextMayDifferFromDomParentElement)             // Case (1)
                                || ko.bindingProvider['instance']['nodeHasBindings'](nodeVerified);       // Case (2)
         if (shouldApplyBindings)
-            shouldBindDescendants = applyBindingsToNodeInternal(nodeVerified, null, viewModel, bindingContextMayDifferFromDomParentElement).shouldBindDescendants;
+            shouldBindDescendants = applyBindingsToNodeInternal(nodeVerified, null, bindingContext, bindingContextMayDifferFromDomParentElement)['shouldBindDescendants'];
 
-        if (shouldBindDescendants) {
+        if (shouldBindDescendants && !bindingDoesNotRecurseIntoElementTypes[ko.utils.tagNameLower(nodeVerified)]) {
             // We're recursing automatically into (real or virtual) child nodes without changing binding contexts. So,
             //  * For children of a *real* element, the binding context is certainly the same as on their DOM .parentNode,
             //    hence bindingContextsMayDifferFromDomParentElement is false
             //  * For children of a *virtual* element, we can't be sure. Evaluating .parentNode on those children may
             //    skip over any number of intermediate virtual elements, any of which might define a custom binding context,
             //    hence bindingContextsMayDifferFromDomParentElement is true
-            applyBindingsToDescendantsInternal(viewModel, nodeVerified, /* bindingContextsMayDifferFromDomParentElement: */ !isElement);
+            applyBindingsToDescendantsInternal(bindingContext, nodeVerified, /* bindingContextsMayDifferFromDomParentElement: */ !isElement);
         }
     }
 
-    var boundElementDomDataKey = '__ko_boundElement';
-    function applyBindingsToNodeInternal (node, bindings, viewModelOrBindingContext, bindingContextMayDifferFromDomParentElement) {
-        // Need to be sure that inits are only run once, and updates never run until all the inits have been run
-        var initPhase = 0; // 0 = before all inits, 1 = during inits, 2 = after all inits
+    var boundElementDomDataKey = ko.utils.domData.nextKey();
 
-        // Each time the dependentObservable is evaluated (after data changes),
-        // the binding attribute is reparsed so that it can pick out the correct
-        // model properties in the context of the changed data.
-        // DOM event callbacks need to be able to access this changed data,
-        // so we need a single parsedBindings variable (shared by all callbacks
-        // associated with this node's bindings) that all the closures can access.
-        var parsedBindings;
-        function makeValueAccessor(bindingKey) {
-            return function () { return parsedBindings[bindingKey] }
-        }
-        function parsedBindingsAccessor() {
-            return parsedBindings;
-        }
 
-        var bindingHandlerThatControlsDescendantBindings;
+    function topologicalSortBindings(bindings) {
+        // Depth-first sort
+        var result = [],                // The list of key/handler pairs that we will return
+            bindingsConsidered = {},    // A temporary record of which bindings are already in 'result'
+            cyclicDependencyStack = []; // Keeps track of a depth-search so that, if there's a cycle, we know which bindings caused it
+        ko.utils.objectForEach(bindings, function pushBinding(bindingKey) {
+            if (!bindingsConsidered[bindingKey]) {
+                var binding = ko['getBindingHandler'](bindingKey);
+                if (binding) {
+                    // First add dependencies (if any) of the current binding
+                    if (binding['after']) {
+                        cyclicDependencyStack.push(bindingKey);
+                        ko.utils.arrayForEach(binding['after'], function(bindingDependencyKey) {
+                            if (bindings[bindingDependencyKey]) {
+                                if (ko.utils.arrayIndexOf(cyclicDependencyStack, bindingDependencyKey) !== -1) {
+                                    throw Error("Cannot combine the following bindings, because they have a cyclic dependency: " + cyclicDependencyStack.join(", "));
+                                } else {
+                                    pushBinding(bindingDependencyKey);
+                                }
+                            }
+                        });
+                        cyclicDependencyStack.pop();
+                    }
+                    // Next add the current binding
+                    result.push({ key: bindingKey, handler: binding });
+                }
+                bindingsConsidered[bindingKey] = true;
+            }
+        });
 
+        return result;
+    }
+
+    function applyBindingsToNodeInternal(node, sourceBindings, bindingContext, bindingContextMayDifferFromDomParentElement) {
         // Prevent multiple applyBindings calls for the same node, except when a binding value is specified
         var alreadyBound = ko.utils.domData.get(node, boundElementDomDataKey);
-        if (!bindings) {
+        if (!sourceBindings) {
             if (alreadyBound) {
                 throw Error("You cannot apply bindings multiple times to the same element.");
             }
             ko.utils.domData.set(node, boundElementDomDataKey, true);
         }
 
-        ko.dependentObservable(
-            function () {
-                // Ensure we have a nonnull binding context to work with
-                var bindingContextInstance = viewModelOrBindingContext && (viewModelOrBindingContext instanceof ko.bindingContext)
-                    ? viewModelOrBindingContext
-                    : new ko.bindingContext(ko.utils.unwrapObservable(viewModelOrBindingContext));
-                var viewModel = bindingContextInstance['$data'];
+        // Optimization: Don't store the binding context on this node if it's definitely the same as on node.parentNode, because
+        // we can easily recover it just by scanning up the node's ancestors in the DOM
+        // (note: here, parent node means "real DOM parent" not "virtual parent", as there's no O(1) way to find the virtual parent)
+        if (!alreadyBound && bindingContextMayDifferFromDomParentElement)
+            ko.storedBindingContextForNode(node, bindingContext);
 
-                // Optimization: Don't store the binding context on this node if it's definitely the same as on node.parentNode, because
-                // we can easily recover it just by scanning up the node's ancestors in the DOM
-                // (note: here, parent node means "real DOM parent" not "virtual parent", as there's no O(1) way to find the virtual parent)
-                if (!alreadyBound && bindingContextMayDifferFromDomParentElement)
-                    ko.storedBindingContextForNode(node, bindingContextInstance);
+        // Use bindings if given, otherwise fall back on asking the bindings provider to give us some bindings
+        var bindings;
+        if (sourceBindings && typeof sourceBindings !== 'function') {
+            bindings = sourceBindings;
+        } else {
+            var provider = ko.bindingProvider['instance'],
+                getBindings = provider['getBindingAccessors'] || getBindingsAndMakeAccessors;
 
-                // Use evaluatedBindings if given, otherwise fall back on asking the bindings provider to give us some bindings
-                var evaluatedBindings = (typeof bindings == "function") ? bindings(bindingContextInstance, node) : bindings;
-                parsedBindings = evaluatedBindings || ko.bindingProvider['instance']['getBindings'](node, bindingContextInstance);
+            if (sourceBindings || bindingContext._subscribable) {
+                // When an obsevable view model is used, the binding context will expose an observable _subscribable value.
+                // Get the binding from the provider within a computed observable so that we can update the bindings whenever
+                // the binding context is updated.
+                var bindingsUpdater = ko.dependentObservable(
+                    function() {
+                        bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext);
+                        // Register a dependency on the binding context
+                        if (bindings && bindingContext._subscribable)
+                            bindingContext._subscribable();
+                        return bindings;
+                    },
+                    null, { disposeWhenNodeIsRemoved: node }
+                );
 
-                if (parsedBindings) {
-                    // First run all the inits, so bindings can register for notification on changes
-                    if (initPhase === 0) {
-                        initPhase = 1;
-                        ko.utils.objectForEach(parsedBindings, function(bindingKey) {
-                            var binding = ko.bindingHandlers[bindingKey];
-                            if (binding && node.nodeType === 8)
-                                validateThatBindingIsAllowedForVirtualElements(bindingKey);
+                if (!bindings || !bindingsUpdater.isActive())
+                    bindingsUpdater = null;
+            } else {
+                bindings = ko.dependencyDetection.ignore(getBindings, provider, [node, bindingContext]);
+            }
+        }
 
-                            if (binding && typeof binding["init"] == "function") {
-                                var handlerInitFn = binding["init"];
-                                var initResult = handlerInitFn(node, makeValueAccessor(bindingKey), parsedBindingsAccessor, viewModel, bindingContextInstance);
+        var bindingHandlerThatControlsDescendantBindings;
+        if (bindings) {
+            // Return the value accessor for a given binding. When bindings are static (won't be updated because of a binding
+            // context update), just return the value accessor from the binding. Otherwise, return a function that always gets
+            // the latest binding value and registers a dependency on the binding updater.
+            var getValueAccessor = bindingsUpdater
+                ? function(bindingKey) {
+                    return function() {
+                        return evaluateValueAccessor(bindingsUpdater()[bindingKey]);
+                    };
+                } : function(bindingKey) {
+                    return bindings[bindingKey];
+                };
 
-                                // If this binding handler claims to control descendant bindings, make a note of this
-                                if (initResult && initResult['controlsDescendantBindings']) {
-                                    if (bindingHandlerThatControlsDescendantBindings !== undefined)
-                                        throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + bindingKey + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
-                                    bindingHandlerThatControlsDescendantBindings = bindingKey;
-                                }
-                            }
-                        });
-                        initPhase = 2;
-                    }
+            // Use of allBindings as a function is maintained for backwards compatibility, but its use is deprecated
+            function allBindings() {
+                return ko.utils.objectMap(bindingsUpdater ? bindingsUpdater() : bindings, evaluateValueAccessor);
+            }
+            // The following is the 3.x allBindings API
+            allBindings['get'] = function(key) {
+                return bindings[key] && evaluateValueAccessor(getValueAccessor(key));
+            };
+            allBindings['has'] = function(key) {
+                return key in bindings;
+            };
 
-                    // ... then run all the updates, which might trigger changes even on the first evaluation
-                    if (initPhase === 2) {
-                        ko.utils.objectForEach(parsedBindings, function(bindingKey) {
-                            var binding = ko.bindingHandlers[bindingKey];
-                            if (binding && typeof binding["update"] == "function") {
-                                var handlerUpdateFn = binding["update"];
-                                handlerUpdateFn(node, makeValueAccessor(bindingKey), parsedBindingsAccessor, viewModel, bindingContextInstance);
-                            }
-                        });
-                    }
+            // First put the bindings into the right order
+            var orderedBindings = topologicalSortBindings(bindings);
+
+            // Go through the sorted bindings, calling init and update for each
+            ko.utils.arrayForEach(orderedBindings, function(bindingKeyAndHandler) {
+                // Note that topologicalSortBindings has already filtered out any nonexistent binding handlers,
+                // so bindingKeyAndHandler.handler will always be nonnull.
+                var handlerInitFn = bindingKeyAndHandler.handler["init"],
+                    handlerUpdateFn = bindingKeyAndHandler.handler["update"],
+                    bindingKey = bindingKeyAndHandler.key;
+
+                if (node.nodeType === 8) {
+                    validateThatBindingIsAllowedForVirtualElements(bindingKey);
                 }
-            },
-            null,
-            { disposeWhenNodeIsRemoved : node }
-        );
+
+                try {
+                    // Run init, ignoring any dependencies
+                    if (typeof handlerInitFn == "function") {
+                        ko.dependencyDetection.ignore(function() {
+                            var initResult = handlerInitFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+
+                            // If this binding handler claims to control descendant bindings, make a note of this
+                            if (initResult && initResult['controlsDescendantBindings']) {
+                                if (bindingHandlerThatControlsDescendantBindings !== undefined)
+                                    throw new Error("Multiple bindings (" + bindingHandlerThatControlsDescendantBindings + " and " + bindingKey + ") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");
+                                bindingHandlerThatControlsDescendantBindings = bindingKey;
+                            }
+                        });
+                    }
+
+                    // Run update in its own computed wrapper
+                    if (typeof handlerUpdateFn == "function") {
+                        ko.dependentObservable(
+                            function() {
+                                handlerUpdateFn(node, getValueAccessor(bindingKey), allBindings, bindingContext['$data'], bindingContext);
+                            },
+                            null,
+                            { disposeWhenNodeIsRemoved: node }
+                        );
+                    }
+                } catch (ex) {
+                    ex.message = "Unable to process binding \"" + bindingKey + ": " + bindings[bindingKey] + "\"\nMessage: " + ex.message;
+                    throw ex;
+                }
+            });
+        }
 
         return {
-            shouldBindDescendants: bindingHandlerThatControlsDescendantBindings === undefined
+            'shouldBindDescendants': bindingHandlerThatControlsDescendantBindings === undefined
         };
     };
 
-    var storedBindingContextDomDataKey = "__ko_bindingContext__";
+    var storedBindingContextDomDataKey = ko.utils.domData.nextKey();
     ko.storedBindingContextForNode = function (node, bindingContext) {
-        if (arguments.length == 2)
+        if (arguments.length == 2) {
             ko.utils.domData.set(node, storedBindingContextDomDataKey, bindingContext);
-        else
+            if (bindingContext._subscribable)
+                bindingContext._subscribable._addNode(node);
+        } else {
             return ko.utils.domData.get(node, storedBindingContextDomDataKey);
+        }
     }
 
-    ko.applyBindingsToNode = function (node, bindings, viewModel) {
+    function getBindingContext(viewModelOrBindingContext) {
+        return viewModelOrBindingContext && (viewModelOrBindingContext instanceof ko.bindingContext)
+            ? viewModelOrBindingContext
+            : new ko.bindingContext(viewModelOrBindingContext);
+    }
+
+    ko.applyBindingAccessorsToNode = function (node, bindings, viewModelOrBindingContext) {
         if (node.nodeType === 1) // If it's an element, workaround IE <= 8 HTML parsing weirdness
             ko.virtualElements.normaliseVirtualElementDomStructure(node);
-        return applyBindingsToNodeInternal(node, bindings, viewModel, true);
+        return applyBindingsToNodeInternal(node, bindings, getBindingContext(viewModelOrBindingContext), true);
     };
 
-    ko.applyBindingsToDescendants = function(viewModel, rootNode) {
+    ko.applyBindingsToNode = function (node, bindings, viewModelOrBindingContext) {
+        var context = getBindingContext(viewModelOrBindingContext);
+        return ko.applyBindingAccessorsToNode(node, makeBindingAccessors(bindings, context, node), context);
+    };
+
+    ko.applyBindingsToDescendants = function(viewModelOrBindingContext, rootNode) {
         if (rootNode.nodeType === 1 || rootNode.nodeType === 8)
-            applyBindingsToDescendantsInternal(viewModel, rootNode, true);
+            applyBindingsToDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true);
     };
 
-    ko.applyBindings = function (viewModel, rootNode) {
+    ko.applyBindings = function (viewModelOrBindingContext, rootNode) {
         if (rootNode && (rootNode.nodeType !== 1) && (rootNode.nodeType !== 8))
             throw new Error("ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node");
         rootNode = rootNode || window.document.body; // Make "rootNode" parameter optional
 
-        applyBindingsToNodeAndDescendantsInternal(viewModel, rootNode, true);
+        applyBindingsToNodeAndDescendantsInternal(getBindingContext(viewModelOrBindingContext), rootNode, true);
     };
 
     // Retrieving binding context from arbitrary nodes
@@ -4999,13 +5541,14 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
     ko.exportSymbol('bindingHandlers', ko.bindingHandlers);
     ko.exportSymbol('applyBindings', ko.applyBindings);
     ko.exportSymbol('applyBindingsToDescendants', ko.applyBindingsToDescendants);
+    ko.exportSymbol('applyBindingAccessorsToNode', ko.applyBindingAccessorsToNode);
     ko.exportSymbol('applyBindingsToNode', ko.applyBindingsToNode);
     ko.exportSymbol('contextFor', ko.contextFor);
     ko.exportSymbol('dataFor', ko.dataFor);
 })();
 var attrHtmlToJavascriptMap = { 'class': 'className', 'for': 'htmlFor' };
 ko.bindingHandlers['attr'] = {
-    'update': function(element, valueAccessor, allBindingsAccessor) {
+    'update': function(element, valueAccessor, allBindings) {
         var value = ko.utils.unwrapObservable(valueAccessor()) || {};
         ko.utils.objectForEach(value, function(attrName, attrValue) {
             attrValue = ko.utils.unwrapObservable(attrValue);
@@ -5041,54 +5584,111 @@ ko.bindingHandlers['attr'] = {
         });
     }
 };
+(function() {
+
 ko.bindingHandlers['checked'] = {
-    'init': function (element, valueAccessor, allBindingsAccessor) {
-        var updateHandler = function() {
-            var valueToWrite;
-            if (element.type == "checkbox") {
-                valueToWrite = element.checked;
-            } else if ((element.type == "radio") && (element.checked)) {
-                valueToWrite = element.value;
-            } else {
-                return; // "checked" binding only responds to checkboxes and selected radio buttons
+    'after': ['value', 'attr'],
+    'init': function (element, valueAccessor, allBindings) {
+        function checkedValue() {
+            return allBindings['has']('checkedValue')
+                ? ko.utils.unwrapObservable(allBindings.get('checkedValue'))
+                : element.value;
+        }
+
+        function updateModel() {
+            // This updates the model value from the view value.
+            // It runs in response to DOM events (click) and changes in checkedValue.
+            var isChecked = element.checked,
+                elemValue = useCheckedValue ? checkedValue() : isChecked;
+
+            // When we're first setting up this computed, don't change any model state.
+            if (!shouldSet) {
+                return;
             }
 
-            var modelValue = valueAccessor(), unwrappedValue = ko.utils.unwrapObservable(modelValue);
-            if ((element.type == "checkbox") && (unwrappedValue instanceof Array)) {
-                // For checkboxes bound to an array, we add/remove the checkbox value to that array
-                // This works for both observable and non-observable arrays
-                var existingEntryIndex = ko.utils.arrayIndexOf(unwrappedValue, element.value);
-                if (element.checked && (existingEntryIndex < 0))
-                    modelValue.push(element.value);
-                else if ((!element.checked) && (existingEntryIndex >= 0))
-                    modelValue.splice(existingEntryIndex, 1);
+            // We can ignore unchecked radio buttons, because some other radio
+            // button will be getting checked, and that one can take care of updating state.
+            if (isRadio && !isChecked) {
+                return;
+            }
+
+            var modelValue = ko.dependencyDetection.ignore(valueAccessor);
+            if (isValueArray) {
+                if (oldElemValue !== elemValue) {
+                    // When we're responding to the checkedValue changing, and the element is
+                    // currently checked, replace the old elem value with the new elem value
+                    // in the model array.
+                    if (isChecked) {
+                        ko.utils.addOrRemoveItem(modelValue, elemValue, true);
+                        ko.utils.addOrRemoveItem(modelValue, oldElemValue, false);
+                    }
+
+                    oldElemValue = elemValue;
+                } else {
+                    // When we're responding to the user having checked/unchecked a checkbox,
+                    // add/remove the element value to the model array.
+                    ko.utils.addOrRemoveItem(modelValue, elemValue, isChecked);
+                }
             } else {
-                ko.expressionRewriting.writeValueToProperty(modelValue, allBindingsAccessor, 'checked', valueToWrite, true);
+                ko.expressionRewriting.writeValueToProperty(modelValue, allBindings, 'checked', elemValue, true);
             }
         };
-        ko.utils.registerEventHandler(element, "click", updateHandler);
+
+        function updateView() {
+            // This updates the view value from the model value.
+            // It runs in response to changes in the bound (checked) value.
+            var modelValue = ko.utils.unwrapObservable(valueAccessor());
+
+            if (isValueArray) {
+                // When a checkbox is bound to an array, being checked represents its value being present in that array
+                element.checked = ko.utils.arrayIndexOf(modelValue, checkedValue()) >= 0;
+            } else if (isCheckbox) {
+                // When a checkbox is bound to any other value (not an array), being checked represents the value being trueish
+                element.checked = modelValue;
+            } else {
+                // For radio buttons, being checked means that the radio button's value corresponds to the model value
+                element.checked = (checkedValue() === modelValue);
+            }
+        };
+
+        var isCheckbox = element.type == "checkbox",
+            isRadio = element.type == "radio";
+
+        // Only bind to check boxes and radio buttons
+        if (!isCheckbox && !isRadio) {
+            return;
+        }
+
+        var isValueArray = isCheckbox && (ko.utils.unwrapObservable(valueAccessor()) instanceof Array),
+            oldElemValue = isValueArray ? checkedValue() : undefined,
+            useCheckedValue = isRadio || isValueArray,
+            shouldSet = false;
 
         // IE 6 won't allow radio buttons to be selected unless they have a name
-        if ((element.type == "radio") && !element.name)
+        if (isRadio && !element.name)
             ko.bindingHandlers['uniqueName']['init'](element, function() { return true });
-    },
-    'update': function (element, valueAccessor) {
-        var value = ko.utils.unwrapObservable(valueAccessor());
 
-        if (element.type == "checkbox") {
-            if (value instanceof Array) {
-                // When bound to an array, the checkbox being checked represents its value being present in that array
-                element.checked = ko.utils.arrayIndexOf(value, element.value) >= 0;
-            } else {
-                // When bound to anything other value (not an array), the checkbox being checked represents the value being trueish
-                element.checked = value;
-            }
-        } else if (element.type == "radio") {
-            element.checked = (element.value == value);
-        }
+        // Set up two computeds to update the binding:
+
+        // The first responds to changes in the checkedValue value and to element clicks
+        ko.dependentObservable(updateModel, null, { disposeWhenNodeIsRemoved: element });
+        ko.utils.registerEventHandler(element, "click", updateModel);
+
+        // The second responds to changes in the model value (the one associated with the checked binding)
+        ko.dependentObservable(updateView, null, { disposeWhenNodeIsRemoved: element });
+
+        shouldSet = true;
     }
 };
-var classesWrittenByBindingKey = '__ko__cssValue';
+ko.expressionRewriting.twoWayBindings['checked'] = true;
+
+ko.bindingHandlers['checkedValue'] = {
+    'update': function (element, valueAccessor) {
+        element.value = ko.utils.unwrapObservable(valueAccessor());
+    }
+};
+
+})();var classesWrittenByBindingKey = '__ko__cssValue';
 ko.bindingHandlers['css'] = {
     'update': function (element, valueAccessor) {
         var value = ko.utils.unwrapObservable(valueAccessor());
@@ -5124,19 +5724,19 @@ ko.bindingHandlers['disable'] = {
 // e.g. click:handler instead of the usual full-length event:{click:handler}
 function makeEventHandlerShortcut(eventName) {
     ko.bindingHandlers[eventName] = {
-        'init': function(element, valueAccessor, allBindingsAccessor, viewModel) {
+        'init': function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             var newValueAccessor = function () {
                 var result = {};
                 result[eventName] = valueAccessor();
                 return result;
             };
-            return ko.bindingHandlers['event']['init'].call(this, element, newValueAccessor, allBindingsAccessor, viewModel);
+            return ko.bindingHandlers['event']['init'].call(this, element, newValueAccessor, allBindings, viewModel, bindingContext);
         }
     }
 }
 
 ko.bindingHandlers['event'] = {
-    'init' : function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    'init' : function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         var eventsToHandle = valueAccessor() || {};
         ko.utils.objectForEach(eventsToHandle, function(eventName) {
             if (typeof eventName == "string") {
@@ -5145,11 +5745,11 @@ ko.bindingHandlers['event'] = {
                     var handlerFunction = valueAccessor()[eventName];
                     if (!handlerFunction)
                         return;
-                    var allBindings = allBindingsAccessor();
 
                     try {
                         // Take all the event args, and prefix with the viewmodel
                         var argsForHandler = ko.utils.makeArray(arguments);
+                        viewModel = bindingContext['$data'];
                         argsForHandler.unshift(viewModel);
                         handlerReturnValue = handlerFunction.apply(viewModel, argsForHandler);
                     } finally {
@@ -5161,7 +5761,7 @@ ko.bindingHandlers['event'] = {
                         }
                     }
 
-                    var bubble = allBindings[eventName + 'Bubble'] !== false;
+                    var bubble = allBindings.get(eventName + 'Bubble') !== false;
                     if (!bubble) {
                         event.cancelBubble = true;
                         if (event.stopPropagation)
@@ -5201,11 +5801,11 @@ ko.bindingHandlers['foreach'] = {
             };
         };
     },
-    'init': function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+    'init': function(element, valueAccessor, allBindings, viewModel, bindingContext) {
         return ko.bindingHandlers['template']['init'](element, ko.bindingHandlers['foreach'].makeTemplateValueAccessor(valueAccessor));
     },
-    'update': function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-        return ko.bindingHandlers['template']['update'](element, ko.bindingHandlers['foreach'].makeTemplateValueAccessor(valueAccessor), allBindingsAccessor, viewModel, bindingContext);
+    'update': function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+        return ko.bindingHandlers['template']['update'](element, ko.bindingHandlers['foreach'].makeTemplateValueAccessor(valueAccessor), allBindings, viewModel, bindingContext);
     }
 };
 ko.expressionRewriting.bindingRewriteValidators['foreach'] = false; // Can't rewrite control flow bindings
@@ -5213,7 +5813,7 @@ ko.virtualElements.allowedBindings['foreach'] = true;
 var hasfocusUpdatingProperty = '__ko_hasfocusUpdating';
 var hasfocusLastValue = '__ko_hasfocusLastValue';
 ko.bindingHandlers['hasfocus'] = {
-    'init': function(element, valueAccessor, allBindingsAccessor) {
+    'init': function(element, valueAccessor, allBindings) {
         var handleElementFocusChange = function(isFocused) {
             // Where possible, ignore which event was raised and determine focus state using activeElement,
             // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
@@ -5224,10 +5824,17 @@ ko.bindingHandlers['hasfocus'] = {
             element[hasfocusUpdatingProperty] = true;
             var ownerDoc = element.ownerDocument;
             if ("activeElement" in ownerDoc) {
-                isFocused = (ownerDoc.activeElement === element);
+                var active;
+                try {
+                    active = ownerDoc.activeElement;
+                } catch(e) {
+                    // IE9 throws if you access activeElement during page load (see issue #703)
+                    active = ownerDoc.body;
+                }
+                isFocused = (active === element);
             }
             var modelValue = valueAccessor();
-            ko.expressionRewriting.writeValueToProperty(modelValue, allBindingsAccessor, 'hasfocus', isFocused, true);
+            ko.expressionRewriting.writeValueToProperty(modelValue, allBindings, 'hasfocus', isFocused, true);
 
             //cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
             element[hasfocusLastValue] = isFocused;
@@ -5249,8 +5856,10 @@ ko.bindingHandlers['hasfocus'] = {
         }
     }
 };
+ko.expressionRewriting.twoWayBindings['hasfocus'] = true;
 
 ko.bindingHandlers['hasFocus'] = ko.bindingHandlers['hasfocus']; // Make "hasFocus" an alias
+ko.expressionRewriting.twoWayBindings['hasFocus'] = true;
 ko.bindingHandlers['html'] = {
     'init': function() {
         // Prevent binding on the dynamically-injected HTML (as developers are unlikely to expect that, and it has security implications)
@@ -5261,15 +5870,15 @@ ko.bindingHandlers['html'] = {
         ko.utils.setHtml(element, valueAccessor());
     }
 };
-var withIfDomDataKey = '__ko_withIfBindingData';
+var withIfDomDataKey = ko.utils.domData.nextKey();
 // Makes a binding like with or if
 function makeWithIfBinding(bindingKey, isWith, isNot, makeContextCallback) {
     ko.bindingHandlers[bindingKey] = {
-        'init': function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        'init': function(element) {
             ko.utils.domData.set(element, withIfDomDataKey, {});
             return { 'controlsDescendantBindings': true };
         },
-        'update': function(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        'update': function(element, valueAccessor, allBindings, viewModel, bindingContext) {
             var withIfData = ko.utils.domData.get(element, withIfDomDataKey),
                 dataValue = ko.utils.unwrapObservable(valueAccessor()),
                 shouldDisplay = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
@@ -5306,119 +5915,157 @@ makeWithIfBinding('with', true /* isWith */, false /* isNot */,
         return bindingContext['createChildContext'](dataValue);
     }
 );
-function ensureDropdownSelectionIsConsistentWithModelValue(element, modelValue, preferModelValue) {
-    if (preferModelValue) {
-        if (modelValue !== ko.selectExtensions.readValue(element))
-            ko.selectExtensions.writeValue(element, modelValue);
-    }
-
-    // No matter which direction we're syncing in, we want the end result to be equality between dropdown value and model value.
-    // If they aren't equal, either we prefer the dropdown value, or the model value couldn't be represented, so either way,
-    // change the model value to match the dropdown.
-    if (modelValue !== ko.selectExtensions.readValue(element))
-        ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
-};
-
 ko.bindingHandlers['options'] = {
-    'update': function (element, valueAccessor, allBindingsAccessor) {
+    'init': function(element) {
         if (ko.utils.tagNameLower(element) !== "select")
             throw new Error("options binding applies only to SELECT elements");
 
-        var selectWasPreviouslyEmpty = element.length == 0;
-        var previousSelectedValues = ko.utils.arrayMap(ko.utils.arrayFilter(element.childNodes, function (node) {
-            return node.tagName && (ko.utils.tagNameLower(node) === "option") && node.selected;
-        }), function (node) {
-            return ko.selectExtensions.readValue(node) || node.innerText || node.textContent;
-        });
-        var previousScrollTop = element.scrollTop;
-
-        var value = ko.utils.unwrapObservable(valueAccessor());
-        var selectedValue = element.value;
-
         // Remove all existing <option>s.
-        // Need to use .remove() rather than .removeChild() for <option>s otherwise IE behaves oddly (https://github.com/SteveSanderson/knockout/issues/134)
         while (element.length > 0) {
-            ko.cleanNode(element.options[0]);
             element.remove(0);
         }
 
-        if (value) {
-            var allBindings = allBindingsAccessor(),
-                includeDestroyed = allBindings['optionsIncludeDestroyed'];
+        // Ensures that the binding processor doesn't try to bind the options
+        return { 'controlsDescendantBindings': true };
+    },
+    'update': function (element, valueAccessor, allBindings) {
+        function selectedOptions() {
+            return ko.utils.arrayFilter(element.options, function (node) { return node.selected; });
+        }
 
-            if (typeof value.length != "number")
-                value = [value];
-            if (allBindings['optionsCaption']) {
-                var option = document.createElement("option");
-                ko.utils.setHtml(option, allBindings['optionsCaption']);
-                ko.selectExtensions.writeValue(option, undefined);
-                element.appendChild(option);
-            }
+        var selectWasPreviouslyEmpty = element.length == 0;
+        var previousScrollTop = (!selectWasPreviouslyEmpty && element.multiple) ? element.scrollTop : null;
 
-            for (var i = 0, j = value.length; i < j; i++) {
-                // Skip destroyed items
-                var arrayEntry = value[i];
-                if (arrayEntry && arrayEntry['_destroy'] && !includeDestroyed)
-                    continue;
+        var unwrappedArray = ko.utils.unwrapObservable(valueAccessor());
+        var includeDestroyed = allBindings.get('optionsIncludeDestroyed');
+        var captionPlaceholder = {};
+        var captionValue;
+        var previousSelectedValues;
+        if (element.multiple) {
+            previousSelectedValues = ko.utils.arrayMap(selectedOptions(), ko.selectExtensions.readValue);
+        } else {
+            previousSelectedValues = element.selectedIndex >= 0 ? [ ko.selectExtensions.readValue(element.options[element.selectedIndex]) ] : [];
+        }
 
-                var option = document.createElement("option");
+        if (unwrappedArray) {
+            if (typeof unwrappedArray.length == "undefined") // Coerce single value into array
+                unwrappedArray = [unwrappedArray];
 
-                function applyToObject(object, predicate, defaultValue) {
-                    var predicateType = typeof predicate;
-                    if (predicateType == "function")    // Given a function; run it against the data value
-                        return predicate(object);
-                    else if (predicateType == "string") // Given a string; treat it as a property name on the data value
-                        return object[predicate];
-                    else                                // Given no optionsText arg; use the data value itself
-                        return defaultValue;
+            // Filter out any entries marked as destroyed
+            var filteredArray = ko.utils.arrayFilter(unwrappedArray, function(item) {
+                return includeDestroyed || item === undefined || item === null || !ko.utils.unwrapObservable(item['_destroy']);
+            });
+
+            // If caption is included, add it to the array
+            if (allBindings['has']('optionsCaption')) {
+                captionValue = ko.utils.unwrapObservable(allBindings.get('optionsCaption'));
+                // If caption value is null or undefined, don't show a caption
+                if (captionValue !== null && captionValue !== undefined) {
+                    filteredArray.unshift(captionPlaceholder);
                 }
+            }
+        } else {
+            // If a falsy value is provided (e.g. null), we'll simply empty the select element
+            unwrappedArray = [];
+        }
 
+        function applyToObject(object, predicate, defaultValue) {
+            var predicateType = typeof predicate;
+            if (predicateType == "function")    // Given a function; run it against the data value
+                return predicate(object);
+            else if (predicateType == "string") // Given a string; treat it as a property name on the data value
+                return object[predicate];
+            else                                // Given no optionsText arg; use the data value itself
+                return defaultValue;
+        }
+
+        // The following functions can run at two different times:
+        // The first is when the whole array is being updated directly from this binding handler.
+        // The second is when an observable value for a specific array entry is updated.
+        // oldOptions will be empty in the first case, but will be filled with the previously generated option in the second.
+        var itemUpdate = false;
+        function optionForArrayItem(arrayEntry, index, oldOptions) {
+            if (oldOptions.length) {
+                previousSelectedValues = oldOptions[0].selected ? [ ko.selectExtensions.readValue(oldOptions[0]) ] : [];
+                itemUpdate = true;
+            }
+            var option = document.createElement("option");
+            if (arrayEntry === captionPlaceholder) {
+                ko.utils.setTextContent(option, allBindings.get('optionsCaption'));
+                ko.selectExtensions.writeValue(option, undefined);
+            } else {
                 // Apply a value to the option element
-                var optionValue = applyToObject(arrayEntry, allBindings['optionsValue'], arrayEntry);
+                var optionValue = applyToObject(arrayEntry, allBindings.get('optionsValue'), arrayEntry);
                 ko.selectExtensions.writeValue(option, ko.utils.unwrapObservable(optionValue));
 
                 // Apply some text to the option element
-                var optionText = applyToObject(arrayEntry, allBindings['optionsText'], optionValue);
+                var optionText = applyToObject(arrayEntry, allBindings.get('optionsText'), optionValue);
                 ko.utils.setTextContent(option, optionText);
-
-                element.appendChild(option);
             }
+            return [option];
+        }
 
+        function setSelectionCallback(arrayEntry, newOptions) {
             // IE6 doesn't like us to assign selection to OPTION nodes before they're added to the document.
             // That's why we first added them without selection. Now it's time to set the selection.
-            var newOptions = element.getElementsByTagName("option");
-            var countSelectionsRetained = 0;
-            for (var i = 0, j = newOptions.length; i < j; i++) {
-                if (ko.utils.arrayIndexOf(previousSelectedValues, ko.selectExtensions.readValue(newOptions[i])) >= 0) {
-                    ko.utils.setOptionNodeSelectionState(newOptions[i], true);
-                    countSelectionsRetained++;
-                }
+            if (previousSelectedValues.length) {
+                var isSelected = ko.utils.arrayIndexOf(previousSelectedValues, ko.selectExtensions.readValue(newOptions[0])) >= 0;
+                ko.utils.setOptionNodeSelectionState(newOptions[0], isSelected);
+
+                // If this option was changed from being selected during a single-item update, notify the change
+                if (itemUpdate && !isSelected)
+                    ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
             }
-
-            element.scrollTop = previousScrollTop;
-
-            if (selectWasPreviouslyEmpty && ('value' in allBindings)) {
-                // Ensure consistency between model value and selected option.
-                // If the dropdown is being populated for the first time here (or was otherwise previously empty),
-                // the dropdown selection state is meaningless, so we preserve the model value.
-                ensureDropdownSelectionIsConsistentWithModelValue(element, ko.utils.peekObservable(allBindings['value']), /* preferModelValue */ true);
-            }
-
-            // Workaround for IE9 bug
-            ko.utils.ensureSelectElementIsRenderedCorrectly(element);
         }
+
+        var callback = setSelectionCallback;
+        if (allBindings['has']('optionsAfterRender')) {
+            callback = function(arrayEntry, newOptions) {
+                setSelectionCallback(arrayEntry, newOptions);
+                ko.dependencyDetection.ignore(allBindings.get('optionsAfterRender'), null, [newOptions[0], arrayEntry !== captionPlaceholder ? arrayEntry : undefined]);
+            }
+        }
+
+        ko.utils.setDomNodeChildrenFromArrayMapping(element, filteredArray, optionForArrayItem, null, callback);
+
+        // Determine if the selection has changed as a result of updating the options list
+        var selectionChanged;
+        if (element.multiple) {
+            // For a multiple-select box, compare the new selection count to the previous one
+            // But if nothing was selected before, the selection can't have changed
+            selectionChanged = previousSelectedValues.length && selectedOptions().length < previousSelectedValues.length;
+        } else {
+            // For a single-select box, compare the current value to the previous value
+            // But if nothing was selected before or nothing is selected now, just look for a change in selection
+            selectionChanged = (previousSelectedValues.length && element.selectedIndex >= 0)
+                ? (ko.selectExtensions.readValue(element.options[element.selectedIndex]) !== previousSelectedValues[0])
+                : (previousSelectedValues.length || element.selectedIndex >= 0);
+        }
+
+        // Ensure consistency between model value and selected option.
+        // If the dropdown was changed so that selection is no longer the same,
+        // notify the value or selectedOptions binding.
+        if (selectionChanged)
+            ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
+
+        // Workaround for IE bug
+        ko.utils.ensureSelectElementIsRenderedCorrectly(element);
+
+        if (previousScrollTop && Math.abs(previousScrollTop - element.scrollTop) > 20)
+            element.scrollTop = previousScrollTop;
     }
 };
-ko.bindingHandlers['options'].optionValueDomDataKey = '__ko.optionValueDomData__';
+ko.bindingHandlers['options'].optionValueDomDataKey = ko.utils.domData.nextKey();
 ko.bindingHandlers['selectedOptions'] = {
-    'init': function (element, valueAccessor, allBindingsAccessor) {
+    'after': ['options', 'foreach'],
+    'init': function (element, valueAccessor, allBindings) {
         ko.utils.registerEventHandler(element, "change", function () {
             var value = valueAccessor(), valueToWrite = [];
             ko.utils.arrayForEach(element.getElementsByTagName("option"), function(node) {
                 if (node.selected)
                     valueToWrite.push(ko.selectExtensions.readValue(node));
             });
-            ko.expressionRewriting.writeValueToProperty(value, allBindingsAccessor, 'selectedOptions', valueToWrite);
+            ko.expressionRewriting.writeValueToProperty(value, allBindings, 'selectedOptions', valueToWrite);
         });
     },
     'update': function (element, valueAccessor) {
@@ -5434,6 +6081,7 @@ ko.bindingHandlers['selectedOptions'] = {
         }
     }
 };
+ko.expressionRewriting.twoWayBindings['selectedOptions'] = true;
 ko.bindingHandlers['style'] = {
     'update': function (element, valueAccessor) {
         var value = ko.utils.unwrapObservable(valueAccessor() || {});
@@ -5444,13 +6092,13 @@ ko.bindingHandlers['style'] = {
     }
 };
 ko.bindingHandlers['submit'] = {
-    'init': function (element, valueAccessor, allBindingsAccessor, viewModel) {
+    'init': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
         if (typeof valueAccessor() != "function")
             throw new Error("The value for a submit binding must be a function");
         ko.utils.registerEventHandler(element, "submit", function (event) {
             var handlerReturnValue;
             var value = valueAccessor();
-            try { handlerReturnValue = value.call(viewModel, element); }
+            try { handlerReturnValue = value.call(bindingContext['$data'], element); }
             finally {
                 if (handlerReturnValue !== true) { // Normally we want to prevent default action. Developer can override this be explicitly returning true.
                     if (event.preventDefault)
@@ -5463,6 +6111,11 @@ ko.bindingHandlers['submit'] = {
     }
 };
 ko.bindingHandlers['text'] = {
+	'init': function() {
+		// Prevent binding on the dynamically-injected text node (as developers are unlikely to expect that, and it has security implications).
+		// It should also make things faster, as we no longer have to consider whether the text node might be bindable.
+        return { 'controlsDescendantBindings': true };
+	},
     'update': function (element, valueAccessor) {
         ko.utils.setTextContent(element, valueAccessor());
     }
@@ -5478,10 +6131,11 @@ ko.bindingHandlers['uniqueName'] = {
 };
 ko.bindingHandlers['uniqueName'].currentIndex = 0;
 ko.bindingHandlers['value'] = {
-    'init': function (element, valueAccessor, allBindingsAccessor) {
+    'after': ['options', 'foreach'],
+    'init': function (element, valueAccessor, allBindings) {
         // Always catch "change" event; possibly other events too if asked
         var eventsToCatch = ["change"];
-        var requestedEventsToCatch = allBindingsAccessor()["valueUpdate"];
+        var requestedEventsToCatch = allBindings.get("valueUpdate");
         var propertyChangedFired = false;
         if (requestedEventsToCatch) {
             if (typeof requestedEventsToCatch == "string") // Allow both individual event names, and arrays of event names
@@ -5494,7 +6148,7 @@ ko.bindingHandlers['value'] = {
             propertyChangedFired = false;
             var modelValue = valueAccessor();
             var elementValue = ko.selectExtensions.readValue(element);
-            ko.expressionRewriting.writeValueToProperty(modelValue, allBindingsAccessor, 'value', elementValue);
+            ko.expressionRewriting.writeValueToProperty(modelValue, allBindings, 'value', elementValue);
         }
 
         // Workaround for https://github.com/SteveSanderson/knockout/issues/122
@@ -5526,31 +6180,28 @@ ko.bindingHandlers['value'] = {
         var valueIsSelectOption = ko.utils.tagNameLower(element) === "select";
         var newValue = ko.utils.unwrapObservable(valueAccessor());
         var elementValue = ko.selectExtensions.readValue(element);
-        var valueHasChanged = (newValue != elementValue);
-
-        // JavaScript's 0 == "" behavious is unfortunate here as it prevents writing 0 to an empty text box (loose equality suggests the values are the same).
-        // We don't want to do a strict equality comparison as that is more confusing for developers in certain cases, so we specifically special case 0 != "" here.
-        if ((newValue === 0) && (elementValue !== 0) && (elementValue !== "0"))
-            valueHasChanged = true;
+        var valueHasChanged = (newValue !== elementValue);
 
         if (valueHasChanged) {
             var applyValueAction = function () { ko.selectExtensions.writeValue(element, newValue); };
             applyValueAction();
 
-            // Workaround for IE6 bug: It won't reliably apply values to SELECT nodes during the same execution thread
-            // right after you've changed the set of OPTION nodes on it. So for that node type, we'll schedule a second thread
-            // to apply the value as well.
-            var alsoApplyAsynchronously = valueIsSelectOption;
-            if (alsoApplyAsynchronously)
-                setTimeout(applyValueAction, 0);
+            if (valueIsSelectOption) {
+                if (newValue !== ko.selectExtensions.readValue(element)) {
+                    // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
+                    // because you're not allowed to have a model value that disagrees with a visible UI selection.
+                    ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
+                } else {
+                    // Workaround for IE6 bug: It won't reliably apply values to SELECT nodes during the same execution thread
+                    // right after you've changed the set of OPTION nodes on it. So for that node type, we'll schedule a second thread
+                    // to apply the value as well.
+                    setTimeout(applyValueAction, 0);
+                }
+            }
         }
-
-        // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
-        // because you're not allowed to have a model value that disagrees with a visible UI selection.
-        if (valueIsSelectOption && (element.length > 0))
-            ensureDropdownSelectionIsConsistentWithModelValue(element, newValue, /* preferModelValue */ false);
     }
 };
+ko.expressionRewriting.twoWayBindings['value'] = true;
 ko.bindingHandlers['visible'] = {
     'update': function (element, valueAccessor) {
         var value = ko.utils.unwrapObservable(valueAccessor());
@@ -5636,7 +6287,7 @@ ko.templateEngine.prototype['rewriteTemplate'] = function (template, rewriterCal
 ko.exportSymbol('templateEngine', ko.templateEngine);
 
 ko.templateRewriting = (function () {
-    var memoizeDataBindingAttributeSyntaxRegex = /(<[a-z]+\d*(\s+(?!data-bind=)[a-z0-9\-]+(=(\"[^\"]*\"|\'[^\']*\'))?)*\s+)data-bind=(["'])([\s\S]*?)\5/gi;
+    var memoizeDataBindingAttributeSyntaxRegex = /(<([a-z]+\d*)(?:\s+(?!data-bind\s*=\s*)[a-z0-9\-]+(?:=(?:\"[^\"]*\"|\'[^\']*\'))?)*\s+)data-bind\s*=\s*(["'])([\s\S]*?)\3/gi;
     var memoizeVirtualContainerBindingSyntaxRegex = /<!--\s*ko\b\s*([\s\S]*?)\s*-->/g;
 
     function validateDataBindValuesForRewriting(keyValueArray) {
@@ -5657,16 +6308,16 @@ ko.templateRewriting = (function () {
         }
     }
 
-    function constructMemoizedTagReplacement(dataBindAttributeValue, tagToRetain, templateEngine) {
+    function constructMemoizedTagReplacement(dataBindAttributeValue, tagToRetain, nodeName, templateEngine) {
         var dataBindKeyValueArray = ko.expressionRewriting.parseObjectLiteral(dataBindAttributeValue);
         validateDataBindValuesForRewriting(dataBindKeyValueArray);
-        var rewrittenDataBindAttributeValue = ko.expressionRewriting.preProcessBindings(dataBindKeyValueArray);
+        var rewrittenDataBindAttributeValue = ko.expressionRewriting.preProcessBindings(dataBindKeyValueArray, {'valueAccessors':true});
 
         // For no obvious reason, Opera fails to evaluate rewrittenDataBindAttributeValue unless it's wrapped in an additional
         // anonymous function, even though Opera's built-in debugger can evaluate it anyway. No other browser requires this
         // extra indirection.
         var applyBindingsToNextSiblingScript =
-            "ko.__tr_ambtns(function($context,$element){return(function(){return{ " + rewrittenDataBindAttributeValue + " } })()})";
+            "ko.__tr_ambtns(function($context,$element){return(function(){return{ " + rewrittenDataBindAttributeValue + " } })()},'" + nodeName.toLowerCase() + "')";
         return templateEngine['createJavaScriptEvaluatorBlock'](applyBindingsToNextSiblingScript) + tagToRetain;
     }
 
@@ -5680,16 +6331,18 @@ ko.templateRewriting = (function () {
 
         memoizeBindingAttributeSyntax: function (htmlString, templateEngine) {
             return htmlString.replace(memoizeDataBindingAttributeSyntaxRegex, function () {
-                return constructMemoizedTagReplacement(/* dataBindAttributeValue: */ arguments[6], /* tagToRetain: */ arguments[1], templateEngine);
+                return constructMemoizedTagReplacement(/* dataBindAttributeValue: */ arguments[4], /* tagToRetain: */ arguments[1], /* nodeName: */ arguments[2], templateEngine);
             }).replace(memoizeVirtualContainerBindingSyntaxRegex, function() {
-                return constructMemoizedTagReplacement(/* dataBindAttributeValue: */ arguments[1], /* tagToRetain: */ "<!-- ko -->", templateEngine);
+                return constructMemoizedTagReplacement(/* dataBindAttributeValue: */ arguments[1], /* tagToRetain: */ "<!-- ko -->", /* nodeName: */ "#comment", templateEngine);
             });
         },
 
-        applyMemoizedBindingsToNextSibling: function (bindings) {
+        applyMemoizedBindingsToNextSibling: function (bindings, nodeName) {
             return ko.memoization.memoize(function (domNode, bindingContext) {
-                if (domNode.nextSibling)
-                    ko.applyBindingsToNode(domNode.nextSibling, bindings, bindingContext);
+                var nodeToBind = domNode.nextSibling;
+                if (nodeToBind && nodeToBind.nodeName.toLowerCase() === nodeName) {
+                    ko.applyBindingAccessorsToNode(nodeToBind, bindings, bindingContext);
+                }
             });
         }
     }
@@ -5748,11 +6401,12 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         }
     };
 
+    var dataDomDataPrefix = ko.utils.domData.nextKey() + "_";
     ko.templateSources.domElement.prototype['data'] = function(key /*, valueToWrite */) {
         if (arguments.length === 1) {
-            return ko.utils.domData.get(this.domElement, "templateSourceData_" + key);
+            return ko.utils.domData.get(this.domElement, dataDomDataPrefix + key);
         } else {
-            ko.utils.domData.set(this.domElement, "templateSourceData_" + key, arguments[1]);
+            ko.utils.domData.set(this.domElement, dataDomDataPrefix + key, arguments[1]);
         }
     };
 
@@ -5761,7 +6415,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
     // For compatibility, you can also read "text"; it will be serialized from the nodes on demand.
     // Writing to "text" is still supported, but then the template data will not be available as DOM nodes.
 
-    var anonymousTemplatesDomDataKey = "__ko_anon_template__";
+    var anonymousTemplatesDomDataKey = ko.utils.domData.nextKey();
     ko.templateSources.anonymousTemplate = function(element) {
         this.domElement = element;
     }
@@ -5800,12 +6454,11 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         _templateEngine = templateEngine;
     }
 
-    function invokeForEachNodeOrCommentInContinuousRange(firstNode, lastNode, action) {
+    function invokeForEachNodeInContinuousRange(firstNode, lastNode, action) {
         var node, nextInQueue = firstNode, firstOutOfRangeNode = ko.virtualElements.nextSibling(lastNode);
         while (nextInQueue && ((node = nextInQueue) !== firstOutOfRangeNode)) {
             nextInQueue = ko.virtualElements.nextSibling(node);
-            if (node.nodeType === 1 || node.nodeType === 8)
-                action(node);
+            action(node, nextInQueue);
         }
     }
 
@@ -5817,16 +6470,52 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         // (2) Unmemoizes any memos in the DOM subtree (e.g., to activate bindings that had been memoized during template rewriting)
 
         if (continuousNodeArray.length) {
-            var firstNode = continuousNodeArray[0], lastNode = continuousNodeArray[continuousNodeArray.length - 1];
+            var firstNode = continuousNodeArray[0],
+                lastNode = continuousNodeArray[continuousNodeArray.length - 1],
+                parentNode = firstNode.parentNode,
+                provider = ko.bindingProvider['instance'],
+                preprocessNode = provider['preprocessNode'];
+
+            if (preprocessNode) {
+                invokeForEachNodeInContinuousRange(firstNode, lastNode, function(node, nextNodeInRange) {
+                    var nodePreviousSibling = node.previousSibling;
+                    var newNodes = preprocessNode.call(provider, node);
+                    if (newNodes) {
+                        if (node === firstNode)
+                            firstNode = newNodes[0] || nextNodeInRange;
+                        if (node === lastNode)
+                            lastNode = newNodes[newNodes.length - 1] || nodePreviousSibling;
+                    }
+                });
+
+                // Because preprocessNode can change the nodes, including the first and last nodes, update continuousNodeArray to match.
+                // We need the full set, including inner nodes, because the unmemoize step might remove the first node (and so the real
+                // first node needs to be in the array).
+                continuousNodeArray.length = 0;
+                if (!firstNode) { // preprocessNode might have removed all the nodes, in which case there's nothing left to do
+                    return;
+                }
+                if (firstNode === lastNode) {
+                    continuousNodeArray.push(firstNode);
+                } else {
+                    continuousNodeArray.push(firstNode, lastNode);
+                    ko.utils.fixUpContinuousNodeArray(continuousNodeArray, parentNode);
+                }
+            }
 
             // Need to applyBindings *before* unmemoziation, because unmemoization might introduce extra nodes (that we don't want to re-bind)
             // whereas a regular applyBindings won't introduce new memoized nodes
-            invokeForEachNodeOrCommentInContinuousRange(firstNode, lastNode, function(node) {
-                ko.applyBindings(bindingContext, node);
+            invokeForEachNodeInContinuousRange(firstNode, lastNode, function(node) {
+                if (node.nodeType === 1 || node.nodeType === 8)
+                    ko.applyBindings(bindingContext, node);
             });
-            invokeForEachNodeOrCommentInContinuousRange(firstNode, lastNode, function(node) {
-                ko.memoization.unmemoizeDomNodeAndDescendants(node, [bindingContext]);
+            invokeForEachNodeInContinuousRange(firstNode, lastNode, function(node) {
+                if (node.nodeType === 1 || node.nodeType === 8)
+                    ko.memoization.unmemoizeDomNodeAndDescendants(node, [bindingContext]);
             });
+
+            // Make sure any changes done by applyBindings or unmemoize are reflected in the array
+            ko.utils.fixUpContinuousNodeArray(continuousNodeArray, parentNode);
         }
     }
 
@@ -5919,8 +6608,9 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         // This will be called by setDomNodeChildrenFromArrayMapping to get the nodes to add to targetNode
         var executeTemplateForArrayItem = function (arrayValue, index) {
             // Support selecting template as a function of the data being rendered
-            arrayItemContext = parentBindingContext['createChildContext'](ko.utils.unwrapObservable(arrayValue), options['as']);
-            arrayItemContext['$index'] = index;
+            arrayItemContext = parentBindingContext['createChildContext'](arrayValue, options['as'], function(context) {
+                context['$index'] = index;
+            });
             var templateName = typeof(template) == 'function' ? template(arrayValue, arrayItemContext) : template;
             return executeTemplate(null, "ignoreTargetNode", templateName, arrayItemContext, options);
         }
@@ -5949,7 +6639,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         }, null, { disposeWhenNodeIsRemoved: targetNode });
     };
 
-    var templateComputedDomDataKey = '__ko__templateComputedDomDataKey__';
+    var templateComputedDomDataKey = ko.utils.domData.nextKey();
     function disposeOldComputedAndStoreNewOne(element, newComputed) {
         var oldComputed = ko.utils.domData.get(element, templateComputedDomDataKey);
         if (oldComputed && (typeof(oldComputed.dispose) == 'function'))
@@ -5961,15 +6651,18 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         'init': function(element, valueAccessor) {
             // Support anonymous templates
             var bindingValue = ko.utils.unwrapObservable(valueAccessor());
-            if ((typeof bindingValue != "string") && (!bindingValue['name']) && (element.nodeType == 1 || element.nodeType == 8)) {
+            if (typeof bindingValue == "string" || bindingValue['name']) {
+                // It's a named template - clear the element
+                ko.virtualElements.emptyNode(element);
+            } else {
                 // It's an anonymous template - store the element contents, then clear the element
-                var templateNodes = element.nodeType == 1 ? element.childNodes : ko.virtualElements.childNodes(element),
+                var templateNodes = ko.virtualElements.childNodes(element),
                     container = ko.utils.moveCleanedNodesToContainerElement(templateNodes); // This also removes the nodes from their current parent
                 new ko.templateSources.anonymousTemplate(element)['nodes'](container);
             }
             return { 'controlsDescendantBindings': true };
         },
-        'update': function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+        'update': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             var templateName = ko.utils.unwrapObservable(valueAccessor()),
                 options = {},
                 shouldDisplay = true,
@@ -6030,17 +6723,20 @@ ko.utils.compareArrays = (function () {
     var statusNotInOld = 'added', statusNotInNew = 'deleted';
 
     // Simple calculation based on Levenshtein distance.
-    function compareArrays(oldArray, newArray, dontLimitMoves) {
+    function compareArrays(oldArray, newArray, options) {
+        // For backward compatibility, if the third arg is actually a bool, interpret
+        // it as the old parameter 'dontLimitMoves'. Newer code should use { dontLimitMoves: true }.
+        options = (typeof options === 'boolean') ? { 'dontLimitMoves': options } : (options || {});
         oldArray = oldArray || [];
         newArray = newArray || [];
 
         if (oldArray.length <= newArray.length)
-            return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, dontLimitMoves);
+            return compareSmallArrayToBigArray(oldArray, newArray, statusNotInOld, statusNotInNew, options);
         else
-            return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, dontLimitMoves);
+            return compareSmallArrayToBigArray(newArray, oldArray, statusNotInNew, statusNotInOld, options);
     }
 
-    function compareSmallArrayToBigArray(smlArray, bigArray, statusNotInSml, statusNotInBig, dontLimitMoves) {
+    function compareSmallArrayToBigArray(smlArray, bigArray, statusNotInSml, statusNotInBig, options) {
         var myMin = Math.min,
             myMax = Math.max,
             editDistanceMatrix = [],
@@ -6085,10 +6781,13 @@ ko.utils.compareArrays = (function () {
                     'value': smlArray[--smlIndex],
                     'index': smlIndex });
             } else {
-                editScript.push({
-                    'status': "retained",
-                    'value': bigArray[--bigIndex] });
+                --bigIndex;
                 --smlIndex;
+                if (!options['sparse']) {
+                    editScript.push({
+                        'status': "retained",
+                        'value': bigArray[bigIndex] });
+                }
             }
         }
 
@@ -6098,7 +6797,7 @@ ko.utils.compareArrays = (function () {
             var limitFailedCompares = smlIndexMax * 10, failedCompares,
                 a, d, notInSmlItem, notInBigItem;
             // Go through the items that have been added and deleted and try to find matches between them.
-            for (failedCompares = a = 0; (dontLimitMoves || failedCompares < limitFailedCompares) && (notInSmlItem = notInSml[a]); a++) {
+            for (failedCompares = a = 0; (options['dontLimitMoves'] || failedCompares < limitFailedCompares) && (notInSmlItem = notInSml[a]); a++) {
                 for (d = 0; notInBigItem = notInBig[d]; d++) {
                     if (notInSmlItem['value'] === notInBigItem['value']) {
                         notInSmlItem['moved'] = notInBigItem['index'];
@@ -6130,51 +6829,15 @@ ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
     // "callbackAfterAddingNodes" will be invoked after any "mapping"-generated nodes are inserted into the container node
     // You can use this, for example, to activate bindings on those nodes.
 
-    function fixUpNodesToBeMovedOrRemoved(contiguousNodeArray) {
-        // Before moving, deleting, or replacing a set of nodes that were previously outputted by the "map" function, we have to reconcile
-        // them against what is in the DOM right now. It may be that some of the nodes have already been removed from the document,
-        // or that new nodes might have been inserted in the middle, for example by a binding. Also, there may previously have been
-        // leading comment nodes (created by rewritten string-based templates) that have since been removed during binding.
-        // So, this function translates the old "map" output array into its best guess of what set of current DOM nodes should be removed.
-        //
-        // Rules:
-        //   [A] Any leading nodes that aren't in the document any more should be ignored
-        //       These most likely correspond to memoization nodes that were already removed during binding
-        //       See https://github.com/SteveSanderson/knockout/pull/440
-        //   [B] We want to output a contiguous series of nodes that are still in the document. So, ignore any nodes that
-        //       have already been removed, and include any nodes that have been inserted among the previous collection
-
-        // Rule [A]
-        while (contiguousNodeArray.length && !ko.utils.domNodeIsAttachedToDocument(contiguousNodeArray[0]))
-            contiguousNodeArray.splice(0, 1);
-
-        // Rule [B]
-        if (contiguousNodeArray.length > 1) {
-            // Build up the actual new contiguous node set
-            var current = contiguousNodeArray[0], last = contiguousNodeArray[contiguousNodeArray.length - 1], newContiguousSet = [current];
-            while (current !== last) {
-                current = current.nextSibling;
-                if (!current) // Won't happen, except if the developer has manually removed some DOM elements (then we're in an undefined scenario)
-                    return;
-                newContiguousSet.push(current);
-            }
-
-            // ... then mutate the input array to match this.
-            // (The following line replaces the contents of contiguousNodeArray with newContiguousSet)
-            Array.prototype.splice.apply(contiguousNodeArray, [0, contiguousNodeArray.length].concat(newContiguousSet));
-        }
-        return contiguousNodeArray;
-    }
-
     function mapNodeAndRefreshWhenChanged(containerNode, mapping, valueToMap, callbackAfterAddingNodes, index) {
         // Map this array value inside a dependentObservable so we re-map when any dependency changes
         var mappedNodes = [];
         var dependentObservable = ko.dependentObservable(function() {
-            var newMappedNodes = mapping(valueToMap, index) || [];
+            var newMappedNodes = mapping(valueToMap, index, ko.utils.fixUpContinuousNodeArray(mappedNodes, containerNode)) || [];
 
             // On subsequent evaluations, just replace the previously-inserted DOM nodes
             if (mappedNodes.length > 0) {
-                ko.utils.replaceDomNodes(fixUpNodesToBeMovedOrRemoved(mappedNodes), newMappedNodes);
+                ko.utils.replaceDomNodes(mappedNodes, newMappedNodes);
                 if (callbackAfterAddingNodes)
                     ko.dependencyDetection.ignore(callbackAfterAddingNodes, null, [valueToMap, newMappedNodes, index]);
             }
@@ -6187,7 +6850,7 @@ ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
         return { mappedNodes : mappedNodes, dependentObservable : (dependentObservable.isActive() ? dependentObservable : undefined) };
     }
 
-    var lastMappingResultDomDataKey = "setDomNodeChildrenFromArrayMapping_lastMappingResult";
+    var lastMappingResultDomDataKey = ko.utils.domData.nextKey();
 
     ko.utils.setDomNodeChildrenFromArrayMapping = function (domNode, array, mapping, options, callbackAfterAddingNodes) {
         // Compare the provided array against the previous one
@@ -6196,7 +6859,7 @@ ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
         var isFirstExecution = ko.utils.domData.get(domNode, lastMappingResultDomDataKey) === undefined;
         var lastMappingResult = ko.utils.domData.get(domNode, lastMappingResultDomDataKey) || [];
         var lastArray = ko.utils.arrayMap(lastMappingResult, function (x) { return x.arrayEntry; });
-        var editScript = ko.utils.compareArrays(lastArray, array);
+        var editScript = ko.utils.compareArrays(lastArray, array, options['dontLimitMoves']);
 
         // Build the new mapping result
         var newMappingResult = [];
@@ -6214,9 +6877,9 @@ ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
             mapData = lastMappingResult[oldPosition];
             if (newMappingResultIndex !== oldPosition)
                 itemsForMoveCallbacks[editScriptIndex] = mapData;
-            // Since updating the index might change the nodes, do so before calling fixUpNodesToBeMovedOrRemoved
+            // Since updating the index might change the nodes, do so before calling fixUpContinuousNodeArray
             mapData.indexObservable(newMappingResultIndex++);
-            fixUpNodesToBeMovedOrRemoved(mapData.mappedNodes);
+            ko.utils.fixUpContinuousNodeArray(mapData.mappedNodes, domNode);
             newMappingResult.push(mapData);
             itemsToProcess.push(mapData);
         }
@@ -6245,7 +6908,7 @@ ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
                             mapData.dependentObservable.dispose();
 
                         // Queue these nodes for later removal
-                        nodesToDelete.push.apply(nodesToDelete, fixUpNodesToBeMovedOrRemoved(mapData.mappedNodes));
+                        nodesToDelete.push.apply(nodesToDelete, ko.utils.fixUpContinuousNodeArray(mapData.mappedNodes, domNode));
                         if (options['beforeRemove']) {
                             itemsForBeforeRemoveCallbacks[i] = mapData;
                             itemsToProcess.push(mapData);
@@ -6420,7 +7083,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 
     ko.exportSymbol('jqueryTmplTemplateEngine', ko.jqueryTmplTemplateEngine);
 })();
-});
+}));
 }());
 })();
 /*
@@ -8133,6 +8796,7 @@ kb.CollectionObservable = (function() {
     }
     switch (event) {
       case 'reset':
+      case 'sort':
       case 'resort':
         this._collection.notifySubscribers(this._collection());
         break;
@@ -8143,6 +8807,9 @@ kb.CollectionObservable = (function() {
         }
         observable = kb.utils.wrappedObservable(this);
         collection = this._collection();
+        if (collection.indexOf(arg) === -1) {
+          return;
+        }
         if ((view_model = this.viewModelByModel(arg))) {
           return;
         }

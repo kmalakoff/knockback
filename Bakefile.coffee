@@ -117,20 +117,20 @@ module.exports =
     _build:
       commands: [
         # create docs
-        'codo src'
+        'npm run docs'
 
         # knockback dependencies
         'cp -v underscore vendor/underscore.js'
         'cp -v underscore/underscore-min.js vendor/underscore.min.js'
         'cp -v backbone vendor/backbone.js'
         'cp -v backbone/backbone-min.js vendor/backbone.min.js'
-        'cp knockout/build/output/knockout-latest.debug.js vendor/knockout-2.2.1.js'
-        'cp knockout/build/output/knockout-latest.js vendor/knockout-2.2.1.min.js'
+        'cp knockout/build/output/knockout-latest.debug.js vendor/knockout-3.0.0.js'
+        'cp knockout/build/output/knockout-latest.js vendor/knockout-3.0.0.min.js'
 
         # knockback optional dependencies
         'cp -v lodash vendor/optional/lodash.js'
-        'uglifyjs -o vendor/optional/lodash-1.2.1.min.js vendor/optional/lodash-1.2.1.js'
-#        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js' # packaged lodash.min.js doesn't concatenate properly
+        'uglifyjs -o vendor/optional/lodash-2.3.0.min.js vendor/optional/lodash-2.3.0.js'
+        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js'
         'cp -v backbone-modelref vendor/optional/backbone-modelref.js'
         'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref.min.js'
         'cp -v backbone-relational vendor/optional/backbone-relational.js'
@@ -142,10 +142,10 @@ module.exports =
         # 'cp -v jqunitjs/qunit/qunit.css vendor/test/qunit.css'
 
         # full and core stack
-        'cat src/license-header-full-stack.js vendor/underscore-1.4.4.js vendor/backbone-1.0.0.js vendor/knockout-2.2.1.js knockback.js > knockback-full-stack.js'
-        'cat src/license-header-full-stack.js vendor/underscore-1.4.4.min.js vendor/backbone-1.0.0.min.js vendor/knockout-2.2.1.min.js knockback.min.js > knockback-full-stack.min.js'
-        'cat src/license-header-core-stack.js vendor/underscore-1.4.4.js vendor/backbone-1.0.0.js vendor/knockout-2.2.1.js knockback-core.js > knockback-core-stack.js'
-        'cat src/license-header-core-stack.js vendor/underscore-1.4.4.min.js vendor/backbone-1.0.0.min.js vendor/knockout-2.2.1.min.js knockback-core.min.js > knockback-core-stack.min.js'
+        'cat src/license-header-full-stack.js vendor/underscore-1.5.2.js vendor/backbone-1.1.0.js vendor/knockout-3.0.0.js knockback.js > knockback-full-stack.js'
+        'cat src/license-header-full-stack.js vendor/underscore-1.5.2.min.js vendor/backbone-1.1.0.min.js vendor/knockout-3.0.0.min.js knockback.min.js > knockback-full-stack.min.js'
+        'cat src/license-header-core-stack.js vendor/underscore-1.5.2.js vendor/backbone-1.1.0.js vendor/knockout-3.0.0.js knockback-core.js > knockback-core-stack.js'
+        'cat src/license-header-core-stack.js vendor/underscore-1.5.2.min.js vendor/backbone-1.1.0.min.js vendor/knockout-3.0.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
 
         # npm
         'cp README.md packages/npm/README.md'

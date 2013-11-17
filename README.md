@@ -172,7 +172,11 @@ Building, Running and Testing the library
 ###Installing:
 
 1. install node.js: http://nodejs.org
-2. install node packages: 'npm install'
+2. install node packages: `npm install`
+
+###Testing:
+
+1. Run `npm test`
 
 ###Commands:
 

@@ -1,9 +1,9 @@
 try
   require.config({
     paths:
-      'underscore': "../../vendor/underscore-1.4.4"
-      'backbone': "../../vendor/backbone-1.0.0"
-      'knockout': "../../vendor/knockout-2.2.1"
+      'underscore': "../../vendor/underscore-1.5.2"
+      'backbone': "../../vendor/backbone-1.1.0"
+      'knockout': "../../vendor/knockout-3.0.0"
       'knockback': "../../knockback-core"
       'knockback-validation': "../../lib/knockback-validation"
       'knockback-examples-localization': "../_examples/build/_localization_examples"

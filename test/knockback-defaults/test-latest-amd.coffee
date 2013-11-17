@@ -1,10 +1,10 @@
 try
   require.config({
     paths:
-      'underscore': "../../vendor/underscore-1.4.4"
-      'backbone': "../../vendor/backbone-1.0.0"
+      'underscore': "../../vendor/underscore-1.5.2"
+      'backbone': "../../vendor/backbone-1.1.0"
       'backbone-modelref': "../../vendor/optional/backbone-modelref-0.1.5"
-      'knockout': "../../vendor/knockout-2.2.1"
+      'knockout': "../../vendor/knockout-3.0.0"
       'knockback': "../../knockback"
       'knockback-localization': "../../lib/knockback-localization"
       'knockback-examples-localization': "../_examples/build/_localization_examples"
