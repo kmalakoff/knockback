@@ -8,11 +8,17 @@
   return (function(factory) {
     // AMD
     if (typeof define === 'function' && define.amd) {
-      return define('knockback', ['underscore', 'backbone', 'knockout'], factory);
+      return define(['require', 'underscore', 'backbone', 'knockout'], factory);
     }
     // CommonJS/NodeJS or No Loader
     else {
       return factory.call(this);
     }
-  })(function() {'__REPLACE__'; return kb;});
+  })(function(_require) {
+    if (typeof _require !== 'undefined') {
+      var require = _require;
+    }
+    '__REPLACE__';
+    return kb;
+  });
 }).call(this);
