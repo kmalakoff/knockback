@@ -4,8 +4,9 @@ Please refer to the following release notes when upgrading your version of Knock
 * bug fix for findOrCreate refering to incorrect class
 * added tests for Knockout 2.3.0pre
 * updated tests for latest lodash
+* added 'sort' collection message in addition to 'resort'
 
-## 0.17.3
+## 0.17.2
 
 * auto-disable RECUSIVE_AUTO_INJECT flags (default disabled) until investigated: https://github.com/kmalakoff/knockback/issues/63
 * bug fix for relational release in EventWatcher
