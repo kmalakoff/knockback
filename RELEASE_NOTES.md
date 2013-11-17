@@ -5,6 +5,8 @@ Please refer to the following release notes when upgrading your version of Knock
 * added tests for Knockout 2.3.0pre
 * updated tests for latest lodash
 * added 'sort' collection message in addition to 'resort'
+* bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
+
 
 ## 0.17.2
 
