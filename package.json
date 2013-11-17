@@ -26,7 +26,9 @@
     "coffee-script": "*",
     "easy-bake": "*",
     "codo": "1.9.x",
-    "phantomjs" : "*"
+    "phantomjs" : "*",
+    "uglify-js" : "*",
+    "module-bundler" : "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
