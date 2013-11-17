@@ -1708,6 +1708,7 @@ kb.CollectionObservable = (function() {
     }
     switch (event) {
       case 'reset':
+      case 'sort':
       case 'resort':
         this._collection.notifySubscribers(this._collection());
         break;
