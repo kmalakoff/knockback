@@ -45,7 +45,7 @@ test("2. Basic Usage: collection observable with ko.dependentObservable", ->
   equal(collection.length, 3, "3 models")
   equal(view_model.count(), 3, "3 count")
 
-  collection.remove('b2').remove('b3')
+  collection.remove('b2'); collection.remove('b3')
   equal(collection.length, 1, "1 model")
   equal(view_model.count(), 1, "1 count")
 
@@ -79,7 +79,7 @@ test("3. Basic Usage: collection observable with ko.dependentObservable", ->
   equal(collection.length, 3, "3 models")
   equal(view_model.count(), 3, "3 count")
 
-  collection.remove('b2').remove('b3')
+  collection.remove('b2'); collection.remove('b3')
   equal(collection.length, 1, "1 model")
   equal(view_model.count(), 1, "1 count")
 
@@ -208,7 +208,7 @@ test("6. Collection sync sorting with sort_attribute", ->
   equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
   equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
-  collection.remove('b2').remove('b3')
+  collection.remove('b2'); collection.remove('b3')
   equal(collection.length, 1, "one model")
   equal(collection_observable().length, 1, "one view model")
   equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
@@ -310,7 +310,7 @@ test("8. Collection sorting with callbacks", ->
   equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Paul', "Paul is second - sorting worked!")
   equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
-  collection.remove('b2').remove('b3')
+  collection.remove('b2'); collection.remove('b3')
   equal(collection.length, 1, "one models")
   equal(collection_observable().length, 1, "one view models")
   equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
@@ -371,7 +371,7 @@ test("9. Collection sync dynamically changing the sorting function", ->
   equal(kb.utils.wrappedModel(collection_observable()[2]).get('name'), 'Ringo', "Ringo is third - sorting worked!")
 
   collection_observable.sortAttribute('name')
-  collection.remove('b2').remove('b3')
+  collection.remove('b2'); collection.remove('b3')
   equal(collection.length, 1, "one models")
   equal(collection_observable().length, 1, "one view models")
   equal(collection.models[0].get('name'), 'Ringo', "Ringo is left")
