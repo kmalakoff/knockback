@@ -2,11 +2,10 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.17.3
 * bug fix for findOrCreate refering to incorrect class
-* added tests for Knockout 2.3.0pre
-* updated tests for latest lodash
+* updated tests for latest libraries (Knockout 3.0.0, Backbone 1.1.0, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
 * added 'sort' collection message in addition to 'resort'
 * bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
-
+* improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80
 
 ## 0.17.2
 
