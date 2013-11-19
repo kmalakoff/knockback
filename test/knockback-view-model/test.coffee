@@ -519,41 +519,41 @@ test("18. model replacement", ->
         prop: 1
       defaults:
         prop: 1
-  
+
   Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
-  
+
   model1 = new Model
   view_model = kb.viewModel(model1)
-  
+
   equal(view_model.prop(), 1, "sanity check")
   model2 = new Model({ prop: 2 })
   equal(model2.get('prop'), 2, "sanity check 2")
-  
+
   view_model.model(model2)
-  
+
   equal(model2.get('prop'), 2, "switched in model shouldn't inherit values from previous model")
   equal(view_model.prop(), 2, "view model should have the value of the switched in model")
-  
+
   kb.release(view_model)
-  
+
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
 test("19. model replacement with select", ->
   kb.statistics = new kb.Statistics()
-  
+
   model_opts =
     attributes:
         prop: 1
       defaults:
         prop: 1
-  
+
   Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
-  
+
   model1 = new Model
   view_model = kb.viewModel(model1)
-  
-  
+
+
   el = $('''
     <div id="the_template1">
       <select data-bind="value: prop">
@@ -563,87 +563,87 @@ test("19. model replacement with select", ->
       </select>
     </div>''')
   $('body').append(el)
-  
+
   widget = el.find('select')
-  
+
   equal(widget.val(), "", "select should be empty to start with")
   ko.applyBindings(view_model, el.get(0))
   equal(widget.val(), "1", "select should be equal to the model after bindings applied")
-  
+
   model2 = new Model({prop : 2})
   equal(model2.get('prop'), 2, "sanity check 2")
   view_model.model(model2)
-  
+
   equal(widget.val(), 2, "model sets the select")
   equal(model2.get('prop'), 2, "switched in model shouldn't inherit values from previous model")
   equal(view_model.model(), model2, "view_model.model should be the same as the new model")
   equal(view_model.prop(), 2, "view model should have the value of the switched in model")
-  
+
   el.remove()
   kb.release(view_model)
-  
+
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
 test("20. model replacement with input", ->
   kb.statistics = new kb.Statistics()
-  
+
   model_opts =
     attributes:
         prop: 1
       defaults:
         prop: 1
-  
+
   Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
-  
+
   model1 = new Model
   view_model = kb.viewModel(model1)
-  
-  
+
+
   el = $('''
     <div id="the_template1">
       <input data-bind="value: prop" />
     </div>''')
   $('body').append(el)
-  
+
   widget = el.find('input')
-  
+
   equal(widget.val(), "", "input should be empty to start with")
   ko.applyBindings(view_model, el.get(0))
   equal(widget.val(), "1", "input should be equal to the model after bindings applied")
-  
+
   model2 = new Model({prop : 2})
   equal(model2.get('prop'), 2, "sanity check 2")
   view_model.model(model2)
-  
+
   equal(widget.val(), 2, "model sets the select")
   equal(model2.get('prop'), 2, "switched in model shouldn't inherit values from previous model")
   equal(view_model.model(), model2, "view_model.model should be the same as the new model")
   equal(view_model.prop(), 2, "view model should have the value of the switched in model")
-  
+
   el.remove()
   kb.release(view_model)
-  
+
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
 
 test("21. model replacement with multiple selects and weird backbone bug", ->
   kb.statistics = new kb.Statistics()
-  
+
   default_attrs =
     prop1 : "p1-wrong"
     prop2 : "p2-wrong"
-  
+
   model_opts =
     attributes: default_attrs
     defaults: default_attrs
-  
+
   Model = if kb.Parse then kb.Model.extend('Model', model_opts) else kb.Model.extend(model_opts)
-  
+
   model1 = new Model
   view_model = kb.viewModel(model1)
-  
-  
+
+
   el = $('''
     <div id="the_template1">
       <select id="prop1" data-bind="value: prop1">
@@ -656,16 +656,16 @@ test("21. model replacement with multiple selects and weird backbone bug", ->
       </select>
     </div>''')
   $('body').append(el)
-  
+
   widget1 = el.find('#prop1')
   widget2 = el.find('#prop2')
-  
+
   equal(widget1.val(), "p1-wrong", "select should be first value to start with")
   equal(widget2.val(), "p2-wrong", "select should be first value to start with")
   ko.applyBindings(view_model, el.get(0))
   equal(widget1.val(), "p1-wrong", "select should be equal to the model after bindings applied")
   equal(widget2.val(), "p2-wrong", "select should be equal to the model after bindings applied")
-  
+
   model2 = new Model(
     DUMMY : ""
     prop1 : "p1-right"
@@ -674,7 +674,7 @@ test("21. model replacement with multiple selects and weird backbone bug", ->
   equal(model2.get('prop1'), 'p1-right', "sanity check 2")
   equal(model2.get('prop2'), 'p2-right', "sanity check 3")
   view_model.model(model2)
-  
+
   equal(widget1.val(), 'p1-right', "model sets the select")
   equal(widget2.val(), 'p2-right', "model sets the select")
   equal(model2.get('prop1'), 'p1-right', "switched in model shouldn't inherit values from previous model")
@@ -682,9 +682,9 @@ test("21. model replacement with multiple selects and weird backbone bug", ->
   equal(view_model.model(), model2, "view_model.model should be the same as the new model")
   equal(view_model.prop1(), 'p1-right', "view model should have the value of the switched in model")
   equal(view_model.prop2(), 'p2-right', "view model should have the value of the switched in model")
-  
+
   el.remove()
   kb.release(view_model)
-  
+
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )

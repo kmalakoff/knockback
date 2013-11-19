@@ -124,8 +124,7 @@ class kb.Observable
         previous = new_model?.get(@key)
         @update(null)
         if new_model and not @vm[@key]?.setToDefault and kb.utils.valueType(@vm[@key]) == KB_TYPE_SIMPLE
-          arg = {}
-          arg[@key] = previous
+          (arg = {})[@key] = previous
           new_model.set(arg)
         @_model(new_model)
     )
