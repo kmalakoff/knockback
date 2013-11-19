@@ -130,7 +130,7 @@ module.exports =
         # knockback optional dependencies
         'cp -v lodash vendor/optional/lodash.js'
         'uglifyjs -o vendor/optional/lodash-2.3.0.min.js vendor/optional/lodash-2.3.0.js'
-        'cp -v lodash/lodash.min.js vendor/optional/lodash.min.js'
+        'cp -v lodash/dist/lodash.min.js vendor/optional/lodash.min.js'
         'cp -v backbone-modelref vendor/optional/backbone-modelref.js'
         'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref.min.js'
         'cp -v backbone-relational vendor/optional/backbone-relational.js'

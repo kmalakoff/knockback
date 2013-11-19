@@ -1127,11 +1127,17 @@ kb.Observable = (function() {
         return _this._mdl;
       },
       write: function(new_model) {
+        var arg, previous, _ref;
         if (_this.__kb_released || (_this._mdl === new_model)) {
           return;
         }
         _this._mdl = new_model;
+        previous = new_model != null ? new_model.get(_this.key) : void 0;
         _this.update(null);
+        if (new_model && !((_ref = _this.vm[_this.key]) != null ? _ref.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
+          (arg = {})[_this.key] = previous;
+          new_model.set(arg);
+        }
         return _this._model(new_model);
       }
     });
