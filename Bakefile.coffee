@@ -128,13 +128,18 @@ module.exports =
         'cp knockout/build/output/knockout-latest.js vendor/knockout-3.0.0.min.js'
 
         # knockback optional dependencies
-        'cp -v lodash vendor/optional/lodash.js'
-        'uglifyjs -o vendor/optional/lodash-2.3.0.min.js vendor/optional/lodash-2.3.0.js'
-        'cp -v lodash/dist/lodash.min.js vendor/optional/lodash.min.js'
-        'cp -v backbone-modelref vendor/optional/backbone-modelref.js'
-        'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref.min.js'
-        'cp -v backbone-relational vendor/optional/backbone-relational.js'
-        'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational.min.js'
+        'cp -v lodash vendor/optional/lodash/lodash.js'
+        'cp -v lodash/dist/lodash.min.js vendor/optional/lodash/lodash.min.js'
+        'cp -v backbone-modelref vendor/optional/backbone-modelref/backbone-modelref.js'
+        'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref/backbone-modelref.min.js'
+        'cp -v backbone-relational vendor/optional/backbone-relational/backbone-relational.js'
+        'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational/backbone-relational.min.js'
+
+        'cp -v backbone-orm vendor/optional/backbone-orm/backbone-orm.js'
+        'cp -v backbone-orm/backbone-orm.min.js vendor/optional/backbone-orm/backbone-orm.min.js'
+        'cp -v moment vendor/optional/backbone-orm/moment.js'
+        'cp -v inflection vendor/optional/backbone-orm/inflection.js'
+        'cp -v lru-cache vendor/optional/backbone-orm/lru-cache.js'
 
         # knockback test dependencies
         # 'cp -v jquery.js vendor/test/jquery.js'
@@ -224,7 +229,6 @@ module.exports =
       ]
       commands: [
         'mbundle test/packaging/bundle-config.coffee'
-        'mbundle test/packaging/bundle-config-knockout-pre.coffee'
         'mbundle test/lodash/bundle-config.coffee'
         'mbundle test/full-stack/bundle-config.coffee'
       ]
