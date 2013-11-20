@@ -7,6 +7,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
 * improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80
 * kb.collectionObservable: added autmatic creation of a collection is one isn't passed since you can reference it using collection() on the observable
+* options merging: automate the merging of options including 'internals', 'requires', 'excludes', 'keys', 'factories'
 
 ## 0.17.2
 

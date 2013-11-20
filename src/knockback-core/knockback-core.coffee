@@ -227,14 +227,6 @@ _arraySplice = Array.prototype.splice
 
 _unwrapObservable = ko.utils.unwrapObservable
 
-_collapseOptions = (options) ->
-  result = _.clone(options)
-  while options.options
-    _.defaults(result, options.options)
-    options = options.options
-  delete result.options
-  return result
-
 _publishMethods = kb._publishMethods = (observable, instance, methods) ->
   observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
   return

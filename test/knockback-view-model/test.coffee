@@ -688,3 +688,90 @@ test("21. model replacement with multiple selects and weird backbone bug", ->
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 )
+
+MERGE_OPTIONS = ['internals', 'requires', 'keys', 'excludes']
+# 'factories'
+
+test '21. can merge unique options', ->
+  options =
+    internals: ['internal1']
+    keys: ['key1']
+    factories: {models: ->}
+    options:
+      requires: 'require2'
+      keys: ['key2']
+      excludes: 'exclude2'
+      options:
+        excludes: ['exclude3']
+        factories: {'collection.models': ->}
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.internals, ['internal1'])
+  deepEqual(collapsed_options.keys, ['key1', 'key2'])
+  deepEqual(_.keys(collapsed_options.factories), ['models', 'collection.models'])
+  deepEqual(collapsed_options.excludes, ['exclude2', 'exclude3'])
+
+test '22. can merge non-unique options', ->
+  factoryOverride = ->
+  factory = ->
+
+  options =
+    internals: ['internal1']
+    keys: ['key1']
+    factories: {models: factoryOverride}
+    options:
+      requires: 'require1'
+      keys: ['key1']
+      excludes: 'exclude1'
+      options:
+        excludes: ['exclude1']
+        factories: {models: factory}
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.internals, ['internal1'])
+  deepEqual(collapsed_options.keys, ['key1'])
+  deepEqual(_.keys(collapsed_options.factories), ['models'])
+  equal(collapsed_options.factories.models, factoryOverride, 'selected overidden factory')
+  notEqual(collapsed_options.factories.models, factory, 'did not select original factory')
+  deepEqual(collapsed_options.excludes, ['exclude1'])
+
+test '23. can merge keys as object', ->
+  options =
+    keys: {name: {key: 'name'}}
+    options:
+      keys: {thing: {key: 'thing'}}
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
+
+  options =
+    keys: 'name'
+    options:
+      keys: {thing: {key: 'thing'}}
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
+
+  options =
+    keys: ['name']
+    options:
+      keys: {thing: {key: 'thing'}}
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
+
+  options =
+    keys: {name: {key: 'name'}}
+    options:
+      keys: 'thing'
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
+
+  options =
+    keys: {name: {key: 'name'}}
+    options:
+      keys: ['thing']
+
+  collapsed_options = kb.utils.collapseOptions(options)
+  deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})

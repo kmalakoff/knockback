@@ -44,6 +44,48 @@ _unwrapModels = (obj) ->
 
   return obj
 
+MERGE_OPTIONS = []
+_mergeArray = (result, key, value) ->
+  result[key] or= []
+  value = [value] unless _.isArray(value)
+  result[key] = if result[key].length then _.union(result[key], value) else value
+_mergeObject = (result, key, value) ->
+  result[key] or= {}
+  _.defaults(result[key], value)
+_keyArrayToObject = (value) ->
+  result = {}
+  result[item] = {key: item} for item in value
+  return result
+
+_collapseOptions = (options) ->
+  result = {}
+  options = {options: options}
+  while options.options
+    for key, value of options.options
+      switch key
+        when 'internals', 'requires', 'excludes' then _mergeArray(result, key, value)
+        when 'keys'
+          # an object
+          if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
+            value = [value] unless _.isObject(value)
+            value = _keyArrayToObject(value) if _.isArray(value)
+            result[key] = _keyArrayToObject(result[key]) if _.isArray(result[key])
+            _mergeObject(result, key, value)
+
+          # an array
+          else
+            _mergeArray(result, key, value)
+        when 'factories'
+          if _.isFunction(value) # special case for ko.observable
+            result[key] = value
+          else
+            _mergeObject(result, key, value)
+        when 'options' then
+        else
+          result[key] = value if result[key] is undefined
+    options = options.options
+  return result
+
 ####################################################
 # Public API
 ####################################################
@@ -258,3 +300,11 @@ class kb.utils
   #   kb.utils.hasModelSignature(new Model());
   @hasCollectionSignature = (obj) ->
     return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
+
+  # Helper to merge options including ViewmModel options like `keys` and `factories`
+  #
+  # @param [Object] obj the object to test
+  #
+  # @example
+  #   kb.utils.collapseOptions(options);
+  @collapseOptions = _collapseOptions

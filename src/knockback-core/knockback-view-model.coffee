@@ -74,7 +74,7 @@ class kb.ViewModel
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions. Signature: `{'some.path': function(object, options)}`
   # @option options [kb.Factory] factory a factory used to create view models.
-  # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
+  # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) ->
@@ -92,8 +92,8 @@ class kb.ViewModel
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
-    not options.internals or @__kb.internals = (if _.isArray(options.internals) then options.internals else [options.internals])
-    not options.excludes or @__kb.excludes = (if _.isArray(options.excludes) then options.excludes else [options.excludes])
+    not options.internals or @__kb.internals = options.internals
+    not options.excludes or @__kb.excludes = options.excludes
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
@@ -129,8 +129,8 @@ class kb.ViewModel
     event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @model}))
 
     # collect requires and internls first because they could be used to define the include order
-    (keys = if _.isArray(options.requires) then _.clone(options.requires) else [options.requires]) if options.requires
-    (keys = if keys then _.union(keys, @__kb.internals) else _.clone(@__kb.internals)) if @__kb.internals
+    keys = options.requires
+    keys = _.union(keys or [], @__kb.internals) if @__kb.internals
 
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified
@@ -140,7 +140,7 @@ class kb.ViewModel
           mapped_keys[if _.isString(mapping_info) then mapping_info else (if mapping_info.key then mapping_info.key else vm_key)] = true
         @__kb.keys = _.keys(mapped_keys)
       else
-        @__kb.keys = if _.isArray(options.keys) then options.keys else [options.keys]
+        @__kb.keys = options.keys
         (keys = if keys then _.union(keys, @__kb.keys) else _.clone(@__kb.keys))
     else
       bb_model = event_watcher.emitter()

@@ -44,7 +44,7 @@ class kb.Observable
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
-  # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
+  # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (model, options, @vm) ->
@@ -103,7 +103,7 @@ class kb.Observable
     observable.__kb_is_o = true # mark as a kb.Observable
     create_options.store = kb.utils.wrappedStore(observable, create_options.store)
     create_options.path = kb.utils.pathJoin(create_options.path, @key)
-    if create_options.factories and ((typeof(create_options.factories) == 'function') or create_options.factories.create)
+    if create_options.factories and ((typeof(create_options.factories) is 'function') or create_options.factories.create)
       create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory))
       create_options.factory.addPathMapping(create_options.path, create_options.factories)
     else

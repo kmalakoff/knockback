@@ -73,7 +73,7 @@ class kb.CollectionObservable
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
-  # @option options [Object] options a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.
+  # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
   constructor: (collection, options) ->

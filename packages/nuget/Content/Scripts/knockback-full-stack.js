@@ -7112,7 +7112,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _ko_applyBindings, _legacyWarning, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, MERGE_OPTIONS, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _mergeArray, _mergeObject, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -7312,17 +7312,6 @@ _arraySplice = Array.prototype.splice;
 
 _unwrapObservable = ko.utils.unwrapObservable;
 
-_collapseOptions = function(options) {
-  var result;
-  result = _.clone(options);
-  while (options.options) {
-    _.defaults(result, options.options);
-    options = options.options;
-  }
-  delete result.options;
-  return result;
-};
-
 _publishMethods = kb._publishMethods = function(observable, instance, methods) {
   var fn, _i, _len;
   for (_i = 0, _len = methods.length; _i < _len; _i++) {
@@ -7456,6 +7445,85 @@ _unwrapModels = function(obj) {
     return result;
   }
   return obj;
+};
+
+MERGE_OPTIONS = [];
+
+_mergeArray = function(result, key, value) {
+  result[key] || (result[key] = []);
+  if (!_.isArray(value)) {
+    value = [value];
+  }
+  return result[key] = result[key].length ? _.union(result[key], value) : value;
+};
+
+_mergeObject = function(result, key, value) {
+  result[key] || (result[key] = {});
+  return _.defaults(result[key], value);
+};
+
+_keyArrayToObject = function(value) {
+  var item, result, _i, _len;
+  result = {};
+  for (_i = 0, _len = value.length; _i < _len; _i++) {
+    item = value[_i];
+    result[item] = {
+      key: item
+    };
+  }
+  return result;
+};
+
+_collapseOptions = function(options) {
+  var key, result, value, _ref;
+  result = {};
+  options = {
+    options: options
+  };
+  while (options.options) {
+    _ref = options.options;
+    for (key in _ref) {
+      value = _ref[key];
+      switch (key) {
+        case 'internals':
+        case 'requires':
+        case 'excludes':
+          _mergeArray(result, key, value);
+          break;
+        case 'keys':
+          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
+            if (!_.isObject(value)) {
+              value = [value];
+            }
+            if (_.isArray(value)) {
+              value = _keyArrayToObject(value);
+            }
+            if (_.isArray(result[key])) {
+              result[key] = _keyArrayToObject(result[key]);
+            }
+            _mergeObject(result, key, value);
+          } else {
+            _mergeArray(result, key, value);
+          }
+          break;
+        case 'factories':
+          if (_.isFunction(value)) {
+            result[key] = value;
+          } else {
+            _mergeObject(result, key, value);
+          }
+          break;
+        case 'options':
+          break;
+        default:
+          if (result[key] === void 0) {
+            result[key] = value;
+          }
+      }
+    }
+    options = options.options;
+  }
+  return result;
 };
 
 kb.utils = (function() {
@@ -7610,6 +7678,8 @@ kb.utils = (function() {
   utils.hasCollectionSignature = function(obj) {
     return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
   };
+
+  utils.collapseOptions = _collapseOptions;
 
   return utils;
 
@@ -8397,8 +8467,8 @@ kb.ViewModel = (function() {
     this.__kb.vm_keys = {};
     this.__kb.model_keys = {};
     this.__kb.view_model = _.isUndefined(view_model) ? this : view_model;
-    !options.internals || (this.__kb.internals = (_.isArray(options.internals) ? options.internals : [options.internals]));
-    !options.excludes || (this.__kb.excludes = (_.isArray(options.excludes) ? options.excludes : [options.excludes]));
+    !options.internals || (this.__kb.internals = options.internals);
+    !options.excludes || (this.__kb.excludes = options.excludes);
     kb.Store.useOptionsOrCreate(options, model, this);
     this.__kb.path = options.path;
     kb.Factory.useOptionsOrCreate(options, this, options.path);
@@ -8436,11 +8506,9 @@ kb.ViewModel = (function() {
     event_watcher = kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(model, this, {
       emitter: this.model
     }));
-    if (options.requires) {
-      keys = _.isArray(options.requires) ? _.clone(options.requires) : [options.requires];
-    }
+    keys = options.requires;
     if (this.__kb.internals) {
-      keys = keys ? _.union(keys, this.__kb.internals) : _.clone(this.__kb.internals);
+      keys = _.union(keys || [], this.__kb.internals);
     }
     if (options.keys) {
       if (_.isObject(options.keys) && !_.isArray(options.keys)) {
@@ -8452,7 +8520,7 @@ kb.ViewModel = (function() {
         }
         this.__kb.keys = _.keys(mapped_keys);
       } else {
-        this.__kb.keys = _.isArray(options.keys) ? options.keys : [options.keys];
+        this.__kb.keys = options.keys;
         keys = keys ? _.union(keys, this.__kb.keys) : _.clone(this.__kb.keys);
       }
     } else {
