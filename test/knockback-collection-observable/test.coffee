@@ -60,12 +60,10 @@ test("3. Basic Usage: collection observable with ko.dependentObservable", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
-  collection_observable = kb.collectionObservable(collection, {
-    models: ContactViewModel
-  })
+  collection_observable = kb.collectionObservable(collection, factories: {models: ContactViewModel})
 
   view_model =
-    count: ko.dependentObservable(->return collection_observable().length )
+    count: ko.dependentObservable(-> return collection_observable().length)
 
   equal(collection.length, 0, "no models")
   equal(view_model.count(), 0, "no count")
@@ -78,6 +76,7 @@ test("3. Basic Usage: collection observable with ko.dependentObservable", ->
   collection.add(new kb.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
   equal(collection.length, 3, "3 models")
   equal(view_model.count(), 3, "3 count")
+  ok(collection_observable()[2] instanceof ContactViewModel, 'correct type from factory')
 
   collection.remove('b2'); collection.remove('b3')
   equal(collection.length, 1, "1 model")
@@ -585,6 +584,45 @@ test("14. collection change is observable", ->
 
   count = 0
   ko.dependentObservable(-> collection_observable.collection(); count++)
+  ok(collection_observable()[0] instanceof kb.ViewModel, 'is a kb.ViewModel')
+
+  collection_observable.collection(null)
+  collection_observable.collection(collection)
+  equal(count, 3, "collection change was observed")
+  kb.release(collection_observable)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test('15. collection is generated if not passed (no options)', ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  collection_observable = kb.collectionObservable()
+  collection = collection_observable.collection()
+  collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+
+  count = 0
+  ko.dependentObservable(-> collection_observable.collection(); count++)
+  ok(collection_observable()[0] instanceof kb.ViewModel, 'is a kb.ViewModel')
+
+  collection_observable.collection(null)
+  collection_observable.collection(collection)
+  equal(count, 3, "collection change was observed")
+  kb.release(collection_observable)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+)
+
+test('15. collection is generated if not passed (options)', ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  collection_observable = kb.collectionObservable({view_model: ContactViewModel})
+  collection = collection_observable.collection()
+  collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
+
+  count = 0
+  ko.dependentObservable(-> collection_observable.collection(); count++)
+  ok(collection_observable()[0] instanceof ContactViewModel, 'is a ContactViewModel')
 
   collection_observable.collection(null)
   collection_observable.collection(collection)
