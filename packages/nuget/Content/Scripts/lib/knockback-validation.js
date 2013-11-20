@@ -1,5 +1,5 @@
 /*
-  knockback-validation.js 0.17.3
+  knockback-validation.js 0.18.0
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
@@ -32,7 +32,7 @@ if (typeof exports !== 'undefined') {
 _unwrapObservable = ko.utils.unwrapObservable;
 
 /*
-  knockback-validation.js 0.17.3
+  knockback-validation.js 0.18.0
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
@@ -181,7 +181,7 @@ kb.formValidator = function(view_model, el) {
 };
 
 /*
-  knockback-validators.js 0.17.3
+  knockback-validators.js 0.18.0
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
