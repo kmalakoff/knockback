@@ -12,7 +12,8 @@
     }
     // CommonJS/NodeJS or No Loader
     else {
-      return factory.call(this);
+      var req = (typeof require !== "undefined") ? require : undefined;
+      return factory.call(this, req);
     }
-  })(function() {'__REPLACE__'; return kb;});
+  })(function(require) {'__REPLACE__'; return kb;});
 }).call(this);
