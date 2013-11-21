@@ -718,14 +718,14 @@ test '22. can merge non-unique options', ->
   options =
     internals: ['internal1']
     keys: ['key1']
-    factories: {models: factoryOverride}
+    factories: {models: factory}
     options:
       requires: 'require1'
       keys: ['key1']
       excludes: 'exclude1'
       options:
         excludes: ['exclude1']
-        factories: {models: factory}
+        factories: {models: factoryOverride}
 
   collapsed_options = kb.utils.collapseOptions(options)
   deepEqual(collapsed_options.internals, ['internal1'])

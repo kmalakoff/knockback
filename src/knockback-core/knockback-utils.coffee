@@ -44,19 +44,18 @@ _unwrapModels = (obj) ->
 
   return obj
 
-MERGE_OPTIONS = []
 _mergeArray = (result, key, value) ->
   result[key] or= []
   value = [value] unless _.isArray(value)
   result[key] = if result[key].length then _.union(result[key], value) else value
+  return result
 _mergeObject = (result, key, value) ->
   result[key] or= {}
-  _.defaults(result[key], value)
+  return _.extend(result[key], value)
 _keyArrayToObject = (value) ->
   result = {}
   result[item] = {key: item} for item in value
   return result
-
 _collapseOptions = (options) ->
   result = {}
   options = {options: options}
@@ -82,7 +81,7 @@ _collapseOptions = (options) ->
             _mergeObject(result, key, value)
         when 'options' then
         else
-          result[key] = value if result[key] is undefined
+          result[key] = value
     options = options.options
   return result
 
