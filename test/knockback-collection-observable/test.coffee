@@ -4,13 +4,12 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
@@ -32,7 +31,7 @@ class TestViewModel extends kb.ViewModel
     value = @test()
     value = @name()
 
-test("2. Basic Usage: collection observable with ko.dependentObservable", ->
+test '2. Basic Usage: collection observable with ko.dependentObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
@@ -61,9 +60,8 @@ test("2. Basic Usage: collection observable with ko.dependentObservable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("3. Basic Usage: collection observable with ko.dependentObservable", ->
+test '3. Basic Usage: collection observable with ko.dependentObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
@@ -94,9 +92,8 @@ test("3. Basic Usage: collection observable with ko.dependentObservable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("4. Basic Usage: no view models", ->
+test '4. Basic Usage: no view models', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
@@ -137,9 +134,8 @@ test("4. Basic Usage: no view models", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("5. Basic Usage: no sorting and no callbacks", ->
+test '5. Basic Usage: no sorting and no callbacks', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
@@ -180,9 +176,8 @@ test("5. Basic Usage: no sorting and no callbacks", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("6. Collection sync sorting with sort_attribute", ->
+test '6. Collection sync sorting with sort_attribute', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
@@ -228,9 +223,8 @@ test("6. Collection sync sorting with sort_attribute", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("7. Collection sync sorting with comparator", ->
+test '7. Collection sync sorting with comparator', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   sortNumber = (model_a, model_b) ->
@@ -279,9 +273,8 @@ test("7. Collection sync sorting with comparator", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("8. Collection sorting with callbacks", ->
+test '8. Collection sorting with callbacks', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   kb.NameSortedContactsCollection = kb.Collection.extend({
@@ -330,9 +323,8 @@ test("8. Collection sorting with callbacks", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("9. Collection sync dynamically changing the sorting function", ->
+test '9. Collection sync dynamically changing the sorting function', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection = new kb.ContactsCollection()
@@ -391,9 +383,8 @@ test("9. Collection sync dynamically changing the sorting function", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("10. Nested custom view models", ->
+test '10. Nested custom view models', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelDate extends kb.ViewModel
@@ -493,9 +484,8 @@ test("10. Nested custom view models", ->
   kb.release(nested_view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("11. Shared Options", ->
+test '11. Shared Options', ->
   kb.statistics = new kb.Statistics() # turn on stats
   collection = new kb.Collection({id: 1, name: 'Bob'})
 
@@ -509,9 +499,8 @@ test("11. Shared Options", ->
   kb.release([collection_observable1, collection_observable2, collection_observable3])
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("12. Filters option", ->
+test '12. Filters option', ->
   kb.statistics = new kb.Statistics() # turn on stats
   collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
@@ -520,36 +509,35 @@ test("12. Filters option", ->
   collection_observable3 = kb.collectionObservable(collection, {filters: [2]})
   collection_observable4 = kb.collectionObservable(collection, {filters: 5})
   collection_observable5 = kb.collectionObservable(collection, {filters: [5]})
-  collection_observable6 = kb.collectionObservable(collection, {filters: (model) -> model.get('name') is 'George'})
-  collection_observable7 = kb.collectionObservable(collection, {filters: [((model) -> model.get('name') is 'Bob'), ((model) -> return model.get('name') is 'Fred')]})
-  observable1 = ko.dependentObservable(-> _.filter(collection_observable6(), (vm) -> vm.name() isnt 'Bob'))
+  collection_observable6 = kb.collectionObservable(collection, {filters: (model) -> model.get('name') isnt 'George'})
+  collection_observable7 = kb.collectionObservable(collection, {filters: [((model) -> model.get('name') isnt 'Bob'), ((model) -> return model.get('name') isnt 'Fred')]})
+  observable1 = ko.dependentObservable(-> _.filter(collection_observable6(), (vm) -> vm.name() is 'Bob'))
 
   equal(_.map(_.pluck(collection_observable1(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
-  equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Fred, George')
-  equal(_.map(_.pluck(collection_observable3(), 'name'), (o) -> o()).join(', '), 'Bob, George')
-  equal(_.map(_.pluck(collection_observable4(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
-  equal(_.map(_.pluck(collection_observable5(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
+  equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Bob')
+  equal(_.map(_.pluck(collection_observable3(), 'name'), (o) -> o()).join(', '), 'Fred')
+  equal(_.map(_.pluck(collection_observable4(), 'name'), (o) -> o()).join(', '), '')
+  equal(_.map(_.pluck(collection_observable5(), 'name'), (o) -> o()).join(', '), '')
   equal(_.map(_.pluck(collection_observable6(), 'name'), (o) -> o()).join(', '), 'Bob, Fred')
   equal(_.map(_.pluck(collection_observable7(), 'name'), (o) -> o()).join(', '), 'George')
-  equal(_.map(_.pluck(observable1(), 'name'), (o) -> o()).join(', '), 'Fred')
+  equal(_.map(_.pluck(observable1(), 'name'), (o) -> o()).join(', '), 'Bob')
 
   collection.add([{id: 4, name: 'Bob'}, {id: 5, name: 'Fred'}, {id: 6, name: 'George'}, {id: 7, name: 'Mary'}])
 
   equal(_.map(_.pluck(collection_observable1(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George, Bob, Fred, George, Mary')
-  equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Fred, George, Bob, Fred, George, Mary')
-  equal(_.map(_.pluck(collection_observable3(), 'name'), (o) -> o()).join(', '), 'Bob, George, Bob, Fred, George, Mary')
-  equal(_.map(_.pluck(collection_observable4(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George, Bob, George, Mary')
-  equal(_.map(_.pluck(collection_observable5(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George, Bob, George, Mary')
+  equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Bob')
+  equal(_.map(_.pluck(collection_observable3(), 'name'), (o) -> o()).join(', '), 'Fred')
+  equal(_.map(_.pluck(collection_observable4(), 'name'), (o) -> o()).join(', '), 'Fred')
+  equal(_.map(_.pluck(collection_observable5(), 'name'), (o) -> o()).join(', '), 'Fred')
   equal(_.map(_.pluck(collection_observable6(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, Bob, Fred, Mary')
   equal(_.map(_.pluck(collection_observable7(), 'name'), (o) -> o()).join(', '), 'George, George, Mary')
-  equal(_.map(_.pluck(observable1(), 'name'), (o) -> o()).join(', '), 'Fred, Fred, Mary')
+  equal(_.map(_.pluck(observable1(), 'name'), (o) -> o()).join(', '), 'Bob, Bob')
 
   kb.release([collection_observable1, collection_observable2, collection_observable3, collection_observable4, collection_observable5, collection_observable6, collection_observable7, observable1])
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("13. Setting view models", ->
+test '13. Setting view models', ->
   kb.statistics = new kb.Statistics() # turn on stats
   collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
@@ -581,9 +569,8 @@ test("13. Setting view models", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("14. collection change is observable", ->
+test '14. collection change is observable', ->
   kb.statistics = new kb.Statistics() # turn on stats
   collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
@@ -599,9 +586,8 @@ test("14. collection change is observable", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test('15. collection is generated if not passed (no options)', ->
+test '15. collection is generated if not passed (no options)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection_observable = kb.collectionObservable()
@@ -618,9 +604,8 @@ test('15. collection is generated if not passed (no options)', ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test '15. collection is generated if not passed (options)', ->
+test '16. collection is generated if not passed (options)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection_observable = kb.collectionObservable({view_model: ContactViewModel})

@@ -147,7 +147,7 @@ class kb.CollectionObservable
       # process filters, sorting, etc
       else
         # apply filters
-        models = _.filter(models, (model) => not @_modelIsFiltered(model)) if filters.length
+        models = _.filter(models, (model) => not filters.length or @_selectModel(model))
 
         # apply sorting
         if comparator
@@ -300,7 +300,7 @@ class kb.CollectionObservable
         @_collection.notifySubscribers(@_collection())
 
       when 'new', 'add'
-        return if @_modelIsFiltered(arg) # filtered
+        return unless @_selectModel(arg) # filtered
 
         observable = kb.utils.wrappedObservable(@)
         collection = @_collection()
@@ -318,7 +318,7 @@ class kb.CollectionObservable
       when 'remove', 'destroy' then @_onModelRemove(arg)
       when 'change'
         # filtered, remove
-        if @_modelIsFiltered(arg)
+        if not @_selectModel(arg)
           @_onModelRemove(arg)
 
         # not filtered, add
@@ -362,7 +362,7 @@ class kb.CollectionObservable
 
     # set Models
     if @models_only
-      models = _.filter(models_or_view_models, (model) => not @_modelIsFiltered(model)) if has_filters # filter the models
+      models = _.filter(models_or_view_models, (model) => not has_filters or @_selectModel(model))
 
     # set ViewModels
     else
@@ -371,7 +371,7 @@ class kb.CollectionObservable
       for view_model in models_or_view_models
         model = kb.utils.wrappedObject(view_model)
         if has_filters
-          continue if @_modelIsFiltered(model) # filtered so skip
+          continue unless @_selectModel(model) # filtered so skip
           view_models.push(view_model)
 
         # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
@@ -398,13 +398,17 @@ class kb.CollectionObservable
     return @create_options.store.findOrCreate(model, @create_options)
 
   # @private
-  _modelIsFiltered: (model) ->
+  _selectModel: (model) ->
     filters = _peekObservable(@_filters)
     for filter in filters
       filter = _peekObservable(filter)
-      if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
-        return true
-    return false
+      if _.isFunction(filter)
+        return false if not filter(model)
+      else if _.isArray(filter)
+        return false unless model.id in filter
+      else
+        return false unless model.id is filter
+    return true
 
 # factory function
 kb.collectionObservable = (collection, options) -> return new kb.CollectionObservable(collection, options)

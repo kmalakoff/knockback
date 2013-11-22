@@ -7114,7 +7114,8 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 */
 
 var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, addStatisticsEvent, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 kb = (function() {
   function kb() {}
@@ -8766,11 +8767,9 @@ kb.CollectionObservable = (function() {
         if (!models || (current_collection.models.length === 0)) {
           view_models = [];
         } else {
-          if (filters.length) {
-            models = _.filter(models, function(model) {
-              return !_this._modelIsFiltered(model);
-            });
-          }
+          models = _.filter(models, function(model) {
+            return !filters.length || _this._selectModel(model);
+          });
           if (comparator) {
             view_models = _.map(models, function(model) {
               return _this._createViewModel(model);
@@ -8918,7 +8917,7 @@ kb.CollectionObservable = (function() {
           break;
         case 'new':
         case 'add':
-          if (_this._modelIsFiltered(arg)) {
+          if (!_this._selectModel(arg)) {
             return;
           }
           observable = kb.utils.wrappedObservable(_this);
@@ -8944,7 +8943,7 @@ kb.CollectionObservable = (function() {
           _this._onModelRemove(arg);
           break;
         case 'change':
-          if (_this._modelIsFiltered(arg)) {
+          if (!_this._selectModel(arg)) {
             _this._onModelRemove(arg);
           } else {
             view_model = _this.models_only ? arg : _this.viewModelByModel(arg);
@@ -8991,11 +8990,9 @@ kb.CollectionObservable = (function() {
       }
       view_models = models_or_view_models;
       if (_this.models_only) {
-        if (has_filters) {
-          models = _.filter(models_or_view_models, function(model) {
-            return !_this._modelIsFiltered(model);
-          });
-        }
+        models = _.filter(models_or_view_models, function(model) {
+          return !has_filters || _this._selectModel(model);
+        });
       } else {
         !has_filters || (view_models = []);
         models = [];
@@ -9003,7 +9000,7 @@ kb.CollectionObservable = (function() {
           view_model = models_or_view_models[_i];
           model = kb.utils.wrappedObject(view_model);
           if (has_filters) {
-            if (_this._modelIsFiltered(model)) {
+            if (!_this._selectModel(model)) {
               continue;
             }
             view_models.push(view_model);
@@ -9038,17 +9035,27 @@ kb.CollectionObservable = (function() {
     return this.create_options.store.findOrCreate(model, this.create_options);
   };
 
-  CollectionObservable.prototype._modelIsFiltered = function(model) {
-    var filter, filters, _i, _len;
+  CollectionObservable.prototype._selectModel = function(model) {
+    var filter, filters, _i, _len, _ref;
     filters = _peekObservable(this._filters);
     for (_i = 0, _len = filters.length; _i < _len; _i++) {
       filter = filters[_i];
       filter = _peekObservable(filter);
-      if (((typeof filter === 'function') && filter(model)) || (model && (model.id === filter))) {
-        return true;
+      if (_.isFunction(filter)) {
+        if (!filter(model)) {
+          return false;
+        }
+      } else if (_.isArray(filter)) {
+        if (_ref = model.id, __indexOf.call(filter, _ref) < 0) {
+          return false;
+        }
+      } else {
+        if (model.id !== filter) {
+          return false;
+        }
       }
     }
-    return false;
+    return true;
   };
 
   return CollectionObservable;

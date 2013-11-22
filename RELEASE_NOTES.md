@@ -1,14 +1,15 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 0.18.0
+* BREAKING CHANGE: filter is now consistent with underscore.js (it was opposite previously where filter true meant remove instead of keep)
+* safe writing to kb.collectionObservable, view models, and kb.observable without generating unexpected observable dependencies
+* options merging: automate the merging of options including 'internals', 'requires', 'excludes', 'keys', 'factories'
+* improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80
+* kb.collectionObservable: added automatic creation of a collection is one isn't passed since you can reference it using collection() on the observable
 * bug fix for findOrCreate refering to incorrect class
 * updated tests for latest libraries (Knockout 3.0.0, Backbone 1.1.0, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
 * added 'sort' collection message in addition to 'resort'
 * bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
-* improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80
-* kb.collectionObservable: added autmatic creation of a collection is one isn't passed since you can reference it using collection() on the observable
-* options merging: automate the merging of options including 'internals', 'requires', 'excludes', 'keys', 'factories'
-* safe writing to kb.collectionObservable, view models, and kb.observable without generating unexpected observable dependencies
 
 ## 0.17.2
 
