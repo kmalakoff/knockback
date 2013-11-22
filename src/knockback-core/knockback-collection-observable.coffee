@@ -76,9 +76,7 @@ class kb.CollectionObservable
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
-  constructor: (collection, options) ->
-    ko.dependencyDetection.begin(->)
-
+  constructor: (collection, options) -> return kb.utils.ignoreDependencies =>
     [collection, options] = [new kb.Collection(), collection] if _.isUndefined(options) and not (collection instanceof kb.Collection) # default create collection
 
     options or= {}
@@ -173,7 +171,6 @@ class kb.CollectionObservable
 
     not kb.statistics or kb.statistics.register('CollectionObservable', @)     # collect memory management statistics
 
-    ko.dependencyDetection.end()
     return observable
 
   # Required clean up function to break cycles, release view models, etc.
@@ -295,9 +292,8 @@ class kb.CollectionObservable
     return factory
 
   # @private
-  _onCollectionChange: (event, arg) ->
+  _onCollectionChange: (event, arg) -> return kb.utils.ignoreDependencies =>
     return if @in_edit # we are doing the editing
-    ko.dependencyDetection.begin(->)
 
     switch event
       when 'reset', 'sort', 'resort'
@@ -339,7 +335,6 @@ class kb.CollectionObservable
           else
             @_onCollectionChange('add', arg)
 
-    ko.dependencyDetection.end()
     return
 
   # @private
@@ -352,7 +347,7 @@ class kb.CollectionObservable
     @in_edit--
 
   # @private
-  _onObservableArrayChange: (models_or_view_models) ->
+  _onObservableArrayChange: (models_or_view_models) -> return kb.utils.ignoreDependencies =>
     return if @in_edit # we are doing the editing
 
     # validate input
@@ -363,7 +358,6 @@ class kb.CollectionObservable
     has_filters = _peekObservable(@_filters).length
     return if not collection # no collection or we are updating ourselves
 
-    ko.dependencyDetection.begin(->)
     view_models = models_or_view_models
 
     # set Models
@@ -389,8 +383,6 @@ class kb.CollectionObservable
     (models_or_view_models.length is view_models.length) or observable(view_models) # replace the ViewModels because they were filtered
     _.isEqual(collection.models, models) or collection.reset(models)
     @in_edit--
-
-    ko.dependencyDetection.end()
     return
 
   # @private

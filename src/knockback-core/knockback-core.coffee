@@ -230,16 +230,11 @@ _unwrapObservable = ko.utils.unwrapObservable
 _peekObservable = (obs) ->
   return obs unless ko.isObservable(obs)
   return obs.peek() if obs.peek
-  ko.dependencyDetection.begin(->); value = obs(); ko.dependencyDetection.end(); return value
+  return kb.utils.ignoreDependencies -> obs()
 
 _publishMethods = kb._publishMethods = (observable, instance, methods) ->
   observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
   return
-
-# republish minified
-_republishBySignature = (obj, name, methods) ->
-  return obj[name] = value for key, value of obj when _.all(methods, (method) -> not _.isUndefined(value[method]))
-console.log "ko.dependencyDetection", ko.dependencyDetection, _republishBySignature(ko, 'dependencyDetection', ['begin', 'end', 'registerDependency']), ko.dependencyDetection
 
 # From Backbone.js (https:github.com/documentcloud/backbone)
 copyProps = (dest, source) ->

@@ -77,9 +77,7 @@ class kb.ViewModel
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  constructor: (model, options, view_model) ->
-    ko.dependencyDetection.begin(->)
-
+  constructor: (model, options, view_model) -> return kb.utils.ignoreDependencies =>
     not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
 
     options or= {}
@@ -158,8 +156,7 @@ class kb.ViewModel
     not keys or @_createObservables(model, keys)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
-
-    ko.dependencyDetection.end()
+    return @
 
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).

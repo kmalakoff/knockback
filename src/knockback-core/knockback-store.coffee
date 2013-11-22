@@ -131,13 +131,12 @@ class kb.Store
     return observable if observable
 
     # create
-    ko.dependencyDetection.begin(->)
-    if creator.create
-      observable = creator.create(obj, options)
-    else
-      observable = new creator(obj, options)
-    observable or= ko.observable(null) # default to null
-    ko.dependencyDetection.end()
+    observable = kb.utils.ignoreDependencies =>
+      if creator.create
+        observable = creator.create(obj, options)
+      else
+        observable = new creator(obj, options)
+      return observable or ko.observable(null) # default to null
 
     # we only store view_models, not observables
     @isRegistered(observable) or @register(obj, observable, options) unless ko.isObservable(observable)
