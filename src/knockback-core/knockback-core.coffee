@@ -236,6 +236,11 @@ _publishMethods = kb._publishMethods = (observable, instance, methods) ->
   observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
   return
 
+# republish minified
+_republishBySignature = (obj, name, methods) ->
+  return obj[name] = value for key, value of obj when _.all(methods, (method) -> not _.isUndefined(value[method]))
+console.log "ko.dependencyDetection", ko.dependencyDetection, _republishBySignature(ko, 'dependencyDetection', ['begin', 'end', 'registerDependency']), ko.dependencyDetection
+
 # From Backbone.js (https:github.com/documentcloud/backbone)
 copyProps = (dest, source) ->
   (dest[key] = value) for key, value of source
