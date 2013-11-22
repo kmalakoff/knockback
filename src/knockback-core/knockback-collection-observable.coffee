@@ -77,6 +77,8 @@ class kb.CollectionObservable
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
   constructor: (collection, options) ->
+    ko.dependencyDetection.begin(->)
+
     [collection, options] = [new kb.Collection(), collection] if _.isUndefined(options) and not (collection instanceof kb.Collection) # default create collection
 
     options or= {}
@@ -171,6 +173,7 @@ class kb.CollectionObservable
 
     not kb.statistics or kb.statistics.register('CollectionObservable', @)     # collect memory management statistics
 
+    ko.dependencyDetection.end()
     return observable
 
   # Required clean up function to break cycles, release view models, etc.
@@ -243,7 +246,7 @@ class kb.CollectionObservable
   viewModelByModel: (model) ->
     return null if @models_only
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(kb.utils.wrappedObservable(@)(), (test) -> return if test?.__kb?.object then (test.__kb.object[id_attribute] == model[id_attribute]) else false)
+    return _.find(_peekObservable(kb.utils.wrappedObservable(@)), (test) -> return if test?.__kb?.object then (test.__kb.object[id_attribute] == model[id_attribute]) else false)
 
   # Will return true unless created with models_only option.
   #
@@ -294,6 +297,7 @@ class kb.CollectionObservable
   # @private
   _onCollectionChange: (event, arg) ->
     return if @in_edit # we are doing the editing
+    ko.dependencyDetection.begin(->)
 
     switch event
       when 'reset', 'sort', 'resort'
@@ -334,6 +338,8 @@ class kb.CollectionObservable
           # add new
           else
             @_onCollectionChange('add', arg)
+
+    ko.dependencyDetection.end()
     return
 
   # @private
@@ -353,9 +359,11 @@ class kb.CollectionObservable
     (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or _throwUnexpected(@, 'incorrect type passed')
 
     observable = kb.utils.wrappedObservable(@)
-    collection = @_collection()
-    has_filters = @_filters().length
+    collection = _peekObservable(@_collection())
+    has_filters = _peekObservable(@_filters()).length
     return if not collection # no collection or we are updating ourselves
+
+    ko.dependencyDetection.begin(->)
     view_models = models_or_view_models
 
     # set Models
@@ -381,6 +389,8 @@ class kb.CollectionObservable
     (models_or_view_models.length is view_models.length) or observable(view_models) # replace the ViewModels because they were filtered
     _.isEqual(collection.models, models) or collection.reset(models)
     @in_edit--
+
+    ko.dependencyDetection.end()
     return
 
   # @private
@@ -397,9 +407,9 @@ class kb.CollectionObservable
 
   # @private
   _modelIsFiltered: (model) ->
-    filters = @_filters()
+    filters = _peekObservable(@_filters)
     for filter in filters
-      filter = _unwrapObservable(filter)
+      filter = _peekObservable(filter)
       if ((typeof(filter) is 'function') and filter(model)) or (model and (model.id is filter))
         return true
     return false

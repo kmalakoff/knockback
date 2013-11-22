@@ -48,6 +48,8 @@ class kb.Observable
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (model, options, @vm) ->
+    ko.dependencyDetection.begin(->)
+
     options or _throwMissing(this, 'options')
     @vm or = {}
 
@@ -141,6 +143,7 @@ class kb.Observable
       observable = kb.defaultObservable(observable, create_options.default)
       delete create_options.default
 
+    ko.dependencyDetection.end()
     return observable
 
   # Required clean up function to break cycles, release view models, etc.

@@ -25,6 +25,13 @@ class ContactViewModelClass
     @name = kb.observable(model, 'name')
     @number = kb.observable(model, 'number')
 
+class TestViewModel extends kb.ViewModel
+  constructor: ->
+    super
+    @test = ko.observable('hello')
+    value = @test()
+    value = @name()
+
 test("2. Basic Usage: collection observable with ko.dependentObservable", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
@@ -631,51 +638,51 @@ test '15. collection is generated if not passed (options)', ->
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
 
-# test '16. collection changes do not cause dependencies inside ko.dependentObservable', ->
-#   kb.statistics = new kb.Statistics() # turn on stats
+test '16. collection changes do not cause dependencies inside ko.dependentObservable', ->
+  kb.statistics = new kb.Statistics() # turn on stats
 
-#   class TestViewModel extends kb.ViewModel
-#     constructor: ->
-#       super
-#       @test = ko.observable('hello')
-#       value = @test()
-#       value = @name()
+  collection_observable = kb.collectionObservable({view_model: TestViewModel})
+  collection = collection_observable.collection()
 
-#   collection_observable = kb.collectionObservable({view_model: TestViewModel})
-#   collection = collection_observable.collection()
+  count_manual = 0
+  ko.dependentObservable ->
+    collection_observable([new TestViewModel(new kb.Model({id: 10, name: 'Manual'}))]) # should not depend
+    count_manual++
 
-#   count = 0
-#   ko.dependentObservable ->
-#     collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}]) # should not depend
-#     collection.add([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}]) # should not depend
-#     collection_observable([new TestViewModel()]) # should not depend
-#     count++
+  count_reset = 0
+  ko.dependentObservable ->
+    collection.reset([{id: 20, name: 'Reset1'}, {id: 21, name: 'Reset2'}]) # should not depend
+    count_reset++
 
-#   collection_count = 0
-#   ko.dependentObservable ->
-#     values = collection_observable() # should depend
-#     collection_count++
+  count_add = 0
+  ko.dependentObservable ->
+    collection.add([{id: 30, name: 'Add1'}, {id: 31, name: 'Add2'}]) # should not depend
+    count_add++
 
-#   vm = new TestViewModel(new kb.Model({name: 'Bob'}))
-#   m = vm.model()
+  count_remove = 0
+  ko.dependentObservable ->
+    collection.remove(collection.at(0))
+    count_remove++
 
-#   ko.dependentObservable ->
-#     m.set({name: 'Bob2'}) # should not depend
-#     m.set({something_new: 'Bob'}) # should not depend
-#     m.set({new_model: new kb.Model({name: 'SubModel'})}) # should not depend
-#     m.set({new_collection: new kb.Collection([{name: 'SubModel'}])}) # should not depend
-#     vm.model(new kb.Model({name: 'SubModel'})) # should not depend
-#     count++
+  observable_count = 0
+  ko.dependentObservable ->
+    values = collection_observable() # should depend
+    observable_count++
 
-#   collection.add({id: 3, name: 'George'})
+  equal(count_manual, 1, 'count_manual'); equal(count_reset, 1, 'count_reset'); equal(count_add, 1, 'count_add'); equal(count_remove, 1, 'count_remove'); equal(observable_count, 1, 'observable_count')
 
-#   equal(count, 1)
-#   collection.models[0].set({name: 'Bob2'})
-#   equal(collection_observable()[0].name(), 'Bob2')
-#   collection_observable()[0].test('world')
-#   equal(collection_observable()[0].test(), 'world')
-#   equal(count, 1)
+  collection_observable([new TestViewModel(new kb.Model({id: 10, name: 'Manual'}))]) # should not depend
+  collection.reset([{id: 20, name: 'Reset1'}, {id: 21, name: 'Reset2'}]) # should not depend
+  collection.add([{id: 30, name: 'Add1'}, {id: 31, name: 'Add2'}]) # should not depend
+  collection.remove(collection.at(0))
+  equal(count_manual, 1, 'count_manual'); equal(count_reset, 1, 'count_reset'); equal(count_add, 1, 'count_add'); equal(count_remove, 1, 'count_remove'); equal(observable_count, 6, 'observable_count')
 
-#   kb.release(collection_observable)
+  collection.models[0].set({name: 'Bob2'})
+  equal(collection_observable()[0].name(), 'Bob2')
+  collection_observable()[0].test('world')
+  equal(collection_observable()[0].test(), 'world')
+  equal(count_manual, 1, 'count_manual'); equal(count_reset, 1, 'count_reset'); equal(count_add, 1, 'count_add'); equal(count_remove, 1, 'count_remove'); equal(observable_count, 6, 'observable_count')
 
-#   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  kb.release(collection_observable)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null

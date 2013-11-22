@@ -227,6 +227,11 @@ _arraySplice = Array.prototype.splice
 
 _unwrapObservable = ko.utils.unwrapObservable
 
+_peekObservable = (obs) ->
+  return obs unless ko.isObservable(obs)
+  return obs.peek() if obs.peek
+  ko.dependencyDetection.begin(->); value = obs(); ko.dependencyDetection.end(); return value
+
 _publishMethods = kb._publishMethods = (observable, instance, methods) ->
   observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
   return

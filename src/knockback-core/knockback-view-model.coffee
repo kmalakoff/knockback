@@ -78,6 +78,8 @@ class kb.ViewModel
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) ->
+    ko.dependencyDetection.begin(->)
+
     not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
 
     options or= {}
@@ -156,6 +158,8 @@ class kb.ViewModel
     not keys or @_createObservables(model, keys)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
+
+    ko.dependencyDetection.end()
 
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
