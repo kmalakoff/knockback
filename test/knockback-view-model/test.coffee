@@ -15,6 +15,13 @@ test("TEST DEPENDENCY MISSING", ->
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
+class TestViewModel extends kb.ViewModel
+  constructor: ->
+    super
+    @test = ko.observable('hello')
+    value = @test()
+    value = @name()
+
 test("1. Standard use case: read and write", ->
   kb.statistics = new kb.Statistics() # turn on stats
 
@@ -776,51 +783,58 @@ test '23. can merge keys as object', ->
   collapsed_options = kb.utils.collapseOptions(options)
   deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
 
-# test '16. collection changes do not cause dependencies inside ko.dependentObservable', ->
-#   kb.statistics = new kb.Statistics() # turn on stats
+test '24. view model changes do not cause dependencies inside ko.dependentObservable', ->
+  kb.statistics = new kb.Statistics() # turn on stats
 
-#   class TestViewModel extends kb.ViewModel
-#     constructor: ->
-#       super
-#       @test = ko.observable('hello')
-#       value = @test()
-#       value = @name()
+  view_model = new TestViewModel(new kb.Model({id: 1, name: 'Initial'}))
+  model = view_model.model()
 
-#   collection_observable = kb.collectionObservable({view_model: TestViewModel})
-#   collection = collection_observable.collection()
+  count_manual = 0
+  ko.dependentObservable ->
+    view_model.model(new kb.Model({id: 10, name: 'Manual'})) # should not depend
+    count_manual++
 
-#   count = 0
-#   ko.dependentObservable ->
-#     collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}]) # should not depend
-#     collection.add([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}]) # should not depend
-#     collection_observable([new TestViewModel()]) # should not depend
-#     count++
+  count_set_existing = 0
+  ko.dependentObservable ->
+    model.set({name: 'Existing'}) # should not depend
+    count_set_existing++
 
-#   collection_count = 0
-#   ko.dependentObservable ->
-#     values = collection_observable() # should depend
-#     collection_count++
+  count_set_new = 0
+  ko.dependentObservable ->
+    model.set({new_attribute: 'New'}) # should not depend
+    count_set_new++
 
-#   vm = new TestViewModel(new kb.Model({name: 'Bob'}))
-#   m = vm.model()
+  count_set_model = 0
+  ko.dependentObservable ->
+    model.set({model: new kb.Model({name: 'NestedModel'})}) # should not depend
+    count_set_model++
 
-#   ko.dependentObservable ->
-#     m.set({name: 'Bob2'}) # should not depend
-#     m.set({something_new: 'Bob'}) # should not depend
-#     m.set({new_model: new kb.Model({name: 'SubModel'})}) # should not depend
-#     m.set({new_collection: new kb.Collection([{name: 'SubModel'}])}) # should not depend
-#     vm.model(new kb.Model({name: 'SubModel'})) # should not depend
-#     count++
+  count_set_collection = 0
+  ko.dependentObservable ->
+    model.set({collection: new kb.Collection([{name: 'NestedModel'}])}) # should not depend
+    count_set_collection++
 
-#   collection.add({id: 3, name: 'George'})
+  observable_count = 0
+  ko.dependentObservable ->
+    view_model.model() # should depend
+    observable_count++
 
-#   equal(count, 1)
-#   collection.models[0].set({name: 'Bob2'})
-#   equal(collection_observable()[0].name(), 'Bob2')
-#   collection_observable()[0].test('world')
-#   equal(collection_observable()[0].test(), 'world')
-#   equal(count, 1)
+  equal(count_manual, 1, 'count_manual'); equal(count_set_existing, 1, 'count_set_existing'); equal(count_set_new, 1, 'count_set_new'); equal(count_set_model, 1, 'count_set_model'); equal(count_set_collection, 1, 'count_set_collection'); equal(observable_count, 1, 'observable_count')
 
-#   kb.release(collection_observable)
+  view_model.model(new kb.Model({id: 10, name: 'Manual'}))
+  # model.set({name: 'Existing'})
+  # model.set({new_attribute: 'New'})
+  # model.set({model: new kb.Model({name: 'NestedModel'})})
+  # model.set({collection: new kb.Collection([{name: 'NestedModel'}])})
+  equal(count_manual, 1, 'count_manual'); equal(count_set_existing, 1, 'count_set_existing'); equal(count_set_new, 1, 'count_set_new'); equal(count_set_model, 1, 'count_set_model'); equal(count_set_collection, 1, 'count_set_collection'); equal(observable_count, 2, 'observable_count')
 
-#   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  model = view_model.model()
+  model.set({name: 'Bob2'})
+  equal(view_model.name(), 'Bob2')
+  view_model.test('world')
+  equal(view_model.test(), 'world')
+  equal(count_manual, 1, 'count_manual'); equal(count_set_existing, 1, 'count_set_existing'); equal(count_set_new, 1, 'count_set_new'); equal(count_set_model, 1, 'count_set_model'); equal(count_set_collection, 1, 'count_set_collection'); equal(observable_count, 2, 'observable_count')
+
+  kb.release(view_model)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null

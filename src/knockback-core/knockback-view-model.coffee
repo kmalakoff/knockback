@@ -106,7 +106,7 @@ class kb.ViewModel
     _mdl = _wrappedKey(@, '_mdl', ko.observable())
     @model = ko.dependentObservable(
       read: => _mdl(); return kb.utils.wrappedObject(@)
-      write: (new_model) =>
+      write: (new_model) => kb.utils.ignoreDependencies =>
         return if (kb.utils.wrappedObject(@) is new_model) # no change
 
         # SHARED NULL MODEL - keep it that way

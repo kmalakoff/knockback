@@ -666,7 +666,7 @@ test '16. collection changes do not cause dependencies inside ko.dependentObserv
 
   observable_count = 0
   ko.dependentObservable ->
-    values = collection_observable() # should depend
+    collection_observable() # should depend
     observable_count++
 
   equal(count_manual, 1, 'count_manual'); equal(count_reset, 1, 'count_reset'); equal(count_add, 1, 'count_add'); equal(count_remove, 1, 'count_remove'); equal(observable_count, 1, 'observable_count')
@@ -677,10 +677,12 @@ test '16. collection changes do not cause dependencies inside ko.dependentObserv
   collection.remove(collection.at(0))
   equal(count_manual, 1, 'count_manual'); equal(count_reset, 1, 'count_reset'); equal(count_add, 1, 'count_add'); equal(count_remove, 1, 'count_remove'); equal(observable_count, 6, 'observable_count')
 
-  collection.models[0].set({name: 'Bob2'})
-  equal(collection_observable()[0].name(), 'Bob2')
-  collection_observable()[0].test('world')
-  equal(collection_observable()[0].test(), 'world')
+  view_model = collection_observable()[0]
+  model = view_model.model()
+  model.set({name: 'Bob2'})
+  equal(view_model.name(), 'Bob2')
+  view_model.test('world')
+  equal(view_model.test(), 'world')
   equal(count_manual, 1, 'count_manual'); equal(count_reset, 1, 'count_reset'); equal(count_add, 1, 'count_add'); equal(count_remove, 1, 'count_remove'); equal(observable_count, 6, 'observable_count')
 
   kb.release(collection_observable)

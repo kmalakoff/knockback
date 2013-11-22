@@ -1417,28 +1417,30 @@ kb.ViewModel = (function() {
           return kb.utils.wrappedObject(_this);
         },
         write: function(new_model) {
-          var event_watcher, missing;
-          if (kb.utils.wrappedObject(_this) === new_model) {
-            return;
-          }
-          if (_this.__kb_null) {
-            !new_model || _throwUnexpected(_this, 'model set on shared null');
-            return;
-          }
-          kb.utils.wrappedObject(_this, new_model);
-          event_watcher = kb.utils.wrappedEventWatcher(_this);
-          if (!event_watcher) {
-            _mdl(new_model);
-            return;
-          }
-          event_watcher.emitter(new_model);
-          if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
-            missing = _.difference(_.keys(new_model.attributes), _.keys(_this.__kb.model_keys));
-            if (missing) {
-              _this._createObservables(new_model, missing);
+          return kb.utils.ignoreDependencies(function() {
+            var event_watcher, missing;
+            if (kb.utils.wrappedObject(_this) === new_model) {
+              return;
             }
-          }
-          _mdl(new_model);
+            if (_this.__kb_null) {
+              !new_model || _throwUnexpected(_this, 'model set on shared null');
+              return;
+            }
+            kb.utils.wrappedObject(_this, new_model);
+            event_watcher = kb.utils.wrappedEventWatcher(_this);
+            if (!event_watcher) {
+              _mdl(new_model);
+              return;
+            }
+            event_watcher.emitter(new_model);
+            if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
+              missing = _.difference(_.keys(new_model.attributes), _.keys(_this.__kb.model_keys));
+              if (missing) {
+                _this._createObservables(new_model, missing);
+              }
+            }
+            _mdl(new_model);
+          });
         }
       });
       event_watcher = kb.utils.wrappedEventWatcher(_this, new kb.EventWatcher(model, _this, {
@@ -1944,9 +1946,6 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype._modelIsFiltered = function(model) {
     var filter, filters, _i, _len;
-    if (!_peekObservable(this._filters)) {
-      debugger;
-    }
     filters = _peekObservable(this._filters);
     for (_i = 0, _len = filters.length; _i < _len; _i++) {
       filter = filters[_i];
