@@ -822,10 +822,10 @@ test '24. view model changes do not cause dependencies inside ko.dependentObserv
   equal(count_manual, 1, 'count_manual'); equal(count_set_existing, 1, 'count_set_existing'); equal(count_set_new, 1, 'count_set_new'); equal(count_set_model, 1, 'count_set_model'); equal(count_set_collection, 1, 'count_set_collection'); equal(observable_count, 1, 'observable_count')
 
   view_model.model(new kb.Model({id: 10, name: 'Manual'}))
-  # model.set({name: 'Existing'})
-  # model.set({new_attribute: 'New'})
-  # model.set({model: new kb.Model({name: 'NestedModel'})})
-  # model.set({collection: new kb.Collection([{name: 'NestedModel'}])})
+  model.set({name: 'Existing'})
+  model.set({new_attribute: 'New'})
+  model.set({model: new kb.Model({name: 'NestedModel'})})
+  model.set({collection: new kb.Collection([{name: 'NestedModel'}])})
   equal(count_manual, 1, 'count_manual'); equal(count_set_existing, 1, 'count_set_existing'); equal(count_set_new, 1, 'count_set_new'); equal(count_set_model, 1, 'count_set_model'); equal(count_set_collection, 1, 'count_set_collection'); equal(observable_count, 2, 'observable_count')
 
   model = view_model.model()

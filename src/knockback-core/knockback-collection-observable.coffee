@@ -116,7 +116,7 @@ class kb.CollectionObservable
     @_collection = ko.observable(collection)
     observable.collection = @collection = ko.dependentObservable(
       read: => return @_collection()
-      write: (new_collection) =>
+      write: (new_collection) => kb.utils.ignoreDependencies =>
         return if ((previous_collection = @_collection()) is new_collection) # no change
 
         # clean up

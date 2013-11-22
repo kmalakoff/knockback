@@ -15,7 +15,7 @@ test("TEST DEPENDENCY MISSING", ->
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
-test("1. Standard use case: direct attributes with read and write", ->
+test '1. Standard use case: direct attributes with read and write', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModel = (model) ->
@@ -46,9 +46,8 @@ test("1. Standard use case: direct attributes with read and write", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("2. Standard use case: direct attributes with custom read and write", ->
+test '2. Standard use case: direct attributes with custom read and write', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModelCustom = (model) ->
@@ -83,9 +82,8 @@ test("2. Standard use case: direct attributes with custom read and write", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("3. Read args", ->
+test '3. Read args', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   args = []
@@ -99,9 +97,8 @@ test("3. Read args", ->
   ok(_.isEqual(args, ['name', 1, 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']) , "got the args: #{args.join(', ')}") # TODO: reduce number of calls on old Backbone?
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("4. Standard use case: ko.dependentObservable", ->
+test '4. Standard use case: ko.dependentObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModel = (model) ->
@@ -129,9 +126,8 @@ test("4. Standard use case: ko.dependentObservable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("5. Inferring observable types: the easy way", ->
+test '5. Inferring observable types: the easy way', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ChildrenCollection extends kb.CollectionObservable
@@ -200,9 +196,8 @@ test("5. Inferring observable types: the easy way", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("6. Inferring observable types: the hard way", ->
+test '6. Inferring observable types: the hard way', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ChildrenCollection extends kb.CollectionObservable
@@ -267,8 +262,8 @@ test("6. Inferring observable types: the hard way", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
-test("7. model change is observable", ->
+
+test '7. model change is observable', ->
   kb.statistics = new kb.Statistics() # turn on stats
   model = new kb.Model({id: 1, name: 'Bob'})
 
@@ -283,4 +278,28 @@ test("7. model change is observable", ->
   kb.release(observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
+
+test '24. view model changes do not cause dependencies inside ko.dependentObservable', ->
+  kb.statistics = new kb.Statistics() # turn on stats
+
+  model = new kb.Model({id: 1, name: 'Initial'})
+  observable = kb.observable(model, 'name')
+
+  count_manual = 0
+  ko.dependentObservable ->
+    observable('Manual')
+    count_manual++
+
+  observable_count = 0
+  ko.dependentObservable ->
+    observable() # should depend
+    observable_count++
+
+  equal(count_manual, 1, 'count_manual'); equal(observable_count, 1, 'observable_count')
+
+  observable('Update')
+  equal(count_manual, 1, 'count_manual'); equal(observable_count, 2, 'observable_count')
+
+  kb.release(observable)
+
+  equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null

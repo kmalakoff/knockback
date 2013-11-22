@@ -1177,30 +1177,32 @@ kb.Observable = (function() {
           return _unwrapObservable(_this.vo());
         },
         write: function(new_value) {
-          var arg, args, set_info, unwrapped_new_value, _i, _len, _ref;
-          unwrapped_new_value = _unwrapModels(new_value);
-          set_info = {};
-          set_info[_unwrapObservable(_this.key)] = unwrapped_new_value;
-          args = _this.write ? [unwrapped_new_value] : [set_info];
-          if (_this.args) {
-            if (_.isArray(_this.args)) {
-              _ref = _this.args;
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                arg = _ref[_i];
-                args.push(_unwrapObservable(arg));
+          return kb.utils.ignoreDependencies(function() {
+            var arg, args, set_info, unwrapped_new_value, _i, _len, _ref;
+            unwrapped_new_value = _unwrapModels(new_value);
+            set_info = {};
+            set_info[_unwrapObservable(_this.key)] = unwrapped_new_value;
+            args = _this.write ? [unwrapped_new_value] : [set_info];
+            if (_this.args) {
+              if (_.isArray(_this.args)) {
+                _ref = _this.args;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  arg = _ref[_i];
+                  args.push(_unwrapObservable(arg));
+                }
+              } else {
+                args.push(_unwrapObservable(_this.args));
               }
-            } else {
-              args.push(_unwrapObservable(_this.args));
             }
-          }
-          if (_this._mdl) {
-            if (_this.write) {
-              _this.write.apply(_this.vm, args);
-            } else {
-              _this._mdl.set.apply(_this._mdl, args);
+            if (_this._mdl) {
+              if (_this.write) {
+                _this.write.apply(_this.vm, args);
+              } else {
+                _this._mdl.set.apply(_this._mdl, args);
+              }
             }
-          }
-          return _this.update(new_value);
+            return _this.update(new_value);
+          });
         },
         owner: _this.vm
       }));
@@ -1221,18 +1223,20 @@ kb.Observable = (function() {
           return _this._mdl;
         },
         write: function(new_model) {
-          var arg, previous, _ref;
-          if (_this.__kb_released || (_this._mdl === new_model)) {
-            return;
-          }
-          _this._mdl = new_model;
-          previous = new_model != null ? new_model.get(_this.key) : void 0;
-          _this.update(null);
-          if (new_model && !((_ref = _this.vm[_this.key]) != null ? _ref.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
-            (arg = {})[_this.key] = previous;
-            new_model.set(arg);
-          }
-          return _this._model(new_model);
+          return kb.utils.ignoreDependencies(function() {
+            var arg, previous, _ref;
+            if (_this.__kb_released || (_this._mdl === new_model)) {
+              return;
+            }
+            _this._mdl = new_model;
+            previous = new_model != null ? new_model.get(_this.key) : void 0;
+            _this.update(null);
+            if (new_model && !((_ref = _this.vm[_this.key]) != null ? _ref.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
+              (arg = {})[_this.key] = previous;
+              new_model.set(arg);
+            }
+            return _this._model(new_model);
+          });
         }
       });
       kb.EventWatcher.useOptionsOrCreate({
@@ -1635,17 +1639,19 @@ kb.CollectionObservable = (function() {
           return _this._collection();
         },
         write: function(new_collection) {
-          var previous_collection;
-          if ((previous_collection = _this._collection()) === new_collection) {
-            return;
-          }
-          if (previous_collection) {
-            previous_collection.unbind('all', _this.__kb._onCollectionChange);
-          }
-          if (new_collection) {
-            new_collection.bind('all', _this.__kb._onCollectionChange);
-          }
-          return _this._collection(new_collection);
+          return kb.utils.ignoreDependencies(function() {
+            var previous_collection;
+            if ((previous_collection = _this._collection()) === new_collection) {
+              return;
+            }
+            if (previous_collection) {
+              previous_collection.unbind('all', _this.__kb._onCollectionChange);
+            }
+            if (new_collection) {
+              new_collection.bind('all', _this.__kb._onCollectionChange);
+            }
+            return _this._collection(new_collection);
+          });
         }
       });
       if (collection) {

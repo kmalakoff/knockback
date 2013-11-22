@@ -83,7 +83,7 @@ class kb.Observable
         # get the observable
         return _unwrapObservable(@vo())
 
-      write: (new_value) =>
+      write: (new_value) => kb.utils.ignoreDependencies =>
         # set on model
         unwrapped_new_value = _unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
         set_info = {}; set_info[_unwrapObservable(@key)] = unwrapped_new_value
@@ -116,7 +116,7 @@ class kb.Observable
     # use external model observable or create
     observable.model = @model = ko.dependentObservable(
       read: => @_model(); return @_mdl
-      write: (new_model) =>
+      write: (new_model) => kb.utils.ignoreDependencies =>
         return if @__kb_released or (@_mdl is new_model) # destroyed or no change
 
         # update references
