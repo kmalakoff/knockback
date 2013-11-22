@@ -25,7 +25,7 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _mergeArray, _mergeObject, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, URL_REGEXP, addStatisticsEvent, arraySlice, callOrGet, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
@@ -224,6 +224,20 @@ _legacyWarning = function(identifier, last_version, message) {
 _arraySplice = Array.prototype.splice;
 
 _unwrapObservable = ko.utils.unwrapObservable;
+
+_peekObservable = function(obs) {
+  var value;
+  if (!ko.isObservable(obs)) {
+    return obs;
+  }
+  if (obs.peek) {
+    return obs.peek();
+  }
+  ko.dependencyDetection.begin(function() {});
+  value = obs();
+  ko.dependencyDetection.end();
+  return value;
+};
 
 _publishMethods = kb._publishMethods = function(observable, instance, methods) {
   var fn, _i, _len;
@@ -794,12 +808,14 @@ kb.Store = (function() {
     if (observable) {
       return observable;
     }
+    ko.dependencyDetection.begin(function() {});
     if (creator.create) {
       observable = creator.create(obj, options);
     } else {
       observable = new creator(obj, options);
     }
     observable || (observable = ko.observable(null));
+    ko.dependencyDetection.end();
     if (!ko.isObservable(observable)) {
       this.isRegistered(observable) || this.register(obj, observable, options);
     }
@@ -1110,6 +1126,7 @@ kb.Observable = (function() {
     var create_options, event_watcher, observable,
       _this = this;
     this.vm = vm;
+    ko.dependencyDetection.begin(function() {});
     options || _throwMissing(this, 'options');
     this.vm || (this.vm = {});
     if (_.isString(options) || ko.isObservable(options)) {
@@ -1226,6 +1243,7 @@ kb.Observable = (function() {
       observable = kb.defaultObservable(observable, create_options["default"]);
       delete create_options["default"];
     }
+    ko.dependencyDetection.end();
     return observable;
   }
 
@@ -1363,6 +1381,7 @@ kb.ViewModel = (function() {
   function ViewModel(model, options, view_model) {
     var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, vm_key, _mdl, _ref,
       _this = this;
+    ko.dependencyDetection.begin(function() {});
     !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(this, 'not a model');
     options || (options = {});
     view_model || (view_model = {});
@@ -1452,6 +1471,7 @@ kb.ViewModel = (function() {
     !options.mappings || this._mapObservables(model, options.mappings);
     !keys || this._createObservables(model, keys);
     !kb.statistics || kb.statistics.register('ViewModel', this);
+    ko.dependencyDetection.end();
   }
 
   ViewModel.prototype.destroy = function() {
@@ -1565,6 +1585,7 @@ kb.CollectionObservable = (function() {
   function CollectionObservable(collection, options) {
     var create_options, observable, _ref,
       _this = this;
+    ko.dependencyDetection.begin(function() {});
     if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
       _ref = [new kb.Collection(), collection], collection = _ref[0], options = _ref[1];
     }
@@ -1664,6 +1685,7 @@ kb.CollectionObservable = (function() {
     });
     observable.subscribe(_.bind(this._onObservableArrayChange, this));
     !kb.statistics || kb.statistics.register('CollectionObservable', this);
+    ko.dependencyDetection.end();
     return observable;
   }
 
@@ -1721,7 +1743,7 @@ kb.CollectionObservable = (function() {
       return null;
     }
     id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
-    return _.find(kb.utils.wrappedObservable(this)(), function(test) {
+    return _.find(_peekObservable(kb.utils.wrappedObservable(this)), function(test) {
       var _ref;
       if (test != null ? (_ref = test.__kb) != null ? _ref.object : void 0 : void 0) {
         return test.__kb.object[id_attribute] === model[id_attribute];
@@ -1780,6 +1802,7 @@ kb.CollectionObservable = (function() {
     if (this.in_edit) {
       return;
     }
+    ko.dependencyDetection.begin(function() {});
     switch (event) {
       case 'reset':
       case 'sort':
@@ -1830,6 +1853,7 @@ kb.CollectionObservable = (function() {
           }
         }
     }
+    ko.dependencyDetection.end();
   };
 
   CollectionObservable.prototype._onModelRemove = function(model) {
@@ -1852,11 +1876,12 @@ kb.CollectionObservable = (function() {
     }
     (this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || _throwUnexpected(this, 'incorrect type passed');
     observable = kb.utils.wrappedObservable(this);
-    collection = this._collection();
-    has_filters = this._filters().length;
+    collection = _peekObservable(this._collection);
+    has_filters = _peekObservable(this._filters).length;
     if (!collection) {
       return;
     }
+    ko.dependencyDetection.begin(function() {});
     view_models = models_or_view_models;
     if (this.models_only) {
       if (has_filters) {
@@ -1884,6 +1909,7 @@ kb.CollectionObservable = (function() {
     (models_or_view_models.length === view_models.length) || observable(view_models);
     _.isEqual(collection.models, models) || collection.reset(models);
     this.in_edit--;
+    ko.dependencyDetection.end();
   };
 
   CollectionObservable.prototype._attributeComparator = function(sort_attribute) {
@@ -1907,10 +1933,10 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype._modelIsFiltered = function(model) {
     var filter, filters, _i, _len;
-    filters = this._filters();
+    filters = _peekObservable(this._filters);
     for (_i = 0, _len = filters.length; _i < _len; _i++) {
       filter = filters[_i];
-      filter = _unwrapObservable(filter);
+      filter = _peekObservable(filter);
       if (((typeof filter === 'function') && filter(model)) || (model && (model.id === filter))) {
         return true;
       }

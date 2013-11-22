@@ -359,8 +359,8 @@ class kb.CollectionObservable
     (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or _throwUnexpected(@, 'incorrect type passed')
 
     observable = kb.utils.wrappedObservable(@)
-    collection = _peekObservable(@_collection())
-    has_filters = _peekObservable(@_filters()).length
+    collection = _peekObservable(@_collection)
+    has_filters = _peekObservable(@_filters).length
     return if not collection # no collection or we are updating ourselves
 
     ko.dependencyDetection.begin(->)
