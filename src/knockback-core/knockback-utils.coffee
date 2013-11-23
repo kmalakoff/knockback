@@ -314,4 +314,4 @@ class kb.utils
   #
   # @example
   #   kb.utils.ignoreDependencies(options);
-  @ignoreDependencies = (fn) -> value = null; obs = ko.dependentObservable(-> value = fn()); obs.dispose(); return value
+  @ignoreDependencies = (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value
