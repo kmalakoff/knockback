@@ -6,14 +6,12 @@
 */
 (function() {
   return (function(factory) {
-    // AMD
-    if (typeof define === 'function' && define.amd) {
-      return define(['require', 'underscore', 'backbone', 'knockout', 'knockback'], factory);
-    }
-    // CommonJS/NodeJS or No Loader
-    else {
-      var req = (typeof require !== "undefined") ? require : undefined;
-      return factory.call(this, req);
+    if (typeof exports == 'object') {
+      module.exports = module.exports = factory.call(this, require);
+    } else if (typeof define == 'function' && define.amd) {
+      define(['require', 'underscore', 'backbone', 'knockout', 'knockback'], factory);
+    } else {
+      this.kb = factory.call(this, (typeof require !== 'undefined') ? require : undefined);
     }
   })(function(require) {'__REPLACE__'; return kb;});
 }).call(this);

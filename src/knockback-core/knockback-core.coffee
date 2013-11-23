@@ -190,11 +190,9 @@ class kb
 ####################################
 # Module
 ####################################
-# export Knockback and kb namespcaes globally and to modules
-@Knockback = @kb = kb; module.exports = kb if (typeof(exports) isnt 'undefined')
 
 # use Parse
-if (@Parse)
+if @Parse
   kb._ = _ = @Parse._
   kb.Parse = @Parse
   kb.Collection = @Parse.Collection
