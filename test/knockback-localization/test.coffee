@@ -5,13 +5,12 @@ kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knock
 _ = kb._
 require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
 locale_manager = new kb.LocaleManager('en', {
   'en':
@@ -41,7 +40,7 @@ class LocalizedStringLocalizer extends kb.LocalizedObservable
   read: (value) ->
     return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
 
-test("Localized greeting", ->
+test 'Localized greeting', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -82,7 +81,6 @@ test("Localized greeting", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
 # NOTE: dependency on globalize and knockback-defaults
 class LongDateLocalizer extends kb.LocalizedObservable
@@ -96,7 +94,7 @@ class LongDateLocalizer extends kb.LocalizedObservable
     return observable.setToDefault() if not (new_value and _.isDate(new_value)) # reset if invalid
     value.setTime(new_value.valueOf())
 
-test("Date and time with jquery.globalize", ->
+test 'Date and time with jquery.globalize', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModelDate = (model) ->
@@ -130,9 +128,8 @@ test("Date and time with jquery.globalize", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("Localization with a changing key", ->
+test 'Localization with a changing key', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # directly with the locale manager
@@ -167,9 +164,8 @@ test("Localization with a changing key", ->
   equal(view_model.greeting(), 'Goodbye', "en: Goodbye")
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("2. internals test (Coffeescript inheritance)", ->
+test '2. internals test (Coffeescript inheritance)', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -238,9 +234,8 @@ test("2. internals test (Coffeescript inheritance)", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("3. internals test (Javascript inheritance)", ->
+test '3. internals test (Javascript inheritance)', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -313,8 +308,8 @@ test("3. internals test (Javascript inheritance)", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
-test("7. Using kb.localizedObservable", ->
+
+test '7. Using kb.localizedObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -368,8 +363,8 @@ test("7. Using kb.localizedObservable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
-test("7. Using kb.localizedObservable", ->
+
+test '7. Using kb.localizedObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -423,9 +418,8 @@ test("7. Using kb.localizedObservable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("10. Nested custom view models", ->
+test '10. Nested custom view models', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -533,8 +527,8 @@ test("10. Nested custom view models", ->
   kb.release(nested_view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
-test("12. Prior kb.Observables functionality", ->
+
+test '12. Prior kb.Observables functionality', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -594,9 +588,8 @@ test("12. Prior kb.Observables functionality", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("13. Bulk mode (array of keys)", ->
+test '13. Bulk mode (array of keys)', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -628,4 +621,3 @@ test("13. Bulk mode (array of keys)", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

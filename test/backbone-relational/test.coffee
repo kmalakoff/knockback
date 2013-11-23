@@ -8,14 +8,13 @@ require('backbone-relational') if not Backbone.Relational and (typeof(require) i
 ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!Backbone, 'Backbone')
   ok(!!kb, 'kb')
   ok(!!Backbone.Relational, 'Backbone.Relational')
   ok(!!kb, 'kb')
-)
 
 window.Person = Backbone.RelationalModel.extend({
   relations: [{
@@ -45,7 +44,7 @@ window.Building = Backbone.RelationalModel.extend({
 Person.setup()
 Building.setup()
 
-test("1. Model with HasMany relations: A house with multiple people living in it", ->
+test '1. Model with HasMany relations: A house with multiple people living in it', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   john = new Person({
@@ -80,9 +79,8 @@ test("1. Model with HasMany relations: A house with multiple people living in it
   kb.release(house_view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("2. Collection with models with HasMany relations: Multiple houses with multiple people living in them", ->
+test '2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   john = new Person({
@@ -165,9 +163,8 @@ test("2. Collection with models with HasMany relations: Multiple houses with mul
   kb.release(places_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("3. Model with recursive HasMany relations: Person with users who are people", ->
+test '3. Model with recursive HasMany relations: Person with users who are people', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   george = new Person({
@@ -220,9 +217,8 @@ test("3. Model with recursive HasMany relations: Person with users who are peopl
   kb.release(george_view_model); george_view_model = null
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("4. After view model create, add models", ->
+test '4. After view model create, add models', ->
   Person = Backbone.RelationalModel.extend({})
 
   House = Backbone.RelationalModel.extend({
@@ -253,9 +249,8 @@ test("4. After view model create, add models", ->
   equal(view_model.occupants().length, 2, 'two occupants')
   equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship')
   equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship')
-)
 
-test("5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34", ->
+test '5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', ->
   Book = Backbone.RelationalModel.extend({
     defaults:
       name: 'untitled'
@@ -328,9 +323,8 @@ test("5. bug fix for relational models https://github.com/kmalakoff/knockback/is
       authored_book.editMode(true)
       equal(authored_book.editMode(), true, 'edit mode set')
   return
-)
 
-test("6. Inferring observable types: from the start", ->
+test '6. Inferring observable types: from the start', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   person1 = new Person({id: 'person-6-1', name: 'Daddy'})
@@ -356,9 +350,8 @@ test("6. Inferring observable types: from the start", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("7a. Inferring observable types: late binding", ->
+test '7a. Inferring observable types: late binding', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   person1 = new Person({id: 'person-7-1', name: 'Daddy'})
@@ -392,9 +385,8 @@ test("7a. Inferring observable types: late binding", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("7b. Inferring observable types: late binding (attribute setting)", ->
+test '7b. Inferring observable types: late binding (attribute setting)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   person1 = new Person({id: 'person-7b-1', name: 'Daddy'})
@@ -429,9 +421,8 @@ test("7b. Inferring observable types: late binding (attribute setting)", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("8a. Customizing observable types: from the start", ->
+test '8a. Customizing observable types: from the start', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class FriendViewModel extends kb.ViewModel
@@ -486,9 +477,8 @@ test("8a. Customizing observable types: from the start", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("8b. Customizing observable types: from the start (attribute setting)", ->
+test '8b. Customizing observable types: from the start (attribute setting)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class FriendViewModel extends kb.ViewModel
@@ -544,9 +534,8 @@ test("8b. Customizing observable types: from the start (attribute setting)", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("9a. Customizing observable types: late binding", ->
+test '9a. Customizing observable types: late binding', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class FriendViewModel extends kb.ViewModel
@@ -608,9 +597,8 @@ test("9a. Customizing observable types: late binding", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("9b. Customizing observable types: late binding (atrributes setting)", ->
+test '9b. Customizing observable types: late binding (atrributes setting)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class FriendViewModel extends kb.ViewModel
@@ -673,8 +661,8 @@ test("9b. Customizing observable types: late binding (atrributes setting)", ->
   kb.release(view_model_house1)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
-test("10. Nested custom view models", ->
+
+test '10. Nested custom view models', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   george = new Person({
@@ -758,9 +746,8 @@ test("10. Nested custom view models", ->
   kb.release(collection_observable)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("11. Minimum factory tree for shared dependent models", ->
+test '11. Minimum factory tree for shared dependent models', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   george = new Person({
@@ -823,4 +810,3 @@ test("11. Minimum factory tree for shared dependent models", ->
   kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo])
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

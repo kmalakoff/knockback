@@ -4,13 +4,12 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
@@ -22,7 +21,7 @@ class TestViewModel extends kb.ViewModel
     value = @test()
     value = @name()
 
-test("1. Standard use case: read and write", ->
+test '1. Standard use case: read and write', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
@@ -46,9 +45,8 @@ test("1. Standard use case: read and write", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("4. Using Coffeescript classes", ->
+test '2. Using Coffeescript classes', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelCustom extends kb.ViewModel
@@ -77,9 +75,8 @@ test("4. Using Coffeescript classes", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("5. Using simple Javascript classes", ->
+test '3. Using simple Javascript classes', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModelCustom = (model) ->
@@ -118,9 +115,8 @@ test("5. Using simple Javascript classes", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("6. requires", ->
+test '4. requires', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelFullName extends kb.ViewModel
@@ -161,9 +157,8 @@ test("6. requires", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("8. reference counting and custom __destroy (Coffeescript inheritance)", ->
+test '5. reference counting and custom __destroy (Coffeescript inheritance)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelFullName extends kb.ViewModel
@@ -206,9 +201,8 @@ test("8. reference counting and custom __destroy (Coffeescript inheritance)", ->
   raises((->view_model.release()), null, "ref count is corrupt")
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("9. reference counting and custom __destroy (Javascript inheritance)", ->
+test '6. reference counting and custom __destroy (Javascript inheritance)', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModelFullName = kb.ViewModel.extend({
@@ -251,9 +245,8 @@ test("9. reference counting and custom __destroy (Javascript inheritance)", ->
   raises((->view_model.release()), null, "ref count is corrupt")
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("10. Nested custom view models", ->
+test '7. Nested custom view models', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelDate extends kb.ViewModel
@@ -354,9 +347,8 @@ test("10. Nested custom view models", ->
   kb.release(nested_view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("11. Changing attribute types", ->
+test '8. Changing attribute types', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   model = new kb.Model({reused: null})
@@ -394,9 +386,8 @@ test("11. Changing attribute types", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("14. Shared Options", ->
+test '9. Shared Options', ->
   kb.statistics = new kb.Statistics() # turn on stats
   model1 = new kb.Model({id: 1, name: 'Bob'})
   model2 = new kb.Model({id: 1, name: 'Bob'})
@@ -412,9 +403,8 @@ test("14. Shared Options", ->
   kb.release([view_model1, view_model2, view_model3])
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("15. Options", ->
+test '10. Options', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # keys - array
@@ -480,9 +470,8 @@ test("15. Options", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("16. array attributes", ->
+test '11. array attributes', ->
 
   model = new kb.Model
     text: ["heading.get these rewards"]
@@ -500,9 +489,8 @@ test("16. array attributes", ->
   ok(_.isEqual(view_model.text(), ["heading.get these rewards"]), 'text observable matches')
   ok(_.isEqual(view_model.widget(), ["sign_up", "rewards"]), 'widget observable matches')
   ok(_.isEqual(view_model.model_data().reward.top_rewards.properties, ["title", "description", "num_points"]), 'model_data observable matches')
-)
 
-test("17. model change is observable", ->
+test '12. model change is observable', ->
   kb.statistics = new kb.Statistics() # turn on stats
   model = new kb.Model({id: 1, name: 'Bob'})
 
@@ -517,9 +505,8 @@ test("17. model change is observable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("18. model replacement", ->
+test '13. model replacement', ->
   kb.statistics = new kb.Statistics()
   model_opts =
     attributes:
@@ -544,9 +531,8 @@ test("18. model replacement", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("19. model replacement with select", ->
+test '14. model replacement with select', ->
   kb.statistics = new kb.Statistics()
 
   model_opts =
@@ -590,9 +576,8 @@ test("19. model replacement with select", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("20. model replacement with input", ->
+test '16. model replacement with input', ->
   kb.statistics = new kb.Statistics()
 
   model_opts =
@@ -632,9 +617,8 @@ test("20. model replacement with input", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("21. model replacement with multiple selects and weird backbone bug", ->
+test '17. model replacement with multiple selects and weird backbone bug', ->
   kb.statistics = new kb.Statistics()
 
   default_attrs =
@@ -694,12 +678,8 @@ test("21. model replacement with multiple selects and weird backbone bug", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-MERGE_OPTIONS = ['internals', 'requires', 'keys', 'excludes']
-# 'factories'
-
-test '21. can merge unique options', ->
+test '18. can merge unique options', ->
   options =
     internals: ['internal1']
     keys: ['key1']
@@ -718,7 +698,7 @@ test '21. can merge unique options', ->
   deepEqual(_.keys(collapsed_options.factories), ['models', 'collection.models'])
   deepEqual(collapsed_options.excludes, ['exclude2', 'exclude3'])
 
-test '22. can merge non-unique options', ->
+test '19. can merge non-unique options', ->
   factoryOverride = ->
   factory = ->
 
@@ -742,7 +722,7 @@ test '22. can merge non-unique options', ->
   notEqual(collapsed_options.factories.models, factory, 'did not select original factory')
   deepEqual(collapsed_options.excludes, ['exclude1'])
 
-test '23. can merge keys as object', ->
+test '20. can merge keys as object', ->
   options =
     keys: {name: {key: 'name'}}
     options:
@@ -783,7 +763,7 @@ test '23. can merge keys as object', ->
   collapsed_options = kb.utils.collapseOptions(options)
   deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
 
-test '24. view model changes do not cause dependencies inside ko.dependentObservable', ->
+test '21. view model changes do not cause dependencies inside ko.dependentObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model = new TestViewModel(new kb.Model({id: 1, name: 'Initial'}))

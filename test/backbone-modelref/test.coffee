@@ -8,18 +8,17 @@ Backbone.ModelRef = if not Backbone.ModelRef and (typeof(require) isnt 'undefine
 ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!Backbone, 'Backbone')
   ok(!!Backbone.ModelRef, 'Backbone.ModelRef')
   ok(!!kb, 'kb')
-)
 
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
-test("Standard use case: just enough to get the picture", ->
+test 'Standard use case: just enough to get the picture', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   ContactViewModel = (model) ->
@@ -72,9 +71,8 @@ test("Standard use case: just enough to get the picture", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("Standard use case with kb.ViewModels", ->
+test 'Standard use case with kb.ViewModels', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModel extends kb.ViewModel
@@ -123,4 +121,3 @@ test("Standard use case with kb.ViewModels", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

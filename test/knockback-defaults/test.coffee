@@ -6,13 +6,12 @@ _ = kb._
 Backbone = kb.Backbone
 require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
@@ -24,7 +23,7 @@ locale_manager = new kb.LocaleManager('en', {
 })
 
 if kb.Backbone
-  test("1. Standard use case: just enough to get the picture", ->
+  test '1. Standard use case: just enough to get the picture', ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
 
@@ -100,8 +99,8 @@ if kb.Backbone
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
-  test("2. Standard use case with kb.ViewModels", ->
+
+  test '2. Standard use case with kb.ViewModels', ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
 
@@ -174,9 +173,8 @@ if kb.Backbone
     kb.release(view_model)
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
 
-test("3. internals test (Coffeescript inheritance)", ->
+test '3. internals test (Coffeescript inheritance)', ->
   kb.statistics = new kb.Statistics() # turn on stats
   kb.locale_manager = locale_manager
 
@@ -243,4 +241,3 @@ test("3. internals test (Coffeescript inheritance)", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

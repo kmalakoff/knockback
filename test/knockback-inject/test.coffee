@@ -4,13 +4,12 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
 window.appCreate = (view_model) -> view_model.app_create = true
 
@@ -42,7 +41,7 @@ class window.SubClass extends SuperClass
     super
     @sub_class = true
 
-test("1. kb-inject", ->
+test '1. kb-inject', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # no attributes
@@ -230,9 +229,8 @@ test("1. kb-inject", ->
   ko.removeNode(inject_el)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("2. data-bind inject recusive", ->
+test '2. data-bind inject recusive', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   previous = kb.RECUSIVE_AUTO_INJECT; kb.RECUSIVE_AUTO_INJECT = true
@@ -263,9 +261,8 @@ test("2. data-bind inject recusive", ->
   kb.RECUSIVE_AUTO_INJECT = previous
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("3. data-bind inject", ->
+test '3. data-bind inject', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # properties
@@ -343,4 +340,3 @@ test("3. data-bind inject", ->
   ko.removeNode(inject_el)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

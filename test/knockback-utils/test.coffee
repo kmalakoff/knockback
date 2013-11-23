@@ -4,15 +4,14 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
-test("kb.utils.wrappedObservable", ->
+test 'kb.utils.wrappedObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   observable = ko.observable()
@@ -21,9 +20,8 @@ test("kb.utils.wrappedObservable", ->
   equal(kb.utils.wrappedObservable(instance), observable, "observable was wrapped") # get
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.utils.wrappedModel", ->
+test 'kb.utils.wrappedModel', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   model = new kb.Model({name: 'Bob'})
@@ -34,9 +32,8 @@ test("kb.utils.wrappedModel", ->
   equal(kb.utils.wrappedModel(instance), model, "model was wrapped") # get
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.utils.wrappedStore", ->
+test 'kb.utils.wrappedStore', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   collection_observable = kb.collectionObservable(new kb.Collection())
@@ -61,9 +58,8 @@ test("kb.utils.wrappedStore", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.utils.valueType", ->
+test 'kb.utils.valueType', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   co = kb.collectionObservable(new kb.Collection())
@@ -88,9 +84,8 @@ test("kb.utils.valueType", ->
   kb.release(view_model) # clean up
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.utils.path", ->
+test 'kb.utils.path', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   equal(kb.utils.pathJoin(null, 'key'), 'key', "key path joined")
@@ -106,4 +101,3 @@ test("kb.utils.path", ->
   equal(kb.utils.optionsPathJoin({path: 'bob.harry.'}, 'key').path, 'bob.harry.key', "bob.harry.key path joined")
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

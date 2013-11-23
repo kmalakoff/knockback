@@ -4,15 +4,14 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
-test("Standard use case: simple events notifications", ->
+test 'Standard use case: simple events notifications', ->
   kb.statistics = new kb.Statistics() # turn on stats
   model = new kb.Model
   model.setLocale = -> model.trigger('change', model)
@@ -43,4 +42,3 @@ test("Standard use case: simple events notifications", ->
   equal(trigger_count, 3, "3: no change")
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

@@ -4,13 +4,12 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
 # ref counted view model
 class RefCountableViewModel
@@ -63,7 +62,7 @@ if kb.Backbone
       relatedModel: Person
     }]
 
-test("Basic view model properties", ->
+test 'Basic view model properties', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   nested_view_model = kb.viewModel(new kb.Model({name: 'name1'}), {name: {}}, @)
@@ -86,9 +85,8 @@ test("Basic view model properties", ->
   ok(!nested_view_model.name, "Property released: nested_view_model.name") # nested_view_model
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("Releasing with nodes", ->
+test 'Releasing with nodes', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model = kb.viewModel(new kb.Model({name: 'Bob'}))
@@ -118,9 +116,8 @@ test("Releasing with nodes", ->
   ko.removeNode($vm_el[0])
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("RefCounting", ->
+test 'RefCounting', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class RefViewModel
@@ -155,9 +152,8 @@ test("RefCounting", ->
   ok(!ref_counted.prop, "Property released: ref_counted.prop")
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.CollectionObservable", ->
+test 'kb.CollectionObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # ref counted view model
@@ -189,9 +185,8 @@ test("kb.CollectionObservable", ->
   ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.CollectionObservable with external store", ->
+test 'kb.CollectionObservable with external store', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # ref counted view model
@@ -243,9 +238,8 @@ test("kb.CollectionObservable with external store", ->
   ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.release destructiveness", ->
+test 'kb.release destructiveness', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   array = ['Hello', 'Friend']
@@ -276,10 +270,9 @@ test("kb.release destructiveness", ->
   ok(!view_model.collection_value, 'releases observables: collection_value')
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
 if kb.Backbone
-  test("kb.CollectionObservable with recursive view models", ->
+  test 'kb.CollectionObservable with recursive view models', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     john = new Person({
@@ -334,9 +327,8 @@ if kb.Backbone
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )
 
-  test("kb.CollectionObservable with recursive view models and external store", ->
+  test 'kb.CollectionObservable with recursive view models and external store', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     john = new Person({
@@ -411,4 +403,3 @@ if kb.Backbone
     ok(!view_model.prop, "Prop destroyed") for view_model in SimpleViewModel.view_models
 
     equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  )

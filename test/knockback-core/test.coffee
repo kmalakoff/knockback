@@ -4,15 +4,14 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
-test("kb.renderTemplate", ->
+test 'kb.renderTemplate', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   # not supported in older versions
@@ -44,4 +43,3 @@ test("kb.renderTemplate", ->
   ok(!view_model.was_called, 'afterRender was not called')
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

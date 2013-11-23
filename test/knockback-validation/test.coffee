@@ -6,15 +6,14 @@ _ = kb._
 
 window.kb = kb unless window.kb # make kb global for bindings
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
-)
 
-test("kb.valueValidator", ->
+test 'kb.valueValidator', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model =
@@ -46,9 +45,8 @@ test("kb.valueValidator", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.inputValidator", ->
+test 'kb.inputValidator', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model =
@@ -86,9 +84,8 @@ test("kb.inputValidator", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.inputValidator with custom validators", ->
+test 'kb.inputValidator with custom validators', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model =
@@ -138,9 +135,8 @@ test("kb.inputValidator with custom validators", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.inputValidator with validation_options", ->
+test 'kb.inputValidator with validation_options', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model =
@@ -205,9 +201,8 @@ test("kb.inputValidator with validation_options", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.formValidator with name", ->
+test 'kb.formValidator with name', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model =
@@ -275,9 +270,8 @@ test("kb.formValidator with name", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.formValidator no name with validation_options", ->
+test 'kb.formValidator no name with validation_options', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   view_model =
@@ -352,9 +346,8 @@ test("kb.formValidator no name with validation_options", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.formValidator with inject and disable", ->
+test 'kb.formValidator with inject and disable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   window.MyViewModel = kb.ViewModel.extend({
@@ -439,4 +432,3 @@ test("kb.formValidator with inject and disable", ->
   ko.removeNode(inject_el)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

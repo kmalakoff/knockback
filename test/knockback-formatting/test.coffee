@@ -4,19 +4,18 @@ ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knock
 kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
 _ = kb._
 
-test("TEST DEPENDENCY MISSING", ->
+test 'TEST DEPENDENCY MISSING', ->
   ok(!!ko, 'ko')
   ok(!!_, '_')
   ok(!!kb.Model, 'kb.Model')
   ok(!!kb.Collection, 'kb.Collection')
   ok(!!kb, 'kb')
   ok(!!kb, 'kb')
-)
 
 kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
-test("Various scenarios", ->
+test 'Various scenarios', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelCustom extends kb.ViewModel
@@ -118,9 +117,8 @@ test("Various scenarios", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("4. Using Coffeescript classes", ->
+test '4. Using Coffeescript classes', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelCustom extends kb.ViewModel
@@ -160,9 +158,8 @@ test("4. Using Coffeescript classes", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("6. requires", ->
+test '6. requires', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelFullName extends kb.ViewModel
@@ -188,9 +185,8 @@ test("6. requires", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)
 
-test("kb.formattedObservable", ->
+test 'kb.formattedObservable', ->
   kb.statistics = new kb.Statistics() # turn on stats
 
   class ContactViewModelFullName extends kb.ViewModel
@@ -214,4 +210,3 @@ test("kb.formattedObservable", ->
   kb.release(view_model)
 
   equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-)

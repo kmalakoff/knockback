@@ -605,12 +605,11 @@ kb.utils = (function() {
   utils.collapseOptions = _collapseOptions;
 
   utils.ignoreDependencies = function(fn) {
-    var obs, value;
+    var value;
     value = null;
-    obs = ko.dependentObservable(function() {
+    ko.dependentObservable(function() {
       return value = fn();
-    });
-    obs.dispose();
+    }).dispose();
     return value;
   };
 
