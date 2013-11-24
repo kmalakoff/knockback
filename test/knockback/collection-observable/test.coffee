@@ -694,15 +694,15 @@ describe 'knockback-collection-observable.js', ->
   it '17. Test auto-generate collections', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    models = (new kb.Contact({id: id}) for id in [0..4])
+    models = (new kb.Contact({id: id}) for id in [1..4])
     class PersonViewModel extends kb.ViewModel
     collection_observable = kb.collectionObservable({view_model: PersonViewModel})
 
     collection_observable.collection().reset(models)
-    assert.equal(collection_observable.collection().length, 5)
+    assert.equal(collection_observable.collection().length, 4)
 
     for view_models in collection_observable()
-      assert.ok(view_models.id() in [0..4])
+      assert.ok(!!view_models.date())
       assert.ok(view_models.model() instanceof kb.Contact)
 
     kb.release(collection_observable)
