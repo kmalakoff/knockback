@@ -1,16 +1,27 @@
 (function() {
+  mocha.setup('bdd');
+  mocha.timeout(10000);
+  mocha.reporter('html');
+  window.assert = chai.assert;
+
   var started = false,
     interval = null;
-  QUnit.done(function(details) {
-    if (!started) return;
-    clearInterval(interval);
-    if (!details.total) {
-      $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail');
-      throw new Error('Warning: no tests run');
-    }
-  });
 
   var startRunner = function() {
+    // mocha.checkLeaks();
+    mocha.globals(['jQuery'])
+
+    mocha.run(function(err) {
+      details = mocha.suite.suites;
+
+      if (!started) return;
+      clearInterval(interval);
+      if (!details.length) {
+        $('#qunit-banner').removeClass('qunit-pass').addClass('qunit-fail');
+        throw new Error('Warning: no tests run');
+      }
+    });
+
     started = true;
     var start = Date.now();
     var timeout = 60000;
@@ -26,7 +37,7 @@
 
   // AMD
   if (typeof define === 'function' && define.amd) {
-    return define('qunit_test_runner', function() { return {start: startRunner}; });
+    return define('mocha_test_runner', function() { return {start: startRunner}; });
   }
 
   // embedded in window

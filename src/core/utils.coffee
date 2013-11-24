@@ -257,17 +257,13 @@ class kb.utils
   @optionsPathJoin = (options, path) ->
     return _.defaults({path: @pathJoin(options.path, path)}, options)
 
-  # Helper to find the creator constructor or function from a factory or Backbone.RelationalModel or by the value's type.
+  # Helper to find the creator constructor or function from a factory or ORM solution
   @inferCreator = (value, factory, path, owner, key) ->
     creator = factory.creatorForPath(value, path) if factory
     return creator if creator
 
-    # infer Backbone.Relational types
-    if owner and kb.Backbone and kb.Backbone.RelationalModel and (owner instanceof kb.Backbone.RelationalModel)
-      key = _unwrapObservable(key)
-      relation = _.find(owner.getRelations(), (test) -> return test.key is key)
-      if relation
-        return if (relation.collectionType or _.isArray(relation.keyContents)) then kb.CollectionObservable else kb.ViewModel
+    # infer related types
+    return creator if owner and creator = kb.orm.inferCreator(owner, _peekObservable(key))
 
     # try fallbacks
     return null                         unless value

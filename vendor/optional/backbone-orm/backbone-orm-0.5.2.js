@@ -2983,7 +2983,7 @@ module.exports = function(model_type) {
         return callback(null, model);
       }
       model = new model_type(data);
-      return model.save({}, function(err) {
+      return model.save(function(err) {
         var cache;
         if (err) {
           return callback(err);
@@ -3134,6 +3134,42 @@ module.exports = function(model_type) {
       return Utils.unset(this, 'partial');
     }
   };
+  model_type.prototype.fetchRelated = function(relations, callback) {
+    var queue, _ref,
+      _this = this;
+    if (arguments.length === 1) {
+      _ref = [null, relations], relations = _ref[0], callback = _ref[1];
+    }
+    queue = new Queue(1);
+    queue.defer(function(callback) {
+      if (_this.isLoaded()) {
+        return callback();
+      }
+      return _this.fetch(callback);
+    });
+    queue.defer(function(callback) {
+      var key, keys, relations_queue, _fn, _i, _len;
+      keys = _.keys(Utils.orSet(_this, 'needs_load', {}));
+      if (relations && !_.isArray(relations)) {
+        relations = [relations];
+      }
+      if (_.isArray(relations)) {
+        keys = _.intersection(keys, relations);
+      }
+      relations_queue = new Queue();
+      _fn = function(key) {
+        return relations_queue.defer(function(callback) {
+          return _this.get(key, callback);
+        });
+      };
+      for (_i = 0, _len = keys.length; _i < _len; _i++) {
+        key = keys[_i];
+        _fn(key);
+      }
+      return relations_queue.await(callback);
+    });
+    return queue.await(callback);
+  };
   model_type.prototype.patchAdd = function(key, relateds, callback) {
     var relation;
     if (!(relation = this.relation(key))) {
@@ -3203,7 +3239,7 @@ module.exports = function(model_type) {
     return clone;
   };
   overrides = {
-    initialize: function() {
+    initialize: function(attributes) {
       var key, needs_load, relation, schema, value, _ref;
       if (model_type.schema && (schema = model_type.schema())) {
         _ref = schema.relations;
@@ -3233,13 +3269,15 @@ module.exports = function(model_type) {
           case 2:
             options = Utils.wrapOptions(options, callback);
         }
+      } else {
+        options || (options = {});
       }
       return model_type.prototype._orm_original_fns.fetch.call(this, Utils.wrapOptions(options, function(err, model, resp, options) {
         if (err) {
           return typeof options.error === "function" ? options.error(_this, resp, options) : void 0;
         }
         _this.setLoaded(true);
-        return typeof options.success === "function" ? options.success(model, resp, options) : void 0;
+        return typeof options.success === "function" ? options.success(_this, resp, options) : void 0;
       }));
     },
     unset: function(key) {
@@ -3354,7 +3392,10 @@ module.exports = function(model_type) {
             options = Utils.wrapOptions(options, callback);
         }
       } else {
-        if (key === null || _.isObject(key)) {
+        if (arguments.length === 0) {
+          attributes = {};
+          options = {};
+        } else if (key === null || _.isObject(key)) {
           attributes = key;
           options = value;
         } else {
@@ -3438,7 +3479,7 @@ module.exports = function(model_type) {
           if (err) {
             return typeof options.error === "function" ? options.error(_this, new Error("Failed to destroy relations. " + err, options)) : void 0;
           }
-          return typeof options.success === "function" ? options.success(model, resp, options) : void 0;
+          return typeof options.success === "function" ? options.success(_this, resp, options) : void 0;
         });
       }));
     },
@@ -5001,7 +5042,7 @@ module.exports = Many = (function(_super) {
     }
     this.virtual_id_accessor || (this.virtual_id_accessor = "" + (inflection.singularize(this.key)) + "_ids");
     if (!this.join_key) {
-      this.join_key = inflection.foreign_key(this.model_type.model_name);
+      this.join_key = this.foreign_key || inflection.foreign_key(this.model_type.model_name);
     }
     if (!this.foreign_key) {
       this.foreign_key = inflection.foreign_key(this.as || this.model_type.model_name);
@@ -5066,7 +5107,9 @@ module.exports = Many = (function(_super) {
       throw new Error("HasMany.set: Unexpected type to set " + key + ". Expecting array: " + (util.inspect(value)));
     }
     Utils.orSet(model, 'rel_dirty', {})[this.key] = true;
-    model.setLoaded(this.key, true);
+    model.setLoaded(this.key, _.all(value, function(item) {
+      return Utils.dataId(item) !== item;
+    }));
     models = (function() {
       var _i, _len, _results;
       _results = [];
@@ -5076,6 +5119,9 @@ module.exports = Many = (function(_super) {
       }
       return _results;
     }).call(this);
+    model.setLoaded(this.key, _.all(models, function(model) {
+      return model.isLoaded();
+    }));
     previous_models = _.clone(collection.models);
     collection.reset(models);
     if (this.reverse_relation.type === 'belongsTo') {
@@ -5583,7 +5629,7 @@ module.exports = One = (function(_super) {
     }
     this.virtual_id_accessor || (this.virtual_id_accessor = "" + this.key + "_id");
     if (!this.join_key) {
-      this.join_key = inflection.foreign_key(this.model_type.model_name);
+      this.join_key = this.foreign_key || inflection.foreign_key(this.model_type.model_name);
     }
     if (!this.foreign_key) {
       this.foreign_key = inflection.foreign_key(this.type === 'belongsTo' ? this.key : this.as || this.model_type.model_name);
@@ -5980,6 +6026,8 @@ module.exports = One = (function(_super) {
     model.on("change:" + this.key, events.change);
     if (related_model = model.get(this.key)) {
       setBacklink(related_model);
+    } else {
+      model.attributes[this.key] = null;
     }
     return model;
   };

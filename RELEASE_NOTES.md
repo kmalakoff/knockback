@@ -2,6 +2,8 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.18.0
 * BREAKING CHANGE: filter is now consistent with underscore.js (it was opposite previously where filter true meant remove instead of keep)
+* BREAKING CHANGE: knockback component libraires are now without the 'knockback-' infront of them. For example, lib/knockback-defaults.js is now lib/defaults.js
+* BREAKING CHANGE: removed Knockback symbol publishing (now only kb is supported).
 * safe writing to kb.collectionObservable, view models, and kb.observable without generating unexpected observable dependencies
 * options merging: automate the merging of options including 'internals', 'requires', 'excludes', 'keys', 'factories'
 * improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80

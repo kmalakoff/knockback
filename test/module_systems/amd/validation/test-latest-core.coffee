@@ -20,6 +20,6 @@ try
   module_name = 'knockback' if (require.toUrl(module_name).split('./..').length is 1)
 
   # library and dependencies
-  require ['underscore', 'backbone', 'knockout', module_name, 'knockback-statistics', 'knockback-validation', 'qunit_test_runner'], (_, Backbone, ko, kb, kbs, kbv, runner) ->
+  require ['underscore', 'backbone', 'knockout', module_name, 'knockback-statistics', 'knockback-validation', 'mocha_test_runner'], (_, Backbone, ko, kb, kbs, kbv, runner) ->
     window._ = window.Backbone = window.ko = window.kb = null # force each test to require dependencies synchronously
     require ['../../../knockback/validation/build/test'], -> runner.start()

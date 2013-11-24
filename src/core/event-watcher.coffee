@@ -1,13 +1,10 @@
 ###
   knockback_event_watcher.js
   (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
+  Knockback.Observable is fremitterly distributable under the MIT license.
+  Semitter the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
-
-addStatisticsEvent = (emitter, event_name, info) ->
-  not kb.statistics or kb.statistics.addModelEvent({name: event_name, emitter: emitter, key: info.key, path: info.path})
 
 # Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 #
@@ -108,15 +105,15 @@ class kb.EventWatcher
         list = []
         callbacks = {
           list: list
-          fn: (emitter) =>
+          fn: (model) =>
             for info in list
               if info.update and not info.rel_fn
 
                 # key doesn't match
-                continue if emitter and info.key and (emitter.hasChanged and not emitter.hasChanged(_unwrapObservable(info.key)))
+                continue if model and info.key and (model.hasChanged and not model.hasChanged(_unwrapObservable(info.key)))
 
                 # trigger update
-                not kb.statistics or addStatisticsEvent(emitter, event_name, info)
+                not kb.statistics or kb.statistics.addModelEvent({name: event_name, model: model, key: info.key, path: info.path})
                 info.update()
 
             return null
@@ -129,9 +126,7 @@ class kb.EventWatcher
       callbacks.list.push(info)
 
     if @ee # loaded
-      # bind relational updates
-      if kb.Backbone and kb.Backbone.RelationalModel and (@ee instanceof kb.Backbone.RelationalModel) and _.contains(event_names, 'change')
-        @_modelBindRelatationalInfo('change', info)
+      info.unbind_fn = kb.orm.bind(@ee, info.key, info.update, info.path) if 'change' in event_names
 
       # trigger now
       info.emitter(@ee) and info.emitter
@@ -146,8 +141,8 @@ class kb.EventWatcher
         callbacks.list.splice(index, 1)
 
         # unbind relational updates
-        @_modelUnbindRelatationalInfo(event_name, info) if info.rel_fn
-        info.emitter(null) if not kb.wasReleased(obj) and info.emitter # not desirable if an object has been released
+        (info.unbind_fn(); info.unbind_fn = null) if info.unbind_fn
+        info.emitter(null) if not kb.wasReleased(obj) and info.emitter # not desirable if an object has bemittern released
         return
 
   ####################################################
@@ -156,18 +151,16 @@ class kb.EventWatcher
 
   # @private
   _onModelLoaded: (model) =>
-    is_relational = kb.Backbone and kb.Backbone.RelationalModel and (model instanceof kb.Backbone.RelationalModel)
     @ee = model
 
     # bind all events
     for event_name, callbacks of @__kb.callbacks
-      @ee.bind(event_name, callbacks.fn)
+      model.bind(event_name, callbacks.fn)
 
       # bind and notify
-      list = callbacks.list
-      for info in list
-        @_modelBindRelatationalInfo(event_name, info) if is_relational
-        (info.emitter(@ee) if info.emitter)
+      for info in callbacks.list
+        info.unbind_fn = kb.orm.bind(model, info.key, info.update, info.path)
+        (info.emitter(model) if info.emitter)
     return
 
   # @private
@@ -181,39 +174,8 @@ class kb.EventWatcher
       # notify
       list = callbacks.list
       for info in list
-        @_modelUnbindRelatationalInfo(event_name, info) if info.rel_fn
+        (info.unbind_fn(); info.unbind_fn = null) if info.unbind_fn
         info.emitter(null) if info.emitter
-    return
-
-  # @private
-  _modelBindRelatationalInfo: (event_name, info) ->
-    if (event_name is 'change') and info.key and info.update
-      key = _unwrapObservable(info.key)
-      return unless relation = _.find(@ee.getRelations(), (test) -> return test.key is key)
-      info.rel_fn = (emitter) ->
-        not kb.statistics or addStatisticsEvent(emitter, "#{event_name} (relational)", info)
-        info.update()
-
-      # VERSIONING: pre Backbone-Relational 0.8.0
-      events = if Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
-      if relation.collectionType or _.isArray(relation.keyContents)
-        info.is_collection = true
-        @ee.bind("#{event}:#{info.key}", info.rel_fn) for event in events
-      else
-        @ee.bind("#{events[0]}:#{info.key}", info.rel_fn)
-    return
-
-  # @private
-  _modelUnbindRelatationalInfo: (event_name, info) ->
-    return unless info.rel_fn
-      # VERSIONING: pre Backbone-Relational 0.8.0
-      events = if Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
-      if relation.collectionType or _.isArray(relation.keyContents)
-        info.is_collection = true
-        @ee.unbind("#{event}:#{info.key}", info.rel_fn) for event in events
-      else
-        @ee.unbind("#{events[0]}:#{info.key}", info.rel_fn)
-    info.rel_fn = null
     return
 
 # factory function
