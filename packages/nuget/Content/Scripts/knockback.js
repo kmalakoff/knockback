@@ -24,8 +24,8 @@
 */
 
 var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, URL_REGEXP, arraySlice, callOrGet, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 kb = (function() {
   function kb() {}
@@ -182,25 +182,11 @@ if (this.Parse) {
     } catch (_error) {
 
     } finally {
-      break;
-    }
-  }
-}
-
-_ = __indexOf.call(_, '_') >= 0 ? _._ : _;
-
-if (_.where && !_.findWhere) {
-  _.mixin({
-    findWhere: function(obj, attrs) {
-      var result;
-      result = _.where(obj, attrs);
-      if (result.length) {
-        return result[0];
-      } else {
-        return null;
+      if (_) {
+        break;
       }
     }
-  });
+  }
 }
 
 kb._ = _;
