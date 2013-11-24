@@ -1,7 +1,7 @@
 if @Parse
   _ = @Parse._
 else if not _ = @_
-  (try _ = require('lodash') catch e then _ = require('underscore'))
+  (try _ = require(key) catch finally break) for key in ['lodash', 'underscore']
 
 # LEGACY
 _ = if '_' in _ then _._ else _

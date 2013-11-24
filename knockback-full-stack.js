@@ -7111,7 +7111,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, URL_REGEXP, arraySlice, callOrGet, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, URL_REGEXP, arraySlice, callOrGet, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -7262,11 +7262,16 @@ kb.ko = ko = this.ko || require('knockout');
 if (this.Parse) {
   _ = this.Parse._;
 } else if (!(_ = this._)) {
-  try {
-    _ = require('lodash');
-  } catch (_error) {
-    e = _error;
-    _ = require('underscore');
+  _ref = ['lodash', 'underscore'];
+  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+    key = _ref[_i];
+    try {
+      _ = require(key);
+    } catch (_error) {
+
+    } finally {
+      break;
+    }
   }
 }
 
@@ -7313,16 +7318,16 @@ ORM = (function() {
   };
 
   ORM.prototype.inferCreator = function(model, key) {
-    var adpater, creator, _i, _len, _ref;
+    var adpater, creator, _j, _len1, _ref1;
     if (!this.adapters.length) {
       return;
     }
     if (!this.initialized) {
       this.initialize();
     }
-    _ref = this.adapters;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      adpater = _ref[_i];
+    _ref1 = this.adapters;
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      adpater = _ref1[_j];
       if (creator = adpater.inferCreator(model, key)) {
         return creator;
       }
@@ -7330,16 +7335,16 @@ ORM = (function() {
   };
 
   ORM.prototype.bind = function(model, key, update, path) {
-    var adpater, unbind_fn, _i, _len, _ref;
+    var adpater, unbind_fn, _j, _len1, _ref1;
     if (!this.adapters.length) {
       return;
     }
     if (!this.initialized) {
       this.initialize();
     }
-    _ref = this.adapters;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      adpater = _ref[_i];
+    _ref1 = this.adapters;
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      adpater = _ref1[_j];
       if (unbind_fn = adpater.bind(model, key, update, path)) {
         return unbind_fn;
       }
@@ -7356,6 +7361,7 @@ ORMAdapter_BackboneORM = (function() {
   function ORMAdapter_BackboneORM() {}
 
   ORMAdapter_BackboneORM.prototype.isAvailable = function() {
+    var e;
     try {
       kb.BackboneORM = !(typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0) && (typeof require !== 'undefined') ? require('backbone-orm') : typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0;
     } catch (_error) {
@@ -7403,7 +7409,7 @@ ORMAdapter_BackboneRelational = (function() {
   function ORMAdapter_BackboneRelational() {}
 
   ORMAdapter_BackboneRelational.prototype.isAvailable = function() {
-    var _ref;
+    var e, _ref1;
     try {
       if (kb.Backbone && !kb.Backbone.RelationalModel && (typeof require !== 'undefined')) {
         require('backbone-relational');
@@ -7411,7 +7417,7 @@ ORMAdapter_BackboneRelational = (function() {
     } catch (_error) {
       e = _error;
     }
-    return !!((_ref = kb.Backbone) != null ? _ref.RelationalModel : void 0);
+    return !!((_ref1 = kb.Backbone) != null ? _ref1.RelationalModel : void 0);
   };
 
   ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
@@ -7444,7 +7450,7 @@ ORMAdapter_BackboneRelational = (function() {
   };
 
   ORMAdapter_BackboneRelational.prototype.bind = function(model, key, update, path) {
-    var event, events, rel_fn, type, _i, _len;
+    var event, events, rel_fn, type, _j, _len1;
     if (!(type = this.relationType(model, key))) {
       return null;
     }
@@ -7459,18 +7465,18 @@ ORMAdapter_BackboneRelational = (function() {
     };
     events = Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
     if (type === KB_TYPE_COLLECTION) {
-      for (_i = 0, _len = events.length; _i < _len; _i++) {
-        event = events[_i];
+      for (_j = 0, _len1 = events.length; _j < _len1; _j++) {
+        event = events[_j];
         model.bind("" + event + ":" + key, rel_fn);
       }
     } else {
       model.bind("" + events[0] + ":" + key, rel_fn);
     }
     return function() {
-      var _j, _len1;
+      var _k, _len2;
       if (type === KB_TYPE_COLLECTION) {
-        for (_j = 0, _len1 = events.length; _j < _len1; _j++) {
-          event = events[_j];
+        for (_k = 0, _len2 = events.length; _k < _len2; _k++) {
+          event = events[_k];
           model.unbind("" + event + ":" + key, rel_fn);
         }
       } else {
@@ -7518,15 +7524,15 @@ _peekObservable = function(obs) {
 };
 
 _publishMethods = kb._publishMethods = function(observable, instance, methods) {
-  var fn, _i, _len;
-  for (_i = 0, _len = methods.length; _i < _len; _i++) {
-    fn = methods[_i];
+  var fn, _j, _len1;
+  for (_j = 0, _len1 = methods.length; _j < _len1; _j++) {
+    fn = methods[_j];
     observable[fn] = kb._.bind(instance[fn], instance);
   }
 };
 
 copyProps = function(dest, source) {
-  var key, value;
+  var value;
   for (key in source) {
     value = source[key];
     dest[key] = value;
@@ -7617,7 +7623,7 @@ _argumentsAddKey = function(args, key) {
 };
 
 _unwrapModels = function(obj) {
-  var key, result, value;
+  var result, value;
   if (!obj) {
     return obj;
   }
@@ -7657,10 +7663,10 @@ _mergeObject = function(result, key, value) {
 };
 
 _keyArrayToObject = function(value) {
-  var item, result, _i, _len;
+  var item, result, _j, _len1;
   result = {};
-  for (_i = 0, _len = value.length; _i < _len; _i++) {
-    item = value[_i];
+  for (_j = 0, _len1 = value.length; _j < _len1; _j++) {
+    item = value[_j];
     result[item] = {
       key: item
     };
@@ -7669,15 +7675,15 @@ _keyArrayToObject = function(value) {
 };
 
 _collapseOptions = function(options) {
-  var key, result, value, _ref;
+  var result, value, _ref1;
   result = {};
   options = {
     options: options
   };
   while (options.options) {
-    _ref = options.options;
-    for (key in _ref) {
-      value = _ref[key];
+    _ref1 = options.options;
+    for (key in _ref1) {
+      value = _ref1[key];
       switch (key) {
         case 'internals':
         case 'requires':
@@ -7984,10 +7990,10 @@ kb.Store = (function() {
   };
 
   Store.prototype.clear = function() {
-    var record, _i, _len, _ref;
-    _ref = this.observable_records.splice(0, this.observable_records.length);
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      record = _ref[_i];
+    var record, _j, _len1, _ref1;
+    _ref1 = this.observable_records.splice(0, this.observable_records.length);
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      record = _ref1[_j];
       kb.release(record.observable);
     }
     kb.release(this.replaced_observables);
@@ -8016,11 +8022,11 @@ kb.Store = (function() {
   };
 
   Store.prototype.findIndex = function(obj, creator) {
-    var index, record, _ref;
+    var index, record, _ref1;
     if (!obj || (obj instanceof kb.Model)) {
-      _ref = this.observable_records;
-      for (index in _ref) {
-        record = _ref[index];
+      _ref1 = this.observable_records;
+      for (index in _ref1) {
+        record = _ref1[index];
         if (!record.observable) {
           continue;
         }
@@ -8049,10 +8055,10 @@ kb.Store = (function() {
   };
 
   Store.prototype.isRegistered = function(observable) {
-    var record, _i, _len, _ref;
-    _ref = this.observable_records;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      record = _ref[_i];
+    var record, _j, _len1, _ref1;
+    _ref1 = this.observable_records;
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      record = _ref1[_j];
       if (record.observable === observable) {
         return true;
       }
@@ -8163,7 +8169,7 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.emitter = function(new_emitter) {
-    var callbacks, event_name, info, list, previous_emitter, _i, _len, _ref;
+    var callbacks, event_name, info, list, previous_emitter, _j, _len1, _ref1;
     if ((arguments.length === 0) || (this.ee === new_emitter)) {
       return this.ee;
     }
@@ -8184,9 +8190,9 @@ kb.EventWatcher = (function() {
     }
     previous_emitter = this.ee;
     this.ee = new_emitter;
-    _ref = this.__kb.callbacks;
-    for (event_name in _ref) {
-      callbacks = _ref[event_name];
+    _ref1 = this.__kb.callbacks;
+    for (event_name in _ref1) {
+      callbacks = _ref1[event_name];
       if (previous_emitter) {
         previous_emitter.unbind(event_name, callbacks.fn);
       }
@@ -8194,8 +8200,8 @@ kb.EventWatcher = (function() {
         this.ee.bind(event_name, callbacks.fn);
       }
       list = callbacks.list;
-      for (_i = 0, _len = list.length; _i < _len; _i++) {
-        info = list[_i];
+      for (_j = 0, _len1 = list.length; _j < _len1; _j++) {
+        info = list[_j];
         if (info.emitter) {
           info.emitter(this.ee);
         }
@@ -8205,14 +8211,14 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.registerCallbacks = function(obj, callback_info) {
-    var callbacks, event_name, event_names, event_selector, info, list, _i, _len,
+    var callbacks, event_name, event_names, event_selector, info, list, _j, _len1,
       _this = this;
     obj || _throwMissing(this, 'obj');
     callback_info || _throwMissing(this, 'info');
     event_selector = callback_info.event_selector ? callback_info.event_selector : 'change';
     event_names = event_selector.split(' ');
-    for (_i = 0, _len = event_names.length; _i < _len; _i++) {
-      event_name = event_names[_i];
+    for (_j = 0, _len1 = event_names.length; _j < _len1; _j++) {
+      event_name = event_names[_j];
       if (!event_name) {
         continue;
       }
@@ -8222,9 +8228,9 @@ kb.EventWatcher = (function() {
         callbacks = {
           list: list,
           fn: function(model) {
-            var info, _j, _len1;
-            for (_j = 0, _len1 = list.length; _j < _len1; _j++) {
-              info = list[_j];
+            var info, _k, _len2;
+            for (_k = 0, _len2 = list.length; _k < _len2; _k++) {
+              info = list[_k];
               if (info.update && !info.rel_fn) {
                 if (model && info.key && (model.hasChanged && !model.hasChanged(_unwrapObservable(info.key)))) {
                   continue;
@@ -8260,16 +8266,16 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.releaseCallbacks = function(obj) {
-    var callbacks, event_name, index, info, _ref, _ref1;
+    var callbacks, event_name, index, info, _ref1, _ref2;
     if (!this.__kb.callbacks || !this.ee) {
       return;
     }
-    _ref = this.__kb.callbacks;
-    for (event_name in _ref) {
-      callbacks = _ref[event_name];
-      _ref1 = callbacks.list;
-      for (index in _ref1) {
-        info = _ref1[index];
+    _ref1 = this.__kb.callbacks;
+    for (event_name in _ref1) {
+      callbacks = _ref1[event_name];
+      _ref2 = callbacks.list;
+      for (index in _ref2) {
+        info = _ref2[index];
         if (info.obj !== obj) {
           continue;
         }
@@ -8287,15 +8293,15 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype._onModelLoaded = function(model) {
-    var callbacks, event_name, info, _i, _len, _ref, _ref1;
+    var callbacks, event_name, info, _j, _len1, _ref1, _ref2;
     this.ee = model;
-    _ref = this.__kb.callbacks;
-    for (event_name in _ref) {
-      callbacks = _ref[event_name];
+    _ref1 = this.__kb.callbacks;
+    for (event_name in _ref1) {
+      callbacks = _ref1[event_name];
       model.bind(event_name, callbacks.fn);
-      _ref1 = callbacks.list;
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        info = _ref1[_i];
+      _ref2 = callbacks.list;
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        info = _ref2[_j];
         info.unbind_fn = kb.orm.bind(model, info.key, info.update, info.path);
         if (info.emitter) {
           info.emitter(model);
@@ -8305,15 +8311,15 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype._onModelUnloaded = function(model) {
-    var callbacks, event_name, info, list, _i, _len, _ref;
+    var callbacks, event_name, info, list, _j, _len1, _ref1;
     this.ee = null;
-    _ref = this.__kb.callbacks;
-    for (event_name in _ref) {
-      callbacks = _ref[event_name];
+    _ref1 = this.__kb.callbacks;
+    for (event_name in _ref1) {
+      callbacks = _ref1[event_name];
       model.unbind(event_name, callbacks.fn);
       list = callbacks.list;
-      for (_i = 0, _len = list.length; _i < _len; _i++) {
-        info = list[_i];
+      for (_j = 0, _len1 = list.length; _j < _len1; _j++) {
+        info = list[_j];
         if (info.unbind_fn) {
           info.unbind_fn();
           info.unbind_fn = null;
@@ -8369,13 +8375,13 @@ kb.Observable = (function() {
       _this._model = ko.observable();
       observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
         read: function() {
-          var arg, args, new_value, _i, _len, _ref;
+          var arg, args, new_value, _j, _len1, _ref1;
           args = [_unwrapObservable(_this.key)];
           if (_this.args) {
             if (_.isArray(_this.args)) {
-              _ref = _this.args;
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                arg = _ref[_i];
+              _ref1 = _this.args;
+              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                arg = _ref1[_j];
                 args.push(_unwrapObservable(arg));
               }
             } else {
@@ -8390,16 +8396,16 @@ kb.Observable = (function() {
         },
         write: function(new_value) {
           return kb.utils.ignore(function() {
-            var arg, args, set_info, unwrapped_new_value, _i, _len, _ref;
+            var arg, args, set_info, unwrapped_new_value, _j, _len1, _ref1;
             unwrapped_new_value = _unwrapModels(new_value);
             set_info = {};
             set_info[_unwrapObservable(_this.key)] = unwrapped_new_value;
             args = _this.write ? [unwrapped_new_value] : [set_info];
             if (_this.args) {
               if (_.isArray(_this.args)) {
-                _ref = _this.args;
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  arg = _ref[_i];
+                _ref1 = _this.args;
+                for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                  arg = _ref1[_j];
                   args.push(_unwrapObservable(arg));
                 }
               } else {
@@ -8436,14 +8442,14 @@ kb.Observable = (function() {
         },
         write: function(new_model) {
           return kb.utils.ignore(function() {
-            var arg, previous, _ref;
+            var arg, previous, _ref1;
             if (_this.__kb_released || (_this._mdl === new_model)) {
               return;
             }
             _this._mdl = new_model;
             previous = new_model != null ? new_model.get(_this.key) : void 0;
             _this.update(null);
-            if (new_model && !((_ref = _this.vm[_this.key]) != null ? _ref.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
+            if (new_model && !((_ref1 = _this.vm[_this.key]) != null ? _ref1.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
               (arg = {})[_this.key] = previous;
               new_model.set(arg);
             }
@@ -8606,7 +8612,7 @@ kb.ViewModel = (function() {
   function ViewModel(model, options, view_model) {
     var _this = this;
     return kb.utils.ignore(function() {
-      var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, vm_key, _mdl, _ref;
+      var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, vm_key, _mdl, _ref1;
       !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(_this, 'not a model');
       options || (options = {});
       view_model || (view_model = {});
@@ -8671,9 +8677,9 @@ kb.ViewModel = (function() {
       if (options.keys) {
         if (_.isObject(options.keys) && !_.isArray(options.keys)) {
           mapped_keys = {};
-          _ref = options.keys;
-          for (vm_key in _ref) {
-            mapping_info = _ref[vm_key];
+          _ref1 = options.keys;
+          for (vm_key in _ref1) {
+            mapping_info = _ref1[vm_key];
             mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
           }
           _this.__kb.keys = _.keys(mapped_keys);
@@ -8729,7 +8735,7 @@ kb.ViewModel = (function() {
   };
 
   ViewModel.prototype._createObservables = function(model, keys, is_static) {
-    var create_options, key, static_defaults, vm_key, _i, _len;
+    var create_options, static_defaults, vm_key, _j, _len1;
     if (is_static) {
       static_defaults = this.__kb.static_defaults || {};
     } else {
@@ -8740,8 +8746,8 @@ kb.ViewModel = (function() {
         event_watcher: kb.utils.wrappedEventWatcher(this)
       };
     }
-    for (_i = 0, _len = keys.length; _i < _len; _i++) {
-      key = keys[_i];
+    for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
+      key = keys[_j];
       vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
       if (this[vm_key]) {
         continue;
@@ -8830,9 +8836,9 @@ kb.CollectionObservable = (function() {
   function CollectionObservable(collection, options) {
     var _this = this;
     return kb.utils.ignore(function() {
-      var create_options, observable, _ref;
+      var create_options, observable, _ref1;
       if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
-        _ref = [new kb.Collection(), collection], collection = _ref[0], options = _ref[1];
+        _ref1 = [new kb.Collection(), collection], collection = _ref1[0], options = _ref1[1];
       }
       options || (options = {});
       observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
@@ -8887,12 +8893,12 @@ kb.CollectionObservable = (function() {
         collection.bind('all', _this.__kb._onCollectionChange);
       }
       _this._mapper = ko.dependentObservable(function() {
-        var comparator, current_collection, filter, filters, models, view_models, _i, _len;
+        var comparator, current_collection, filter, filters, models, view_models, _j, _len1;
         comparator = _this._comparator();
         filters = _this._filters();
         if (filters) {
-          for (_i = 0, _len = filters.length; _i < _len; _i++) {
-            filter = filters[_i];
+          for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+            filter = filters[_j];
             _unwrapObservable(filter);
           }
         }
@@ -8989,8 +8995,8 @@ kb.CollectionObservable = (function() {
     }
     id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
     return _.find(_peekObservable(kb.utils.wrappedObservable(this)), function(test) {
-      var _ref;
-      if (test != null ? (_ref = test.__kb) != null ? _ref.object : void 0 : void 0) {
+      var _ref1;
+      if (test != null ? (_ref1 = test.__kb) != null ? _ref1.object : void 0 : void 0) {
         return test.__kb.object[id_attribute] === model[id_attribute];
       } else {
         return false;
@@ -9117,7 +9123,7 @@ kb.CollectionObservable = (function() {
   CollectionObservable.prototype._onObservableArrayChange = function(models_or_view_models) {
     var _this = this;
     return kb.utils.ignore(function() {
-      var collection, has_filters, model, models, observable, view_model, view_models, _i, _len;
+      var collection, has_filters, model, models, observable, view_model, view_models, _j, _len1;
       if (_this.in_edit) {
         return;
       }
@@ -9136,8 +9142,8 @@ kb.CollectionObservable = (function() {
       } else {
         !has_filters || (view_models = []);
         models = [];
-        for (_i = 0, _len = models_or_view_models.length; _i < _len; _i++) {
-          view_model = models_or_view_models[_i];
+        for (_j = 0, _len1 = models_or_view_models.length; _j < _len1; _j++) {
+          view_model = models_or_view_models[_j];
           model = kb.utils.wrappedObject(view_model);
           if (has_filters) {
             if (!_this._selectModel(model)) {
@@ -9176,17 +9182,17 @@ kb.CollectionObservable = (function() {
   };
 
   CollectionObservable.prototype._selectModel = function(model) {
-    var filter, filters, _i, _len, _ref;
+    var filter, filters, _j, _len1, _ref1;
     filters = _peekObservable(this._filters);
-    for (_i = 0, _len = filters.length; _i < _len; _i++) {
-      filter = filters[_i];
+    for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+      filter = filters[_j];
       filter = _peekObservable(filter);
       if (_.isFunction(filter)) {
         if (!filter(model)) {
           return false;
         }
       } else if (_.isArray(filter)) {
-        if (_ref = model.id, __indexOf.call(filter, _ref) < 0) {
+        if (_ref1 = model.id, __indexOf.call(filter, _ref1) < 0) {
           return false;
         }
       } else {
@@ -9229,7 +9235,7 @@ kb.Inject = (function() {
   Inject.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
     var inject, result, wrapper;
     inject = function(data) {
-      var key, target, value;
+      var target, value;
       if (_.isFunction(data)) {
         view_model = new data(view_model, element, value_accessor, all_bindings_accessor);
         kb.releaseOnNodeRemove(view_model, element);
@@ -9267,10 +9273,10 @@ kb.Inject = (function() {
   };
 
   Inject.injectViewModels = function(root) {
-    var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _i, _len;
+    var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _j, _len1;
     results = [];
     findElements = function(el) {
-      var attr, child_el, _i, _len, _ref;
+      var attr, child_el, _j, _len1, _ref1;
       if (!el.__kb_injected) {
         if (el.attributes && (attr = _.find(el.attributes, function(attr) {
           return attr.name === 'kb-inject';
@@ -9283,15 +9289,15 @@ kb.Inject = (function() {
           });
         }
       }
-      _ref = el.childNodes;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        child_el = _ref[_i];
+      _ref1 = el.childNodes;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        child_el = _ref1[_j];
         findElements(child_el);
       }
     };
     findElements(root || document);
-    for (_i = 0, _len = results.length; _i < _len; _i++) {
-      app = results[_i];
+    for (_j = 0, _len1 = results.length; _j < _len1; _j++) {
+      app = results[_j];
       if (expression = app.binding) {
         (expression.search(/[:]/) < 0) || (expression = "{" + expression + "}");
         data = (new Function("", "return ( " + expression + " )"))();
@@ -9403,27 +9409,27 @@ kb.defaultObservable = function(target, default_value) {
 
 
 kb.Observable.prototype.setToDefault = function() {
-  var _ref;
-  if ((_ref = this.__kb_value) != null) {
-    if (typeof _ref.setToDefault === "function") {
-      _ref.setToDefault();
+  var _ref1;
+  if ((_ref1 = this.__kb_value) != null) {
+    if (typeof _ref1.setToDefault === "function") {
+      _ref1.setToDefault();
     }
   }
 };
 
 kb.ViewModel.prototype.setToDefault = function() {
-  var vm_key, _ref;
+  var vm_key, _ref1;
   for (vm_key in this.__kb.vm_keys) {
-    if ((_ref = this[vm_key]) != null) {
-      if (typeof _ref.setToDefault === "function") {
-        _ref.setToDefault();
+    if ((_ref1 = this[vm_key]) != null) {
+      if (typeof _ref1.setToDefault === "function") {
+        _ref1.setToDefault();
       }
     }
   }
 };
 
 kb.utils.setToDefault = function(obj) {
-  var key, value;
+  var value;
   if (!obj) {
     return;
   }
@@ -9531,10 +9537,10 @@ kb.FormattedObservable = (function() {
     }
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
       read: function() {
-        var arg, _i, _len;
+        var arg, _j, _len1;
         args = [_unwrapObservable(format)];
-        for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
-          arg = observable_args[_i];
+        for (_j = 0, _len1 = observable_args.length; _j < _len1; _j++) {
+          arg = observable_args[_j];
           args.push(_unwrapObservable(arg));
         }
         return kb.toFormattedString.apply(null, args);
@@ -9801,7 +9807,7 @@ kb.valueValidator = function(value, bindings, validation_options) {
 };
 
 kb.inputValidator = function(view_model, el, validation_options) {
-  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators, _ref;
+  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators, _ref1;
   if (validation_options == null) {
     validation_options = {};
   }
@@ -9823,9 +9829,9 @@ kb.inputValidator = function(view_model, el, validation_options) {
   (!validators[type = $input_el.attr('type')]) || (bindings[type] = validators[type]);
   (!$input_el.attr('required')) || (bindings.required = validators.required);
   if (options.validations) {
-    _ref = options.validations;
-    for (identifier in _ref) {
-      validator = _ref[identifier];
+    _ref1 = options.validations;
+    for (identifier in _ref1) {
+      validator = _ref1[identifier];
       bindings[identifier] = validator;
     }
   }
@@ -9835,7 +9841,7 @@ kb.inputValidator = function(view_model, el, validation_options) {
 };
 
 kb.formValidator = function(view_model, el) {
-  var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _i, _len, _ref;
+  var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _j, _len1, _ref1;
   results = {};
   validators = [];
   $root_el = $(el);
@@ -9848,9 +9854,9 @@ kb.formValidator = function(view_model, el) {
   }
   validation_options || (validation_options = {});
   validation_options.no_attach = !!form_name;
-  _ref = $root_el.find('input');
-  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-    input_el = _ref[_i];
+  _ref1 = $root_el.find('input');
+  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+    input_el = _ref1[_j];
     if (!(name = $(input_el).attr('name'))) {
       continue;
     }
@@ -9858,10 +9864,10 @@ kb.formValidator = function(view_model, el) {
     !validator || validators.push(results[name] = validator);
   }
   results.$error_count = ko.dependentObservable(function() {
-    var error_count, _j, _len1;
+    var error_count, _k, _len2;
     error_count = 0;
-    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
-      validator = validators[_j];
+    for (_k = 0, _len2 = validators.length; _k < _len2; _k++) {
+      validator = validators[_k];
       error_count += validator().$error_count;
     }
     return error_count;
@@ -9870,10 +9876,10 @@ kb.formValidator = function(view_model, el) {
     return results.$error_count() === 0;
   });
   results.$enabled = ko.dependentObservable(function() {
-    var enabled, _j, _len1;
+    var enabled, _k, _len2;
     enabled = true;
-    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
-      validator = validators[_j];
+    for (_k = 0, _len2 = validators.length; _k < _len2; _k++) {
+      validator = validators[_k];
       enabled &= validator().$enabled;
     }
     return enabled;
