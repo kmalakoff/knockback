@@ -62,7 +62,7 @@ _collapseOptions = (options) ->
   while options.options
     for key, value of options.options
       switch key
-        when 'internals', 'requires', 'excludes' then _mergeArray(result, key, value)
+        when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
         when 'keys'
           # an object
           if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
@@ -79,6 +79,7 @@ _collapseOptions = (options) ->
             result[key] = value
           else
             _mergeObject(result, key, value)
+        when 'static_defaults' then _mergeObject(result, key, value)
         when 'options' then
         else
           result[key] = value

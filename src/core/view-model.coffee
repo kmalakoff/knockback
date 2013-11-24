@@ -94,6 +94,8 @@ class kb.ViewModel
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
     not options.internals or @__kb.internals = options.internals
     not options.excludes or @__kb.excludes = options.excludes
+    not options.statics or @__kb.statics = options.statics
+    not options.static_defaults or @__kb.static_defaults = options.static_defaults
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
@@ -148,12 +150,14 @@ class kb.ViewModel
         attribute_keys = _.keys(bb_model.attributes)
         keys = if keys then _.union(keys, attribute_keys) else attribute_keys
     keys = _.difference(keys, @__kb.excludes) if keys and @__kb.excludes  # remove excludes
+    keys = _.difference(keys, @__kb.statics) if keys and @__kb.statics  # remove statics
 
     # initialize
     @_mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)
     @_mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
     not options.mappings or @_mapObservables(model, options.mappings)
     not keys or @_createObservables(model, keys)
+    not @__kb.statics or @_createObservables(model, @__kb.statics, true)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
     return @
@@ -179,18 +183,28 @@ class kb.ViewModel
   ####################################################
 
   # @private
-  _createObservables: (model, keys) ->
-    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
+  _createObservables: (model, keys, is_static) ->
+    if is_static
+      static_defaults = @__kb.static_defaults or {}
+    else
+      create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
+
     for key in keys
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
       continue if @[vm_key] # already exists, skip
 
       # add to the keys list
-      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[key]=true
+      @__kb.vm_keys[vm_key] = @__kb.model_keys[key] = true
 
       # create
-      create_options.key = key
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
+      if is_static
+        if model.has(vm_key)
+          @[vm_key] = @__kb.view_model[vm_key] = model.get(vm_key)
+        else if vm_key of static_defaults
+          @[vm_key] = @__kb.view_model[vm_key] = static_defaults[vm_key]
+      else
+        create_options.key = key
+        @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
     return
 
   # @private

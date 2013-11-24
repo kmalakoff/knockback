@@ -12,6 +12,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * updated tests for latest libraries (Knockout 3.0.0, Backbone 1.1.0, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
 * added 'sort' collection message in addition to 'resort'
 * bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
+* added statics and static_defaults
 
 ## 0.17.2
 

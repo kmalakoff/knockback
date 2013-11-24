@@ -839,3 +839,34 @@ describe 'knockback-view-model.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '22. statics and static defaults keyword', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    view_model = new kb.ViewModel(
+      new kb.Model({id: 1, name: 'Initial', date: new Date()}),
+      {statics: ['name', 'author', 'description', 'tags'], static_defaults: {author: '(none)', description: null}}
+    )
+
+    assert.ok(view_model.name and !ko.isObservable(view_model.name), 'name: non-observable')
+    assert.equal(view_model.name, 'Initial', 'name: value is correct')
+    assert.equal(ko.utils.unwrapObservable(view_model.name), 'Initial', 'name: unwrapped value is correct')
+
+    assert.ok(view_model.date and ko.isObservable(view_model.date), 'date: observable')
+    assert.equal(view_model.date(), view_model.model().get('date'), 'date: value is correct')
+    assert.equal(ko.utils.unwrapObservable(view_model.date), view_model.model().get('date'), 'date: unwrapped value is correct')
+
+    assert.ok(view_model.author and !ko.isObservable(view_model.author), 'author: non-observable')
+    assert.equal(view_model.author, '(none)', 'author: value is correct')
+    assert.equal(ko.utils.unwrapObservable(view_model.author), '(none)', 'author: unwrapped value is correct')
+
+    assert.ok(!view_model.description and !ko.isObservable(view_model.description), 'description: non-observable')
+    assert.equal(view_model.description, null, 'description: value is correct')
+    assert.equal(ko.utils.unwrapObservable(view_model.description), null, 'description: unwrapped value is correct')
+
+    assert.ok(_.isUndefined(view_model.tags), 'tags: not created')
+
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
