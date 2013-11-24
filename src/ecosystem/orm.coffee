@@ -142,7 +142,13 @@ class ORMAdapter_Supermodel
     return null unless type = @relationType(model, key)
     return if type is KB_TYPE_COLLECTION then kb.CollectionObservable else kb.ViewModel
 
-  bind: (model, key, update, path) -> return null
+  bind: (model, key, update, path) ->
+    return null unless type = @relationType(model, key)
+    rel_fn = (model) ->
+      not kb.statistics or kb.statistics.addModelEvent({name: 'update (supermodel)', model: model, key: key, path: path})
+      update(model[key]())
+    model.bind("associate:#{key}", rel_fn)
+    return -> model.unbind("associate:#{key}", rel_fn)
 
 kb.orm.addAdapter(new ORMAdapter_Supermodel())
 ###############################

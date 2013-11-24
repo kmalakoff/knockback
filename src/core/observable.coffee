@@ -77,7 +77,7 @@ class kb.Observable
 
         # read and update
         if (@_mdl is @_model() and @_mdl) # maybe not yet initialized
-          new_value = if @read then @read.apply(@vm, args) else @_mdl.get.apply(@_mdl, args)
+          new_value = if @read then @read.apply(@vm, args) else @getValue(@_mdl, args)
           @update(new_value)
 
         # get the observable
@@ -121,7 +121,7 @@ class kb.Observable
 
         # update references
         @_mdl = new_model
-        previous = new_model?.get(@key)
+        previous = @getValue(new_model)
         @update(null)
         if new_model and not @vm[@key]?.setToDefault and kb.utils.valueType(@vm[@key]) == KB_TYPE_SIMPLE
           (arg = {})[@key] = previous
@@ -158,7 +158,7 @@ class kb.Observable
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: ->
-    new_value = if @_mdl then @_mdl.get(@key) else null
+    new_value = if @_mdl then @getValue(@_mdl) else null
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
@@ -170,7 +170,7 @@ class kb.Observable
     return if @__kb_released # destroyed, nothing to do
 
     # determine the new type
-    new_value = @_mdl.get(_unwrapObservable(@key)) if @_mdl and not arguments.length
+    new_value = @getValue(@_mdl) if @_mdl and not arguments.length
     (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
@@ -255,5 +255,10 @@ class kb.Observable
     # store the value
     @__kb_value = value
     @vo(value)
+
+  getValue: (model, args) ->
+    return unless model
+    key = _peekObservable(@key)
+    return if not model.has or model.has(key) then (if args then model.get.apply(model, args) else model.get(key)) else model[key]?()
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)

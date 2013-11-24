@@ -532,7 +532,23 @@ ORMAdapter_Supermodel = (function() {
   };
 
   ORMAdapter_Supermodel.prototype.bind = function(model, key, update, path) {
-    return null;
+    var rel_fn, type;
+    if (!(type = this.relationType(model, key))) {
+      return null;
+    }
+    rel_fn = function(model) {
+      !kb.statistics || kb.statistics.addModelEvent({
+        name: 'update (supermodel)',
+        model: model,
+        key: key,
+        path: path
+      });
+      return update(model[key]());
+    };
+    model.bind("associate:" + key, rel_fn);
+    return function() {
+      return model.unbind("associate:" + key, rel_fn);
+    };
   };
 
   return ORMAdapter_Supermodel;
@@ -1439,7 +1455,7 @@ kb.Observable = (function() {
             }
           }
           if (_this._mdl === _this._model() && _this._mdl) {
-            new_value = _this.read ? _this.read.apply(_this.vm, args) : _this._mdl.get.apply(_this._mdl, args);
+            new_value = _this.read ? _this.read.apply(_this.vm, args) : _this.getValue(_this._mdl, args);
             _this.update(new_value);
           }
           return _unwrapObservable(_this.vo());
@@ -1497,7 +1513,7 @@ kb.Observable = (function() {
               return;
             }
             _this._mdl = new_model;
-            previous = new_model != null ? new_model.get(_this.key) : void 0;
+            previous = _this.getValue(new_model);
             _this.update(null);
             if (new_model && !((_ref1 = _this.vm[_this.key]) != null ? _ref1.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
               (arg = {})[_this.key] = previous;
@@ -1545,7 +1561,7 @@ kb.Observable = (function() {
 
   Observable.prototype.valueType = function() {
     var new_value;
-    new_value = this._mdl ? this._mdl.get(this.key) : null;
+    new_value = this._mdl ? this.getValue(this._mdl) : null;
     this.value_type || this._updateValueObservable(new_value);
     return this.value_type;
   };
@@ -1556,7 +1572,7 @@ kb.Observable = (function() {
       return;
     }
     if (this._mdl && !arguments.length) {
-      new_value = this._mdl.get(_unwrapObservable(this.key));
+      new_value = this.getValue(this._mdl);
     }
     (new_value !== void 0) || (new_value = null);
     new_type = kb.utils.valueType(new_value);
@@ -1637,6 +1653,22 @@ kb.Observable = (function() {
     }
     this.__kb_value = value;
     return this.vo(value);
+  };
+
+  Observable.prototype.getValue = function(model, args) {
+    if (!model) {
+      return;
+    }
+    key = _peekObservable(this.key);
+    if (!model.has || model.has(key)) {
+      if (args) {
+        return model.get.apply(model, args);
+      } else {
+        return model.get(key);
+      }
+    } else {
+      return typeof model[key] === "function" ? model[key]() : void 0;
+    }
   };
 
   return Observable;

@@ -7111,7 +7111,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, URL_REGEXP, arraySlice, callOrGet, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, URL_REGEXP, arraySlice, callOrGet, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -7572,6 +7572,78 @@ ORMAdapter_BackboneAssociations = (function() {
 })();
 
 kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
+
+ORMAdapter_Supermodel = (function() {
+  function ORMAdapter_Supermodel() {}
+
+  ORMAdapter_Supermodel.prototype.isAvailable = function() {
+    try {
+      (typeof window !== "undefined" && window !== null ? window.Supermodel : void 0) || (typeof require === "function" ? require('supermodel') : void 0);
+    } catch (_error) {
+
+    }
+    return !!(typeof window !== "undefined" && window !== null ? window.Supermodel : void 0);
+  };
+
+  ORMAdapter_Supermodel.prototype.keys = function(model) {
+    if (!(model instanceof Supermodel.Model)) {
+      return null;
+    }
+    return _.keys(model.constructor.associations());
+  };
+
+  ORMAdapter_Supermodel.prototype.relationType = function(model, key) {
+    var relation;
+    if (!(model instanceof Supermodel.Model)) {
+      return null;
+    }
+    if (!(relation = model.constructor.associations()[key])) {
+      return null;
+    }
+    if (relation.add) {
+      return KB_TYPE_COLLECTION;
+    } else {
+      return KB_TYPE_MODEL;
+    }
+  };
+
+  ORMAdapter_Supermodel.prototype.inferCreator = function(model, key) {
+    var type;
+    if (!(type = this.relationType(model, key))) {
+      return null;
+    }
+    if (type === KB_TYPE_COLLECTION) {
+      return kb.CollectionObservable;
+    } else {
+      return kb.ViewModel;
+    }
+  };
+
+  ORMAdapter_Supermodel.prototype.bind = function(model, key, update, path) {
+    var rel_fn, type;
+    if (!(type = this.relationType(model, key))) {
+      return null;
+    }
+    rel_fn = function(model) {
+      !kb.statistics || kb.statistics.addModelEvent({
+        name: 'update (supermodel)',
+        model: model,
+        key: key,
+        path: path
+      });
+      return update(model[key]());
+    };
+    model.bind("associate:" + key, rel_fn);
+    return function() {
+      return model.unbind("associate:" + key, rel_fn);
+    };
+  };
+
+  return ORMAdapter_Supermodel;
+
+})();
+
+kb.orm.addAdapter(new ORMAdapter_Supermodel());
 
 _throwMissing = function(instance, message) {
   throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
@@ -8471,7 +8543,7 @@ kb.Observable = (function() {
             }
           }
           if (_this._mdl === _this._model() && _this._mdl) {
-            new_value = _this.read ? _this.read.apply(_this.vm, args) : _this._mdl.get.apply(_this._mdl, args);
+            new_value = _this.read ? _this.read.apply(_this.vm, args) : _this.getValue(_this._mdl, args);
             _this.update(new_value);
           }
           return _unwrapObservable(_this.vo());
@@ -8529,7 +8601,7 @@ kb.Observable = (function() {
               return;
             }
             _this._mdl = new_model;
-            previous = new_model != null ? new_model.get(_this.key) : void 0;
+            previous = _this.getValue(new_model);
             _this.update(null);
             if (new_model && !((_ref1 = _this.vm[_this.key]) != null ? _ref1.setToDefault : void 0) && kb.utils.valueType(_this.vm[_this.key]) === KB_TYPE_SIMPLE) {
               (arg = {})[_this.key] = previous;
@@ -8577,7 +8649,7 @@ kb.Observable = (function() {
 
   Observable.prototype.valueType = function() {
     var new_value;
-    new_value = this._mdl ? this._mdl.get(this.key) : null;
+    new_value = this._mdl ? this.getValue(this._mdl) : null;
     this.value_type || this._updateValueObservable(new_value);
     return this.value_type;
   };
@@ -8588,7 +8660,7 @@ kb.Observable = (function() {
       return;
     }
     if (this._mdl && !arguments.length) {
-      new_value = this._mdl.get(_unwrapObservable(this.key));
+      new_value = this.getValue(this._mdl);
     }
     (new_value !== void 0) || (new_value = null);
     new_type = kb.utils.valueType(new_value);
@@ -8669,6 +8741,22 @@ kb.Observable = (function() {
     }
     this.__kb_value = value;
     return this.vo(value);
+  };
+
+  Observable.prototype.getValue = function(model, args) {
+    if (!model) {
+      return;
+    }
+    key = _peekObservable(this.key);
+    if (!model.has || model.has(key)) {
+      if (args) {
+        return model.get.apply(model, args);
+      } else {
+        return model.get(key);
+      }
+    } else {
+      return typeof model[key] === "function" ? model[key]() : void 0;
+    }
   };
 
   return Observable;
