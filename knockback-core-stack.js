@@ -7369,11 +7369,10 @@ ORMAdapter_BackboneORM = (function() {
   function ORMAdapter_BackboneORM() {}
 
   ORMAdapter_BackboneORM.prototype.isAvailable = function() {
-    var e;
     try {
-      kb.BackboneORM = !(typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0) && (typeof require !== 'undefined') ? require('backbone-orm') : typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0;
+      kb.BackboneORM = (typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0) || (typeof require === "function" ? require('backbone-orm') : void 0);
     } catch (_error) {
-      e = _error;
+
     }
     return !!kb.BackboneORM;
   };
@@ -7424,15 +7423,13 @@ ORMAdapter_BackboneRelational = (function() {
   function ORMAdapter_BackboneRelational() {}
 
   ORMAdapter_BackboneRelational.prototype.isAvailable = function() {
-    var e, _ref1;
+    var _ref1, _ref2;
     try {
-      if (kb.Backbone && !kb.Backbone.RelationalModel && (typeof require !== 'undefined')) {
-        require('backbone-relational');
-      }
+      ((_ref1 = kb.Backbone) != null ? _ref1.RelationalModel : void 0) || (typeof require === "function" ? require('backbone-relational') : void 0);
     } catch (_error) {
-      e = _error;
+
     }
-    return !!((_ref1 = kb.Backbone) != null ? _ref1.RelationalModel : void 0);
+    return !!((_ref2 = kb.Backbone) != null ? _ref2.RelationalModel : void 0);
   };
 
   ORMAdapter_BackboneRelational.prototype.keys = function(model) {
@@ -7519,15 +7516,13 @@ ORMAdapter_BackboneAssociations = (function() {
   function ORMAdapter_BackboneAssociations() {}
 
   ORMAdapter_BackboneAssociations.prototype.isAvailable = function() {
-    var e, _ref1;
+    var _ref1, _ref2;
     try {
-      if (kb.Backbone && !kb.Backbone.AssociatedModel && (typeof require !== 'undefined')) {
-        require('backbone-associations');
-      }
+      ((_ref1 = kb.Backbone) != null ? _ref1.AssociatedModel : void 0) || (typeof require === "function" ? require('backbone-associations') : void 0);
     } catch (_error) {
-      e = _error;
+
     }
-    return !!((_ref1 = kb.Backbone) != null ? _ref1.AssociatedModel : void 0);
+    return !!((_ref2 = kb.Backbone) != null ? _ref2.AssociatedModel : void 0);
   };
 
   ORMAdapter_BackboneAssociations.prototype.keys = function(model) {

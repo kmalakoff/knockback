@@ -1,12 +1,11 @@
 describe 'Knockback.js with Backbone-Relational.js', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
-  require('backbone-relational') if not Backbone.Relational and (typeof(require) isnt 'undefined')
-  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = window._ or require?('underscore')
+  Backbone = window.Backbone or require?('backbone')
+  Backbone?.Relational or require?('backbone-relational')
+  ko = window.ko or require?('knockout')
+  kb = window.kb or require?('knockback')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -42,8 +41,6 @@ describe 'Knockback.js with Backbone-Relational.js', ->
         key: 'occupies'
     }]
   })
-  Person.setup()
-  Building.setup()
 
   it '1. Model with HasMany relations: A house with multiple people living in it', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -286,9 +283,6 @@ describe 'Knockback.js with Backbone-Relational.js', ->
         relatedModel: Author
       }]
     })
-
-    Author.setup()
-    BookStore.setup()
 
     bs = new BookStore({
       books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],

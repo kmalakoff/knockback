@@ -1,23 +1,22 @@
-describe 'Knockback.js with Backbone-Relational.js', ->
+describe 'Knockback.js with Backbone Supermodel', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = if not window._ and (typeof(require) isnt 'undefined') then require('underscore') else window._
-  _ = _._ if _ and _.hasOwnProperty('_') # LEGACY
-  Backbone = if not window.Backbone and (typeof(require) isnt 'undefined') then require('backbone') else window.Backbone
-  require('backbone-relational') if not Backbone.Relational and (typeof(require) isnt 'undefined')
-  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  _ = window._ or require?('underscore')
+  Backbone = window.Backbone or require?('backbone')
+  Supermodel = window.Supermodel or require?('supermodel')
+  ko = window.ko or require?('knockout')
+  kb = window.kb or require?('knockback')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
     assert.ok(!!_, '_')
     assert.ok(!!Backbone, 'Backbone')
     assert.ok(!!kb, 'kb')
-    assert.ok(!!Backbone.Relational, 'Backbone.Relational')
+    assert.ok(!!Supermodel, 'Supermodel')
     assert.ok(!!kb, 'kb')
     done()
 
-  window.Person = Backbone.RelationalModel.extend({
+  window.Person = Supermodel.Model.extend({
     relations: [{
       type: Backbone.HasMany
       key: 'friends'
@@ -32,7 +31,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     }]
   })
 
-  window.Building = Backbone.RelationalModel.extend({
+  window.Building = Supermodel.Model.extend({
     relations: [{
       type: Backbone.HasMany
       key: 'occupants'
@@ -42,8 +41,6 @@ describe 'Knockback.js with Backbone-Relational.js', ->
         key: 'occupies'
     }]
   })
-  Person.setup()
-  Building.setup()
 
   it '1. Model with HasMany relations: A house with multiple people living in it', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -223,9 +220,9 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     done()
 
   it '4. After view model create, add models', (done) ->
-    Occupant = Backbone.RelationalModel.extend({})
+    Occupant = Supermodel.Model.extend({})
 
-    House = Backbone.RelationalModel.extend({
+    House = Supermodel.Model.extend({
       relations: [{
         type: Backbone.HasMany
         key: 'occupants'
@@ -256,12 +253,12 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     done()
 
   it '5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) ->
-    Book = Backbone.RelationalModel.extend({
+    Book = Supermodel.Model.extend({
       defaults:
         name: 'untitled'
       idAttribute: '_id'
     })
-    Author = Backbone.RelationalModel.extend({
+    Author = Supermodel.Model.extend({
       defaults:
         name: 'untitled'
       idAttribute: '_id'
@@ -275,7 +272,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
           includeInJSON: '_id'
       }]
     })
-    BookStore = Backbone.RelationalModel.extend({
+    BookStore = Supermodel.Model.extend({
       relations:[{
         type: 'HasMany'
         key: 'books'
@@ -286,9 +283,6 @@ describe 'Knockback.js with Backbone-Relational.js', ->
         relatedModel: Author
       }]
     })
-
-    Author.setup()
-    BookStore.setup()
 
     bs = new BookStore({
       books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],

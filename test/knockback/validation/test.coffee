@@ -1,7 +1,7 @@
 describe 'knockback-validation.js', ->
 
-  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  ko = window.ko or require?('knockout')
+  kb = window.kb or require?('knockback')
   _ = kb._
 
   window.kb = kb unless window.kb # make kb global for bindings

@@ -36,7 +36,7 @@ kb.orm = new ORM()
 ###############################
 class ORMAdapter_BackboneORM
   isAvailable: ->
-    try kb.BackboneORM = if not window?.BackboneORM and (typeof(require) isnt 'undefined') then require('backbone-orm') else window?.BackboneORM catch e
+    try kb.BackboneORM = window?.BackboneORM or require?('backbone-orm') catch
     return !!kb.BackboneORM
 
   keys: (model) ->
@@ -60,7 +60,7 @@ kb.orm.addAdapter(new ORMAdapter_BackboneORM())
 ###############################
 class ORMAdapter_BackboneRelational
   isAvailable: ->
-    try require('backbone-relational') if kb.Backbone and not kb.Backbone.RelationalModel and (typeof(require) isnt 'undefined') catch e
+    try kb.Backbone?.RelationalModel or require?('backbone-relational') catch
     return !!kb.Backbone?.RelationalModel
 
   keys: (model) ->
@@ -102,7 +102,7 @@ kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
 ###############################
 class ORMAdapter_BackboneAssociations
   isAvailable: ->
-    try require('backbone-associations') if kb.Backbone and not kb.Backbone.AssociatedModel and (typeof(require) isnt 'undefined') catch e
+    try kb.Backbone?.AssociatedModel or require?('backbone-associations') catch
     return !!kb.Backbone?.AssociatedModel
 
   keys: (model) ->

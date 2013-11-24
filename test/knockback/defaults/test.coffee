@@ -1,10 +1,10 @@
 describe 'knockback-defaults.js', ->
 
-  ko = if not window.ko and (typeof(require) isnt 'undefined') then require('knockout') else window.ko
-  kb = if not window.kb and (typeof(require) isnt 'undefined') then require('knockback') else window.kb
+  ko = window.ko or require?('knockout')
+  kb = window.kb or require?('knockback')
   _ = kb._
   Backbone = kb.Backbone
-  require('knockback-examples-localization') if (typeof(require) isnt 'undefined')
+  require?('knockback-examples-localization')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
