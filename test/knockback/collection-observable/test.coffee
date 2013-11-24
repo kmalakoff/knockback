@@ -690,3 +690,22 @@ describe 'knockback-collection-observable.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '17. Test auto-generate collections', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    models = (new kb.Contact({id: id}) for id in [0..4])
+    class PersonViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable({view_model: PersonViewModel})
+
+    collection_observable.collection().reset(models)
+    assert.equal(collection_observable.collection().length, 5)
+
+    for view_models in collection_observable()
+      assert.ok(view_models.id() in [0..4])
+      assert.ok(view_models.model() instanceof kb.Contact)
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
