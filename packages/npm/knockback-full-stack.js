@@ -7112,8 +7112,8 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 */
 
 var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, URL_REGEXP, arraySlice, callOrGet, copyProps, e, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 kb = (function() {
   function kb() {}
@@ -7257,36 +7257,36 @@ KB_TYPE_MODEL = kb.TYPE_MODEL;
 
 KB_TYPE_COLLECTION = kb.TYPE_COLLECTION;
 
-kb.ko = ko = !this.ko && (typeof require !== 'undefined') ? require('knockout') : this.ko;
+kb.ko = ko = this.ko || require('knockout');
 
 if (this.Parse) {
-  kb._ = _ = this.Parse._;
-} else {
-  if (!this._ && (typeof require !== 'undefined')) {
-    try {
-      _ = require('lodash');
-    } catch (_error) {
-      e = _error;
-      _ = require('underscore');
-    }
-  } else {
-    _ = this._;
-  }
-  kb._ = _ = _.hasOwnProperty('_') ? _._ : _;
-  if (_.where && !_.findWhere) {
-    _.mixin({
-      findWhere: function(obj, attrs) {
-        var result;
-        result = _.where(obj, attrs);
-        if (result.length) {
-          return result[0];
-        } else {
-          return null;
-        }
-      }
-    });
+  _ = this.Parse._;
+} else if (!(_ = this._)) {
+  try {
+    _ = require('lodash');
+  } catch (_error) {
+    e = _error;
+    _ = require('underscore');
   }
 }
+
+_ = __indexOf.call(_, '_') >= 0 ? _._ : _;
+
+if (_.where && !_.findWhere) {
+  _.mixin({
+    findWhere: function(obj, attrs) {
+      var result;
+      result = _.where(obj, attrs);
+      if (result.length) {
+        return result[0];
+      } else {
+        return null;
+      }
+    }
+  });
+}
+
+kb._ = _;
 
 if (this.Parse) {
   kb.Parse = this.Parse;
@@ -7294,7 +7294,7 @@ if (this.Parse) {
   kb.Model = this.Parse.Object;
   kb.Events = this.Parse.Events;
 } else {
-  kb.Backbone = !this.Backbone && (typeof require !== 'undefined') ? require('backbone') : this.Backbone;
+  kb.Backbone = this.Backbone || require('backbone');
   kb.Collection = kb.Backbone.Collection;
   kb.Model = kb.Backbone.Model;
   kb.Events = kb.Backbone.Events;
