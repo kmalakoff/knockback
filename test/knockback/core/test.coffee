@@ -16,7 +16,9 @@ describe 'knockback_core utils', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     # not supported in older versions
-    return assert.ok(true) unless ko.version
+    unless ko.version
+       assert.ok(true)
+       return done()
 
     class ViewModel
       constructor: ->

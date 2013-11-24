@@ -535,6 +535,7 @@ describe 'knockback-localized-observable.js', ->
     kb.release(nested_view_model)
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
 
   it '12. Prior kb.Observables functionality', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats

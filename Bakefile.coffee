@@ -250,7 +250,7 @@ module.exports =
       ]
     _test:
       command: 'phantomjs'
-      runner: 'phantomjs-qunit-runner.js'
+      runner: 'phantomjs-mocha-runner.js'
       files: '**/*.html'
       directories: [
         'test/knockback/core'

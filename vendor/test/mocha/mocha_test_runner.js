@@ -1,7 +1,7 @@
 (function() {
-  mocha.setup('bdd');
-  mocha.timeout(10000);
-  mocha.reporter('html');
+  var options = {ui: 'bdd', reporter: 'html', timeout: 60000};
+  if (window.MochaReporter) options.reporter = window.MochaReporter;
+  mocha.setup(options);
   window.assert = chai.assert;
 
   var started = false,
@@ -11,7 +11,7 @@
     // mocha.checkLeaks();
     mocha.globals(['jQuery'])
 
-    mocha.run(function(err) {
+    window.mocha_reporter = mocha.run(function(err) {
       details = mocha.suite.suites;
 
       if (!started) return;
