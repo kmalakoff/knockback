@@ -275,7 +275,7 @@ module.exports =
         'test/ecosystem/backbone-orm'
         'test/ecosystem/backbone-relational'
         'test/ecosystem/backbone-associations'
-        # 'test/ecosystem/supermodel'
+        'test/ecosystem/supermodel'
         'test/ecosystem/lodash'
         'test/ecosystem/parse'
 

@@ -23,7 +23,7 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -484,6 +484,62 @@ ORMAdapter_BackboneAssociations = (function() {
 })();
 
 kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
+
+ORMAdapter_Supermodel = (function() {
+  function ORMAdapter_Supermodel() {}
+
+  ORMAdapter_Supermodel.prototype.isAvailable = function() {
+    try {
+      (typeof window !== "undefined" && window !== null ? window.Supermodel : void 0) || (typeof require === "function" ? require('supermodel') : void 0);
+    } catch (_error) {
+
+    }
+    return !!(typeof window !== "undefined" && window !== null ? window.Supermodel : void 0);
+  };
+
+  ORMAdapter_Supermodel.prototype.keys = function(model) {
+    if (!(model instanceof Supermodel.Model)) {
+      return null;
+    }
+    return _.keys(model.constructor.associations());
+  };
+
+  ORMAdapter_Supermodel.prototype.relationType = function(model, key) {
+    var relation;
+    if (!(model instanceof Supermodel.Model)) {
+      return null;
+    }
+    if (!(relation = model.constructor.associations()[key])) {
+      return null;
+    }
+    if (relation.add) {
+      return KB_TYPE_COLLECTION;
+    } else {
+      return KB_TYPE_MODEL;
+    }
+  };
+
+  ORMAdapter_Supermodel.prototype.inferCreator = function(model, key) {
+    var type;
+    if (!(type = this.relationType(model, key))) {
+      return null;
+    }
+    if (type === KB_TYPE_COLLECTION) {
+      return kb.CollectionObservable;
+    } else {
+      return kb.ViewModel;
+    }
+  };
+
+  ORMAdapter_Supermodel.prototype.bind = function(model, key, update, path) {
+    return null;
+  };
+
+  return ORMAdapter_Supermodel;
+
+})();
+
+kb.orm.addAdapter(new ORMAdapter_Supermodel());
 
 _throwMissing = function(instance, message) {
   throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";

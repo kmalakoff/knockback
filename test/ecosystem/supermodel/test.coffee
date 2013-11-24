@@ -16,49 +16,33 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  window.Person = Supermodel.Model.extend({
-    relations: [{
-      type: Backbone.HasMany
-      key: 'friends'
-      relatedModel: 'Person'
-    }, {
-      type: Backbone.HasOne
-      key: 'best_friend'
-      relatedModel: 'Person'
-      reverseRelation:
-        type: Backbone.HasMany
-        key: 'best_friends_with_me'
-    }]
-  })
+  window.Person = Supermodel.Model.extend({})
+  window.Building = Supermodel.Model.extend({})
 
-  window.Building = Supermodel.Model.extend({
-    relations: [{
-      type: Backbone.HasMany
-      key: 'occupants'
-      relatedModel: Person
-      reverseRelation:
-        type: Backbone.HasOne
-        key: 'occupies'
-    }]
-  })
+  Person.has().many('friends', {model: Person, inverse: 'friends_with_me', collection: Backbone.Collection})
+  Person.has().many('best_friends_with_me', {model: Person, inverse: 'best_friend', collection: Backbone.Collection})
+  Person.has().one('best_friend', {model: Person, inverse: 'best_friends_with_me'})
+
+  Building.has().many('occupants', {model: Person, inverse: 'occupies', collection: Backbone.Collection})
+  Person.has().one('occupies', {model: Building, inverse: 'occupants'})
 
   it '1. Model with HasMany relations: A house with multiple people living in it', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    john = new Person({
+    john = Person.create({
       id: 'person-1-1'
       name: 'John'
     })
 
-    paul = new Person({
+    paul = Person.create({
       id: 'person-1-2'
       name: 'Paul'
     })
 
-    our_house = new Building({
+    our_house = Building.create({
       id: 'house-1-1'
       location: 'in the middle of the street'
-      occupants: ['person-1-1', 'person-1-2']
+      occupants: [john, paul]
     })
 
     house_view_model = new kb.ViewModel(our_house)
@@ -82,29 +66,29 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    john = new Person({
+    john = Person.create({
       id: 'person-2-1'
       name: 'John'
     })
-    paul = new Person({
+    paul = Person.create({
       id: 'person-2-2'
       name: 'Paul'
     })
-    george = new Person({
+    george = Person.create({
       id: 'person-2-3'
       name: 'George'
     })
-    ringo = new Person({
+    ringo = Person.create({
       id: 'person-2-4'
       name: 'Ringo'
     })
 
-    abbey_flats = new Building({
+    abbey_flats = Building.create({
       id: 'house-2-1'
       location: 'one side of the street'
-      occupants: ['person-2-1', 'person-2-2', 'person-2-3', 'person-2-4']
+      occupants: [john, paul, george, ringo]
     })
-    abbey_studios = new Building({
+    abbey_studios = Building.create({
       id: 'studio-2-2'
       location: 'the other side of the street'
       occupants: []
@@ -131,7 +115,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
         assert.equal(place_view_model.occupants().length, 0, "No one is here")
 
     # a beattle crosses the road
-    abbey_studios.get('occupants').add(john)
+    abbey_studios.occupants().add(john)
 
     for place_view_model in places_observable()
       if place_view_model.id() == 'house-2-1'
@@ -167,25 +151,25 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '3. Model with recursive HasMany relations: Person with users who are people', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    george = new Person({
+    george = Person.create({
       id: 'person-3-3'
       name: 'George'
       friends: ['person-3-1', 'person-3-2', 'person-3-4']
     })
-    john = new Person({
+    john = Person.create({
       id: 'person-3-1'
       name: 'John'
       friends: ['person-3-2', 'person-3-3', 'person-3-4']
       best_friend: george
     })
     george.set(best_friend: john)
-    paul = new Person({
+    paul = Person.create({
       id: 'person-3-2'
       name: 'Paul'
       friends: ['person-3-1', 'person-3-3', 'person-3-4']
       best_friend: george
     })
-    ringo = new Person({
+    ringo = Person.create({
       id: 'person-3-4'
       name: 'Ringo'
       friends: ['person-3-1', 'person-3-2', 'person-3-3']
@@ -221,21 +205,14 @@ describe 'Knockback.js with Backbone Supermodel', ->
 
   it '4. After view model create, add models', (done) ->
     Occupant = Supermodel.Model.extend({})
+    House = Supermodel.Model.extend({})
+    House.has().many('occupants', {model: Occupant, inverse: 'livesIn', collection: Backbone.Collection})
+    Occupant.has().one('livesIn', {model: House, inverse: 'occupants'})
 
-    House = Supermodel.Model.extend({
-      relations: [{
-        type: Backbone.HasMany
-        key: 'occupants'
-        relatedModel: Occupant
-        reverseRelation:
-          key: 'livesIn'
-      }]
-    })
+    bob = Occupant.create({id: 'person-1', name: 'Bob'})
+    fred = Occupant.create({id: 'person-2', name: 'Fred'})
 
-    bob = new Occupant({id: 'person-1', name: 'Bob'})
-    fred = new Occupant({id: 'person-2', name: 'Fred'})
-
-    house = new House({
+    house = House.create({
       location: 'In the middle of our street'
       occupants: new kb.Collection()
     })
@@ -244,7 +221,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     view_model = kb.viewModel(house)
     assert.equal(view_model.occupants().length, 0, "no occupants")
 
-    occupants_relationship = house.get('occupants')
+    occupants_relationship = house.occupants()
     occupants_relationship.add(bob)
     occupants_relationship.add(fred)
     assert.equal(view_model.occupants().length, 2, 'two occupants')
@@ -262,29 +239,15 @@ describe 'Knockback.js with Backbone Supermodel', ->
       defaults:
         name: 'untitled'
       idAttribute: '_id'
-      relations:[{
-        type: 'HasMany'
-        key: 'books'
-        relatedModel: Book
-        includeInJSON: '_id'
-        reverseRelation:
-          key: 'author'
-          includeInJSON: '_id'
-      }]
     })
-    BookStore = Supermodel.Model.extend({
-      relations:[{
-        type: 'HasMany'
-        key: 'books'
-        relatedModel: Book
-      },{
-        type: 'HasMany'
-        key: 'authors'
-        relatedModel: Author
-      }]
-    })
+    Author.has().many('books', {model: Book, inverse: 'author', collection: Backbone.Collection})
+    Book.has().one('author', {model: Author, inverse: 'books'})
 
-    bs = new BookStore({
+    BookStore = Supermodel.Model.extend({})
+    BookStore.has().many('books', {model: Book, inverse: 'bookstore', collection: Backbone.Collection})
+    BookStore.has().many('authors', {model: Author, inverse: 'bookstore', collection: Backbone.Collection})
+
+    bs = BookStore.create({
       books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],
       authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
     })
@@ -309,7 +272,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     })
 
     view_model = {
-      books: kb.collectionObservable(bs.get('books'), {
+      books: kb.collectionObservable(bs.books(), {
         factories:
           models: BookViewModel
           'models.author.books.models': BookViewModel
@@ -326,10 +289,10 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '6. Inferring observable types: from the start', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    person1 = new Person({id: 'person-6-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-6-2', name: 'Mommy'})
-    house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: ['person-6-1', 'person-6-2']})
-    person1.get('friends').add(person2); person2.set({best_friend: person1})
+    person1 = Person.create({id: 'person-6-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-6-2', name: 'Mommy'})
+    house = Building.create({id: 'house-6-1', name: 'Home Sweet Home', occupants: ['person-6-1', 'person-6-2']})
+    person1.friends().add(person2); person2.set({best_friend: person1})
 
     view_model_person1 = kb.viewModel(person1)
     view_model_house1 = kb.viewModel(house)
@@ -354,9 +317,9 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '7a. Inferring observable types: late binding', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    person1 = new Person({id: 'person-7-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-7-2', name: 'Mommy'})
-    house = new Building({id: 'house-7-1', name: 'Home Sweet Home'})
+    person1 = Person.create({id: 'person-7-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-7-2', name: 'Mommy'})
+    house = Building.create({id: 'house-7-1', name: 'Home Sweet Home'})
 
     view_model_person1 = kb.viewModel(person1)
     view_model_house1 = kb.viewModel(house)
@@ -369,13 +332,13 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
     # add some friends
-    person1.get('friends').add(person2); person2.set({best_friend: person1})
+    person1.friends().add(person2); person2.set({best_friend: person1})
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
     assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
     assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
     # add some occupants
-    house.get('occupants').add(person1).add(person2)
+    house.occupants().add(person1); house.occupants().add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
@@ -390,9 +353,9 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '7b. Inferring observable types: late binding (attribute setting)', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    person1 = new Person({id: 'person-7b-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-7b-2', name: 'Mommy'})
-    house = new Building({id: 'house-7b-1', name: 'Home Sweet Home'})
+    person1 = Person.create({id: 'person-7b-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-7b-2', name: 'Mommy'})
+    house = Building.create({id: 'house-7b-1', name: 'Home Sweet Home'})
 
     view_model_person1 = kb.viewModel(person1)
     view_model_house1 = kb.viewModel(house)
@@ -405,14 +368,14 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
     # add some friends
-    friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({friends: friends})
+    friends = _.clone(person1.friends().models); friends.push(person2); person1.set({friends: friends})
     person2.set({best_friend: person1})
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
     assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
     assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
     # add some occupants
-    occupants = _.clone(house.get('occupants').models); occupants.push(person1); occupants.push(person2); house.set({occupants: occupants})
+    occupants = _.clone(house.occupants().models); occupants.push(person1); occupants.push(person2); house.set({occupants: occupants})
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
@@ -442,11 +405,11 @@ describe 'Knockback.js with Backbone Supermodel', ->
           'occupants.models': PersonViewModel
         }, options: options})
 
-    person1 = new Person({id: 'person-8-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-8-2', name: 'Mommy'})
+    person1 = Person.create({id: 'person-8-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-8-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
-    house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: ['person-8-1', 'person-8-2']})
-    person1.get('friends').add(person2)
+    house = Building.create({id: 'house-8-1', name: 'Home Sweet Home', occupants: ['person-8-1', 'person-8-2']})
+    person1.friends().add(person2)
     person2.set({best_friend: person1})
 
     view_model_person1 = new PersonViewModel(person1)
@@ -499,12 +462,12 @@ describe 'Knockback.js with Backbone Supermodel', ->
           'occupants.models': PersonViewModel
         }, options: options})
 
-    person1 = new Person({id: 'person-8b-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-8b-2', name: 'Mommy'})
+    person1 = Person.create({id: 'person-8b-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-8b-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
-    house = new Building({id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()]})
+    house = Building.create({id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()]})
     house.set({occupants: [person1.toJSON(), person2.toJSON()]})
-    friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({friends: friends})
+    friends = _.clone(person1.friends().models); friends.push(person2); person1.set({friends: friends})
     person2.set({best_friend: person1})
 
     view_model_person1 = new PersonViewModel(person1)
@@ -557,10 +520,10 @@ describe 'Knockback.js with Backbone Supermodel', ->
           'occupants.models': PersonViewModel
         }, options: options})
 
-    person1 = new Person({id: 'person-9-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-9-2', name: 'Mommy'})
+    person1 = Person.create({id: 'person-9-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-9-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
-    house = new Building({id: 'house-9-1', name: 'Home Sweet Home'})
+    house = Building.create({id: 'house-9-1', name: 'Home Sweet Home'})
 
     view_model_person1 = new PersonViewModel(person1)
     view_model_person2 = new PersonViewModel(person2)
@@ -575,7 +538,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
     # check friends
-    person1.get('friends').add(person2); person2.set({best_friend: person1})
+    person1.friends().add(person2); person2.set({best_friend: person1})
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
     assert.ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
     assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
@@ -586,7 +549,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     # check occupants
-    house.get('occupants').add(person1).add(person2)
+    house.occupants().add(person1); house.occupants().add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
@@ -621,10 +584,10 @@ describe 'Knockback.js with Backbone Supermodel', ->
           'occupants.models': PersonViewModel
         }, options: options})
 
-    person1 = new Person({id: 'person-9b-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-9b-2', name: 'Mommy'})
+    person1 = Person.create({id: 'person-9b-1', name: 'Daddy'})
+    person2 = Person.create({id: 'person-9b-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
-    house = new Building({id: 'house-9b-1', name: 'Home Sweet Home'})
+    house = Building.create({id: 'house-9b-1', name: 'Home Sweet Home'})
 
     view_model_person1 = new PersonViewModel(person1)
     view_model_person2 = new PersonViewModel(person2)
@@ -639,7 +602,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
     # check friends
-    friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({friends: friends})
+    friends = _.clone(person1.friends().models); friends.push(person2); person1.set({friends: friends})
     person2.set({best_friend: person1})
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
     assert.ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
@@ -651,7 +614,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     # check occupants
-    occupants = _.clone(house.get('occupants').models); occupants.push(person1); occupants.push(person2); house.set({occupants: occupants})
+    occupants = _.clone(house.occupants().models); occupants.push(person1); occupants.push(person2); house.set({occupants: occupants})
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
@@ -671,25 +634,25 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '10. Nested custom view models', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    george = new Person({
+    george = Person.create({
       id: 'person-10-3'
       name: 'George'
       friends: ['person-10-1', 'person-10-2', 'person-10-4']
     })
-    john = new Person({
+    john = Person.create({
       id: 'person-10-1'
       name: 'John'
       friends: ['person-10-2', 'person-10-3', 'person-10-4']
       best_friend: george
     })
     george.set(best_friend: john)
-    paul = new Person({
+    paul = Person.create({
       id: 'person-10-2'
       name: 'Paul'
       friends: ['person-10-1', 'person-10-3', 'person-10-4']
       best_friend: george
     })
-    ringo = new Person({
+    ringo = Person.create({
       id: 'person-10-4'
       name: 'Ringo'
       friends: ['person-10-1', 'person-10-2', 'person-10-3']
@@ -757,22 +720,22 @@ describe 'Knockback.js with Backbone Supermodel', ->
   it '11. Minimum factory tree for shared dependent models', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    george = new Person({
+    george = Person.create({
       id: 'person-11-3'
       name: 'George'
       friends: ['person-11-1', 'person-11-2', 'person-11-4']
     })
-    john = new Person({
+    john = Person.create({
       id: 'person-11-1'
       name: 'John'
       friends: ['person-11-2', 'person-11-3', 'person-11-4']
     })
-    paul = new Person({
+    paul = Person.create({
       id: 'person-11-2'
       name: 'Paul'
       friends: ['person-11-1', 'person-11-3', 'person-11-4']
     })
-    ringo = new Person({
+    ringo = Person.create({
       id: 'person-11-4'
       name: 'Ringo'
       friends: ['person-11-1', 'person-11-2', 'person-11-3']
@@ -796,8 +759,8 @@ describe 'Knockback.js with Backbone Supermodel', ->
           options: options
         })
 
-    collection_observable1 = new PersonCollection(new kb.Collection([george, john, paul, ringo]))
-    collection_observable2 = new PersonCollection(new kb.Collection([george, john, paul, ringo]), collection_observable1.shareOptions())
+    collection_observable1 = Person.createCollection(new kb.Collection([george, john, paul, ringo]))
+    collection_observable2 = Person.createCollection(new kb.Collection([george, john, paul, ringo]), collection_observable1.shareOptions())
 
     assert.equal(collection_observable1.__kb.factory, collection_observable2.__kb.factory, "the factory should be shared")
 

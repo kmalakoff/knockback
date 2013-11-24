@@ -122,3 +122,27 @@ class ORMAdapter_BackboneAssociations
 
 kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################
+
+###############################
+class ORMAdapter_Supermodel
+  isAvailable: ->
+    try window?.Supermodel or require?('supermodel') catch
+    return !!window?.Supermodel
+
+  keys: (model) ->
+    return null unless model instanceof Supermodel.Model
+    return _.keys(model.constructor.associations())
+
+  relationType: (model, key) ->
+    return null unless model instanceof Supermodel.Model
+    return null unless relation = model.constructor.associations()[key]
+    return if relation.add then KB_TYPE_COLLECTION else KB_TYPE_MODEL
+
+  inferCreator: (model, key) ->
+    return null unless type = @relationType(model, key)
+    return if type is KB_TYPE_COLLECTION then kb.CollectionObservable else kb.ViewModel
+
+  bind: (model, key, update, path) -> return null
+
+kb.orm.addAdapter(new ORMAdapter_Supermodel())
+###############################
