@@ -17,7 +17,7 @@ describe 'Knockback.js with BackboneORM', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  Queue = BackboneORM.Queue
+  BackboneORM.CacheSingletons.ModelCache.configure({enabled: true, max: 100})
 
   class Person extends Backbone.Model
     model_name: 'Person'
@@ -185,57 +185,52 @@ describe 'Knockback.js with BackboneORM', ->
     })
 
     models = [george, john, paul, ringo]
-    queue = new Queue(1)
-    for model in models
-      do (model) -> queue.defer (callback) -> model.save callback
-    for model in models
-      do (model) -> queue.defer (callback) -> model.fetchRelated callback
-    queue.await (err) ->
-      assert.ok(!err, "No errors: #{err}")
+    model.save(->) for model in models
+    model.fetchRelated(->) for model in models
 
-      john_view_model = new kb.ViewModel(john)
-      assert.equal(john_view_model.name(), 'John', "Name is correct")
-      for friend in john_view_model.friends()
-        assert.ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
-      assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name')
-      assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
-      kb.release(john_view_model); john_view_model = null
+    john_view_model = new kb.ViewModel(john)
+    assert.equal(john_view_model.name(), 'John', "Name is correct")
+    for friend in john_view_model.friends()
+      assert.ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
+    assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name')
+    assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
+    kb.release(john_view_model); john_view_model = null
 
-      paul_view_model = new kb.ViewModel(paul)
-      assert.equal(paul_view_model.name(), 'Paul', "Name is correct")
-      for friend in paul_view_model.friends()
-        assert.ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
-      assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
-      assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
-      kb.release(paul_view_model); paul_view_model = null
+    paul_view_model = new kb.ViewModel(paul)
+    assert.equal(paul_view_model.name(), 'Paul', "Name is correct")
+    for friend in paul_view_model.friends()
+      assert.ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
+    assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
+    assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
+    kb.release(paul_view_model); paul_view_model = null
 
-      george_view_model = new kb.ViewModel(george)
-      assert.equal(george_view_model.name(), 'George', "Name is correct")
-      for friend in george_view_model.friends()
-        assert.ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
-      assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name')
-      assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
-      assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
-      kb.release(george_view_model); george_view_model = null
+    george_view_model = new kb.ViewModel(george)
+    assert.equal(george_view_model.name(), 'George', "Name is correct")
+    for friend in george_view_model.friends()
+      assert.ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
+    assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name')
+    assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
+    assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
+    kb.release(george_view_model); george_view_model = null
 
-      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-      done()
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
 
   it '4. After view model create, add models', (done) ->
-    class Person extends Backbone.Model
+    class Occupant extends Backbone.Model
       model_name: 'Person'
       schema:
         livesIn: -> ['belongsTo', House, as: 'occupants']
-      sync: BackboneORM.sync(Person)
+      sync: BackboneORM.sync(Occupant)
 
     class House extends Backbone.Model
       model_name: 'House'
       schema:
-        occupants: ['hasMany', Person, as: 'livesIn']
+        occupants: ['hasMany', Occupant, as: 'livesIn']
       sync: BackboneORM.sync(House)
 
-    bob = new Person({id: 'person-1', name: 'Bob'})
-    fred = new Person({id: 'person-2', name: 'Fred'})
+    bob = new Occupant({id: 'person-4-1', name: 'Bob'})
+    fred = new Occupant({id: 'person-4-2', name: 'Fred'})
 
     house = new House({
       location: 'In the middle of our street'
@@ -262,7 +257,7 @@ describe 'Knockback.js with BackboneORM', ->
 
       defaults:
         name: 'untitled'
-      idAttribute: "_id"
+      idAttribute: '_id'
 
     class Author extends Backbone.Model
       model_name: 'Author'
@@ -272,7 +267,7 @@ describe 'Knockback.js with BackboneORM', ->
 
       defaults:
         name: 'untitled'
-      idAttribute: "_id"
+      idAttribute: '_id'
 
     class BookStore extends Backbone.Model
       model_name: 'BookStore'
@@ -282,11 +277,12 @@ describe 'Knockback.js with BackboneORM', ->
       sync: BackboneORM.sync(BookStore)
 
     bs = new BookStore({
-      books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],
+      books:[{_id: "b1", name: "Book One", author: "a1"}, {_id: "b2", name: "Book Two", author: "a1"}],
       authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
     })
-    author.save(->) for author in bs.get('authors').models
-    book.fetchRelated(->) for book in bs.get('books').models
+
+    model.save(->) for model in bs.get('authors').models
+    model.fetchRelated(->) for model in bs.get('books').models
 
     BookViewModel = kb.ViewModel.extend({
       constructor: (model) ->
@@ -328,8 +324,10 @@ describe 'Knockback.js with BackboneORM', ->
     person1 = new Person({id: 'person-6-1', name: 'Daddy', friends: ['person-6-2']})
     person2 = new Person({id: 'person-6-2', name: 'Mommy', best_friend: 'person-6-1'})
     house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: [person1, person2]})
-    person1.save(->); person2.save(->)
-    person1.fetchRelated(->); person2.fetchRelated(->)
+
+    models = [person1, person2]
+    model.save(->) for model in models
+    model.fetchRelated(->) for model in models
 
     view_model_person1 = kb.viewModel(person1)
     view_model_house1 = kb.viewModel(house)
@@ -501,7 +499,9 @@ describe 'Knockback.js with BackboneORM', ->
 
     person1 = new Person({id: 'person-8b-1', name: 'Daddy'})
     person2 = new Person({id: 'person-8b-2', name: 'Mommy'})
-    person1.save(->); person2.save(->)
+    models = [person1, person2]
+    model.save(->) for model in models
+
     family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()]})
     house.set({occupants: [person1.toJSON(), person2.toJSON()]})
@@ -587,7 +587,7 @@ describe 'Knockback.js with BackboneORM', ->
     assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     # check occupants
-    house.get('occupants').add(person1).add(person2)
+    house.get('occupants').add(person1); house.get('occupants').add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
@@ -695,6 +695,9 @@ describe 'Knockback.js with BackboneORM', ->
       name: 'Ringo'
       friends: ['person-10-1', 'person-10-2', 'person-10-3']
     })
+    models = [george, john, paul, ringo]
+    model.save(->) for model in models
+    model.fetchRelated(->) for model in models
 
     FriendViewModel = (model) ->
       @name = kb.observable(model, 'name')

@@ -223,20 +223,20 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     done()
 
   it '4. After view model create, add models', (done) ->
-    Person = Backbone.RelationalModel.extend({})
+    Occupant = Backbone.RelationalModel.extend({})
 
     House = Backbone.RelationalModel.extend({
       relations: [{
         type: Backbone.HasMany
         key: 'occupants'
-        relatedModel: 'Person'
+        relatedModel: Occupant
         reverseRelation:
           key: 'livesIn'
       }]
     })
 
-    bob = new Person({id: 'person-1', name: 'Bob'})
-    fred = new Person({id: 'person-2', name: 'Fred'})
+    bob = new Occupant({id: 'person-1', name: 'Bob'})
+    fred = new Occupant({id: 'person-2', name: 'Fred'})
 
     house = new House({
       location: 'In the middle of our street'
@@ -259,20 +259,20 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     Book = Backbone.RelationalModel.extend({
       defaults:
         name: 'untitled'
-      idAttribute: "_id"
+      idAttribute: '_id'
     })
     Author = Backbone.RelationalModel.extend({
       defaults:
         name: 'untitled'
-      idAttribute: "_id"
+      idAttribute: '_id'
       relations:[{
         type: 'HasMany'
         key: 'books'
         relatedModel: Book
-        includeInJSON: "_id"
+        includeInJSON: '_id'
         reverseRelation:
           key: 'author'
-          includeInJSON: "_id"
+          includeInJSON: '_id'
       }]
     })
     BookStore = Backbone.RelationalModel.extend({

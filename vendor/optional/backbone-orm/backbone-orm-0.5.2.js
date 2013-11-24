@@ -2102,13 +2102,12 @@ CacheSync = (function() {
   CacheSync.prototype.create = function(model, options) {
     var _this = this;
     return this.wrapped_sync_fn('create', model, bbCallback(function(err, json) {
-      var cache_model;
+      var attributes, cache_model;
       if (err) {
         return options.error(err);
       }
-      model.set({
-        id: json.id
-      });
+      (attributes = {})[_this.model_type.prototype.idAttribute] = json[_this.model_type.prototype.idAttribute];
+      model.set(attributes);
       if (cache_model = _this.model_type.cache.get(model.id)) {
         if (cache_model !== model) {
           Utils.updateModel(cache_model, model);
@@ -2633,16 +2632,18 @@ module.exports = Cursor = (function() {
     schema = this.model_type.schema();
     shared_related_models = {};
     findOrNew = function(related_json, reverse_model_type) {
-      if (!shared_related_models[related_json.id]) {
+      var related_id;
+      related_id = related_json[reverse_model_type.prototype.idAttribute];
+      if (!shared_related_models[related_id]) {
         if (reverse_model_type.cache) {
-          if (!(shared_related_models[related_json.id] = reverse_model_type.cache.get(related_json.id))) {
-            reverse_model_type.cache.set(related_json.id, shared_related_models[related_json.id] = new reverse_model_type(related_json));
+          if (!(shared_related_models[related_id] = reverse_model_type.cache.get(related_id))) {
+            reverse_model_type.cache.set(related_id, shared_related_models[related_id] = new reverse_model_type(related_json));
           }
         } else {
-          shared_related_models[related_json.id] = new reverse_model_type(related_json);
+          shared_related_models[related_id] = new reverse_model_type(related_json);
         }
       }
-      return shared_related_models[related_json.id];
+      return shared_related_models[related_id];
     };
     _ref = this._cursor.$include;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -2982,17 +2983,7 @@ module.exports = function(model_type) {
       if (model) {
         return callback(null, model);
       }
-      model = new model_type(data);
-      return model.save(function(err) {
-        var cache;
-        if (err) {
-          return callback(err);
-        }
-        if (cache = model_type.cache) {
-          cache.set(model.id, model);
-        }
-        return callback(null, model);
-      });
+      return (new model_type(data)).save(callback);
     });
   };
   model_type.findOneNearestDate = function(date, options, query, callback) {
@@ -3407,6 +3398,9 @@ module.exports = function(model_type) {
       }
       this._orm || (this._orm = {});
       if (this._orm.save > 0) {
+        if (this.id) {
+          return typeof options.success === "function" ? options.success(this, {}, options) : void 0;
+        }
         return typeof options.error === "function" ? options.error(this, new Error("Model is in a save loop: " + model_type.model_name)) : void 0;
       }
       (_base = this._orm).save || (_base.save = 0);
@@ -3438,8 +3432,12 @@ module.exports = function(model_type) {
             }
           }
           return queue.await(function(err) {
+            var cache;
             if (err) {
               return typeof options.error === "function" ? options.error(_this, Error("Failed to save relations. " + err, options)) : void 0;
+            }
+            if (cache = model_type.cache) {
+              cache.set(_this.id, _this);
             }
             return typeof options.success === "function" ? options.success(_this, resp, options) : void 0;
           });
@@ -4408,7 +4406,7 @@ module.exports = MemoryCursor = (function(_super) {
             _ref1 = _this.store;
             for (id in _ref1) {
               model_json = _ref1[id];
-              if (_.contains(_this._cursor.$ids, model_json.id) && _.isEqual(_.pick(model_json, keys), find_query)) {
+              if (_.contains(_this._cursor.$ids, id) && _.isEqual(_.pick(model_json, keys), find_query)) {
                 json.push(JSONUtils.deepClone(model_json));
               }
             }
@@ -4463,7 +4461,7 @@ module.exports = MemoryCursor = (function(_super) {
             _ref3 = _this.store;
             for (id in _ref3) {
               model_json = _ref3[id];
-              if (_.contains(_this._cursor.$ids, model_json.id)) {
+              if (_.contains(_this._cursor.$ids, id)) {
                 json.push(JSONUtils.deepClone(model_json));
               }
             }
@@ -4697,6 +4695,9 @@ module.exports = MemoryCursor = (function(_super) {
         return callback(err);
       }
       key = key_components.shift();
+      if (key === 'id') {
+        key = model_type.prototype.idAttribute;
+      }
       if (!key_components.length) {
         was_handled = false;
         find_value = find_query[key_path];
@@ -4815,13 +4816,12 @@ MemorySync = (function() {
   MemorySync.prototype.create = function(model, options) {
     var _this = this;
     return QueryCache.reset(this.model_type, function(err) {
-      var model_json;
+      var attributes, model_json;
       if (err) {
         return typeof options.error === "function" ? options.error(err) : void 0;
       }
-      model.set({
-        id: Utils.guid()
-      });
+      (attributes = {})[_this.model_type.prototype.idAttribute] = Utils.guid();
+      model.set(attributes);
       model_json = _this.store[model.id] = model.toJSON();
       return options.success(JSONUtils.deepClone(model_json));
     });
@@ -4884,7 +4884,7 @@ MemorySync = (function() {
       }, query), (function(model_json, callback) {
         return Utils.patchRemoveByJSON(_this.model_type, model_json, function(err) {
           if (!err) {
-            delete _this.store[model_json.id];
+            delete _this.store[model_json[_this.model_type.prototype.idAttribute]];
           }
           return callback(err);
         });
@@ -4967,7 +4967,7 @@ module.exports = Queue = (function() {
       throw new Error("Awaiting callback was added twice: " + callback);
     }
     this.await_callback = callback;
-    if (!(this.tasks.length + this.running_count)) {
+    if (this.error || !(this.tasks.length + this.running_count)) {
       return this._callAwaiting();
     }
   };
@@ -5166,7 +5166,7 @@ module.exports = Many = (function(_super) {
         model.setLoaded(_this.key, true);
         for (_i = 0, _len = json.length; _i < _len; _i++) {
           model_json = json[_i];
-          if (related_model = collection.get(model_json.id)) {
+          if (related_model = collection.get(model_json[_this.reverse_model_type.prototype.idAttribute])) {
             related_model.set(model_json);
           } else {
             collection.add(related_model = Utils.updateOrNew(model_json, _this.reverse_model_type));
@@ -5176,7 +5176,7 @@ module.exports = Many = (function(_super) {
           _ref = collection.models;
           for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
             related_model = _ref[_j];
-            cache.set(model.id, related_model);
+            cache.set(related_model.id, related_model);
           }
         }
         result = returnValue();
@@ -5469,7 +5469,7 @@ module.exports = Many = (function(_super) {
   Many.prototype.cursor = function(model, key, query) {
     var json;
     json = Utils.isModel(model) ? model.attributes : model;
-    (query = _.clone(query || {}))[this.join_table ? this.join_key : this.reverse_relation.foreign_key] = json.id;
+    (query = _.clone(query || {}))[this.join_table ? this.join_key : this.reverse_relation.foreign_key] = json[this.model_type.prototype.idAttribute];
     if (key === this.virtual_id_accessor) {
       (query.$values || (query.$values = [])).push('id');
     }
@@ -5797,7 +5797,7 @@ module.exports = One = (function(_super) {
         if (err) {
           return callback(err);
         }
-        if (current_related_json && (related_id === current_related_json.id)) {
+        if (current_related_json && (related_id === current_related_json[_this.reverse_model_type.prototype.idAttribute])) {
           return callback();
         }
         queue = new Queue(1);
@@ -5921,7 +5921,7 @@ module.exports = One = (function(_super) {
         if (!related_json) {
           return callback();
         }
-        if (!_.contains(related_ids, related_json.id)) {
+        if (!_.contains(related_ids, related_json[_this.reverse_model_type.prototype.idAttribute])) {
           return callback();
         }
         related_json[_this.reverse_relation.foreign_key] = null;
@@ -6171,10 +6171,10 @@ module.exports = Relation = (function() {
                 _results = [];
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   related_json = _ref[_i];
-                  _results.push(related_json.id);
+                  _results.push(related_json[this.reverse_model_type.prototype.idAttribute]);
                 }
                 return _results;
-              })()
+              }).call(_this)
             };
             return _this.join_table.destroy(query, callback);
           });
@@ -6770,7 +6770,7 @@ module.exports = Utils = (function() {
   };
 
   Utils.dataToModel = function(data, model_type) {
-    var item, model;
+    var attributes, item, model;
     if (!data) {
       return null;
     }
@@ -6790,9 +6790,8 @@ module.exports = Utils = (function() {
     } else if (Utils.dataId(data) !== data) {
       model = new model_type(model_type.prototype.parse(data));
     } else {
-      model = new model_type({
-        id: data
-      });
+      (attributes = {})[model_type.prototype.idAttribute] = data;
+      model = new model_type(attributes);
       model.setLoaded(false);
     }
     return model;

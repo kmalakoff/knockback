@@ -1,8 +1,11 @@
+###############################
 class ORM
   constructor: ->
     @adapters = []
 
-  initialize: -> @adapters = _.select(@adapters, (adapter) -> adapter.isAvailable())
+  initialize: ->
+    @adapters = _.select(@adapters, (adapter) -> adapter.isAvailable())
+    @initialized = true
 
   inferCreator: (model, key) ->
     return unless @adapters.length
@@ -19,10 +22,12 @@ class ORM
     return
 
 kb.orm = new ORM()
+###############################
 
+###############################
 class ORMAdapter_BackboneORM
   isAvailable: ->
-    try kb.BackboneORM = if not @BackboneORM and (typeof(require) isnt 'undefined') then require('backbone-orm') else @BackboneORM catch e
+    try kb.BackboneORM = if not window?.BackboneORM and (typeof(require) isnt 'undefined') then require('backbone-orm') else window?.BackboneORM catch e
     return !!kb.BackboneORM
 
   relationType: (model, key) ->
@@ -34,30 +39,12 @@ class ORMAdapter_BackboneORM
     return null unless type = @relationType(model, key)
     return if type is KB_TYPE_COLLECTION then kb.CollectionObservable else kb.ViewModel
 
-  bind: (model, key, update, path) ->
-    return null unless type = @relationType(model, key)
-    rel_fn = (model) ->
-      not kb.statistics or kb.statistics.addModelEvent({name: 'update (backbone-orm)', model: model, key: key, path: path})
-      update()
-
-    # if type is KB_TYPE_COLLECTION
-    #   model.bind("#{event}:#{key}", rel_fn) for event in events = ['change', 'add', 'remove']
-    # else
-    model.bind("add", rel_fn)
-    model.bind("remove", rel_fn)
-    model.bind("change:#{key}", rel_fn)
-
-    return ->
-      # if type is KB_TYPE_COLLECTION
-      #   model.unbind("#{event}:#{key}", rel_fn) for event in events
-      # else
-      model.unbind("add", rel_fn)
-      model.unbind("remove", rel_fn)
-      model.unbind("change:#{key}", rel_fn)
-      return
+  bind: (model, key, update, path) -> return
 
 kb.orm.adapters.push(new ORMAdapter_BackboneORM())
+###############################
 
+###############################
 class ORMAdapter_BackboneRelational
   isAvailable: ->
     try require('backbone-relational') if kb.Backbone and not kb.Backbone.RelationalModel and (typeof(require) isnt 'undefined') catch e
@@ -93,3 +80,4 @@ class ORMAdapter_BackboneRelational
       return
 
 kb.orm.adapters.push(new ORMAdapter_BackboneRelational())
+###############################

@@ -7306,13 +7306,17 @@ ORM = (function() {
   }
 
   ORM.prototype.initialize = function() {
-    return this.adapters = _.select(this.adapters, function(adapter) {
+    this.adapters = _.select(this.adapters, function(adapter) {
       return adapter.isAvailable();
     });
+    return this.initialized = true;
   };
 
   ORM.prototype.inferCreator = function(model, key) {
     var adpater, creator, _i, _len, _ref;
+    if (!this.adapters.length) {
+      return;
+    }
     if (!this.initialized) {
       this.initialize();
     }
@@ -7323,11 +7327,13 @@ ORM = (function() {
         return creator;
       }
     }
-    return null;
   };
 
   ORM.prototype.bind = function(model, key, update, path) {
     var adpater, unbind_fn, _i, _len, _ref;
+    if (!this.adapters.length) {
+      return;
+    }
     if (!this.initialized) {
       this.initialize();
     }
@@ -7338,7 +7344,6 @@ ORM = (function() {
         return unbind_fn;
       }
     }
-    return null;
   };
 
   return ORM;
@@ -7352,7 +7357,7 @@ ORMAdapter_BackboneORM = (function() {
 
   ORMAdapter_BackboneORM.prototype.isAvailable = function() {
     try {
-      kb.BackboneORM = !this.BackboneORM && (typeof require !== 'undefined') ? require('backbone-orm') : this.BackboneORM;
+      kb.BackboneORM = !(typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0) && (typeof require !== 'undefined') ? require('backbone-orm') : typeof window !== "undefined" && window !== null ? window.BackboneORM : void 0;
     } catch (_error) {
       e = _error;
     }
@@ -7386,29 +7391,7 @@ ORMAdapter_BackboneORM = (function() {
     }
   };
 
-  ORMAdapter_BackboneORM.prototype.bind = function(model, key, update, path) {
-    var rel_fn, type;
-    if (!(type = this.relationType(model, key))) {
-      return null;
-    }
-    rel_fn = function(model) {
-      !kb.statistics || kb.statistics.addModelEvent({
-        name: 'update (backbone-orm)',
-        model: model,
-        key: key,
-        path: path
-      });
-      return update();
-    };
-    model.bind("add", rel_fn);
-    model.bind("remove", rel_fn);
-    model.bind("change:" + key, rel_fn);
-    return function() {
-      model.unbind("add", rel_fn);
-      model.unbind("remove", rel_fn);
-      model.unbind("change:" + key, rel_fn);
-    };
-  };
+  ORMAdapter_BackboneORM.prototype.bind = function(model, key, update, path) {};
 
   return ORMAdapter_BackboneORM;
 
