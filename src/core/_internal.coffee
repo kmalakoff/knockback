@@ -17,7 +17,7 @@ _unwrapObservable = ko.utils.unwrapObservable
 _peekObservable = (obs) ->
   return obs unless ko.isObservable(obs)
   return obs.peek() if obs.peek
-  return kb.utils.ignoreDependencies -> obs()
+  return kb.utils.ignore -> obs()
 
 _publishMethods = kb._publishMethods = (observable, instance, methods) ->
   observable[fn] = kb._.bind(instance[fn], instance) for fn in methods

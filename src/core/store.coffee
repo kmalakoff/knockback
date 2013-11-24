@@ -131,7 +131,7 @@ class kb.Store
     return observable if observable
 
     # create
-    observable = kb.utils.ignoreDependencies =>
+    observable = kb.utils.ignore =>
       if creator.create
         observable = creator.create(obj, options)
       else

@@ -309,5 +309,5 @@ class kb.utils
   # @param [Object] obj the object to test
   #
   # @example
-  #   kb.utils.ignoreDependencies(options);
-  @ignoreDependencies = (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value
+  #   kb.utils.ignore(options);
+  @ignore = (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value

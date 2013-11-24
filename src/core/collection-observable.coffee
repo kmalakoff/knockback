@@ -76,7 +76,7 @@ class kb.CollectionObservable
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
-  constructor: (collection, options) -> return kb.utils.ignoreDependencies =>
+  constructor: (collection, options) -> return kb.utils.ignore =>
     [collection, options] = [new kb.Collection(), collection] if _.isUndefined(options) and not (collection instanceof kb.Collection) # default create collection
 
     options or= {}
@@ -116,7 +116,7 @@ class kb.CollectionObservable
     @_collection = ko.observable(collection)
     observable.collection = @collection = ko.dependentObservable(
       read: => return @_collection()
-      write: (new_collection) => kb.utils.ignoreDependencies =>
+      write: (new_collection) => kb.utils.ignore =>
         return if ((previous_collection = @_collection()) is new_collection) # no change
 
         # clean up
@@ -292,7 +292,7 @@ class kb.CollectionObservable
     return factory
 
   # @private
-  _onCollectionChange: (event, arg) -> return kb.utils.ignoreDependencies =>
+  _onCollectionChange: (event, arg) -> return kb.utils.ignore =>
     return if @in_edit # we are doing the editing
 
     switch event
@@ -347,7 +347,7 @@ class kb.CollectionObservable
     @in_edit--
 
   # @private
-  _onObservableArrayChange: (models_or_view_models) -> return kb.utils.ignoreDependencies =>
+  _onObservableArrayChange: (models_or_view_models) -> return kb.utils.ignore =>
     return if @in_edit # we are doing the editing
 
     # validate input
