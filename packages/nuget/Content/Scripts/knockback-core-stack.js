@@ -7111,7 +7111,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
 
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, ORM, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneORM, ORMAdapter_BackboneRelational, copyProps, kb, key, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -7303,6 +7303,28 @@ ORM = (function() {
     return this.initialized = true;
   };
 
+  ORM.prototype.addAdapter = function(adapter) {
+    this.adapters.push(adapter);
+    return this.initialized = false;
+  };
+
+  ORM.prototype.keys = function(model) {
+    var adpater, keys, _j, _len1, _ref1;
+    if (!this.adapters.length) {
+      return;
+    }
+    if (!this.initialized) {
+      this.initialize();
+    }
+    _ref1 = this.adapters;
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      adpater = _ref1[_j];
+      if (keys = adpater.keys(model)) {
+        return keys;
+      }
+    }
+  };
+
   ORM.prototype.inferCreator = function(model, key) {
     var adpater, creator, _j, _len1, _ref1;
     if (!this.adapters.length) {
@@ -7356,6 +7378,13 @@ ORMAdapter_BackboneORM = (function() {
     return !!kb.BackboneORM;
   };
 
+  ORMAdapter_BackboneORM.prototype.keys = function(model) {
+    if (!(model.schema && _.isFunction(model.relation))) {
+      return null;
+    }
+    return _.keys(model.schema().relations);
+  };
+
   ORMAdapter_BackboneORM.prototype.relationType = function(model, key) {
     var relation;
     if (!(model.schema && _.isFunction(model.relation))) {
@@ -7389,7 +7418,7 @@ ORMAdapter_BackboneORM = (function() {
 
 })();
 
-kb.orm.adapters.push(new ORMAdapter_BackboneORM());
+kb.orm.addAdapter(new ORMAdapter_BackboneORM());
 
 ORMAdapter_BackboneRelational = (function() {
   function ORMAdapter_BackboneRelational() {}
@@ -7404,6 +7433,15 @@ ORMAdapter_BackboneRelational = (function() {
       e = _error;
     }
     return !!((_ref1 = kb.Backbone) != null ? _ref1.RelationalModel : void 0);
+  };
+
+  ORMAdapter_BackboneRelational.prototype.keys = function(model) {
+    if (!(model instanceof kb.Backbone.RelationalModel)) {
+      return null;
+    }
+    return _.map(model.getRelations(), function(test) {
+      return test.key;
+    });
   };
 
   ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
@@ -7475,7 +7513,70 @@ ORMAdapter_BackboneRelational = (function() {
 
 })();
 
-kb.orm.adapters.push(new ORMAdapter_BackboneRelational());
+kb.orm.addAdapter(new ORMAdapter_BackboneRelational());
+
+ORMAdapter_BackboneAssociations = (function() {
+  function ORMAdapter_BackboneAssociations() {}
+
+  ORMAdapter_BackboneAssociations.prototype.isAvailable = function() {
+    var e, _ref1;
+    try {
+      if (kb.Backbone && !kb.Backbone.AssociatedModel && (typeof require !== 'undefined')) {
+        require('backbone-associations');
+      }
+    } catch (_error) {
+      e = _error;
+    }
+    return !!((_ref1 = kb.Backbone) != null ? _ref1.AssociatedModel : void 0);
+  };
+
+  ORMAdapter_BackboneAssociations.prototype.keys = function(model) {
+    if (!(model instanceof kb.Backbone.AssociatedModel)) {
+      return null;
+    }
+    return _.map(model.relations, function(test) {
+      return test.key;
+    });
+  };
+
+  ORMAdapter_BackboneAssociations.prototype.relationType = function(model, key) {
+    var relation;
+    if (!(model instanceof kb.Backbone.AssociatedModel)) {
+      return null;
+    }
+    if (!(relation = _.find(model.relations, function(test) {
+      return test.key === key;
+    }))) {
+      return null;
+    }
+    if (relation.type === 'Many') {
+      return KB_TYPE_COLLECTION;
+    } else {
+      return KB_TYPE_MODEL;
+    }
+  };
+
+  ORMAdapter_BackboneAssociations.prototype.inferCreator = function(model, key) {
+    var type;
+    if (!(type = this.relationType(model, key))) {
+      return null;
+    }
+    if (type === KB_TYPE_COLLECTION) {
+      return kb.CollectionObservable;
+    } else {
+      return kb.ViewModel;
+    }
+  };
+
+  ORMAdapter_BackboneAssociations.prototype.bind = function(model, key, update, path) {
+    return null;
+  };
+
+  return ORMAdapter_BackboneAssociations;
+
+})();
+
+kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
 
 _throwMissing = function(instance, message) {
   throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
@@ -8598,7 +8699,7 @@ kb.ViewModel = (function() {
   function ViewModel(model, options, view_model) {
     var _this = this;
     return kb.utils.ignore(function() {
-      var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, vm_key, _mdl, _ref1;
+      var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref1;
       !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(_this, 'not a model');
       options || (options = {});
       view_model || (view_model = {});
@@ -8628,7 +8729,7 @@ kb.ViewModel = (function() {
         },
         write: function(new_model) {
           return kb.utils.ignore(function() {
-            var event_watcher, missing;
+            var event_watcher, keys, missing, rel_keys;
             if (kb.utils.wrappedObject(_this) === new_model) {
               return;
             }
@@ -8644,7 +8745,11 @@ kb.ViewModel = (function() {
             }
             event_watcher.emitter(new_model);
             if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
-              missing = _.difference(_.keys(new_model.attributes), _.keys(_this.__kb.model_keys));
+              keys = _.keys(new_model.attributes);
+              if (new_model && (rel_keys = kb.orm.keys(new_model))) {
+                keys = _.union(keys, rel_keys);
+              }
+              missing = _.difference(keys, _.keys(_this.__kb.model_keys));
               if (missing) {
                 _this._createObservables(new_model, missing);
               }
@@ -8659,6 +8764,9 @@ kb.ViewModel = (function() {
       keys = options.requires;
       if (_this.__kb.internals) {
         keys = _.union(keys || [], _this.__kb.internals);
+      }
+      if (model && (rel_keys = kb.orm.keys(model))) {
+        keys = _.union(keys || [], rel_keys);
       }
       if (options.keys) {
         if (_.isObject(options.keys) && !_.isArray(options.keys)) {
@@ -8769,8 +8877,7 @@ kb.ViewModel = (function() {
         key: mapping_info
       } : _.clone(mapping_info);
       mapping_info.key || (mapping_info.key = vm_key);
-      this.__kb.vm_keys[vm_key] = true;
-      this.__kb.model_keys[mapping_info.key] = true;
+      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[mapping_info.key] = true;
       this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), this);
     }
   };

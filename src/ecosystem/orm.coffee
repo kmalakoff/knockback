@@ -7,6 +7,8 @@ class ORM
     @adapters = _.select(@adapters, (adapter) -> adapter.isAvailable())
     @initialized = true
 
+  addAdapter: (adapter) -> @adapters.push(adapter); @initialized = false
+
   keys: (model) ->
     return unless @adapters.length
     @initialize() unless @initialized
@@ -52,7 +54,7 @@ class ORMAdapter_BackboneORM
 
   bind: (model, key, update, path) -> return
 
-kb.orm.adapters.push(new ORMAdapter_BackboneORM())
+kb.orm.addAdapter(new ORMAdapter_BackboneORM())
 ###############################
 
 ###############################
@@ -94,7 +96,7 @@ class ORMAdapter_BackboneRelational
         model.unbind("#{events[0]}:#{key}", rel_fn)
       return
 
-kb.orm.adapters.push(new ORMAdapter_BackboneRelational())
+kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
 ###############################
 
 ###############################
@@ -118,5 +120,5 @@ class ORMAdapter_BackboneAssociations
 
   bind: (model, key, update, path) -> return null
 
-kb.orm.adapters.push(new ORMAdapter_BackboneAssociations())
+kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################

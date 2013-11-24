@@ -215,6 +215,11 @@ ORM = (function() {
     return this.initialized = true;
   };
 
+  ORM.prototype.addAdapter = function(adapter) {
+    this.adapters.push(adapter);
+    return this.initialized = false;
+  };
+
   ORM.prototype.keys = function(model) {
     var adpater, keys, _j, _len1, _ref1;
     if (!this.adapters.length) {
@@ -325,7 +330,7 @@ ORMAdapter_BackboneORM = (function() {
 
 })();
 
-kb.orm.adapters.push(new ORMAdapter_BackboneORM());
+kb.orm.addAdapter(new ORMAdapter_BackboneORM());
 
 ORMAdapter_BackboneRelational = (function() {
   function ORMAdapter_BackboneRelational() {}
@@ -420,7 +425,7 @@ ORMAdapter_BackboneRelational = (function() {
 
 })();
 
-kb.orm.adapters.push(new ORMAdapter_BackboneRelational());
+kb.orm.addAdapter(new ORMAdapter_BackboneRelational());
 
 ORMAdapter_BackboneAssociations = (function() {
   function ORMAdapter_BackboneAssociations() {}
@@ -483,7 +488,7 @@ ORMAdapter_BackboneAssociations = (function() {
 
 })();
 
-kb.orm.adapters.push(new ORMAdapter_BackboneAssociations());
+kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
 
 _throwMissing = function(instance, message) {
   throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
@@ -1636,7 +1641,7 @@ kb.ViewModel = (function() {
         },
         write: function(new_model) {
           return kb.utils.ignore(function() {
-            var event_watcher, missing;
+            var event_watcher, keys, missing, rel_keys;
             if (kb.utils.wrappedObject(_this) === new_model) {
               return;
             }
@@ -1652,7 +1657,11 @@ kb.ViewModel = (function() {
             }
             event_watcher.emitter(new_model);
             if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
-              missing = _.difference(_.keys(new_model.attributes), _.keys(_this.__kb.model_keys));
+              keys = _.keys(new_model.attributes);
+              if (new_model && (rel_keys = kb.orm.keys(new_model))) {
+                keys = _.union(keys, rel_keys);
+              }
+              missing = _.difference(keys, _.keys(_this.__kb.model_keys));
               if (missing) {
                 _this._createObservables(new_model, missing);
               }
@@ -1668,7 +1677,7 @@ kb.ViewModel = (function() {
       if (_this.__kb.internals) {
         keys = _.union(keys || [], _this.__kb.internals);
       }
-      if (rel_keys = kb.orm.keys(model)) {
+      if (model && (rel_keys = kb.orm.keys(model))) {
         keys = _.union(keys || [], rel_keys);
       }
       if (options.keys) {
@@ -1780,8 +1789,7 @@ kb.ViewModel = (function() {
         key: mapping_info
       } : _.clone(mapping_info);
       mapping_info.key || (mapping_info.key = vm_key);
-      this.__kb.vm_keys[vm_key] = true;
-      this.__kb.model_keys[mapping_info.key] = true;
+      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[mapping_info.key] = true;
       this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), this);
     }
   };

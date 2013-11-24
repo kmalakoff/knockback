@@ -123,8 +123,11 @@ class kb.ViewModel
         # sync missing attributes
         if not (@__kb.keys or not new_model or not new_model.attributes) # only allow specific keys or nothing to add
           # NOTE: this does not remove keys that are different between the models
-          missing = _.difference(_.keys(new_model.attributes), _.keys(@__kb.model_keys))
-          @_createObservables(new_model, missing) if missing
+          keys = _.keys(new_model.attributes)
+          keys = _.union(keys, rel_keys) if new_model and (rel_keys = kb.orm.keys(new_model))
+          missing = _.difference(keys, _.keys(@__kb.model_keys))
+          if missing
+            @_createObservables(new_model, missing)
         _mdl(new_model)
         return
     )
@@ -133,7 +136,7 @@ class kb.ViewModel
     # collect requires and internls first because they could be used to define the include order
     keys = options.requires
     keys = _.union(keys or [], @__kb.internals) if @__kb.internals
-    keys = _.union(keys or [], rel_keys) if rel_keys = kb.orm.keys(model)
+    keys = _.union(keys or [], rel_keys) if model and (rel_keys = kb.orm.keys(model))
 
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified
@@ -167,8 +170,7 @@ class kb.ViewModel
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     if @__kb.view_model isnt @ # clear the external references
-      for vm_key of @__kb.vm_keys
-        @__kb.view_model[vm_key] = null
+      @__kb.view_model[vm_key] = null for vm_key of @__kb.vm_keys
     @__kb.view_model = null
     kb.releaseKeys(@)
     kb.utils.wrappedDestroy(@)
@@ -217,7 +219,7 @@ class kb.ViewModel
       mapping_info.key or= vm_key
 
       # add to the keys list
-      @__kb.vm_keys[vm_key]=true; @__kb.model_keys[mapping_info.key]=true
+      @__kb.vm_keys[vm_key] = @__kb.model_keys[mapping_info.key] = true
 
       # create
       @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), @)

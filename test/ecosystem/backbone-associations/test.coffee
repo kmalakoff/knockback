@@ -345,7 +345,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     person1 = new Person({id: 'person-6-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-6-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-6-2', name: 'Mommy'})
     house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: [person1, person2]})
     person1.get('friends').add(person2); person2.set({best_friend: person1})
 
@@ -373,7 +373,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     person1 = new Person({id: 'person-7-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-7-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-7-2', name: 'Mommy'})
     house = new Building({id: 'house-7-1', name: 'Home Sweet Home', occupants: []})
 
     view_model_person1 = kb.viewModel(person1)
@@ -409,7 +409,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     person1 = new Person({id: 'person-7b-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-7b-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-7b-2', name: 'Mommy'})
     house = new Building({id: 'house-7b-1', name: 'Home Sweet Home', occupants: []})
 
     view_model_person1 = kb.viewModel(person1)
@@ -461,7 +461,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
         }, options: options})
 
     person1 = new Person({id: 'person-8-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-8-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-8-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: [person1, person2]})
     person1.get('friends').add(person2)
@@ -518,7 +518,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
         }, options: options})
 
     person1 = new Person({id: 'person-8b-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-8b-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-8b-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()]})
     house.set({occupants: [person1.toJSON(), person2.toJSON()]})
@@ -576,7 +576,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
         }, options: options})
 
     person1 = new Person({id: 'person-9-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-9-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-9-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-9-1', name: 'Home Sweet Home', occupants: []})
 
@@ -640,7 +640,7 @@ describe 'Knockback.js with Backbone-Associations.js', ->
         }, options: options})
 
     person1 = new Person({id: 'person-9b-1', name: 'Daddy', friends: []})
-    person2 = new Person({id: 'person-9b-2', name: 'Mommy', friends: []})
+    person2 = new Person({id: 'person-9b-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-9b-1', name: 'Home Sweet Home', occupants: []})
 
