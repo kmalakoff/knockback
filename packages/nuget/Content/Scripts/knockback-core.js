@@ -594,6 +594,7 @@ _collapseOptions = function(options) {
         case 'internals':
         case 'requires':
         case 'excludes':
+        case 'statics':
           _mergeArray(result, key, value);
           break;
         case 'keys':
@@ -618,6 +619,9 @@ _collapseOptions = function(options) {
           } else {
             _mergeObject(result, key, value);
           }
+          break;
+        case 'static_defaults':
+          _mergeObject(result, key, value);
           break;
         case 'options':
           break;
@@ -1531,6 +1535,8 @@ kb.ViewModel = (function() {
       _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
       !options.internals || (_this.__kb.internals = options.internals);
       !options.excludes || (_this.__kb.excludes = options.excludes);
+      !options.statics || (_this.__kb.statics = options.statics);
+      !options.static_defaults || (_this.__kb.static_defaults = options.static_defaults);
       kb.Store.useOptionsOrCreate(options, model, _this);
       _this.__kb.path = options.path;
       kb.Factory.useOptionsOrCreate(options, _this, options.path);
@@ -1597,6 +1603,9 @@ kb.ViewModel = (function() {
       if (keys && _this.__kb.excludes) {
         keys = _.difference(keys, _this.__kb.excludes);
       }
+      if (keys && _this.__kb.statics) {
+        keys = _.difference(keys, _this.__kb.statics);
+      }
       if (_.isObject(options.keys) && !_.isArray(options.keys)) {
         _this._mapObservables(model, options.keys);
       }
@@ -1605,6 +1614,7 @@ kb.ViewModel = (function() {
       }
       !options.mappings || _this._mapObservables(model, options.mappings);
       !keys || _this._createObservables(model, keys);
+      !_this.__kb.statics || _this._createObservables(model, _this.__kb.statics, true);
       !kb.statistics || kb.statistics.register('ViewModel', _this);
       return _this;
     });
@@ -1630,24 +1640,35 @@ kb.ViewModel = (function() {
     };
   };
 
-  ViewModel.prototype._createObservables = function(model, keys) {
-    var create_options, key, vm_key, _i, _len;
-    create_options = {
-      store: kb.utils.wrappedStore(this),
-      factory: kb.utils.wrappedFactory(this),
-      path: this.__kb.path,
-      event_watcher: kb.utils.wrappedEventWatcher(this)
-    };
+  ViewModel.prototype._createObservables = function(model, keys, is_static) {
+    var create_options, key, static_defaults, vm_key, _i, _len;
+    if (is_static) {
+      static_defaults = this.__kb.static_defaults || {};
+    } else {
+      create_options = {
+        store: kb.utils.wrappedStore(this),
+        factory: kb.utils.wrappedFactory(this),
+        path: this.__kb.path,
+        event_watcher: kb.utils.wrappedEventWatcher(this)
+      };
+    }
     for (_i = 0, _len = keys.length; _i < _len; _i++) {
       key = keys[_i];
       vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
       if (this[vm_key]) {
         continue;
       }
-      this.__kb.vm_keys[vm_key] = true;
-      this.__kb.model_keys[key] = true;
-      create_options.key = key;
-      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, create_options, this);
+      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[key] = true;
+      if (is_static) {
+        if (model.has(vm_key)) {
+          this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
+        } else if (vm_key in static_defaults) {
+          this[vm_key] = this.__kb.view_model[vm_key] = static_defaults[vm_key];
+        }
+      } else {
+        create_options.key = key;
+        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, create_options, this);
+      }
     }
   };
 
