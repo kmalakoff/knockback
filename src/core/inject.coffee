@@ -6,7 +6,7 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-kb.RECUSIVE_AUTO_INJECT = false # disable until bug resolved: https://github.com/kmalakoff/knockback/issues/63
+kb.RECUSIVE_AUTO_INJECT = true
 
 # custom Knockout `inject` binding
 ko.bindingHandlers['inject'] =

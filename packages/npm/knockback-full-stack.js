@@ -9215,7 +9215,7 @@ kb.collectionObservable = function(collection, options) {
 */
 
 
-kb.RECUSIVE_AUTO_INJECT = false;
+kb.RECUSIVE_AUTO_INJECT = true;
 
 ko.bindingHandlers['inject'] = {
   'init': function(element, value_accessor, all_bindings_accessor, view_model) {
