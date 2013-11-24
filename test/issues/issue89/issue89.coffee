@@ -10,3 +10,5 @@ class RecordCollection extends Backbone.Collection
 
 records = kb.collectionObservable(new RecordCollection([new Record({id: 1}), new Record({id: 2})]), {view_model: RecordViewModel})
 _.last(records()).destroy()
+
+kb.release(records)

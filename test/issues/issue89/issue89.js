@@ -61,4 +61,6 @@
 
   _.last(records()).destroy();
 
+  kb.release(records);
+
 }).call(this);
