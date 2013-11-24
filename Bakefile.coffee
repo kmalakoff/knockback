@@ -144,6 +144,8 @@ module.exports =
         'cp -v backbone-modelref/backbone-modelref.min.js vendor/optional/backbone-modelref/backbone-modelref.min.js'
         'cp -v backbone-relational vendor/optional/backbone-relational/backbone-relational.js'
         'cp -v backbone-relational/backbone-relational.min.js vendor/optional/backbone-relational/backbone-relational.min.js'
+        'cp -v backbone-associations vendor/optional/backbone-associations/backbone-associations.js'
+        'cp -v supermodel vendor/optional/supermodel/supermodel.js'
 
         'cp -v backbone-orm/backbone-orm.js vendor/optional/backbone-orm/backbone-orm.js'
         'cp -v backbone-orm/backbone-orm.min.js vendor/optional/backbone-orm/backbone-orm.min.js'
@@ -235,6 +237,8 @@ module.exports =
         'test/ecosystem/backbone-modelref'
         'test/ecosystem/backbone-orm'
         'test/ecosystem/backbone-relational'
+        'test/ecosystem/backbone-associations'
+        'test/ecosystem/supermodel'
 
         'test/module_systems/amd/observable'
         'test/module_systems/amd/defaults'
@@ -270,6 +274,8 @@ module.exports =
         'test/ecosystem/backbone-modelref'
         'test/ecosystem/backbone-orm'
         'test/ecosystem/backbone-relational'
+        'test/ecosystem/backbone-associations'
+        'test/ecosystem/supermodel'
         'test/ecosystem/lodash'
         'test/ecosystem/parse'
 

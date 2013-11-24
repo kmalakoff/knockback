@@ -7,6 +7,13 @@ class ORM
     @adapters = _.select(@adapters, (adapter) -> adapter.isAvailable())
     @initialized = true
 
+  keys: (model) ->
+    return unless @adapters.length
+    @initialize() unless @initialized
+
+    return keys for adpater in @adapters when keys = adpater.keys(model)
+    return
+
   inferCreator: (model, key) ->
     return unless @adapters.length
     @initialize() unless @initialized
@@ -30,6 +37,10 @@ class ORMAdapter_BackboneORM
     try kb.BackboneORM = if not window?.BackboneORM and (typeof(require) isnt 'undefined') then require('backbone-orm') else window?.BackboneORM catch e
     return !!kb.BackboneORM
 
+  keys: (model) ->
+    return null unless (model.schema and _.isFunction(model.relation))
+    return _.keys(model.schema().relations)
+
   relationType: (model, key) ->
     return null unless (model.schema and _.isFunction(model.relation))
     return null unless relation = model.relation(key)
@@ -49,6 +60,10 @@ class ORMAdapter_BackboneRelational
   isAvailable: ->
     try require('backbone-relational') if kb.Backbone and not kb.Backbone.RelationalModel and (typeof(require) isnt 'undefined') catch e
     return !!kb.Backbone?.RelationalModel
+
+  keys: (model) ->
+    return null unless model instanceof kb.Backbone.RelationalModel
+    return _.map(model.getRelations(), (test) -> test.key)
 
   relationType: (model, key) ->
     return null unless model instanceof kb.Backbone.RelationalModel
@@ -80,4 +95,28 @@ class ORMAdapter_BackboneRelational
       return
 
 kb.orm.adapters.push(new ORMAdapter_BackboneRelational())
+###############################
+
+###############################
+class ORMAdapter_BackboneAssociations
+  isAvailable: ->
+    try require('backbone-associations') if kb.Backbone and not kb.Backbone.AssociatedModel and (typeof(require) isnt 'undefined') catch e
+    return !!kb.Backbone?.AssociatedModel
+
+  keys: (model) ->
+    return null unless model instanceof kb.Backbone.AssociatedModel
+    return _.map(model.relations, (test) -> test.key)
+
+  relationType: (model, key) ->
+    return null unless model instanceof kb.Backbone.AssociatedModel
+    return null unless relation = _.find(model.relations, (test) -> return test.key is key)
+    return if (relation.type is 'Many') then KB_TYPE_COLLECTION else KB_TYPE_MODEL
+
+  inferCreator: (model, key) ->
+    return null unless type = @relationType(model, key)
+    return if type is KB_TYPE_COLLECTION then kb.CollectionObservable else kb.ViewModel
+
+  bind: (model, key, update, path) -> return null
+
+kb.orm.adapters.push(new ORMAdapter_BackboneAssociations())
 ###############################

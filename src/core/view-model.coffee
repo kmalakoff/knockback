@@ -133,6 +133,7 @@ class kb.ViewModel
     # collect requires and internls first because they could be used to define the include order
     keys = options.requires
     keys = _.union(keys or [], @__kb.internals) if @__kb.internals
+    keys = _.union(keys or [], rel_keys) if rel_keys = kb.orm.keys(model)
 
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified
