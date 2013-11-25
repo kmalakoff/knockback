@@ -362,7 +362,6 @@ describe 'Knockback.js with BackboneORM', ->
     assert.equal(view_model_person1.name(), 'Daddy', 'person1 name is Daddy')
     assert.equal(view_model_person1.friends().length, 0, 'person1 has no friends')
     assert.equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has not best_friends')
-    assert.ok(view_model_person1.occupies() instanceof kb.ViewModel, 'person1 occupies is kb.ViewModel')
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
     # add some friends
@@ -398,7 +397,6 @@ describe 'Knockback.js with BackboneORM', ->
     assert.equal(view_model_person1.name(), 'Daddy', 'person1 name is Daddy')
     assert.equal(view_model_person1.friends().length, 0, 'person1 has no friends')
     assert.equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has not best_friends')
-    assert.ok(view_model_person1.occupies() instanceof kb.ViewModel, 'person1 occupies is kb.ViewModel')
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
     # add some friends

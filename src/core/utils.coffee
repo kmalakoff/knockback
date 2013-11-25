@@ -263,9 +263,6 @@ class kb.utils
     creator = factory.creatorForPath(value, path) if factory
     return creator if creator
 
-    # infer related types
-    return creator if owner and creator = kb.orm.inferCreator(owner, _peekObservable(key))
-
     # try fallbacks
     return null                         unless value
     return kb.ViewModel                 if value instanceof kb.Model

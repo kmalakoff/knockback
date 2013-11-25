@@ -6026,6 +6026,8 @@ module.exports = One = (function(_super) {
     model.on("change:" + this.key, events.change);
     if (related_model = model.get(this.key)) {
       setBacklink(related_model);
+    } else {
+      model.attributes[this.key] = null;
     }
     return model;
   };
