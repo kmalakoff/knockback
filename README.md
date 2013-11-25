@@ -10,9 +10,13 @@ Some great advantages to using Knockback.js:
 
 * leverage the wonderful work from both the Backbone and Knockout communities
 
-* easily view and edit relationships between Models using [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/)
+* easily view and edit relationships between Models using an ORM of your choice:
+  * [BackboneORM](http://vidigami.github.io/backbone-orm/)
+  * [Backbone-Relational.js](http://backbonerelational.org/)
+  * [Backbone Associations](http://dhruvaray.github.io/backbone-associations/)
+  * [Supermodel.js](http://pathable.github.io/supermodel/)
 
-* (optional) simplify program control flow by configuring your application from your HTML Views (***new!***): think of it like Angular.js without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!
+* simplify program control flow by configuring your application from your HTML Views: think of it like Angular.js without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!
 
 
 These resources can help you get started:
@@ -25,9 +29,9 @@ These resources can help you get started:
 
 * [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/)
 
-* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) (***new!***): demonstrates best practices when using Knockback.js including page routing and lifecycle management.
+* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/): demonstrates best practices when using Knockback.js including page routing and lifecycle management.
 
-* [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators) (***new!***): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
+* [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 
 #Download Latest (0.17.2):
@@ -56,18 +60,6 @@ You can also find Knockback on your favorite distributions:
 * [NuGet Gallery](http://nuget.org/packages/Knockback.js)
 * [Bower](http://sindresorhus.com/bower-components/)
 
-###Module Loading
-
-Knockback.js is compatible with RequireJS, CommonJS, Brunch and AMD module loading. Module names:
-
-* 'knockback' - knockback.js full, full stack, core, and core stack. If you use a knockback-core.js variant, you can check post-loading whether the module included optional extensions.
-* 'knockback-defaults' - knockback-defaults.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-formatting' - knockback-formatting.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-localization' - knockback-localization.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-triggering' - knockback-triggering.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-validation' - knockback-validation.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-statistics' - knockback-statistics.js module. Not bundled with any library nor component.
-
 ###Dependencies
 
 * [Backbone.js](http://backbonejs.org/)
@@ -76,15 +68,29 @@ Knockback.js is compatible with RequireJS, CommonJS, Brunch and AMD module loadi
 
 ###Replaceable Dependencies
 
-* [LoDash](http://lodash.com/) - it you prefer LoDash, we've got support for it!
-* [Parse](https://www.parse.com/) - (***new!***) instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
+* [LoDash](http://lodash.com/) - it you prefer LoDash to Underscore.js, we've got support for it!
+* [Parse](https://www.parse.com/) - instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
 
 ###Compatible Components
 
-* [BackboneRelational.js](https://github.com/PaulUithol/Backbone-relational/) - provides helpers for one-to-one and one-to-many relationships between your Backbone.Models.
+* [BackboneORM](http://vidigami.github.io/backbone-orm/) - A polystore ORM for Node.js and the browser
+* [Backbone-Relational.js](http://backbonerelational.org/) - Get and set relations (one-to-one, one-to-many, many-to-one) for Backbone models
+* [Backbone Associations](http://dhruvaray.github.io/backbone-associations/) - Create object hierarchies with Backbone models. Respond to hierarchy changes using regular Backbone events
+* [Supermodel.js](http://pathable.github.io/supermodel/) - Minimal Model Tracking for Backbonejs
 * [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
 * [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
 * [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
+
+###Modules to Extend Core
+
+To minimize library size, you can choose to use Knockback Core and then extend it with the following modules.
+
+* 'knockback-defaults' - lib/defaults.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-formatting' - lib/formatting.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-localization' - lib/localization.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-triggering' - lib/triggering.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-validation' - lib/validation.js module. Comes bundled with knockback.js and knockback-full-stack.js.
+* 'knockback-statistics' - lib/statistics.js module. Not bundled with any library nor component.
 
 
 Why Write Knockback.js?
