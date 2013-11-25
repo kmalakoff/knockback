@@ -9538,7 +9538,7 @@ kb.toFormattedString = function(format) {
   for (index in args) {
     arg = args[index];
     value = _unwrapObservable(arg);
-    if (_.isUndefined(value)) {
+    if (_.isUndefined(value) || _.isNull(value)) {
       value = '';
     }
     parameter_index = format.indexOf("\{" + index + "\}");
