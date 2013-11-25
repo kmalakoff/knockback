@@ -237,7 +237,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
 
     house = new House({
       location: 'In the middle of our street'
-      occupants: new kb.Collection()
+      occupants: []
     })
 
     # confirm no occupants

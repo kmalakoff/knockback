@@ -47,9 +47,8 @@ class kb.Observable
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
-  constructor: (model, options, @vm) -> return kb.utils.ignore =>
+  constructor: (model, options, @_vm={}) -> return kb.utils.ignore =>
     options or _throwMissing(this, 'options')
-    @vm or = {}
 
     # copy create options
     if _.isString(options) or ko.isObservable(options)
@@ -66,39 +65,29 @@ class kb.Observable
     delete create_options.event_watcher
 
     # set up basics
-    @vo = ko.observable(null) # create a value observable for the first dependency
+    @_vo = ko.observable(null) # create a value observable for the first dependency
     @_model = ko.observable()
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
-        # create dependencies if needed
-        args = [_unwrapObservable(@key)]
-        if @args
-          if _.isArray(@args) then (args.push(_unwrapObservable(arg)) for arg in @args) else args.push(_unwrapObservable(@args))
-
-        # read and update
-        if (@_mdl is @_model() and @_mdl) # maybe not yet initialized
-          new_value = if @read then @read.apply(@vm, args) else @getValue(@_mdl, args)
-          @update(new_value)
-
-        # get the observable
-        return _unwrapObservable(@vo())
+        _model = @_model(); _unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
+        if @read
+          @update(@read.apply(@, args))
+        else if !_.isUndefined(_model)
+          kb.utils.ignore => @update(@getValue(_model))
+        return _unwrapObservable(@_vo())
 
       write: (new_value) => kb.utils.ignore =>
-        # set on model
         unwrapped_new_value = _unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
         set_info = {}; set_info[_unwrapObservable(@key)] = unwrapped_new_value
-        args = if @write then [unwrapped_new_value] else [set_info]
-        if @args
-          if _.isArray(@args) then (args.push(_unwrapObservable(arg)) for arg in @args) else args.push(_unwrapObservable(@args))
-
-        # write
-        if @_mdl # maybe not yet initialized
-          if @write then @write.apply(@vm, args) else @_mdl.set.apply(@_mdl, args)
-
-        # update the observable
+        _model = _peekObservable(@_model)
+        if @write
+          @write.apply(@_vm,[unwrapped_new_value])
+          new_value = @getValue(_model)
+        else if _model
+          _model.set.apply(_model, [set_info])
         @update(new_value)
 
-      owner: @vm
+      owner: @_vm
     ))
     observable.__kb_is_o = true # mark as a kb.Observable
     create_options.store = kb.utils.wrappedStore(observable, create_options.store)
@@ -115,18 +104,16 @@ class kb.Observable
 
     # use external model observable or create
     observable.model = @model = ko.dependentObservable(
-      read: => @_model(); return @_mdl
+      read: => _unwrapObservable(@_model)
       write: (new_model) => kb.utils.ignore =>
-        return if @__kb_released or (@_mdl is new_model) # destroyed or no change
+        return if @__kb_released or (_peekObservable(@_model) is new_model) # destroyed or no change
 
         # update references
-        @_mdl = new_model
-        previous = @getValue(new_model)
-        @update(null)
-        if new_model and not @vm[@key]?.setToDefault and kb.utils.valueType(@vm[@key]) == KB_TYPE_SIMPLE
-          (arg = {})[@key] = previous
-          new_model.set(arg)
+        previous_value = @getValue(previous_model) if previous_model = _peekObservable(@_model)
         @_model(new_model)
+        return @update(null) unless new_model
+        return @update(new_value) unless _.isUndefined(new_value = @getValue(new_model))
+        @update(previous_value or null) if @_vm[@key]?.setToDefault and kb.utils.valueType(@_vm[@key]) == KB_TYPE_SIMPLE
     )
     kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
@@ -149,7 +136,7 @@ class kb.Observable
     observable = kb.utils.wrappedObservable(@)
     @__kb_released = true
     kb.release(@__kb_value); @__kb_value = null
-    @model.dispose(); @_mdl = @model = observable.model = null
+    @model.dispose(); @model = observable.model = null
     kb.utils.wrappedDestroy(@)
 
   # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Collection, it will hold a CollectionObservable.
@@ -158,7 +145,7 @@ class kb.Observable
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: ->
-    new_value = if @_mdl then @getValue(@_mdl) else null
+    new_value = @getValue(_peekObservable(@_model))
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
@@ -170,7 +157,7 @@ class kb.Observable
     return if @__kb_released # destroyed, nothing to do
 
     # determine the new type
-    new_value = @getValue(@_mdl) if @_mdl and not arguments.length
+    new_value = @getValue(_peekObservable(@_model)) unless arguments.length
     (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
@@ -208,7 +195,7 @@ class kb.Observable
   # @private
   _updateValueObservable: (new_value) ->
     create_options = @create_options
-    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, @_mdl, @key)
+    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, _peekObservable(@_model), @key)
     @value_type = KB_TYPE_UNKNOWN
     creator = create_options.creator
 
@@ -254,7 +241,7 @@ class kb.Observable
 
     # store the value
     @__kb_value = value
-    @vo(value)
+    @_vo(value)
 
   getValue: (model, args) ->
     return unless model

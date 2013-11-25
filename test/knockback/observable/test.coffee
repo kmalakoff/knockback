@@ -91,7 +91,7 @@ describe 'knockback-observable.js', ->
     args = []
     ContactViewModelCustom = (model) ->
       @name = kb.observable(model, {key:'name', read: ((key, arg1, arg2) -> args.push(arg1); args.push(arg2); return model.get('name')), args: ['name', 1] })
-      @number = kb.observable(model, {key:'name', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
+      @number = kb.observable(model, {key:'number', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
       return
 
     model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})

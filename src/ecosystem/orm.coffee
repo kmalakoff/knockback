@@ -144,11 +144,19 @@ class ORMAdapter_Supermodel
 
   bind: (model, key, update, path) ->
     return null unless type = @relationType(model, key)
-    rel_fn = (model) ->
+    rel_fn = (model, other) ->
       not kb.statistics or kb.statistics.addModelEvent({name: 'update (supermodel)', model: model, key: key, path: path})
-      update(model[key]())
-    model.bind("associate:#{key}", rel_fn)
-    return -> model.unbind("associate:#{key}", rel_fn)
+
+      # HACK: the relationship may not be set until after this call
+      relation = model.constructor.associations()[key]
+      previous = model[relation.store]
+      model[relation.store] = other
+      update(other)
+      model[relation.store] = previous
+    if type is KB_TYPE_MODEL
+      model.bind("associate:#{key}", rel_fn)
+      return -> model.unbind("associate:#{key}", rel_fn)
+    return
 
 kb.orm.addAdapter(new ORMAdapter_Supermodel())
 ###############################
