@@ -170,6 +170,33 @@ kb = (function() {
     return value;
   };
 
+  kb.getValue = function(model, key, args) {
+    if (!model) {
+      return;
+    }
+    if (_.isFunction(model[key]) && kb.orm.useFunction(model, key)) {
+      return model[key]();
+    }
+    if (!args) {
+      return model.get(key);
+    }
+    return model.get.apply(model, _.map([key].concat(args), function(value) {
+      return _peekObservable(value);
+    }));
+  };
+
+  kb.setValue = function(model, key, value) {
+    var attributes;
+    if (!model) {
+      return;
+    }
+    if (_.isFunction(model[key]) && kb.orm.useFunction(model, key)) {
+      return model[key](value);
+    }
+    (attributes = {})[key] = value;
+    return model.set(attributes);
+  };
+
   return kb;
 
 })();
@@ -269,6 +296,23 @@ ORM = (function() {
     }
   };
 
+  ORM.prototype.useFunction = function(model, key) {
+    var adpater, _j, _len1, _ref1;
+    if (!this.adapters.length) {
+      return;
+    }
+    if (!this.initialized) {
+      this.initialize();
+    }
+    _ref1 = this.adapters;
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      adpater = _ref1[_j];
+      if (adpater.useFunction(model, key)) {
+        return true;
+      }
+    }
+  };
+
   return ORM;
 
 })();
@@ -345,6 +389,10 @@ ORMAdapter_BackboneRelational = (function() {
     };
   };
 
+  ORMAdapter_BackboneRelational.prototype.useFunction = function(model, key) {
+    return false;
+  };
+
   return ORMAdapter_BackboneRelational;
 
 })();
@@ -392,6 +440,10 @@ ORMAdapter_BackboneAssociations = (function() {
 
   ORMAdapter_BackboneAssociations.prototype.bind = function(model, key, update, path) {
     return null;
+  };
+
+  ORMAdapter_BackboneAssociations.prototype.useFunction = function(model, key) {
+    return false;
   };
 
   return ORMAdapter_BackboneAssociations;
@@ -459,6 +511,10 @@ ORMAdapter_Supermodel = (function() {
         return model.unbind("associate:" + key, rel_fn);
       };
     }
+  };
+
+  ORMAdapter_Supermodel.prototype.useFunction = function(model, key) {
+    return !!this.relationType(model, key);
   };
 
   return ORMAdapter_Supermodel;
@@ -1349,23 +1405,21 @@ kb.Observable = (function() {
             _this.update(_this.read.apply(_this, args));
           } else if (!_.isUndefined(_model)) {
             kb.ignore(function() {
-              return _this.update(_this.getValue(_model));
+              return _this.update(kb.getValue(_model, _peekObservable(_this.key), _this.args));
             });
           }
           return _unwrapObservable(_this._vo());
         },
         write: function(new_value) {
           return kb.ignore(function() {
-            var set_info, unwrapped_new_value, _model;
+            var unwrapped_new_value, _model;
             unwrapped_new_value = _unwrapModels(new_value);
-            set_info = {};
-            set_info[_unwrapObservable(_this.key)] = unwrapped_new_value;
             _model = _peekObservable(_this._model);
             if (_this.write) {
-              _this.write.apply(_this._vm, [unwrapped_new_value]);
-              new_value = _this.getValue(_model);
+              _this.write.call(_this._vm, unwrapped_new_value);
+              new_value = kb.getValue(_model, _peekObservable(_this.key), _this.args);
             } else if (_model) {
-              _model.set.apply(_model, [set_info]);
+              kb.setValue(_model, _peekObservable(_this.key), unwrapped_new_value);
             }
             return _this.update(new_value);
           });
@@ -1393,11 +1447,11 @@ kb.Observable = (function() {
             if (_this.__kb_released || (_peekObservable(_this._model) === new_model)) {
               return;
             }
+            new_value = kb.getValue(new_model, _peekObservable(_this.key), _this.args);
             _this._model(new_model);
             if (!new_model) {
               return _this.update(null);
-            }
-            if (!_.isUndefined(new_value = _this.getValue(new_model))) {
+            } else if (!_.isUndefined(new_value)) {
               return _this.update(new_value);
             }
           });
@@ -1441,7 +1495,7 @@ kb.Observable = (function() {
 
   Observable.prototype.valueType = function() {
     var new_value;
-    new_value = this.getValue(_peekObservable(this._model));
+    new_value = kb.getValue(_peekObservable(this._model), _peekObservable(this.key));
     this.value_type || this._updateValueObservable(new_value);
     return this.value_type;
   };
@@ -1452,7 +1506,7 @@ kb.Observable = (function() {
       return;
     }
     if (!arguments.length) {
-      new_value = this.getValue(_peekObservable(this._model));
+      new_value = kb.getValue(_peekObservable(this._model), _peekObservable(this.key));
     }
     (new_value !== void 0) || (new_value = null);
     new_type = kb.utils.valueType(new_value);
@@ -1533,32 +1587,6 @@ kb.Observable = (function() {
     }
     this.__kb_value = value;
     return this._vo(value);
-  };
-
-  Observable.prototype.getValue = function(model) {
-    var arg, key;
-    if (!model) {
-      return;
-    }
-    key = _peekObservable(this.key);
-    if (!model.has || model.has(key)) {
-      if (this.args) {
-        return model.get.apply(model, [key].concat((function() {
-          var _j, _len1, _ref1, _results;
-          _ref1 = this.args;
-          _results = [];
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            arg = _ref1[_j];
-            _results.push(_peekObservable(arg));
-          }
-          return _results;
-        }).call(this)));
-      } else {
-        return model.get(key);
-      }
-    } else {
-      return typeof model[key] === "function" ? model[key]() : void 0;
-    }
   };
 
   return Observable;

@@ -23,6 +23,13 @@ class ORM
     return unbind_fn for adpater in @adapters when unbind_fn = adpater.bind(model, key, update, path)
     return
 
+  useFunction: (model, key) ->
+    return unless @adapters.length
+    @initialize() unless @initialized
+
+    return true for adpater in @adapters when adpater.useFunction(model, key)
+    return
+
 kb.orm = new ORM()
 ###############################
 
@@ -59,6 +66,8 @@ class ORMAdapter_BackboneRelational
         model.unbind("#{events[0]}:#{key}", rel_fn)
       return
 
+  useFunction: (model, key) -> return false
+
 kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
 ###############################
 
@@ -78,6 +87,7 @@ class ORMAdapter_BackboneAssociations
     return if (relation.type is 'Many') then KB_TYPE_COLLECTION else KB_TYPE_MODEL
 
   bind: (model, key, update, path) -> return null
+  useFunction: (model, key) -> return false
 
 kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################
@@ -112,6 +122,8 @@ class ORMAdapter_Supermodel
       model.bind("associate:#{key}", rel_fn)
       return -> model.unbind("associate:#{key}", rel_fn)
     return
+
+  useFunction: (model, key) -> return !!@relationType(model, key)
 
 kb.orm.addAdapter(new ORMAdapter_Supermodel())
 ###############################

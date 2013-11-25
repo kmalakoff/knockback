@@ -203,6 +203,18 @@ class kb
       ko.dependentObservable(-> value = fn()).dispose()
     return value
 
+  @getValue = (model, key, args) ->
+    return unless model
+    return model[key]() if _.isFunction(model[key]) and kb.orm.useFunction(model, key)
+    return model.get(key) unless args
+    model.get.apply(model, _.map([key].concat(args), (value) -> _peekObservable(value)))
+
+  @setValue = (model, key, value) ->
+    return unless model
+    return model[key](value) if _.isFunction(model[key]) and kb.orm.useFunction(model, key)
+    (attributes = {})[key] = value
+    model.set(attributes)
+
 ####################################
 # OBSERVABLE STORAGE TYPES
 ####################################

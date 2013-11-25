@@ -73,18 +73,17 @@ class kb.Observable
         if @read
           @update(@read.apply(@, args))
         else if !_.isUndefined(_model)
-          kb.ignore => @update(@getValue(_model))
+          kb.ignore => @update(kb.getValue(_model, _peekObservable(@key), @args))
         return _unwrapObservable(@_vo())
 
       write: (new_value) => kb.ignore =>
         unwrapped_new_value = _unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
-        set_info = {}; set_info[_unwrapObservable(@key)] = unwrapped_new_value
         _model = _peekObservable(@_model)
         if @write
-          @write.apply(@_vm,[unwrapped_new_value])
-          new_value = @getValue(_model)
+          @write.call(@_vm, unwrapped_new_value)
+          new_value = kb.getValue(_model, _peekObservable(@key), @args)
         else if _model
-          _model.set.apply(_model, [set_info])
+          kb.setValue(_model, _peekObservable(@key), unwrapped_new_value)
         @update(new_value)
 
       owner: @_vm
@@ -109,9 +108,12 @@ class kb.Observable
         return if @__kb_released or (_peekObservable(@_model) is new_model) # destroyed or no change
 
         # update references
+        new_value = kb.getValue(new_model, _peekObservable(@key), @args)
         @_model(new_model)
-        return @update(null) unless new_model
-        @update(new_value) unless _.isUndefined(new_value = @getValue(new_model))
+        if not new_model
+          @update(null)
+        else if not _.isUndefined(new_value)
+          @update(new_value)
     )
     kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
@@ -143,7 +145,7 @@ class kb.Observable
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: ->
-    new_value = @getValue(_peekObservable(@_model))
+    new_value = kb.getValue(_peekObservable(@_model), _peekObservable(@key))
     @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
@@ -155,7 +157,7 @@ class kb.Observable
     return if @__kb_released # destroyed, nothing to do
 
     # determine the new type
-    new_value = @getValue(_peekObservable(@_model)) unless arguments.length
+    new_value = kb.getValue(_peekObservable(@_model), _peekObservable(@key)) unless arguments.length
     (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
@@ -240,13 +242,5 @@ class kb.Observable
     # store the value
     @__kb_value = value
     @_vo(value)
-
-  getValue: (model) ->
-    return unless model
-    key = _peekObservable(@key)
-    if not model.has or model.has(key)
-      return if @args then model.get.apply(model, [key].concat(_peekObservable(arg) for arg in @args)) else model.get(key)
-    else
-      return model[key]?()
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)
