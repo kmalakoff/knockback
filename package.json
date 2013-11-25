@@ -4,6 +4,7 @@
   "version"       : "0.18.0",
   "description"   : "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "keywords"      : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
+  "main"          : "knockback.js",
 
   "url"           : "http://kmalakoff.github.com/knockback/",
   "homepage"      : "http://kmalakoff.github.com/knockback/",
