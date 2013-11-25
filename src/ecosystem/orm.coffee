@@ -45,7 +45,7 @@ class ORMAdapter_BackboneORM
 
   relationType: (model, key) ->
     return null unless (model.schema and _.isFunction(model.relation))
-    return null unless relation = model.relation(key)
+    return null unless relation = model.schema().relations[key]
     return if relation.type is 'hasMany' then KB_TYPE_COLLECTION else KB_TYPE_MODEL
 
   inferCreator: (model, key) ->

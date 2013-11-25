@@ -301,7 +301,7 @@ ORMAdapter_BackboneORM = (function() {
     if (!(model.schema && _.isFunction(model.relation))) {
       return null;
     }
-    if (!(relation = model.relation(key))) {
+    if (!(relation = model.schema().relations[key])) {
       return null;
     }
     if (relation.type === 'hasMany') {
