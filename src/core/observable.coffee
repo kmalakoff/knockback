@@ -109,11 +109,9 @@ class kb.Observable
         return if @__kb_released or (_peekObservable(@_model) is new_model) # destroyed or no change
 
         # update references
-        previous_value = @getValue(previous_model) if previous_model = _peekObservable(@_model)
         @_model(new_model)
         return @update(null) unless new_model
-        return @update(new_value) unless _.isUndefined(new_value = @getValue(new_model))
-        @update(previous_value or null) if @_vm[@key]?.setToDefault and kb.utils.valueType(@_vm[@key]) == KB_TYPE_SIMPLE
+        @update(new_value) unless _.isUndefined(new_value = @getValue(new_model))
     )
     kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create

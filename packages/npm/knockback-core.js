@@ -1389,12 +1389,9 @@ kb.Observable = (function() {
         },
         write: function(new_model) {
           return kb.ignore(function() {
-            var new_value, previous_model, previous_value, _ref1;
+            var new_value;
             if (_this.__kb_released || (_peekObservable(_this._model) === new_model)) {
               return;
-            }
-            if (previous_model = _peekObservable(_this._model)) {
-              previous_value = _this.getValue(previous_model);
             }
             _this._model(new_model);
             if (!new_model) {
@@ -1402,9 +1399,6 @@ kb.Observable = (function() {
             }
             if (!_.isUndefined(new_value = _this.getValue(new_model))) {
               return _this.update(new_value);
-            }
-            if (((_ref1 = _this._vm[_this.key]) != null ? _ref1.setToDefault : void 0) && kb.utils.valueType(_this._vm[_this.key]) === KB_TYPE_SIMPLE) {
-              return _this.update(previous_value || null);
             }
           });
         }
