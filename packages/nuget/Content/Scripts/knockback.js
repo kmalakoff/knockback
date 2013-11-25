@@ -252,23 +252,6 @@ ORM = (function() {
     }
   };
 
-  ORM.prototype.inferCreator = function(model, key) {
-    var adpater, creator, _j, _len1, _ref1;
-    if (!this.adapters.length) {
-      return;
-    }
-    if (!this.initialized) {
-      this.initialize();
-    }
-    _ref1 = this.adapters;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      adpater = _ref1[_j];
-      if (creator = adpater.inferCreator(model, key)) {
-        return creator;
-      }
-    }
-  };
-
   ORM.prototype.bind = function(model, key, update, path) {
     var adpater, unbind_fn, _j, _len1, _ref1;
     if (!this.adapters.length) {
@@ -306,12 +289,7 @@ ORMAdapter_BackboneRelational = (function() {
   };
 
   ORMAdapter_BackboneRelational.prototype.keys = function(model) {
-    if (!(model instanceof kb.Backbone.RelationalModel)) {
-      return null;
-    }
-    return _.map(model.getRelations(), function(test) {
-      return test.key;
-    });
+    return null;
   };
 
   ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
@@ -328,18 +306,6 @@ ORMAdapter_BackboneRelational = (function() {
       return KB_TYPE_COLLECTION;
     } else {
       return KB_TYPE_MODEL;
-    }
-  };
-
-  ORMAdapter_BackboneRelational.prototype.inferCreator = function(model, key) {
-    var type;
-    if (!(type = this.relationType(model, key))) {
-      return null;
-    }
-    if (type === KB_TYPE_COLLECTION) {
-      return kb.CollectionObservable;
-    } else {
-      return kb.ViewModel;
     }
   };
 
@@ -424,18 +390,6 @@ ORMAdapter_BackboneAssociations = (function() {
     }
   };
 
-  ORMAdapter_BackboneAssociations.prototype.inferCreator = function(model, key) {
-    var type;
-    if (!(type = this.relationType(model, key))) {
-      return null;
-    }
-    if (type === KB_TYPE_COLLECTION) {
-      return kb.CollectionObservable;
-    } else {
-      return kb.ViewModel;
-    }
-  };
-
   ORMAdapter_BackboneAssociations.prototype.bind = function(model, key, update, path) {
     return null;
   };
@@ -477,18 +431,6 @@ ORMAdapter_Supermodel = (function() {
       return KB_TYPE_COLLECTION;
     } else {
       return KB_TYPE_MODEL;
-    }
-  };
-
-  ORMAdapter_Supermodel.prototype.inferCreator = function(model, key) {
-    var type;
-    if (!(type = this.relationType(model, key))) {
-      return null;
-    }
-    if (type === KB_TYPE_COLLECTION) {
-      return kb.CollectionObservable;
-    } else {
-      return kb.ViewModel;
     }
   };
 
@@ -867,9 +809,6 @@ kb.utils = (function() {
       creator = factory.creatorForPath(value, path);
     }
     if (creator) {
-      return creator;
-    }
-    if (owner && (creator = kb.orm.inferCreator(owner, _peekObservable(key)))) {
       return creator;
     }
     if (!value) {
