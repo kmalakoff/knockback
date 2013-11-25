@@ -13,7 +13,7 @@ kb.toFormattedString = (format) ->
   args = arraySlice.call(arguments, 1)
   for index, arg of args
     value = _unwrapObservable(arg)
-    value or= ''
+    value = '' if _.isUndefined(value)
 
     parameter_index = format.indexOf("\{#{index}\}")
     while (parameter_index>=0)

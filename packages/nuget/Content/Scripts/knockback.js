@@ -1541,15 +1541,24 @@ kb.Observable = (function() {
     return this._vo(value);
   };
 
-  Observable.prototype.getValue = function(model, args) {
-    var key;
+  Observable.prototype.getValue = function(model) {
+    var arg, key;
     if (!model) {
       return;
     }
     key = _peekObservable(this.key);
     if (!model.has || model.has(key)) {
-      if (args) {
-        return model.get.apply(model, args);
+      if (this.args) {
+        return model.get.apply(model, [key].concat((function() {
+          var _j, _len1, _ref1, _results;
+          _ref1 = this.args;
+          _results = [];
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            arg = _ref1[_j];
+            _results.push(_peekObservable(arg));
+          }
+          return _results;
+        }).call(this)));
       } else {
         return model.get(key);
       }
@@ -2441,7 +2450,9 @@ kb.toFormattedString = function(format) {
   for (index in args) {
     arg = args[index];
     value = _unwrapObservable(arg);
-    value || (value = '');
+    if (_.isUndefined(value)) {
+      value = '';
+    }
     parameter_index = format.indexOf("\{" + index + "\}");
     while (parameter_index >= 0) {
       result = result.replace("{" + index + "}", value);

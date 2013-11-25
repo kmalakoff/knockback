@@ -243,9 +243,12 @@ class kb.Observable
     @__kb_value = value
     @_vo(value)
 
-  getValue: (model, args) ->
+  getValue: (model) ->
     return unless model
     key = _peekObservable(@key)
-    return if not model.has or model.has(key) then (if args then model.get.apply(model, args) else model.get(key)) else model[key]?()
+    if not model.has or model.has(key)
+      return if @args then model.get.apply(model, [key].concat(_peekObservable(arg) for arg in @args)) else model.get(key)
+    else
+      return model[key]?()
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)
