@@ -125,8 +125,6 @@ class kb.CollectionObservable
         # store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
         new_collection.bind('all', @__kb._onCollectionChange) if new_collection
 
-        debugger unless new_collection
-
         # update references (including notification)
         @_collection(new_collection)
     )

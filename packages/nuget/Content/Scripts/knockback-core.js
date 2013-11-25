@@ -1975,9 +1975,6 @@ kb.CollectionObservable = (function() {
             if (new_collection) {
               new_collection.bind('all', _this.__kb._onCollectionChange);
             }
-            if (!new_collection) {
-              debugger;
-            }
             return _this._collection(new_collection);
           });
         }
