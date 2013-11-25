@@ -69,7 +69,9 @@ class kb.ViewModel
   # @option options [Array|String] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
   # @option options [Array|String] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model. Useful for binding Views that require specific observables to exist
   # @option options [Array|String] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
-  # @option options [Object|Array|String] if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
+  # @option options [Object|Array|String] excludes if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
+  # @option options [Array] statics creates non-observable properties on your view model for Model attributes that do not need to be observed for changes.
+  # @option options [Object] static_defaults provides default values for statics.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions. Signature: `{'some.path': function(object, options)}`
