@@ -77,7 +77,7 @@ class kb.ViewModel
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  constructor: (model, options, view_model) -> return kb.utils.ignore =>
+  constructor: (model, options, view_model) -> return kb.ignore =>
     not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
 
     options or= {}
@@ -108,7 +108,7 @@ class kb.ViewModel
     _mdl = _wrappedKey(@, '_mdl', ko.observable())
     @model = ko.dependentObservable(
       read: => _mdl(); return kb.utils.wrappedObject(@)
-      write: (new_model) => kb.utils.ignore =>
+      write: (new_model) => kb.ignore =>
         return if (kb.utils.wrappedObject(@) is new_model) # no change
 
         # SHARED NULL MODEL - keep it that way

@@ -7243,6 +7243,21 @@ kb = (function() {
     return kb.releaseOnNodeRemove(view_model, node);
   };
 
+  kb.ignore = function(fn) {
+    var value;
+    value = null;
+    if (ko.dependencyDetection) {
+      ko.dependencyDetection.begin(function() {});
+      value = fn();
+      ko.dependencyDetection.end();
+    } else {
+      ko.dependentObservable(function() {
+        return value = fn();
+      }).dispose();
+    }
+    return value;
+  };
+
   return kb;
 
 })();
@@ -7679,7 +7694,7 @@ _peekObservable = function(obs) {
   if (obs.peek) {
     return obs.peek();
   }
-  return kb.utils.ignore(function() {
+  return kb.ignore(function() {
     return obs();
   });
 };
@@ -8034,21 +8049,6 @@ kb.utils = (function() {
 
   utils.collapseOptions = _collapseOptions;
 
-  utils.ignore = function(fn) {
-    var value;
-    value = null;
-    if (ko.dependencyDetection) {
-      ko.dependencyDetection.begin(function() {});
-      value = fn();
-      ko.dependencyDetection.end();
-    } else {
-      ko.dependentObservable(function() {
-        return value = fn();
-      }).dispose();
-    }
-    return value;
-  };
-
   return utils;
 
 })();
@@ -8253,7 +8253,7 @@ kb.Store = (function() {
     if (observable) {
       return observable;
     }
-    observable = kb.utils.ignore(function() {
+    observable = kb.ignore(function() {
       if (creator.create) {
         observable = creator.create(obj, options);
       } else {
@@ -8519,7 +8519,7 @@ kb.Observable = (function() {
   function Observable(model, options, _vm) {
     var _this = this;
     this._vm = _vm != null ? _vm : {};
-    return kb.utils.ignore(function() {
+    return kb.ignore(function() {
       var create_options, event_watcher, observable;
       options || _throwMissing(_this, 'options');
       if (_.isString(options) || ko.isObservable(options)) {
@@ -8551,14 +8551,14 @@ kb.Observable = (function() {
           if (_this.read) {
             _this.update(_this.read.apply(_this, args));
           } else if (!_.isUndefined(_model)) {
-            kb.utils.ignore(function() {
+            kb.ignore(function() {
               return _this.update(_this.getValue(_model));
             });
           }
           return _unwrapObservable(_this._vo());
         },
         write: function(new_value) {
-          return kb.utils.ignore(function() {
+          return kb.ignore(function() {
             var set_info, unwrapped_new_value, _model;
             unwrapped_new_value = _unwrapModels(new_value);
             set_info = {};
@@ -8591,7 +8591,7 @@ kb.Observable = (function() {
           return _unwrapObservable(_this._model);
         },
         write: function(new_model) {
-          return kb.utils.ignore(function() {
+          return kb.ignore(function() {
             var new_value, previous_model, previous_value, _ref1;
             if (_this.__kb_released || (_peekObservable(_this._model) === new_model)) {
               return;
@@ -8783,7 +8783,7 @@ kb.ViewModel = (function() {
 
   function ViewModel(model, options, view_model) {
     var _this = this;
-    return kb.utils.ignore(function() {
+    return kb.ignore(function() {
       var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref1;
       !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(_this, 'not a model');
       options || (options = {});
@@ -8813,7 +8813,7 @@ kb.ViewModel = (function() {
           return kb.utils.wrappedObject(_this);
         },
         write: function(new_model) {
-          return kb.utils.ignore(function() {
+          return kb.ignore(function() {
             var event_watcher, keys, missing, rel_keys;
             if (kb.utils.wrappedObject(_this) === new_model) {
               return;
@@ -9013,7 +9013,7 @@ kb.CollectionObservable = (function() {
 
   function CollectionObservable(collection, options) {
     var _this = this;
-    return kb.utils.ignore(function() {
+    return kb.ignore(function() {
       var create_options, observable, _ref1;
       if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
         _ref1 = [new kb.Collection(), collection], collection = _ref1[0], options = _ref1[1];
@@ -9052,7 +9052,7 @@ kb.CollectionObservable = (function() {
           return _this._collection();
         },
         write: function(new_collection) {
-          return kb.utils.ignore(function() {
+          return kb.ignore(function() {
             var previous_collection;
             if ((previous_collection = _this._collection()) === new_collection) {
               return;
@@ -9231,7 +9231,7 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype._onCollectionChange = function(event, arg) {
     var _this = this;
-    return kb.utils.ignore(function() {
+    return kb.ignore(function() {
       var collection, comparator, observable, view_model;
       if (_this.in_edit) {
         return;
@@ -9303,7 +9303,7 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype._onObservableArrayChange = function(models_or_view_models) {
     var _this = this;
-    return kb.utils.ignore(function() {
+    return kb.ignore(function() {
       var collection, has_filters, model, models, observable, view_model, view_models, _j, _len1;
       if (_this.in_edit) {
         return;
