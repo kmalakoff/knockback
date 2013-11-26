@@ -17,9 +17,9 @@
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>knockback-defaults</span>
+    <span class='title'>defaults</span>
     &raquo;
-    <span class='title'>knockback-extensions.coffee</span>
+    <span class='title'>default-observable.coffee</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -110,40 +110,20 @@
     <div id='content'>
       <h1>
         File:
-        knockback-extensions.coffee
+        default-observable.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-defaults</td>
+          <td>src&#47;defaults</td>
         </tr>
       </table>
       <h2>Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#kb.Observable.prototype.setToDefault-file'>
-        ? (void) <strong>kb.Observable.prototype.setToDefault</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      knockback-extensions.js (knockback-defaults) (c) 2011-2013 Kevin Malakoff.
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#kb.ViewModel.prototype.setToDefault-file'>
-        ? (void) <strong>kb.ViewModel.prototype.setToDefault</strong>()
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#kb.utils.setToDefault-file'>
-        ? (void) <strong>kb.utils.setToDefault</strong>(obj)
+      <a href='#kb.defaultObservable-file'>
+        ? (void) <strong>kb.defaultObservable</strong>(target, default_value)
       </a>
     </span>
     <span class='desc'>
@@ -154,56 +134,21 @@
       <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='kb.Observable.prototype.setToDefault-file'>
-      ? (void) <strong>kb.Observable.prototype.setToDefault</strong>()
-    </p>
-    <div class='docstring'>
-  <p>knockback-extensions.js (knockback-defaults)
-(c) 2011-2013 Kevin Malakoff.
-Knockback.js is freely distributable under the MIT license.
-See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a>
-Dependencies: Knockout.js, Backbone.js, and Underscore.js. Optional dependency: Backbone.ModelRef.js.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='kb.ViewModel.prototype.setToDefault-file'>
-      ? (void) <strong>kb.ViewModel.prototype.setToDefault</strong>()
+    <p class='signature' id='kb.defaultObservable-file'>
+      ? (void) <strong>kb.defaultObservable</strong>(target, default_value)
     </p>
     <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='kb.utils.setToDefault-file'>
-      ? (void) <strong>kb.utils.setToDefault</strong>(obj)
-    </p>
-    <div class='docstring'>
-  
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffee'>var model = new Backbone.Model({name: &#39;Bob&#39;});
-var view_model = {
-  wrapped_name: kb.defaultWrapper(kb.observable(model, &#39;name&#39;), &#39;(no name)&#39;)
-}; &#47;&#47; view_model.wrapped name: Bob
-kb.utils.setToDefault(view_model); &#47;&#47; view_model.wrapped name: (no name)</code></pre>
-  </div>
-</div>
-<div class='tags'>
 </div>
   </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

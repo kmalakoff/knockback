@@ -17,9 +17,9 @@
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>knockback-triggering</span>
+    <span class='title'>core</span>
     &raquo;
-    <span class='title'>knockback-triggered-observable.coffee</span>
+    <span class='title'>collection-observable.coffee</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -110,20 +110,57 @@
     <div id='content'>
       <h1>
         File:
-        knockback-triggered-observable.coffee
+        collection-observable.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-triggering</td>
+          <td>src&#47;core</td>
         </tr>
       </table>
+      <h2>Constant Summary</h2>
+      <dl class='constants'>
+        <dt id='COMPARE_EQUAL-constant'>
+          COMPARE_EQUAL
+          =
+          <div class='docstring'>
+  <p>knockback-collection-observable.js
+(c) 2011-2013 Kevin Malakoff.
+Knockback.CollectionObservable is freely distributable under the MIT license.
+See the following for full license details: <a href="https://github.com/kmalakoff/knockback/blob/master/LICENSE">https://github.com/kmalakoff/knockback/blob/master/LICENSE</a></p>
+</div>
+<div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>0</code></pre>
+        </dd>
+        <dt id='COMPARE_DESCENDING-constant'>
+          COMPARE_DESCENDING
+          =
+          <div class='tags'>
+</div>
+        </dt>
+        <dd>
+          <pre><code class='coffee'>1</code></pre>
+        </dd>
+      </dl>
       <h2>Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#kb.triggeredObservable-file'>
-        ? (void) <strong>kb.triggeredObservable</strong>(emitter, event_selector)
+      <a href='#kb.compare-file'>
+        ? (void) <strong>kb.compare</strong>(value_a, value_b)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#kb.collectionObservable-file'>
+        ? (void) <strong>kb.collectionObservable</strong>(collection, options)
       </a>
     </span>
     <span class='desc'>
@@ -134,8 +171,15 @@
       <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='kb.triggeredObservable-file'>
-      ? (void) <strong>kb.triggeredObservable</strong>(emitter, event_selector)
+    <p class='signature' id='kb.compare-file'>
+      ? (void) <strong>kb.compare</strong>(value_a, value_b)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='kb.collectionObservable-file'>
+      ? (void) <strong>kb.collectionObservable</strong>(collection, options)
     </p>
     <div class='docstring'>
   <p>factory function</p>
@@ -147,11 +191,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

@@ -111,7 +111,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-core&#47;knockback-core.coffee</td>
+          <td>src&#47;core&#47;core.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -132,7 +132,7 @@
 </div>
         </dt>
         <dd>
-          <pre><code class='coffee'>'0.17.3'</code></pre>
+          <pre><code class='coffee'>'0.18.1'</code></pre>
         </dd>
         <dt id='TYPE_UNKNOWN-constant'>
           TYPE_UNKNOWN
@@ -325,6 +325,36 @@
     </span>
     <span class='desc'>
       Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#ignore-class'>
+        + (void) <strong>ignore</strong>(fn)
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to ignore dependencies in a function
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getValue-class'>
+        + (void) <strong>getValue</strong>(model, key, args)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setValue-class'>
+        + (void) <strong>setValue</strong>(model, key, value)
+      </a>
+    </span>
+    <span class='desc'>
+      
     </span>
   </li>
 </ul>
@@ -706,15 +736,57 @@ ko.removeNode(el); &#47;&#47; removes el from the DOM and calls kb.release(view_
 <div class='tags'>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='ignore-class'>
+      + (void) <strong>ignore</strong>(fn)
+    </p>
+    <div class='docstring'>
+  <p>Helper to ignore dependencies in a function</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffee'>kb.ignore(options);</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>the object to test</span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getValue-class'>
+      + (void) <strong>getValue</strong>(model, key, args)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setValue-class'>
+      + (void) <strong>setValue</strong>(model, key, value)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

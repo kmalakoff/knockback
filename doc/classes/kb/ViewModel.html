@@ -113,7 +113,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-core&#47;knockback-view-model.coffee</td>
+          <td>src&#47;core&#47;view-model.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -337,12 +337,28 @@ var view_model = new ViewModel(model);</code></pre>
       <span class='desc'>restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes</span>
     </li>
     <li>
-      <span class='name'>if</span>
+      <span class='name'>excludes</span>
       <span class='type'>
         (<tt>Object|Array|String</tt>)
       </span>
       &mdash;
-      <span class='desc'>an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.</span>
+      <span class='desc'>if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.</span>
+    </li>
+    <li>
+      <span class='name'>statics</span>
+      <span class='type'>
+        (<tt>Array</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>creates non-observable properties on your view model for Model attributes that do not need to be observed for changes.</span>
+    </li>
+    <li>
+      <span class='name'>static_defaults</span>
+      <span class='type'>
+        (<tt>Object</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>provides default values for statics.</span>
     </li>
     <li>
       <span class='name'>path</span>
@@ -382,7 +398,7 @@ var view_model = new ViewModel(model);</code></pre>
         (<tt>Object</tt>)
       </span>
       &mdash;
-      <span class='desc'>a set of options merge into these options using _.defaults. Useful for extending options when deriving classes rather than merging them by hand.</span>
+      <span class='desc'>a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.</span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -452,11 +468,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

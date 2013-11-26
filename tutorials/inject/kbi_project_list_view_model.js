@@ -4,11 +4,10 @@ var ProjectListViewModel = function(projects) {
   this.projects = kb.collectionObservable(projects, {
     view_model: ProjectViewModel,
     sort_attribute: 'name',
-    filters: function(model) {
-      var filter;
-      filter = _this.filter();
-      if (!filter) return false;
-      return model.get('name').search(filter) < 0;
-    }
+    filters: [function(model) {
+      var filter = _this.filter();
+      if (!filter) return true;
+      return model.get('name').search(filter) >= 0;
+    }]
   });
 };

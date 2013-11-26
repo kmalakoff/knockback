@@ -17,9 +17,9 @@
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>knockback-validation</span>
+    <span class='title'>core</span>
     &raquo;
-    <span class='title'>knockback-validators.coffee</span>
+    <span class='title'>utils.coffee</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -110,73 +110,30 @@
     <div id='content'>
       <h1>
         File:
-        knockback-validators.coffee
+        utils.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-validation</td>
+          <td>src&#47;core</td>
         </tr>
       </table>
-      <h2>Constant Summary</h2>
-      <dl class='constants'>
-        <dt id='URL_REGEXP-constant'>
-          URL_REGEXP
-          =
-          <div class='docstring'>
-  <p>Regular expressions from Angular.js: <a href="https://github.com/angular/angular.js">https://github.com/angular/angular.js</a></p>
-</div>
-<div class='tags'>
-</div>
-        </dt>
-        <dd>
-          <pre><code class='coffee'>/^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/</code></pre>
-        </dd>
-        <dt id='EMAIL_REGEXP-constant'>
-          EMAIL_REGEXP
-          =
-          <div class='tags'>
-</div>
-        </dt>
-        <dd>
-          <pre><code class='coffee'>/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/</code></pre>
-        </dd>
-        <dt id='NUMBER_REGEXP-constant'>
-          NUMBER_REGEXP
-          =
-          <div class='tags'>
-</div>
-        </dt>
-        <dd>
-          <pre><code class='coffee'>/^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/</code></pre>
-        </dd>
-      </dl>
       <h2>Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#kb.hasChangedFn-file'>
-        ? (void) <strong>kb.hasChangedFn</strong>(model)
+      <a href='#_wrappedKey-file'>
+        ? (void) <strong>_wrappedKey</strong>(obj, key, value)
       </a>
     </span>
     <span class='desc'>
-      Convention is that if they end in Fn then returns a function pointer based on parameters passed.
+      <h6 id="-">#</h6>
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.minLengthFn-file'>
-        ? (void) <strong>kb.minLengthFn</strong>(length)
-      </a>
-    </span>
-    <span class='desc'>
-      
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#kb.uniqueValueFn-file'>
-        ? (void) <strong>kb.uniqueValueFn</strong>(model, key, collection)
+      <a href='#_argumentsAddKey-file'>
+        ? (void) <strong>_argumentsAddKey</strong>(args, key)
       </a>
     </span>
     <span class='desc'>
@@ -185,8 +142,18 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.untilTrueFn-file'>
-        ? (void) <strong>kb.untilTrueFn</strong>(stand_in, fn, model)
+      <a href='#_unwrapModels-file'>
+        ? (void) <strong>_unwrapModels</strong>(obj)
+      </a>
+    </span>
+    <span class='desc'>
+      used for attribute setting to ensure all model attributes have their underlying models
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_mergeArray-file'>
+        ? (void) <strong>_mergeArray</strong>(result, key, value)
       </a>
     </span>
     <span class='desc'>
@@ -195,8 +162,28 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.untilFalseFn-file'>
-        ? (void) <strong>kb.untilFalseFn</strong>(stand_in, fn, model)
+      <a href='#_mergeObject-file'>
+        ? (void) <strong>_mergeObject</strong>(result, key, value)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_keyArrayToObject-file'>
+        ? (void) <strong>_keyArrayToObject</strong>(value)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_collapseOptions-file'>
+        ? (void) <strong>_collapseOptions</strong>(options)
       </a>
     </span>
     <span class='desc'>
@@ -207,39 +194,57 @@
       <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='kb.hasChangedFn-file'>
-      ? (void) <strong>kb.hasChangedFn</strong>(model)
+    <p class='signature' id='_wrappedKey-file'>
+      ? (void) <strong>_wrappedKey</strong>(obj, key, value)
     </p>
     <div class='docstring'>
-  <p>Convention is that if they end in Fn then returns a function pointer based on parameters passed.</p>
+  <h6 id="-">#</h6><p>Internal</p><h6 id="-">#</h6>
+
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.minLengthFn-file'>
-      ? (void) <strong>kb.minLengthFn</strong>(length)
+    <p class='signature' id='_argumentsAddKey-file'>
+      ? (void) <strong>_argumentsAddKey</strong>(args, key)
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.uniqueValueFn-file'>
-      ? (void) <strong>kb.uniqueValueFn</strong>(model, key, collection)
+    <p class='signature' id='_unwrapModels-file'>
+      ? (void) <strong>_unwrapModels</strong>(obj)
+    </p>
+    <div class='docstring'>
+  <p>used for attribute setting to ensure all model attributes have their underlying models</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_mergeArray-file'>
+      ? (void) <strong>_mergeArray</strong>(result, key, value)
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.untilTrueFn-file'>
-      ? (void) <strong>kb.untilTrueFn</strong>(stand_in, fn, model)
+    <p class='signature' id='_mergeObject-file'>
+      ? (void) <strong>_mergeObject</strong>(result, key, value)
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.untilFalseFn-file'>
-      ? (void) <strong>kb.untilFalseFn</strong>(stand_in, fn, model)
+    <p class='signature' id='_keyArrayToObject-file'>
+      ? (void) <strong>_keyArrayToObject</strong>(value)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_collapseOptions-file'>
+      ? (void) <strong>_collapseOptions</strong>(options)
     </p>
     <div class='tags'>
 </div>
@@ -248,11 +253,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

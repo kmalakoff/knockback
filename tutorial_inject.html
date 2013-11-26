@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.17.2.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -487,10 +487,10 @@ var Project = Backbone.Model.extend({
   @projects = kb.collectionObservable(projects, {
     view_model: ProjectViewModel
     sort_attribute: 'name'
-    filters: (model) =&gt;
-      filter = @filter()
-      return false unless filter
-      return (model.get('name').search(filter) &lt; 0)
+    filters: [(model) =&gt;
+      return true unless filter = @filter()
+      return (model.get('name').search(filter) &gt;= 0)
+    ]
   })
   return</pre>
                 <pre data-for="js">var ProjectListViewModel = function(projects) {
@@ -499,12 +499,11 @@ var Project = Backbone.Model.extend({
   this.projects = kb.collectionObservable(projects, {
     view_model: ProjectViewModel,
     sort_attribute: 'name',
-    filters: function(model) {
-      var filter;
-      filter = _this.filter();
-      if (!filter) return false;
-      return model.get('name').search(filter) &lt; 0;
-    }
+    filters: [function(model) {
+      var filter = _this.filter();
+      if (!filter) return true;
+      return model.get('name').search(filter) &gt;= 0;
+    }]
   });
 };</pre>
               </div>

@@ -17,9 +17,9 @@
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>knockback-core</span>
+    <span class='title'>validation</span>
     &raquo;
-    <span class='title'>knockback-observable.coffee</span>
+    <span class='title'>validation.coffee</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -110,20 +110,50 @@
     <div id='content'>
       <h1>
         File:
-        knockback-observable.coffee
+        validation.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-core</td>
+          <td>src&#47;validation</td>
         </tr>
       </table>
       <h2>Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#kb.observable-file'>
-        ? (void) <strong>kb.observable</strong>(model, options, view_model)
+      <a href='#callOrGet-file'>
+        ? (void) <strong>callOrGet</strong>(value)
+      </a>
+    </span>
+    <span class='desc'>
+      internal helper
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#kb.valueValidator-file'>
+        ? (void) <strong>kb.valueValidator</strong>(value, bindings, validation_options = {})
+      </a>
+    </span>
+    <span class='desc'>
+      <h6 id="-">#</h6>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#kb.inputValidator-file'>
+        ? (void) <strong>kb.inputValidator</strong>(view_model, el, validation_options = {})
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#kb.formValidator-file'>
+        ? (void) <strong>kb.formValidator</strong>(view_model, el)
       </a>
     </span>
     <span class='desc'>
@@ -134,8 +164,36 @@
       <h2>Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='kb.observable-file'>
-      ? (void) <strong>kb.observable</strong>(model, options, view_model)
+    <p class='signature' id='callOrGet-file'>
+      ? (void) <strong>callOrGet</strong>(value)
+    </p>
+    <div class='docstring'>
+  <p>internal helper</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='kb.valueValidator-file'>
+      ? (void) <strong>kb.valueValidator</strong>(value, bindings, validation_options = {})
+    </p>
+    <div class='docstring'>
+  <h6 id="-">#</h6><p>Aliases</p><h6 id="-">#</h6>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='kb.inputValidator-file'>
+      ? (void) <strong>kb.inputValidator</strong>(view_model, el, validation_options = {})
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='kb.formValidator-file'>
+      ? (void) <strong>kb.formValidator</strong>(view_model, el)
     </p>
     <div class='tags'>
 </div>
@@ -144,11 +202,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;

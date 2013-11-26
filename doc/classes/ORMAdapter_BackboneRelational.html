@@ -3,23 +3,19 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <link rel='stylesheet' href='../../../assets/codo.css' type='text/css'>
-  <script src='../../../assets/codo.js'></script>
-  <script src='../../../assets/search_data.js'></script>
+  <link rel='stylesheet' href='../assets/codo.css' type='text/css'>
+  <script src='../assets/codo.js'></script>
+  <script src='../assets/search_data.js'></script>
 </head>
   <body>
-    <div id='base' data-path='../../../'></div>
+    <div id='base' data-path='../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../../README.md.html' title='Knockback.js'>Knockback.js</a>
+    <a href='../README.md.html' title='Knockback.js'>Knockback.js</a>
     &raquo;
-    <a href='../../../class_index.html' title='Index'>Index</a>
+    <a href='../class_index.html' title='Index'>Index</a>
     &raquo;
-    <span class='title'>src</span>
-    &raquo;
-    <span class='title'>knockback-formatting</span>
-    &raquo;
-    <span class='title'>knockback-formatted-observable.coffee</span>
+    <span class='title'>ORMAdapter_BackboneRelational</span>
     <nav>
       <ul>
         <li class='noframes'>
@@ -28,10 +24,10 @@
       </ul>
     </nav>
     <div id='search'>
-      <a id='class_list_link' href='../../../class_list.html'>Classes</a>
-      <a id='file_list_link' href='../../../file_list.html'>Files</a>
-      <a id='method_list_link' href='../../../method_list.html'>Methods</a>
-      <a id='extra_list_link' href='../../../extra_list.html'>Extras</a>
+      <a id='class_list_link' href='../class_list.html'>Classes</a>
+      <a id='file_list_link' href='../file_list.html'>Files</a>
+      <a id='method_list_link' href='../method_list.html'>Methods</a>
+      <a id='extra_list_link' href='../extra_list.html'>Extras</a>
     </div>
   </div>
   <iframe id='search_frame'></iframe>
@@ -109,21 +105,28 @@
 </div>
     <div id='content'>
       <h1>
-        File:
-        knockback-formatted-observable.coffee
+        Class:
+        ORMAdapter_BackboneRelational
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;knockback-formatting</td>
+          <td>src&#47;ecosystem&#47;orm.coffee</td>
         </tr>
       </table>
-      <h2>Method Summary</h2>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <h6 id="-">#</h6>
+
+</div>
+<div class='tags'>
+</div>
+      <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#kb.toFormattedString-file'>
-        ? (void) <strong>kb.toFormattedString</strong>(format)
+      <a href='#isAvailable-instance'>
+        - (void) <strong>isAvailable</strong>()
       </a>
     </span>
     <span class='desc'>
@@ -132,8 +135,8 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.parseFormattedString-file'>
-        ? (void) <strong>kb.parseFormattedString</strong>(string, format)
+      <a href='#keys-instance'>
+        - (void) <strong>keys</strong>(model)
       </a>
     </span>
     <span class='desc'>
@@ -142,8 +145,28 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#kb.formattedObservable-file'>
-        ? (void) <strong>kb.formattedObservable</strong>(format, args)
+      <a href='#relationType-instance'>
+        - (void) <strong>relationType</strong>(model, key)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#bind-instance'>
+        - (void) <strong>bind</strong>(model, key, update, path)
+      </a>
+    </span>
+    <span class='desc'>
+      
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#useFunction-instance'>
+        - (void) <strong>useFunction</strong>(model, key)
       </a>
     </span>
     <span class='desc'>
@@ -151,25 +174,39 @@
     </span>
   </li>
 </ul>
-      <h2>Method Details</h2>
+      <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='kb.toFormattedString-file'>
-      ? (void) <strong>kb.toFormattedString</strong>(format)
+    <p class='signature' id='isAvailable-instance'>
+      - (void) <strong>isAvailable</strong>()
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.parseFormattedString-file'>
-      ? (void) <strong>kb.parseFormattedString</strong>(string, format)
+    <p class='signature' id='keys-instance'>
+      - (void) <strong>keys</strong>(model)
     </p>
     <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='kb.formattedObservable-file'>
-      ? (void) <strong>kb.formattedObservable</strong>(format, args)
+    <p class='signature' id='relationType-instance'>
+      - (void) <strong>relationType</strong>(model, key)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='bind-instance'>
+      - (void) <strong>bind</strong>(model, key, update, path)
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='useFunction-instance'>
+      - (void) <strong>useFunction</strong>(model, key)
     </p>
     <div class='tags'>
 </div>
@@ -178,11 +215,11 @@
     </div>
     <div id='footer'>
   Generated on
-  Sun Nov 17 2013 11:14:24 GMT-0800 (PST)
+  Mon Nov 25 2013 19:18:08 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
-  v1.7.2
-  (Node.js v0.10.21).
+  v1.9.0
+  (Node.js v0.10.22).
   &#10034;
   Press Ctrl-h to see the keyboard shortcuts
   &#10034;
