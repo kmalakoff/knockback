@@ -56,9 +56,10 @@ Removes advanced features that can be included separately: localization, formatt
 
 You can also find Knockback on your favorite distributions:
 
-* [npm registry](http://search.npmjs.org/#/knockback)
+* [npm registry](https://npmjs.org/package/knockback)
 * [NuGet Gallery](http://nuget.org/packages/Knockback.js)
 * [Bower](http://sindresorhus.com/bower-components/)
+* [Jam](http://jamjs.org/packages/#/details/knockback)
 
 ###Dependencies
 

@@ -11,8 +11,8 @@
   "repository"    : {"type": "git", "url": "http://github.com/kmalakoff/knockback.git"},
 
   "optionalDependencies": {
-    "underscore": "1.5.x",
-    "backbone": "1.1.x",
-    "knockout": "3.0.x"
+    "underscore": ">=1.1.7",
+    "backbone": ">=0.5.1",
+    "knockout": ">=1.2.1"
   }
 }

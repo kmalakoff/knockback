@@ -7,9 +7,9 @@
     <licenseUrl>https://github.com/kmalakoff/knockback/blob/master/LICENSE</licenseUrl>
     <projectUrl>http://kmalakoff.github.com/knockback/</projectUrl>
     <dependencies>
-      <dependency id="knockoutjs" version="2.2.0" />
-      <dependency id="Backbone.js" version="0.9.9" />
-      <dependency id="Underscore.js" version="1.4.3" />
+      <dependency id="Underscore.js" version="1.1.7" />
+      <dependency id="Backbone.js" version="0.5.1" />
+      <dependency id="knockoutjs" version="1.2.1" />
     </dependencies>
     <id>Knockback.js</id>
     <title>Knockback.js</title>

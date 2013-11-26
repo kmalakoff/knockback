@@ -19,9 +19,9 @@
     "docs": "codo -n Knockback.js -o doc src/."
   },
   "dependencies": {
-    "underscore": "1.5.x",
-    "backbone": "1.1.x",
-    "knockout": "3.0.x"
+    "underscore": ">=1.1.7",
+    "backbone": ">=0.5.1",
+    "knockout": ">=1.2.1"
   },
   "devDependencies": {
     "coffee-script": "*",
@@ -46,9 +46,9 @@
   },
   "jam": {
     "dependencies": {
-      "backbone": "*",
-      "underscore": "*",
-      "knockout": "*"
+      "underscore": ">=1.1.7",
+      "backbone": ">=0.5.1",
+      "knockout": ">=1.2.1"
     }
   }
 }
