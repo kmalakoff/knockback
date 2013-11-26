@@ -1845,6 +1845,8 @@ kb.CollectionObservable = (function() {
       var create_options, observable, _ref1;
       if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
         _ref1 = [new kb.Collection(), collection], collection = _ref1[0], options = _ref1[1];
+      } else if (_.isArray(collection)) {
+        collection = new kb.Collection(collection);
       }
       options || (options = {});
       observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));

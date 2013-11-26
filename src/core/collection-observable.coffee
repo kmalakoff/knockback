@@ -77,7 +77,10 @@ class kb.CollectionObservable
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
   constructor: (collection, options) -> return kb.ignore =>
-    [collection, options] = [new kb.Collection(), collection] if _.isUndefined(options) and not (collection instanceof kb.Collection) # default create collection
+    if _.isUndefined(options) and not (collection instanceof kb.Collection) # default create collection
+      [collection, options] = [new kb.Collection(), collection]
+    else if _.isArray(collection)
+      collection = new kb.Collection(collection)
 
     options or= {}
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))

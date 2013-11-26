@@ -3,16 +3,16 @@ Please refer to the following release notes when upgrading your version of Knock
 ## 0.18.0
 * BREAKING CHANGE: filter is now consistent with underscore.js (it was opposite previously where filter true meant remove instead of keep)
 * BREAKING CHANGE: knockback component libraires are now without the 'knockback-' infront of them. For example, lib/knockback-defaults.js is now lib/defaults.js
-* BREAKING CHANGE: removed Knockback symbol publishing (now only kb is supported).
-* safe writing to kb.collectionObservable, view models, and kb.observable without generating unexpected observable dependencies
-* options merging: automate the merging of options including 'internals', 'requires', 'excludes', 'keys', 'factories'
+* BREAKING CHANGE: removed window.Knockback symbol publishing (now only window.kb is supported).
+* kb.ViewModel, kb.CollectionObservable, and kb.Observable are now guaranteed to not create observable dependencies when you set their properties
+* options merging: automate the merging of options including 'internals', 'requires', 'excludes', 'keys', 'factories', 'statics', 'staticDefaults'
 * improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80
-* kb.collectionObservable: added automatic creation of a collection is one isn't passed since you can reference it using collection() on the observable
+* kb.collectionObservable: added automatic creation of a collection is one isn't passed or if an array is passed since you can reference it using collection() on the observable
 * bug fix for findOrCreate refering to incorrect class
 * updated tests for latest libraries (Knockout 3.0.0, Backbone 1.1.0, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
 * added 'sort' collection message in addition to 'resort'
 * bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
-* added statics and static_defaults
+* added statics and static_defaults: kb.viewModel(model, {statics: ['name'], staticDefaults: {name: '(no name)'}})
 
 ## 0.17.2
 
