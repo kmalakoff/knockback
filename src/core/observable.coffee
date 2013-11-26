@@ -71,7 +71,7 @@ class kb.Observable
       read: =>
         _model = @_model(); _unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
         if @read
-          @update(@read.apply(@, args))
+          @update(@read.apply(@_vm, args))
         else if !_.isUndefined(_model)
           kb.ignore => @update(kb.getValue(_model, _peekObservable(@key), @args))
         return _unwrapObservable(@_vo())

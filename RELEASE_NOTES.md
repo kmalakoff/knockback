@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.18.1
+* bugfix for missing binding of this pointer on custom read method
+
 ## 0.18.0
 * BREAKING CHANGE: filter is now consistent with underscore.js (it was opposite previously where filter true meant remove instead of keep)
 * BREAKING CHANGE: knockback component libraires are now without the 'knockback-' infront of them. For example, lib/knockback-defaults.js is now lib/defaults.js

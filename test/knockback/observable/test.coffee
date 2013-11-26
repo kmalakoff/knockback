@@ -311,3 +311,24 @@ describe 'knockback-observable.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '9. this is bound', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model = new Backbone.Model({number: 33})
+
+    ViewModel = (model) ->
+      @number = kb.observable(model, 'number')
+      @formatted_number = kb.observable(model, {
+        key:'number'
+        read: -> return "#: #{@number()}"
+        write: (value) -> @number(value.substring(3))
+      }, @)
+      return
+
+    view_model = new ViewModel(model)
+
+    assert.equal(view_model.formatted_number(), "#: #{view_model.number()}")
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

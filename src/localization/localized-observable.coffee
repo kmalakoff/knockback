@@ -1,5 +1,5 @@
 ###
-  knockback-localized-observable.js 0.18.0
+  knockback-localized-observable.js 0.18.1
   (c) 2011-2013 Kevin Malakoff.
   Knockback.LocalizedObservable is freely distributable under the MIT license.
   See the following for full license details:
