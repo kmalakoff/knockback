@@ -301,3 +301,14 @@ class kb.utils
   # @example
   #   kb.utils.collapseOptions(options);
   @collapseOptions = _collapseOptions
+
+# Helper to ignore dependencies in a function
+#
+# @param [Object] obj the object to test
+#
+# @example
+#   kb.ignore(options);
+if ko.dependencyDetection
+  kb.ignore = (fn) -> value = null; ko.dependencyDetection.begin(->); value = fn(); ko.dependencyDetection.end(); return value
+else
+  kb.ignore = (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value

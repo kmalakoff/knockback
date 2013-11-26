@@ -7243,21 +7243,6 @@ kb = (function() {
     return kb.releaseOnNodeRemove(view_model, node);
   };
 
-  kb.ignore = function(fn) {
-    var value;
-    value = null;
-    if (ko.dependencyDetection) {
-      ko.dependencyDetection.begin(function() {});
-      value = fn();
-      ko.dependencyDetection.end();
-    } else {
-      ko.dependentObservable(function() {
-        return value = fn();
-      }).dispose();
-    }
-    return value;
-  };
-
   kb.getValue = function(model, key, args) {
     if (!model) {
       return;
@@ -7993,6 +7978,26 @@ kb.utils = (function() {
   return utils;
 
 })();
+
+if (ko.dependencyDetection) {
+  kb.ignore = function(fn) {
+    var value;
+    value = null;
+    ko.dependencyDetection.begin(function() {});
+    value = fn();
+    ko.dependencyDetection.end();
+    return value;
+  };
+} else {
+  kb.ignore = function(fn) {
+    var value;
+    value = null;
+    ko.dependentObservable(function() {
+      return value = fn();
+    }).dispose();
+    return value;
+  };
+}
 
 /*
   knockback_factory.js

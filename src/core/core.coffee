@@ -187,22 +187,6 @@ class kb
     ko.applyBindings(view_model, node)
     kb.releaseOnNodeRemove(view_model, node)
 
-  # Helper to ignore dependencies in a function
-  #
-  # @param [Object] obj the object to test
-  #
-  # @example
-  #   kb.ignore(options);
-  @ignore = (fn) ->
-    value = null
-    if ko.dependencyDetection
-      ko.dependencyDetection.begin(->)
-      value = fn()
-      ko.dependencyDetection.end()
-    else
-      ko.dependentObservable(-> value = fn()).dispose()
-    return value
-
   @getValue = (model, key, args) ->
     return unless model
     return model[key]() if _.isFunction(model[key]) and kb.orm.useFunction(model, key)
