@@ -10,6 +10,28 @@
     "node_modules",
     "packages",
     "test",
-    "vendor"
-  ]
+    "vendor",
+    "bower_components",
+    "tests"
+  ],
+  "homepage": "https://github.com/kmalakoff/knockback",
+  "authors": [
+    "Kevin Malakoff <kmalakoff@gmail.com>"
+  ],
+  "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
+  "keywords": [
+    "knockback",
+    "knockbackjs",
+    "backbone",
+    "backbonejs",
+    "knockout",
+    "knockoutjs"
+  ],
+  "dependencies": {
+    "backbone": "*",
+    "underscore": "*",
+    "knockout": "*"
+  },
+
+  "license": "MIT"
 }

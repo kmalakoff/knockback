@@ -43,5 +43,12 @@
 
     "backbone-associations": "0.5.x",
     "supermodel": "0.0.x"
+  },
+  "jam": {
+    "dependencies": {
+      "backbone": "*",
+      "underscore": "*",
+      "knockout": "*"
+    }
   }
 }
