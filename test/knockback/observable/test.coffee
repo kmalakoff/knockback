@@ -315,7 +315,7 @@ describe 'knockback-observable.js', ->
   it '9. this is bound', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    model = new Backbone.Model({number: 33})
+    model = new kb.Model({number: 33})
 
     ViewModel = (model) ->
       @number = kb.observable(model, 'number')
