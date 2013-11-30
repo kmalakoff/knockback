@@ -816,3 +816,89 @@ describe 'Knockback.js with Backbone-Relational.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '12. Issue 96', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    Parameter = Backbone.RelationalModel.extend({idAttribute: "ParameterName"})
+    ParameterCollection = Backbone.Collection.extend({model: Parameter})
+
+    Filter = Backbone.RelationalModel.extend({
+      relations:[{
+        type: Backbone.HasOne,
+        key: "Parameter",
+        keySource: "ParameterName",
+        relatedModel: Parameter,
+        includeInJSON: "ParameterName",
+        reverseRelation: {
+          key: "Filters",
+          type: Backbone.HasMany,
+          includeInJSON: false
+        }
+      }]
+    })
+
+    class StringParameterViewModel extends kb.ViewModel
+    class BooleanParameterViewModel extends kb.ViewModel
+
+    ParameterFactory =
+      create: (parameter, options) ->
+        switch (parameter.get("Type"))
+          when 0 then return new StringParameterViewModel(parameter, options)
+          when 1 then return new BooleanParameterViewModel(parameter, options)
+          else throw "Invalid parameter type attribute."
+
+    parameter_models = new ParameterCollection()
+    parameters = kb.collectionObservable(parameter_models, {factories: {"models": ParameterFactory}})
+
+    parameter_models.push({Type: 0})
+    parameter_models.push({Type: 1})
+
+    assert.ok(parameters()[0] instanceof StringParameterViewModel)
+    assert.ok(parameters()[1] instanceof BooleanParameterViewModel)
+
+    kb.release(parameters)
+
+    FilterGroup = Backbone.RelationalModel.extend({
+      relations:[{
+        type: Backbone.HasMany,
+        key: "Filters",
+        relatedModel: Filter
+      }]
+    })
+
+    class FilterViewModel extends kb.ViewModel
+
+    class FilterGroupViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super model, {
+          factories:
+            "Filters.models": FilterViewModel
+            "Filters.models.Parameter": ParameterFactory
+          options: options
+        }
+
+    filter_group_model = new FilterGroup({Filters: [
+      {Name: 'String', Parameter: {Type: 0}}
+      {Name: 'Boolean', Parameter: {Type: 1}}
+    ]})
+
+    # LEGACY
+    unless filter_group_model.get('Filters').models[0].get('Parameter')
+      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+      return done()
+
+    filter_group = new FilterGroupViewModel(filter_group_model)
+
+    filter = filter_group.Filters()[0]
+    assert.equal(filter.Name(), 'String')
+    assert.ok(filter.Parameter() instanceof StringParameterViewModel)
+
+    filter = filter_group.Filters()[1]
+    assert.equal(filter.Name(), 'Boolean')
+    assert.ok(filter.Parameter() instanceof BooleanParameterViewModel)
+
+    kb.release(filter_group)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
