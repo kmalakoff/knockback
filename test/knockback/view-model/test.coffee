@@ -870,3 +870,43 @@ describe 'knockback-view-model.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '23. Issue 94', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    Child = Backbone.Model.extend()
+
+    Parent = Backbone.Model.extend({
+        defaults: {
+            child: new Child({name: "SingleChild"}),
+            children: new Backbone.Collection([new Child({name: "Child1"}), new Child({name: "Child2"})], {model: Child})
+        }
+    })
+
+    ChildViewModel = (model) ->
+      assert.ok(!!model, 'model is null?')
+      view_model = kb.viewModel(model)
+
+      view_model.nameComputed = ko.computed =>
+        ret = "no name function!"
+        ret = "Hello, " + view_model.name() if view_model.name
+        return ret
+
+      return view_model
+
+    ParentViewModel = (model) ->
+      view_model = kb.viewModel(model, {
+        factories: {
+          'children.models': ChildViewModel,
+          'child': ChildViewModel
+        }
+      })
+      view_model.nameComputed = ko.computed => return "Hello, " + view_model.name()
+      return view_model
+
+    parent_view_model = new ParentViewModel(new Parent({name: "TestParent"}))
+
+    kb.release(parent_view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
