@@ -248,41 +248,19 @@ ORM = (function() {
   };
 
   ORM.prototype.keys = function(model) {
-    var adpater, keys, _j, _len1, _ref1;
-    if (!this.adapters.length) {
-      return;
-    }
-    if (!this.initialized) {
-      this.initialize();
-    }
-    _ref1 = this.adapters;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      adpater = _ref1[_j];
-      if (keys = adpater.keys(model)) {
-        return keys;
-      }
-    }
+    return this._call('keys', arguments);
   };
 
-  ORM.prototype.bind = function(model, key, update, path) {
-    var adpater, unbind_fn, _j, _len1, _ref1;
-    if (!this.adapters.length) {
-      return;
-    }
-    if (!this.initialized) {
-      this.initialize();
-    }
-    _ref1 = this.adapters;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      adpater = _ref1[_j];
-      if (unbind_fn = adpater.bind(model, key, update, path)) {
-        return unbind_fn;
-      }
-    }
+  ORM.prototype.bind = function(model) {
+    return this._call('bind', arguments);
   };
 
-  ORM.prototype.useFunction = function(model, key) {
-    var adpater, _j, _len1, _ref1;
+  ORM.prototype.useFunction = function(model) {
+    return this._call('useFunction', arguments);
+  };
+
+  ORM.prototype._call = function(name, args) {
+    var adpater, result, _j, _len1, _ref1;
     if (!this.adapters.length) {
       return;
     }
@@ -292,8 +270,8 @@ ORM = (function() {
     _ref1 = this.adapters;
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       adpater = _ref1[_j];
-      if (adpater.useFunction(model, key)) {
-        return true;
+      if (adpater[name] && (result = adpater[name].apply(adpater, args))) {
+        return result;
       }
     }
   };
@@ -315,10 +293,6 @@ ORMAdapter_BackboneRelational = (function() {
 
     }
     return !!((_ref2 = kb.Backbone) != null ? _ref2.RelationalModel : void 0);
-  };
-
-  ORMAdapter_BackboneRelational.prototype.keys = function(model) {
-    return null;
   };
 
   ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
@@ -374,10 +348,6 @@ ORMAdapter_BackboneRelational = (function() {
     };
   };
 
-  ORMAdapter_BackboneRelational.prototype.useFunction = function(model, key) {
-    return false;
-  };
-
   return ORMAdapter_BackboneRelational;
 
 })();
@@ -421,14 +391,6 @@ ORMAdapter_BackboneAssociations = (function() {
     } else {
       return KB_TYPE_MODEL;
     }
-  };
-
-  ORMAdapter_BackboneAssociations.prototype.bind = function(model, key, update, path) {
-    return null;
-  };
-
-  ORMAdapter_BackboneAssociations.prototype.useFunction = function(model, key) {
-    return false;
   };
 
   return ORMAdapter_BackboneAssociations;

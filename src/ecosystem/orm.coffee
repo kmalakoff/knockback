@@ -9,25 +9,15 @@ class ORM
 
   addAdapter: (adapter) -> @adapters.push(adapter); @initialized = false
 
-  keys: (model) ->
+  keys: (model) -> return @_call('keys', arguments)
+  bind: (model) -> return @_call('bind', arguments)
+  useFunction: (model) -> return @_call('useFunction', arguments)
+
+  _call: (name, args) ->
     return unless @adapters.length
     @initialize() unless @initialized
 
-    return keys for adpater in @adapters when keys = adpater.keys(model)
-    return
-
-  bind: (model, key, update, path) ->
-    return unless @adapters.length
-    @initialize() unless @initialized
-
-    return unbind_fn for adpater in @adapters when unbind_fn = adpater.bind(model, key, update, path)
-    return
-
-  useFunction: (model, key) ->
-    return unless @adapters.length
-    @initialize() unless @initialized
-
-    return true for adpater in @adapters when adpater.useFunction(model, key)
+    return result for adpater in @adapters when adpater[name] and result = adpater[name].apply(adpater, args)
     return
 
 kb.orm = new ORM()
@@ -38,8 +28,6 @@ class ORMAdapter_BackboneRelational
   isAvailable: ->
     try kb.Backbone?.RelationalModel or require?('backbone-relational') catch
     return !!kb.Backbone?.RelationalModel
-
-  keys: (model) -> null
 
   relationType: (model, key) ->
     return null unless model instanceof kb.Backbone.RelationalModel
@@ -66,8 +54,6 @@ class ORMAdapter_BackboneRelational
         model.unbind("#{events[0]}:#{key}", rel_fn)
       return
 
-  useFunction: (model, key) -> return false
-
 kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
 ###############################
 
@@ -85,9 +71,6 @@ class ORMAdapter_BackboneAssociations
     return null unless model instanceof kb.Backbone.AssociatedModel
     return null unless relation = _.find(model.relations, (test) -> return test.key is key)
     return if (relation.type is 'Many') then KB_TYPE_COLLECTION else KB_TYPE_MODEL
-
-  bind: (model, key, update, path) -> return null
-  useFunction: (model, key) -> return false
 
 kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################
