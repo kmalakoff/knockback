@@ -726,3 +726,40 @@ describe 'knockback-collection-observable.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '19. push and unshift', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class PersonViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(new kb.ContactsCollection(), {view_model: PersonViewModel})
+
+    collection_observable.collection().push()
+    assert.equal(collection_observable.collection().length, 0)
+    assert.equal(collection_observable().length, 0)
+    collection_observable.collection().push(null)
+    assert.equal(collection_observable.collection().length, 0)
+    assert.equal(collection_observable().length, 0)
+    collection_observable.collection().push(new kb.Contact())
+    assert.equal(collection_observable.collection().length, 1)
+    assert.equal(collection_observable().length, 1)
+    collection_observable.collection().reset()
+    assert.equal(collection_observable.collection().length, 0)
+    assert.equal(collection_observable().length, 0)
+
+    collection_observable.collection().unshift()
+    assert.equal(collection_observable.collection().length, 0)
+    assert.equal(collection_observable().length, 0)
+    collection_observable.collection().unshift(null)
+    assert.equal(collection_observable.collection().length, 0)
+    assert.equal(collection_observable().length, 0)
+    collection_observable.collection().unshift(new kb.Contact())
+    assert.equal(collection_observable.collection().length, 1)
+    assert.equal(collection_observable().length, 1)
+    collection_observable.collection().reset()
+    assert.equal(collection_observable.collection().length, 0)
+    assert.equal(collection_observable().length, 0)
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
