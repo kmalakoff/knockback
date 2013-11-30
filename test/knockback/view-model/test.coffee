@@ -877,6 +877,9 @@ describe 'knockback-view-model.js', ->
   it '23. Issue 94', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
+    # ECOSYSTEM
+    return done() if kb.Parse
+
     Child = kb.Model.extend()
 
     Parent = kb.Model.extend({
