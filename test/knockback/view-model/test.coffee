@@ -877,13 +877,13 @@ describe 'knockback-view-model.js', ->
   it '23. Issue 94', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    Child = Backbone.Model.extend()
+    Child = kb.Model.extend()
 
-    Parent = Backbone.Model.extend({
-        defaults: {
-            child: new Child({name: "SingleChild"}),
-            children: new Backbone.Collection([new Child({name: "Child1"}), new Child({name: "Child2"})], {model: Child})
-        }
+    Parent = kb.Model.extend({
+      defaults: {
+        child: new Child({name: "SingleChild"}),
+        children: new kb.Collection([new Child({name: "Child1"}), new Child({name: "Child2"})], {model: Child})
+      }
     })
 
     ChildViewModel = (model) ->
