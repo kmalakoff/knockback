@@ -64,6 +64,7 @@ class kb.CollectionObservable
   # @param [Collection] collection the collection to observe (can be null)
   # @param [Object] options the create options
   # @option options [Boolean] models_only flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.
+  # @option options [Boolean] auto_compact flag used to compact memory used by the collection observable when large changes occur, eg. resetting the collection.
   # @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
   # @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
   # @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
@@ -93,6 +94,7 @@ class kb.CollectionObservable
 
     # options
     options = _collapseOptions(options)
+    @auto_compact = true if options.auto_compact
     if options.sort_attribute
       @_comparator = ko.observable(@_attributeComparator(options.sort_attribute))
     else
@@ -257,6 +259,14 @@ class kb.CollectionObservable
   #   todos2.hasViewModels();     // true
   hasViewModels: -> return not @models_only
 
+  # Compacts the Collection Observable to use the least amount of memory. Currently, this is brute force meaning it releases than regenerates all view models when called.
+  #
+  compact: -> return kb.ignore =>
+    observable = kb.utils.wrappedObservable(@)
+    return unless kb.utils.wrappedStoreIsOwned(observable)
+    kb.utils.wrappedStore(observable).clear()
+    @_collection.notifySubscribers(@_collection())
+
   ####################################################
   # Internal
   ####################################################
@@ -299,7 +309,9 @@ class kb.CollectionObservable
     return if @in_edit # we are doing the editing
 
     switch event
-      when 'reset', 'sort', 'resort'
+      when 'reset'
+        if @auto_compact then @compact() else @_collection.notifySubscribers(@_collection())
+      when 'sort', 'resort'
         @_collection.notifySubscribers(@_collection())
 
       when 'new', 'add'

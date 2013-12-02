@@ -1822,6 +1822,9 @@ kb.CollectionObservable = (function() {
       _this.__kb || (_this.__kb = {});
       _this.__kb._onCollectionChange = _.bind(_this._onCollectionChange, _this);
       options = _collapseOptions(options);
+      if (options.auto_compact) {
+        _this.auto_compact = true;
+      }
       if (options.sort_attribute) {
         _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));
       } else {
@@ -1983,6 +1986,19 @@ kb.CollectionObservable = (function() {
     return !this.models_only;
   };
 
+  CollectionObservable.prototype.compact = function() {
+    var _this = this;
+    return kb.ignore(function() {
+      var observable;
+      observable = kb.utils.wrappedObservable(_this);
+      if (!kb.utils.wrappedStoreIsOwned(observable)) {
+        return;
+      }
+      kb.utils.wrappedStore(observable).clear();
+      return _this._collection.notifySubscribers(_this._collection());
+    });
+  };
+
   CollectionObservable.prototype._shareOrCreateFactory = function(options) {
     var absolute_models_path, existing_creator, factories, factory;
     absolute_models_path = kb.utils.pathJoin(options.path, 'models');
@@ -2032,6 +2048,12 @@ kb.CollectionObservable = (function() {
       }
       switch (event) {
         case 'reset':
+          if (_this.auto_compact) {
+            _this.compact();
+          } else {
+            _this._collection.notifySubscribers(_this._collection());
+          }
+          break;
         case 'sort':
         case 'resort':
           _this._collection.notifySubscribers(_this._collection());

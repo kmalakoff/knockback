@@ -767,3 +767,38 @@ describe 'knockback-collection-observable.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '20. Auto compact for collections', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    models = (new kb.Contact({id: id}) for id in [1..4])
+    class PersonViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(models, {view_model: PersonViewModel, auto_compact: true})
+    assert.equal(collection_observable.collection().length, 4)
+
+    previous_view_models = collection_observable().slice()
+    assert.equal(previous_view_models.length, 4)
+    console.log previous_view_models
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'ViewModel: 4\n CollectionObservable: 1', "Expected stats")
+
+    collection_observable.collection().add(new kb.Contact({id: 5}))
+    new_view_models = collection_observable()
+    assert.equal(new_view_models.length, 5)
+    assert.equal(previous_view_models.length, 4)
+    for vm in new_view_models
+      if vm.model() is collection_observable.collection().models[4]
+        assert.ok(not(vm in previous_view_models))
+      else
+        assert.ok(vm in previous_view_models)
+
+    models = collection_observable.collection().models.slice()
+    collection_observable.collection().reset(models)
+    new_view_models = collection_observable()
+    assert.equal(new_view_models.length, 5)
+    assert.equal(previous_view_models.length, 4)
+    assert.ok(not(vm in previous_view_models)) for vm in new_view_models
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
