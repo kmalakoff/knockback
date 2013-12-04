@@ -778,7 +778,6 @@ describe 'knockback-collection-observable.js', ->
 
     previous_view_models = collection_observable().slice()
     assert.equal(previous_view_models.length, 4)
-    console.log previous_view_models
     assert.equal(kb.statistics.registeredStatsString('all released'), 'ViewModel: 4\n CollectionObservable: 1', "Expected stats")
 
     collection_observable.collection().add(new kb.Contact({id: 5}))

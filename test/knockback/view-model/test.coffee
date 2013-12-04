@@ -916,3 +916,57 @@ describe 'knockback-view-model.js', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '24. Issue 82 - createObservables', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    children = new kb.Collection([
+      new kb.Model({name:"Charles"}),
+      new kb.Model({name:"Eve"})
+    ])
+
+    parent = new kb.Model({name: "Bob", children: children})
+
+    subFactory = (model) ->
+      subVm = new kb.ViewModel(model)
+      subVm.cid = ko.computed -> return model.cid
+      return subVm;
+
+    vm = new kb.ViewModel(parent, {excludes : ['children']})
+
+    vm.shareOptions().factory.addPathMapping('children.models', subFactory);
+    vm.createObservables(parent, ['children'])
+
+    assert.ok(vm.children()[0].cid())
+
+    kb.release(vm)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  it '24. Issue 82 - mapObservables', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    children = new kb.Collection([
+      new kb.Model({name:"Charles"}),
+      new kb.Model({name:"Eve"})
+    ])
+
+    parent = new kb.Model({name: "Bob", children: children})
+
+    subFactory = (model) ->
+      subVm = new kb.ViewModel(model)
+      subVm.cid = ko.computed -> return model.cid
+      return subVm;
+
+    vm = new kb.ViewModel(parent, {excludes : ['children']})
+
+    vm.shareOptions().factory.addPathMapping('children.models', subFactory);
+    vm.mapObservables(parent, {children: {}})
+
+    assert.ok(vm.children()[0].cid())
+
+    kb.release(vm)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

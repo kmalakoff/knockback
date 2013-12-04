@@ -8719,7 +8719,7 @@ kb.ViewModel = (function() {
               }
               missing = _.difference(keys, _.keys(_this.__kb.model_keys));
               if (missing) {
-                _this._createObservables(new_model, missing);
+                _this.createObservables(new_model, missing);
               }
             }
             _mdl(new_model);
@@ -8763,14 +8763,14 @@ kb.ViewModel = (function() {
         keys = _.difference(keys, _this.__kb.statics);
       }
       if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-        _this._mapObservables(model, options.keys);
+        _this.mapObservables(model, options.keys);
       }
       if (_.isObject(options.requires) && !_.isArray(options.requires)) {
-        _this._mapObservables(model, options.requires);
+        _this.mapObservables(model, options.requires);
       }
-      !options.mappings || _this._mapObservables(model, options.mappings);
-      !keys || _this._createObservables(model, keys);
-      !_this.__kb.statics || _this._createObservables(model, _this.__kb.statics, true);
+      !options.mappings || _this.mapObservables(model, options.mappings);
+      !keys || _this.createObservables(model, keys);
+      !_this.__kb.statics || _this.createObservables(model, _this.__kb.statics, true);
       !kb.statistics || kb.statistics.register('ViewModel', _this);
       return _this;
     });
@@ -8796,7 +8796,7 @@ kb.ViewModel = (function() {
     };
   };
 
-  ViewModel.prototype._createObservables = function(model, keys, is_static) {
+  ViewModel.prototype.createObservables = function(model, keys, is_static) {
     var create_options, key, static_defaults, vm_key, _j, _len1;
     if (is_static) {
       static_defaults = this.__kb.static_defaults || {};
@@ -8828,7 +8828,7 @@ kb.ViewModel = (function() {
     }
   };
 
-  ViewModel.prototype._mapObservables = function(model, mappings) {
+  ViewModel.prototype.mapObservables = function(model, mappings) {
     var create_options, mapping_info, vm_key;
     create_options = {
       store: kb.utils.wrappedStore(this),

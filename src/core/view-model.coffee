@@ -129,7 +129,7 @@ class kb.ViewModel
           keys = _.union(keys, rel_keys) if new_model and (rel_keys = kb.orm.keys(new_model))
           missing = _.difference(keys, _.keys(@__kb.model_keys))
           if missing
-            @_createObservables(new_model, missing)
+            @createObservables(new_model, missing)
         _mdl(new_model)
         return
     )
@@ -159,11 +159,11 @@ class kb.ViewModel
     keys = _.difference(keys, @__kb.statics) if keys and @__kb.statics  # remove statics
 
     # initialize
-    @_mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)
-    @_mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
-    not options.mappings or @_mapObservables(model, options.mappings)
-    not keys or @_createObservables(model, keys)
-    not @__kb.statics or @_createObservables(model, @__kb.statics, true)
+    @mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)
+    @mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
+    not options.mappings or @mapObservables(model, options.mappings)
+    not keys or @createObservables(model, keys)
+    not @__kb.statics or @createObservables(model, @__kb.statics, true)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
     return @
@@ -183,12 +183,8 @@ class kb.ViewModel
   shareOptions: ->
     return {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
 
-  ####################################################
-  # Internal
-  ####################################################
-
-  # @private
-  _createObservables: (model, keys, is_static) ->
+  # Manually add observables to the view model by keys if the obervables do not yet exist
+  createObservables: (model, keys, is_static) ->
     if is_static
       static_defaults = @__kb.static_defaults or {}
     else
@@ -212,8 +208,8 @@ class kb.ViewModel
         @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
     return
 
-  # @private
-  _mapObservables: (model, mappings) ->
+  # Manually add observables to the view model by object map if the obervables do not yet exist
+  mapObservables: (model, mappings) ->
     create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
     for vm_key, mapping_info of mappings
       continue if @[vm_key] # already exists, skip
