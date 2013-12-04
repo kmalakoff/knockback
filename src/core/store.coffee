@@ -44,6 +44,13 @@ class kb.Store
     kb.release(@replaced_observables)
     return
 
+  # Manually compact the store by searching for released view models.
+  compact: ->
+    removals = []
+    removals.push(record) for index, record of @observable_records when record.observable?.__kb_released
+    @observable_records = _.difference(@observable_records, removals) if removals.length
+    return
+
   # Used to register a new view model with the store.
   #
   # @param [Model] obj the Model
@@ -80,11 +87,7 @@ class kb.Store
         continue unless record.observable
 
         # already released, release our references
-        if record.observable.__kb_released
-          record.obj = null
-          record.observable = null
-          removals.push record
-          continue
+        (removals.push(record); continue) if record.observable.__kb_released
 
         # first pass doesn't match (both not null or both not same object)
         if (not obj and not record.observable.__kb_null) or (obj and (record.observable.__kb_null or (record.obj isnt obj)))
@@ -92,8 +95,11 @@ class kb.Store
 
         # creator matches
         else if ((record.creator is creator) or (record.creator.create and (record.creator.create is creator.create)))
-          @observable_records = _.difference(@observable_records, removals) if removals.length
-          return index
+          if removals.length
+            @observable_records = _.difference(@observable_records, removals)
+            return _.indexOf(@observable_records, record)
+          else
+            return index
 
     @observable_records = _.difference(@observable_records, removals) if removals.length
     return -1

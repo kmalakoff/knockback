@@ -561,6 +561,7 @@ describe 'knockback-collection-observable.js', ->
     assert.ok(collection_observable()[0] isnt previous_view_model, 'view model updated')
     assert.ok(collection_observable()[0] is view_models[0], 'view model updated from new list')
     store = kb.utils.wrappedStore(collection_observable)
+    store.compact() # ensure compact does not throw
     assert.ok(store.find(collection.models[0], kb.ViewModel) is view_models[0], 'view model was added to the store')
     assert.ok(store.find(collection.models[0], kb.ViewModel) isnt previous_view_model, 'previous view model was removed from the store')
     kb.release(view_models)
@@ -575,6 +576,7 @@ describe 'knockback-collection-observable.js', ->
     assert.ok(collection_observable()[0] isnt previous_view_model, 'view model updated')
     assert.ok(collection_observable()[0] is view_models[0], 'view model updated from new list')
     store = kb.utils.wrappedStore(collection_observable)
+    store.compact() # ensure compact does not throw
     assert.ok(store.find(collection.models[0], kb.ViewModel) isnt view_models[0], 'view model was not added to the store')
     assert.ok(store.find(collection.models[0], kb.ViewModel) is previous_view_model, 'previous view model was not removed from the store')
     kb.release(view_models)

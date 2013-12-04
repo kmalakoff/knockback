@@ -8074,6 +8074,21 @@ kb.Store = (function() {
     kb.release(this.replaced_observables);
   };
 
+  Store.prototype.compact = function() {
+    var index, record, removals, _ref1, _ref2;
+    removals = [];
+    _ref1 = this.observable_records;
+    for (index in _ref1) {
+      record = _ref1[index];
+      if ((_ref2 = record.observable) != null ? _ref2.__kb_released : void 0) {
+        removals.push(record);
+      }
+    }
+    if (removals.length) {
+      this.observable_records = _.difference(this.observable_records, removals);
+    }
+  };
+
   Store.prototype.register = function(obj, observable, options) {
     var creator;
     if (!observable) {
@@ -8107,8 +8122,6 @@ kb.Store = (function() {
           continue;
         }
         if (record.observable.__kb_released) {
-          record.obj = null;
-          record.observable = null;
           removals.push(record);
           continue;
         }
@@ -8117,8 +8130,10 @@ kb.Store = (function() {
         } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
           if (removals.length) {
             this.observable_records = _.difference(this.observable_records, removals);
+            return _.indexOf(this.observable_records, record);
+          } else {
+            return index;
           }
-          return index;
         }
       }
     }
