@@ -74,6 +74,7 @@ class kb.Store
 
   # @private
   findIndex: (obj, creator) ->
+    removals = []
     if not obj or (obj instanceof kb.Model)
       for index, record of @observable_records
         continue unless record.observable
@@ -82,6 +83,7 @@ class kb.Store
         if record.observable.__kb_released
           record.obj = null
           record.observable = null
+          removals.push record
           continue
 
         # first pass doesn't match (both not null or both not same object)
@@ -90,8 +92,10 @@ class kb.Store
 
         # creator matches
         else if ((record.creator is creator) or (record.creator.create and (record.creator.create is creator.create)))
+          @observable_records = _.difference(@observable_records, removals) if removals.length
           return index
 
+    @observable_records = _.difference(@observable_records, removals) if removals.length
     return -1
 
   # @private
@@ -99,8 +103,7 @@ class kb.Store
 
   # @private
   isRegistered: (observable) ->
-    for record in @observable_records
-      return true if record.observable is observable
+    return true for record in @observable_records when record.observable is observable
     return false
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.

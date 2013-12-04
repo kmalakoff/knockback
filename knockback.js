@@ -1009,7 +1009,8 @@ kb.Store = (function() {
   };
 
   Store.prototype.findIndex = function(obj, creator) {
-    var index, record, _ref1;
+    var index, record, removals, _ref1;
+    removals = [];
     if (!obj || (obj instanceof kb.Model)) {
       _ref1 = this.observable_records;
       for (index in _ref1) {
@@ -1020,14 +1021,21 @@ kb.Store = (function() {
         if (record.observable.__kb_released) {
           record.obj = null;
           record.observable = null;
+          removals.push(record);
           continue;
         }
         if ((!obj && !record.observable.__kb_null) || (obj && (record.observable.__kb_null || (record.obj !== obj)))) {
           continue;
         } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
+          if (removals.length) {
+            this.observable_records = _.difference(this.observable_records, removals);
+          }
           return index;
         }
       }
+    }
+    if (removals.length) {
+      this.observable_records = _.difference(this.observable_records, removals);
     }
     return -1;
   };
