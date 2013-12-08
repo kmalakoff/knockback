@@ -180,6 +180,16 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   </li>
   <li>
     <span class='signature'>
+      <a href='#compact-instance'>
+        - (void) <strong>compact</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Manually compact the store by searching for released view models.
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#register-instance'>
         - (void) <strong>register</strong>(obj, observable, options)
       </a>
@@ -278,6 +288,16 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     </p>
     <div class='docstring'>
   <p>Manually clear the store.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='compact-instance'>
+      - (void) <strong>compact</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Manually compact the store by searching for released view models.</p>
 </div>
 <div class='tags'>
 </div>
@@ -442,7 +462,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     </div>
     <div id='footer'>
   Generated on
-  Tue Nov 26 2013 05:06:40 GMT-0800 (PST)
+  Sat Dec 07 2013 19:22:37 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.9.0

@@ -244,6 +244,16 @@ var view_model = {
       Will return true unless created with models_only option.
     </span>
   </li>
+  <li>
+    <span class='signature'>
+      <a href='#compact-instance'>
+        - (void) <strong>compact</strong>()
+      </a>
+    </span>
+    <span class='desc'>
+      Compacts the Collection Observable to use the least amount of memory.
+    </span>
+  </li>
 </ul>
       <h2>Class Method Details</h2>
       <div class='methods'>
@@ -350,6 +360,14 @@ var view_model = {
       </span>
       &mdash;
       <span class='desc'>flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.</span>
+    </li>
+    <li>
+      <span class='name'>auto_compact</span>
+      <span class='type'>
+        (<tt>Boolean</tt>)
+      </span>
+      &mdash;
+      <span class='desc'>flag used to compact memory used by the collection observable when large changes occur, eg. resetting the collection.</span>
     </li>
     <li>
       <span class='name'>view_model</span>
@@ -627,11 +645,21 @@ todos2.hasViewModels();     &#47;&#47; true</code></pre>
 <div class='tags'>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='compact-instance'>
+      - (void) <strong>compact</strong>()
+    </p>
+    <div class='docstring'>
+  <p>Compacts the Collection Observable to use the least amount of memory. Currently, this is brute force meaning it releases than regenerates all view models when called.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Tue Nov 26 2013 05:06:40 GMT-0800 (PST)
+  Sat Dec 07 2013 19:22:37 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.9.0

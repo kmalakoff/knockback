@@ -204,6 +204,26 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); &#47;&#47; ob
       Get the options for a new view model that can be used for sharing view models.
     </span>
   </li>
+  <li>
+    <span class='signature'>
+      <a href='#createObservables-instance'>
+        - (void) <strong>createObservables</strong>(model, keys, is_static)
+      </a>
+    </span>
+    <span class='desc'>
+      Manually add observables to the view model by keys if the obervables do not yet exist
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#mapObservables-instance'>
+        - (void) <strong>mapObservables</strong>(model, mappings)
+      </a>
+    </span>
+    <span class='desc'>
+      Manually add observables to the view model by object map if the obervables do not yet exist
+    </span>
+  </li>
 </ul>
       <h2>Class Method Details</h2>
       <div class='methods'>
@@ -464,11 +484,31 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 <div class='tags'>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='createObservables-instance'>
+      - (void) <strong>createObservables</strong>(model, keys, is_static)
+    </p>
+    <div class='docstring'>
+  <p>Manually add observables to the view model by keys if the obervables do not yet exist</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='mapObservables-instance'>
+      - (void) <strong>mapObservables</strong>(model, mappings)
+    </p>
+    <div class='docstring'>
+  <p>Manually add observables to the view model by object map if the obervables do not yet exist</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
   Generated on
-  Tue Nov 26 2013 05:06:40 GMT-0800 (PST)
+  Sat Dec 07 2013 19:22:37 GMT-0800 (PST)
   by
   <a href='https://github.com/netzpirat/codo' title='CoffeeScript API documentation generator'>Codo</a>
   v1.9.0
