@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.18.2
+* added auto_compact option for collection paging to regenerate observables on collection reset
+* exposed kb.ViewModel's createObservables and mapObservables functions for manual use
+
 ## 0.18.1
 * bugfix for missing binding of this pointer on custom read method
 
