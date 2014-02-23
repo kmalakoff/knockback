@@ -127,7 +127,7 @@ module.exports =
     _build:
       commands: [
         # create docs
-        'npm run docs'
+        # 'npm run docs' # disable until can get latest codo working
 
         # knockback dependencies
         'cp -v underscore vendor/underscore.js'
@@ -159,10 +159,10 @@ module.exports =
         # 'cp -v jqunitjs/qunit/qunit.css vendor/test/qunit.css'
 
         # full and core stack
-        'cat src/_license-header-full-stack.js vendor/underscore-1.5.2.js vendor/backbone-1.1.0.js vendor/knockout-3.0.0.js knockback.js > knockback-full-stack.js'
-        'cat src/_license-header-full-stack.js vendor/underscore-1.5.2.min.js vendor/backbone-1.1.0.min.js vendor/knockout-3.0.0.min.js knockback.min.js > knockback-full-stack.min.js'
-        'cat src/_license-header-core-stack.js vendor/underscore-1.5.2.js vendor/backbone-1.1.0.js vendor/knockout-3.0.0.js knockback-core.js > knockback-core-stack.js'
-        'cat src/_license-header-core-stack.js vendor/underscore-1.5.2.min.js vendor/backbone-1.1.0.min.js vendor/knockout-3.0.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
+        'cat src/_license-header-full-stack.js vendor/underscore-1.6.0.js vendor/backbone-1.1.2.js vendor/knockout-3.0.0.js knockback.js > knockback-full-stack.js'
+        'cat src/_license-header-full-stack.js vendor/underscore-1.6.0.min.js vendor/backbone-1.1.2.min.js vendor/knockout-3.0.0.min.js knockback.min.js > knockback-full-stack.min.js'
+        'cat src/_license-header-core-stack.js vendor/underscore-1.6.0.js vendor/backbone-1.1.2.js vendor/knockout-3.0.0.js knockback-core.js > knockback-core-stack.js'
+        'cat src/_license-header-core-stack.js vendor/underscore-1.6.0.min.js vendor/backbone-1.1.2.min.js vendor/knockout-3.0.0.min.js knockback-core.min.js > knockback-core-stack.min.js'
 
         # npm
         'cp README.md packages/npm/README.md'

@@ -26,7 +26,7 @@
   "devDependencies": {
     "coffee-script": "*",
     "easy-bake": "*",
-    "codo": "1.9.x",
+    "codo": "2.x.x",
     "phantomjs" : "*",
     "uglify-js" : "*",
     "module-bundler" : "*"
@@ -34,12 +34,10 @@
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
     "backbone-modelref": "0.1.x",
-    "lodash": "2.3.x",
+    "lodash": "2.x.x",
 
     "backbone-orm": "0.5.x",
-    "moment": "2.0.x",
-    "inflection": "1.2.x",
-    "lru-cache": "2.3.x",
+    "moment": "2.x.x",
 
     "backbone-associations": "0.5.x",
     "supermodel": "0.0.x"

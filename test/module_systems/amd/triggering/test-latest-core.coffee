@@ -1,8 +1,9 @@
 try
   require.config({
     paths:
-      'underscore': "../../../../vendor/underscore-1.5.2"
-      'backbone': "../../../../vendor/backbone-1.1.0"
+      'underscore': "../../../../vendor/underscore-1.6.0"
+      'jquery': "../../../../vendor/test/jquery-1.10.2"
+      'backbone': "../../../../vendor/backbone-1.1.2"
       'knockout': "../../../../vendor/knockout-3.0.0"
       'knockback': "../../../../knockback-core"
       'knockback-triggering': "../../../../lib/triggering"
