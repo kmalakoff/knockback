@@ -15,11 +15,7 @@
     "knockback.js",
     "knockback.min.js",
     "knockback-core.js",
-    "knockback-core.min.js",
-    "knockback-core-stack.js",
-    "knockback-core-stack.min.js",
-    "knockback-full-stack.js",
-    "knockback-full-stack.min.js"
+    "knockback-core.min.js"
   ],
   "license": "MIT"
 }
