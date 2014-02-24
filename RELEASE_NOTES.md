@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.18.4
+* fixed failed npm publish
+
 ## 0.18.3
 * made safe to run on Node.js
 
