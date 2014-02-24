@@ -150,8 +150,6 @@ module.exports =
         'cp -v backbone-orm/backbone-orm.js vendor/optional/backbone-orm/backbone-orm.js'
         'cp -v backbone-orm/backbone-orm.min.js vendor/optional/backbone-orm/backbone-orm.min.js'
         'cp -v moment vendor/optional/backbone-orm/moment.js'
-        'cp -v inflection vendor/optional/backbone-orm/inflection.js'
-        'cp -v lru-cache vendor/optional/backbone-orm/lru-cache.js'
 
         # knockback test dependencies
         # 'cp -v jquery.js vendor/test/jquery.js'
