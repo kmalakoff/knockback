@@ -5,17 +5,19 @@
   "description"   : "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "keywords"      : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
   "main"          : "knockback.js",
+  "private"       : true,
 
   "url"           : "http://kmalakoff.github.com/knockback/",
   "homepage"      : "http://kmalakoff.github.com/knockback/",
   "repository"    : {"type": "git", "url": "http://github.com/kmalakoff/knockback.git"},
 
   "scripts": {
-    "clean": "bake clean",
-    "build": "bake build",
-    "watch": "bake watch",
-    "test": "bake test -c",
-    "docs": "codo -n Knockback.js -o doc src/."
+    "postinstall": "./node_modules/.bin/bake postinstall",
+    "clean": "./node_modules/.bin/bake clean",
+    "build": "./node_modules/.bin/bake build",
+    "watch": "./node_modules/.bin/bake watch",
+    "test": "./node_modules/.bin/bake test -c",
+    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
   },
   "dependencies": {
     "underscore": ">=1.1.7",
