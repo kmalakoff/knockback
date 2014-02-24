@@ -11,7 +11,6 @@
   "repository"    : {"type": "git", "url": "http://github.com/kmalakoff/knockback.git"},
 
   "scripts": {
-    "postinstall": "bake postinstall",
     "clean": "bake clean",
     "build": "bake build",
     "watch": "bake watch",
