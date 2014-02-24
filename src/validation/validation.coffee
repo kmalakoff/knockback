@@ -1,5 +1,5 @@
 ###
-  knockback-validation.js 0.18.2
+  knockback-validation.js 0.18.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:

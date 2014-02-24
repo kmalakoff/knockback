@@ -1,5 +1,5 @@
 /*
-  knockback-triggering.js 0.18.2
+  knockback-triggering.js 0.18.3
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
@@ -26,7 +26,7 @@ _unwrapObservable = ko.utils.unwrapObservable;
 
 
 /*
-  knockback-triggered-observable.js 0.18.2
+  knockback-triggered-observable.js 0.18.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:

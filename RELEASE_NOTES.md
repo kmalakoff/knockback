@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.18.3
+* made safe to run on Node.js
+
 ## 0.18.2
 * added auto_compact option for collection paging to regenerate observables on collection reset
 * exposed kb.ViewModel's createObservables and mapObservables functions for manual use

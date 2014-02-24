@@ -128,7 +128,8 @@ class kb.Inject
           results.push({el: el, view_model: {}, binding: attr.value})
       findElements(child_el) for child_el in el.childNodes
       return
-    findElements(root or document)
+    root = document if not root and document?
+    findElements(root)
 
     # bind the view models
     for app in results
@@ -163,16 +164,17 @@ kb.injectViewModels = kb.Inject.injectViewModels
 #############################
 # Auto Inject results
 #############################
-# use DOM library ready function
-if @$
-  @$(->kb.injectViewModels())
+if document?
+  # use DOM library ready function
+  if @$
+    @$(->kb.injectViewModels())
 
-# use simple ready check
-else
-  (onReady = ->
-    # keep waiting for the document to load
-    return setTimeout(onReady, 0) unless document.readyState is "complete"
+  # use simple ready check
+  else
+    (onReady = ->
+      # keep waiting for the document to load
+      return setTimeout(onReady, 0) unless document.readyState is "complete"
 
-    # the document is loaded
-    kb.injectViewModels()
-  )()
+      # the document is loaded
+      kb.injectViewModels()
+    )()

@@ -10,7 +10,7 @@ module.exports =
       underscore: 'lodash'
 
   'test/ecosystem/lodash/build/bundle-lodash-latest.js':
-    lodash: 'vendor/optional/lodash/lodash-2.3.0.js'
+    lodash: 'vendor/optional/lodash/lodash-2.4.1.js'
     backbone: 'backbone'
     'backbone-modelref': 'backbone-modelref'
     knockout: 'vendor/knockout-3.0.0.js'

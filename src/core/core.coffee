@@ -1,5 +1,5 @@
 ###
-  knockback-core.js 0.18.2
+  knockback-core.js 0.18.3
   (c) 2011-2013 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -47,7 +47,7 @@
 class kb
 
   # Knockback library semantic version
-  @VERSION: '0.18.2'
+  @VERSION: '0.18.3'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -167,6 +167,8 @@ class kb
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @renderTemplate = (template, view_model, options={}) ->
+    return console.log 'renderTemplate: document is undefined' unless document?
+
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
     el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
