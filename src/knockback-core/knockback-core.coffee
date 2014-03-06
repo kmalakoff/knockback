@@ -99,7 +99,7 @@ class kb
 
     # observable or lifecycle managed
     if ko.isObservable(obj) or (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
-      if ko.isObservable(obj) and _.isArray(array = obj())
+      if ko.isObservable(obj) and _.isArray(array = obj.peek())
         if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is KB_TYPE_COLLECTION))
           if obj.destroy
             obj.destroy()
