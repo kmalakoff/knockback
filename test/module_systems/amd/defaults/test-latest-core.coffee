@@ -5,7 +5,7 @@ try
       'jquery': "../../../../vendor/test/jquery-1.10.2"
       'backbone': "../../../../vendor/backbone-1.1.2"
       'backbone-modelref': "../../../../vendor/optional/backbone-modelref/backbone-modelref-0.1.5"
-      'knockout': "../../../../vendor/knockout-3.0.0"
+      'knockout': "../../../../vendor/knockout-3.1.0"
       'knockback': "../../../../knockback-core"
       'knockback-defaults': "../../../../lib/defaults"
       'knockback-localization': "../../../../lib/localization"

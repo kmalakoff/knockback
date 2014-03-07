@@ -4,7 +4,7 @@ module.exports =
     backbone: 'vendor/backbone-1.1.2.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
-    knockout: 'vendor/knockout-3.0.0.min.js'
+    knockout: 'vendor/knockout-3.1.0.min.js'
     knockback: 'knockback-core.js'
     _publish:
       _: 'underscore'
@@ -16,7 +16,7 @@ module.exports =
     backbone: 'vendor/backbone-1.1.2.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
-    knockout: 'vendor/knockout-3.0.0.min.js'
+    knockout: 'vendor/knockout-3.1.0.min.js'
     knockback: 'knockback.js'
     'knockback-examples-localization': 'test/_examples/build/_localization_examples.js'
     _publish:
@@ -29,7 +29,7 @@ module.exports =
     backbone: 'vendor/backbone-1.1.2.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
-    knockout: 'vendor/knockout-3.0.0.min.js'
+    knockout: 'vendor/knockout-3.1.0.min.js'
     knockback: 'knockback-core.js'
     _alias:
       underscore: 'lodash'
@@ -43,7 +43,7 @@ module.exports =
     backbone: 'vendor/backbone-1.1.2.min.js'
     'backbone-modelref': 'backbone-modelref'
     'backbone-relational': 'backbone-relational'
-    knockout: 'vendor/knockout-3.0.0.min.js'
+    knockout: 'vendor/knockout-3.1.0.min.js'
     knockback: 'knockback.js'
     'knockback-examples-localization': 'test/_examples/build/_localization_examples.js'
     _alias:
