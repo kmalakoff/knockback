@@ -1,5 +1,5 @@
 ###
-  knockback-core.js 0.18.4
+  knockback-core.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
@@ -47,7 +47,7 @@
 class kb
 
   # Knockback library semantic version
-  @VERSION: '0.18.4'
+  @VERSION: '0.18.5'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -114,7 +114,7 @@ class kb
     obj.__kb_released = true # mark as released
 
     # observable or lifecycle managed
-    if ko.isObservable(obj) and _.isArray(array = obj())
+    if ko.isObservable(obj) and _.isArray(array = _peekObservable(obj))
       if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is KB_TYPE_COLLECTION))
         if obj.destroy
           obj.destroy()
