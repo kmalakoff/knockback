@@ -307,8 +307,5 @@ class kb.utils
 # @param [Object] obj the object to test
 #
 # @example
-#   kb.ignore(options);
-if ko.dependencyDetection
-  kb.ignore = (fn) -> value = null; ko.dependencyDetection.begin(->); value = fn(); ko.dependencyDetection.end(); return value
-else
-  kb.ignore = (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value
+#   kb.ignore(fn);
+kb.ignore = ko.dependencyDetection?.ignore or (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value

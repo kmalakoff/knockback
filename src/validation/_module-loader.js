@@ -1,5 +1,5 @@
 /*
-  knockback-validation.js 0.18.4
+  knockback-validation.js 0.18.5
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.

@@ -1,7 +1,11 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 0.18.5
+<<<<<<< HEAD
 * Fix for memory leak: https://github.com/kmalakoff/knockback/pull/110
+=======
+* Use peek during release: https://github.com/kmalakoff/knockback/pull/110
+>>>>>>> edd0600728c820fef341a6f3724f8973550b0ae4
 
 ## 0.18.4
 * fixed failed npm publish
