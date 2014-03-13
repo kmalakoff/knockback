@@ -308,4 +308,4 @@ class kb.utils
 #
 # @example
 #   kb.ignore(fn);
-kb.ignore = ko.dependencyDetection?.ignore or (fn) -> value = null; ko.dependentObservable(-> value = fn()).dispose(); return value
+kb.ignore = ko.dependencyDetection?.ignore or (callback, callbackTarget, callbackArgs) -> value = null; ko.dependentObservable(-> value = callback.apply(callbackTarget, callbackArgs || [])).dispose(); return value

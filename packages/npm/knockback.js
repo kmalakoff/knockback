@@ -856,11 +856,11 @@ kb.utils = (function() {
 
 })();
 
-kb.ignore = ((_ref1 = ko.dependencyDetection) != null ? _ref1.ignore : void 0) || function(fn) {
+kb.ignore = ((_ref1 = ko.dependencyDetection) != null ? _ref1.ignore : void 0) || function(callback, callbackTarget, callbackArgs) {
   var value;
   value = null;
   ko.dependentObservable(function() {
-    return value = fn();
+    return value = callback.apply(callbackTarget, callbackArgs || []);
   }).dispose();
   return value;
 };

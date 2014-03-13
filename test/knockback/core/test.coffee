@@ -47,3 +47,33 @@ describe 'knockback_core utils', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'kb.ignore', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    counter = 0
+    counter_ignore = 0
+
+    name = ko.observable('Bob')
+    counter_computed = ko.dependentObservable =>
+      name()
+      ++counter
+
+    counter_computed_ignore = ko.dependentObservable =>
+      value = kb.ignore ->
+        name()
+        ++counter_ignore
+      assert.equal(value, counter_ignore)
+
+    assert.equal(counter, 1)
+    assert.equal(counter_ignore, 1)
+
+    name('Fred')
+    assert.equal(counter, 2)
+    assert.equal(counter_ignore, 1)
+
+    # ignore with arguments
+    kb.ignore ((arg1, arg2) -> assert.equal(arg1, 1); assert.equal(arg2, 2)), null, [1, 2]
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
