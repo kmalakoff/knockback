@@ -16,7 +16,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  Backbone.Relational.store.addModelScope(window)
+  Backbone.Relational.store.addModelScope?(window)
 
   window.Person = Backbone.RelationalModel.extend({
     relations: [{
