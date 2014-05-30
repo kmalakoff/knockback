@@ -70,7 +70,9 @@ kb.Statistics = (function() {
     type_tracker = this.registeredTracker(key);
     index = _.indexOf(type_tracker, obj);
     if (index < 0) {
-      console.log("kb.Statistics: failed to unregister type: " + key);
+      if (typeof console !== "undefined" && console !== null) {
+        console.log("kb.Statistics: failed to unregister type: " + key);
+      }
     }
     return type_tracker.splice(index, 1);
   };

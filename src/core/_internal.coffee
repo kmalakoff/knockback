@@ -8,7 +8,7 @@ _legacyWarning = (identifier, last_version, message) ->
   @_legacy_warnings or= {}
   @_legacy_warnings[identifier] or= 0
   @_legacy_warnings[identifier]++
-  console.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
+  console?.warn("warning: '#{identifier}' has been deprecated (will be removed in Knockback after #{last_version}). #{message}.")
 
 _arraySplice = Array.prototype.splice
 

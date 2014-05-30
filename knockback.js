@@ -138,7 +138,7 @@ kb = (function() {
       options = {};
     }
     if (typeof document === "undefined" || document === null) {
-      return console.log('renderTemplate: document is undefined');
+      return typeof console !== "undefined" && console !== null ? console.log('renderTemplate: document is undefined') : void 0;
     }
     el = document.createElement('div');
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
@@ -486,7 +486,7 @@ _legacyWarning = function(identifier, last_version, message) {
   this._legacy_warnings || (this._legacy_warnings = {});
   (_base = this._legacy_warnings)[identifier] || (_base[identifier] = 0);
   this._legacy_warnings[identifier]++;
-  return console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".");
+  return typeof console !== "undefined" && console !== null ? console.warn("warning: '" + identifier + "' has been deprecated (will be removed in Knockback after " + last_version + "). " + message + ".") : void 0;
 };
 
 _arraySplice = Array.prototype.splice;

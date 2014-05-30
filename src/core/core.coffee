@@ -167,7 +167,7 @@ class kb
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @renderTemplate = (template, view_model, options={}) ->
-    return console.log 'renderTemplate: document is undefined' unless document?
+    return console?.log 'renderTemplate: document is undefined' unless document?
 
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');

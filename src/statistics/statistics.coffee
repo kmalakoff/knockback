@@ -48,7 +48,7 @@ class kb.Statistics
   unregister: (key, obj) ->
     type_tracker = @registeredTracker(key)
     index = _.indexOf(type_tracker, obj)
-    console.log("kb.Statistics: failed to unregister type: #{key}") if index < 0
+    console?.log("kb.Statistics: failed to unregister type: #{key}") if index < 0
     type_tracker.splice(index, 1)
 
   # @return [Integer] the number of registered objects by type
