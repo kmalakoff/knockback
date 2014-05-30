@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -80,17 +80,17 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1>Tutorial: Knockback Todos App</h1>
+      <content class="page"><h1 id="tutorial-knockback-todos-app">Tutorial: Knockback Todos App</h1>
 <p><a href="http://kmalakoff.github.com/knockback-todos-app/">Try the demo</a> or <a href="https://github.com/kmalakoff/knockback-todos-app">Look at the Code</a></p>
-<h2>Todos Architecture</h2>
-<h3>Knockback follows the MVVM Pattern</h3>
+<h2 id="todos-architecture">Todos Architecture</h2>
+<h3 id="knockback-follows-the-mvvm-pattern">Knockback follows the MVVM Pattern</h3>
 <p>With the MVVM pattern, instead of Model, View, Controller you use Model, View, ViewModel. As an simple approximation using MVC terminology:</p>
 <ul>
 <li>Models are handled by Backbone.Models and Backbone.Collections</li>
 <li>Views are handled by Templates (inline or jQuery)</li>
 <li>ViewModels take the place of Controllers</li>
 </ul>
-<h3>Knockback ViewModel Injection</h3>
+<h3 id="knockback-viewmodel-injection">Knockback ViewModel Injection</h3>
 <p>Like <a href="http://angularjs.org/">AngularJS</a>, Knockback.js provides a mechanism through the <code>kb-inject</code> attribute or the data-bind <code>inject</code> Knockback custom binding to bind HTML Views without a central application control point.</p>
 
         <pre>&lt;section id=&quot;todoapp&quot; kb-inject=&quot;AppViewModel&quot;&gt;
@@ -98,37 +98,37 @@
   ...
 &lt;/section&gt;
 </pre><p>Please look at the <a href="doc/classes/kb.html#injectViewModels-class">API Documentation</a> or the <a href="tutorial_inject.html">ViewModel Injection Tutorial</a> for more information and examples.</p>
-<h2>MVVM in &quot;Todos - Classic&quot;</h2>
+<h2 id="mvvm-in-todos-classic-">MVVM in &quot;Todos - Classic&quot;</h2>
 <p>The Classic application is an upgraded port of the Backbone Todos application so it has the same ORM with Todo (Backbone.Model) and TodoCollection (Backbone.Collection), but the application&#39;s Views are controlled by two ViewModels (AppViewModel and TodoViewModel).</p>
-<h3>Models (Backbone.Model + Backbone.Collection)</h3>
+<h3 id="models-backbone-model-backbone-collection-">Models (Backbone.Model + Backbone.Collection)</h3>
 <ul>
 <li><strong>Todo:</strong> provides the data and operations for a Todo like setting its complete state and saving changes on the server/local-storage.</li>
 <li><strong>TodoCollection:</strong> fetches models from the server and provides summary information on the Todo data like how many are completed, remaining, etc.</li>
 </ul>
-<h3>ViewModels</h3>
+<h3 id="viewmodels">ViewModels</h3>
 <ul>
 <li><p><strong>AppViewModel:</strong> is bound directly in the View HTML and loads the Backbone.Collection with the Todos, to set up Knockout observables to control the sections of the application, to configure the page routing.</p>
 </li>
 <li><p><strong>TodoViewModel:</strong> is instantiated for each Backbone.Model in the todos Collection.</p>
 </li>
 </ul>
-<h2>MVVM in &quot;Todos - Extended&quot;</h2>
+<h2 id="mvvm-in-todos-extended-">MVVM in &quot;Todos - Extended&quot;</h2>
 <p>This application extends the &quot;Todos - Classic&quot; by adding settings including todo priorities (display colors and orders), language selection and localized text, adding todos list sorting options (by name, created date, and priority). Along with the following changes:</p>
-<h3>Models (Backbone.Model + Backbone.Collection)</h3>
+<h3 id="models-backbone-model-backbone-collection-">Models (Backbone.Model + Backbone.Collection)</h3>
 <ul>
 <li><p><strong>Priority:</strong> provides the data for the priority and color information that is saved on the server/local-storage. It could be a generic Backbone.Model but for clarity and consistency with the mock up, it is given a class.</p>
 </li>
 <li><p><strong>PriorityCollection:</strong> a very basic collection for fetching all of the priority settings</p>
 </li>
 </ul>
-<h3>ViewModels</h3>
+<h3 id="viewmodels">ViewModels</h3>
 <ul>
 <li><p><strong>PrioritiesViewModel:</strong> provides localized text (that shouldn&#39;t be saved to the server) and color properties to the &#39;priority-setting-template&#39; template</p>
 </li>
 <li><p><strong>SettingsViewModel:</strong> provides the priority settings globally to the application, the current default priority and color for new tasks, a priority ranking to the TodosViewModel for sorting, the selected and available locales from the locale manager (&#39;en&#39;, &#39;fr-FR&#39;, &#39;it-IT&#39;, &#39;ja-JA&#39;) into display strings (&#39;EN&#39;, &#39;FR&#39;, &#39;IT&#39;, &#39;JA&#39;), todos sorting radio buttons.</p>
 </li>
 </ul>
-<h3>Localization</h3>
+<h3 id="localization">Localization</h3>
 <p>Localization is key for the global applications we create today. It should not be an afterthought!</p>
 <p>Knockback does not provide a locale manager (although there is a sample implementation with this todos application in: models/locale_manager.coffee) because different applications will retrieve their localized strings in different ways. Instead, Knockback provides a localization pattern by using a simpified Backbone.Model-like signature that hooks into Knockback like any other model:</p>
 <ul>
@@ -137,11 +137,11 @@
 </ul>
 
         <pre data-for="cs">@trigger('change', @)
-@trigger(&quot;change:#{key}&quot;, value) for key, value of @translations_by_locale[@locale_identifier]
+@trigger("change:#{key}", value) for key, value of @translations_by_locale[@locale_identifier]
 </pre>
         <pre data-for="js">this.trigger('change', @);
 for (var key in this.translations_by_locale[this.locale_identifier]) {
-  this.trigger(&quot;change:#{key}&quot;, this.translations_by_locale[this.locale_identifier][key]);
+  this.trigger("change:#{key}", this.translations_by_locale[this.locale_identifier][key]);
 }
 </pre><p>Register your custom locale manager like:</p>
 
@@ -151,10 +151,10 @@ for (var key in this.translations_by_locale[this.locale_identifier]) {
 </pre><p>Also, if you want to perform some specialized formatting above and beyond a string lookup, you can provide custom localizer classes derived from kb.LocalizedObservable:</p>
 
         <pre data-for="cs">class LongDateLocalizer extends kb.LocalizedObservable
-  constructor: -&gt; return super
-  read: (value) -&gt;
+  constructor: -> return super
+  read: (value) ->
     return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.f, kb.locale_manager.getLocale())
-  write: (localized_string, value, observable) -&gt;
+  write: (localized_string, value, observable) ->
     new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
     value.setTime(new_value.valueOf())
     </pre>
@@ -176,7 +176,7 @@ for (var key in this.translations_by_locale[this.locale_identifier]) {
 </pre><p><strong>Note:</strong> kb.LocalizedObservable&#39;s constructor actually returns a ko.computed (not the instance itself) so you either need to return super result or if you have custom initialization, return the underlying observable using the following helper: &#39;kb.wrappedObservable(this)&#39;</p>
 <p>You can simply watch an attribute on the locale manager as follows:</p>
 
-        <pre data-for="cs">AppViewModel = -&gt;
+        <pre data-for="cs">AppViewModel = ->
   ...
   @input_placeholder_text = kb.observable(kb.locale_manager, {key: 'placeholder_create'})
   </pre>
@@ -186,7 +186,7 @@ for (var key in this.translations_by_locale[this.locale_identifier]) {
 };
 </pre><p>Or model attributes can be localized automatically when your locale manager triggers a change:</p>
 
-        <pre data-for="cs">TodoViewModel = (model) -&gt;
+        <pre data-for="cs">TodoViewModel = (model) ->
   ...
   @completed = kb.observable(model, {key: 'completed', localizer: LongDateLocalizer})
   </pre>
@@ -194,12 +194,12 @@ for (var key in this.translations_by_locale[this.locale_identifier]) {
   ...
   this.completed = kb.observable(model, {key: 'completed', localizer: LongDateLocalizer});
 };
-</pre><h2>Lazy Loading</h2>
+</pre><h2 id="lazy-loading">Lazy Loading</h2>
 <p>By using Knockback with <a href="https://github.com/kmalakoff/backbone-modelref">Backbone.ModelRef</a>, you can start rendering your views before the models are loaded.</p>
 <p>As demonstration, you can see that the colors arrive a little after the rendering. It is achieved by passing model references instead of models to the settings view model:</p>
 
-        <pre data-for="cs">SettingsViewModel = (priorities) -&gt;
-  @priorities = ko.observableArray(_.map(priorities, (model)-&gt; return new PrioritiesViewModel(model)))
+        <pre data-for="cs">SettingsViewModel = (priorities) ->
+  @priorities = ko.observableArray(_.map(priorities, (model)-> return new PrioritiesViewModel(model)))
   ...
 window.app.viewmodels.settings = new SettingsViewModel([
   new Backbone.ModelRef(priorities, 'high'),
@@ -208,7 +208,7 @@ window.app.viewmodels.settings = new SettingsViewModel([
 ])
 </pre>
         <pre data-for="js">var SettingsViewModel = function(priorities) {
-  this.priorities = ko.observableArray(_.map(priorities, (model)-&gt; return new PrioritiesViewModel(model)));
+  this.priorities = ko.observableArray(_.map(priorities, (model)-> return new PrioritiesViewModel(model)));
   ...
 window.app.viewmodels.settings = new SettingsViewModel([
   new Backbone.ModelRef(priorities, 'high'),
@@ -218,9 +218,9 @@ window.app.viewmodels.settings = new SettingsViewModel([
 </pre><p>and then lazy fetching them (which creates them if they don&#39;t exist):</p>
 
         <pre data-for="cs"># Load the prioties late to show the dynamic nature of Knockback with Backbone.ModelRef
-_.delay((-&gt;
+_.delay((->
   priorities.fetch(
-    success: (collection) -&gt;
+    success: (collection) ->
       collection.create({id:'high', color:'#c00020'}) if not collection.get('high')
       collection.create({id:'medium', color:'#c08040'}) if not collection.get('medium')
       collection.create({id:'low', color:'#00ff60'}) if not collection.get('low')

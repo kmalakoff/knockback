@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -80,7 +80,7 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1>Tutorial: ViewModel Injection</h1>
+      <content class="page"><h1 id="tutorial-viewmodel-injection">Tutorial: ViewModel Injection</h1>
 <p><a href="index.html">Knockback.js</a> provides an a few helpers to inject ViewModels into your HTML Views in a similar way to <a href="http://angularjs.org/">AngularJS&#39;s</a> <code>ng-app</code> so you can build up an application by dynamically binding observables directly from your HTML.</p>
 <p>The following examples show how you might port AngularJS samples to Knockback to help you compare approaches. There&#39;s nothing complicated here, just a <code>kb-inject</code> attribute and a custom <code>inject</code> Knockout binding to add observables to your ViewModel.</p>
 <p>The main way to bind a View when your page is loaded, is to use a <code>kb-inject</code> attribute on your HTML elements. You can optionally provide some hooks if you like:</p>
@@ -103,7 +103,7 @@
 &lt;!-- INJECT A USING A CUSTOM FUNCTION --&gt;
 &lt;div data-bind=&quot;inject: ProjectAppController&quot;&gt;&lt;/div&gt;
 </pre><p>That&#39;s basically it...it&#39;s really a lot easier than memorizing or looking up a large number of custom <code>ng-{something}</code> bindings and you can reuse your knowledge of Knockback.js, Knockout.js, and Backbone.js!</p>
-<h2>Getting Started - Hello World!</h2>
+<h2 id="getting-started-hello-world-">Getting Started - Hello World!</h2>
 <p>There are a few helpers to get us started:</p>
 
         <pre data-for="cs"># helper to toggle classes
@@ -127,7 +127,7 @@ ko.bindingHandlers['classes'] = {
 
 // helpers to manage push state
 window.loadUrl = function(url) { return Backbone.history.loadUrl(url); };
-window.loadUrlFn = function(url) { return function() { return Backbone.history.loadUrl(url); }; };</pre><h2>Hello Example</h2>
+window.loadUrlFn = function(url) { return function() { return Backbone.history.loadUrl(url); }; };</pre><h2 id="hello-example">Hello Example</h2>
 <p>This example uses the &#39;kb-inject&#39; attribute to seed a root application ViewModel with a yourName observable (like a more flexible ng-model binding).</p>
 
         <div class="row-fluid">
@@ -153,7 +153,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
         </div><p>You could have just as easily written the first line like:</p>
 
         <pre>&lt;div data-bind=&quot;inject: {yourName: ko.observable('')}&quot; kb-inject&gt;
-</pre><h2>Todo Example</h2>
+</pre><h2 id="todo-example">Todo Example</h2>
 <p>The todo example uses a custom &#39;TodoCtrl&#39; inject function to add some functions and observables to your view model. Then you can bind them to your HTML using standard Knockout bindings.</p>
 
         <div class="row-fluid">
@@ -225,10 +225,10 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
 };</pre>
               </div>
               <div id="kbi_todo_css" class="tab-pane">
-                <pre><style>.done {
+                <pre>.done {
   text-decoration: line-through;
   color: grey;
-}</style></pre>
+}</pre>
               </div>
             </div>
           </div>
@@ -256,7 +256,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
 </div>
             </div>
           </div>
-        </div><h2>Project Example</h2>
+        </div><h2 id="project-example">Project Example</h2>
 <p>Before we start the example, you should review the <a href="doc/classes/kb/Validation.html">validations documentation</a>.
 Now on with the example! This example shows:</p>
 <ul>

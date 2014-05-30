@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -81,8 +81,8 @@
       <header class="page">
       </header>
       <content class="page">
-        <section><h1>Getting Started with Knockback.js: Knockback.js Important Details</h1>
-<h1>Inheritance</h1>
+        <section><h1 id="getting-started-with-knockback-js-knockback-js-important-details">Getting Started with Knockback.js: Knockback.js Important Details</h1>
+<h1 id="inheritance">Inheritance</h1>
 <p>Some Knockback classes are meant to be inherited from. Specifically:</p>
 <ul>
 <li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
@@ -91,12 +91,12 @@
 </ul>
 <p>When using CoffeeScript, you can derive from a super class using:</p>
 <pre><code>class YourClass extends SuperClass
-  # extensions</code></pre>
-<p>or when using JavaScript, you can derive from a super class using:</p>
+  # extensions
+</code></pre><p>or when using JavaScript, you can derive from a super class using:</p>
 <pre><code>var YourClass = SuperClass.extend({
   /* extensions */
-})</code></pre>
-<p>For example:</p>
+})
+</code></pre><p>For example:</p>
 
           <div class="row-fluid">
             <div class="span8">
@@ -150,7 +150,7 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
                 <script type="application/javascript" src="getting_started/knockback_important_details/kb_view_model_inheritance.js"></script>
               </div>
             </div>
-          </div><h1>Specifying Mappings Paths for Nested Models</h1>
+          </div><h1 id="specifying-mappings-paths-for-nested-models">Specifying Mappings Paths for Nested Models</h1>
 <p>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the <code>factories</code> option when creating a <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> or <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a></p>
 
           <pre data-for="cs">view_model = {
@@ -168,7 +168,7 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
     }
   })
 };</pre><p>Please take a look at the <a href="tutorial_nested_models.html">Nested Model Tutorial</a> for more details.</p>
-<h1>Knockout Observables Foundations</h1>
+<h1 id="knockout-observables-foundations">Knockout Observables Foundations</h1>
 <p>Many Knockback.js classes return Knockout.js observables so their dependencies/subscriptions can and should be managed like any Knockout observable. This is **very important if you choose to extend Knockback classes.</p>
 <p>These classes return a ko.observable instead of &#39;this&#39;:</p>
 <ul>
@@ -184,15 +184,15 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
   constructor: function(collection, options) {
     return kb.CollectionObservable.prototype.constructor.call(this, collection, { view_model: YourViewModel, options: options });
   }
-});</code></pre>
-<p>or</p>
+});
+</code></pre><p>or</p>
 <pre><code>YourCollectionObservable = kb.CollectionObservable.extend({
   constructor: function(collection, options) {
     kb.CollectionObservable.prototype.constructor.call(this, collection, { view_model: YourViewModel, options: options });
     return ko.utils.wrappedObservable(this);
   }
-});</code></pre>
-<p>These classes return &#39;this&#39;:</p>
+});
+</code></pre><p>These classes return &#39;this&#39;:</p>
 <ul>
 <li><a href="doc/classes/kb/Factory.html">kb.Factory</a></li>
 <li><a href="doc/classes/kb/ModelWatcher.html">kb.ModelWatcher</a></li>
@@ -200,7 +200,7 @@ ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
 <li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
 <li><a href="doc/classes/kb/Statistics.html">kb.Statistics</a></li>
 </ul>
-<h1>Backbone.Model Signatures</h1>
+<h1 id="backbone-model-signatures">Backbone.Model Signatures</h1>
 <p>Knockback.js does not require Backbone.Models or Backbone.ModelRefs for attribute watching, but requires only Backbone.Model-like signature.</p>
 <p>The minimal Backbone.Model signature is:</p>
 <ul>

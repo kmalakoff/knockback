@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -105,11 +105,11 @@ var planets = new Backbone.Collection([earth, mars]);
           <p>Router:</p>
           <pre data-for="cs">class PageRouter extends Backbone.Router
   routes:
-    &quot;earth&quot;:    &quot;switchToEarth&quot;     // #earth
-    &quot;mars&quot;:     &quot;switchToMars&quot;      // #mars
+    "earth":    "switchToEarth"     // #earth
+    "mars":     "switchToMars"      // #mars
     
-  switchToEarth: -&gt; # do something
-  switchToMars: -&gt; # do something
+  switchToEarth: -> # do something
+  switchToMars: -> # do something
   
 # instantiate the router and start listening for URL changes
 page_router = new PageRouter()
@@ -117,8 +117,8 @@ Backbone.history.start()
 </pre>
           <pre data-for="js">var PageRouter = Backbone.Router.extend({
   routes: {
-    &quot;earth&quot;:    &quot;switchToEarth&quot;,     // #earth
-    &quot;mars&quot;:     &quot;switchToMars&quot;      // #mars
+    "earth":    "switchToEarth",     // #earth
+    "mars":     "switchToMars"      // #mars
   },
   
   switchToEarth: function() { /* do something */ },
@@ -186,25 +186,25 @@ ko.applyBindings(view_model, $('#ko_basic')[0]);</pre>
           <h4>Knockout.js ViewModel Injectionstances</h4>
           <p>In Knockout.js, ViewModels need to be unique instances so often you use a simple function with 'new' to create an instance to bind. Here are some equivalents:</p>
           <pre data-for="cs"># Form 1: Simple function-based class
-ViewModel = (model) -&gt;
+ViewModel = (model) ->
   @first_name = ko.observable(model.first_name)
   return
   
-view_model = new ViewModel({first_name: &quot;Hello&quot;})
+view_model = new ViewModel({first_name: "Hello"})
 
 # Form 2: CoffeeScript class (allows for inheritance)
 class ViewModel
-  constructor: (model) -&gt;
+  constructor: (model) ->
     @first_name = ko.observable(model.first_name)
     
-view_model = new ViewModel({first_name: &quot;Hello&quot;})
+view_model = new ViewModel({first_name: "Hello"})
 </pre>
           <pre data-for="js">// Simple function-based class
 var ViewModel = function(model) {
   this.first_name = ko.observable(model.first_name);
 };
 
-var view_model = new ViewModel({first_name: &quot;Hello&quot;});</pre>
+var view_model = new ViewModel({first_name: "Hello"});</pre>
         </section>
       </content>
       <footer class="page">

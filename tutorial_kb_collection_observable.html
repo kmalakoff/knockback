@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -80,9 +80,9 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1>Tutorial: kb.CollectionObservable</h1>
+      <content class="page"><h1 id="tutorial-kb-collectionobservable">Tutorial: kb.CollectionObservable</h1>
 <p><a href="index.html">Knockback.js</a> provides an <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a> that watches Backbone.Collections when models are added, removed, and changed. In addition, kb.CollectionObservables can be used to sort models independently from the Backbone.Collection order, to bind HTML select elements, to render/edit <a href="tutorial_relational_models.html">model relationships</a>, and to filter collections.</p>
-<h2>Sorting Models</h2>
+<h2 id="sorting-models">Sorting Models</h2>
 <p>You can sort models using an <a href="doc/classes/kb/CollectionObservable.html#sortAttribute-instance">attribute name</a> or by providing a <a href="doc/classes/kb/CollectionObservable.html#sortedIndex-instance">sorted_index function</a>.</p>
 
         <div class="row-fluid">
@@ -156,7 +156,7 @@ ko.applyBindings(view_model, $('#kbco_sorting')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_collection_observable/kbco_sorting_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2>Filtering Models</h2>
+        </div><h2 id="filtering-models">Filtering Models</h2>
 <p>You can use kb.CollectionObservables to filter both ViewModels or Models (using the &#39;models_only&#39; option) using the filters constructor option. Filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.</p>
 
         <div class="row-fluid">
@@ -230,7 +230,7 @@ ko.applyBindings(view_model, $('#kbco_filtering')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_collection_observable/kbco_filtering_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2>HTML Select Statements</h2>
+        </div><h2 id="html-select-statements">HTML Select Statements</h2>
 <p>You can use kb.CollectionObservables to bind HTML select statements using <a href="http://knockoutjs.com/">Knockout.js selectOptions</a>.</p>
 
         <div class="row-fluid">

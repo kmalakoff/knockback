@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -80,7 +80,7 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1>Tutorial: kb.ViewModel</h1>
+      <content class="page"><h1 id="tutorial-kb-viewmodel">Tutorial: kb.ViewModel</h1>
 <p><a href="index.html">Knockback.js</a> has a helper called <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> to automatically generate observables for each attribute. Most likely you will use the <a href="doc/classes/kb.html#viewModel-class">kb.viewModel(model) factory method</a> to create a kb.ViewModel.</p>
 <p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/classes/kb/ViewModel.html#constructor-instance">constructor options</a> like &#39;keys&#39; or &#39;excludes&#39; to limit the attributes which have kb.Observables for them or &#39;requires&#39; to ensure that observables are created consistently irregardless of the Model.</p>
 <p>In this case, Knockback will skip creating an observable for the &#39;id&#39; attribute:</p>
@@ -92,7 +92,7 @@
         <pre data-for="cs">view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), {requires: ['name', 'date']})
 </pre>
         <pre data-for="js">var view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), {requires: ['name', 'date']});
-</pre><h2>Attribute Type: Backbone.Model</h2>
+</pre><h2 id="attribute-type-backbone-model">Attribute Type: Backbone.Model</h2>
 <p>If Knockback encounters a attribute that is a Backbone.Model, it automatically creates a kb.ViewModel for it. Because the model can change behind the scenes, you must access the view model using the &#39;attribute_name()&#39; syntax rather than as a simple property such as &#39;friend().name&#39; below.</p>
 
         <div class="row-fluid">
@@ -159,7 +159,7 @@ ko.applyBindings(view_model, $('#kbvm_bb_model')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_view_model/kbvm_bb_model_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2>Attribute Type: Backbone.Collection</h2>
+        </div><h2 id="attribute-type-backbone-collection">Attribute Type: Backbone.Collection</h2>
 <p>If Knockback encounters a attribute that is a Backbone.Collection, it automatically creates a kb.CollectionObservable for it and a kb.ViewModel for each of it&#39;s models. Because the collection can change behind the scenes, you must access the collection observable using the &#39;attribute_name()&#39; syntax rather than as a simple property.</p>
 
         <div class="row-fluid">

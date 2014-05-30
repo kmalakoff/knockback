@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -80,9 +80,9 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1>Tutorial: kb.Observable</h1>
+      <content class="page"><h1 id="tutorial-kb-observable">Tutorial: kb.Observable</h1>
 <p><a href="index.html">Knockback.js</a> provides ways to customize a kb.Observable when it is created. This tutorial provides working examples of using these options.</p>
-<h2>Create Options: {read: function(), write: function(value)}</h2>
+<h2 id="create-options-read-function-write-function-value-">Create Options: {read: function(), write: function(value)}</h2>
 <p>Instead of performing a simple Backbone.Model get or set to synchronize with a kb.Observable, you can provide a custom read or write method like for a ko.observable.</p>
 <p><strong>Note</strong>: just like in Knockout.js, if you require access to the owning view model, it provided as &#39;this&#39; in read and write methods if you provide it as a parameter to the kb.observable&#39;s create method: (model, options, owning_view_model)</p>
 
@@ -140,9 +140,9 @@ ko.applyBindings(view_model, $('#kboo_read_write')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_observable/kboo_read_write_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2>Create Options: {localizer: constructor(value)}</h2>
+        </div><h2 id="create-options-localizer-constructor-value-">Create Options: {localizer: constructor(value)}</h2>
 <p>Instead of a read and/or write option, you can provide a kb.LocalizedObservable derived class for custom localized of an attribute. Please see the <a href="tutorial_kb_localized_observable.html#localized_input">kb.LocalizedObservable tutorial</a> an explanation of the following:</p>
-<h3>ViewModel and Bindings:</h3>
+<h3 id="viewmodel-and-bindings-">ViewModel and Bindings:</h3>
 
         <pre data-for="cs">model = new Backbone.Model({date: new Date()})
 
@@ -152,7 +152,7 @@ view_model =
 
   var view_model = {
     date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})
-  };</pre><h2>Create Options: {default: value or observable}</h2>
+  };</pre><h2 id="create-options-default-value-or-observable-">Create Options: {default: value or observable}</h2>
 <p>You can pass a default function or parameter to provide a value when there is no value available.</p>
 
         <div class="row-fluid">
@@ -201,7 +201,7 @@ ko.applyBindings(view_model, $('#kboo_default')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_observable/kboo_default_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2>Dynamic Attribute Types</h2>
+        </div><h2 id="dynamic-attribute-types">Dynamic Attribute Types</h2>
 <p>Since Knockback.js version 0.16.0, a kb.Observable can be created using the correct type before the attribute is loaded using the <a href="doc/classes/kb/ViewModel.html#constructor-instance">factories options</a> and change types when the attribute value changes.</p>
 
         <pre data-for="cs">model = new Backbone.Model({reused: null})

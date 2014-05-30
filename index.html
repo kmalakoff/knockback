@@ -117,7 +117,7 @@
             </div>
             <div class="content row">
               <div class="span7 wrapped">
-                <h2>Download Latest <small>0.18.4</small></h2>
+                <h2>Download Latest <small>0.18.5</small></h2>
                 <table class="table">
                   <thead>
                     <tr>
@@ -131,14 +131,14 @@
                       <td>Full</td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback.js'>Development</a> <small>(dev, 82k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback.min.js'>Production</a> <small>(min+gzip, 13k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback.js'>Development</a> <small>(dev, 82k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback.min.js'>Production</a> <small>(min+gzip, 13k)</small></li>
                         </ul>
                       </td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback-full-stack.js'>Development</a> <small>(dev, 363k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback-full-stack.min.js'>Production</a> <small>(min+gzip, 39k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback-full-stack.js'>Development</a> <small>(dev, 363k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback-full-stack.min.js'>Production</a> <small>(min+gzip, 39k)</small></li>
                         </ul>
                       </td>
                     </tr>
@@ -146,14 +146,14 @@
                       <td>Core</td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback-core.js'>Development</a> <small>(dev, 62k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback-core.min.js'>Production</a> <small>(min+gzip, 10k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback-core.js'>Development</a> <small>(dev, 62k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback-core.min.js'>Production</a> <small>(min+gzip, 10k)</small></li>
                         </ul>
                       </td>
                       <td>
                         <ul>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback-core-stack.js'>Development</a> <small>(dev, 343k)</small></li>
-                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.4/knockback-core-stack.min.js'>Production</a> <small>(min+gzip, 36k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback-core-stack.js'>Development</a> <small>(dev, 343k)</small></li>
+                          <li><a href='https://raw.github.com/kmalakoff/knockback/0.18.5/knockback-core-stack.min.js'>Production</a> <small>(min+gzip, 36k)</small></li>
                         </ul>
                       </td>
                     </tr>
@@ -164,16 +164,16 @@
                   <div><strong>*Core</strong> removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics.</div>
                 </p>
               </div>
-              <div class="span3"><h2>Distributions</h2>
+              <div class="span3"><h2 id="distributions">Distributions</h2>
 <ul>
 <li><a href="https://npmjs.org/package/knockback">npm registry</a></li>
 <li><a href="http://nuget.org/packages/Knockback.js">NuGet Gallery</a></li>
 <li><a href="http://sindresorhus.com/bower-components/">Bower</a></li>
 <li><a href="http://jamjs.org/packages/#/details/knockback">Jam</a></li>
 </ul>
-<h2>Source</h2>
+<h2 id="source">Source</h2>
 <p>You can find the source on <a href="https://github.com/kmalakoff/knockback">Github</a>. To provide feedback leave a message or <a href="https://github.com/kmalakoff/knockback/issues">create an issue</a>.</p>
-<h2>Release Notes</h2>
+<h2 id="release-notes">Release Notes</h2>
 <p>Please look at the <a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">release notes</a> if you are migrating from an earlier version.</p>
 
               </div>
@@ -192,7 +192,7 @@
                   <th>Backbone.js</th>
                   <th class="kb mid">Knockback.js</th>
                   <th>Knockout.js</th>
-                  <th class="ref">!</th>
+                  <th title="Notes" class="ref">!</th>
                 </tr>
               </thead>
               <tbody>
@@ -209,9 +209,9 @@
                   <td class="ref"><a title="View description" href="#comparison-1">1</a></td>
                 </tr>
                 <tr>
-                  <td class="no"><abbr>MVC</abbr></td>
+                  <td class="no"><abbr title="Model/View/Controller">MVC</abbr></td>
                   <td class="done">&#9755;</td>
-                  <td class="yes"><abbr>MVVM</abbr></td>
+                  <td class="yes"><abbr title="Model/View/ViewModel">MVVM</abbr></td>
                   <td class="skip-cell"></td>
                 </tr>
                 <tr>
@@ -268,7 +268,7 @@
           <div class="content notes">
             <h2>Notes</h2>
             <section>
-              <div id="comparison-1"><h1>Serialization</h1>
+              <div id="comparison-1"><h1 id="serialization">Serialization</h1>
 <p>As you probably know, Backbone is known to have a fantastic syncing system built
 as close as possible to the RESTful pattern. And if this is not good for your
 application you can always opt to build a custom <code>Backbone.sync</code> or, if further
@@ -279,14 +279,14 @@ plugin to map into/from any JSON source.</p>
 serialization features we all love are still there!</p>
 
               </div>
-              <div id="comparison-2"><h1>Routing</h1>
+              <div id="comparison-2"><h1 id="routing">Routing</h1>
 <p>In Knockback, while using Knockout.js ViewModel pattern, we developed a full
 pattern that supports Backbone&#39;s routing solution.</p>
 
               </div>
             </section>
             <section>
-              <div id="comparison-3"><h1>(Im)proper use of tools</h1>
+              <div id="comparison-3"><h1 id="-im-proper-use-of-tools">(Im)proper use of tools</h1>
 <p>Too often, in a large Backbone application you find yourself building up views
 with too much logic in them, almost always requiring sub-state management. This is
 actually an improper use of views, which should be as logic-less as possible.</p>
@@ -304,7 +304,7 @@ Knockout.js.</p>
               </div>
             </section>
             <section>
-              <div id="comparison-4"><h1>Views&#39; settings</h1>
+              <div id="comparison-4"><h1 id="views-settings">Views&#39; settings</h1>
 <p>Following MVVM principles where a ViewModel is the &quot;View&#39;s Model&quot;, and therefore
 owns its own properties and methods which are <em>then</em> reflected in the View
 itself, Knockback ViewModels can add View setting and control properties, which are not
@@ -320,14 +320,14 @@ how Knockback provides internationalization to your applications.</p>
           </div>
           <div class="wrapped">
             <div class="row-fluid">
-              <div class="span4"><h2>Projects</h2>
+              <div class="span4"><h2 id="projects">Projects</h2>
 <ul>
 <li><a href="http://www.vidigami.com/">Vidigami</a></li>
 <li><a href="https://github.com/kmalakoff/knockback-site/issues">Submit yours now</a>!</li>
 </ul>
 
               </div>
-              <div class="span3"><h2>Frameworks</h2>
+              <div class="span3"><h2 id="frameworks">Frameworks</h2>
 <ul>
 <li><a href="https://github.com/thedrow/django-knockback">django-knockback</a></li>
 <li><a href="http://pypi.python.org/pypi/js.knockback">js.knockback</a></li>
@@ -335,7 +335,7 @@ how Knockback provides internationalization to your applications.</p>
 </ul>
 
               </div>
-              <div class="span4"><h2>Community Extensions</h2>
+              <div class="span4"><h2 id="community-extensions">Community Extensions</h2>
 <p><a href="https://github.com/kmalakoff/knockback-site/issues">Submit yours now</a>!</p>
 
               </div>

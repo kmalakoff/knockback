@@ -1,12 +1,12 @@
 /*
-  knockback-full-stack.js 0.18.1
+  knockback-full-stack.js 0.18.5
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 */
-//     Underscore.js 1.5.2
+//     Underscore.js 1.6.0
 //     http://underscorejs.org
-//     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -71,7 +71,7 @@
   }
 
   // Current version.
-  _.VERSION = '1.5.2';
+  _.VERSION = '1.6.0';
 
   // Collection Functions
   // --------------------
@@ -80,7 +80,7 @@
   // Handles objects with the built-in `forEach`, arrays, and raw objects.
   // Delegates to **ECMAScript 5**'s native `forEach` if available.
   var each = _.each = _.forEach = function(obj, iterator, context) {
-    if (obj == null) return;
+    if (obj == null) return obj;
     if (nativeForEach && obj.forEach === nativeForEach) {
       obj.forEach(iterator, context);
     } else if (obj.length === +obj.length) {
@@ -93,6 +93,7 @@
         if (iterator.call(context, obj[keys[i]], keys[i], obj) === breaker) return;
       }
     }
+    return obj;
   };
 
   // Return the results of applying the iterator to each element.
@@ -158,10 +159,10 @@
   };
 
   // Return the first value which passes a truth test. Aliased as `detect`.
-  _.find = _.detect = function(obj, iterator, context) {
+  _.find = _.detect = function(obj, predicate, context) {
     var result;
     any(obj, function(value, index, list) {
-      if (iterator.call(context, value, index, list)) {
+      if (predicate.call(context, value, index, list)) {
         result = value;
         return true;
       }
@@ -172,33 +173,33 @@
   // Return all the elements that pass a truth test.
   // Delegates to **ECMAScript 5**'s native `filter` if available.
   // Aliased as `select`.
-  _.filter = _.select = function(obj, iterator, context) {
+  _.filter = _.select = function(obj, predicate, context) {
     var results = [];
     if (obj == null) return results;
-    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(iterator, context);
+    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(predicate, context);
     each(obj, function(value, index, list) {
-      if (iterator.call(context, value, index, list)) results.push(value);
+      if (predicate.call(context, value, index, list)) results.push(value);
     });
     return results;
   };
 
   // Return all the elements for which a truth test fails.
-  _.reject = function(obj, iterator, context) {
+  _.reject = function(obj, predicate, context) {
     return _.filter(obj, function(value, index, list) {
-      return !iterator.call(context, value, index, list);
+      return !predicate.call(context, value, index, list);
     }, context);
   };
 
   // Determine whether all of the elements match a truth test.
   // Delegates to **ECMAScript 5**'s native `every` if available.
   // Aliased as `all`.
-  _.every = _.all = function(obj, iterator, context) {
-    iterator || (iterator = _.identity);
+  _.every = _.all = function(obj, predicate, context) {
+    predicate || (predicate = _.identity);
     var result = true;
     if (obj == null) return result;
-    if (nativeEvery && obj.every === nativeEvery) return obj.every(iterator, context);
+    if (nativeEvery && obj.every === nativeEvery) return obj.every(predicate, context);
     each(obj, function(value, index, list) {
-      if (!(result = result && iterator.call(context, value, index, list))) return breaker;
+      if (!(result = result && predicate.call(context, value, index, list))) return breaker;
     });
     return !!result;
   };
@@ -206,13 +207,13 @@
   // Determine if at least one element in the object matches a truth test.
   // Delegates to **ECMAScript 5**'s native `some` if available.
   // Aliased as `any`.
-  var any = _.some = _.any = function(obj, iterator, context) {
-    iterator || (iterator = _.identity);
+  var any = _.some = _.any = function(obj, predicate, context) {
+    predicate || (predicate = _.identity);
     var result = false;
     if (obj == null) return result;
-    if (nativeSome && obj.some === nativeSome) return obj.some(iterator, context);
+    if (nativeSome && obj.some === nativeSome) return obj.some(predicate, context);
     each(obj, function(value, index, list) {
-      if (result || (result = iterator.call(context, value, index, list))) return breaker;
+      if (result || (result = predicate.call(context, value, index, list))) return breaker;
     });
     return !!result;
   };
@@ -238,25 +239,19 @@
 
   // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
-    return _.map(obj, function(value){ return value[key]; });
+    return _.map(obj, _.property(key));
   };
 
   // Convenience version of a common use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
-  _.where = function(obj, attrs, first) {
-    if (_.isEmpty(attrs)) return first ? void 0 : [];
-    return _[first ? 'find' : 'filter'](obj, function(value) {
-      for (var key in attrs) {
-        if (attrs[key] !== value[key]) return false;
-      }
-      return true;
-    });
+  _.where = function(obj, attrs) {
+    return _.filter(obj, _.matches(attrs));
   };
 
   // Convenience version of a common use case of `find`: getting the first object
   // containing specific `key:value` pairs.
   _.findWhere = function(obj, attrs) {
-    return _.where(obj, attrs, true);
+    return _.find(obj, _.matches(attrs));
   };
 
   // Return the maximum element or (element-based computation).
@@ -266,13 +261,15 @@
     if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
       return Math.max.apply(Math, obj);
     }
-    if (!iterator && _.isEmpty(obj)) return -Infinity;
-    var result = {computed : -Infinity, value: -Infinity};
+    var result = -Infinity, lastComputed = -Infinity;
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed > result.computed && (result = {value : value, computed : computed});
+      if (computed > lastComputed) {
+        result = value;
+        lastComputed = computed;
+      }
     });
-    return result.value;
+    return result;
   };
 
   // Return the minimum element (or element-based computation).
@@ -280,16 +277,18 @@
     if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
       return Math.min.apply(Math, obj);
     }
-    if (!iterator && _.isEmpty(obj)) return Infinity;
-    var result = {computed : Infinity, value: Infinity};
+    var result = Infinity, lastComputed = Infinity;
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed < result.computed && (result = {value : value, computed : computed});
+      if (computed < lastComputed) {
+        result = value;
+        lastComputed = computed;
+      }
     });
-    return result.value;
+    return result;
   };
 
-  // Shuffle an array, using the modern version of the 
+  // Shuffle an array, using the modern version of the
   // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
   _.shuffle = function(obj) {
     var rand;
@@ -303,11 +302,12 @@
     return shuffled;
   };
 
-  // Sample **n** random values from an array.
-  // If **n** is not specified, returns a single random element from the array.
+  // Sample **n** random values from a collection.
+  // If **n** is not specified, returns a single random element.
   // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
-    if (arguments.length < 2 || guard) {
+    if (n == null || guard) {
+      if (obj.length !== +obj.length) obj = _.values(obj);
       return obj[_.random(obj.length - 1)];
     }
     return _.shuffle(obj).slice(0, Math.max(0, n));
@@ -315,12 +315,14 @@
 
   // An internal function to generate lookup iterators.
   var lookupIterator = function(value) {
-    return _.isFunction(value) ? value : function(obj){ return obj[value]; };
+    if (value == null) return _.identity;
+    if (_.isFunction(value)) return value;
+    return _.property(value);
   };
 
   // Sort the object's values by a criterion produced by an iterator.
-  _.sortBy = function(obj, value, context) {
-    var iterator = lookupIterator(value);
+  _.sortBy = function(obj, iterator, context) {
+    iterator = lookupIterator(iterator);
     return _.pluck(_.map(obj, function(value, index, list) {
       return {
         value: value,
@@ -340,9 +342,9 @@
 
   // An internal function used for aggregate "group by" operations.
   var group = function(behavior) {
-    return function(obj, value, context) {
+    return function(obj, iterator, context) {
       var result = {};
-      var iterator = value == null ? _.identity : lookupIterator(value);
+      iterator = lookupIterator(iterator);
       each(obj, function(value, index) {
         var key = iterator.call(context, value, index, obj);
         behavior(result, key, value);
@@ -354,7 +356,7 @@
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
   _.groupBy = group(function(result, key, value) {
-    (_.has(result, key) ? result[key] : (result[key] = [])).push(value);
+    _.has(result, key) ? result[key].push(value) : result[key] = [value];
   });
 
   // Indexes the object's values by a criterion, similar to `groupBy`, but for
@@ -373,7 +375,7 @@
   // Use a comparator function to figure out the smallest index at which
   // an object should be inserted so as to maintain order. Uses binary search.
   _.sortedIndex = function(array, obj, iterator, context) {
-    iterator = iterator == null ? _.identity : lookupIterator(iterator);
+    iterator = lookupIterator(iterator);
     var value = iterator.call(context, obj);
     var low = 0, high = array.length;
     while (low < high) {
@@ -405,7 +407,9 @@
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null) return void 0;
-    return (n == null) || guard ? array[0] : slice.call(array, 0, n);
+    if ((n == null) || guard) return array[0];
+    if (n < 0) return [];
+    return slice.call(array, 0, n);
   };
 
   // Returns everything but the last entry of the array. Especially useful on
@@ -420,11 +424,8 @@
   // values in the array. The **guard** check allows it to work with `_.map`.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
-    if ((n == null) || guard) {
-      return array[array.length - 1];
-    } else {
-      return slice.call(array, Math.max(array.length - n, 0));
-    }
+    if ((n == null) || guard) return array[array.length - 1];
+    return slice.call(array, Math.max(array.length - n, 0));
   };
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
@@ -465,6 +466,16 @@
     return _.difference(array, slice.call(arguments, 1));
   };
 
+  // Split an array into two arrays: one whose elements all satisfy the given
+  // predicate, and one whose elements all do not satisfy the predicate.
+  _.partition = function(array, predicate) {
+    var pass = [], fail = [];
+    each(array, function(elem) {
+      (predicate(elem) ? pass : fail).push(elem);
+    });
+    return [pass, fail];
+  };
+
   // Produce a duplicate-free version of the array. If the array has already
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
@@ -498,7 +509,7 @@
     var rest = slice.call(arguments, 1);
     return _.filter(_.uniq(array), function(item) {
       return _.every(rest, function(other) {
-        return _.indexOf(other, item) >= 0;
+        return _.contains(other, item);
       });
     });
   };
@@ -513,7 +524,7 @@
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
   _.zip = function() {
-    var length = _.max(_.pluck(arguments, "length").concat(0));
+    var length = _.max(_.pluck(arguments, 'length').concat(0));
     var results = new Array(length);
     for (var i = 0; i < length; i++) {
       results[i] = _.pluck(arguments, '' + i);
@@ -619,19 +630,27 @@
   };
 
   // Partially apply a function by creating a version that has had some of its
-  // arguments pre-filled, without changing its dynamic `this` context.
+  // arguments pre-filled, without changing its dynamic `this` context. _ acts
+  // as a placeholder, allowing any combination of arguments to be pre-filled.
   _.partial = function(func) {
-    var args = slice.call(arguments, 1);
+    var boundArgs = slice.call(arguments, 1);
     return function() {
-      return func.apply(this, args.concat(slice.call(arguments)));
+      var position = 0;
+      var args = boundArgs.slice();
+      for (var i = 0, length = args.length; i < length; i++) {
+        if (args[i] === _) args[i] = arguments[position++];
+      }
+      while (position < arguments.length) args.push(arguments[position++]);
+      return func.apply(this, args);
     };
   };
 
-  // Bind all of an object's methods to that object. Useful for ensuring that
-  // all callbacks defined on an object belong to it.
+  // Bind a number of an object's methods to that object. Remaining arguments
+  // are the method names to be bound. Useful for ensuring that all callbacks
+  // defined on an object belong to it.
   _.bindAll = function(obj) {
     var funcs = slice.call(arguments, 1);
-    if (funcs.length === 0) throw new Error("bindAll must be passed function names");
+    if (funcs.length === 0) throw new Error('bindAll must be passed function names');
     each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
     return obj;
   };
@@ -670,12 +689,13 @@
     var previous = 0;
     options || (options = {});
     var later = function() {
-      previous = options.leading === false ? 0 : new Date;
+      previous = options.leading === false ? 0 : _.now();
       timeout = null;
       result = func.apply(context, args);
+      context = args = null;
     };
     return function() {
-      var now = new Date;
+      var now = _.now();
       if (!previous && options.leading === false) previous = now;
       var remaining = wait - (now - previous);
       context = this;
@@ -685,6 +705,7 @@
         timeout = null;
         previous = now;
         result = func.apply(context, args);
+        context = args = null;
       } else if (!timeout && options.trailing !== false) {
         timeout = setTimeout(later, remaining);
       }
@@ -698,24 +719,33 @@
   // leading edge, instead of the trailing.
   _.debounce = function(func, wait, immediate) {
     var timeout, args, context, timestamp, result;
+
+    var later = function() {
+      var last = _.now() - timestamp;
+      if (last < wait) {
+        timeout = setTimeout(later, wait - last);
+      } else {
+        timeout = null;
+        if (!immediate) {
+          result = func.apply(context, args);
+          context = args = null;
+        }
+      }
+    };
+
     return function() {
       context = this;
       args = arguments;
-      timestamp = new Date();
-      var later = function() {
-        var last = (new Date()) - timestamp;
-        if (last < wait) {
-          timeout = setTimeout(later, wait - last);
-        } else {
-          timeout = null;
-          if (!immediate) result = func.apply(context, args);
-        }
-      };
+      timestamp = _.now();
       var callNow = immediate && !timeout;
       if (!timeout) {
         timeout = setTimeout(later, wait);
       }
-      if (callNow) result = func.apply(context, args);
+      if (callNow) {
+        result = func.apply(context, args);
+        context = args = null;
+      }
+
       return result;
     };
   };
@@ -737,11 +767,7 @@
   // allowing you to adjust arguments, run code before and after, and
   // conditionally execute the original function.
   _.wrap = function(func, wrapper) {
-    return function() {
-      var args = [func];
-      push.apply(args, arguments);
-      return wrapper.apply(this, args);
-    };
+    return _.partial(wrapper, func);
   };
 
   // Returns a function that is the composition of a list of functions, each
@@ -771,8 +797,9 @@
 
   // Retrieve the names of an object's properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
-  _.keys = nativeKeys || function(obj) {
-    if (obj !== Object(obj)) throw new TypeError('Invalid object');
+  _.keys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    if (nativeKeys) return nativeKeys(obj);
     var keys = [];
     for (var key in obj) if (_.has(obj, key)) keys.push(key);
     return keys;
@@ -927,7 +954,8 @@
     // from different frames are.
     var aCtor = a.constructor, bCtor = b.constructor;
     if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
-                             _.isFunction(bCtor) && (bCtor instanceof bCtor))) {
+                             _.isFunction(bCtor) && (bCtor instanceof bCtor))
+                        && ('constructor' in a && 'constructor' in b)) {
       return false;
     }
     // Add the first object to the stack of traversed objects.
@@ -1067,6 +1095,30 @@
     return value;
   };
 
+  _.constant = function(value) {
+    return function () {
+      return value;
+    };
+  };
+
+  _.property = function(key) {
+    return function(obj) {
+      return obj[key];
+    };
+  };
+
+  // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
+  _.matches = function(attrs) {
+    return function(obj) {
+      if (obj === attrs) return true; //avoid comparing an object to itself.
+      for (var key in attrs) {
+        if (attrs[key] !== obj[key])
+          return false;
+      }
+      return true;
+    }
+  };
+
   // Run a function **n** times.
   _.times = function(n, iterator, context) {
     var accum = Array(Math.max(0, n));
@@ -1082,6 +1134,9 @@
     }
     return min + Math.floor(Math.random() * (max - min + 1));
   };
+
+  // A (possibly faster) way to get the current timestamp as an integer.
+  _.now = Date.now || function() { return new Date().getTime(); };
 
   // List of HTML entities for escaping.
   var entityMap = {
@@ -1279,23 +1334,50 @@
 
   });
 
+  // AMD registration happens at the end for compatibility with AMD loaders
+  // that may not enforce next-turn semantics on modules. Even though general
+  // practice for AMD registration is to be anonymous, underscore registers
+  // as a named module because, like jQuery, it is a base library that is
+  // popular enough to be bundled in a third party lib, but not be part of
+  // an AMD load request. Those cases could generate an error when an
+  // anonymous define() is called outside of a loader request.
+  if (typeof define === 'function' && define.amd) {
+    define('underscore', [], function() {
+      return _;
+    });
+  }
 }).call(this);
-//     Backbone.js 1.1.0
+//     Backbone.js 1.1.2
 
-//     (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
-//     (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Backbone may be freely distributed under the MIT license.
 //     For all details and documentation:
 //     http://backbonejs.org
 
-(function(){
+(function(root, factory) {
+
+  // Set up Backbone appropriately for the environment. Start with AMD.
+  if (typeof define === 'function' && define.amd) {
+    define(['underscore', 'jquery', 'exports'], function(_, $, exports) {
+      // Export global even in AMD case in case this script is loaded with
+      // others that may still expect a global Backbone.
+      root.Backbone = factory(root, exports, _, $);
+    });
+
+  // Next for Node.js or CommonJS. jQuery may not be needed as a module.
+  } else if (typeof exports !== 'undefined') {
+    var _ = require('underscore');
+    factory(root, exports, _);
+
+  // Finally, as a browser global.
+  } else {
+    root.Backbone = factory(root, {}, root._, (root.jQuery || root.Zepto || root.ender || root.$));
+  }
+
+}(this, function(root, Backbone, _, $) {
 
   // Initial Setup
   // -------------
-
-  // Save a reference to the global object (`window` in the browser, `exports`
-  // on the server).
-  var root = this;
 
   // Save the previous value of the `Backbone` variable, so that it can be
   // restored later on, if `noConflict` is used.
@@ -1307,25 +1389,12 @@
   var slice = array.slice;
   var splice = array.splice;
 
-  // The top-level namespace. All public Backbone classes and modules will
-  // be attached to this. Exported for both the browser and the server.
-  var Backbone;
-  if (typeof exports !== 'undefined') {
-    Backbone = exports;
-  } else {
-    Backbone = root.Backbone = {};
-  }
-
   // Current version of the library. Keep in sync with `package.json`.
-  Backbone.VERSION = '1.1.0';
-
-  // Require Underscore, if we're on the server, and it's not already present.
-  var _ = root._;
-  if (!_ && (typeof require !== 'undefined')) _ = require('underscore');
+  Backbone.VERSION = '1.1.2';
 
   // For Backbone's purposes, jQuery, Zepto, Ender, or My Library (kidding) owns
   // the `$` variable.
-  Backbone.$ = root.jQuery || root.Zepto || root.ender || root.$;
+  Backbone.$ = $;
 
   // Runs Backbone.js in *noConflict* mode, returning the `Backbone` variable
   // to its previous owner. Returns a reference to this Backbone object.
@@ -1391,7 +1460,7 @@
       var retain, ev, events, names, i, l, j, k;
       if (!this._events || !eventsApi(this, 'off', name, [callback, context])) return this;
       if (!name && !callback && !context) {
-        this._events = {};
+        this._events = void 0;
         return this;
       }
       names = name ? [name] : _.keys(this._events);
@@ -1487,7 +1556,7 @@
       case 1: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1); return;
       case 2: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2); return;
       case 3: while (++i < l) (ev = events[i]).callback.call(ev.ctx, a1, a2, a3); return;
-      default: while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args);
+      default: while (++i < l) (ev = events[i]).callback.apply(ev.ctx, args); return;
     }
   };
 
@@ -1632,7 +1701,7 @@
 
       // Trigger all relevant attribute changes.
       if (!silent) {
-        if (changes.length) this._pending = true;
+        if (changes.length) this._pending = options;
         for (var i = 0, l = changes.length; i < l; i++) {
           this.trigger('change:' + changes[i], this, current[changes[i]], options);
         }
@@ -1643,6 +1712,7 @@
       if (changing) return this;
       if (!silent) {
         while (this._pending) {
+          options = this._pending;
           this._pending = false;
           this.trigger('change', this, options);
         }
@@ -1810,9 +1880,12 @@
     // using Backbone's restful methods, override this to change the endpoint
     // that will be called.
     url: function() {
-      var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url') || urlError();
+      var base =
+        _.result(this, 'urlRoot') ||
+        _.result(this.collection, 'url') ||
+        urlError();
       if (this.isNew()) return base;
-      return base + (base.charAt(base.length - 1) === '/' ? '' : '/') + encodeURIComponent(this.id);
+      return base.replace(/([^\/])$/, '$1/') + encodeURIComponent(this.id);
     },
 
     // **parse** converts a response into the hash of attributes to be `set` on
@@ -1828,7 +1901,7 @@
 
     // A model is new if it has never been saved to the server, and lacks an id.
     isNew: function() {
-      return this.id == null;
+      return !this.has(this.idAttribute);
     },
 
     // Check if the model is currently in a valid state.
@@ -1932,7 +2005,7 @@
           options.index = index;
           model.trigger('remove', model, this, options);
         }
-        this._removeReference(model);
+        this._removeReference(model, options);
       }
       return singular ? models[0] : models;
     },
@@ -1958,11 +2031,11 @@
       // Turn bare objects into model references, and prevent invalid models
       // from being added.
       for (i = 0, l = models.length; i < l; i++) {
-        attrs = models[i];
+        attrs = models[i] || {};
         if (attrs instanceof Model) {
           id = model = attrs;
         } else {
-          id = attrs[targetModel.prototype.idAttribute];
+          id = attrs[targetModel.prototype.idAttribute || 'id'];
         }
 
         // If a duplicate is found, prevent it from being added and
@@ -1982,14 +2055,13 @@
           model = models[i] = this._prepareModel(attrs, options);
           if (!model) continue;
           toAdd.push(model);
-
-          // Listen to added models' events, and index models for lookup by
-          // `id` and by `cid`.
-          model.on('all', this._onModelEvent, this);
-          this._byId[model.cid] = model;
-          if (model.id != null) this._byId[model.id] = model;
+          this._addReference(model, options);
         }
-        if (order) order.push(existing || model);
+
+        // Do not add multiple models with the same `id`.
+        model = existing || model;
+        if (order && (model.isNew() || !modelMap[model.id])) order.push(model);
+        modelMap[model.id] = true;
       }
 
       // Remove nonexistent models if appropriate.
@@ -2027,7 +2099,7 @@
         }
         if (sort || (order && order.length)) this.trigger('sort', this, options);
       }
-      
+
       // Return the added (or merged) model (or models).
       return singular ? models[0] : models;
     },
@@ -2039,7 +2111,7 @@
     reset: function(models, options) {
       options || (options = {});
       for (var i = 0, l = this.models.length; i < l; i++) {
-        this._removeReference(this.models[i]);
+        this._removeReference(this.models[i], options);
       }
       options.previousModels = this.models;
       this._reset();
@@ -2080,7 +2152,7 @@
     // Get a model from the set by id.
     get: function(obj) {
       if (obj == null) return void 0;
-      return this._byId[obj.id] || this._byId[obj.cid] || this._byId[obj];
+      return this._byId[obj] || this._byId[obj.id] || this._byId[obj.cid];
     },
 
     // Get the model at the given index.
@@ -2156,7 +2228,7 @@
       if (!options.wait) this.add(model, options);
       var collection = this;
       var success = options.success;
-      options.success = function(model, resp, options) {
+      options.success = function(model, resp) {
         if (options.wait) collection.add(model, options);
         if (success) success(model, resp, options);
       };
@@ -2186,10 +2258,7 @@
     // Prepare a hash of attributes (or other model) to be added to this
     // collection.
     _prepareModel: function(attrs, options) {
-      if (attrs instanceof Model) {
-        if (!attrs.collection) attrs.collection = this;
-        return attrs;
-      }
+      if (attrs instanceof Model) return attrs;
       options = options ? _.clone(options) : {};
       options.collection = this;
       var model = new this.model(attrs, options);
@@ -2198,8 +2267,16 @@
       return false;
     },
 
+    // Internal method to create a model's ties to a collection.
+    _addReference: function(model, options) {
+      this._byId[model.cid] = model;
+      if (model.id != null) this._byId[model.id] = model;
+      if (!model.collection) model.collection = this;
+      model.on('all', this._onModelEvent, this);
+    },
+
     // Internal method to sever a model's ties to a collection.
-    _removeReference: function(model) {
+    _removeReference: function(model, options) {
       if (this === model.collection) delete model.collection;
       model.off('all', this._onModelEvent, this);
     },
@@ -2228,7 +2305,7 @@
     'reject', 'every', 'all', 'some', 'any', 'include', 'contains', 'invoke',
     'max', 'min', 'toArray', 'size', 'first', 'head', 'take', 'initial', 'rest',
     'tail', 'drop', 'last', 'without', 'difference', 'indexOf', 'shuffle',
-    'lastIndexOf', 'isEmpty', 'chain'];
+    'lastIndexOf', 'isEmpty', 'chain', 'sample'];
 
   // Mix in each Underscore method as a proxy to `Collection#models`.
   _.each(methods, function(method) {
@@ -2240,7 +2317,7 @@
   });
 
   // Underscore methods that take a property name as an argument.
-  var attributeMethods = ['groupBy', 'countBy', 'sortBy'];
+  var attributeMethods = ['groupBy', 'countBy', 'sortBy', 'indexBy'];
 
   // Use attributes instead of properties.
   _.each(attributeMethods, function(method) {
@@ -2462,7 +2539,9 @@
     return xhr;
   };
 
-  var noXhrPatch = typeof window !== 'undefined' && !!window.ActiveXObject && !(window.XMLHttpRequest && (new XMLHttpRequest).dispatchEvent);
+  var noXhrPatch =
+    typeof window !== 'undefined' && !!window.ActiveXObject &&
+      !(window.XMLHttpRequest && (new XMLHttpRequest).dispatchEvent);
 
   // Map from CRUD to HTTP for our default `Backbone.sync` implementation.
   var methodMap = {
@@ -2521,12 +2600,18 @@
       var router = this;
       Backbone.history.route(route, function(fragment) {
         var args = router._extractParameters(route, fragment);
-        callback && callback.apply(router, args);
+        router.execute(callback, args);
         router.trigger.apply(router, ['route:' + name].concat(args));
         router.trigger('route', name, args);
         Backbone.history.trigger('route', router, name, args);
       });
       return this;
+    },
+
+    // Execute a route handler with the provided parameters.  This is an
+    // excellent place to do pre-route setup or post-route cleanup.
+    execute: function(callback, args) {
+      if (callback) callback.apply(this, args);
     },
 
     // Simple proxy to `Backbone.history` to save a fragment into the history.
@@ -2553,10 +2638,10 @@
       route = route.replace(escapeRegExp, '\\$&')
                    .replace(optionalParam, '(?:$1)?')
                    .replace(namedParam, function(match, optional) {
-                     return optional ? match : '([^\/]+)';
+                     return optional ? match : '([^/?]+)';
                    })
-                   .replace(splatParam, '(.*?)');
-      return new RegExp('^' + route + '$');
+                   .replace(splatParam, '([^?]*?)');
+      return new RegExp('^' + route + '(?:\\?([\\s\\S]*))?$');
     },
 
     // Given a route, and a URL fragment that it matches, return the array of
@@ -2564,7 +2649,9 @@
     // treated as `null` to normalize cross-browser behavior.
     _extractParameters: function(route, fragment) {
       var params = route.exec(fragment).slice(1);
-      return _.map(params, function(param) {
+      return _.map(params, function(param, i) {
+        // Don't decode the search params.
+        if (i === params.length - 1) return param || null;
         return param ? decodeURIComponent(param) : null;
       });
     }
@@ -2602,8 +2689,8 @@
   // Cached regex for removing a trailing slash.
   var trailingSlash = /\/$/;
 
-  // Cached regex for stripping urls of hash and query.
-  var pathStripper = /[?#].*$/;
+  // Cached regex for stripping urls of hash.
+  var pathStripper = /#.*$/;
 
   // Has the history handling already been started?
   History.started = false;
@@ -2614,6 +2701,11 @@
     // The default interval to poll for hash changes, if necessary, is
     // twenty times a second.
     interval: 50,
+
+    // Are we at the app root?
+    atRoot: function() {
+      return this.location.pathname.replace(/[^\/]$/, '$&/') === this.root;
+    },
 
     // Gets the true hash value. Cannot use location.hash directly due to bug
     // in Firefox where location.hash will always be decoded.
@@ -2627,7 +2719,7 @@
     getFragment: function(fragment, forcePushState) {
       if (fragment == null) {
         if (this._hasPushState || !this._wantsHashChange || forcePushState) {
-          fragment = this.location.pathname;
+          fragment = decodeURI(this.location.pathname + this.location.search);
           var root = this.root.replace(trailingSlash, '');
           if (!fragment.indexOf(root)) fragment = fragment.slice(root.length);
         } else {
@@ -2658,7 +2750,8 @@
       this.root = ('/' + this.root + '/').replace(rootStripper, '/');
 
       if (oldIE && this._wantsHashChange) {
-        this.iframe = Backbone.$('<iframe src="javascript:0" tabindex="-1" />').hide().appendTo('body')[0].contentWindow;
+        var frame = Backbone.$('<iframe src="javascript:0" tabindex="-1">');
+        this.iframe = frame.hide().appendTo('body')[0].contentWindow;
         this.navigate(fragment);
       }
 
@@ -2676,7 +2769,6 @@
       // opened by a non-pushState browser.
       this.fragment = fragment;
       var loc = this.location;
-      var atRoot = loc.pathname.replace(/[^\/]$/, '$&/') === this.root;
 
       // Transition from hashChange to pushState or vice versa if both are
       // requested.
@@ -2684,17 +2776,17 @@
 
         // If we've started off with a route from a `pushState`-enabled
         // browser, but we're currently in a browser that doesn't support it...
-        if (!this._hasPushState && !atRoot) {
+        if (!this._hasPushState && !this.atRoot()) {
           this.fragment = this.getFragment(null, true);
-          this.location.replace(this.root + this.location.search + '#' + this.fragment);
+          this.location.replace(this.root + '#' + this.fragment);
           // Return immediately as browser will do redirect to new url
           return true;
 
         // Or if we've started out with a hash-based route, but we're currently
         // in a browser where it could be `pushState`-based instead...
-        } else if (this._hasPushState && atRoot && loc.hash) {
+        } else if (this._hasPushState && this.atRoot() && loc.hash) {
           this.fragment = this.getHash().replace(routeStripper, '');
-          this.history.replaceState({}, document.title, this.root + this.fragment + loc.search);
+          this.history.replaceState({}, document.title, this.root + this.fragment);
         }
 
       }
@@ -2706,7 +2798,7 @@
     // but possibly useful for unit testing Routers.
     stop: function() {
       Backbone.$(window).off('popstate', this.checkUrl).off('hashchange', this.checkUrl);
-      clearInterval(this._checkUrlInterval);
+      if (this._checkUrlInterval) clearInterval(this._checkUrlInterval);
       History.started = false;
     },
 
@@ -2754,7 +2846,7 @@
 
       var url = this.root + (fragment = this.getFragment(fragment || ''));
 
-      // Strip the fragment of the query and hash for matching.
+      // Strip the hash for matching.
       fragment = fragment.replace(pathStripper, '');
 
       if (this.fragment === fragment) return;
@@ -2860,8 +2952,10 @@
     };
   };
 
-}).call(this);
-// Knockout JavaScript library v3.0.0
+  return Backbone;
+
+}));
+// Knockout JavaScript library v3.1.0
 // (c) Steven Sanderson - http://knockoutjs.com/
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
@@ -2907,17 +3001,35 @@ ko.exportSymbol = function(koPath, object) {
 ko.exportProperty = function(owner, publicName, object) {
   owner[publicName] = object;
 };
-ko.version = "3.0.0";
+ko.version = "3.1.0";
 
 ko.exportSymbol('version', ko.version);
 ko.utils = (function () {
-    var objectForEach = function(obj, action) {
+    function objectForEach(obj, action) {
         for (var prop in obj) {
             if (obj.hasOwnProperty(prop)) {
                 action(prop, obj[prop]);
             }
         }
-    };
+    }
+
+    function extend(target, source) {
+        if (source) {
+            for(var prop in source) {
+                if(source.hasOwnProperty(prop)) {
+                    target[prop] = source[prop];
+                }
+            }
+        }
+        return target;
+    }
+
+    function setPrototypeOf(obj, proto) {
+        obj.__proto__ = proto;
+        return obj;
+    }
+
+    var canSetPrototype = ({ __proto__: [] } instanceof Array);
 
     // Represent the known event types in a compact way, then at runtime transform it into a hash with event name as key (for fast lookup)
     var knownEvents = {}, knownEventTypesByEventName = {};
@@ -2961,7 +3073,7 @@ ko.utils = (function () {
 
         arrayForEach: function (array, action) {
             for (var i = 0, j = array.length; i < j; i++)
-                action(array[i]);
+                action(array[i], i);
         },
 
         arrayIndexOf: function (array, item) {
@@ -2975,15 +3087,19 @@ ko.utils = (function () {
 
         arrayFirst: function (array, predicate, predicateOwner) {
             for (var i = 0, j = array.length; i < j; i++)
-                if (predicate.call(predicateOwner, array[i]))
+                if (predicate.call(predicateOwner, array[i], i))
                     return array[i];
             return null;
         },
 
         arrayRemoveItem: function (array, itemToRemove) {
             var index = ko.utils.arrayIndexOf(array, itemToRemove);
-            if (index >= 0)
+            if (index > 0) {
                 array.splice(index, 1);
+            }
+            else if (index === 0) {
+                array.shift();
+            }
         },
 
         arrayGetDistinctValues: function (array) {
@@ -3000,7 +3116,7 @@ ko.utils = (function () {
             array = array || [];
             var result = [];
             for (var i = 0, j = array.length; i < j; i++)
-                result.push(mapping(array[i]));
+                result.push(mapping(array[i], i));
             return result;
         },
 
@@ -3008,7 +3124,7 @@ ko.utils = (function () {
             array = array || [];
             var result = [];
             for (var i = 0, j = array.length; i < j; i++)
-                if (predicate(array[i]))
+                if (predicate(array[i], i))
                     result.push(array[i]);
             return result;
         },
@@ -3033,16 +3149,13 @@ ko.utils = (function () {
             }
         },
 
-        extend: function (target, source) {
-            if (source) {
-                for(var prop in source) {
-                    if(source.hasOwnProperty(prop)) {
-                        target[prop] = source[prop];
-                    }
-                }
-            }
-            return target;
-        },
+        canSetPrototype: canSetPrototype,
+
+        extend: extend,
+
+        setPrototypeOf: setPrototypeOf,
+
+        setPrototypeOfOrExtend: canSetPrototype ? setPrototypeOf : extend,
 
         objectForEach: objectForEach,
 
@@ -3125,7 +3238,7 @@ ko.utils = (function () {
 
                 // Rule [A]
                 while (continuousNodeArray.length && continuousNodeArray[0].parentNode !== parentNode)
-                    continuousNodeArray.splice(0, 1);
+                    continuousNodeArray.shift();
 
                 // Rule [B]
                 if (continuousNodeArray.length > 1) {
@@ -3209,21 +3322,7 @@ ko.utils = (function () {
 
         registerEventHandler: function (element, eventType, handler) {
             var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType];
-            if (!mustUseAttachEvent && typeof jQuery != "undefined") {
-                if (isClickOnCheckableElement(element, eventType)) {
-                    // For click events on checkboxes, jQuery interferes with the event handling in an awkward way:
-                    // it toggles the element checked state *after* the click event handlers run, whereas native
-                    // click events toggle the checked state *before* the event handler.
-                    // Fix this by intecepting the handler and applying the correct checkedness before it runs.
-                    var originalHandler = handler;
-                    handler = function(event, eventData) {
-                        var jQuerySuppliedCheckedState = this.checked;
-                        if (eventData)
-                            this.checked = eventData.checkedStateBeforeEvent !== true;
-                        originalHandler.call(this, event);
-                        this.checked = jQuerySuppliedCheckedState; // Restore the state jQuery applied
-                    };
-                }
+            if (!mustUseAttachEvent && jQuery) {
                 jQuery(element)['bind'](eventType, handler);
             } else if (!mustUseAttachEvent && typeof element.addEventListener == "function")
                 element.addEventListener(eventType, handler, false);
@@ -3245,13 +3344,14 @@ ko.utils = (function () {
             if (!(element && element.nodeType))
                 throw new Error("element must be a DOM node when calling triggerEvent");
 
-            if (typeof jQuery != "undefined") {
-                var eventData = [];
-                if (isClickOnCheckableElement(element, eventType)) {
-                    // Work around the jQuery "click events on checkboxes" issue described above by storing the original checked state before triggering the handler
-                    eventData.push({ checkedStateBeforeEvent: element.checked });
-                }
-                jQuery(element)['trigger'](eventType, eventData);
+            // For click events on checkboxes and radio buttons, jQuery toggles the element checked state *after* the
+            // event handler runs instead of *before*. (This was fixed in 1.9 for checkboxes but not for radio buttons.)
+            // IE doesn't change the checked state when you trigger the click event using "fireEvent".
+            // In both cases, we'll use the click method instead.
+            var useClickWorkaround = isClickOnCheckableElement(element, eventType);
+
+            if (jQuery && !useClickWorkaround) {
+                jQuery(element)['trigger'](eventType);
             } else if (typeof document.createEvent == "function") {
                 if (typeof element.dispatchEvent == "function") {
                     var eventCategory = knownEventTypesByEventName[eventType] || "HTMLEvents";
@@ -3261,15 +3361,13 @@ ko.utils = (function () {
                 }
                 else
                     throw new Error("The supplied element doesn't support dispatchEvent");
+            } else if (useClickWorkaround && element.click) {
+                element.click();
             } else if (typeof element.fireEvent != "undefined") {
-                // Unlike other browsers, IE doesn't change the checked state of checkboxes/radiobuttons when you trigger their "click" event
-                // so to make it consistent, we'll do it manually here
-                if (isClickOnCheckableElement(element, eventType))
-                    element.checked = element.checked !== true;
                 element.fireEvent("on" + eventType);
-            }
-            else
+            } else {
                 throw new Error("Browser doesn't support triggering events");
+            }
         },
 
         unwrapObservable: function (value) {
@@ -3301,7 +3399,7 @@ ko.utils = (function () {
             // we'll clear everything and create a single text node.
             var innerTextNode = ko.virtualElements.firstChild(element);
             if (!innerTextNode || innerTextNode.nodeType != 3 || ko.virtualElements.nextSibling(innerTextNode)) {
-                ko.virtualElements.setDomNodeChildren(element, [document.createTextNode(value)]);
+                ko.virtualElements.setDomNodeChildren(element, [element.ownerDocument.createTextNode(value)]);
             } else {
                 innerTextNode.data = value;
             }
@@ -3550,16 +3648,13 @@ ko.utils.domNodeDisposal = new (function () {
                 callbacks[i](node);
         }
 
-        // Also erase the DOM data
+        // Erase the DOM data
         ko.utils.domData.clear(node);
 
-        // Special support for jQuery here because it's so commonly used.
-        // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
-        // so notify it to tear down any resources associated with the node & descendants here.
-        if ((typeof jQuery == "function") && (typeof jQuery['cleanData'] == "function"))
-            jQuery['cleanData']([node]);
+        // Perform cleanup needed by external libraries (currently only jQuery, but can be extended)
+        ko.utils.domNodeDisposal["cleanExternalData"](node);
 
-        // Also clear any immediate-child comment nodes, as these wouldn't have been found by
+        // Clear any immediate-child comment nodes, as these wouldn't have been found by
         // node.getElementsByTagName("*") in cleanNode() (comment nodes aren't elements)
         if (cleanableNodeTypesWithDescendants[node.nodeType])
             cleanImmediateCommentTypeChildren(node);
@@ -3611,6 +3706,14 @@ ko.utils.domNodeDisposal = new (function () {
             ko.cleanNode(node);
             if (node.parentNode)
                 node.parentNode.removeChild(node);
+        },
+
+        "cleanExternalData" : function (node) {
+            // Special support for jQuery here because it's so commonly used.
+            // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
+            // so notify it to tear down any resources associated with the node & descendants here.
+            if (jQuery && (typeof jQuery['cleanData'] == "function"))
+                jQuery['cleanData']([node]);
         }
     }
 })();
@@ -3684,8 +3787,8 @@ ko.exportSymbol('utils.domNodeDisposal.removeDisposeCallback', ko.utils.domNodeD
     }
 
     ko.utils.parseHtmlFragment = function(html) {
-        return typeof jQuery != 'undefined' ? jQueryHtmlParse(html)   // As below, benefit from jQuery's optimisations where possible
-                                            : simpleHtmlParse(html);  // ... otherwise, this simple logic will do in most common cases.
+        return jQuery ? jQueryHtmlParse(html)   // As below, benefit from jQuery's optimisations where possible
+                      : simpleHtmlParse(html);  // ... otherwise, this simple logic will do in most common cases.
     };
 
     ko.utils.setHtml = function(node, html) {
@@ -3701,7 +3804,7 @@ ko.exportSymbol('utils.domNodeDisposal.removeDisposeCallback', ko.utils.domNodeD
             // jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
             // for example <tr> elements which are not normally allowed to exist on their own.
             // If you've referenced jQuery we'll use that rather than duplicating its code.
-            if (typeof jQuery != 'undefined') {
+            if (jQuery) {
                 jQuery(node)['html'](html);
             } else {
                 // ... otherwise, use KO's own parsing logic.
@@ -3807,6 +3910,22 @@ ko.extenders = {
         });
     },
 
+    'rateLimit': function(target, options) {
+        var timeout, method, limitFunction;
+
+        if (typeof options == 'number') {
+            timeout = options;
+        } else {
+            timeout = options['timeout'];
+            method = options['method'];
+        }
+
+        limitFunction = method == 'notifyWhenChangesStop' ?  debounce : throttle;
+        target.limit(function(callback) {
+            return limitFunction(callback, timeout);
+        });
+    },
+
     'notify': function(target, notifyWhen) {
         target["equalityComparer"] = notifyWhen == "always" ?
             null :  // null equalityComparer means to always notify
@@ -3818,6 +3937,26 @@ var primitiveTypes = { 'undefined':1, 'boolean':1, 'number':1, 'string':1 };
 function valuesArePrimitiveAndEqual(a, b) {
     var oldValueIsPrimitive = (a === null) || (typeof(a) in primitiveTypes);
     return oldValueIsPrimitive ? (a === b) : false;
+}
+
+function throttle(callback, timeout) {
+    var timeoutInstance;
+    return function () {
+        if (!timeoutInstance) {
+            timeoutInstance = setTimeout(function() {
+                timeoutInstance = undefined;
+                callback();
+            }, timeout);
+        }
+    };
+}
+
+function debounce(callback, timeout) {
+    var timeoutInstance;
+    return function () {
+        clearTimeout(timeoutInstance);
+        timeoutInstance = setTimeout(callback, timeout);
+    };
 }
 
 function applyExtenders(requestedExtenders) {
@@ -3839,6 +3978,7 @@ ko.subscription = function (target, callback, disposeCallback) {
     this.target = target;
     this.callback = callback;
     this.disposeCallback = disposeCallback;
+    this.isDisposed = false;
     ko.exportProperty(this, 'dispose', this.dispose);
 };
 ko.subscription.prototype.dispose = function () {
@@ -3847,28 +3987,32 @@ ko.subscription.prototype.dispose = function () {
 };
 
 ko.subscribable = function () {
+    ko.utils.setPrototypeOfOrExtend(this, ko.subscribable['fn']);
     this._subscriptions = {};
-
-    ko.utils.extend(this, ko.subscribable['fn']);
-    ko.exportProperty(this, 'subscribe', this.subscribe);
-    ko.exportProperty(this, 'extend', this.extend);
-    ko.exportProperty(this, 'getSubscriptionsCount', this.getSubscriptionsCount);
 }
 
 var defaultEvent = "change";
 
-ko.subscribable['fn'] = {
+var ko_subscribable_fn = {
     subscribe: function (callback, callbackTarget, event) {
+        var self = this;
+
         event = event || defaultEvent;
         var boundCallback = callbackTarget ? callback.bind(callbackTarget) : callback;
 
-        var subscription = new ko.subscription(this, boundCallback, function () {
-            ko.utils.arrayRemoveItem(this._subscriptions[event], subscription);
-        }.bind(this));
+        var subscription = new ko.subscription(self, boundCallback, function () {
+            ko.utils.arrayRemoveItem(self._subscriptions[event], subscription);
+        });
 
-        if (!this._subscriptions[event])
-            this._subscriptions[event] = [];
-        this._subscriptions[event].push(subscription);
+        // This will force a computed with deferEvaluation to evaluate before any subscriptions
+        // are registered.
+        if (self.peek) {
+            self.peek();
+        }
+
+        if (!self._subscriptions[event])
+            self._subscriptions[event] = [];
+        self._subscriptions[event].push(subscription);
         return subscription;
     },
 
@@ -3876,17 +4020,59 @@ ko.subscribable['fn'] = {
         event = event || defaultEvent;
         if (this.hasSubscriptionsForEvent(event)) {
             try {
-                ko.dependencyDetection.begin();
+                ko.dependencyDetection.begin(); // Begin suppressing dependency detection (by setting the top frame to undefined)
                 for (var a = this._subscriptions[event].slice(0), i = 0, subscription; subscription = a[i]; ++i) {
                     // In case a subscription was disposed during the arrayForEach cycle, check
                     // for isDisposed on each subscription before invoking its callback
-                    if (subscription && (subscription.isDisposed !== true))
+                    if (!subscription.isDisposed)
                         subscription.callback(valueToNotify);
                 }
             } finally {
-                ko.dependencyDetection.end();
+                ko.dependencyDetection.end(); // End suppressing dependency detection
             }
         }
+    },
+
+    limit: function(limitFunction) {
+        var self = this, selfIsObservable = ko.isObservable(self),
+            isPending, previousValue, pendingValue, beforeChange = 'beforeChange';
+
+        if (!self._origNotifySubscribers) {
+            self._origNotifySubscribers = self["notifySubscribers"];
+            self["notifySubscribers"] = function(value, event) {
+                if (!event || event === defaultEvent) {
+                    self._rateLimitedChange(value);
+                } else if (event === beforeChange) {
+                    self._rateLimitedBeforeChange(value);
+                } else {
+                    self._origNotifySubscribers(value, event);
+                }
+            };
+        }
+
+        var finish = limitFunction(function() {
+            // If an observable provided a reference to itself, access it to get the latest value.
+            // This allows computed observables to delay calculating their value until needed.
+            if (selfIsObservable && pendingValue === self) {
+                pendingValue = self();
+            }
+            isPending = false;
+            if (self.isDifferent(previousValue, pendingValue)) {
+                self._origNotifySubscribers(previousValue = pendingValue);
+            }
+        });
+
+        self._rateLimitedChange = function(value) {
+            isPending = true;
+            pendingValue = value;
+            finish();
+        };
+        self._rateLimitedBeforeChange = function(value) {
+            if (!isPending) {
+                previousValue = value;
+                self._origNotifySubscribers(value, beforeChange);
+            }
+        };
     },
 
     hasSubscriptionsForEvent: function(event) {
@@ -3901,8 +4087,25 @@ ko.subscribable['fn'] = {
         return total;
     },
 
+    isDifferent: function(oldValue, newValue) {
+        return !this['equalityComparer'] || !this['equalityComparer'](oldValue, newValue);
+    },
+
     extend: applyExtenders
 };
+
+ko.exportProperty(ko_subscribable_fn, 'subscribe', ko_subscribable_fn.subscribe);
+ko.exportProperty(ko_subscribable_fn, 'extend', ko_subscribable_fn.extend);
+ko.exportProperty(ko_subscribable_fn, 'getSubscriptionsCount', ko_subscribable_fn.getSubscriptionsCount);
+
+// For browsers that support proto assignment, we overwrite the prototype of each
+// observable instance. Since observables are functions, we need Function.prototype
+// to still be in the prototype chain.
+if (ko.utils.canSetPrototype) {
+    ko.utils.setPrototypeOf(ko_subscribable_fn, Function.prototype);
+}
+
+ko.subscribable['fn'] = ko_subscribable_fn;
 
 
 ko.isSubscribable = function (instance) {
@@ -3912,40 +4115,67 @@ ko.isSubscribable = function (instance) {
 ko.exportSymbol('subscribable', ko.subscribable);
 ko.exportSymbol('isSubscribable', ko.isSubscribable);
 
-ko.dependencyDetection = (function () {
-    var _frames = [];
+ko.computedContext = ko.dependencyDetection = (function () {
+    var outerFrames = [],
+        currentFrame,
+        lastId = 0;
+
+    // Return a unique ID that can be assigned to an observable for dependency tracking.
+    // Theoretically, you could eventually overflow the number storage size, resulting
+    // in duplicate IDs. But in JavaScript, the largest exact integral value is 2^53
+    // or 9,007,199,254,740,992. If you created 1,000,000 IDs per second, it would
+    // take over 285 years to reach that number.
+    // Reference http://blog.vjeux.com/2010/javascript/javascript-max_int-number-limits.html
+    function getId() {
+        return ++lastId;
+    }
+
+    function begin(options) {
+        outerFrames.push(currentFrame);
+        currentFrame = options;
+    }
+
+    function end() {
+        currentFrame = outerFrames.pop();
+    }
 
     return {
-        begin: function (callback) {
-            _frames.push(callback && { callback: callback, distinctDependencies:[] });
-        },
+        begin: begin,
 
-        end: function () {
-            _frames.pop();
-        },
+        end: end,
 
         registerDependency: function (subscribable) {
-            if (!ko.isSubscribable(subscribable))
-                throw new Error("Only subscribable things can act as dependencies");
-            if (_frames.length > 0) {
-                var topFrame = _frames[_frames.length - 1];
-                if (!topFrame || ko.utils.arrayIndexOf(topFrame.distinctDependencies, subscribable) >= 0)
-                    return;
-                topFrame.distinctDependencies.push(subscribable);
-                topFrame.callback(subscribable);
+            if (currentFrame) {
+                if (!ko.isSubscribable(subscribable))
+                    throw new Error("Only subscribable things can act as dependencies");
+                currentFrame.callback(subscribable, subscribable._id || (subscribable._id = getId()));
             }
         },
 
-        ignore: function(callback, callbackTarget, callbackArgs) {
+        ignore: function (callback, callbackTarget, callbackArgs) {
             try {
-                _frames.push(null);
+                begin();
                 return callback.apply(callbackTarget, callbackArgs || []);
             } finally {
-                _frames.pop();
+                end();
             }
+        },
+
+        getDependenciesCount: function () {
+            if (currentFrame)
+                return currentFrame.computed.getDependenciesCount();
+        },
+
+        isInitial: function() {
+            if (currentFrame)
+                return currentFrame.isInitial;
         }
     };
 })();
+
+ko.exportSymbol('computedContext', ko.computedContext);
+ko.exportSymbol('computedContext.getDependenciesCount', ko.computedContext.getDependenciesCount);
+ko.exportSymbol('computedContext.isInitial', ko.computedContext.isInitial);
 ko.observable = function (initialValue) {
     var _latestValue = initialValue;
 
@@ -3954,7 +4184,7 @@ ko.observable = function (initialValue) {
             // Write
 
             // Ignore writes if the value hasn't changed
-            if (!observable['equalityComparer'] || !observable['equalityComparer'](_latestValue, arguments[0])) {
+            if (observable.isDifferent(_latestValue, arguments[0])) {
                 observable.valueWillMutate();
                 _latestValue = arguments[0];
                 if (DEBUG) observable._latestValue = _latestValue;
@@ -3968,12 +4198,13 @@ ko.observable = function (initialValue) {
             return _latestValue;
         }
     }
-    if (DEBUG) observable._latestValue = _latestValue;
     ko.subscribable.call(observable);
+    ko.utils.setPrototypeOfOrExtend(observable, ko.observable['fn']);
+
+    if (DEBUG) observable._latestValue = _latestValue;
     observable.peek = function() { return _latestValue };
     observable.valueHasMutated = function () { observable["notifySubscribers"](_latestValue); }
     observable.valueWillMutate = function () { observable["notifySubscribers"](_latestValue, "beforeChange"); }
-    ko.utils.extend(observable, ko.observable['fn']);
 
     ko.exportProperty(observable, 'peek', observable.peek);
     ko.exportProperty(observable, "valueHasMutated", observable.valueHasMutated);
@@ -3988,6 +4219,12 @@ ko.observable['fn'] = {
 
 var protoProperty = ko.observable.protoProperty = "__ko_proto__";
 ko.observable['fn'][protoProperty] = ko.observable;
+
+// Note that for browsers that don't support proto assignment, the
+// inheritance chain is created manually in the ko.observable constructor
+if (ko.utils.canSetPrototype) {
+    ko.utils.setPrototypeOf(ko.observable['fn'], ko.subscribable['fn']);
+}
 
 ko.hasPrototype = function(instance, prototype) {
     if ((instance === null) || (instance === undefined) || (instance[protoProperty] === undefined)) return false;
@@ -4020,7 +4257,7 @@ ko.observableArray = function (initialValues) {
         throw new Error("The argument passed when initializing an observable array must be an array, or null, or undefined.");
 
     var result = ko.observable(initialValues);
-    ko.utils.extend(result, ko.observableArray['fn']);
+    ko.utils.setPrototypeOfOrExtend(result, ko.observableArray['fn']);
     return result.extend({'trackArrayChanges':true});
 };
 
@@ -4128,6 +4365,12 @@ ko.utils.arrayForEach(["slice"], function (methodName) {
     };
 });
 
+// Note that for browsers that don't support proto assignment, the
+// inheritance chain is created manually in the ko.observableArray constructor
+if (ko.utils.canSetPrototype) {
+    ko.utils.setPrototypeOf(ko.observableArray['fn'], ko.observable['fn']);
+}
+
 ko.exportSymbol('observableArray', ko.observableArray);
 var arrayChangeEventName = 'arrayChange';
 ko.extenders['trackArrayChanges'] = function(target) {
@@ -4190,9 +4433,9 @@ ko.extenders['trackArrayChanges'] = function(target) {
 
     function getChanges(previousContents, currentContents) {
         // We try to re-use cached diffs.
-        // The only scenario where pendingNotifications > 1 is when using the KO 'deferred updates' plugin,
-        // which without this check would not be compatible with arrayChange notifications. Without that
-        // plugin, notifications are always issued immediately so we wouldn't be queueing up more than one.
+        // The scenarios where pendingNotifications > 1 are when using rate-limiting or the Deferred Updates
+        // plugin, which without this check would not be compatible with arrayChange notifications. Normally,
+        // notifications are issued immediately so we wouldn't be queueing up more than one.
         if (!cachedDiff || pendingNotifications > 1) {
             cachedDiff = ko.utils.compareArrays(previousContents, currentContents, { 'sparse': true });
         }
@@ -4212,7 +4455,7 @@ ko.extenders['trackArrayChanges'] = function(target) {
             offset = 0;
 
         function pushDiff(status, value, index) {
-            diff.push({ 'status': status, 'value': value, 'index': index });
+            return diff[diff.length] = { 'status': status, 'value': value, 'index': index };
         }
         switch (operationName) {
             case 'push':
@@ -4237,13 +4480,15 @@ ko.extenders['trackArrayChanges'] = function(target) {
                 var startIndex = Math.min(Math.max(0, args[0] < 0 ? arrayLength + args[0] : args[0]), arrayLength),
                     endDeleteIndex = argsLength === 1 ? arrayLength : Math.min(startIndex + (args[1] || 0), arrayLength),
                     endAddIndex = startIndex + argsLength - 2,
-                    endIndex = Math.max(endDeleteIndex, endAddIndex);
+                    endIndex = Math.max(endDeleteIndex, endAddIndex),
+                    additions = [], deletions = [];
                 for (var index = startIndex, argsIndex = 2; index < endIndex; ++index, ++argsIndex) {
                     if (index < endDeleteIndex)
-                        pushDiff('deleted', rawArray[index], index);
+                        deletions.push(pushDiff('deleted', rawArray[index], index));
                     if (index < endAddIndex)
-                        pushDiff('added', args[argsIndex], index);
+                        additions.push(pushDiff('added', args[argsIndex], index));
                 }
+                ko.utils.findMovesInArrayComparison(deletions, additions);
                 break;
 
             default:
@@ -4252,11 +4497,12 @@ ko.extenders['trackArrayChanges'] = function(target) {
         cachedDiff = diff;
     };
 };
-ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
+ko.computed = ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunctionTarget, options) {
     var _latestValue,
-        _hasBeenEvaluated = false,
+        _needsEvaluation = true,
         _isBeingEvaluated = false,
         _suppressDisposalUntilDisposeWhenReturnsFalse = false,
+        _isDisposed = false,
         readFunction = evaluatorFunctionOrOptions;
 
     if (readFunction && typeof readFunction == "object") {
@@ -4272,15 +4518,21 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
     if (typeof readFunction != "function")
         throw new Error("Pass a function that returns the value of the ko.computed");
 
-    function addSubscriptionToDependency(subscribable) {
-        _subscriptionsToDependencies.push(subscribable.subscribe(evaluatePossiblyAsync));
+    function addSubscriptionToDependency(subscribable, id) {
+        if (!_subscriptionsToDependencies[id]) {
+            _subscriptionsToDependencies[id] = subscribable.subscribe(evaluatePossiblyAsync);
+            ++_dependenciesCount;
+        }
     }
 
     function disposeAllSubscriptionsToDependencies() {
-        ko.utils.arrayForEach(_subscriptionsToDependencies, function (subscription) {
+        _isDisposed = true;
+        ko.utils.objectForEach(_subscriptionsToDependencies, function (id, subscription) {
             subscription.dispose();
         });
-        _subscriptionsToDependencies = [];
+        _subscriptionsToDependencies = {};
+        _dependenciesCount = 0;
+        _needsEvaluation = false;
     }
 
     function evaluatePossiblyAsync() {
@@ -4288,8 +4540,11 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
         if (throttleEvaluationTimeout && throttleEvaluationTimeout >= 0) {
             clearTimeout(evaluationTimeoutInstance);
             evaluationTimeoutInstance = setTimeout(evaluateImmediate, throttleEvaluationTimeout);
-        } else
+        } else if (dependentObservable._evalRateLimited) {
+            dependentObservable._evalRateLimited();
+        } else {
             evaluateImmediate();
+        }
     }
 
     function evaluateImmediate() {
@@ -4301,11 +4556,15 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
             return;
         }
 
+        // Do not evaluate (and possibly capture new dependencies) if disposed
+        if (_isDisposed) {
+            return;
+        }
+
         if (disposeWhen && disposeWhen()) {
             // See comment below about _suppressDisposalUntilDisposeWhenReturnsFalse
             if (!_suppressDisposalUntilDisposeWhenReturnsFalse) {
                 dispose();
-                _hasBeenEvaluated = true;
                 return;
             }
         } else {
@@ -4317,38 +4576,63 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
         try {
             // Initially, we assume that none of the subscriptions are still being used (i.e., all are candidates for disposal).
             // Then, during evaluation, we cross off any that are in fact still being used.
-            var disposalCandidates = ko.utils.arrayMap(_subscriptionsToDependencies, function(item) {return item.target;});
-
-            ko.dependencyDetection.begin(function(subscribable) {
-                var inOld;
-                if ((inOld = ko.utils.arrayIndexOf(disposalCandidates, subscribable)) >= 0)
-                    disposalCandidates[inOld] = undefined; // Don't want to dispose this subscription, as it's still being used
-                else
-                    addSubscriptionToDependency(subscribable); // Brand new subscription - add it
+            var disposalCandidates = _subscriptionsToDependencies, disposalCount = _dependenciesCount;
+            ko.dependencyDetection.begin({
+                callback: function(subscribable, id) {
+                    if (!_isDisposed) {
+                        if (disposalCount && disposalCandidates[id]) {
+                            // Don't want to dispose this subscription, as it's still being used
+                            _subscriptionsToDependencies[id] = disposalCandidates[id];
+                            ++_dependenciesCount;
+                            delete disposalCandidates[id];
+                            --disposalCount;
+                        } else {
+                            // Brand new subscription - add it
+                            addSubscriptionToDependency(subscribable, id);
+                        }
+                    }
+                },
+                computed: dependentObservable,
+                isInitial: !_dependenciesCount        // If we're evaluating when there are no previous dependencies, it must be the first time
             });
 
-            var newValue = evaluatorFunctionTarget ? readFunction.call(evaluatorFunctionTarget) : readFunction();
+            _subscriptionsToDependencies = {};
+            _dependenciesCount = 0;
 
-            // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
-            for (var i = disposalCandidates.length - 1; i >= 0; i--) {
-                if (disposalCandidates[i])
-                    _subscriptionsToDependencies.splice(i, 1)[0].dispose();
+            try {
+                var newValue = evaluatorFunctionTarget ? readFunction.call(evaluatorFunctionTarget) : readFunction();
+
+            } finally {
+                ko.dependencyDetection.end();
+
+                // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
+                if (disposalCount) {
+                    ko.utils.objectForEach(disposalCandidates, function(id, toDispose) {
+                        toDispose.dispose();
+                    });
+                }
+
+                _needsEvaluation = false;
             }
-            _hasBeenEvaluated = true;
 
-            if (!dependentObservable['equalityComparer'] || !dependentObservable['equalityComparer'](_latestValue, newValue)) {
+            if (dependentObservable.isDifferent(_latestValue, newValue)) {
                 dependentObservable["notifySubscribers"](_latestValue, "beforeChange");
 
                 _latestValue = newValue;
                 if (DEBUG) dependentObservable._latestValue = _latestValue;
-                dependentObservable["notifySubscribers"](_latestValue);
+
+                // If rate-limited, the notification will happen within the limit function. Otherwise,
+                // notify as soon as the value changes. Check specifically for the throttle setting since
+                // it overrides rateLimit.
+                if (!dependentObservable._evalRateLimited || dependentObservable['throttleEvaluation']) {
+                    dependentObservable["notifySubscribers"](_latestValue);
+                }
             }
         } finally {
-            ko.dependencyDetection.end();
             _isBeingEvaluated = false;
         }
 
-        if (!_subscriptionsToDependencies.length)
+        if (!_dependenciesCount)
             dispose();
     }
 
@@ -4363,7 +4647,7 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
             return this; // Permits chained assignments
         } else {
             // Reading the value
-            if (!_hasBeenEvaluated)
+            if (_needsEvaluation)
                 evaluateImmediate();
             ko.dependencyDetection.registerDependency(dependentObservable);
             return _latestValue;
@@ -4371,13 +4655,15 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
     }
 
     function peek() {
-        if (!_hasBeenEvaluated)
+        // Peek won't re-evaluate, except to get the initial value when "deferEvaluation" is set.
+        // That's the only time that both of these conditions will be satisfied.
+        if (_needsEvaluation && !_dependenciesCount)
             evaluateImmediate();
         return _latestValue;
     }
 
     function isActive() {
-        return !_hasBeenEvaluated || _subscriptionsToDependencies.length > 0;
+        return _needsEvaluation || _dependenciesCount > 0;
     }
 
     // By here, "options" is always non-null
@@ -4386,20 +4672,36 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
         disposeWhenOption = options["disposeWhen"] || options.disposeWhen,
         disposeWhen = disposeWhenOption,
         dispose = disposeAllSubscriptionsToDependencies,
-        _subscriptionsToDependencies = [],
+        _subscriptionsToDependencies = {},
+        _dependenciesCount = 0,
         evaluationTimeoutInstance = null;
 
     if (!evaluatorFunctionTarget)
         evaluatorFunctionTarget = options["owner"];
 
+    ko.subscribable.call(dependentObservable);
+    ko.utils.setPrototypeOfOrExtend(dependentObservable, ko.dependentObservable['fn']);
+
     dependentObservable.peek = peek;
-    dependentObservable.getDependenciesCount = function () { return _subscriptionsToDependencies.length; };
+    dependentObservable.getDependenciesCount = function () { return _dependenciesCount; };
     dependentObservable.hasWriteFunction = typeof options["write"] === "function";
     dependentObservable.dispose = function () { dispose(); };
     dependentObservable.isActive = isActive;
 
-    ko.subscribable.call(dependentObservable);
-    ko.utils.extend(dependentObservable, ko.dependentObservable['fn']);
+    // Replace the limit function with one that delays evaluation as well.
+    var originalLimit = dependentObservable.limit;
+    dependentObservable.limit = function(limitFunction) {
+        originalLimit.call(dependentObservable, limitFunction);
+        dependentObservable._evalRateLimited = function() {
+            dependentObservable._rateLimitedBeforeChange(_latestValue);
+
+            _needsEvaluation = true;    // Mark as dirty
+
+            // Pass the observable to the rate-limit code, which will access it when
+            // it's time to do the notification.
+            dependentObservable._rateLimitedChange(dependentObservable);
+        }
+    };
 
     ko.exportProperty(dependentObservable, 'peek', dependentObservable.peek);
     ko.exportProperty(dependentObservable, 'dispose', dependentObservable.dispose);
@@ -4431,7 +4733,7 @@ ko.dependentObservable = function (evaluatorFunctionOrOptions, evaluatorFunction
 
     // Attach a DOM node disposal callback so that the computed will be proactively disposed as soon as the node is
     // removed using ko.removeNode. But skip if isActive is false (there will never be any dependencies to dispose).
-    if (disposeWhenNodeIsRemoved && isActive()) {
+    if (disposeWhenNodeIsRemoved && isActive() && disposeWhenNodeIsRemoved.nodeType) {
         dispose = function() {
             ko.utils.domNodeDisposal.removeDisposeCallback(disposeWhenNodeIsRemoved, dispose);
             disposeAllSubscriptionsToDependencies();
@@ -4453,6 +4755,12 @@ ko.dependentObservable['fn'] = {
     "equalityComparer": valuesArePrimitiveAndEqual
 };
 ko.dependentObservable['fn'][protoProp] = ko.dependentObservable;
+
+// Note that for browsers that don't support proto assignment, the
+// inheritance chain is created manually in the ko.dependentObservable constructor
+if (ko.utils.canSetPrototype) {
+    ko.utils.setPrototypeOf(ko.dependentObservable['fn'], ko.subscribable['fn']);
+}
 
 ko.exportSymbol('dependentObservable', ko.dependentObservable);
 ko.exportSymbol('computed', ko.dependentObservable); // Make "ko.computed" an alias for "ko.dependentObservable"
@@ -4575,7 +4883,7 @@ ko.exportSymbol('toJSON', ko.toJSON);
             }
         },
 
-        writeValue: function(element, value) {
+        writeValue: function(element, value, allowUnset) {
             switch (ko.utils.tagNameLower(element)) {
                 case 'option':
                     switch(typeof value) {
@@ -4597,19 +4905,19 @@ ko.exportSymbol('toJSON', ko.toJSON);
                     }
                     break;
                 case 'select':
-                    if (value === "")
+                    if (value === "" || value === null)       // A blank string or null value will select the caption
                         value = undefined;
-                    if (value === null || value === undefined)
-                        element.selectedIndex = -1;
-                    for (var i = element.options.length - 1; i >= 0; i--) {
-                        if (ko.selectExtensions.readValue(element.options[i]) == value) {
-                            element.selectedIndex = i;
+                    var selection = -1;
+                    for (var i = 0, n = element.options.length, optionValue; i < n; ++i) {
+                        optionValue = ko.selectExtensions.readValue(element.options[i]);
+                        // Include special check to handle selecting a caption with a blank string value
+                        if (optionValue == value || (optionValue == "" && value === undefined)) {
+                            selection = i;
                             break;
                         }
                     }
-                    // for drop-down select, ensure first is selected
-                    if (!(element.size > 1) && element.selectedIndex === -1) {
-                        element.selectedIndex = 0;
+                    if (allowUnset || selection >= 0 || (value === undefined && element.size > 1)) {
+                        element.selectedIndex = selection;
                     }
                     break;
                 default:
@@ -4765,7 +5073,7 @@ ko.expressionRewriting = (function () {
         });
 
         if (propertyAccessorResultStrings.length)
-            processKeyValue('_ko_property_writers', "{" + propertyAccessorResultStrings.join(",") + "}");
+            processKeyValue('_ko_property_writers', "{" + propertyAccessorResultStrings.join(",") + " }");
 
         return resultStrings.join(",");
     }
@@ -5114,10 +5422,11 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
         // any child contexts, must be updated when the view model is changed.
         function updateContext() {
             // Most of the time, the context will directly get a view model object, but if a function is given,
-            // we call the function to retrieve the view model. If the function accesses any obsevables (or is
-            // itself an observable), the dependency is tracked, and those observables can later cause the binding
+            // we call the function to retrieve the view model. If the function accesses any obsevables or returns
+            // an observable, the dependency is tracked, and those observables can later cause the binding
             // context to be updated.
-            var dataItem = isFunc ? dataItemOrAccessor() : dataItemOrAccessor;
+            var dataItemOrObservable = isFunc ? dataItemOrAccessor() : dataItemOrAccessor,
+                dataItem = ko.utils.unwrapObservable(dataItemOrObservable);
 
             if (parentContext) {
                 // When a "parent" context is given, register a dependency on the parent context. Thus whenever the
@@ -5142,7 +5451,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                 // See https://github.com/SteveSanderson/knockout/issues/490
                 self['ko'] = ko;
             }
-            self['$rawData'] = dataItemOrAccessor;
+            self['$rawData'] = dataItemOrObservable;
             self['$data'] = dataItem;
             if (dataItemAlias)
                 self[dataItemAlias] = dataItem;
@@ -5160,7 +5469,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
         }
 
         var self = this,
-            isFunc = typeof(dataItemOrAccessor) == "function",
+            isFunc = typeof(dataItemOrAccessor) == "function" && !ko.isObservable(dataItemOrAccessor),
             nodes,
             subscribable = ko.dependentObservable(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true });
 
@@ -5215,7 +5524,12 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
     // Similarly to "child" contexts, provide a function here to make sure that the correct values are set
     // when an observable view model is updated.
     ko.bindingContext.prototype['extend'] = function(properties) {
-        return new ko.bindingContext(this['$rawData'], this, null, function(self) {
+        // If the parent context references an observable view model, "_subscribable" will always be the
+        // latest view model object. If not, "_subscribable" isn't set, and we can use the static "$data" value.
+        return new ko.bindingContext(this._subscribable || this['$data'], this, null, function(self, parentContext) {
+            // This "child" context doesn't directly track a parent observable view model,
+            // so we need to manually set the $rawData value to match the parent.
+            self['$rawData'] = parentContext['$rawData'];
             ko.utils.extend(self, typeof(properties) == "function" ? properties() : properties);
         });
     };
@@ -5343,7 +5657,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                                 }
                             }
                         });
-                        cyclicDependencyStack.pop();
+                        cyclicDependencyStack.length--;
                     }
                     // Next add the current binding
                     result.push({ key: bindingKey, handler: binding });
@@ -5379,26 +5693,21 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
             var provider = ko.bindingProvider['instance'],
                 getBindings = provider['getBindingAccessors'] || getBindingsAndMakeAccessors;
 
-            if (sourceBindings || bindingContext._subscribable) {
-                // When an obsevable view model is used, the binding context will expose an observable _subscribable value.
-                // Get the binding from the provider within a computed observable so that we can update the bindings whenever
-                // the binding context is updated.
-                var bindingsUpdater = ko.dependentObservable(
-                    function() {
-                        bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext);
-                        // Register a dependency on the binding context
-                        if (bindings && bindingContext._subscribable)
-                            bindingContext._subscribable();
-                        return bindings;
-                    },
-                    null, { disposeWhenNodeIsRemoved: node }
-                );
+            // Get the binding from the provider within a computed observable so that we can update the bindings whenever
+            // the binding context is updated or if the binding provider accesses observables.
+            var bindingsUpdater = ko.dependentObservable(
+                function() {
+                    bindings = sourceBindings ? sourceBindings(bindingContext, node) : getBindings.call(provider, node, bindingContext);
+                    // Register a dependency on the binding context to support obsevable view models.
+                    if (bindings && bindingContext._subscribable)
+                        bindingContext._subscribable();
+                    return bindings;
+                },
+                null, { disposeWhenNodeIsRemoved: node }
+            );
 
-                if (!bindings || !bindingsUpdater.isActive())
-                    bindingsUpdater = null;
-            } else {
-                bindings = ko.dependencyDetection.ignore(getBindings, provider, [node, bindingContext]);
-            }
+            if (!bindings || !bindingsUpdater.isActive())
+                bindingsUpdater = null;
         }
 
         var bindingHandlerThatControlsDescendantBindings;
@@ -5513,6 +5822,11 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
     };
 
     ko.applyBindings = function (viewModelOrBindingContext, rootNode) {
+        // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
+        if (!jQuery && window['jQuery']) {
+            jQuery = window['jQuery'];
+        }
+
         if (rootNode && (rootNode.nodeType !== 1) && (rootNode.nodeType !== 8))
             throw new Error("ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node");
         rootNode = rootNode || window.document.body; // Make "rootNode" parameter optional
@@ -5602,7 +5916,7 @@ ko.bindingHandlers['checked'] = {
                 elemValue = useCheckedValue ? checkedValue() : isChecked;
 
             // When we're first setting up this computed, don't change any model state.
-            if (!shouldSet) {
+            if (ko.computedContext.isInitial()) {
                 return;
             }
 
@@ -5661,8 +5975,7 @@ ko.bindingHandlers['checked'] = {
 
         var isValueArray = isCheckbox && (ko.utils.unwrapObservable(valueAccessor()) instanceof Array),
             oldElemValue = isValueArray ? checkedValue() : undefined,
-            useCheckedValue = isRadio || isValueArray,
-            shouldSet = false;
+            useCheckedValue = isRadio || isValueArray;
 
         // IE 6 won't allow radio buttons to be selected unless they have a name
         if (isRadio && !element.name)
@@ -5671,13 +5984,11 @@ ko.bindingHandlers['checked'] = {
         // Set up two computeds to update the binding:
 
         // The first responds to changes in the checkedValue value and to element clicks
-        ko.dependentObservable(updateModel, null, { disposeWhenNodeIsRemoved: element });
+        ko.computed(updateModel, null, { disposeWhenNodeIsRemoved: element });
         ko.utils.registerEventHandler(element, "click", updateModel);
 
         // The second responds to changes in the model value (the one associated with the checked binding)
-        ko.dependentObservable(updateView, null, { disposeWhenNodeIsRemoved: element });
-
-        shouldSet = true;
+        ko.computed(updateView, null, { disposeWhenNodeIsRemoved: element });
     }
 };
 ko.expressionRewriting.twoWayBindings['checked'] = true;
@@ -5870,37 +6181,37 @@ ko.bindingHandlers['html'] = {
         ko.utils.setHtml(element, valueAccessor());
     }
 };
-var withIfDomDataKey = ko.utils.domData.nextKey();
 // Makes a binding like with or if
 function makeWithIfBinding(bindingKey, isWith, isNot, makeContextCallback) {
     ko.bindingHandlers[bindingKey] = {
-        'init': function(element) {
-            ko.utils.domData.set(element, withIfDomDataKey, {});
-            return { 'controlsDescendantBindings': true };
-        },
-        'update': function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var withIfData = ko.utils.domData.get(element, withIfDomDataKey),
-                dataValue = ko.utils.unwrapObservable(valueAccessor()),
-                shouldDisplay = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
-                isFirstRender = !withIfData.savedNodes,
-                needsRefresh = isFirstRender || isWith || (shouldDisplay !== withIfData.didDisplayOnLastUpdate);
+        'init': function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+            var didDisplayOnLastUpdate,
+                savedNodes;
+            ko.computed(function() {
+                var dataValue = ko.utils.unwrapObservable(valueAccessor()),
+                    shouldDisplay = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
+                    isFirstRender = !savedNodes,
+                    needsRefresh = isFirstRender || isWith || (shouldDisplay !== didDisplayOnLastUpdate);
 
-            if (needsRefresh) {
-                if (isFirstRender) {
-                    withIfData.savedNodes = ko.utils.cloneNodes(ko.virtualElements.childNodes(element), true /* shouldCleanNodes */);
-                }
-
-                if (shouldDisplay) {
-                    if (!isFirstRender) {
-                        ko.virtualElements.setDomNodeChildren(element, ko.utils.cloneNodes(withIfData.savedNodes));
+                if (needsRefresh) {
+                    // Save a copy of the inner nodes on the initial update, but only if we have dependencies.
+                    if (isFirstRender && ko.computedContext.getDependenciesCount()) {
+                        savedNodes = ko.utils.cloneNodes(ko.virtualElements.childNodes(element), true /* shouldCleanNodes */);
                     }
-                    ko.applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, dataValue) : bindingContext, element);
-                } else {
-                    ko.virtualElements.emptyNode(element);
-                }
 
-                withIfData.didDisplayOnLastUpdate = shouldDisplay;
-            }
+                    if (shouldDisplay) {
+                        if (!isFirstRender) {
+                            ko.virtualElements.setDomNodeChildren(element, ko.utils.cloneNodes(savedNodes));
+                        }
+                        ko.applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, dataValue) : bindingContext, element);
+                    } else {
+                        ko.virtualElements.emptyNode(element);
+                    }
+
+                    didDisplayOnLastUpdate = shouldDisplay;
+                }
+            }, null, { disposeWhenNodeIsRemoved: element });
+            return { 'controlsDescendantBindings': true };
         }
     };
     ko.expressionRewriting.bindingRewriteValidators[bindingKey] = false; // Can't rewrite control flow bindings
@@ -5915,6 +6226,7 @@ makeWithIfBinding('with', true /* isWith */, false /* isNot */,
         return bindingContext['createChildContext'](dataValue);
     }
 );
+var captionPlaceholder = {};
 ko.bindingHandlers['options'] = {
     'init': function(element) {
         if (ko.utils.tagNameLower(element) !== "select")
@@ -5935,12 +6247,13 @@ ko.bindingHandlers['options'] = {
 
         var selectWasPreviouslyEmpty = element.length == 0;
         var previousScrollTop = (!selectWasPreviouslyEmpty && element.multiple) ? element.scrollTop : null;
-
         var unwrappedArray = ko.utils.unwrapObservable(valueAccessor());
         var includeDestroyed = allBindings.get('optionsIncludeDestroyed');
-        var captionPlaceholder = {};
+        var arrayToDomNodeChildrenOptions = {};
         var captionValue;
+        var filteredArray;
         var previousSelectedValues;
+
         if (element.multiple) {
             previousSelectedValues = ko.utils.arrayMap(selectedOptions(), ko.selectExtensions.readValue);
         } else {
@@ -5952,7 +6265,7 @@ ko.bindingHandlers['options'] = {
                 unwrappedArray = [unwrappedArray];
 
             // Filter out any entries marked as destroyed
-            var filteredArray = ko.utils.arrayFilter(unwrappedArray, function(item) {
+            filteredArray = ko.utils.arrayFilter(unwrappedArray, function(item) {
                 return includeDestroyed || item === undefined || item === null || !ko.utils.unwrapObservable(item['_destroy']);
             });
 
@@ -5966,7 +6279,6 @@ ko.bindingHandlers['options'] = {
             }
         } else {
             // If a falsy value is provided (e.g. null), we'll simply empty the select element
-            unwrappedArray = [];
         }
 
         function applyToObject(object, predicate, defaultValue) {
@@ -5989,7 +6301,7 @@ ko.bindingHandlers['options'] = {
                 previousSelectedValues = oldOptions[0].selected ? [ ko.selectExtensions.readValue(oldOptions[0]) ] : [];
                 itemUpdate = true;
             }
-            var option = document.createElement("option");
+            var option = element.ownerDocument.createElement("option");
             if (arrayEntry === captionPlaceholder) {
                 ko.utils.setTextContent(option, allBindings.get('optionsCaption'));
                 ko.selectExtensions.writeValue(option, undefined);
@@ -6004,6 +6316,13 @@ ko.bindingHandlers['options'] = {
             }
             return [option];
         }
+
+        // By using a beforeRemove callback, we delay the removal until after new items are added. This fixes a selection
+        // problem in IE<=8 and Firefox. See https://github.com/knockout/knockout/issues/1208
+        arrayToDomNodeChildrenOptions['beforeRemove'] =
+            function (option) {
+                element.removeChild(option);
+            };
 
         function setSelectionCallback(arrayEntry, newOptions) {
             // IE6 doesn't like us to assign selection to OPTION nodes before they're added to the document.
@@ -6026,27 +6345,35 @@ ko.bindingHandlers['options'] = {
             }
         }
 
-        ko.utils.setDomNodeChildrenFromArrayMapping(element, filteredArray, optionForArrayItem, null, callback);
+        ko.utils.setDomNodeChildrenFromArrayMapping(element, filteredArray, optionForArrayItem, arrayToDomNodeChildrenOptions, callback);
 
-        // Determine if the selection has changed as a result of updating the options list
-        var selectionChanged;
-        if (element.multiple) {
-            // For a multiple-select box, compare the new selection count to the previous one
-            // But if nothing was selected before, the selection can't have changed
-            selectionChanged = previousSelectedValues.length && selectedOptions().length < previousSelectedValues.length;
-        } else {
-            // For a single-select box, compare the current value to the previous value
-            // But if nothing was selected before or nothing is selected now, just look for a change in selection
-            selectionChanged = (previousSelectedValues.length && element.selectedIndex >= 0)
-                ? (ko.selectExtensions.readValue(element.options[element.selectedIndex]) !== previousSelectedValues[0])
-                : (previousSelectedValues.length || element.selectedIndex >= 0);
-        }
+        ko.dependencyDetection.ignore(function () {
+            if (allBindings.get('valueAllowUnset') && allBindings['has']('value')) {
+                // The model value is authoritative, so make sure its value is the one selected
+                ko.selectExtensions.writeValue(element, ko.utils.unwrapObservable(allBindings.get('value')), true /* allowUnset */);
+            } else {
+                // Determine if the selection has changed as a result of updating the options list
+                var selectionChanged;
+                if (element.multiple) {
+                    // For a multiple-select box, compare the new selection count to the previous one
+                    // But if nothing was selected before, the selection can't have changed
+                    selectionChanged = previousSelectedValues.length && selectedOptions().length < previousSelectedValues.length;
+                } else {
+                    // For a single-select box, compare the current value to the previous value
+                    // But if nothing was selected before or nothing is selected now, just look for a change in selection
+                    selectionChanged = (previousSelectedValues.length && element.selectedIndex >= 0)
+                        ? (ko.selectExtensions.readValue(element.options[element.selectedIndex]) !== previousSelectedValues[0])
+                        : (previousSelectedValues.length || element.selectedIndex >= 0);
+                }
 
-        // Ensure consistency between model value and selected option.
-        // If the dropdown was changed so that selection is no longer the same,
-        // notify the value or selectedOptions binding.
-        if (selectionChanged)
-            ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
+                // Ensure consistency between model value and selected option.
+                // If the dropdown was changed so that selection is no longer the same,
+                // notify the value or selectedOptions binding.
+                if (selectionChanged) {
+                    ko.utils.triggerEvent(element, "change");
+                }
+            }
+        });
 
         // Workaround for IE bug
         ko.utils.ensureSelectElementIsRenderedCorrectly(element);
@@ -6157,6 +6484,7 @@ ko.bindingHandlers['value'] = {
                                        && element.autocomplete != "off" && (!element.form || element.form.autocomplete != "off");
         if (ieAutoCompleteHackNeeded && ko.utils.arrayIndexOf(eventsToCatch, "propertychange") == -1) {
             ko.utils.registerEventHandler(element, "propertychange", function () { propertyChangedFired = true });
+            ko.utils.registerEventHandler(element, "focus", function () { propertyChangedFired = false });
             ko.utils.registerEventHandler(element, "blur", function() {
                 if (propertyChangedFired) {
                     valueUpdateHandler();
@@ -6176,18 +6504,20 @@ ko.bindingHandlers['value'] = {
             ko.utils.registerEventHandler(element, eventName, handler);
         });
     },
-    'update': function (element, valueAccessor) {
-        var valueIsSelectOption = ko.utils.tagNameLower(element) === "select";
+    'update': function (element, valueAccessor, allBindings) {
         var newValue = ko.utils.unwrapObservable(valueAccessor());
         var elementValue = ko.selectExtensions.readValue(element);
         var valueHasChanged = (newValue !== elementValue);
 
         if (valueHasChanged) {
-            var applyValueAction = function () { ko.selectExtensions.writeValue(element, newValue); };
-            applyValueAction();
+            if (ko.utils.tagNameLower(element) === "select") {
+                var allowUnset = allBindings.get('valueAllowUnset');
+                var applyValueAction = function () {
+                    ko.selectExtensions.writeValue(element, newValue, allowUnset);
+                };
+                applyValueAction();
 
-            if (valueIsSelectOption) {
-                if (newValue !== ko.selectExtensions.readValue(element)) {
+                if (!allowUnset && newValue !== ko.selectExtensions.readValue(element)) {
                     // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
                     // because you're not allowed to have a model value that disagrees with a visible UI selection.
                     ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
@@ -6197,6 +6527,8 @@ ko.bindingHandlers['value'] = {
                     // to apply the value as well.
                     setTimeout(applyValueAction, 0);
                 }
+            } else {
+                ko.selectExtensions.writeValue(element, newValue);
             }
         }
     }
@@ -6581,7 +6913,8 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
                         : new ko.bindingContext(ko.utils.unwrapObservable(dataOrBindingContext));
 
                     // Support selecting template as a function of the data being rendered
-                    var templateName = typeof(template) == 'function' ? template(bindingContext['$data'], bindingContext) : template;
+                    var templateName = ko.isObservable(template) ? template()
+                        : typeof(template) == 'function' ? template(bindingContext['$data'], bindingContext) : template;
 
                     var renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options);
                     if (renderMode == "replaceNode") {
@@ -6663,15 +6996,18 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
             return { 'controlsDescendantBindings': true };
         },
         'update': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-            var templateName = ko.utils.unwrapObservable(valueAccessor()),
-                options = {},
-                shouldDisplay = true,
+            var value = valueAccessor(),
                 dataValue,
-                templateComputed = null;
+                options = ko.utils.unwrapObservable(value),
+                shouldDisplay = true,
+                templateComputed = null,
+                templateName;
 
-            if (typeof templateName != "string") {
-                options = templateName;
-                templateName = ko.utils.unwrapObservable(options['name']);
+            if (typeof options == "string") {
+                templateName = value;
+                options = {};
+            } else {
+                templateName = options['name'];
 
                 // Support "if"/"ifnot" conditions
                 if ('if' in options)
@@ -6718,6 +7054,24 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
 
 ko.exportSymbol('setTemplateEngine', ko.setTemplateEngine);
 ko.exportSymbol('renderTemplate', ko.renderTemplate);
+// Go through the items that have been added and deleted and try to find matches between them.
+ko.utils.findMovesInArrayComparison = function (left, right, limitFailedCompares) {
+    if (left.length && right.length) {
+        var failedCompares, l, r, leftItem, rightItem;
+        for (failedCompares = l = 0; (!limitFailedCompares || failedCompares < limitFailedCompares) && (leftItem = left[l]); ++l) {
+            for (r = 0; rightItem = right[r]; ++r) {
+                if (leftItem['value'] === rightItem['value']) {
+                    leftItem['moved'] = rightItem['index'];
+                    rightItem['moved'] = leftItem['index'];
+                    right.splice(r, 1);         // This item is marked as moved; so remove it from right list
+                    failedCompares = r = 0;     // Reset failed compares count because we're checking for consecutive failures
+                    break;
+                }
+            }
+            failedCompares += r;
+        }
+    }
+};
 
 ko.utils.compareArrays = (function () {
     var statusNotInOld = 'added', statusNotInNew = 'deleted';
@@ -6791,25 +7145,10 @@ ko.utils.compareArrays = (function () {
             }
         }
 
-        if (notInSml.length && notInBig.length) {
-            // Set a limit on the number of consecutive non-matching comparisons; having it a multiple of
-            // smlIndexMax keeps the time complexity of this algorithm linear.
-            var limitFailedCompares = smlIndexMax * 10, failedCompares,
-                a, d, notInSmlItem, notInBigItem;
-            // Go through the items that have been added and deleted and try to find matches between them.
-            for (failedCompares = a = 0; (options['dontLimitMoves'] || failedCompares < limitFailedCompares) && (notInSmlItem = notInSml[a]); a++) {
-                for (d = 0; notInBigItem = notInBig[d]; d++) {
-                    if (notInSmlItem['value'] === notInBigItem['value']) {
-                        notInSmlItem['moved'] = notInBigItem['index'];
-                        notInBigItem['moved'] = notInSmlItem['index'];
-                        notInBig.splice(d,1);       // This item is marked as moved; so remove it from notInBig list
-                        failedCompares = d = 0;     // Reset failed compares count because we're checking for consecutive failures
-                        break;
-                    }
-                }
-                failedCompares += d;
-            }
-        }
+        // Set a limit on the number of consecutive non-matching comparisons; having it a multiple of
+        // smlIndexMax keeps the time complexity of this algorithm linear.
+        ko.utils.findMovesInArrayComparison(notInSml, notInBig, smlIndexMax * 10);
+
         return editScript.reverse();
     }
 
@@ -6817,7 +7156,6 @@ ko.utils.compareArrays = (function () {
 })();
 
 ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
-
 (function () {
     // Objective:
     // * Given an input array, a container DOM node, and a function from array elements to arrays of DOM nodes,
@@ -6844,7 +7182,7 @@ ko.exportSymbol('utils.compareArrays', ko.utils.compareArrays);
 
             // Replace the contents of the mappedNodes array, thereby updating the record
             // of which nodes would be deleted if valueToMap was itself later removed
-            mappedNodes.splice(0, mappedNodes.length);
+            mappedNodes.length = 0;
             ko.utils.arrayPushAll(mappedNodes, newMappedNodes);
         }, null, { disposeWhenNodeIsRemoved: containerNode, disposeWhen: function() { return !ko.utils.anyDomNodeIsAttachedToDocument(mappedNodes); } });
         return { mappedNodes : mappedNodes, dependentObservable : (dependentObservable.isActive() ? dependentObservable : undefined) };
@@ -7007,7 +7345,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
         // Note that as of Knockout 1.3, we only support jQuery.tmpl 1.0.0pre and later,
         // which KO internally refers to as version "2", so older versions are no longer detected.
         var jQueryTmplVersion = this.jQueryTmplVersion = (function() {
-            if ((typeof(jQuery) == "undefined") || !(jQuery['tmpl']))
+            if (!jQuery || !(jQuery['tmpl']))
                 return 0;
             // Since it exposes no official version number, we use our own numbering system. To be updated as jquery-tmpl evolves.
             try {
@@ -7087,7 +7425,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 }());
 })();
 /*
-  knockback.js 0.18.1 (full version)
+  knockback.js 0.18.5 (full version)
   (c) 2011-2013 Kevin Malakoff - http://kmalakoff.github.com/knockback/
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
@@ -7101,24 +7439,24 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
     } else {
       this.kb = factory.call(this, (typeof require !== 'undefined') ? require : undefined);
     }
-  })(function(require) {// Generated by CoffeeScript 1.6.3
+  })(function(require) {// Generated by CoffeeScript 1.7.1
+
 /*
-  knockback-core.js 0.18.1
+  knockback-core.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.js is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-*/
-
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, URL_REGEXP, arraySlice, callOrGet, copyProps, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _key, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
+ */
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, EMAIL_REGEXP, KB_TYPE_ARRAY, KB_TYPE_COLLECTION, KB_TYPE_MODEL, KB_TYPE_SIMPLE, KB_TYPE_UNKNOWN, NUMBER_REGEXP, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, URL_REGEXP, arraySlice, callOrGet, copyProps, kb, ko, onReady, _, _argumentsAddKey, _arraySplice, _collapseOptions, _i, _key, _keyArrayToObject, _ko_applyBindings, _legacyWarning, _len, _mergeArray, _mergeObject, _peekObservable, _publishMethods, _ref, _ref1, _throwMissing, _throwUnexpected, _unwrapModels, _unwrapObservable, _wrappedKey,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 kb = (function() {
   function kb() {}
 
-  kb.VERSION = '0.18.1';
+  kb.VERSION = '0.18.5';
 
   kb.TYPE_UNKNOWN = 0;
 
@@ -7174,7 +7512,7 @@ kb = (function() {
       return;
     }
     obj.__kb_released = true;
-    if (ko.isObservable(obj) && _.isArray(array = obj())) {
+    if (ko.isObservable(obj) && _.isArray(array = _peekObservable(obj))) {
       if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === KB_TYPE_COLLECTION))) {
         if (obj.destroy) {
           obj.destroy();
@@ -7225,6 +7563,9 @@ kb = (function() {
     if (options == null) {
       options = {};
     }
+    if (typeof document === "undefined" || document === null) {
+      return console.log('renderTemplate: document is undefined');
+    }
     el = document.createElement('div');
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
     if (el.children.length === 1) {
@@ -7241,21 +7582,6 @@ kb = (function() {
   kb.applyBindings = function(view_model, node) {
     ko.applyBindings(view_model, node);
     return kb.releaseOnNodeRemove(view_model, node);
-  };
-
-  kb.ignore = function(fn) {
-    var value;
-    value = null;
-    if (ko.dependencyDetection) {
-      ko.dependencyDetection.begin(function() {});
-      value = fn();
-      ko.dependencyDetection.end();
-    } else {
-      ko.dependentObservable(function() {
-        return value = fn();
-      }).dispose();
-    }
-    return value;
   };
 
   kb.getValue = function(model, key, args) {
@@ -7351,41 +7677,19 @@ ORM = (function() {
   };
 
   ORM.prototype.keys = function(model) {
-    var adpater, keys, _j, _len1, _ref1;
-    if (!this.adapters.length) {
-      return;
-    }
-    if (!this.initialized) {
-      this.initialize();
-    }
-    _ref1 = this.adapters;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      adpater = _ref1[_j];
-      if (keys = adpater.keys(model)) {
-        return keys;
-      }
-    }
+    return this._call('keys', arguments);
   };
 
-  ORM.prototype.bind = function(model, key, update, path) {
-    var adpater, unbind_fn, _j, _len1, _ref1;
-    if (!this.adapters.length) {
-      return;
-    }
-    if (!this.initialized) {
-      this.initialize();
-    }
-    _ref1 = this.adapters;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      adpater = _ref1[_j];
-      if (unbind_fn = adpater.bind(model, key, update, path)) {
-        return unbind_fn;
-      }
-    }
+  ORM.prototype.bind = function(model) {
+    return this._call('bind', arguments);
   };
 
-  ORM.prototype.useFunction = function(model, key) {
-    var adpater, _j, _len1, _ref1;
+  ORM.prototype.useFunction = function(model) {
+    return this._call('useFunction', arguments);
+  };
+
+  ORM.prototype._call = function(name, args) {
+    var adpater, result, _j, _len1, _ref1;
     if (!this.adapters.length) {
       return;
     }
@@ -7395,8 +7699,8 @@ ORM = (function() {
     _ref1 = this.adapters;
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       adpater = _ref1[_j];
-      if (adpater.useFunction(model, key)) {
-        return true;
+      if (adpater[name] && (result = adpater[name].apply(adpater, args))) {
+        return result;
       }
     }
   };
@@ -7418,10 +7722,6 @@ ORMAdapter_BackboneRelational = (function() {
 
     }
     return !!((_ref2 = kb.Backbone) != null ? _ref2.RelationalModel : void 0);
-  };
-
-  ORMAdapter_BackboneRelational.prototype.keys = function(model) {
-    return null;
   };
 
   ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
@@ -7477,10 +7777,6 @@ ORMAdapter_BackboneRelational = (function() {
     };
   };
 
-  ORMAdapter_BackboneRelational.prototype.useFunction = function(model, key) {
-    return false;
-  };
-
   return ORMAdapter_BackboneRelational;
 
 })();
@@ -7524,14 +7820,6 @@ ORMAdapter_BackboneAssociations = (function() {
     } else {
       return KB_TYPE_MODEL;
     }
-  };
-
-  ORMAdapter_BackboneAssociations.prototype.bind = function(model, key, update, path) {
-    return null;
-  };
-
-  ORMAdapter_BackboneAssociations.prototype.useFunction = function(model, key) {
-    return false;
   };
 
   return ORMAdapter_BackboneAssociations;
@@ -7712,6 +8000,7 @@ var extend = function (protoProps, classProps) {
 
 kb.extend = extend;
 
+
 /*
   knockback-utils.js
   (c) 2011-2013 Kevin Malakoff.
@@ -7720,8 +8009,7 @@ kb.extend = extend;
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
     Optional dependency: Backbone.ModelRef.js.
-*/
-
+ */
 
 _wrappedKey = function(obj, key, value) {
   if (arguments.length === 2) {
@@ -7994,14 +8282,23 @@ kb.utils = (function() {
 
 })();
 
+kb.ignore = ((_ref1 = ko.dependencyDetection) != null ? _ref1.ignore : void 0) || function(callback, callbackTarget, callbackArgs) {
+  var value;
+  value = null;
+  ko.dependentObservable(function() {
+    return value = callback.apply(callbackTarget, callbackArgs || []);
+  }).dispose();
+  return value;
+};
+
+
 /*
   knockback_factory.js
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Factory is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 kb.Factory = (function() {
   Factory.useOptionsOrCreate = function(options, obj, owner_path) {
@@ -8068,14 +8365,14 @@ kb.Factory = (function() {
 
 })();
 
+
 /*
   knockback_store.js
   (c) 2012 Kevin Malakoff.
   Knockback.Store is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 kb.Store = (function() {
   Store.useOptionsOrCreate = function(options, obj, observable) {
@@ -8098,13 +8395,28 @@ kb.Store = (function() {
   };
 
   Store.prototype.clear = function() {
-    var record, _j, _len1, _ref1;
-    _ref1 = this.observable_records.splice(0, this.observable_records.length);
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      record = _ref1[_j];
+    var record, _j, _len1, _ref2;
+    _ref2 = this.observable_records.splice(0, this.observable_records.length);
+    for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+      record = _ref2[_j];
       kb.release(record.observable);
     }
     kb.release(this.replaced_observables);
+  };
+
+  Store.prototype.compact = function() {
+    var index, record, removals, _ref2, _ref3;
+    removals = [];
+    _ref2 = this.observable_records;
+    for (index in _ref2) {
+      record = _ref2[index];
+      if ((_ref3 = record.observable) != null ? _ref3.__kb_released : void 0) {
+        removals.push(record);
+      }
+    }
+    if (removals.length) {
+      this.observable_records = _.difference(this.observable_records, removals);
+    }
   };
 
   Store.prototype.register = function(obj, observable, options) {
@@ -8130,25 +8442,33 @@ kb.Store = (function() {
   };
 
   Store.prototype.findIndex = function(obj, creator) {
-    var index, record, _ref1;
+    var index, record, removals, _ref2;
+    removals = [];
     if (!obj || (obj instanceof kb.Model)) {
-      _ref1 = this.observable_records;
-      for (index in _ref1) {
-        record = _ref1[index];
+      _ref2 = this.observable_records;
+      for (index in _ref2) {
+        record = _ref2[index];
         if (!record.observable) {
           continue;
         }
         if (record.observable.__kb_released) {
-          record.obj = null;
-          record.observable = null;
+          removals.push(record);
           continue;
         }
         if ((!obj && !record.observable.__kb_null) || (obj && (record.observable.__kb_null || (record.obj !== obj)))) {
           continue;
         } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
-          return index;
+          if (removals.length) {
+            this.observable_records = _.difference(this.observable_records, removals);
+            return _.indexOf(this.observable_records, record);
+          } else {
+            return index;
+          }
         }
       }
+    }
+    if (removals.length) {
+      this.observable_records = _.difference(this.observable_records, removals);
     }
     return -1;
   };
@@ -8163,10 +8483,10 @@ kb.Store = (function() {
   };
 
   Store.prototype.isRegistered = function(observable) {
-    var record, _j, _len1, _ref1;
-    _ref1 = this.observable_records;
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      record = _ref1[_j];
+    var record, _j, _len1, _ref2;
+    _ref2 = this.observable_records;
+    for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+      record = _ref2[_j];
       if (record.observable === observable) {
         return true;
       }
@@ -8175,8 +8495,7 @@ kb.Store = (function() {
   };
 
   Store.prototype.findOrCreate = function(obj, options) {
-    var creator, observable,
-      _this = this;
+    var creator, observable;
     options.store = this;
     options.creator || (options.creator = kb.utils.inferCreator(obj, options.factory, options.path));
     if (!options.creator && (obj instanceof kb.Model)) {
@@ -8194,14 +8513,16 @@ kb.Store = (function() {
     if (observable) {
       return observable;
     }
-    observable = kb.ignore(function() {
-      if (creator.create) {
-        observable = creator.create(obj, options);
-      } else {
-        observable = new creator(obj, options);
-      }
-      return observable || ko.observable(null);
-    });
+    observable = kb.ignore((function(_this) {
+      return function() {
+        if (creator.create) {
+          observable = creator.create(obj, options);
+        } else {
+          observable = new creator(obj, options);
+        }
+        return observable || ko.observable(null);
+      };
+    })(this));
     if (!ko.isObservable(observable)) {
       this.isRegistered(observable) || this.register(obj, observable, options);
     }
@@ -8231,14 +8552,14 @@ kb.Store = (function() {
 
 })();
 
+
 /*
   knockback_event_watcher.js
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is fremitterly distributable under the MIT license.
   Semitter the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 kb.EventWatcher = (function() {
   EventWatcher.useOptionsOrCreate = function(options, emitter, obj, callback_options) {
@@ -8277,7 +8598,7 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.emitter = function(new_emitter) {
-    var callbacks, event_name, info, list, previous_emitter, _j, _len1, _ref1;
+    var callbacks, event_name, info, list, previous_emitter, _j, _len1, _ref2;
     if ((arguments.length === 0) || (this.ee === new_emitter)) {
       return this.ee;
     }
@@ -8298,9 +8619,9 @@ kb.EventWatcher = (function() {
     }
     previous_emitter = this.ee;
     this.ee = new_emitter;
-    _ref1 = this.__kb.callbacks;
-    for (event_name in _ref1) {
-      callbacks = _ref1[event_name];
+    _ref2 = this.__kb.callbacks;
+    for (event_name in _ref2) {
+      callbacks = _ref2[event_name];
       if (previous_emitter) {
         previous_emitter.unbind(event_name, callbacks.fn);
       }
@@ -8319,8 +8640,7 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.registerCallbacks = function(obj, callback_info) {
-    var callbacks, event_name, event_names, event_selector, info, list, _j, _len1,
-      _this = this;
+    var callbacks, event_name, event_names, event_selector, info, list, _j, _len1;
     obj || _throwMissing(this, 'obj');
     callback_info || _throwMissing(this, 'info');
     event_selector = callback_info.event_selector ? callback_info.event_selector : 'change';
@@ -8335,25 +8655,27 @@ kb.EventWatcher = (function() {
         list = [];
         callbacks = {
           list: list,
-          fn: function(model) {
-            var info, _k, _len2;
-            for (_k = 0, _len2 = list.length; _k < _len2; _k++) {
-              info = list[_k];
-              if (info.update && !info.rel_fn) {
-                if (model && info.key && (model.hasChanged && !model.hasChanged(_unwrapObservable(info.key)))) {
-                  continue;
+          fn: (function(_this) {
+            return function(model) {
+              var info, _k, _len2;
+              for (_k = 0, _len2 = list.length; _k < _len2; _k++) {
+                info = list[_k];
+                if (info.update && !info.rel_fn) {
+                  if (model && info.key && (model.hasChanged && !model.hasChanged(_unwrapObservable(info.key)))) {
+                    continue;
+                  }
+                  !kb.statistics || kb.statistics.addModelEvent({
+                    name: event_name,
+                    model: model,
+                    key: info.key,
+                    path: info.path
+                  });
+                  info.update();
                 }
-                !kb.statistics || kb.statistics.addModelEvent({
-                  name: event_name,
-                  model: model,
-                  key: info.key,
-                  path: info.path
-                });
-                info.update();
               }
-            }
-            return null;
-          }
+              return null;
+            };
+          })(this)
         };
         this.__kb.callbacks[event_name] = callbacks;
         if (this.ee) {
@@ -8374,16 +8696,16 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype.releaseCallbacks = function(obj) {
-    var callbacks, event_name, index, info, _ref1, _ref2;
+    var callbacks, event_name, index, info, _ref2, _ref3;
     if (!this.__kb.callbacks || !this.ee) {
       return;
     }
-    _ref1 = this.__kb.callbacks;
-    for (event_name in _ref1) {
-      callbacks = _ref1[event_name];
-      _ref2 = callbacks.list;
-      for (index in _ref2) {
-        info = _ref2[index];
+    _ref2 = this.__kb.callbacks;
+    for (event_name in _ref2) {
+      callbacks = _ref2[event_name];
+      _ref3 = callbacks.list;
+      for (index in _ref3) {
+        info = _ref3[index];
         if (info.obj !== obj) {
           continue;
         }
@@ -8401,15 +8723,15 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype._onModelLoaded = function(model) {
-    var callbacks, event_name, info, _j, _len1, _ref1, _ref2;
+    var callbacks, event_name, info, _j, _len1, _ref2, _ref3;
     this.ee = model;
-    _ref1 = this.__kb.callbacks;
-    for (event_name in _ref1) {
-      callbacks = _ref1[event_name];
+    _ref2 = this.__kb.callbacks;
+    for (event_name in _ref2) {
+      callbacks = _ref2[event_name];
       model.bind(event_name, callbacks.fn);
-      _ref2 = callbacks.list;
-      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-        info = _ref2[_j];
+      _ref3 = callbacks.list;
+      for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
+        info = _ref3[_j];
         info.unbind_fn = kb.orm.bind(model, info.key, info.update, info.path);
         if (info.emitter) {
           info.emitter(model);
@@ -8419,11 +8741,11 @@ kb.EventWatcher = (function() {
   };
 
   EventWatcher.prototype._onModelUnloaded = function(model) {
-    var callbacks, event_name, info, list, _j, _len1, _ref1;
+    var callbacks, event_name, info, list, _j, _len1, _ref2;
     this.ee = null;
-    _ref1 = this.__kb.callbacks;
-    for (event_name in _ref1) {
-      callbacks = _ref1[event_name];
+    _ref2 = this.__kb.callbacks;
+    for (event_name in _ref2) {
+      callbacks = _ref2[event_name];
       model.unbind(event_name, callbacks.fn);
       list = callbacks.list;
       for (_j = 0, _len1 = list.length; _j < _len1; _j++) {
@@ -8447,123 +8769,124 @@ kb.emitterObservable = function(emitter, observable) {
   return new kb.EventWatcher(emitter, observable);
 };
 
+
 /*
   knockback-observable.js
   (c) 2012 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 kb.Observable = (function() {
   function Observable(model, options, _vm) {
-    var _this = this;
     this._vm = _vm != null ? _vm : {};
-    return kb.ignore(function() {
-      var create_options, event_watcher, observable;
-      options || _throwMissing(_this, 'options');
-      if (_.isString(options) || ko.isObservable(options)) {
-        create_options = _this.create_options = {
-          key: options
-        };
-      } else {
-        create_options = _this.create_options = _collapseOptions(options);
-      }
-      _this.key = create_options.key;
-      delete create_options.key;
-      _this.key || _throwMissing(_this, 'key');
-      !create_options.args || (_this.args = create_options.args, delete create_options.args);
-      !create_options.read || (_this.read = create_options.read, delete create_options.read);
-      !create_options.write || (_this.write = create_options.write, delete create_options.write);
-      event_watcher = create_options.event_watcher;
-      delete create_options.event_watcher;
-      _this._vo = ko.observable(null);
-      _this._model = ko.observable();
-      observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
-        read: function() {
-          var arg, args, _j, _len1, _model, _ref1;
-          _model = _this._model();
-          _ref1 = args = [_this.key].concat(_this.args || []);
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            arg = _ref1[_j];
-            _unwrapObservable(arg);
-          }
-          if (_this.read) {
-            _this.update(_this.read.apply(_this._vm, args));
-          } else if (!_.isUndefined(_model)) {
-            kb.ignore(function() {
-              return _this.update(kb.getValue(_model, _peekObservable(_this.key), _this.args));
+    return kb.ignore((function(_this) {
+      return function() {
+        var create_options, event_watcher, observable;
+        options || _throwMissing(_this, 'options');
+        if (_.isString(options) || ko.isObservable(options)) {
+          create_options = _this.create_options = {
+            key: options
+          };
+        } else {
+          create_options = _this.create_options = _collapseOptions(options);
+        }
+        _this.key = create_options.key;
+        delete create_options.key;
+        _this.key || _throwMissing(_this, 'key');
+        !create_options.args || (_this.args = create_options.args, delete create_options.args);
+        !create_options.read || (_this.read = create_options.read, delete create_options.read);
+        !create_options.write || (_this.write = create_options.write, delete create_options.write);
+        event_watcher = create_options.event_watcher;
+        delete create_options.event_watcher;
+        _this._vo = ko.observable(null);
+        _this._model = ko.observable();
+        observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
+          read: function() {
+            var arg, args, _j, _len1, _model, _ref2;
+            _model = _this._model();
+            _ref2 = args = [_this.key].concat(_this.args || []);
+            for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+              arg = _ref2[_j];
+              _unwrapObservable(arg);
+            }
+            if (_this.read) {
+              _this.update(_this.read.apply(_this._vm, args));
+            } else if (!_.isUndefined(_model)) {
+              kb.ignore(function() {
+                return _this.update(kb.getValue(_model, _peekObservable(_this.key), _this.args));
+              });
+            }
+            return _unwrapObservable(_this._vo());
+          },
+          write: function(new_value) {
+            return kb.ignore(function() {
+              var unwrapped_new_value, _model;
+              unwrapped_new_value = _unwrapModels(new_value);
+              _model = _peekObservable(_this._model);
+              if (_this.write) {
+                _this.write.call(_this._vm, unwrapped_new_value);
+                new_value = kb.getValue(_model, _peekObservable(_this.key), _this.args);
+              } else if (_model) {
+                kb.setValue(_model, _peekObservable(_this.key), unwrapped_new_value);
+              }
+              return _this.update(new_value);
+            });
+          },
+          owner: _this._vm
+        }));
+        observable.__kb_is_o = true;
+        create_options.store = kb.utils.wrappedStore(observable, create_options.store);
+        create_options.path = kb.utils.pathJoin(create_options.path, _this.key);
+        if (create_options.factories && ((typeof create_options.factories === 'function') || create_options.factories.create)) {
+          create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory));
+          create_options.factory.addPathMapping(create_options.path, create_options.factories);
+        } else {
+          create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
+        }
+        delete create_options.factories;
+        _publishMethods(observable, _this, ['value', 'valueType', 'destroy']);
+        observable.model = _this.model = ko.dependentObservable({
+          read: function() {
+            return _unwrapObservable(_this._model);
+          },
+          write: function(new_model) {
+            return kb.ignore(function() {
+              var new_value;
+              if (_this.__kb_released || (_peekObservable(_this._model) === new_model)) {
+                return;
+              }
+              new_value = kb.getValue(new_model, _peekObservable(_this.key), _this.args);
+              _this._model(new_model);
+              if (!new_model) {
+                return _this.update(null);
+              } else if (!_.isUndefined(new_value)) {
+                return _this.update(new_value);
+              }
             });
           }
-          return _unwrapObservable(_this._vo());
-        },
-        write: function(new_value) {
-          return kb.ignore(function() {
-            var unwrapped_new_value, _model;
-            unwrapped_new_value = _unwrapModels(new_value);
-            _model = _peekObservable(_this._model);
-            if (_this.write) {
-              _this.write.call(_this._vm, unwrapped_new_value);
-              new_value = kb.getValue(_model, _peekObservable(_this.key), _this.args);
-            } else if (_model) {
-              kb.setValue(_model, _peekObservable(_this.key), unwrapped_new_value);
-            }
-            return _this.update(new_value);
-          });
-        },
-        owner: _this._vm
-      }));
-      observable.__kb_is_o = true;
-      create_options.store = kb.utils.wrappedStore(observable, create_options.store);
-      create_options.path = kb.utils.pathJoin(create_options.path, _this.key);
-      if (create_options.factories && ((typeof create_options.factories === 'function') || create_options.factories.create)) {
-        create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory));
-        create_options.factory.addPathMapping(create_options.path, create_options.factories);
-      } else {
-        create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
-      }
-      delete create_options.factories;
-      _publishMethods(observable, _this, ['value', 'valueType', 'destroy']);
-      observable.model = _this.model = ko.dependentObservable({
-        read: function() {
-          return _unwrapObservable(_this._model);
-        },
-        write: function(new_model) {
-          return kb.ignore(function() {
-            var new_value;
-            if (_this.__kb_released || (_peekObservable(_this._model) === new_model)) {
-              return;
-            }
-            new_value = kb.getValue(new_model, _peekObservable(_this.key), _this.args);
-            _this._model(new_model);
-            if (!new_model) {
-              return _this.update(null);
-            } else if (!_.isUndefined(new_value)) {
-              return _this.update(new_value);
-            }
-          });
+        });
+        kb.EventWatcher.useOptionsOrCreate({
+          event_watcher: event_watcher
+        }, model, _this, {
+          emitter: _this.model,
+          update: _.bind(_this.update, _this),
+          key: _this.key,
+          path: create_options.path
+        });
+        _this.__kb_value || _this.update();
+        if (kb.LocalizedObservable && create_options.localizer) {
+          observable = new create_options.localizer(observable);
+          delete create_options.localizer;
         }
-      });
-      kb.EventWatcher.useOptionsOrCreate({
-        event_watcher: event_watcher
-      }, model, _this, {
-        emitter: _this.model,
-        update: _.bind(_this.update, _this),
-        key: _this.key,
-        path: create_options.path
-      });
-      _this.__kb_value || _this.update();
-      if (kb.LocalizedObservable && create_options.localizer) {
-        observable = new create_options.localizer(observable);
-        delete create_options.localizer;
-      }
-      if (kb.DefaultObservable && create_options.hasOwnProperty('default')) {
-        observable = kb.defaultObservable(observable, create_options["default"]);
-        delete create_options["default"];
-      }
-      return observable;
-    });
+        if (kb.DefaultObservable && create_options.hasOwnProperty('default')) {
+          observable = kb.defaultObservable(observable, create_options["default"]);
+          delete create_options["default"];
+        }
+        return observable;
+      };
+    })(this));
   }
 
   Observable.prototype.destroy = function() {
@@ -8685,128 +9008,129 @@ kb.observable = function(model, options, view_model) {
   return new kb.Observable(model, options, view_model);
 };
 
+
 /*
   knockback-view-model.js
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 kb.ViewModel = (function() {
   ViewModel.extend = kb.extend;
 
   function ViewModel(model, options, view_model) {
-    var _this = this;
-    return kb.ignore(function() {
-      var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref1;
-      !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(_this, 'not a model');
-      options || (options = {});
-      view_model || (view_model = {});
-      if (_.isArray(options)) {
-        options = {
-          keys: options
-        };
-      } else {
-        options = _collapseOptions(options);
-      }
-      _this.__kb || (_this.__kb = {});
-      _this.__kb.vm_keys = {};
-      _this.__kb.model_keys = {};
-      _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
-      !options.internals || (_this.__kb.internals = options.internals);
-      !options.excludes || (_this.__kb.excludes = options.excludes);
-      !options.statics || (_this.__kb.statics = options.statics);
-      !options.static_defaults || (_this.__kb.static_defaults = options.static_defaults);
-      kb.Store.useOptionsOrCreate(options, model, _this);
-      _this.__kb.path = options.path;
-      kb.Factory.useOptionsOrCreate(options, _this, options.path);
-      _mdl = _wrappedKey(_this, '_mdl', ko.observable());
-      _this.model = ko.dependentObservable({
-        read: function() {
-          _mdl();
-          return kb.utils.wrappedObject(_this);
-        },
-        write: function(new_model) {
-          return kb.ignore(function() {
-            var event_watcher, keys, missing, rel_keys;
-            if (kb.utils.wrappedObject(_this) === new_model) {
-              return;
-            }
-            if (_this.__kb_null) {
-              !new_model || _throwUnexpected(_this, 'model set on shared null');
-              return;
-            }
-            kb.utils.wrappedObject(_this, new_model);
-            event_watcher = kb.utils.wrappedEventWatcher(_this);
-            if (!event_watcher) {
-              _mdl(new_model);
-              return;
-            }
-            event_watcher.emitter(new_model);
-            if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
-              keys = _.keys(new_model.attributes);
-              if (new_model && (rel_keys = kb.orm.keys(new_model))) {
-                keys = _.union(keys, rel_keys);
-              }
-              missing = _.difference(keys, _.keys(_this.__kb.model_keys));
-              if (missing) {
-                _this._createObservables(new_model, missing);
-              }
-            }
-            _mdl(new_model);
-          });
-        }
-      });
-      event_watcher = kb.utils.wrappedEventWatcher(_this, new kb.EventWatcher(model, _this, {
-        emitter: _this.model
-      }));
-      keys = options.requires;
-      if (_this.__kb.internals) {
-        keys = _.union(keys || [], _this.__kb.internals);
-      }
-      if (model && (rel_keys = kb.orm.keys(model))) {
-        keys = _.union(keys || [], rel_keys);
-      }
-      if (options.keys) {
-        if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-          mapped_keys = {};
-          _ref1 = options.keys;
-          for (vm_key in _ref1) {
-            mapping_info = _ref1[vm_key];
-            mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
-          }
-          _this.__kb.keys = _.keys(mapped_keys);
+    return kb.ignore((function(_this) {
+      return function() {
+        var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref2;
+        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || _throwUnexpected(_this, 'not a model');
+        options || (options = {});
+        view_model || (view_model = {});
+        if (_.isArray(options)) {
+          options = {
+            keys: options
+          };
         } else {
-          _this.__kb.keys = options.keys;
-          keys = keys ? _.union(keys, _this.__kb.keys) : _.clone(_this.__kb.keys);
+          options = _collapseOptions(options);
         }
-      } else {
-        bb_model = event_watcher.emitter();
-        if (bb_model && bb_model.attributes) {
-          attribute_keys = _.keys(bb_model.attributes);
-          keys = keys ? _.union(keys, attribute_keys) : attribute_keys;
+        _this.__kb || (_this.__kb = {});
+        _this.__kb.vm_keys = {};
+        _this.__kb.model_keys = {};
+        _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
+        !options.internals || (_this.__kb.internals = options.internals);
+        !options.excludes || (_this.__kb.excludes = options.excludes);
+        !options.statics || (_this.__kb.statics = options.statics);
+        !options.static_defaults || (_this.__kb.static_defaults = options.static_defaults);
+        kb.Store.useOptionsOrCreate(options, model, _this);
+        _this.__kb.path = options.path;
+        kb.Factory.useOptionsOrCreate(options, _this, options.path);
+        _mdl = _wrappedKey(_this, '_mdl', ko.observable());
+        _this.model = ko.dependentObservable({
+          read: function() {
+            _mdl();
+            return kb.utils.wrappedObject(_this);
+          },
+          write: function(new_model) {
+            return kb.ignore(function() {
+              var event_watcher, keys, missing, rel_keys;
+              if (kb.utils.wrappedObject(_this) === new_model) {
+                return;
+              }
+              if (_this.__kb_null) {
+                !new_model || _throwUnexpected(_this, 'model set on shared null');
+                return;
+              }
+              kb.utils.wrappedObject(_this, new_model);
+              event_watcher = kb.utils.wrappedEventWatcher(_this);
+              if (!event_watcher) {
+                _mdl(new_model);
+                return;
+              }
+              event_watcher.emitter(new_model);
+              if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
+                keys = _.keys(new_model.attributes);
+                if (new_model && (rel_keys = kb.orm.keys(new_model))) {
+                  keys = _.union(keys, rel_keys);
+                }
+                missing = _.difference(keys, _.keys(_this.__kb.model_keys));
+                if (missing) {
+                  _this.createObservables(new_model, missing);
+                }
+              }
+              _mdl(new_model);
+            });
+          }
+        });
+        event_watcher = kb.utils.wrappedEventWatcher(_this, new kb.EventWatcher(model, _this, {
+          emitter: _this.model
+        }));
+        keys = options.requires;
+        if (_this.__kb.internals) {
+          keys = _.union(keys || [], _this.__kb.internals);
         }
-      }
-      if (keys && _this.__kb.excludes) {
-        keys = _.difference(keys, _this.__kb.excludes);
-      }
-      if (keys && _this.__kb.statics) {
-        keys = _.difference(keys, _this.__kb.statics);
-      }
-      if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-        _this._mapObservables(model, options.keys);
-      }
-      if (_.isObject(options.requires) && !_.isArray(options.requires)) {
-        _this._mapObservables(model, options.requires);
-      }
-      !options.mappings || _this._mapObservables(model, options.mappings);
-      !keys || _this._createObservables(model, keys);
-      !_this.__kb.statics || _this._createObservables(model, _this.__kb.statics, true);
-      !kb.statistics || kb.statistics.register('ViewModel', _this);
-      return _this;
-    });
+        if (model && (rel_keys = kb.orm.keys(model))) {
+          keys = _.union(keys || [], rel_keys);
+        }
+        if (options.keys) {
+          if (_.isObject(options.keys) && !_.isArray(options.keys)) {
+            mapped_keys = {};
+            _ref2 = options.keys;
+            for (vm_key in _ref2) {
+              mapping_info = _ref2[vm_key];
+              mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
+            }
+            _this.__kb.keys = _.keys(mapped_keys);
+          } else {
+            _this.__kb.keys = options.keys;
+            keys = keys ? _.union(keys, _this.__kb.keys) : _.clone(_this.__kb.keys);
+          }
+        } else {
+          bb_model = event_watcher.emitter();
+          if (bb_model && bb_model.attributes) {
+            attribute_keys = _.keys(bb_model.attributes);
+            keys = keys ? _.union(keys, attribute_keys) : attribute_keys;
+          }
+        }
+        if (keys && _this.__kb.excludes) {
+          keys = _.difference(keys, _this.__kb.excludes);
+        }
+        if (keys && _this.__kb.statics) {
+          keys = _.difference(keys, _this.__kb.statics);
+        }
+        if (_.isObject(options.keys) && !_.isArray(options.keys)) {
+          _this.mapObservables(model, options.keys);
+        }
+        if (_.isObject(options.requires) && !_.isArray(options.requires)) {
+          _this.mapObservables(model, options.requires);
+        }
+        !options.mappings || _this.mapObservables(model, options.mappings);
+        !keys || _this.createObservables(model, keys);
+        !_this.__kb.statics || _this.createObservables(model, _this.__kb.statics, true);
+        !kb.statistics || kb.statistics.register('ViewModel', _this);
+        return _this;
+      };
+    })(this));
   }
 
   ViewModel.prototype.destroy = function() {
@@ -8829,7 +9153,7 @@ kb.ViewModel = (function() {
     };
   };
 
-  ViewModel.prototype._createObservables = function(model, keys, is_static) {
+  ViewModel.prototype.createObservables = function(model, keys, is_static) {
     var create_options, key, static_defaults, vm_key, _j, _len1;
     if (is_static) {
       static_defaults = this.__kb.static_defaults || {};
@@ -8861,7 +9185,7 @@ kb.ViewModel = (function() {
     }
   };
 
-  ViewModel.prototype._mapObservables = function(model, mappings) {
+  ViewModel.prototype.mapObservables = function(model, mappings) {
     var create_options, mapping_info, vm_key;
     create_options = {
       store: kb.utils.wrappedStore(this),
@@ -8891,14 +9215,14 @@ kb.viewModel = function(model, options, view_model) {
   return new kb.ViewModel(model, options, view_model);
 };
 
+
 /*
   knockback-collection-observable.js
   (c) 2011-2013 Kevin Malakoff.
   Knockback.CollectionObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 COMPARE_EQUAL = 0;
 
@@ -8928,112 +9252,116 @@ kb.CollectionObservable = (function() {
   CollectionObservable.extend = kb.extend;
 
   function CollectionObservable(collection, options) {
-    var _this = this;
-    return kb.ignore(function() {
-      var create_options, observable, _ref1;
-      if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
-        _ref1 = [new kb.Collection(), collection], collection = _ref1[0], options = _ref1[1];
-      } else if (_.isArray(collection)) {
-        collection = new kb.Collection(collection);
-      }
-      options || (options = {});
-      observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
-      observable.__kb_is_co = true;
-      _this.in_edit = 0;
-      _this.__kb || (_this.__kb = {});
-      _this.__kb._onCollectionChange = _.bind(_this._onCollectionChange, _this);
-      options = _collapseOptions(options);
-      if (options.sort_attribute) {
-        _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));
-      } else {
-        _this._comparator = ko.observable(options.comparator);
-      }
-      if (options.filters) {
-        _this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : void 0);
-      } else {
-        _this._filters = ko.observableArray([]);
-      }
-      create_options = _this.create_options = {
-        store: kb.Store.useOptionsOrCreate(options, collection, observable)
-      };
-      _this.path = options.path;
-      create_options.factory = kb.utils.wrappedFactory(observable, _this._shareOrCreateFactory(options));
-      create_options.path = kb.utils.pathJoin(options.path, 'models');
-      create_options.creator = create_options.factory.creatorForPath(null, create_options.path);
-      if (create_options.creator) {
-        _this.models_only = create_options.creator.models_only;
-      }
-      _publishMethods(observable, _this, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']);
-      _this._collection = ko.observable(collection);
-      observable.collection = _this.collection = ko.dependentObservable({
-        read: function() {
-          return _this._collection();
-        },
-        write: function(new_collection) {
-          return kb.ignore(function() {
-            var previous_collection;
-            if ((previous_collection = _this._collection()) === new_collection) {
-              return;
-            }
-            if (previous_collection) {
-              previous_collection.unbind('all', _this.__kb._onCollectionChange);
-            }
-            if (new_collection) {
-              new_collection.bind('all', _this.__kb._onCollectionChange);
-            }
-            return _this._collection(new_collection);
-          });
+    return kb.ignore((function(_this) {
+      return function() {
+        var create_options, observable, _ref2;
+        if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
+          _ref2 = [new kb.Collection(), collection], collection = _ref2[0], options = _ref2[1];
+        } else if (_.isArray(collection)) {
+          collection = new kb.Collection(collection);
         }
-      });
-      if (collection) {
-        collection.bind('all', _this.__kb._onCollectionChange);
-      }
-      _this._mapper = ko.dependentObservable(function() {
-        var comparator, current_collection, filter, filters, models, view_models, _j, _len1;
-        comparator = _this._comparator();
-        filters = _this._filters();
-        if (filters) {
-          for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
-            filter = filters[_j];
-            _unwrapObservable(filter);
-          }
+        options || (options = {});
+        observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
+        observable.__kb_is_co = true;
+        _this.in_edit = 0;
+        _this.__kb || (_this.__kb = {});
+        _this.__kb._onCollectionChange = _.bind(_this._onCollectionChange, _this);
+        options = _collapseOptions(options);
+        if (options.auto_compact) {
+          _this.auto_compact = true;
         }
-        current_collection = _this._collection();
-        if (_this.in_edit) {
-          return;
-        }
-        observable = kb.utils.wrappedObservable(_this);
-        if (current_collection) {
-          models = current_collection.models;
-        }
-        if (!models || (current_collection.models.length === 0)) {
-          view_models = [];
+        if (options.sort_attribute) {
+          _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));
         } else {
-          models = _.filter(models, function(model) {
-            return !filters.length || _this._selectModel(model);
-          });
-          if (comparator) {
-            view_models = _.map(models, function(model) {
-              return _this._createViewModel(model);
-            }).sort(comparator);
+          _this._comparator = ko.observable(options.comparator);
+        }
+        if (options.filters) {
+          _this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : void 0);
+        } else {
+          _this._filters = ko.observableArray([]);
+        }
+        create_options = _this.create_options = {
+          store: kb.Store.useOptionsOrCreate(options, collection, observable)
+        };
+        _this.path = options.path;
+        create_options.factory = kb.utils.wrappedFactory(observable, _this._shareOrCreateFactory(options));
+        create_options.path = kb.utils.pathJoin(options.path, 'models');
+        create_options.creator = create_options.factory.creatorForPath(null, create_options.path);
+        if (create_options.creator) {
+          _this.models_only = create_options.creator.models_only;
+        }
+        _publishMethods(observable, _this, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']);
+        _this._collection = ko.observable(collection);
+        observable.collection = _this.collection = ko.dependentObservable({
+          read: function() {
+            return _this._collection();
+          },
+          write: function(new_collection) {
+            return kb.ignore(function() {
+              var previous_collection;
+              if ((previous_collection = _this._collection()) === new_collection) {
+                return;
+              }
+              if (previous_collection) {
+                previous_collection.unbind('all', _this.__kb._onCollectionChange);
+              }
+              if (new_collection) {
+                new_collection.bind('all', _this.__kb._onCollectionChange);
+              }
+              return _this._collection(new_collection);
+            });
+          }
+        });
+        if (collection) {
+          collection.bind('all', _this.__kb._onCollectionChange);
+        }
+        _this._mapper = ko.dependentObservable(function() {
+          var comparator, current_collection, filter, filters, models, view_models, _j, _len1;
+          comparator = _this._comparator();
+          filters = _this._filters();
+          if (filters) {
+            for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+              filter = filters[_j];
+              _unwrapObservable(filter);
+            }
+          }
+          current_collection = _this._collection();
+          if (_this.in_edit) {
+            return;
+          }
+          observable = kb.utils.wrappedObservable(_this);
+          if (current_collection) {
+            models = current_collection.models;
+          }
+          if (!models || (current_collection.models.length === 0)) {
+            view_models = [];
           } else {
-            if (_this.models_only) {
-              view_models = filters.length ? models : models.slice();
-            } else {
+            models = _.filter(models, function(model) {
+              return !filters.length || _this._selectModel(model);
+            });
+            if (comparator) {
               view_models = _.map(models, function(model) {
                 return _this._createViewModel(model);
-              });
+              }).sort(comparator);
+            } else {
+              if (_this.models_only) {
+                view_models = filters.length ? models : models.slice();
+              } else {
+                view_models = _.map(models, function(model) {
+                  return _this._createViewModel(model);
+                });
+              }
             }
           }
-        }
-        _this.in_edit++;
-        observable(view_models);
-        return _this.in_edit--;
-      });
-      observable.subscribe(_.bind(_this._onObservableArrayChange, _this));
-      !kb.statistics || kb.statistics.register('CollectionObservable', _this);
-      return observable;
-    });
+          _this.in_edit++;
+          observable(view_models);
+          return _this.in_edit--;
+        });
+        observable.subscribe(_.bind(_this._onObservableArrayChange, _this));
+        !kb.statistics || kb.statistics.register('CollectionObservable', _this);
+        return observable;
+      };
+    })(this));
   }
 
   CollectionObservable.prototype.destroy = function() {
@@ -9091,8 +9419,8 @@ kb.CollectionObservable = (function() {
     }
     id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
     return _.find(_peekObservable(kb.utils.wrappedObservable(this)), function(test) {
-      var _ref1;
-      if (test != null ? (_ref1 = test.__kb) != null ? _ref1.object : void 0 : void 0) {
+      var _ref2;
+      if (test != null ? (_ref2 = test.__kb) != null ? _ref2.object : void 0 : void 0) {
         return test.__kb.object[id_attribute] === model[id_attribute];
       } else {
         return false;
@@ -9102,6 +9430,20 @@ kb.CollectionObservable = (function() {
 
   CollectionObservable.prototype.hasViewModels = function() {
     return !this.models_only;
+  };
+
+  CollectionObservable.prototype.compact = function() {
+    return kb.ignore((function(_this) {
+      return function() {
+        var observable;
+        observable = kb.utils.wrappedObservable(_this);
+        if (!kb.utils.wrappedStoreIsOwned(observable)) {
+          return;
+        }
+        kb.utils.wrappedStore(observable).clear();
+        return _this._collection.notifySubscribers(_this._collection());
+      };
+    })(this));
   };
 
   CollectionObservable.prototype._shareOrCreateFactory = function(options) {
@@ -9145,63 +9487,70 @@ kb.CollectionObservable = (function() {
   };
 
   CollectionObservable.prototype._onCollectionChange = function(event, arg) {
-    var _this = this;
-    return kb.ignore(function() {
-      var collection, comparator, observable, view_model;
-      if (_this.in_edit) {
-        return;
-      }
-      switch (event) {
-        case 'reset':
-        case 'sort':
-        case 'resort':
-          _this._collection.notifySubscribers(_this._collection());
-          break;
-        case 'new':
-        case 'add':
-          if (!_this._selectModel(arg)) {
-            return;
-          }
-          observable = kb.utils.wrappedObservable(_this);
-          collection = _this._collection();
-          if (collection.indexOf(arg) === -1) {
-            return;
-          }
-          if ((view_model = _this.viewModelByModel(arg))) {
-            return;
-          }
-          _this.in_edit++;
-          view_model = _this._createViewModel(arg);
-          if ((comparator = _this._comparator())) {
-            observable().push(view_model);
-            observable.sort(comparator);
-          } else {
-            observable.splice(collection.indexOf(arg), 0, view_model);
-          }
-          _this.in_edit--;
-          break;
-        case 'remove':
-        case 'destroy':
-          _this._onModelRemove(arg);
-          break;
-        case 'change':
-          if (!_this._selectModel(arg)) {
-            _this._onModelRemove(arg);
-          } else {
-            view_model = _this.models_only ? arg : _this.viewModelByModel(arg);
-            if (view_model) {
-              if ((comparator = _this._comparator())) {
-                observable = kb.utils.wrappedObservable(_this);
-                _this.in_edit++;
-                observable.sort(comparator);
-                _this.in_edit--;
-              }
+    return kb.ignore((function(_this) {
+      return function() {
+        var collection, comparator, observable, view_model;
+        if (_this.in_edit) {
+          return;
+        }
+        switch (event) {
+          case 'reset':
+            if (_this.auto_compact) {
+              _this.compact();
             } else {
-              _this._onCollectionChange('add', arg);
+              _this._collection.notifySubscribers(_this._collection());
             }
-          }
-      }
-    });
+            break;
+          case 'sort':
+          case 'resort':
+            _this._collection.notifySubscribers(_this._collection());
+            break;
+          case 'new':
+          case 'add':
+            if (!_this._selectModel(arg)) {
+              return;
+            }
+            observable = kb.utils.wrappedObservable(_this);
+            collection = _this._collection();
+            if (collection.indexOf(arg) === -1) {
+              return;
+            }
+            if ((view_model = _this.viewModelByModel(arg))) {
+              return;
+            }
+            _this.in_edit++;
+            view_model = _this._createViewModel(arg);
+            if ((comparator = _this._comparator())) {
+              observable().push(view_model);
+              observable.sort(comparator);
+            } else {
+              observable.splice(collection.indexOf(arg), 0, view_model);
+            }
+            _this.in_edit--;
+            break;
+          case 'remove':
+          case 'destroy':
+            _this._onModelRemove(arg);
+            break;
+          case 'change':
+            if (!_this._selectModel(arg)) {
+              _this._onModelRemove(arg);
+            } else {
+              view_model = _this.models_only ? arg : _this.viewModelByModel(arg);
+              if (view_model) {
+                if ((comparator = _this._comparator())) {
+                  observable = kb.utils.wrappedObservable(_this);
+                  _this.in_edit++;
+                  observable.sort(comparator);
+                  _this.in_edit--;
+                }
+              } else {
+                _this._onCollectionChange('add', arg);
+              }
+            }
+        }
+      };
+    })(this));
   };
 
   CollectionObservable.prototype._onModelRemove = function(model) {
@@ -9217,45 +9566,46 @@ kb.CollectionObservable = (function() {
   };
 
   CollectionObservable.prototype._onObservableArrayChange = function(models_or_view_models) {
-    var _this = this;
-    return kb.ignore(function() {
-      var collection, has_filters, model, models, observable, view_model, view_models, _j, _len1;
-      if (_this.in_edit) {
-        return;
-      }
-      (_this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!_this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || _throwUnexpected(_this, 'incorrect type passed');
-      observable = kb.utils.wrappedObservable(_this);
-      collection = _peekObservable(_this._collection);
-      has_filters = _peekObservable(_this._filters).length;
-      if (!collection) {
-        return;
-      }
-      view_models = models_or_view_models;
-      if (_this.models_only) {
-        models = _.filter(models_or_view_models, function(model) {
-          return !has_filters || _this._selectModel(model);
-        });
-      } else {
-        !has_filters || (view_models = []);
-        models = [];
-        for (_j = 0, _len1 = models_or_view_models.length; _j < _len1; _j++) {
-          view_model = models_or_view_models[_j];
-          model = kb.utils.wrappedObject(view_model);
-          if (has_filters) {
-            if (!_this._selectModel(model)) {
-              continue;
-            }
-            view_models.push(view_model);
-          }
-          _this.create_options.store.findOrReplace(model, _this.create_options.creator, view_model);
-          models.push(model);
+    return kb.ignore((function(_this) {
+      return function() {
+        var collection, has_filters, model, models, observable, view_model, view_models, _j, _len1;
+        if (_this.in_edit) {
+          return;
         }
-      }
-      _this.in_edit++;
-      (models_or_view_models.length === view_models.length) || observable(view_models);
-      _.isEqual(collection.models, models) || collection.reset(models);
-      _this.in_edit--;
-    });
+        (_this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!_this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || _throwUnexpected(_this, 'incorrect type passed');
+        observable = kb.utils.wrappedObservable(_this);
+        collection = _peekObservable(_this._collection);
+        has_filters = _peekObservable(_this._filters).length;
+        if (!collection) {
+          return;
+        }
+        view_models = models_or_view_models;
+        if (_this.models_only) {
+          models = _.filter(models_or_view_models, function(model) {
+            return !has_filters || _this._selectModel(model);
+          });
+        } else {
+          !has_filters || (view_models = []);
+          models = [];
+          for (_j = 0, _len1 = models_or_view_models.length; _j < _len1; _j++) {
+            view_model = models_or_view_models[_j];
+            model = kb.utils.wrappedObject(view_model);
+            if (has_filters) {
+              if (!_this._selectModel(model)) {
+                continue;
+              }
+              view_models.push(view_model);
+            }
+            _this.create_options.store.findOrReplace(model, _this.create_options.creator, view_model);
+            models.push(model);
+          }
+        }
+        _this.in_edit++;
+        (models_or_view_models.length === view_models.length) || observable(view_models);
+        _.isEqual(collection.models, models) || collection.reset(models);
+        _this.in_edit--;
+      };
+    })(this));
   };
 
   CollectionObservable.prototype._attributeComparator = function(sort_attribute) {
@@ -9278,7 +9628,7 @@ kb.CollectionObservable = (function() {
   };
 
   CollectionObservable.prototype._selectModel = function(model) {
-    var filter, filters, _j, _len1, _ref1;
+    var filter, filters, _j, _len1, _ref2;
     filters = _peekObservable(this._filters);
     for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
       filter = filters[_j];
@@ -9288,7 +9638,7 @@ kb.CollectionObservable = (function() {
           return false;
         }
       } else if (_.isArray(filter)) {
-        if (_ref1 = model.id, __indexOf.call(filter, _ref1) < 0) {
+        if (_ref2 = model.id, __indexOf.call(filter, _ref2) < 0) {
           return false;
         }
       } else {
@@ -9308,14 +9658,14 @@ kb.collectionObservable = function(collection, options) {
   return new kb.CollectionObservable(collection, options);
 };
 
+
 /*
   knockback-inject.js
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Inject is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 kb.RECUSIVE_AUTO_INJECT = true;
 
@@ -9372,7 +9722,7 @@ kb.Inject = (function() {
     var afterBinding, app, beforeBinding, data, expression, findElements, options, results, _j, _len1;
     results = [];
     findElements = function(el) {
-      var attr, child_el, _j, _len1, _ref1;
+      var attr, child_el, _j, _len1, _ref2;
       if (!el.__kb_injected) {
         if (el.attributes && (attr = _.find(el.attributes, function(attr) {
           return attr.name === 'kb-inject';
@@ -9385,13 +9735,16 @@ kb.Inject = (function() {
           });
         }
       }
-      _ref1 = el.childNodes;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        child_el = _ref1[_j];
+      _ref2 = el.childNodes;
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        child_el = _ref2[_j];
         findElements(child_el);
       }
     };
-    findElements(root || document);
+    if (!root && (typeof document !== "undefined" && document !== null)) {
+      root = document;
+    }
+    findElements(root);
     for (_j = 0, _len1 = results.length; _j < _len1; _j++) {
       app = results[_j];
       if (expression = app.binding) {
@@ -9431,44 +9784,47 @@ ko.applyBindings = function(context, element) {
 
 kb.injectViewModels = kb.Inject.injectViewModels;
 
-if (this.$) {
-  this.$(function() {
-    return kb.injectViewModels();
-  });
-} else {
-  (onReady = function() {
-    if (document.readyState !== "complete") {
-      return setTimeout(onReady, 0);
-    }
-    return kb.injectViewModels();
-  })();
+if (typeof document !== "undefined" && document !== null) {
+  if (this.$) {
+    this.$(function() {
+      return kb.injectViewModels();
+    });
+  } else {
+    (onReady = function() {
+      if (document.readyState !== "complete") {
+        return setTimeout(onReady, 0);
+      }
+      return kb.injectViewModels();
+    })();
+  }
 }
 
+
 /*
-  knockback_default_observable.js 0.18.1
+  knockback_default_observable.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.DefaultObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 _publishMethods = kb._publishMethods;
 
 kb.DefaultObservable = (function() {
   function DefaultObservable(target_observable, dv) {
-    var observable,
-      _this = this;
+    var observable;
     this.dv = dv;
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
-      read: function() {
-        var current_target;
-        if ((current_target = _unwrapObservable(target_observable()))) {
-          return current_target;
-        } else {
-          return _unwrapObservable(_this.dv);
-        }
-      },
+      read: (function(_this) {
+        return function() {
+          var current_target;
+          if ((current_target = _unwrapObservable(target_observable()))) {
+            return current_target;
+          } else {
+            return _unwrapObservable(_this.dv);
+          }
+        };
+      })(this),
       write: function(value) {
         return target_observable(value);
       }
@@ -9493,6 +9849,7 @@ kb.defaultObservable = function(target, default_value) {
   return new kb.DefaultObservable(target, default_value);
 };
 
+
 /*
   knockback-extensions.js (knockback-defaults)
   (c) 2011-2013 Kevin Malakoff.
@@ -9501,24 +9858,23 @@ kb.defaultObservable = function(target, default_value) {
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
     Optional dependency: Backbone.ModelRef.js.
-*/
-
+ */
 
 kb.Observable.prototype.setToDefault = function() {
-  var _ref1;
-  if ((_ref1 = this.__kb_value) != null) {
-    if (typeof _ref1.setToDefault === "function") {
-      _ref1.setToDefault();
+  var _ref2;
+  if ((_ref2 = this.__kb_value) != null) {
+    if (typeof _ref2.setToDefault === "function") {
+      _ref2.setToDefault();
     }
   }
 };
 
 kb.ViewModel.prototype.setToDefault = function() {
-  var vm_key, _ref1;
+  var vm_key, _ref2;
   for (vm_key in this.__kb.vm_keys) {
-    if ((_ref1 = this[vm_key]) != null) {
-      if (typeof _ref1.setToDefault === "function") {
-        _ref1.setToDefault();
+    if ((_ref2 = this[vm_key]) != null) {
+      if (typeof _ref2.setToDefault === "function") {
+        _ref2.setToDefault();
       }
     }
   }
@@ -9544,14 +9900,14 @@ kb.utils.setToDefault = function(obj) {
   return obj;
 };
 
+
 /*
-  knockback-formatted-observable.js 0.18.1
+  knockback-formatted-observable.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.FormattedObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 arraySlice = Array.prototype.slice;
 
@@ -9669,14 +10025,14 @@ kb.formattedObservable = function(format, args) {
   return new kb.FormattedObservable(format, arraySlice.call(arguments, 1));
 };
 
+
 /*
-  knockback-localized-observable.js 0.18.1
+  knockback-localized-observable.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.LocalizedObservable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 _publishMethods = kb._publishMethods;
 
@@ -9684,8 +10040,7 @@ kb.LocalizedObservable = (function() {
   LocalizedObservable.extend = kb.extend;
 
   function LocalizedObservable(value, options, vm) {
-    var observable,
-      _this = this;
+    var observable;
     this.value = value;
     this.vm = vm;
     options || (options = {});
@@ -9700,21 +10055,25 @@ kb.LocalizedObservable = (function() {
     }
     this.vo = ko.observable(!value ? null : this.read(value, null));
     observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
-      read: function() {
-        if (_this.value) {
-          _unwrapObservable(_this.value);
-        }
-        _this.vo();
-        return _this.read(_unwrapObservable(_this.value));
-      },
-      write: function(value) {
-        _this.write || _throwUnexpected(_this, 'writing to read-only');
-        _this.write(value, _unwrapObservable(_this.value));
-        _this.vo(value);
-        if (_this.__kb._onChange) {
-          return _this.__kb._onChange(value);
-        }
-      },
+      read: (function(_this) {
+        return function() {
+          if (_this.value) {
+            _unwrapObservable(_this.value);
+          }
+          _this.vo();
+          return _this.read(_unwrapObservable(_this.value));
+        };
+      })(this),
+      write: (function(_this) {
+        return function(value) {
+          _this.write || _throwUnexpected(_this, 'writing to read-only');
+          _this.write(value, _unwrapObservable(_this.value));
+          _this.vo(value);
+          if (_this.__kb._onChange) {
+            return _this.__kb._onChange(value);
+          }
+        };
+      })(this),
       owner: this.vm
     }));
     _publishMethods(observable, this, ['destroy', 'observedValue', 'resetToCurrent']);
@@ -9766,6 +10125,7 @@ kb.localizedObservable = function(value, options, view_model) {
   return new kb.LocalizedObservable(value, options, view_model);
 };
 
+
 /*
   knockback-extensions.js (knockback-localization)
   (c) 2011-2013 Kevin Malakoff.
@@ -9774,33 +10134,33 @@ kb.localizedObservable = function(value, options, view_model) {
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
     Optional dependency: Backbone.ModelRef.js.
-*/
-
+ */
 
 kb.locale_manager = void 0;
 
+
 /*
-  knockback-triggered-observable.js 0.18.1
+  knockback-triggered-observable.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 _publishMethods = kb._publishMethods;
 
 kb.TriggeredObservable = (function() {
   function TriggeredObservable(emitter, event_selector) {
-    var observable,
-      _this = this;
+    var observable;
     this.event_selector = event_selector;
     emitter || _throwMissing(this, 'emitter');
     this.event_selector || _throwMissing(this, 'event_selector');
     this.vo = ko.observable();
-    observable = kb.utils.wrappedObservable(this, ko.dependentObservable(function() {
-      return _this.vo();
-    }));
+    observable = kb.utils.wrappedObservable(this, ko.dependentObservable((function(_this) {
+      return function() {
+        return _this.vo();
+      };
+    })(this)));
     _publishMethods(observable, this, ['destroy']);
     kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, {
       emitter: _.bind(this.emitter, this),
@@ -9842,14 +10202,14 @@ kb.triggeredObservable = function(emitter, event_selector) {
   return new kb.TriggeredObservable(emitter, event_selector);
 };
 
+
 /*
-  knockback-validation.js 0.18.1
+  knockback-validation.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 callOrGet = function(value) {
   value = _unwrapObservable(value);
@@ -9905,7 +10265,7 @@ kb.valueValidator = function(value, bindings, validation_options) {
 };
 
 kb.inputValidator = function(view_model, el, validation_options) {
-  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators, _ref1;
+  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators, _ref2;
   if (validation_options == null) {
     validation_options = {};
   }
@@ -9927,9 +10287,9 @@ kb.inputValidator = function(view_model, el, validation_options) {
   (!validators[type = $input_el.attr('type')]) || (bindings[type] = validators[type]);
   (!$input_el.attr('required')) || (bindings.required = validators.required);
   if (options.validations) {
-    _ref1 = options.validations;
-    for (identifier in _ref1) {
-      validator = _ref1[identifier];
+    _ref2 = options.validations;
+    for (identifier in _ref2) {
+      validator = _ref2[identifier];
       bindings[identifier] = validator;
     }
   }
@@ -9939,7 +10299,7 @@ kb.inputValidator = function(view_model, el, validation_options) {
 };
 
 kb.formValidator = function(view_model, el) {
-  var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _j, _len1, _ref1;
+  var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _j, _len1, _ref2;
   results = {};
   validators = [];
   $root_el = $(el);
@@ -9952,9 +10312,9 @@ kb.formValidator = function(view_model, el) {
   }
   validation_options || (validation_options = {});
   validation_options.no_attach = !!form_name;
-  _ref1 = $root_el.find('input');
-  for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-    input_el = _ref1[_j];
+  _ref2 = $root_el.find('input');
+  for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+    input_el = _ref2[_j];
     if (!(name = $(input_el).attr('name'))) {
       continue;
     }
@@ -9991,14 +10351,14 @@ kb.formValidator = function(view_model, el) {
   return results;
 };
 
+
 /*
-  knockback-validators.js 0.18.1
+  knockback-validators.js 0.18.5
   (c) 2011-2013 Kevin Malakoff.
   Knockback.Observable is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-*/
-
+ */
 
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 
@@ -10047,17 +10407,18 @@ kb.minLengthFn = function(length) {
 
 kb.uniqueValueFn = function(model, key, collection) {
   return function(value) {
-    var c, k, m,
-      _this = this;
+    var c, k, m;
     m = _unwrapObservable(model);
     k = _unwrapObservable(key);
     c = _unwrapObservable(collection);
     if (!(m && k && c)) {
       return false;
     }
-    return !!_.find(c.models, function(test) {
-      return (test !== m) && test.get(k) === value;
-    });
+    return !!_.find(c.models, (function(_this) {
+      return function(test) {
+        return (test !== m) && test.get(k) === value;
+      };
+    })(this));
   };
 };
 

@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -81,11 +81,11 @@
       <header class="page">
       </header>
       <content class="page">
-        <section><h1>Auto-Releasing View Models</h1>
+        <section><h1 id="auto-releasing-view-models">Auto-Releasing View Models</h1>
 <p>When an element is created, Knockback provides functions to auto-release ViewModels using Knockout&#39;s dispose node callback:</p>
 
           <pre data-for="cs"># binds a callback to the node that releases the view model when the node is removed using ko.removeNode
-ko.utils.domNodeDisposal.addDisposeCallback(node, -&gt; kb.release(view_model) );</pre>
+ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model) );</pre>
           <pre data-for="js">// binds a callback to the node that releases the view model when the node is removed using ko.removeNode
 ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );</pre><p>There are three ways to do this in Knockback:</p>
 
@@ -107,7 +107,7 @@ kb.applyBindings(view_model, el);
 kb.releaseOnNodeRemove(view_model, el);</pre><p>This means you can use a Backbone.Router as follows and not need to explicitly call kb.release() because ko.removeNode calls it for you:</p>
 
           <pre data-for="cs">window.RouterBackboneJS = Backbone.Router.extend({
-  constructor: -&gt;
+  constructor: ->
     Backbone.Router.prototype.constructor.apply(@, arguments)
     
     loadPage = function(el) {
@@ -116,9 +116,9 @@ kb.releaseOnNodeRemove(view_model, el);</pre><p>This means you can use a Backbon
       $(el).addClass('active')
     }
     
-    @route('', null, -&gt; loadPage(kb.renderTemplate('home', new HomeViewModel())))
-    @route('things', null, -&gt; loadUrl(kb.renderTemplate('things_page', new ThingsPageViewModel())))
-    @route('things/:id', null, (id) -&gt; loadPage(kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))))
+    @route('', null, -> loadPage(kb.renderTemplate('home', new HomeViewModel())))
+    @route('things', null, -> loadUrl(kb.renderTemplate('things_page', new ThingsPageViewModel())))
+    @route('things/:id', null, (id) -> loadPage(kb.renderTemplate('thing_page', new ThingCellViewModel(things_collection.get(id)))))
 })</pre>
           <pre data-for="js">window.RouterBackboneJS = Backbone.Router.extend({
 
