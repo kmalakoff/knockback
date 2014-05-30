@@ -374,7 +374,8 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
     # add some occupants
-    house.get('occupants').add(person1).add(person2)
+    house.get('occupants').add(person1)
+    house.get('occupants').add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
@@ -584,7 +585,8 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     # check occupants
-    house.get('occupants').add(person1).add(person2)
+    house.get('occupants').add(person1)
+    house.get('occupants').add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
