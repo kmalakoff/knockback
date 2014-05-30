@@ -127,7 +127,7 @@ var require = globals.require;
 require.register('connection_pool', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -146,7 +146,7 @@ module.exports = new MemoryStore({
 require.register('cursor', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -160,7 +160,7 @@ QueryCache = require('./cache/singletons').QueryCache;
 
 Utils = require('./utils');
 
-CURSOR_KEYS = ['$count', '$exists', '$zero', '$one', '$offset', '$limit', '$page', '$sort', '$white_list', '$select', '$include', '$values', '$ids'];
+CURSOR_KEYS = ['$count', '$exists', '$zero', '$one', '$offset', '$limit', '$page', '$sort', '$white_list', '$select', '$include', '$values', '$ids', '$or'];
 
 module.exports = Cursor = (function() {
   function Cursor(query, options) {
@@ -597,7 +597,7 @@ module.exports = Cursor = (function() {
 require.register('database_url', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -718,7 +718,7 @@ module.exports = DatabaseURL = (function() {
 require.register('index', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -780,7 +780,7 @@ try {
 require.register('json_utils', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1176,7 +1176,7 @@ module.exports = JSONUtils = (function() {
 require.register('queue', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1247,7 +1247,7 @@ module.exports = Queue = (function() {
 require.register('schema', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1504,7 +1504,7 @@ module.exports = Schema = (function() {
 require.register('utils', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1934,7 +1934,7 @@ module.exports = Utils = (function() {
 require.register('cache/cursor', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1964,7 +1964,7 @@ module.exports = CacheCursor = (function(_super) {
 require.register('cache/memory_store', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2057,7 +2057,7 @@ module.exports = MemoryStore = (function() {
 require.register('cache/model_cache', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2170,7 +2170,7 @@ module.exports = ModelCache = (function() {
 require.register('cache/query_cache', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2447,7 +2447,7 @@ module.exports = QueryCache = (function() {
 require.register('cache/singletons', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2469,7 +2469,7 @@ try {
 require.register('cache/sync', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2633,7 +2633,7 @@ module.exports = function(model_type, wrapped_sync_fn) {
 require.register('extensions/collection', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2699,7 +2699,7 @@ if (!collection_type.prototype._orm_original_fns) {
 require.register('extensions/model', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -3694,12 +3694,12 @@ module.exports = ModelStream = (function(_super) {
 require.register('memory/cursor', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
  */
-var Cursor, IS_MATCH_FNS, IS_MATCH_OPERATORS, JSONUtils, MemoryCursor, Queue, Utils, inflection, moment, _,
+var Cursor, IS_MATCH_FNS, IS_MATCH_OPERATORS, JSONUtils, MemoryCursor, Queue, Utils, inflection, mergeQuery, moment, valueToArray, _,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -3761,6 +3761,16 @@ IS_MATCH_FNS = {
 };
 
 IS_MATCH_OPERATORS = _.keys(IS_MATCH_FNS);
+
+valueToArray = function(value) {
+  return (_.isArray(value) ? value : (_.isNull(value) ? [] : (value.$in ? value.$in : [value])));
+};
+
+mergeQuery = function(query, key, value) {
+  return query[key] = query.hasOwnProperty(key) ? {
+    $in: _.intersection(valueToArray(query[key]), valueToArray(value))
+  } : value;
+};
 
 module.exports = MemoryCursor = (function(_super) {
   __extends(MemoryCursor, _super);
@@ -3954,11 +3964,11 @@ module.exports = MemoryCursor = (function(_super) {
         return queue.defer(function(callback) {
           var related_query, relation;
           if (!(relation = _this.model_type.relation(relation_key))) {
-            find_query[key] = value;
+            mergeQuery(find_query, key, value);
             return callback();
           }
           if (!relation.join_table && (value_key === 'id')) {
-            find_query[relation.foreign_key] = value;
+            mergeQuery(find_query, relation.foreign_key, value);
             return callback();
           } else if (relation.join_table || (relation.type === 'belongsTo')) {
             (related_query = {
@@ -3971,22 +3981,22 @@ module.exports = MemoryCursor = (function(_super) {
               }
               if (relation.join_table) {
                 (join_query = {})[relation.reverse_relation.join_key] = {
-                  $in: _.compact(related_ids)
+                  $in: related_ids
                 };
                 join_query.$values = relation.foreign_key;
                 return relation.join_table.cursor(join_query).toJSON(function(err, model_ids) {
                   if (err) {
                     return callback(err);
                   }
-                  find_query.id = {
-                    $in: _.compact(model_ids)
-                  };
+                  mergeQuery(find_query, 'id', {
+                    $in: model_ids
+                  });
                   return callback();
                 });
               } else {
-                find_query[relation.foreign_key] = {
-                  $in: _.compact(related_ids)
-                };
+                mergeQuery(find_query, relation.foreign_key, {
+                  $in: related_ids
+                });
                 return callback();
               }
             });
@@ -3997,9 +4007,9 @@ module.exports = MemoryCursor = (function(_super) {
               if (err) {
                 return callback(err);
               }
-              find_query.id = {
-                $in: _.compact(model_ids)
-              };
+              mergeQuery(find_query, 'id', {
+                $in: model_ids
+              });
               return callback();
             });
           }
@@ -4010,11 +4020,11 @@ module.exports = MemoryCursor = (function(_super) {
       value = _ref[key];
       if (key.indexOf('.') < 0) {
         if (!(reverse_relation = this.model_type.reverseRelation(key))) {
-          find_query[key] = value;
+          mergeQuery(find_query, key, value);
           continue;
         }
         if (!reverse_relation.embed && !reverse_relation.join_table) {
-          find_query[key] = value;
+          mergeQuery(find_query, key, value);
           continue;
         }
         (function(_this) {
@@ -4028,9 +4038,9 @@ module.exports = MemoryCursor = (function(_super) {
                   if (err) {
                     return callback(err);
                   }
-                  find_query._json = _.map(models_json, function(test) {
+                  mergeQuery(find_query, '_json', _.map(models_json, function(test) {
                     return test[reverse_relation.key];
-                  });
+                  }));
                   return callback();
                 });
               } else {
@@ -4040,9 +4050,9 @@ module.exports = MemoryCursor = (function(_super) {
                   if (err) {
                     return callback(err);
                   }
-                  find_query.id = {
+                  mergeQuery(find_query, 'id', {
                     $in: model_ids
-                  };
+                  });
                   return callback();
                 });
               }
@@ -4053,7 +4063,7 @@ module.exports = MemoryCursor = (function(_super) {
       }
       _ref1 = key.split('.'), relation_key = _ref1[0], value_key = _ref1[1];
       if (this.model_type.relationIsEmbedded(relation_key)) {
-        find_query[key] = value;
+        mergeQuery(find_query, key, value);
         continue;
       }
       _fn(relation_key, value_key, value);
@@ -4164,7 +4174,7 @@ module.exports = MemoryCursor = (function(_super) {
 require.register('memory/sync', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -4358,7 +4368,7 @@ module.exports = function(type) {
 require.register('relations/many', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -4381,7 +4391,7 @@ module.exports = Many = (function(_super) {
   __extends(Many, _super);
 
   function Many(model_type, key, options) {
-    var Collection, value;
+    var Collection, reverse_model_type, value;
     this.model_type = model_type;
     this.key = key;
     for (key in options) {
@@ -4396,6 +4406,7 @@ module.exports = Many = (function(_super) {
       this.foreign_key = inflection.foreign_key(this.as || this.model_type.model_name);
     }
     if (!this.collection_type) {
+      reverse_model_type = this.reverse_model_type;
       Collection = (function(_super1) {
         __extends(Collection, _super1);
 
@@ -4403,7 +4414,7 @@ module.exports = Many = (function(_super) {
           return Collection.__super__.constructor.apply(this, arguments);
         }
 
-        Collection.prototype.model = Collection.reverse_model_type;
+        Collection.prototype.model = reverse_model_type;
 
         return Collection;
 
@@ -4957,7 +4968,7 @@ module.exports = Many = (function(_super) {
 require.register('relations/one', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -5437,7 +5448,7 @@ module.exports = One = (function(_super) {
 require.register('relations/relation', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.13
+  backbone-orm.js 0.5.15
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
