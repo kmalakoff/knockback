@@ -1,4 +1,5 @@
 ###############################
+# @nodoc
 class ORM
   constructor: ->
     @adapters = []
@@ -24,6 +25,7 @@ kb.orm = new ORM()
 ###############################
 
 ###############################
+# @nodoc
 class ORMAdapter_BackboneRelational
   isAvailable: ->
     try kb.Backbone?.RelationalModel or require?('backbone-relational') catch
@@ -58,6 +60,7 @@ kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
 ###############################
 
 ###############################
+# @nodoc
 class ORMAdapter_BackboneAssociations
   isAvailable: ->
     try kb.Backbone?.AssociatedModel or require?('backbone-associations') catch
@@ -76,6 +79,7 @@ kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################
 
 ###############################
+# @nodoc
 class ORMAdapter_Supermodel
   isAvailable: ->
     try window?.Supermodel or require?('supermodel') catch
