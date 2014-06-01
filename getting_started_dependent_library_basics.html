@@ -139,9 +139,9 @@ Backbone.history.start()
               </ul>
               <div class="tab-content">
                 <div id="ko_basic_view" class="tab-pane active">
-                  <pre>&lt;div id='ko_basic'&gt;
-  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+                  <pre>&lt;div id=&#39;ko_basic&#39;&gt;
+  &lt;p&gt;First name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: first_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: last_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
   &lt;p&gt;Hello, &lt;span data-bind=&quot;text: full_name&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
 &lt;/div&gt;
 </pre>
@@ -156,7 +156,7 @@ ViewModel = (model) -&gt;
   return
 view_model = new ViewModel(model)
 
-ko.applyBindings(view_model, $('#ko_basic')[0])</pre>
+ko.applyBindings(view_model, $(&#39;#ko_basic&#39;)[0])</pre>
                   <pre data-for="js">var model = {first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;};
 
 var ViewModel = function(model) {
@@ -167,7 +167,7 @@ var ViewModel = function(model) {
 
 var view_model = new ViewModel(model);
 
-ko.applyBindings(view_model, $('#ko_basic')[0]);</pre>
+ko.applyBindings(view_model, $(&#39;#ko_basic&#39;)[0]);</pre>
                 </div>
               </div>
             </div>

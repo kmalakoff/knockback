@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../../javascript/application.js'></script>
+  <script src='../../javascript/search.js'></script>
+  <link rel='stylesheet' href='../../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../../extra/README.md.html' title='Knockback.js'>
+      Knockback.js
+    </a>
+    &raquo;
+    <a href='../../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>kb</span>
+    &raquo;
+    <span class='title'>CollectionObservable</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        kb.CollectionObservable
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>src&#47;core&#47;collection-observable.coffee</td>
+        </tr>
+      </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Base class for observing collections.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+    </h4>
+    <pre><code class='coffeescript'>var collection = new Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
+var view_model = {
+  todos: kb.collectionObservable(collection)
+};</code></pre>
+    <h4>
+      How to access and change the observed collection.
+    </h4>
+    <pre><code class='coffeescript'> var todos = new kb.CollectionObservable(new kb.Collection([{name: &#39;name1&#39;}, {name: &#39;name2&#39;}]);
+ var current_collection = todos.collection(); &#47;&#47; get
+ todos.collection(new Backbone.Collection([{name: &#39;name3&#39;}, {name: &#39;name4&#39;}])); &#47;&#47; set</code></pre>
+  </div>
+</div>
+<div class='tags'>
+</div>
+      <h2>Variables Summary</h2>
+      <dl class='constants'>
+  <dt id='extend-variable'>
+    extend
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>kb</code></pre>
+    
+  </dd>
+</dl>
+      <h2>Class Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#extend-static'>
+        .
+(ko.observable)
+<b>extend</b><span>(prototype_properties, class_properties)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Class method for JavaScript inheritance. 
+    </span>
+  </li>
+</ul>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#destroy-dynamic'>
+        #
+(void)
+<b>destroy</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Required clean up function to break cycles, release view models, etc. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#shareOptions-dynamic'>
+        #
+(void)
+<b>shareOptions</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Get the options for a new collection that can be used for sharing view models. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#filters-dynamic'>
+        #
+(void)
+<b>filters</b><span>(filters)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Setter for the filters array for excluding models in the collection observable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#comparator-dynamic'>
+        #
+(void)
+<b>comparator</b><span>(comparator)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#sortAttribute-dynamic'>
+        #
+(void)
+<b>sortAttribute</b><span>(sort_attribute)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#viewModelByModel-dynamic'>
+        #
+(void)
+<b>viewModelByModel</b><span>(model)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Reverse lookup for a view model by model. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#hasViewModels-dynamic'>
+        #
+(void)
+<b>hasViewModels</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Will return true unless created with models_only option. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#compact-dynamic'>
+        #
+(void)
+<b>compact</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Compacts the Collection Observable to use the least amount of memory. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_shareOrCreateFactory-dynamic'>
+        #
+(void)
+<b>_shareOrCreateFactory</b><span>(options)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_onCollectionChange-dynamic'>
+        #
+(void)
+<b>_onCollectionChange</b><span>(event, arg)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_onModelRemove-dynamic'>
+        #
+(void)
+<b>_onModelRemove</b><span>(model)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_onObservableArrayChange-dynamic'>
+        #
+(void)
+<b>_onObservableArrayChange</b><span>(models_or_view_models)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_attributeComparator-dynamic'>
+        #
+(void)
+<b>_attributeComparator</b><span>(sort_attribute)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_createViewModel-dynamic'>
+        #
+(void)
+<b>_createViewModel</b><span>(model)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_selectModel-dynamic'>
+        #
+(void)
+<b>_selectModel</b><span>(model)</span>
+      </a>
+    </span>
+    <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#collection-dynamic'>
+        #
+(Collection|void)
+<b>collection</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection. 
+    </span>
+  </li>
+</ul>
+      <h2>Class Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='extend-static'>
+      .
+(ko.observable)
+<b>extend</b><span>(prototype_properties, class_properties)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Class method for JavaScript inheritance.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'>var MyCollectionObservable = kb.CollectionObservable.extend({
+   constructor: function(collection, options) {
+     &#47;&#47; the constructor does not return &#39;this&#39; but a ko.observableArray
+     return kb.CollectionObservable.prototype.constructor.call(this, collection, {
+       view_model: MyViewModel,
+       options: options
+   });
+});</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>prototype_properties</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the prototype </span>
+    </li>
+    <li>
+      <span class='name'>class_properties</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the properties to add to the class </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>ko.observable</tt>
+      )
+      &mdash;
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observableArray </span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(ko.observableArray)
+<b>constructor</b><span>(collection, options)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <div class='note'>
+    <strong>Note:</strong>
+    the constructor does not return &#39;this&#39; but a ko.observableArray 
+  </div>
+  <p>Used to create a new kb.CollectionObservable.</p><p>When the observable is updated, the following Backbone.Events are triggered:</p><ul>
+<li><strong><em>add</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li>
+<li><strong><em>resort</em></strong>: (view_model, collection_observable, new_index) or if batch: (collection_observable)</li>
+<li><strong><em>remove</em></strong>: (view_model, collection_observable) or if batch: (collection_observable)</li>
+</ul>
+
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>collection</span>
+      <span class='type'>
+        (
+          <tt>Collection</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the collection to observe (can be null) </span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the create options </span>
+    </li>
+  </ul>
+  <h3>
+    Options Hash:
+    (options):
+  </h3>
+  <ul class='options'>
+    <li>
+      <span class='name'>models_only</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models. </span>
+    </li>
+    <li>
+      <span class='name'>auto_compact</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>flag used to compact memory used by the collection observable when large changes occur, eg. resetting the collection. </span>
+    </li>
+    <li>
+      <span class='name'>view_model</span>
+      <span class='type'>
+        (
+          <tt>Constructor</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the view model constructor used for models in the collection. Signature: constructor(model, options) </span>
+    </li>
+    <li>
+      <span class='name'>create</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a function used to create a view model for models in the collection. Signature: create(model, options) </span>
+    </li>
+    <li>
+      <span class='name'>factories</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a map of dot-deliminated paths; for example &#39;models.owner&#39;: kb.ViewModel to either constructors or create functions. Signature: &#39;some.path&#39;: function(object, options) </span>
+    </li>
+    <li>
+      <span class='name'>comparator</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a function that is used to sort an object. Signature: <code>function(model_a, model_b)</code> returns negative value for ascending, 0 for equal, and positive for descending </span>
+    </li>
+    <li>
+      <span class='name'>sort_attribute</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the name of an attribute. Default: resort on all changes to a model. </span>
+    </li>
+    <li>
+      <span class='name'>filters</span>
+      <span class='type'>
+        (
+          <tt>Id|Function|Array</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions. </span>
+    </li>
+    <li>
+      <span class='name'>path</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the path to the value (used to create related observables from the factory). </span>
+    </li>
+    <li>
+      <span class='name'>store</span>
+      <span class='type'>
+        (
+          <tt><a href='../../class/kb/Store.html'>kb.Store</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a store used to cache and share view models. </span>
+    </li>
+    <li>
+      <span class='name'>factory</span>
+      <span class='type'>
+        (
+          <tt><a href='../../class/kb/Factory.html'>kb.Factory</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a factory used to create view models. </span>
+    </li>
+    <li>
+      <span class='name'>options</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>ko.observableArray</tt>
+      )
+      &mdash;
+      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observableArray </span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='destroy-dynamic'>
+      #
+(void)
+<b>destroy</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Required clean up function to break cycles, release view models, etc.
+Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='shareOptions-dynamic'>
+      #
+(void)
+<b>shareOptions</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Get the options for a new collection that can be used for sharing view models.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      Sharing view models for an HTML select element.
+    </h4>
+    <pre><code class='coffeescript'>var selected_collection = new Backbone.Collection();
+var available_collection = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Fred&#39;}]);
+var selected = kb.collectionObservable(available_collection);
+var available = kb.collectionObservable(available_collection, available_collection.shareOptions()); &#47;&#47; view models shared with selected collection observable</code></pre>
+  </div>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='filters-dynamic'>
+      #
+(void)
+<b>filters</b><span>(filters)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Setter for the filters array for excluding models in the collection observable.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'> &#47;&#47; exclude a single model by id
+ collection_observable.filters(model.id);</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>filters</span>
+      <span class='type'>
+        (
+          <tt>Id|Function|Array</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='comparator-dynamic'>
+      #
+(void)
+<b>comparator</b><span>(comparator)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'> &#47;&#47; change the sorting function
+ collection_observable.comparator(
+   function(view_models, vm){
+     return _.comparator(view_models, vm, (test) -&gt; kb.utils.wrappedModel(test).get(&#39;name&#39;));
+   }
+ );</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>comparator</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a function that returns an index where to insert the model. Signature: function(models, model) </span>
+    </li>
+    <li>
+      <span class='name'>comparator</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>a function that is used to sort an object. Signature: <code>function(model_a, model_b)</code> returns negative value for ascending, 0 for equal, and positive for descending </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='sortAttribute-dynamic'>
+      #
+(void)
+<b>sortAttribute</b><span>(sort_attribute)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'> var todos = new kb.CollectionObservable(new Backbone.Collection([{name: &#39;Zanadu&#39;, name: &#39;Alex&#39;}]));
+ &#47;&#47; in order of Zanadu then Alex
+ todos.sortAttribute(&#39;name&#39;);
+ &#47;&#47; in order of Alex then Zanadu</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>sort_attribute</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the name of an attribute. Default: resort on all changes to a model. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='viewModelByModel-dynamic'>
+      #
+(void)
+<b>viewModelByModel</b><span>(model)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Reverse lookup for a view model by model. If created with models_only option, will return null.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='hasViewModels-dynamic'>
+      #
+(void)
+<b>hasViewModels</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Will return true unless created with models_only option.</p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'>var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
+todos1.hasViewModels();     &#47;&#47; false
+var todos2 = new kb.CollectionObservable(new Backbone.Collection());
+todos2.hasViewModels();     &#47;&#47; true</code></pre>
+  </div>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='compact-dynamic'>
+      #
+(void)
+<b>compact</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Compacts the Collection Observable to use the least amount of memory. Currently, this is brute force meaning it releases than regenerates all view models when called.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_shareOrCreateFactory-dynamic'>
+      #
+(void)
+<b>_shareOrCreateFactory</b><span>(options)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_onCollectionChange-dynamic'>
+      #
+(void)
+<b>_onCollectionChange</b><span>(event, arg)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_onModelRemove-dynamic'>
+      #
+(void)
+<b>_onModelRemove</b><span>(model)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_onObservableArrayChange-dynamic'>
+      #
+(void)
+<b>_onObservableArrayChange</b><span>(models_or_view_models)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_attributeComparator-dynamic'>
+      #
+(void)
+<b>_attributeComparator</b><span>(sort_attribute)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_createViewModel-dynamic'>
+      #
+(void)
+<b>_createViewModel</b><span>(model)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_selectModel-dynamic'>
+      #
+(void)
+<b>_selectModel</b><span>(model)</span>
+      <span class='note private'>Private</span>
+      <br>
+    </p>
+    <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='collection-dynamic'>
+      #
+(Collection|void)
+<b>collection</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Collection|void</tt>
+      )
+      &mdash;
+      <span class='desc'>getter: the collection whose models are being observed (can be null) OR setter: void </span>
+    </li>
+  </ul>
+</div>
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  May 31, 14 18:09:08 by
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.0.9
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>
