@@ -33,7 +33,7 @@
 #   @param [Any] default_value the default value. Can be a value, string or ko.observable
 #   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 #
-# @method .formattedObservable(format, arg1, arg2, ...)
+# @method .formattedObservable(format, arg1, arg2, etc)
 #   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
 #   @param [String|ko.observable] format the format string. Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
 #   @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
@@ -66,11 +66,11 @@ class kb
 
   # Checks if an object has been released.
   # @param [Any] obj the object to release and also release its keys
-  @wasReleased = (obj) -> return not obj or obj.__kb_released
+  @wasReleased: (obj) -> return not obj or obj.__kb_released
 
   # Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.
   # @param [Any] obj the object to release and also release its keys
-  @isReleaseable = (obj, depth=0) ->
+  @isReleaseable: (obj, depth=0) ->
     # must be an object and not already released
     if (not obj or (obj isnt Object(obj))) or obj.__kb_released
       return false
@@ -103,7 +103,7 @@ class kb
   # @example
   #   var todos = kb.collectionObservable(collection);
   #   kb.utils.release(todos); todos = null;
-  @release = (obj) ->
+  @release: (obj) ->
     return unless kb.isReleaseable(obj)
 
     # release array's items
@@ -138,7 +138,7 @@ class kb
     return
 
   # Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
-  @releaseKeys = (obj) ->
+  @releaseKeys: (obj) ->
     ((obj[key] = null; kb.release(value)) if (key isnt '__kb') and kb.isReleaseable(value)) for key, value of obj
     return
 
@@ -153,7 +153,7 @@ class kb
   #   kb.releaseOnNodeRemove(view_model, el);
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-  @releaseOnNodeRemove = (view_model, node) ->
+  @releaseOnNodeRemove: (view_model, node) ->
     view_model or _throwUnexpected(@, 'missing view model')
     node or _throwUnexpected(@, 'missing node')
     ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
@@ -166,7 +166,7 @@ class kb
   #   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-  @renderTemplate = (template, view_model, options={}) ->
+  @renderTemplate: (template, view_model, options={}) ->
     return console?.log 'renderTemplate: document is undefined' unless document?
 
     el = document.createElement('div')
@@ -185,17 +185,17 @@ class kb
   #   kb.applyBindings(kb.viewModel(new Backbone.Model({name: 'Bob'})), el);
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-  @applyBindings = (view_model, node) ->
+  @applyBindings: (view_model, node) ->
     ko.applyBindings(view_model, node)
     kb.releaseOnNodeRemove(view_model, node)
 
-  @getValue = (model, key, args) ->
+  @getValue: (model, key, args) ->
     return unless model
     return model[key]() if _.isFunction(model[key]) and kb.orm.useFunction(model, key)
     return model.get(key) unless args
     model.get.apply(model, _.map([key].concat(args), (value) -> _peekObservable(value)))
 
-  @setValue = (model, key, value) ->
+  @setValue: (model, key, value) ->
     return unless model
     return model[key](value) if _.isFunction(model[key]) and kb.orm.useFunction(model, key)
     (attributes = {})[key] = value
