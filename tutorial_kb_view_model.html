@@ -81,8 +81,8 @@
       <header class="page">
       </header>
       <content class="page"><h1 id="tutorial-kb-viewmodel">Tutorial: kb.ViewModel</h1>
-<p><a href="index.html">Knockback.js</a> has a helper called <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> to automatically generate observables for each attribute. Most likely you will use the <a href="doc/classes/kb.html#viewModel-class">kb.viewModel(model) factory method</a> to create a kb.ViewModel.</p>
-<p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/classes/kb/ViewModel.html#constructor-instance">constructor options</a> like &#39;keys&#39; or &#39;excludes&#39; to limit the attributes which have kb.Observables for them or &#39;requires&#39; to ensure that observables are created consistently irregardless of the Model.</p>
+<p><a href="index.html">Knockback.js</a> has a helper called <a href="doc/class/kb/ViewModel.html">kb.ViewModel</a> to automatically generate observables for each attribute. Most likely you will use the <a href="doc/class/kb/ViewModel.html#extend-static">kb.viewModel(model) factory method</a> to create a kb.ViewModel.</p>
+<p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/class/kb/ViewModel.html#constructor-dynamic">constructor options</a> like &#39;keys&#39; or &#39;excludes&#39; to limit the attributes which have kb.Observables for them or &#39;requires&#39; to ensure that observables are created consistently irregardless of the Model.</p>
 <p>In this case, Knockback will skip creating an observable for the &#39;id&#39; attribute:</p>
 
         <pre data-for="cs">view_model = kb.viewModel(new Backbone.Model({id: 20, name: 'Bob'}), {keys: ['name']})
@@ -103,14 +103,14 @@
             </ul>
             <div class="tab-content">
               <div id="kbvm_bb_model_view" class="tab-pane active">
-                <pre>&lt;div id=&#39;kbvm_bb_model&#39;&gt;
+                <pre>&lt;div id='kbvm_bb_model'&gt;
   &lt;p&gt;
     &lt;span&gt;First Person: &lt;/span&gt;
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: name, valueUpdate: 'keyup'&quot;/&gt;
   &lt;/p&gt;
   &lt;p&gt;
     &lt;span&gt;Second Person: &lt;/span&gt;
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: friend().name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: friend().name, valueUpdate: 'keyup'&quot;/&gt;
   &lt;/p&gt;
 
   &lt;p&gt;
@@ -123,16 +123,16 @@
 &lt;/div&gt;</pre>
               </div>
               <div id="kbvm_bb_model_view_model" class="tab-pane">
-                <pre data-for="cs">bob = new Backbone.Model({name: &#39;Bob&#39;, friend: new Backbone.Model({name: &#39;Fred&#39;})})
+                <pre data-for="cs">bob = new Backbone.Model({name: 'Bob', friend: new Backbone.Model({name: 'Fred'})})
 
 view_model = kb.viewModel(bob)
 
-ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0])</pre>
-                <pre data-for="js">var bob = new Backbone.Model({name: &#39;Bob&#39;, friend: new Backbone.Model({name: &#39;Fred&#39;})});
+ko.applyBindings(view_model, $('#kbvm_bb_model')[0])</pre>
+                <pre data-for="js">var bob = new Backbone.Model({name: 'Bob', friend: new Backbone.Model({name: 'Fred'})});
 
 var view_model = kb.viewModel(bob);
 
-ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbvm_bb_model')[0]);</pre>
               </div>
             </div>
           </div>
@@ -170,18 +170,18 @@ ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0]);</pre>
             </ul>
             <div class="tab-content">
               <div id="kbvm_bb_collection_view" class="tab-pane active">
-                <pre>&lt;div id=&#39;kbvm_bb_collection&#39;&gt;
+                <pre>&lt;div id='kbvm_bb_collection'&gt;
   &lt;p&gt;
     &lt;span&gt;First Person: &lt;/span&gt;
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: name, valueUpdate: 'keyup'&quot;/&gt;
   &lt;/p&gt;
   &lt;p&gt;
     &lt;span&gt;Second Person: &lt;/span&gt;
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: friends()[0].name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: friends()[0].name, valueUpdate: 'keyup'&quot;/&gt;
   &lt;/p&gt;
   &lt;p&gt;
     &lt;span&gt;Third Person: &lt;/span&gt;
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: friends()[1].name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: friends()[1].name, valueUpdate: 'keyup'&quot;/&gt;
   &lt;/p&gt;
 
   &lt;p&gt;
@@ -196,16 +196,16 @@ ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0]);</pre>
 &lt;/div&gt;</pre>
               </div>
               <div id="kbvm_bb_collection_view_model" class="tab-pane">
-                <pre data-for="cs">bob = new Backbone.Model({name: &#39;Bob&#39;, friends: new Backbone.Collection([new Backbone.Model({name: &#39;Fred&#39;}), new Backbone.Model({name: &#39;John&#39;})])})
+                <pre data-for="cs">bob = new Backbone.Model({name: 'Bob', friends: new Backbone.Collection([new Backbone.Model({name: 'Fred'}), new Backbone.Model({name: 'John'})])})
 
 view_model = kb.viewModel(bob)
 
-ko.applyBindings(view_model, $(&#39;#kbvm_bb_collection&#39;)[0])</pre>
-                <pre data-for="js">var bob = new Backbone.Model({name: &#39;Bob&#39;, friends: new Backbone.Collection([new Backbone.Model({name: &#39;Fred&#39;}), new Backbone.Model({name: &#39;John&#39;})])});
+ko.applyBindings(view_model, $('#kbvm_bb_collection')[0])</pre>
+                <pre data-for="js">var bob = new Backbone.Model({name: 'Bob', friends: new Backbone.Collection([new Backbone.Model({name: 'Fred'}), new Backbone.Model({name: 'John'})])});
 
 var view_model = kb.viewModel(bob);
 
-ko.applyBindings(view_model, $(&#39;#kbvm_bb_collection&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbvm_bb_collection')[0]);</pre>
               </div>
             </div>
           </div>

@@ -85,9 +85,9 @@
 <h1 id="inheritance">Inheritance</h1>
 <p>Some Knockback classes are meant to be inherited from. Specifically:</p>
 <ul>
-<li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
-<li><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a></li>
-<li><a href="doc/classes/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
+<li><a href="doc/class/kb/ViewModel.html">kb.ViewModel</a></li>
+<li><a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable</a></li>
+<li><a href="doc/class/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
 </ul>
 <p>When using CoffeeScript, you can derive from a super class using:</p>
 <pre><code>class YourClass extends SuperClass
@@ -106,9 +106,9 @@
               </ul>
               <div class="tab-content">
                 <div id="kb_view_model_inheritance_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kb_view_model_inheritance&#39;&gt;
-  &lt;p&gt;First name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: first_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Last name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: last_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
+                  <pre>&lt;div id='kb_view_model_inheritance'&gt;
+  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
   &lt;p&gt;Hello, &lt;span data-bind=&quot;text: full_name&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
 &lt;/div&gt;</pre>
                 </div>
@@ -121,7 +121,7 @@ class MyViewModel extends kb.ViewModel
     @full_name = ko.computed((-&gt;return &quot;#{@first_name()} #{@last_name()}&quot;), @)
 view_model = new MyViewModel(model)
 
-ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0])</pre>
                   <pre data-for="js">var model = new Backbone.Model({first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;});
 
 var MyViewModel = kb.ViewModel.extend({
@@ -135,7 +135,7 @@ var MyViewModel = kb.ViewModel.extend({
 
 var view_model = new MyViewModel(model);
 
-ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0]);
+ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
 </pre>
                 </div>
               </div>
@@ -151,20 +151,20 @@ ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0]);
               </div>
             </div>
           </div><h1 id="specifying-mappings-paths-for-nested-models">Specifying Mappings Paths for Nested Models</h1>
-<p>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the <code>factories</code> option when creating a <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> or <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a></p>
+<p>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the <code>factories</code> option when creating a <a href="doc/class/kb/ViewModel.html">kb.ViewModel</a> or <a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable</a></p>
 
           <pre data-for="cs">view_model = {
   people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
     factories:
-      &#39;models&#39;: PersonViewModel
-      &#39;models.friends.models&#39;: FriendViewModel
+      'models': PersonViewModel
+      'models.friends.models': FriendViewModel
   })
 }</pre>
           <pre data-for="js">var view_model = {
   people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
     factories: {
-      &#39;models&#39;: PersonViewModel,
-      &#39;models.friends.models&#39;: FriendViewModel
+      'models': PersonViewModel,
+      'models.friends.models': FriendViewModel
     }
   })
 };</pre><p>Please take a look at the <a href="tutorial_nested_models.html">Nested Model Tutorial</a> for more details.</p>
@@ -172,12 +172,12 @@ ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0]);
 <p>Many Knockback.js classes return Knockout.js observables so their dependencies/subscriptions can and should be managed like any Knockout observable. This is **very important if you choose to extend Knockback classes.</p>
 <p>These classes return a ko.observable instead of &#39;this&#39;:</p>
 <ul>
-<li><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a></li>
-<li><a href="doc/classes/kb/Observable.html">kb.Observable</a></li>
-<li><a href="doc/classes/kb/DefaultWrapper.html">kb.DefaultWrapper</a></li>
-<li><a href="doc/classes/kb/FormattedObservable.html">kb.FormattedObservable</a></li>
-<li><a href="doc/classes/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
-<li><a href="doc/classes/kb/TriggeredObservable.html">kb.TriggeredObservable</a></li>
+<li><a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable</a></li>
+<li><a href="doc/class/kb/Observable.html">kb.Observable</a></li>
+<li><a href="doc/class/kb/DefaultWrapper.html">kb.DefaultWrapper</a></li>
+<li><a href="doc/class/kb/FormattedObservable.html">kb.FormattedObservable</a></li>
+<li><a href="doc/class/kb/LocalizedObservable.html">kb.LocalizedObservable</a></li>
+<li><a href="doc/class/kb/TriggeredObservable.html">kb.TriggeredObservable</a></li>
 </ul>
 <p>Use ko.utils.wrappedObservable(this) or return the constructor result if you dervive from them:</p>
 <pre><code>YourCollectionObservable = kb.CollectionObservable.extend({
@@ -194,11 +194,11 @@ ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0]);
 });
 </code></pre><p>These classes return &#39;this&#39;:</p>
 <ul>
-<li><a href="doc/classes/kb/Factory.html">kb.Factory</a></li>
-<li><a href="doc/classes/kb/ModelWatcher.html">kb.ModelWatcher</a></li>
-<li><a href="doc/classes/kb/Store.html">kb.Store</a></li>
-<li><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a></li>
-<li><a href="doc/classes/kb/Statistics.html">kb.Statistics</a></li>
+<li><a href="doc/class/kb/Factory.html">kb.Factory</a></li>
+<li><a href="doc/class/kb/ModelWatcher.html">kb.ModelWatcher</a></li>
+<li><a href="doc/class/kb/Store.html">kb.Store</a></li>
+<li><a href="doc/class/kb/ViewModel.html">kb.ViewModel</a></li>
+<li><a href="doc/class/kb/Statistics.html">kb.Statistics</a></li>
 </ul>
 <h1 id="backbone-model-signatures">Backbone.Model Signatures</h1>
 <p>Knockback.js does not require Backbone.Models or Backbone.ModelRefs for attribute watching, but requires only Backbone.Model-like signature.</p>

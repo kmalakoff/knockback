@@ -96,17 +96,17 @@
               </ul>
               <div class="tab-content">
                 <div id="kbnm_view_models_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;rm_manual&#39;&gt;
+                  <pre>&lt;div id='rm_manual'&gt;
   &lt;p&gt;First Person:
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: occupants()[0].name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: occupants()[0].name, valueUpdate: 'keyup'&quot;/&gt;
     &lt;div&gt;(home: &lt;span data-bind=&quot;text: occupants()[0].livesIn().location&quot;&gt;&lt;/span&gt;)&lt;/div&gt;
   &lt;/p&gt;
   &lt;p&gt;Second Person:
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: occupants()[1].name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: occupants()[1].name, valueUpdate: 'keyup'&quot;/&gt;
     &lt;div&gt;(home: &lt;span data-bind=&quot;text: occupants()[1].livesIn().location&quot;&gt;&lt;/span&gt;)&lt;/div&gt;
   &lt;/p&gt;
 
-  &lt;p&gt;Location: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: location, valueUpdate: &#39;keyup&#39;&quot;/&gt;&lt;/p&gt;
+  &lt;p&gt;Location: &lt;input class='input-small pull-right' data-bind=&quot;value: location, valueUpdate: 'keyup'&quot;/&gt;&lt;/p&gt;
   &lt;p&gt;
     Has these people living there:
     &lt;ul data-bind=&quot;foreach: occupants&quot;&gt;
@@ -116,11 +116,11 @@
 &lt;/div&gt;</pre>
                 </div>
                 <div id="kbnm_view_models_view_model" class="tab-pane">
-                  <pre data-for="cs">bob = new Backbone.Model({name: &#39;Bob&#39;})
-fred = new Backbone.Model({name: &#39;Fred&#39;})
+                  <pre data-for="cs">bob = new Backbone.Model({name: 'Bob'})
+fred = new Backbone.Model({name: 'Fred'})
 
 house = new Backbone.Model({
-  location: &#39;In the middle of our street&#39;
+  location: 'In the middle of our street'
   occupants: new Backbone.Collection([bob, fred])
 })
 
@@ -129,12 +129,12 @@ fred.set({livesIn: house})
 
 view_model = kb.viewModel(house)
 
-ko.applyBindings(view_model, $(&#39;#rm_manual&#39;)[0])</pre>
-                  <pre data-for="js">var bob = new Backbone.Model({name: &#39;Bob&#39;});
-var fred = new Backbone.Model({name: &#39;Fred&#39;});
+ko.applyBindings(view_model, $('#rm_manual')[0])</pre>
+                  <pre data-for="js">var bob = new Backbone.Model({name: 'Bob'});
+var fred = new Backbone.Model({name: 'Fred'});
 
 var house = new Backbone.Model({
-  location: &#39;In the middle of our street&#39;,
+  location: 'In the middle of our street',
   occupants: new Backbone.Collection([bob, fred])
 });
 
@@ -143,7 +143,7 @@ fred.set({livesIn: house});
 
 view_model = kb.viewModel(house);
 
-ko.applyBindings(view_model, $(&#39;#rm_manual&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#rm_manual')[0]);</pre>
                 </div>
               </div>
             </div>
@@ -184,17 +184,17 @@ ko.applyBindings(view_model, $(&#39;#rm_manual&#39;)[0]);</pre>
               </ul>
               <div class="tab-content">
                 <div id="br_view_model_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;br_relational_models&#39;&gt;
+                  <pre>&lt;div id='br_relational_models'&gt;
   &lt;p&gt;First Person:
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: occupants()[0].name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: occupants()[0].name, valueUpdate: 'keyup'&quot;/&gt;
     &lt;div&gt;(home: &lt;span data-bind=&quot;text: occupants()[0].livesIn().location&quot;&gt;&lt;/span&gt;)&lt;/div&gt;
   &lt;/p&gt;
   &lt;p&gt;Second Person:
-    &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: occupants()[1].name, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+    &lt;input class='input-small pull-right' data-bind=&quot;value: occupants()[1].name, valueUpdate: 'keyup'&quot;/&gt;
     &lt;div&gt;(home: &lt;span data-bind=&quot;text: occupants()[1].livesIn().location&quot;&gt;&lt;/span&gt;)&lt;/div&gt;
   &lt;/p&gt;
 
-  &lt;p&gt;Location: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: location, valueUpdate: &#39;keyup&#39;&quot;/&gt;&lt;/p&gt;
+  &lt;p&gt;Location: &lt;input class='input-small pull-right' data-bind=&quot;value: location, valueUpdate: 'keyup'&quot;/&gt;&lt;/p&gt;
   &lt;p&gt;
     Has these people living there:
     &lt;ul data-bind=&quot;foreach: occupants&quot;&gt;
@@ -207,10 +207,10 @@ ko.applyBindings(view_model, $(&#39;#rm_manual&#39;)[0]);</pre>
                   <pre data-for="cs">House = Backbone.RelationalModel.extend({
   relations: [{
     type: Backbone.HasMany
-    key: &#39;occupants&#39;
-    relatedModel: &#39;Person&#39;
+    key: 'occupants'
+    relatedModel: 'Person'
     reverseRelation:
-      key: &#39;livesIn&#39;
+      key: 'livesIn'
   }]
 })
 
@@ -218,10 +218,10 @@ Person = Backbone.RelationalModel.extend({})</pre>
                   <pre data-for="js">var House = Backbone.RelationalModel.extend({
   relations: [{
     type: Backbone.HasMany,
-    key: &#39;occupants&#39;,
-    relatedModel: &#39;Person&#39;,
+    key: 'occupants',
+    relatedModel: 'Person',
     reverseRelation: {
-      key: &#39;livesIn&#39;
+      key: 'livesIn'
     }
   }]
 });
@@ -229,28 +229,28 @@ Person = Backbone.RelationalModel.extend({})</pre>
 var Person = Backbone.RelationalModel.extend({});</pre>
                 </div>
                 <div id="br_view_model_view_model" class="tab-pane">
-                  <pre data-for="cs">bob = new Person({id: &#39;person-1&#39;, name: &#39;Bob&#39;})
-fred = new Person({id: &#39;person-2&#39;, name: &#39;Fred&#39;})
+                  <pre data-for="cs">bob = new Person({id: 'person-1', name: 'Bob'})
+fred = new Person({id: 'person-2', name: 'Fred'})
 
 house = new House({
-  location: &#39;In the middle of our street&#39;
-  occupants: [&#39;person-1&#39;, &#39;person-2&#39;]
+  location: 'In the middle of our street'
+  occupants: ['person-1', 'person-2']
 })
 
 view_model = kb.viewModel(house)
 
-ko.applyBindings(view_model, $(&#39;#br_relational_models&#39;)[0])</pre>
-                  <pre data-for="js">var bob = new Person({id: &#39;person-1&#39;, name: &#39;Bob&#39;});
-var fred = new Person({id: &#39;person-2&#39;, name: &#39;Fred&#39;});
+ko.applyBindings(view_model, $('#br_relational_models')[0])</pre>
+                  <pre data-for="js">var bob = new Person({id: 'person-1', name: 'Bob'});
+var fred = new Person({id: 'person-2', name: 'Fred'});
 
 var house = new House({
-  location: &#39;In the middle of our street&#39;,
-  occupants: [&#39;person-1&#39;, &#39;person-2&#39;]
+  location: 'In the middle of our street',
+  occupants: ['person-1', 'person-2']
 });
 
 var view_model = kb.viewModel(house);
 
-ko.applyBindings(view_model, $(&#39;#br_relational_models&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#br_relational_models')[0]);</pre>
                 </div>
               </div>
             </div>

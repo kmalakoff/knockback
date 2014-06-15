@@ -84,7 +84,7 @@
       <content class="page">
         <section>
           <h1>Tutorial: Nested Models</h1>
-          <div><span>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the `factories` option when creating a</span><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a><span> or</span><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable.</a></div>
+          <div><span>Because Backbone.Models can have attributes than contain nested Backbone.Models or Backbone.Collections, there are times where you need to specialize the ViewModel you want to use; for example, in a model/collection hierachy with relationships. When you do need to, you can use the `factories` option when creating a</span><a href="doc/class/kb/ViewModel.html">kb.ViewModel</a><span> or</span><a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable.</a></div>
           <h2>Specifying Mappings Paths for kb.CollectionObservables</h2>
           <p>In the following example, we specify bindings so the collection view models (path: 'models') use a PersonViewModel; whereas, the 'friends' relationship (path: 'models.friends.models') uses FriendViewModel.</p>
           <div class="row-fluid">
@@ -95,9 +95,9 @@
               </ul>
               <div class="tab-content">
                 <div id="kbnm_collection_observables_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kbnm_collection_observables&#39; data-bind=&quot;foreach: people&quot;&gt;
+                  <pre>&lt;div id='kbnm_collection_observables' data-bind=&quot;foreach: people&quot;&gt;
   &lt;p&gt;Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-  &lt;p&gt;Name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot;/&gt;&lt;/p&gt;
+  &lt;p&gt;Name: &lt;input class='input-small pull-right' data-bind=&quot;value: name, valueUpdate: 'keyup'&quot;/&gt;&lt;/p&gt;
 
   &lt;div data-bind=&quot;foreach: friends&quot;&gt;
     &lt;p&gt;Friend Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt; &lt;span class=&quot;pull-right&quot; &gt;Name: &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
@@ -109,49 +109,49 @@
 fred = new Backbone.Model({name: &quot;Fred&quot;, friends: new Backbone.Collection([bob])})
 
 FriendViewModel = (model) -&gt;
-  @name = kb.observable(model, &#39;name&#39;)
-  @type = ko.observable(&#39;friend&#39;)
+  @name = kb.observable(model, 'name')
+  @type = ko.observable('friend')
   return
 
 class PersonViewModel extends kb.ViewModel
   constructor: (model, options) -&gt;
     super
-    @type = ko.observable(&#39;person&#39;)
+    @type = ko.observable('person')
 
 view_model = {
   people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
     factories:
-      &#39;models&#39;: PersonViewModel
-      &#39;models.friends.models&#39;: FriendViewModel
+      'models': PersonViewModel
+      'models.friends.models': FriendViewModel
   })
 }
 
-ko.applyBindings(view_model, $(&#39;#kbnm_collection_observables&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#kbnm_collection_observables')[0])</pre>
                   <pre data-for="js">var bob = new Backbone.Model({name: &quot;Bob&quot;, friends: new Backbone.Collection()});
 var fred = new Backbone.Model({name: &quot;Fred&quot;, friends: new Backbone.Collection([bob])});
 
 var FriendViewModel = function(model) {
-  this.name = kb.observable(model, &#39;name&#39;);
-  this.type = ko.observable(&#39;friend&#39;);
+  this.name = kb.observable(model, 'name');
+  this.type = ko.observable('friend');
 };
 
 var PersonViewModel = kb.ViewModel.extend({
   constructor: function(model, options) {
     kb.ViewModel.prototype.constructor.apply(this, arguments);
-    this.type = ko.observable(&#39;person&#39;);
+    this.type = ko.observable('person');
   }
 });
 
 var view_model = {
   people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
     factories: {
-      &#39;models&#39;: PersonViewModel,
-      &#39;models.friends.models&#39;: FriendViewModel
+      'models': PersonViewModel,
+      'models.friends.models': FriendViewModel
     }
   })
 };
 
-ko.applyBindings(view_model, $(&#39;#kbnm_collection_observables&#39;)[0]);
+ko.applyBindings(view_model, $('#kbnm_collection_observables')[0]);
 </pre>
                 </div>
               </div>
@@ -180,9 +180,9 @@ ko.applyBindings(view_model, $(&#39;#kbnm_collection_observables&#39;)[0]);
               </ul>
               <div class="tab-content">
                 <div id="kbnm_view_models_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kbnm_view_models&#39;&gt;
+                  <pre>&lt;div id='kbnm_view_models'&gt;
   &lt;p&gt;Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt;&lt;/p&gt;
-  &lt;p&gt;Name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot;/&gt;&lt;/p&gt;
+  &lt;p&gt;Name: &lt;input class='input-small pull-right' data-bind=&quot;value: name, valueUpdate: 'keyup'&quot;/&gt;&lt;/p&gt;
 
   &lt;div data-bind=&quot;foreach: friends&quot;&gt;
     &lt;p&gt;Friend Type: &lt;span data-bind=&quot;text: type&quot;&gt;&lt;/span&gt; &lt;span class=&quot;pull-right&quot; &gt;Name: &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
@@ -198,48 +198,48 @@ fred = new Backbone.Model({name: &quot;Fred&quot;, friends: new Backbone.Collect
 bob.set({friends: new Backbone.Collection([fred])})
 
 FriendViewModel = (model, options) -&gt;
-  @type = &#39;friend&#39;
-  @name = kb.observable(model, &#39;name&#39;)
-  @friends = kb.collectionObservable(model.get(&#39;friends&#39;), kb.utils.optionsPathJoin(options, &#39;friends&#39;))
+  @type = 'friend'
+  @name = kb.observable(model, 'name')
+  @friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'))
   return
 
 class PersonViewModel extends kb.ViewModel
   constructor: (model, options) -&gt;
-    @type = &#39;person&#39;
+    @type = 'person'
     super
 
 view_model = new PersonViewModel(fred, {
   factories:
-    &#39;friends.models&#39;: FriendViewModel
-    &#39;friends.models.friends.models&#39;: FriendViewModel
+    'friends.models': FriendViewModel
+    'friends.models.friends.models': FriendViewModel
 })
 
-ko.applyBindings(view_model, $(&#39;#kbnm_view_models&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#kbnm_view_models')[0])</pre>
                   <pre data-for="js">var bob = new Backbone.Model({name: &quot;Bob&quot;});
 var fred = new Backbone.Model({name: &quot;Fred&quot;, friends: new Backbone.Collection([bob])});
 bob.set({friends: new Backbone.Collection([fred])});
 
 var FriendViewModel = function(model, options) {
-  this.type = &#39;friend&#39;;
-  this.name = kb.observable(model, &#39;name&#39;);
-  this.friends = kb.collectionObservable(model.get(&#39;friends&#39;), kb.utils.optionsPathJoin(options, &#39;friends&#39;));
+  this.type = 'friend';
+  this.name = kb.observable(model, 'name');
+  this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));
 };
 
 var PersonViewModel = kb.ViewModel.extend({
   constructor: function(model, options) {
-    this.type = &#39;person&#39;;
+    this.type = 'person';
     kb.ViewModel.prototype.constructor.apply(this, arguments);
   }
 });
 
 var view_model = new PersonViewModel(fred, {
   factories: {
-    &#39;friends.models&#39;: FriendViewModel,
-    &#39;friends.models.friends.models&#39;: FriendViewModel
+    'friends.models': FriendViewModel,
+    'friends.models.friends.models': FriendViewModel
   }
 });
 
-ko.applyBindings(view_model, $(&#39;#kbnm_view_models&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbnm_view_models')[0]);</pre>
                 </div>
               </div>
             </div>
