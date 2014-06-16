@@ -127,7 +127,7 @@ var require = globals.require;
 require.register('connection_pool', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -146,7 +146,7 @@ module.exports = new MemoryStore({
 require.register('cursor', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -597,7 +597,7 @@ module.exports = Cursor = (function() {
 require.register('database_url', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -718,7 +718,7 @@ module.exports = DatabaseURL = (function() {
 require.register('index', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -780,7 +780,7 @@ try {
 require.register('json_utils', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1020,7 +1020,7 @@ module.exports = JSONUtils = (function() {
             fn_args = _.isArray(args.args) ? args.args.slice() : (args.args ? [args.args] : []);
             fn_args.push(function(err, json) {
               result[key] = json;
-              return callback();
+              return callback(err);
             });
             return model[args.method].apply(model, fn_args);
           } else {
@@ -1176,7 +1176,7 @@ module.exports = JSONUtils = (function() {
 require.register('queue', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1247,7 +1247,7 @@ module.exports = Queue = (function() {
 require.register('schema', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1325,7 +1325,41 @@ module.exports = Schema = (function() {
     return null;
   };
 
-  Schema.prototype.allRelations = function() {
+  Schema.prototype.columns = function() {
+    var columns, key, relation, _ref;
+    columns = _.keys(this.fields);
+    if (!_.find(columns, function(column) {
+      return column === 'id';
+    })) {
+      columns.push('id');
+    }
+    _ref = this.relations;
+    for (key in _ref) {
+      relation = _ref[key];
+      if ((relation.type === 'belongsTo') && !relation.isVirtual() && !relation.isEmbedded()) {
+        columns.push(relation.foreign_key);
+      }
+    }
+    return columns;
+  };
+
+  Schema.prototype.joinTables = function() {
+    var key, relation;
+    return (function() {
+      var _ref, _results;
+      _ref = this.relations;
+      _results = [];
+      for (key in _ref) {
+        relation = _ref[key];
+        if (!relation.isVirtual() && relation.join_table) {
+          _results.push(relation.join_table);
+        }
+      }
+      return _results;
+    }).call(this);
+  };
+
+  Schema.prototype.relatedModels = function() {
     var key, related_model_types, relation, _ref;
     related_model_types = [];
     _ref = this.relations;
@@ -1337,6 +1371,14 @@ module.exports = Schema = (function() {
       }
     }
     return related_model_types;
+  };
+
+  Schema.prototype.allColumns = function() {
+    return this.columns();
+  };
+
+  Schema.prototype.allRelations = function() {
+    return this.relatedModels();
   };
 
   Schema.prototype.generateBelongsTo = function(reverse_model_type) {
@@ -1429,19 +1471,6 @@ module.exports = Schema = (function() {
     return JoinTable;
   };
 
-  Schema.prototype.allColumns = function() {
-    var columns, key, relation, _ref;
-    columns = _.keys(this.fields);
-    _ref = this.relations;
-    for (key in _ref) {
-      relation = _ref[key];
-      if (relation.type === 'belongsTo') {
-        columns.push(relation.foreign_key);
-      }
-    }
-    return columns;
-  };
-
   Schema.prototype._parseField = function(key, info) {
     var options, relation, type;
     options = this._fieldInfoToOptions(_.isFunction(info) ? info() : info);
@@ -1504,7 +1533,7 @@ module.exports = Schema = (function() {
 require.register('utils', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1934,7 +1963,7 @@ module.exports = Utils = (function() {
 require.register('cache/cursor', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -1964,7 +1993,7 @@ module.exports = CacheCursor = (function(_super) {
 require.register('cache/memory_store', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2057,7 +2086,7 @@ module.exports = MemoryStore = (function() {
 require.register('cache/model_cache', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2170,7 +2199,7 @@ module.exports = ModelCache = (function() {
 require.register('cache/query_cache', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2447,7 +2476,7 @@ module.exports = QueryCache = (function() {
 require.register('cache/singletons', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2469,7 +2498,7 @@ try {
 require.register('cache/sync', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2633,7 +2662,7 @@ module.exports = function(model_type, wrapped_sync_fn) {
 require.register('extensions/collection', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -2699,7 +2728,7 @@ if (!collection_type.prototype._orm_original_fns) {
 require.register('extensions/model', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -3694,7 +3723,7 @@ module.exports = ModelStream = (function(_super) {
 require.register('memory/cursor', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -4174,7 +4203,7 @@ module.exports = MemoryCursor = (function(_super) {
 require.register('memory/sync', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -4368,7 +4397,7 @@ module.exports = function(type) {
 require.register('relations/many', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -4968,7 +4997,7 @@ module.exports = Many = (function(_super) {
 require.register('relations/one', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
@@ -5448,7 +5477,7 @@ module.exports = One = (function(_super) {
 require.register('relations/relation', function(exports, require, module) {
 
 /*
-  backbone-orm.js 0.5.15
+  backbone-orm.js 0.5.16
   Copyright (c) 2013 Vidigami - https://github.com/vidigami/backbone-orm
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Dependencies: Backbone.js, Underscore.js, and Moment.js.
