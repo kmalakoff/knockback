@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.18.6
+* Put AMD loader first due to webpack imcompatibity
+
 ## 0.18.5
 * Fix for memory leak: https://github.com/kmalakoff/knockback/pull/110
 
