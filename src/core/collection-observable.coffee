@@ -6,6 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
+
 COMPARE_EQUAL = 0
 COMPARE_ASCENDING = -1
 COMPARE_DESCENDING = 1
@@ -115,7 +119,7 @@ class kb.CollectionObservable
     @models_only = create_options.creator.models_only if create_options.creator
 
     # publish public interface on the observable and return instead of this
-    _publishMethods(observable, @, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'])
+    kb.publishMethods(observable, @, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'])
 
     # start the processing
     @_collection = ko.observable(collection)
@@ -139,7 +143,7 @@ class kb.CollectionObservable
     @_mapper = ko.dependentObservable(=>
       comparator = @_comparator() # create dependency
       filters = @_filters() # create dependency
-      (_unwrapObservable(filter) for filter in filters) if filters # create a dependency
+      (ko.utils.unwrapObservable(filter) for filter in filters) if filters # create a dependency
       current_collection = @_collection() # create dependency
       return if @in_edit # we are doing the editing
 
@@ -248,7 +252,7 @@ class kb.CollectionObservable
   viewModelByModel: (model) ->
     return null if @models_only
     id_attribute = if model.hasOwnProperty(model.idAttribute) then model.idAttribute else 'cid'
-    return _.find(_peekObservable(kb.utils.wrappedObservable(@)), (test) -> return if test?.__kb?.object then (test.__kb.object[id_attribute] == model[id_attribute]) else false)
+    return _.find(kb.peek(kb.utils.wrappedObservable(@)), (test) -> return if test?.__kb?.object then (test.__kb.object[id_attribute] == model[id_attribute]) else false)
 
   # Will return true unless created with models_only option.
   #
@@ -366,11 +370,11 @@ class kb.CollectionObservable
     return if @in_edit # we are doing the editing
 
     # validate input
-    (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or _throwUnexpected(@, 'incorrect type passed')
+    (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or kb._throwUnexpected(@, 'incorrect type passed')
 
     observable = kb.utils.wrappedObservable(@)
-    collection = _peekObservable(@_collection)
-    has_filters = _peekObservable(@_filters).length
+    collection = kb.peek(@_collection)
+    has_filters = kb.peek(@_filters).length
     return if not collection # no collection or we are updating ourselves
 
     view_models = models_or_view_models
@@ -403,7 +407,7 @@ class kb.CollectionObservable
   # @private
   _attributeComparator: (sort_attribute) ->
     modelAttributeCompare = (model_a, model_b) ->
-      attribute_name = _unwrapObservable(sort_attribute)
+      attribute_name = ko.utils.unwrapObservable(sort_attribute)
       kb.compare(model_a.get(attribute_name), model_b.get(attribute_name))
     return (if @models_only then modelAttributeCompare else (model_a, model_b) -> modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b)))
 
@@ -414,9 +418,9 @@ class kb.CollectionObservable
 
   # @private
   _selectModel: (model) ->
-    filters = _peekObservable(@_filters)
+    filters = kb.peek(@_filters)
     for filter in filters
-      filter = _peekObservable(filter)
+      filter = kb.peek(filter)
       if _.isFunction(filter)
         return false if not filter(model)
       else if _.isArray(filter)

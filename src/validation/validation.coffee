@@ -8,7 +8,7 @@
 
 # internal helper
 callOrGet = (value) ->
-  value = _unwrapObservable(value)
+  value = ko.utils.unwrapObservable(value)
   return if typeof(value) is 'function' then value.apply(null, Array.prototype.slice.call(arguments, 1)) else value
 
 # Helpers for validating forms, inputs, and values.
@@ -129,7 +129,7 @@ kb.valueValidator = (value, bindings, validation_options={}) ->
   (validation_options and not (typeof(validation_options) is 'function')) or (validation_options = {})
   return ko.dependentObservable(->
     results = {$error_count: 0}
-    current_value = _unwrapObservable(value)
+    current_value = ko.utils.unwrapObservable(value)
     not ('disable' of validation_options) or (disabled = callOrGet(validation_options.disable))
     not ('enable' of validation_options) or (disabled = not callOrGet(validation_options.enable))
     priorities = validation_options.priorities or []

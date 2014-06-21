@@ -6,6 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
+
 # Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 #
 class kb.EventWatcher
@@ -22,7 +26,7 @@ class kb.EventWatcher
   # @option options [String] key the optional key to filter update attribute events.
   @useOptionsOrCreate: (options, emitter, obj, callback_options) ->
     if options.event_watcher
-      _throwUnexpected(@, 'emitter not matching') unless (options.event_watcher.emitter() is emitter or (options.event_watcher.model_ref is emitter))
+      kb._throwUnexpected(@, 'emitter not matching') unless (options.event_watcher.emitter() is emitter or (options.event_watcher.model_ref is emitter))
       return kb.utils.wrappedEventWatcher(obj, options.event_watcher).registerCallbacks(obj, callback_options)
     else
       kb.utils.wrappedEventWatcherIsOwned(obj, true)
@@ -92,8 +96,8 @@ class kb.EventWatcher
   # @option options [String] emitter_name the name of the emitter.
   # @option options [String] key the optional key to filter update attribute events.
   registerCallbacks: (obj, callback_info) ->
-    obj or _throwMissing(this, 'obj')
-    callback_info or _throwMissing(this, 'info')
+    obj or kb._throwMissing(this, 'obj')
+    callback_info or kb._throwMissing(this, 'info')
     event_selector = if callback_info.event_selector then callback_info.event_selector else 'change'
     event_names = event_selector.split(' ')
     for event_name in event_names
@@ -110,7 +114,7 @@ class kb.EventWatcher
               if info.update and not info.rel_fn
 
                 # key doesn't match
-                continue if model and info.key and (model.hasChanged and not model.hasChanged(_unwrapObservable(info.key)))
+                continue if model and info.key and (model.hasChanged and not model.hasChanged(ko.utils.unwrapObservable(info.key)))
 
                 # trigger update
                 not kb.statistics or kb.statistics.addModelEvent({name: event_name, model: model, key: info.key, path: info.path})

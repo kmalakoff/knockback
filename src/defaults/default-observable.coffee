@@ -6,7 +6,7 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-_publishMethods = kb._publishMethods
+kb.publishMethods = kb.kb.publishMethods
 
 # Used to provide a default value when an observable is null, undefined, or the empty string.
 #
@@ -23,12 +23,12 @@ class kb.DefaultObservable
   constructor: (target_observable, @dv) -> # @dv is default value
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        return if (current_target = _unwrapObservable(target_observable())) then current_target else _unwrapObservable(@dv)
+        return if (current_target = ko.utils.unwrapObservable(target_observable())) then current_target else ko.utils.unwrapObservable(@dv)
       write: (value) -> target_observable(value)
     }))
 
     # publish public interface on the observable and return instead of this
-    _publishMethods(observable, @, ['destroy', 'setToDefault'])
+    kb.publishMethods(observable, @, ['destroy', 'setToDefault'])
 
     return observable
 

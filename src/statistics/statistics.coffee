@@ -6,6 +6,9 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+module.exports = kb = require 'knockback'
+_ = require 'underscore'
+
 # kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
 #
 # kb.Statistics is not included in `knockback.js` nor `knockback-core.js` so you need to manually include it from the `lib` directory.

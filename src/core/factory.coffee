@@ -6,6 +6,9 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+
 # Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 #
 # @example Create an instance by path.

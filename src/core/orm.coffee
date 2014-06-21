@@ -1,4 +1,8 @@
 ###############################
+
+kb = require './kb'
+_ = require 'underscore'
+
 # @nodoc
 class ORM
   constructor: ->
@@ -34,7 +38,7 @@ class ORMAdapter_BackboneRelational
   relationType: (model, key) ->
     return null unless model instanceof kb.Backbone.RelationalModel
     return null unless relation = _.find(model.getRelations(), (test) -> return test.key is key)
-    return if (relation.collectionType or _.isArray(relation.keyContents)) then KB_TYPE_COLLECTION else KB_TYPE_MODEL
+    return if (relation.collectionType or _.isArray(relation.keyContents)) then kb.TYPE_COLLECTION else kb.TYPE_MODEL
 
   bind: (model, key, update, path) ->
     return null unless type = @relationType(model, key)
@@ -44,13 +48,13 @@ class ORMAdapter_BackboneRelational
 
     # VERSIONING: pre Backbone-Relational 0.8.0
     events = if Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
-    if type is KB_TYPE_COLLECTION
+    if type is kb.TYPE_COLLECTION
       model.bind("#{event}:#{key}", rel_fn) for event in events
     else
       model.bind("#{events[0]}:#{key}", rel_fn)
 
     return ->
-      if type is KB_TYPE_COLLECTION
+      if type is kb.TYPE_COLLECTION
         model.unbind("#{event}:#{key}", rel_fn) for event in events
       else
         model.unbind("#{events[0]}:#{key}", rel_fn)
@@ -73,7 +77,7 @@ class ORMAdapter_BackboneAssociations
   relationType: (model, key) ->
     return null unless model instanceof kb.Backbone.AssociatedModel
     return null unless relation = _.find(model.relations, (test) -> return test.key is key)
-    return if (relation.type is 'Many') then KB_TYPE_COLLECTION else KB_TYPE_MODEL
+    return if (relation.type is 'Many') then kb.TYPE_COLLECTION else kb.TYPE_MODEL
 
 kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################
@@ -92,7 +96,7 @@ class ORMAdapter_Supermodel
   relationType: (model, key) ->
     return null unless model instanceof Supermodel.Model
     return null unless relation = model.constructor.associations()[key]
-    return if relation.add then KB_TYPE_COLLECTION else KB_TYPE_MODEL
+    return if relation.add then kb.TYPE_COLLECTION else kb.TYPE_MODEL
 
   bind: (model, key, update, path) ->
     return null unless type = @relationType(model, key)
@@ -105,7 +109,7 @@ class ORMAdapter_Supermodel
       model[relation.store] = other
       update(other)
       model[relation.store] = previous
-    if type is KB_TYPE_MODEL
+    if type is kb.TYPE_MODEL
       model.bind("associate:#{key}", rel_fn)
       return -> model.unbind("associate:#{key}", rel_fn)
     return

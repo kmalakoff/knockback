@@ -8,23 +8,25 @@
     Optional dependency: Backbone.ModelRef.js.
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
+
 ####################################################
 # Internal
 ####################################################
-_wrappedKey = (obj, key, value) ->
+_wrappedKey = kb._wrappedKey = (obj, key, value) ->
   # get
   if arguments.length is 2
     return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
 
   # set
-  obj or _throwUnexpected(@, "no obj for wrapping #{key}")
+  obj or kb._throwUnexpected(@, "no obj for wrapping #{key}")
   obj.__kb or= {}
   obj.__kb[key] = value
   return value
 
-_argumentsAddKey = (args, key) ->
-  _arraySplice.call(args, 1, 0, key)
-  return args
+_argumentsAddKey = (args, key) -> Array.prototype.splice.call(args, 1, 0, key); return args
 
 # used for attribute setting to ensure all model attributes have their underlying models
 _unwrapModels = (obj) ->
@@ -49,13 +51,11 @@ _mergeArray = (result, key, value) ->
   value = [value] unless _.isArray(value)
   result[key] = if result[key].length then _.union(result[key], value) else value
   return result
-_mergeObject = (result, key, value) ->
-  result[key] or= {}
-  return _.extend(result[key], value)
-_keyArrayToObject = (value) ->
-  result = {}
-  result[item] = {key: item} for item in value
-  return result
+
+_mergeObject = (result, key, value) -> result[key] or= {}; return _.extend(result[key], value)
+
+_keyArrayToObject = (value) -> result = {}; result[item] = {key: item} for item in value; return result
+
 _collapseOptions = (options) ->
   result = {}
   options = {options: options}
@@ -229,12 +229,12 @@ class kb.utils
   #   kb.utils.valueType(view_model.simple_attr); // kb.TYPE_SIMPLE
   #   kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
   @valueType = (observable) ->
-    return KB_TYPE_UNKNOWN        unless observable
+    return kb.TYPE_UNKNOWN        unless observable
     return observable.valueType() if observable.__kb_is_o
-    return KB_TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof kb.Collection)
-    return KB_TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof kb.Model)
-    return KB_TYPE_ARRAY          if _.isArray(observable)
-    return KB_TYPE_SIMPLE
+    return kb.TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof kb.Collection)
+    return kb.TYPE_MODEL          if (observable instanceof kb.ViewModel) or (observable instanceof kb.Model)
+    return kb.TYPE_ARRAY          if _.isArray(observable)
+    return kb.TYPE_SIMPLE
 
   # Helper to join a dot-deliminated path.
   #
@@ -309,3 +309,72 @@ class kb.utils
 # @example
 #   kb.ignore(fn);
 kb.ignore = ko.dependencyDetection?.ignore or (callback, callbackTarget, callbackArgs) -> value = null; ko.dependentObservable(-> value = callback.apply(callbackTarget, callbackArgs || [])).dispose(); return value
+
+####################################
+# INTERNAL HELPERS
+####################################
+kb._throwMissing = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
+kb._throwUnexpected = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is unexpected"
+
+kb.peek = (obs) ->
+  return obs unless ko.isObservable(obs)
+  return obs.peek() if obs.peek
+  return kb.ignore -> obs()
+
+kb.publishMethods = (observable, instance, methods) ->
+  observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
+  return
+
+# From Backbone.js (https:github.com/documentcloud/backbone)
+copyProps = (dest, source) -> (dest[key] = value) for key, value of source; return dest
+
+`// Shared empty constructor function to aid in prototype-chain creation.
+var ctor = function(){};
+
+// Helper function to correctly set up the prototype chain, for subclasses.
+// Similar to 'goog.inherits', but uses a hash of prototype properties and
+// class properties to be extended.
+var inherits = function(parent, protoProps, staticProps) {
+  var child;
+
+  // The constructor function for the new subclass is either defined by you
+  // (the "constructor" property in your extend definition), or defaulted
+  // by us to simply call the parent's constructor.
+  if (protoProps && protoProps.hasOwnProperty('constructor')) {
+    child = protoProps.constructor;
+  } else {
+    child = function(){ parent.apply(this, arguments); };
+  }
+
+  // Inherit class (static) properties from parent.
+  copyProps(child, parent);
+
+  // Set the prototype chain to inherit from parent, without calling
+  // parent's constructor function.
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor();
+
+  // Add prototype properties (instance properties) to the subclass,
+  // if supplied.
+  if (protoProps) copyProps(child.prototype, protoProps);
+
+  // Add static properties to the constructor function, if supplied.
+  if (staticProps) copyProps(child, staticProps);
+
+  // Correctly set child's 'prototype.constructor'.
+  child.prototype.constructor = child;
+
+  // Set a convenience property in case the parent's prototype is needed later.
+  child.__super__ = parent.prototype;
+
+  return child;
+};
+
+// The self-propagating extend function that BacLCone classes use.
+var extend = function (protoProps, classProps) {
+  var child = inherits(this, protoProps, classProps);
+  child.extend = this.extend;
+  return child;
+};
+`
+kb.extend = extend

@@ -6,7 +6,7 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-_publishMethods = kb._publishMethods
+kb.publishMethods = kb.kb.publishMethods
 
 # @abstract You must provide the following two methods:
 #   * read: function(value, observable) called to get the value and each time the locale changes
@@ -66,8 +66,8 @@ class kb.LocalizedObservable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (@value, options, @vm) -> # @vm is view_model
     options or= {}; @vm or= {}
-    @read or _throwMissing(this, 'read')
-    kb.locale_manager or _throwMissing(this, 'kb.locale_manager')
+    @read or kb._throwMissing(this, 'read')
+    kb.locale_manager or kb._throwMissing(this, 'kb.locale_manager')
 
     # bind callbacks
     @__kb or= {}
@@ -75,17 +75,17 @@ class kb.LocalizedObservable
     @__kb._onChange = options.onChange
 
     # internal state
-    value = _unwrapObservable(@value) if @value
+    value = ko.utils.unwrapObservable(@value) if @value
     @vo = ko.observable(if not value then null else @read(value, null))
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        _unwrapObservable(@value) if @value
+        ko.utils.unwrapObservable(@value) if @value
         @vo() # create a depdenency
-        return @read(_unwrapObservable(@value))
+        return @read(ko.utils.unwrapObservable(@value))
 
       write: (value) =>
-        @write or _throwUnexpected(@, 'writing to read-only')
-        @write(value, _unwrapObservable(@value))
+        @write or kb._throwUnexpected(@, 'writing to read-only')
+        @write(value, ko.utils.unwrapObservable(@value))
         @vo(value)
         @__kb._onChange(value) if @__kb._onChange
 
@@ -93,7 +93,7 @@ class kb.LocalizedObservable
     }))
 
     # publish public interface on the observable and return instead of this
-    _publishMethods(observable, @, ['destroy', 'observedValue', 'resetToCurrent'])
+    kb.publishMethods(observable, @, ['destroy', 'observedValue', 'resetToCurrent'])
 
     # start
     kb.locale_manager.bind('change', @__kb._onLocaleChange)
@@ -113,7 +113,7 @@ class kb.LocalizedObservable
   # Used to reset the value if localization is not possible.
   resetToCurrent: ->
     observable = kb.utils.wrappedObservable(@)
-    current_value = if @value then @read(_unwrapObservable(@value)) else null
+    current_value = if @value then @read(ko.utils.unwrapObservable(@value)) else null
     return if observable() is current_value
     observable(current_value)
 
@@ -129,7 +129,7 @@ class kb.LocalizedObservable
 
   # @private
   _onLocaleChange: ->
-    value = @read(_unwrapObservable(@value))
+    value = @read(ko.utils.unwrapObservable(@value))
     @vo(value)
     @__kb._onChange(value) if @__kb._onChange
 

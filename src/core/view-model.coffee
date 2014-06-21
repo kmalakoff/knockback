@@ -6,6 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
+
 # Base class for ViewModels for Models.
 #
 # @example How to create a ViewModel with first_name and last_name observables.
@@ -80,7 +84,7 @@ class kb.ViewModel
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options, view_model) -> return kb.ignore =>
-    not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or _throwUnexpected(@, 'not a model')
+    not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or kb._throwUnexpected(@, 'not a model')
 
     options or= {}
     view_model or= {}
@@ -107,14 +111,14 @@ class kb.ViewModel
     kb.Factory.useOptionsOrCreate(options, @, options.path)
 
     # create an observable model function and use watcher
-    _mdl = _wrappedKey(@, '_mdl', ko.observable())
+    _mdl = kb._wrappedKey(@, '_mdl', ko.observable())
     @model = ko.dependentObservable(
       read: => _mdl(); return kb.utils.wrappedObject(@)
       write: (new_model) => kb.ignore =>
         return if (kb.utils.wrappedObject(@) is new_model) # no change
 
         # SHARED NULL MODEL - keep it that way
-        (not new_model or _throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
+        (not new_model or kb._throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
 
         # update references
         kb.utils.wrappedObject(@, new_model)

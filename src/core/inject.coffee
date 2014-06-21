@@ -6,12 +6,16 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
+
 kb.RECUSIVE_AUTO_INJECT = true
 
 # custom Knockout `inject` binding
 ko.bindingHandlers['inject'] =
   'init': (element, value_accessor, all_bindings_accessor, view_model) ->
-    kb.Inject.inject(_unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor)
+    kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor)
 
 # Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
 #

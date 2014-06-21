@@ -6,7 +6,7 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
-_publishMethods = kb._publishMethods
+kb.publishMethods = kb.kb.publishMethods
 
 # Class for observing emitter events.
 #
@@ -35,15 +35,15 @@ class kb.TriggeredObservable
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (emitter, @event_selector) ->
-    emitter or _throwMissing(this, 'emitter')
-    @event_selector or _throwMissing(this, 'event_selector')
+    emitter or kb._throwMissing(this, 'emitter')
+    @event_selector or kb._throwMissing(this, 'event_selector')
 
     # internal state
     @vo = ko.observable()
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> @vo()))
 
     # publish public interface on the observable and return instead of this
-    _publishMethods(observable, @, ['destroy'])
+    kb.publishMethods(observable, @, ['destroy'])
 
     # create emitter observable
     kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(emitter, @, {emitter: _.bind(@emitter, @), update: _.bind(@update, @), event_selector: @event_selector}))

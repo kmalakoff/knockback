@@ -6,6 +6,10 @@
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
 ###
 
+kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
+
 # Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 #
 # @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
@@ -154,14 +158,14 @@ class kb.Store
 
   # @private
   findOrReplace: (obj, creator, observable) ->
-    obj or _throwUnexpected(@, 'obj missing')
+    obj or kb._throwUnexpected(@, 'obj missing')
     if (index = @findIndex(obj, creator)) < 0
       return @register(obj, observable, {creator: creator})
     else
       record = @observable_records[index]
-      (kb.utils.wrappedObject(record.observable) is obj) or _throwUnexpected(@, 'different object') # same object
+      (kb.utils.wrappedObject(record.observable) is obj) or kb._throwUnexpected(@, 'different object') # same object
       if (record.observable isnt observable) # a change
-        (record.observable.constructor is observable.constructor) or _throwUnexpected(@, 'replacing different type')
+        (record.observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
 
         # put the previous observable on the destroy list (but don't release until the store is released)
         @replaced_observables.push(record.observable)

@@ -7,6 +7,9 @@
   Dependencies: Knockout.js, Backbone.js, and Underscore.js.
 ###
 
+_ = require 'underscore'
+ko = require 'knockout'
+
 # The 'kb' namespace for classes, factory functions, constants, etc. Aliased to 'Knockback'
 #
 # @method .collectionObservable(collection, options)
@@ -44,7 +47,7 @@
 #   @param [Data|ko.observable] value the value to localize
 #   @param [Object] options the create options
 #   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-class kb
+module.exports = class kb
 
   # Knockback library semantic version
   @VERSION: '0.18.6'
@@ -114,8 +117,8 @@ class kb
     obj.__kb_released = true # mark as released
 
     # observable or lifecycle managed
-    if ko.isObservable(obj) and _.isArray(array = _peekObservable(obj))
-      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is KB_TYPE_COLLECTION))
+    if ko.isObservable(obj) and _.isArray(array = kb.peek(obj))
+      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
         if obj.destroy
           obj.destroy()
         else if obj.dispose # we may be releasing our observable
@@ -154,8 +157,8 @@ class kb
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @releaseOnNodeRemove: (view_model, node) ->
-    view_model or _throwUnexpected(@, 'missing view model')
-    node or _throwUnexpected(@, 'missing node')
+    view_model or kb._throwUnexpected(@, 'missing view model')
+    node or kb._throwUnexpected(@, 'missing node')
     ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
 
   # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
@@ -193,7 +196,7 @@ class kb
     return unless model
     return model[key]() if _.isFunction(model[key]) and kb.orm.useFunction(model, key)
     return model.get(key) unless args
-    model.get.apply(model, _.map([key].concat(args), (value) -> _peekObservable(value)))
+    model.get.apply(model, _.map([key].concat(args), (value) -> kb.peek(value)))
 
   @setValue: (model, key, value) ->
     return unless model
@@ -201,13 +204,19 @@ class kb
     (attributes = {})[key] = value
     model.set(attributes)
 
-####################################
-# OBSERVABLE STORAGE TYPES
-####################################
+# use Parse
+if @Parse
+  kb.Parse = @Parse
+  kb.Collection = @Parse.Collection
+  kb.Model = @Parse.Object
+  kb.Events = @Parse.Events
 
-# constants optimized for internal minimization
-KB_TYPE_UNKNOWN = kb.TYPE_UNKNOWN
-KB_TYPE_SIMPLE = kb.TYPE_SIMPLE
-KB_TYPE_ARRAY = kb.TYPE_ARRAY
-KB_TYPE_MODEL = kb.TYPE_MODEL
-KB_TYPE_COLLECTION = kb.TYPE_COLLECTION
+# use Backbone
+else
+  kb.Backbone = require('backbone')
+  kb.Collection = kb.Backbone.Collection
+  kb.Model = kb.Backbone.Model
+  kb.Events = kb.Backbone.Events
+
+kb._ = require 'underscore'
+kb.ko = require 'knockout'
