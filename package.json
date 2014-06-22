@@ -41,7 +41,8 @@
     "gulp-shell": "*",
     "event-stream": "*",
     "module-bundler": "*",
-    "queue-async": "*"
+    "queue-async": "*",
+    "vinyl-fs": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",

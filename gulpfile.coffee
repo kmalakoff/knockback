@@ -2,6 +2,7 @@ path = require 'path'
 _ = require 'underscore'
 es = require 'event-stream'
 Queue = require 'queue-async'
+vinyl = require 'vinyl-fs'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -43,18 +44,21 @@ ALL_LIBRARY_FILES = (path.join(library.destination, library.modules.file_name) f
 ALL_LIBRARY_FILES.push path.join(library.destination, library.stack_file_name) for library in LIBRARIES when library.stack_file_name
 ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBRARY_FILES
 
-dependencyInfo = (name) ->
-  file_path = require.resolve(name).replace(__dirname, '.')
+packagePath = (file_path) ->
   paths = file_path.split('node_modules')
   paths.push("#{paths.pop().split('/').slice(0,2).join('/')}/package.json")
-  return {name: name, file_name: "#{name}-#{require(paths.join('node_modules')).version}", path: file_path}
+  return paths.join('node_modules')
 
-copyDependency = (name, destination, callback) ->
-  info = dependencyInfo(name)
-  gulp.src(info.path)
-    .pipe(rename (file) -> file.basename = info.file_name; return file)
-    .pipe(gulp.dest(path.join(destination)))
-    .on 'end', callback
+copyDependencies = (module_names, destination, callback) ->
+  queue = new Queue()
+  for module_name in module_names
+    do (module_name) -> queue.defer (callback) ->
+      file_path = require.resolve(module_name).replace(__dirname, '.')
+      gulp.src(file_path)
+        .pipe(rename (file) -> package_info = require(packagePath(file_path)); file.basename = "#{package_info.name}-#{package_info.version}"; return file)
+        .pipe(gulp.dest(path.join(destination)))
+        .on 'end', callback
+  queue.await callback
 
 copyLibraryFiles = (destination, callback) ->
   gulp.src(ALL_LIBRARY_FILES.concat('README.md'))
@@ -87,7 +91,7 @@ buildLibrary = (library, callback) ->
 gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
 gulp.task 'minify', ['build'], ->
-  gulp.src(ALL_LIBRARY_FILES)
+  gulp.src(ALL_LIBRARY_FILES, '!*.min.js')
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
     .pipe(header(HEADER))
@@ -107,11 +111,8 @@ gulp.task 'prepare_tests', ->
 
   # copy dependent libraries
   library_package = require './package.json'
-  for name in _.keys(library_package.dependencies)
-    do (name) -> queue.defer (callback) ->
-      copyDependency(name, 'vendor', callback)
-  for name in _.keys(library_package.optionalDependencies)
-    do (name) -> queue.defer (callback) -> copyDependency(name, 'vendor/optional', callback)
+  queue.defer (callback) -> copyDependencies(_.keys(library_package.dependencies), 'vendor', callback)
+  queue.defer (callback) -> copyDependencies(_.keys(library_package.optionalDependencies), 'vendor/optional', callback)
 
   # build test modules
   queue.defer (callback) ->
