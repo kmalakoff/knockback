@@ -39,6 +39,14 @@ MODULE_ADD_PATHS = _.flatten((["src/#{module}/**/*.coffee", "!src/#{module}/inde
 LIBRARIES.push {paths: ['src/core/**/*.coffee'], modules: {type: 'local-shim', file_name: 'knockback-core.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-core-stack.js'}
 LIBRARIES.push {paths: ['src/core/**/*.coffee'].concat(MODULE_ADD_PATHS), modules: {type: 'local-shim', file_name: 'knockback.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-full-stack.js'}
 
+ALL_LIBRARY_FILES = (path.join(library.destination, library.modules.file_name) for library in LIBRARIES)
+ALL_LIBRARY_FILES.push path.join(library.destination, library.stack_file_name) for library in LIBRARIES when library.stack_file_name
+ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBRARY_FILES
+
+copyLibraryFiles = (destination, callback) ->
+  gulp.src(ALL_LIBRARY_FILES)
+    .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on 'end', callback
+
 cachedBuild = (library) ->
   root_paths = (root_path.replace('/**/*.coffee', '') for root_path in library.paths when root_path.indexOf('/**/*.coffee') >= 0)
   return gulp.src(library.paths)
@@ -79,7 +87,13 @@ minifyLibrary = (library, callback) ->
 
 gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
-gulp.task 'release', ['build'], -> LIBRARIES.map minifyLibrary
+gulp.task 'minify', -> LIBRARIES.map (library) -> minifyLibrary(library, ->)
+gulp.task 'update_packages', ->
+  queue = new Queue(1)
+  queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
+  queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
+  queue.await (err) ->
+gulp.task 'release', ['build', 'minify', 'update_packages'], ->
 
 gulp.task 'build_tests', ->
   queue = new Queue(1)
