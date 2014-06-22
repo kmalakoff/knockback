@@ -2,6 +2,7 @@ path = require 'path'
 _ = require 'underscore'
 es = require 'event-stream'
 Queue = require 'queue-async'
+Async = require 'async'
 vinyl = require 'vinyl-fs'
 
 gulp = require 'gulp'
@@ -86,9 +87,9 @@ buildLibrary = (library, callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
   queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
-  queue.await (err) -> callback?(err)
+  queue.await callback
 
-gulp.task 'build', -> LIBRARIES.map buildLibrary
+gulp.task 'build', (callback) -> Async.map(LIBRARIES, buildLibrary, callback)
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
 
 minifyLibrary = (library, callback) ->
@@ -100,27 +101,28 @@ minifyLibrary = (library, callback) ->
       .pipe(gulp.dest(library.destination))
       .on 'end', callback
 
-  queue = new Queue(1)
-  queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
-  queue.defer (callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback) if library.stack_file_name
-  queue.await (err) -> callback?(err)
-gulp.task 'minify', ['build'], -> LIBRARIES.map (library) -> minifyLibrary(library, ->)
+  queue = new Queue()
+  queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
+  queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
+  queue.await callback
+gulp.task 'minify', ['build'], (callback) -> Async.map(LIBRARIES, minifyLibrary, callback)
 
-# gulp.task 'minify', ['build'], ->
-#   gulp.src(ALL_LIBRARY_FILES, '!**/*.min.js')
+# gulp.task 'minify', ['build'], (callback) ->
+#   gulp.src(ALL_LIBRARY_FILES.concat('!**/*.min.js'))
 #     .pipe(uglify())
 #     .pipe(rename({suffix: '.min'}))
 #     .pipe(header(HEADER))
 #     .pipe(gulp.dest((file) -> file.base))
+#     .on 'end', callback
 
-gulp.task 'update_packages', ->
+gulp.task 'update_packages', (callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
-  queue.await (err) ->
+  queue.await callback
 gulp.task 'release', ['test', 'update_packages'], ->
 
-gulp.task 'prepare_tests', ->
+gulp.task 'test', ['minify'], (callback) ->
   queue = new Queue(1)
 
   queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
@@ -130,11 +132,7 @@ gulp.task 'prepare_tests', ->
   queue.defer (callback) -> copyDependencies(_.keys(library_package.dependencies), 'vendor', callback)
   queue.defer (callback) -> copyDependencies(_.keys(library_package.optionalDependencies), 'vendor/optional', callback)
 
-  # build test modules
-  queue.defer (callback) ->
-    gulp.src('test/**/_bundle-config.coffee')
-      .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
-      .on 'end', callback
+  # build tests
   queue.defer (callback) ->
     gulp.src('test/**/test*.coffee')
       .pipe(compile({coffee: {bare: true}}))
@@ -143,9 +141,23 @@ gulp.task 'prepare_tests', ->
       .pipe(gulp.dest('./test'))
       .on 'end', callback
 
-  queue.await (err) ->
+  # build test bundled modules
+  queue.defer (callback) ->
+    count = 0
+    Writable = require('stream').Writable
+    ws = Writable({objectMode: true})
+    ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
 
-gulp.task 'test', ['minify', 'prepare_tests'], ->
-  gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
-    .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-    .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)
+    gulp.src('test/**/_bundle-config.coffee')
+      .pipe(es.map((file, callback) -> count++; callback(null, file)))
+      .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
+      .pipe(ws)
+
+  # run tests
+  queue.defer (callback) ->
+    gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
+      .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+      .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)
+      .on 'end', callback
+
+  queue.await callback
