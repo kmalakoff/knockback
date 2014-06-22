@@ -1,6 +1,7 @@
 path = require 'path'
 _ = require 'underscore'
 es = require 'event-stream'
+Queue = require 'queue-async'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -26,8 +27,11 @@ HEADER = """
 */\n
 """
 
-MODULES = ['defaults', 'formatting', 'localization', 'statistics', 'triggering', 'validation']
-LIBRARIES = ({paths: ["src/#{module}/**/*.coffee"], modules: {type: 'local-shim', file_name: "knockback-#{module}.js", umd: {symbol: "knockback-#{module}", dependencies: ['knockback']}}, destination: './lib/'} for module in MODULES)
+moduleToBuildOptions = (module) -> {paths: ["src/#{module}/**/*.coffee"], modules: {type: 'local-shim', file_name: "knockback-#{module}.js", umd: {symbol: "knockback-#{module}", dependencies: ['knockback']}}, destination: './lib/'}
+
+MODULES = ['defaults', 'formatting', 'localization', 'triggering', 'validation']
+LIBRARIES = (moduleToBuildOptions(module) for module in MODULES)
+LIBRARIES.push moduleToBuildOptions('statistics')
 
 # core and full variants
 STACK_PATHS = ['node_modules/underscore/underscore.js', 'node_modules/backbone/backbone.js', 'node_modules/knockout/build/output/knockout-latest.debug.js']
@@ -73,18 +77,24 @@ gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
 gulp.task 'release', ['build'], -> LIBRARIES.map minifyLibrary
 
-gulp.task 'test', ['release'], ->
-  buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, ->
+gulp.task 'build_tests', ->
+  queue = new Queue(1)
+  queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
+  queue.defer (callback) ->
+    gulp.src('test/**/_bundle-config.coffee')
+      .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
+      .on 'end', callback
 
-  gulp.src('test/**/_bundle-config.coffee')
-    .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
+  queue.defer (callback) ->
+    gulp.src('test/**/test*.coffee')
+      .pipe(compile({coffee: {bare: true}}))
+      .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
+      .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+      .pipe(gulp.dest('./test'))
+      .on 'end', callback
+  queue.await (err) ->
 
-  gulp.src('test/**/test*.coffee')
-    .pipe(compile({coffee: {bare: true}}))
-    .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
+gulp.task 'test', ['release', 'build_tests'], ->
+  gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
     .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-    .pipe(gulp.dest('./test'))
-    .on 'end', ->
-      gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
-        .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-        .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)
+    .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)

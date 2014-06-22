@@ -40,7 +40,8 @@
     "gulp-mocha-phantomjs": "*",
     "gulp-shell": "*",
     "event-stream": "*",
-    "module-bundler": "*"
+    "module-bundler": "*",
+    "queue-async": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
