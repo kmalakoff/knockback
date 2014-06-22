@@ -56,22 +56,26 @@ buildLibrary = (library, callback) ->
     stream
       .pipe(header(HEADER, {file_name: file_name}))
       .pipe(gulp.dest(library.destination))
-      .on 'end', -> callback?()
+      .on 'end', callback
 
-  helper(cachedBuild(library), library.modules.file_name, callback)
-  helper(cachedStackBuild(library), library.stack_file_name) if library.stack_file_name
+  queue = new Queue(1)
+  queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
+  queue.defer (callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback) if library.stack_file_name
+  queue.await (err) -> callback?(err)
 
 minifyLibrary = (library, callback) ->
-  helper = (stream, file_name) ->
+  helper = (stream, file_name, callback) ->
     stream
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
       .pipe(header(HEADER, {file_name: file_name}))
       .pipe(gulp.dest(library.destination))
-      .on 'end', -> callback?()
+      .on 'end', callback
 
-  helper(cachedBuild(library), library.modules.file_name)
-  helper(cachedStackBuild(library), library.stack_file_name) if library.stack_file_name
+  queue = new Queue(1)
+  queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
+  queue.defer (callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback) if library.stack_file_name
+  queue.await (err) -> callback?(err)
 
 gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
