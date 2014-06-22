@@ -85,35 +85,20 @@ buildLibrary = (library, callback) ->
       .on 'end', callback
 
   queue = new Queue(1)
-  queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
+  queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
   queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
   queue.await callback
 
 gulp.task 'build', (callback) -> Async.map(LIBRARIES, buildLibrary, callback)
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
 
-minifyLibrary = (library, callback) ->
-  helper = (stream, file_name, callback) ->
-    stream
-      .pipe(uglify())
-      .pipe(rename({suffix: '.min'}))
-      .pipe(header(HEADER, {file_name: file_name}))
-      .pipe(gulp.dest(library.destination))
-      .on 'end', callback
-
-  queue = new Queue()
-  queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
-  queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
-  queue.await callback
-gulp.task 'minify', ['build'], (callback) -> Async.map(LIBRARIES, minifyLibrary, callback)
-
-# gulp.task 'minify', ['build'], (callback) ->
-#   gulp.src(ALL_LIBRARY_FILES.concat('!**/*.min.js'))
-#     .pipe(uglify())
-#     .pipe(rename({suffix: '.min'}))
-#     .pipe(header(HEADER))
-#     .pipe(gulp.dest((file) -> file.base))
-#     .on 'end', callback
+gulp.task 'minify', ['build'], (callback) ->
+  gulp.src(['*.js', '!*.min.js', 'lib/*.js', '!lib/*.min.js'])
+    .pipe(uglify())
+    .pipe(rename({suffix: '.min'}))
+    .pipe(header(HEADER))
+    .pipe(gulp.dest((file) -> file.base))
+    .on 'end', callback # somewhere there is an extra callback in gulp. do I need to listen to more events?
 
 gulp.task 'update_packages', (callback) ->
   queue = new Queue(1)
