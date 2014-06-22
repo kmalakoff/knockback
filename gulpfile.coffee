@@ -72,7 +72,6 @@ gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
 gulp.task 'release', ['build'], -> LIBRARIES.map minifyLibrary
 
-# gulp.task 'test', ->
 gulp.task 'test', ['release'], ->
   buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, ->
 
