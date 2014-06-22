@@ -90,12 +90,28 @@ buildLibrary = (library, callback) ->
 
 gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
-gulp.task 'minify', ['build'], ->
-  gulp.src(ALL_LIBRARY_FILES, '!*.min.js')
-    .pipe(uglify())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(header(HEADER))
-    .pipe(gulp.dest((file) -> file.base))
+
+minifyLibrary = (library, callback) ->
+  helper = (stream, file_name, callback) ->
+    stream
+      .pipe(uglify())
+      .pipe(rename({suffix: '.min'}))
+      .pipe(header(HEADER, {file_name: file_name}))
+      .pipe(gulp.dest(library.destination))
+      .on 'end', callback
+
+  queue = new Queue(1)
+  queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
+  queue.defer (callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback) if library.stack_file_name
+  queue.await (err) -> callback?(err)
+gulp.task 'minify', ['build'], -> LIBRARIES.map (library) -> minifyLibrary(library, ->)
+
+# gulp.task 'minify', ['build'], ->
+#   gulp.src(ALL_LIBRARY_FILES, '!**/*.min.js')
+#     .pipe(uglify())
+#     .pipe(rename({suffix: '.min'}))
+#     .pipe(header(HEADER))
+#     .pipe(gulp.dest((file) -> file.base))
 
 gulp.task 'update_packages', ->
   queue = new Queue(1)
