@@ -17,13 +17,13 @@ shell = require 'gulp-shell'
 
 HEADER = """
 /*
-  <%= file_name %>
-  (c) 2011-2014 Kevin Malakoff.
+  <%= file.path.split('/').splice(-1)[0].replace('.min', '') %>
+  (c) 2011-#{(new Date()).getFullYear()} Kevin Malakoff.
   Knockback is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-    Optional dependency: Backbone.ModelRef.js.
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */\n
 """
 
@@ -84,23 +84,15 @@ buildLibrary = (library, callback) ->
   queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
   queue.await (err) -> callback?(err)
 
-minifyLibrary = (library, callback) ->
-  helper = (stream, file_name, callback) ->
-    stream
-      .pipe(uglify())
-      .pipe(rename({suffix: '.min'}))
-      .pipe(header(HEADER, {file_name: file_name}))
-      .pipe(gulp.dest(library.destination))
-      .on 'end', callback
-
-  queue = new Queue(1)
-  queue.defer (callback) -> helper(cachedBuild(library), library.modules.file_name, callback)
-  queue.defer (callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback) if library.stack_file_name
-  queue.await (err) -> callback?(err)
-
 gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
-gulp.task 'minify', -> LIBRARIES.map (library) -> minifyLibrary(library, ->)
+gulp.task 'minify', ['build'], ->
+  gulp.src(ALL_LIBRARY_FILES)
+    .pipe(uglify())
+    .pipe(rename({suffix: '.min'}))
+    .pipe(header(HEADER))
+    .pipe(gulp.dest((file) -> file.base))
+
 gulp.task 'update_packages', ->
   queue = new Queue(1)
   queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
@@ -136,7 +128,7 @@ gulp.task 'prepare_tests', ->
 
   queue.await (err) ->
 
-gulp.task 'test', ['build', 'minify', 'prepare_tests'], ->
+gulp.task 'test', ['minify', 'prepare_tests'], ->
   gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
     .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
     .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)

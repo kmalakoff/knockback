@@ -4,8 +4,8 @@
   Knockback is freely distributable under the MIT license.
   See the following for full license details:
     https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-    Optional dependency: Backbone.ModelRef.js.
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 //     Underscore.js 1.6.0
 //     http://underscorejs.org
