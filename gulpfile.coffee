@@ -50,6 +50,7 @@ dependencyInfo = (name) ->
   return {name: name, file_name: "#{name}-#{require(paths.join('node_modules')).version}", path: file_path}
 
 copyDependency = (name, destination, callback) ->
+  info = dependencyInfo(name)
   gulp.src(info.path)
     .pipe(rename (file) -> file.basename = info.file_name; return file)
     .pipe(gulp.dest(path.join(destination)))
@@ -110,6 +111,8 @@ gulp.task 'release', ['test', 'update_packages'], ->
 gulp.task 'prepare_tests', ->
   queue = new Queue(1)
 
+  queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
+
   # copy dependent libraries
   library_package = require './package.json'
   for name in _.keys(library_package.dependencies)
@@ -119,7 +122,6 @@ gulp.task 'prepare_tests', ->
     do (name) -> queue.defer (callback) -> copyDependency(name, 'vendor/optional', callback)
 
   # build test modules
-  queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
   queue.defer (callback) ->
     gulp.src('test/**/_bundle-config.coffee')
       .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
