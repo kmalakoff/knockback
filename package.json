@@ -46,10 +46,10 @@
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
     "backbone-modelref": "0.1.x",
-    "lodash": "2.x.x",
+    "lodash": "2.x",
 
     "backbone-orm": "0.5.x",
-    "moment": "2.x.x",
+    "moment": "2.x",
 
     "backbone-associations": "0.5.x",
     "supermodel": "0.0.x"

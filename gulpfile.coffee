@@ -43,8 +43,20 @@ ALL_LIBRARY_FILES = (path.join(library.destination, library.modules.file_name) f
 ALL_LIBRARY_FILES.push path.join(library.destination, library.stack_file_name) for library in LIBRARIES when library.stack_file_name
 ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBRARY_FILES
 
+dependencyInfo = (name) ->
+  file_path = require.resolve(name).replace(__dirname, '.')
+  paths = file_path.split('node_modules')
+  paths.push("#{paths.pop().split('/').slice(0,2).join('/')}/package.json")
+  return {name: name, file_name: "#{name}-#{require(paths.join('node_modules')).version}.js", path: file_path}
+
+copyDependency = (name, destination, callback) ->
+  info = dependencyInfo(name)
+  gulp.src(info.path)
+    .pipe(rename (file) -> file.basename = info.file_name; return file)
+    .pipe(gulp.dest(path.join(destination)))
+
 copyLibraryFiles = (destination, callback) ->
-  gulp.src(ALL_LIBRARY_FILES)
+  gulp.src(ALL_LIBRARY_FILES.concat('README.md'))
     .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on 'end', callback
 
 cachedBuild = (library) ->
@@ -93,9 +105,9 @@ gulp.task 'update_packages', ->
   queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
   queue.await (err) ->
-gulp.task 'release', ['build', 'minify', 'update_packages'], ->
+gulp.task 'release', ['test', 'update_packages'], ->
 
-gulp.task 'build_tests', ->
+gulp.task 'prepare_tests', ->
   queue = new Queue(1)
   queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
   queue.defer (callback) ->
@@ -110,9 +122,21 @@ gulp.task 'build_tests', ->
       .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
       .pipe(gulp.dest('./test'))
       .on 'end', callback
+
+  queue.defer (callback) ->
+    gulp.src('underscore')
+      .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+      .pipe(gulp.dest('./vendor'))
+      .on 'end', callback
+
   queue.await (err) ->
 
-gulp.task 'test', ['release', 'build_tests'], ->
-  gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
-    .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-    .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)
+gulp.task 'test', ->
+  library_package = require './package.json'
+  copyDependency(name, 'vendor') for name in _.keys(library_package.dependencies)
+  copyDependency(name, 'vendor/optional') for name in _.keys(library_package.optionalDependencies)
+
+# gulp.task 'test', ['build', 'minify', 'prepare_tests'], ->
+#   gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
+#     .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+#     .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)
