@@ -1,3 +1,5 @@
+try kb = require 'knockback' catch err then kb = require './kb'
+
 class kb.LocaleManager
   @prototype extends kb.Events # Mix in kb.Events so callers can subscribe
 

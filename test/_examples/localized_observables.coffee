@@ -1,3 +1,6 @@
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
+
 class kb.LocalizedStringLocalizer extends kb.LocalizedObservable
   read: (value) ->
     return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''

@@ -34,6 +34,8 @@ MODULE_ADD_PATHS = _.flatten((["src/#{module}/**/*.coffee", "!src/#{module}/inde
 LIBRARIES.push {paths: ['src/core/**/*.coffee'], modules: {type: 'local-shim', file_name: 'knockback-core.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-core-stack.js'}
 LIBRARIES.push {paths: ['src/core/**/*.coffee'].concat(MODULE_ADD_PATHS), modules: {type: 'local-shim', file_name: 'knockback.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-full-stack.js'}
 
+console.log LIBRARIES[LIBRARIES.length-1]
+
 cachedBuild = (library) ->
   root_paths = (root_path.replace('/**/*.coffee', '') for root_path in library.paths when root_path.indexOf('/**/*.coffee') >= 0)
   return gulp.src(library.paths)
@@ -46,22 +48,24 @@ cachedStackBuild = (library) ->
   es.merge(gulp.src(STACK_PATHS), cachedBuild(library))
     .pipe(concat(library.stack_file_name))
 
-buildLibrary = (library) ->
-  helper = (stream, file_name) ->
+buildLibrary = (library, callback) ->
+  helper = (stream, file_name, callback) ->
     stream
       .pipe(header(HEADER, {file_name: library.stack_file_name}))
       .pipe(gulp.dest(library.destination))
+      .on 'end', -> callback?()
 
-  helper(cachedBuild(library), library.modules.file_name)
+  helper(cachedBuild(library, callback), library.modules.file_name)
   helper(cachedStackBuild(library), library.stack_file_name) if library.stack_file_name
 
-minifyLibrary = (library) ->
+minifyLibrary = (library, callback) ->
   helper = (stream, file_name) ->
     stream
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
       .pipe(header(HEADER, {file_name: file_name}))
       .pipe(gulp.dest(library.destination))
+      .on 'end', -> callback?()
 
   helper(cachedBuild(library), library.modules.file_name)
   helper(cachedStackBuild(library), library.stack_file_name) if library.stack_file_name
@@ -70,12 +74,14 @@ gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', -> LIBRARIES.map (library) -> buildLibrary(library); gulp.watch library.paths, -> buildLibrary(library)
 gulp.task 'release', -> LIBRARIES.map minifyLibrary
 
-# gulp.task 'test', ['release'], ->
-gulp.task 'test', ->
-  # gulp.src('test/**/test.coffee')
-  #   .pipe(compile({coffee: {bare: true}}))
-  #   .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
-  #   .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-  #   .pipe(gulp.dest('./test'))
-  #   .on 'end', ->
+gulp.task 'test', ['release'], ->
+# gulp.task 'test', ->
+  buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, ->
+
+  gulp.src('test/**/test.coffee')
+    .pipe(compile({coffee: {bare: true}}))
+    .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
+    .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+    .pipe(gulp.dest('./test'))
+    .on 'end', ->
       gulp.src(['test/**/*.html', '!test/all_tests.html']).pipe(mochaPhantomJS());

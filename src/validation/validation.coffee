@@ -2,6 +2,8 @@ try kb = require 'knockback' catch err then kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
 
+require './validators'
+
 # internal helper
 callOrGet = (value) ->
   value = ko.utils.unwrapObservable(value)

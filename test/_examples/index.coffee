@@ -6,4 +6,6 @@ if window? and require.shim
     {symbol: 'kb', path: 'knockback'}
   ])
 
-module.exports = require './default-observable'
+module.exports = require './locale_manager'
+require './localized_string'
+require './localized_observables'

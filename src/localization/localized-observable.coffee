@@ -2,6 +2,8 @@ try kb = require 'knockback' catch err then kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
 
+require './extensions'
+
 # @abstract You must provide the following two methods:
 #   * read: function(value, observable) called to get the value and each time the locale changes
 #   * write: function(localized_string, value, observable) called to set the value (optional)

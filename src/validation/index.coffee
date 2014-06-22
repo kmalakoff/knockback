@@ -7,4 +7,3 @@ if window? and require.shim
   ])
 
 module.exports = require './validation'
-require './validators'
