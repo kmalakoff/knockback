@@ -1,11 +1,3 @@
-###
-  knockback-observable.js
-  (c) 2012 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
@@ -58,7 +50,7 @@ class kb.Observable
     if _.isString(options) or ko.isObservable(options)
       create_options = @create_options = {key: options}
     else
-      create_options = @create_options = _collapseOptions(options)
+      create_options = @create_options = kb.utils.collapseOptions(options)
 
     # extract options
     @key = create_options.key; delete create_options.key; @key or kb._throwMissing(this, 'key')
@@ -81,7 +73,7 @@ class kb.Observable
         return ko.utils.unwrapObservable(@_vo())
 
       write: (new_value) => kb.ignore =>
-        unwrapped_new_value = _unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
+        unwrapped_new_value = kb.utils.unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
         _model = kb.peek(@_model)
         if @write
           @write.call(@_vm, unwrapped_new_value)

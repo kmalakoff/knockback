@@ -1,10 +1,6 @@
-###
-  knockback-validators.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
 
 # Regular expressions from Angular.js: https://github.com/angular/angular.js
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/

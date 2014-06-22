@@ -1,11 +1,3 @@
-###
-  knockback-view-model.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
@@ -93,7 +85,7 @@ class kb.ViewModel
     if _.isArray(options)
       options = {keys: options}
     else
-      options = _collapseOptions(options)
+      options = kb.utils.collapseOptions(options)
     @__kb or= {}
     @__kb.vm_keys = {}
     @__kb.model_keys = {}

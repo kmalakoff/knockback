@@ -1,12 +1,6 @@
-###
-  knockback-localized-observable.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.LocalizedObservable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
-kb.publishMethods = kb.kb.publishMethods
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
 
 # @abstract You must provide the following two methods:
 #   * read: function(value, observable) called to get the value and each time the locale changes
@@ -53,7 +47,7 @@ kb.publishMethods = kb.kb.publishMethods
 #          return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
 #        }
 #     });
-class kb.LocalizedObservable
+module.exports = class kb.LocalizedObservable
   @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.LocalizedObservable. This an abstract class.

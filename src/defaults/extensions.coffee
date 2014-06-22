@@ -1,12 +1,4 @@
-###
-  knockback-extensions.js (knockback-defaults)
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.js is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-    Optional dependency: Backbone.ModelRef.js.
-###
+try kb = require 'knockback' catch err then kb = require './kb'
 
 kb.Observable::setToDefault = ->
   @__kb_value?.setToDefault?()

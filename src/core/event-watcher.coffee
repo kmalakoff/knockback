@@ -1,11 +1,3 @@
-###
-  knockback_event_watcher.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is fremitterly distributable under the MIT license.
-  Semitter the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'

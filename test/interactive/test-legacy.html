@@ -17,7 +17,7 @@
     <script type="text/javascript" src="../../knockback.js"></script>
 
     <!-- HELPERS -->
-    <script type="text/javascript" src="../../test/_examples/build/_localization_examples.js"></script>
+    <script type="text/javascript" src="../../test/_examples/build/_knockback-localization_examples.js"></script>
     <script type="text/javascript" src="../../vendor/test/globalize/globalize.js"></script>
     <script type="text/javascript" src="../../vendor/test/globalize/globalize.culture.en-GB.js"></script>
     <script type="text/javascript" src="../../vendor/test/globalize/globalize.culture.fr-FR.js"></script>
@@ -89,7 +89,7 @@
           label_date: "Date de Naissance:"
         }
       });
-      kb.Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+      kb.Contact = Backbone.Model.extend({ knockback-defaults: { name: '', number: 0, date: new Date() } });
       kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact });
       var collection = new kb.ContactsCollection([
         {name: 'Moe',   email: 'moe@3s.com',    date: new Date(1897, 6, 19)},

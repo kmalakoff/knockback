@@ -1,10 +1,6 @@
-###
-  knockback-validation.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
 
 # internal helper
 callOrGet = (value) ->
@@ -120,7 +116,7 @@ callOrGet = (value) ->
 #   Used to combine conditions.
 #   @note Called using `kb.untilFalseFn` (not  kb.Validation.untilFalseFn)
 #   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
-class kb.Validation
+module.exports = class kb.Validation
 
 #############################
 # Aliases

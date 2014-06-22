@@ -1,13 +1,3 @@
-###
-  knockback-utils.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.js is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-    Optional dependency: Backbone.ModelRef.js.
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
@@ -28,24 +18,6 @@ _wrappedKey = kb._wrappedKey = (obj, key, value) ->
 
 _argumentsAddKey = (args, key) -> Array.prototype.splice.call(args, 1, 0, key); return args
 
-# used for attribute setting to ensure all model attributes have their underlying models
-_unwrapModels = (obj) ->
-  return obj if not obj
-
-  if obj.__kb
-    return if ('object' of obj.__kb) then obj.__kb.object else obj
-
-  else if _.isArray(obj)
-    return _.map(obj, (test) -> return _unwrapModels(test))
-
-  else if _.isObject(obj) and (obj.constructor is {}.constructor) # a simple object
-    result = {}
-    for key, value of obj
-      result[key] = _unwrapModels(value)
-    return result
-
-  return obj
-
 _mergeArray = (result, key, value) ->
   result[key] or= []
   value = [value] unless _.isArray(value)
@@ -55,36 +27,6 @@ _mergeArray = (result, key, value) ->
 _mergeObject = (result, key, value) -> result[key] or= {}; return _.extend(result[key], value)
 
 _keyArrayToObject = (value) -> result = {}; result[item] = {key: item} for item in value; return result
-
-_collapseOptions = (options) ->
-  result = {}
-  options = {options: options}
-  while options.options
-    for key, value of options.options
-      switch key
-        when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
-        when 'keys'
-          # an object
-          if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
-            value = [value] unless _.isObject(value)
-            value = _keyArrayToObject(value) if _.isArray(value)
-            result[key] = _keyArrayToObject(result[key]) if _.isArray(result[key])
-            _mergeObject(result, key, value)
-
-          # an array
-          else
-            _mergeArray(result, key, value)
-        when 'factories'
-          if _.isFunction(value) # special case for ko.observable
-            result[key] = value
-          else
-            _mergeObject(result, key, value)
-        when 'static_defaults' then _mergeObject(result, key, value)
-        when 'options' then
-        else
-          result[key] = value
-    options = options.options
-  return result
 
 ####################################################
 # Public API
@@ -118,7 +60,7 @@ class kb.utils
   #       return kb.utils.wrappedObservable(this);
   #     }
   #   });
-  @wrappedObservable = (obj, value)           -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'observable'))
+  @wrappedObservable: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'observable'))
 
   # Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.
   # @note this is almost the same as {kb.utils.wrappedModel} except that if the Model doesn't exist, it returns null.
@@ -135,7 +77,7 @@ class kb.utils
   # @example
   #   var model = kb.utils.wrappedObject(view_model);
   #   var collection = kb.utils.wrappedObject(collection_observable);
-  @wrappedObject = (obj, value)               -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
+  @wrappedObject: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
 
   # Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
   # @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
@@ -148,7 +90,7 @@ class kb.utils
   #   Sets the observable on an object
   #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Model.
   #   @param [Model] model the Model
-  @wrappedModel = (obj, value) ->
+  @wrappedModel: (obj, value) ->
     # get
     if (arguments.length is 1)
       value = _wrappedKey(obj, 'object')
@@ -172,10 +114,10 @@ class kb.utils
   #   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   #     store: kb.utils.wrappedStore(co)
   #   });
-  @wrappedStore = (obj, value)                -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
+  @wrappedStore: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
 
   # @private
-  @wrappedStoreIsOwned = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store_is_owned'))
+  @wrappedStoreIsOwned: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store_is_owned'))
 
   # Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner.
   #
@@ -187,7 +129,7 @@ class kb.utils
   #   Sets the factory on an object
   #   @param [Any] obj the owner
   #   @param [kb.Factory] factory the factory
-  @wrappedFactory = (obj, value)              -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
+  @wrappedFactory: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
 
   # Dual-purpose getter/setter for retrieving and storing a kb.EventWatcher on an owner.
   #
@@ -199,13 +141,13 @@ class kb.utils
   #   Sets the event_watcher on an object
   #   @param [Any] obj the owner
   #   @param [kb.EventWatcher] event_watcher the event_watcher
-  @wrappedEventWatcher = (obj, value)         -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher'))
+  @wrappedEventWatcher: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher'))
 
   # @private
-  @wrappedEventWatcherIsOwned = (obj, value)  -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher_is_owned'))
+  @wrappedEventWatcherIsOwned: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher_is_owned'))
 
   # Clean up function that releases all of the wrapped values on an owner.
-  @wrappedDestroy = (obj) ->
+  @wrappedDestroy: (obj) ->
     return unless obj.__kb
     obj.__kb.event_watcher.releaseCallbacks(obj) if obj.__kb.event_watcher
     __kb = obj.__kb; obj.__kb = null # clear now to break cycles
@@ -228,7 +170,7 @@ class kb.utils
   #   var view_model = kb.viewModel(new Model({simple_attr: null, model_attr: null}), {factories: {model_attr: kb.ViewModel});
   #   kb.utils.valueType(view_model.simple_attr); // kb.TYPE_SIMPLE
   #   kb.utils.valueType(view_model.model_attr);  // kb.TYPE_MODEL
-  @valueType = (observable) ->
+  @valueType: (observable) ->
     return kb.TYPE_UNKNOWN        unless observable
     return observable.valueType() if observable.__kb_is_o
     return kb.TYPE_COLLECTION     if observable.__kb_is_co or (observable instanceof kb.Collection)
@@ -244,8 +186,7 @@ class kb.utils
   #
   # @example
   #   kb.utils.pathJoin('models', 'name'); // 'models.name'
-  @pathJoin = (path1, path2) ->
-    return (if path1 then (if path1[path1.length-1] isnt '.' then "#{path1}." else path1) else '') + path2
+  @pathJoin: (path1, path2) -> return (if path1 then (if path1[path1.length-1] isnt '.' then "#{path1}." else path1) else '') + path2
 
   # Helper to join a dot-deliminated path with the path on options and returns a new options object with the result.
   #
@@ -255,11 +196,10 @@ class kb.utils
   #
   # @example
   #   this.friends = kb.collectionObservable(model.get('friends'), kb.utils.optionsPathJoin(options, 'friends'));
-  @optionsPathJoin = (options, path) ->
-    return _.defaults({path: @pathJoin(options.path, path)}, options)
+  @optionsPathJoin: (options, path) -> return _.defaults({path: @pathJoin(options.path, path)}, options)
 
   # Helper to find the creator constructor or function from a factory or ORM solution
-  @inferCreator = (value, factory, path, owner, key) ->
+  @inferCreator: (value, factory, path, owner, key) ->
     creator = factory.creatorForPath(value, path) if factory
     return creator if creator
 
@@ -270,7 +210,7 @@ class kb.utils
     return null
 
   # Creates an observable based on a value's type.
-  @createFromDefaultCreator = (obj, options) ->
+  @createFromDefaultCreator: (obj, options) ->
     return kb.viewModel(obj, options)                   if obj instanceof kb.Model
     return kb.collectionObservable(obj, options)        if obj instanceof kb.Collection
     return ko.observableArray(obj)                      if _.isArray(obj)
@@ -282,8 +222,7 @@ class kb.utils
   #
   # @example
   #   kb.utils.hasModelSignature(new Model());
-  @hasModelSignature = (obj) ->
-    return obj and (obj.attributes and not obj.models) and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
+  @hasModelSignature: (obj) -> return obj and (obj.attributes and not obj.models) and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
 
   # Helper to check an object for having a Model signature. For example, locale managers and ModelRef don't need to derive from Model
   #
@@ -291,8 +230,7 @@ class kb.utils
   #
   # @example
   #   kb.utils.hasModelSignature(new Model());
-  @hasCollectionSignature = (obj) ->
-    return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
+  @hasCollectionSignature: (obj) -> return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
 
   # Helper to merge options including ViewmModel options like `keys` and `factories`
   #
@@ -300,81 +238,50 @@ class kb.utils
   #
   # @example
   #   kb.utils.collapseOptions(options);
-  @collapseOptions = _collapseOptions
+  @collapseOptions: (options) ->
+    result = {}
+    options = {options: options}
+    while options.options
+      for key, value of options.options
+        switch key
+          when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
+          when 'keys'
+            # an object
+            if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
+              value = [value] unless _.isObject(value)
+              value = _keyArrayToObject(value) if _.isArray(value)
+              result[key] = _keyArrayToObject(result[key]) if _.isArray(result[key])
+              _mergeObject(result, key, value)
 
-# Helper to ignore dependencies in a function
-#
-# @param [Object] obj the object to test
-#
-# @example
-#   kb.ignore(fn);
-kb.ignore = ko.dependencyDetection?.ignore or (callback, callbackTarget, callbackArgs) -> value = null; ko.dependentObservable(-> value = callback.apply(callbackTarget, callbackArgs || [])).dispose(); return value
+            # an array
+            else
+              _mergeArray(result, key, value)
+          when 'factories'
+            if _.isFunction(value) # special case for ko.observable
+              result[key] = value
+            else
+              _mergeObject(result, key, value)
+          when 'static_defaults' then _mergeObject(result, key, value)
+          when 'options' then
+          else
+            result[key] = value
+      options = options.options
+    return result
 
-####################################
-# INTERNAL HELPERS
-####################################
-kb._throwMissing = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
-kb._throwUnexpected = (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is unexpected"
+  # used for attribute setting to ensure all model attributes have their underlying models
+  @unwrapModels: (obj) ->
+    return obj if not obj
 
-kb.peek = (obs) ->
-  return obs unless ko.isObservable(obs)
-  return obs.peek() if obs.peek
-  return kb.ignore -> obs()
+    if obj.__kb
+      return if ('object' of obj.__kb) then obj.__kb.object else obj
 
-kb.publishMethods = (observable, instance, methods) ->
-  observable[fn] = kb._.bind(instance[fn], instance) for fn in methods
-  return
+    else if _.isArray(obj)
+      return _.map(obj, (test) -> return kb.utils.unwrapModels(test))
 
-# From Backbone.js (https:github.com/documentcloud/backbone)
-copyProps = (dest, source) -> (dest[key] = value) for key, value of source; return dest
+    else if _.isObject(obj) and (obj.constructor is {}.constructor) # a simple object
+      result = {}
+      for key, value of obj
+        result[key] = kb.utils.unwrapModels(value)
+      return result
 
-`// Shared empty constructor function to aid in prototype-chain creation.
-var ctor = function(){};
-
-// Helper function to correctly set up the prototype chain, for subclasses.
-// Similar to 'goog.inherits', but uses a hash of prototype properties and
-// class properties to be extended.
-var inherits = function(parent, protoProps, staticProps) {
-  var child;
-
-  // The constructor function for the new subclass is either defined by you
-  // (the "constructor" property in your extend definition), or defaulted
-  // by us to simply call the parent's constructor.
-  if (protoProps && protoProps.hasOwnProperty('constructor')) {
-    child = protoProps.constructor;
-  } else {
-    child = function(){ parent.apply(this, arguments); };
-  }
-
-  // Inherit class (static) properties from parent.
-  copyProps(child, parent);
-
-  // Set the prototype chain to inherit from parent, without calling
-  // parent's constructor function.
-  ctor.prototype = parent.prototype;
-  child.prototype = new ctor();
-
-  // Add prototype properties (instance properties) to the subclass,
-  // if supplied.
-  if (protoProps) copyProps(child.prototype, protoProps);
-
-  // Add static properties to the constructor function, if supplied.
-  if (staticProps) copyProps(child, staticProps);
-
-  // Correctly set child's 'prototype.constructor'.
-  child.prototype.constructor = child;
-
-  // Set a convenience property in case the parent's prototype is needed later.
-  child.__super__ = parent.prototype;
-
-  return child;
-};
-
-// The self-propagating extend function that BacLCone classes use.
-var extend = function (protoProps, classProps) {
-  var child = inherits(this, protoProps, classProps);
-  child.extend = this.extend;
-  return child;
-};
-`
-kb.extend = extend
+    return obj

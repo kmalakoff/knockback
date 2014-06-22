@@ -1,10 +1,3 @@
-###
-  knockback.js 0.18.6
-  (c) 2011-2014 Kevin Malakoff - http://kmalakoff.github.com/knockback/
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-###
-
 # ensure the client symbols are resolved
 if window? and require.shim
   require.shim([
@@ -14,7 +7,7 @@ if window? and require.shim
   ])
 
 module.exports = kb = require('./kb')
-require(component) for component in ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './inject']
+require(component) for component in ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './orm', './inject']
 
 # re-expose modules
 kb.modules = {}

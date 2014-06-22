@@ -1,3 +1,12 @@
+/*
+  knockback-core.js
+  (c) 2011-2014 Kevin Malakoff.
+  Knockback is freely distributable under the MIT license.
+  See the following for full license details:
+    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
+    Optional dependency: Backbone.ModelRef.js.
+*/
 (function() {
   
 var globals = {requires: []};
@@ -125,14 +134,6 @@ if (typeof require !== "undefined" && require !== null) globals.requires.push(re
 }).call(this);
 var require = globals.require;
 require.register('collection-observable', function(exports, require, module) {
-
-/*
-  knockback-collection-observable.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.CollectionObservable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, kb, ko, _,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -184,7 +185,7 @@ kb.CollectionObservable = (function() {
         _this.in_edit = 0;
         _this.__kb || (_this.__kb = {});
         _this.__kb._onCollectionChange = _.bind(_this._onCollectionChange, _this);
-        options = _collapseOptions(options);
+        options = kb.utils.collapseOptions(options);
         if (options.auto_compact) {
           _this.auto_compact = true;
         }
@@ -578,14 +579,6 @@ kb.collectionObservable = function(collection, options) {
 
 });
 require.register('event-watcher', function(exports, require, module) {
-
-/*
-  knockback_event_watcher.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is fremitterly distributable under the MIT license.
-  Semitter the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var kb, ko, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -806,14 +799,6 @@ kb.emitterObservable = function(emitter, observable) {
 
 });
 require.register('factory', function(exports, require, module) {
-
-/*
-  knockback_factory.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Factory is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var kb, _;
 
 kb = require('./kb');
@@ -887,13 +872,6 @@ kb.Factory = (function() {
 
 });
 require.register('index', function(exports, require, module) {
-
-/*
-  knockback.js 0.18.6
-  (c) 2011-2014 Kevin Malakoff - http://kmalakoff.github.com/knockback/
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
- */
 var component, kb, _i, _j, _len, _len1, _ref, _ref1;
 
 if ((typeof window !== "undefined" && window !== null) && require.shim) {
@@ -918,7 +896,7 @@ if ((typeof window !== "undefined" && window !== null) && require.shim) {
 
 module.exports = kb = require('./kb');
 
-_ref = ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './inject'];
+_ref = ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './orm', './inject'];
 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
   component = _ref[_i];
   require(component);
@@ -934,14 +912,6 @@ for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
 
 });
 require.register('inject', function(exports, require, module) {
-
-/*
-  knockback-inject.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Inject is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var kb, ko, onReady, _, _ko_applyBindings;
 
 kb = require('./kb');
@@ -1084,22 +1054,74 @@ if (typeof document !== "undefined" && document !== null) {
 
 });
 require.register('kb', function(exports, require, module) {
-
-/*
-  knockback-core.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.js is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
- */
-var kb, ko, _;
+var copyProps, kb, ko, _;
 
 _ = require('underscore');
 
 ko = require('knockout');
 
+copyProps = function(dest, source) {
+  var key, value;
+  for (key in source) {
+    value = source[key];
+    dest[key] = value;
+  }
+  return dest;
+};
+
+// Shared empty constructor function to aid in prototype-chain creation.
+var ctor = function(){};
+
+// Helper function to correctly set up the prototype chain, for subclasses.
+// Similar to 'goog.inherits', but uses a hash of prototype properties and
+// class properties to be extended.
+var inherits = function(parent, protoProps, staticProps) {
+  var child;
+
+  // The constructor function for the new subclass is either defined by you
+  // (the "constructor" property in your extend definition), or defaulted
+  // by us to simply call the parent's constructor.
+  if (protoProps && protoProps.hasOwnProperty('constructor')) {
+    child = protoProps.constructor;
+  } else {
+    child = function(){ parent.apply(this, arguments); };
+  }
+
+  // Inherit class (static) properties from parent.
+  copyProps(child, parent);
+
+  // Set the prototype chain to inherit from parent, without calling
+  // parent's constructor function.
+  ctor.prototype = parent.prototype;
+  child.prototype = new ctor();
+
+  // Add prototype properties (instance properties) to the subclass,
+  // if supplied.
+  if (protoProps) copyProps(child.prototype, protoProps);
+
+  // Add static properties to the constructor function, if supplied.
+  if (staticProps) copyProps(child, staticProps);
+
+  // Correctly set child's 'prototype.constructor'.
+  child.prototype.constructor = child;
+
+  // Set a convenience property in case the parent's prototype is needed later.
+  child.__super__ = parent.prototype;
+
+  return child;
+};
+
+// The self-propagating extend function that BacLCone classes use.
+var extend = function (protoProps, classProps) {
+  var child = inherits(this, protoProps, classProps);
+  child.extend = this.extend;
+  return child;
+};
+;
+
 module.exports = kb = (function() {
+  var _ref;
+
   function kb() {}
 
   kb.VERSION = '0.18.6';
@@ -1257,6 +1279,45 @@ module.exports = kb = (function() {
     return model.set(attributes);
   };
 
+  kb.ignore = ((_ref = ko.dependencyDetection) != null ? _ref.ignore : void 0) || function(callback, callbackTarget, callbackArgs) {
+    var value;
+    value = null;
+    ko.dependentObservable(function() {
+      return value = callback.apply(callbackTarget, callbackArgs || []);
+    }).dispose();
+    return value;
+  };
+
+  kb.extend = extend;
+
+  kb._throwMissing = function(instance, message) {
+    throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
+  };
+
+  kb._throwUnexpected = function(instance, message) {
+    throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is unexpected";
+  };
+
+  kb.publishMethods = function(observable, instance, methods) {
+    var fn, _i, _len;
+    for (_i = 0, _len = methods.length; _i < _len; _i++) {
+      fn = methods[_i];
+      observable[fn] = kb._.bind(instance[fn], instance);
+    }
+  };
+
+  kb.peek = function(obs) {
+    if (!ko.isObservable(obs)) {
+      return obs;
+    }
+    if (obs.peek) {
+      return obs.peek();
+    }
+    return kb.ignore(function() {
+      return obs();
+    });
+  };
+
   return kb;
 
 })();
@@ -1279,14 +1340,6 @@ kb.ko = require('knockout');
 
 });
 require.register('observable', function(exports, require, module) {
-
-/*
-  knockback-observable.js
-  (c) 2012 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var kb, ko, _;
 
 kb = require('./kb');
@@ -1307,7 +1360,7 @@ kb.Observable = (function() {
             key: options
           };
         } else {
-          create_options = _this.create_options = _collapseOptions(options);
+          create_options = _this.create_options = kb.utils.collapseOptions(options);
         }
         _this.key = create_options.key;
         delete create_options.key;
@@ -1340,7 +1393,7 @@ kb.Observable = (function() {
           write: function(new_value) {
             return kb.ignore(function() {
               var unwrapped_new_value, _model;
-              unwrapped_new_value = _unwrapModels(new_value);
+              unwrapped_new_value = kb.utils.unwrapModels(new_value);
               _model = kb.peek(_this._model);
               if (_this.write) {
                 _this.write.call(_this._vm, unwrapped_new_value);
@@ -1775,14 +1828,6 @@ kb.orm.addAdapter(new ORMAdapter_Supermodel());
 
 });
 require.register('store', function(exports, require, module) {
-
-/*
-  knockback_store.js
-  (c) 2012 Kevin Malakoff.
-  Knockback.Store is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var kb, ko, _;
 
 kb = require('./kb');
@@ -1971,17 +2016,7 @@ kb.Store = (function() {
 
 });
 require.register('utils', function(exports, require, module) {
-
-/*
-  knockback-utils.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.js is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js.
-    Optional dependency: Backbone.ModelRef.js.
- */
-var copyProps, kb, ko, _, _argumentsAddKey, _collapseOptions, _keyArrayToObject, _mergeArray, _mergeObject, _ref, _unwrapModels, _wrappedKey;
+var kb, ko, _, _argumentsAddKey, _keyArrayToObject, _mergeArray, _mergeObject, _wrappedKey;
 
 kb = require('./kb');
 
@@ -2008,32 +2043,6 @@ _argumentsAddKey = function(args, key) {
   return args;
 };
 
-_unwrapModels = function(obj) {
-  var key, result, value;
-  if (!obj) {
-    return obj;
-  }
-  if (obj.__kb) {
-    if ('object' in obj.__kb) {
-      return obj.__kb.object;
-    } else {
-      return obj;
-    }
-  } else if (_.isArray(obj)) {
-    return _.map(obj, function(test) {
-      return _unwrapModels(test);
-    });
-  } else if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
-    result = {};
-    for (key in obj) {
-      value = obj[key];
-      result[key] = _unwrapModels(value);
-    }
-    return result;
-  }
-  return obj;
-};
-
 _mergeArray = function(result, key, value) {
   result[key] || (result[key] = []);
   if (!_.isArray(value)) {
@@ -2056,60 +2065,6 @@ _keyArrayToObject = function(value) {
     result[item] = {
       key: item
     };
-  }
-  return result;
-};
-
-_collapseOptions = function(options) {
-  var key, result, value, _ref;
-  result = {};
-  options = {
-    options: options
-  };
-  while (options.options) {
-    _ref = options.options;
-    for (key in _ref) {
-      value = _ref[key];
-      switch (key) {
-        case 'internals':
-        case 'requires':
-        case 'excludes':
-        case 'statics':
-          _mergeArray(result, key, value);
-          break;
-        case 'keys':
-          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
-            if (!_.isObject(value)) {
-              value = [value];
-            }
-            if (_.isArray(value)) {
-              value = _keyArrayToObject(value);
-            }
-            if (_.isArray(result[key])) {
-              result[key] = _keyArrayToObject(result[key]);
-            }
-            _mergeObject(result, key, value);
-          } else {
-            _mergeArray(result, key, value);
-          }
-          break;
-        case 'factories':
-          if (_.isFunction(value)) {
-            result[key] = value;
-          } else {
-            _mergeObject(result, key, value);
-          }
-          break;
-        case 'static_defaults':
-          _mergeObject(result, key, value);
-          break;
-        case 'options':
-          break;
-        default:
-          result[key] = value;
-      }
-    }
-    options = options.options;
   }
   return result;
 };
@@ -2254,120 +2209,92 @@ kb.utils = (function() {
     return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
   };
 
-  utils.collapseOptions = _collapseOptions;
+  utils.collapseOptions = function(options) {
+    var key, result, value, _ref;
+    result = {};
+    options = {
+      options: options
+    };
+    while (options.options) {
+      _ref = options.options;
+      for (key in _ref) {
+        value = _ref[key];
+        switch (key) {
+          case 'internals':
+          case 'requires':
+          case 'excludes':
+          case 'statics':
+            _mergeArray(result, key, value);
+            break;
+          case 'keys':
+            if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
+              if (!_.isObject(value)) {
+                value = [value];
+              }
+              if (_.isArray(value)) {
+                value = _keyArrayToObject(value);
+              }
+              if (_.isArray(result[key])) {
+                result[key] = _keyArrayToObject(result[key]);
+              }
+              _mergeObject(result, key, value);
+            } else {
+              _mergeArray(result, key, value);
+            }
+            break;
+          case 'factories':
+            if (_.isFunction(value)) {
+              result[key] = value;
+            } else {
+              _mergeObject(result, key, value);
+            }
+            break;
+          case 'static_defaults':
+            _mergeObject(result, key, value);
+            break;
+          case 'options':
+            break;
+          default:
+            result[key] = value;
+        }
+      }
+      options = options.options;
+    }
+    return result;
+  };
+
+  utils.unwrapModels = function(obj) {
+    var key, result, value;
+    if (!obj) {
+      return obj;
+    }
+    if (obj.__kb) {
+      if ('object' in obj.__kb) {
+        return obj.__kb.object;
+      } else {
+        return obj;
+      }
+    } else if (_.isArray(obj)) {
+      return _.map(obj, function(test) {
+        return kb.utils.unwrapModels(test);
+      });
+    } else if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
+      result = {};
+      for (key in obj) {
+        value = obj[key];
+        result[key] = kb.utils.unwrapModels(value);
+      }
+      return result;
+    }
+    return obj;
+  };
 
   return utils;
 
 })();
 
-kb.ignore = ((_ref = ko.dependencyDetection) != null ? _ref.ignore : void 0) || function(callback, callbackTarget, callbackArgs) {
-  var value;
-  value = null;
-  ko.dependentObservable(function() {
-    return value = callback.apply(callbackTarget, callbackArgs || []);
-  }).dispose();
-  return value;
-};
-
-kb._throwMissing = function(instance, message) {
-  throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
-};
-
-kb._throwUnexpected = function(instance, message) {
-  throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is unexpected";
-};
-
-kb.peek = function(obs) {
-  if (!ko.isObservable(obs)) {
-    return obs;
-  }
-  if (obs.peek) {
-    return obs.peek();
-  }
-  return kb.ignore(function() {
-    return obs();
-  });
-};
-
-kb.publishMethods = function(observable, instance, methods) {
-  var fn, _i, _len;
-  for (_i = 0, _len = methods.length; _i < _len; _i++) {
-    fn = methods[_i];
-    observable[fn] = kb._.bind(instance[fn], instance);
-  }
-};
-
-copyProps = function(dest, source) {
-  var key, value;
-  for (key in source) {
-    value = source[key];
-    dest[key] = value;
-  }
-  return dest;
-};
-
-// Shared empty constructor function to aid in prototype-chain creation.
-var ctor = function(){};
-
-// Helper function to correctly set up the prototype chain, for subclasses.
-// Similar to 'goog.inherits', but uses a hash of prototype properties and
-// class properties to be extended.
-var inherits = function(parent, protoProps, staticProps) {
-  var child;
-
-  // The constructor function for the new subclass is either defined by you
-  // (the "constructor" property in your extend definition), or defaulted
-  // by us to simply call the parent's constructor.
-  if (protoProps && protoProps.hasOwnProperty('constructor')) {
-    child = protoProps.constructor;
-  } else {
-    child = function(){ parent.apply(this, arguments); };
-  }
-
-  // Inherit class (static) properties from parent.
-  copyProps(child, parent);
-
-  // Set the prototype chain to inherit from parent, without calling
-  // parent's constructor function.
-  ctor.prototype = parent.prototype;
-  child.prototype = new ctor();
-
-  // Add prototype properties (instance properties) to the subclass,
-  // if supplied.
-  if (protoProps) copyProps(child.prototype, protoProps);
-
-  // Add static properties to the constructor function, if supplied.
-  if (staticProps) copyProps(child, staticProps);
-
-  // Correctly set child's 'prototype.constructor'.
-  child.prototype.constructor = child;
-
-  // Set a convenience property in case the parent's prototype is needed later.
-  child.__super__ = parent.prototype;
-
-  return child;
-};
-
-// The self-propagating extend function that BacLCone classes use.
-var extend = function (protoProps, classProps) {
-  var child = inherits(this, protoProps, classProps);
-  child.extend = this.extend;
-  return child;
-};
-;
-
-kb.extend = extend;
-
 });
 require.register('view-model', function(exports, require, module) {
-
-/*
-  knockback-view-model.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
- */
 var kb, ko, _;
 
 kb = require('./kb');
@@ -2391,7 +2318,7 @@ kb.ViewModel = (function() {
             keys: options
           };
         } else {
-          options = _collapseOptions(options);
+          options = kb.utils.collapseOptions(options);
         }
         _this.__kb || (_this.__kb = {});
         _this.__kb.vm_keys = {};

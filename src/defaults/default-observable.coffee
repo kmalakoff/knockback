@@ -1,18 +1,11 @@
-###
-  knockback_default_observable.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.DefaultObservable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
-kb.publishMethods = kb.kb.publishMethods
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
 
 # Used to provide a default value when an observable is null, undefined, or the empty string.
 #
 # @example Provide a observable with observable and/or non observable default argument in the form of:
 #   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
-class kb.DefaultObservable
+module.exports = class kb.DefaultObservable
 
   # Used to create a new kb.DefaultObservable.
   #

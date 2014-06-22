@@ -1,11 +1,3 @@
-###
-  knockback_store.js
-  (c) 2012 Kevin Malakoff.
-  Knockback.Store is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'

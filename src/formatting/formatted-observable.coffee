@@ -1,10 +1,5 @@
-###
-  knockback-formatted-observable.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.FormattedObservable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
 
 arraySlice = Array.prototype.slice
 
@@ -60,7 +55,7 @@ kb.parseFormattedString = (string, format) ->
 #
 # @example change the formatted name whenever a model's name attribute changes
 #   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
-class kb.FormattedObservable
+module.exports = class kb.FormattedObservable
 
   # Used to create a new kb.FormattedObservable.
   #

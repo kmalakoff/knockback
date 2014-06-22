@@ -1,11 +1,3 @@
-###
-  knockback-collection-observable.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.CollectionObservable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
@@ -97,7 +89,7 @@ class kb.CollectionObservable
     @__kb._onCollectionChange = _.bind(@_onCollectionChange, @)
 
     # options
-    options = _collapseOptions(options)
+    options = kb.utils.collapseOptions(options)
     @auto_compact = true if options.auto_compact
     if options.sort_attribute
       @_comparator = ko.observable(@_attributeComparator(options.sort_attribute))

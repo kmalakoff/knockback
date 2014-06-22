@@ -1,11 +1,3 @@
-###
-  knockback-inject.js
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Inject is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
 kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'

@@ -12,13 +12,12 @@
   "repository"    : {"type": "git", "url": "http://github.com/kmalakoff/knockback.git"},
 
   "scripts": {
-    "test": "gulp build --require coffee-script/register; NODE_ENV=test mocha test/suite.coffee --compilers coffee:coffee-script/register --reporter spec --timeout 10000",
+    "test": "gulp test --require coffee-script/register",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
     "build": "gulp build --require coffee-script/register",
     "watch": "gulp watch --require coffee-script/register",
     "release": "gulp release --require coffee-script/register",
-    "clean": "rm -rf lib/*",
-    "prepublish": "gulp release --require coffee-script/register"
+    "clean": "rm -rf lib/*"
   },
   "dependencies": {
     "underscore": ">=1.1.7",
@@ -37,6 +36,7 @@
     "gulp-coffee": "*",
     "gulp-compile-js": "*",
     "gulp-module-system": "*",
+    "gulp-header": "*",
     "event-stream": "*"
   },
   "optionalDependencies": {

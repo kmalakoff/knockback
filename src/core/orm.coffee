@@ -1,5 +1,3 @@
-###############################
-
 kb = require './kb'
 _ = require 'underscore'
 
@@ -26,8 +24,9 @@ class ORM
     return
 
 kb.orm = new ORM()
-###############################
 
+###############################
+# Backbone Relational
 ###############################
 # @nodoc
 class ORMAdapter_BackboneRelational
@@ -61,8 +60,9 @@ class ORMAdapter_BackboneRelational
       return
 
 kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
-###############################
 
+###############################
+# Backbone Associations
 ###############################
 # @nodoc
 class ORMAdapter_BackboneAssociations
@@ -117,4 +117,3 @@ class ORMAdapter_Supermodel
   useFunction: (model, key) -> return !!@relationType(model, key)
 
 kb.orm.addAdapter(new ORMAdapter_Supermodel())
-###############################

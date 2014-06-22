@@ -1,12 +1,6 @@
-###
-  knockback-triggered-observable.js 0.18.6
-  (c) 2011-2013 Kevin Malakoff.
-  Knockback.Observable is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
-###
-
-kb.publishMethods = kb.kb.publishMethods
+try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
 
 # Class for observing emitter events.
 #
@@ -26,7 +20,7 @@ kb.publishMethods = kb.kb.publishMethods
 #   emitter.set(name: 'bob');       # trigger_count: 1
 #   emitter.set(name: 'george');    # trigger_count: 2
 #   emitter.set(last: 'smith');     # trigger_count: 3
-class kb.TriggeredObservable
+module.exports = class kb.TriggeredObservable
 
   # Used to create a new kb.Observable.
   #
