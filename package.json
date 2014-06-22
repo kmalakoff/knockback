@@ -38,7 +38,9 @@
     "gulp-header": "*",
     "gulp-concat": "*",
     "gulp-mocha-phantomjs": "*",
-    "event-stream": "*"
+    "gulp-shell": "*",
+    "event-stream": "*",
+    "module-bundler": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",

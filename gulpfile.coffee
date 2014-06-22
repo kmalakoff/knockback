@@ -12,6 +12,7 @@ uglify = require 'gulp-uglify'
 header = require 'gulp-header'
 mochaPhantomJS = require 'gulp-mocha-phantomjs'
 concat = require 'gulp-concat'
+shell = require 'gulp-shell'
 
 HEADER = """
 /*
@@ -74,6 +75,9 @@ gulp.task 'release', ['build'], -> LIBRARIES.map minifyLibrary
 
 gulp.task 'test', ['release'], ->
   buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, ->
+
+  gulp.src('test/**/_bundle-config.coffee')
+    .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
 
   gulp.src('test/**/test*.coffee')
     .pipe(compile({coffee: {bare: true}}))
