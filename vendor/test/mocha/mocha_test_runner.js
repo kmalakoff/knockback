@@ -11,6 +11,8 @@
     // mocha.checkLeaks();
     mocha.globals(['jQuery'])
 
+    if(window.mochaPhantomJS) {return window.mochaPhantomJS.run();}
+
     window.mocha_reporter = mocha.run(function(err) {
       details = mocha.suite.suites;
 

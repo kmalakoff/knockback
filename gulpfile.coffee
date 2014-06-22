@@ -43,7 +43,7 @@ cachedBuild = (library) ->
     .pipe(es.map((file, callback) -> console.log "Compiled #{library.modules.file_name}"; callback(null, file)))
 
 cachedStackBuild = (library) ->
-  es.merge(cachedBuild(library), gulp.src(STACK_PATHS))
+  es.merge(gulp.src(STACK_PATHS), cachedBuild(library))
     .pipe(concat(library.stack_file_name))
 
 buildLibrary = (library) ->
@@ -70,11 +70,12 @@ gulp.task 'build', -> LIBRARIES.map buildLibrary
 gulp.task 'watch', -> LIBRARIES.map (library) -> buildLibrary(library); gulp.watch library.paths, -> buildLibrary(library)
 gulp.task 'release', -> LIBRARIES.map minifyLibrary
 
-gulp.task 'test', ['release'], ->
-  gulp.src('test/**/test.coffee')
-    .pipe(compile({coffee: {bare: true}}))
-    .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
-    .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-    .pipe(gulp.dest('./test'))
-    .on 'end', ->
+# gulp.task 'test', ['release'], ->
+gulp.task 'test', ->
+  # gulp.src('test/**/test.coffee')
+  #   .pipe(compile({coffee: {bare: true}}))
+  #   .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
+  #   .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+  #   .pipe(gulp.dest('./test'))
+  #   .on 'end', ->
       gulp.src(['test/**/*.html', '!test/all_tests.html']).pipe(mochaPhantomJS());
