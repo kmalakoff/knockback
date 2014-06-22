@@ -89,7 +89,7 @@
           label_date: "Date de Naissance:"
         }
       });
-      kb.Contact = Backbone.Model.extend({ knockback-defaults: { name: '', number: 0, date: new Date() } });
+      kb.Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
       kb.ContactsCollection = Backbone.Collection.extend({ model: kb.Contact });
       var collection = new kb.ContactsCollection([
         {name: 'Moe',   email: 'moe@3s.com',    date: new Date(1897, 6, 19)},
@@ -131,7 +131,7 @@
           date:           { key: 'date', localizer: kb.LongDateLocalizer }
         }}, this);
       };
-      view_model.contacts = Knockback.collectionObservable(collection, {
+      view_model.contacts = kb.collectionObservable(collection, {
         view_model:       ContactViewModel,
         sort_attribute:   'name'
       });

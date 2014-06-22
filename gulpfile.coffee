@@ -34,8 +34,6 @@ MODULE_ADD_PATHS = _.flatten((["src/#{module}/**/*.coffee", "!src/#{module}/inde
 LIBRARIES.push {paths: ['src/core/**/*.coffee'], modules: {type: 'local-shim', file_name: 'knockback-core.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-core-stack.js'}
 LIBRARIES.push {paths: ['src/core/**/*.coffee'].concat(MODULE_ADD_PATHS), modules: {type: 'local-shim', file_name: 'knockback.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-full-stack.js'}
 
-console.log LIBRARIES[LIBRARIES.length-1]
-
 cachedBuild = (library) ->
   root_paths = (root_path.replace('/**/*.coffee', '') for root_path in library.paths when root_path.indexOf('/**/*.coffee') >= 0)
   return gulp.src(library.paths)
@@ -75,7 +73,6 @@ gulp.task 'watch', -> LIBRARIES.map (library) -> buildLibrary(library); gulp.wat
 gulp.task 'release', -> LIBRARIES.map minifyLibrary
 
 gulp.task 'test', ['release'], ->
-# gulp.task 'test', ->
   buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, ->
 
   gulp.src('test/**/test.coffee')
