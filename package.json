@@ -42,7 +42,9 @@
     "event-stream": "*",
     "module-bundler": "*",
     "queue-async": "*",
-    "vinyl-fs": "*"
+    "vinyl-fs": "*",
+    "webpack": "*",
+    "webpack-dev-server": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
