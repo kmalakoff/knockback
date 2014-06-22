@@ -1,5 +1,5 @@
 /*
-  knockback.js
+  knockback-full-stack.js
   (c) 2011-2014 Kevin Malakoff.
   Knockback is freely distributable under the MIT license.
   See the following for full license details:

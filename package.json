@@ -26,8 +26,7 @@
   },
   "devDependencies": {
     "coffee-script": "*",
-    "codo": "2.x.x",
-    "phantomjs" : "*",
+    "codo": "2.x",
     "gulp": "*",
     "gulp-util": "*",
     "gulp-uglify": "*",
@@ -37,6 +36,8 @@
     "gulp-compile-js": "*",
     "gulp-module-system": "*",
     "gulp-header": "*",
+    "gulp-concat": "*",
+    "gulp-mocha-phantomjs": "*",
     "event-stream": "*"
   },
   "optionalDependencies": {
