@@ -2,7 +2,9 @@ try kb = require 'knockback' catch err then kb = require './kb'
 _ = require 'underscore'
 ko = require 'knockout'
 
-require './extensions'
+# Locale Manager - if you are using localization, set this property.
+# It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
+kb.locale_manager or= undefined
 
 # @abstract You must provide the following two methods:
 #   * read: function(value, observable) called to get the value and each time the locale changes

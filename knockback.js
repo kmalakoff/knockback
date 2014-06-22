@@ -1,5 +1,5 @@
 /*
-  knockback-full-stack.js
+  knockback.js
   (c) 2011-2014 Kevin Malakoff.
   Knockback is freely distributable under the MIT license.
   See the following for full license details:
@@ -872,7 +872,12 @@ kb.Factory = (function() {
 
 });
 require.register('index', function(exports, require, module) {
-var component, err, kb, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+var Backbone, component, err, kb, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+
+if (this.Parse) {
+  this.Backbone = this.Parse;
+  this._ = this.Parse._;
+}
 
 if ((typeof window !== "undefined" && window !== null) && require.shim) {
   require.shim([
@@ -895,6 +900,22 @@ if ((typeof window !== "undefined" && window !== null) && require.shim) {
 }
 
 module.exports = kb = require('./kb');
+
+if (this.Parse) {
+  Backbone = kb.Parse = this.Parse;
+} else {
+  Backbone = kb.Backbone = require('backbone');
+}
+
+kb.Collection = Backbone.Collection;
+
+kb.Model = Backbone.Object || Backbone.Model;
+
+kb.Events = Backbone.Events;
+
+kb._ = require('underscore');
+
+kb.ko = require('knockout');
 
 _ref = ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './orm', './inject'];
 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -1332,22 +1353,6 @@ module.exports = kb = (function() {
   return kb;
 
 })();
-
-if (this.Parse) {
-  kb.Parse = this.Parse;
-  kb.Collection = this.Parse.Collection;
-  kb.Model = this.Parse.Object;
-  kb.Events = this.Parse.Events;
-} else {
-  kb.Backbone = require('backbone');
-  kb.Collection = kb.Backbone.Collection;
-  kb.Model = kb.Backbone.Model;
-  kb.Events = kb.Backbone.Events;
-}
-
-kb._ = require('underscore');
-
-kb.ko = require('knockout');
 
 });
 require.register('observable', function(exports, require, module) {
@@ -2514,7 +2519,7 @@ kb.viewModel = function(model, options, view_model) {
 
 });
 require.register('default-observable', function(exports, require, module) {
-var err, kb, _;
+var err, kb, ko, _;
 
 try {
   kb = require('knockback');
@@ -2524,6 +2529,8 @@ try {
 }
 
 _ = require('underscore');
+
+ko = require('knockout');
 
 require('./extensions');
 
@@ -2568,7 +2575,7 @@ kb.defaultObservable = function(target, default_value) {
 
 });
 require.register('extensions', function(exports, require, module) {
-var err, kb;
+var err, kb, ko, _;
 
 try {
   kb = require('knockback');
@@ -2576,6 +2583,10 @@ try {
   err = _error;
   kb = require('./kb');
 }
+
+_ = require('underscore');
+
+ko = require('knockout');
 
 kb.Observable.prototype.setToDefault = function() {
   var _ref;
@@ -2619,7 +2630,7 @@ kb.utils.setToDefault = function(obj) {
 
 });
 require.register('formatted-observable', function(exports, require, module) {
-var arraySlice, err, kb, _;
+var arraySlice, err, kb, ko, _;
 
 try {
   kb = require('knockback');
@@ -2629,6 +2640,8 @@ try {
 }
 
 _ = require('underscore');
+
+ko = require('knockout');
 
 arraySlice = Array.prototype.slice;
 
@@ -2747,19 +2760,6 @@ kb.formattedObservable = function(format, args) {
 };
 
 });
-require.register('extensions', function(exports, require, module) {
-var err, kb;
-
-try {
-  kb = require('knockback');
-} catch (_error) {
-  err = _error;
-  kb = require('./kb');
-}
-
-kb.locale_manager = void 0;
-
-});
 require.register('localized-observable', function(exports, require, module) {
 var err, kb, ko, _;
 
@@ -2774,7 +2774,7 @@ _ = require('underscore');
 
 ko = require('knockout');
 
-require('./extensions');
+kb.locale_manager || (kb.locale_manager = void 0);
 
 module.exports = kb.LocalizedObservable = (function() {
   LocalizedObservable.extend = kb.extend;

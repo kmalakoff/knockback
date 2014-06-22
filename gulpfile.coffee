@@ -49,11 +49,11 @@ cachedStackBuild = (library) ->
 buildLibrary = (library, callback) ->
   helper = (stream, file_name, callback) ->
     stream
-      .pipe(header(HEADER, {file_name: library.stack_file_name}))
+      .pipe(header(HEADER, {file_name: file_name}))
       .pipe(gulp.dest(library.destination))
       .on 'end', -> callback?()
 
-  helper(cachedBuild(library, callback), library.modules.file_name)
+  helper(cachedBuild(library), library.modules.file_name, callback)
   helper(cachedStackBuild(library), library.stack_file_name) if library.stack_file_name
 
 minifyLibrary = (library, callback) ->
@@ -69,16 +69,19 @@ minifyLibrary = (library, callback) ->
   helper(cachedStackBuild(library), library.stack_file_name) if library.stack_file_name
 
 gulp.task 'build', -> LIBRARIES.map buildLibrary
-gulp.task 'watch', -> LIBRARIES.map (library) -> buildLibrary(library); gulp.watch library.paths, -> buildLibrary(library)
-gulp.task 'release', -> LIBRARIES.map minifyLibrary
+gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
+gulp.task 'release', ['build'], -> LIBRARIES.map minifyLibrary
 
+# gulp.task 'test', ->
 gulp.task 'test', ['release'], ->
   buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, ->
 
-  gulp.src('test/**/test.coffee')
+  gulp.src('test/**/test*.coffee')
     .pipe(compile({coffee: {bare: true}}))
     .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
     .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
     .pipe(gulp.dest('./test'))
     .on 'end', ->
-      gulp.src(['test/**/*.html', '!test/all_tests.html']).pipe(mochaPhantomJS());
+      gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
+        .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
+        .pipe(mochaPhantomJS());

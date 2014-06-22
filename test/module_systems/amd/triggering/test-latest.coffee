@@ -7,7 +7,7 @@ try
       'knockout': "../../../../vendor/knockout-3.1.0"
       'knockback': "../../../../knockback"
       'knockback-examples-localization': "../../../_examples/build/_localization_examples"
-      'knockback-statistics': "../../../../lib/statistics"
+      'knockback-statistics': "../../../../lib/knockback-statistics"
     shim:
       underscore:
         exports: '_'

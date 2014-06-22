@@ -1,4 +1,6 @@
 try kb = require 'knockback' catch err then kb = require './kb'
+_ = require 'underscore'
+ko = require 'knockout'
 
 kb.Observable::setToDefault = ->
   @__kb_value?.setToDefault?()

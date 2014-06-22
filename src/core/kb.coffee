@@ -265,20 +265,3 @@ module.exports = class kb
 
   @publishMethods: (observable, instance, methods) -> observable[fn] = kb._.bind(instance[fn], instance) for fn in methods; return
   @peek: (obs) -> return obs unless ko.isObservable(obs); return obs.peek() if obs.peek; return kb.ignore -> obs()
-
-# use Parse
-if @Parse
-  kb.Parse = @Parse
-  kb.Collection = @Parse.Collection
-  kb.Model = @Parse.Object
-  kb.Events = @Parse.Events
-
-# use Backbone
-else
-  kb.Backbone = require('backbone')
-  kb.Collection = kb.Backbone.Collection
-  kb.Model = kb.Backbone.Model
-  kb.Events = kb.Backbone.Events
-
-kb._ = require 'underscore'
-kb.ko = require 'knockout'

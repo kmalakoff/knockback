@@ -6,7 +6,7 @@ try
       'backbone': "../../../../vendor/backbone-1.1.2"
       'knockout': "../../../../vendor/knockout-3.1.0"
       'knockback': "../../../../knockback-core"
-      'knockback-statistics': "../../../../lib/statistics"
+      'knockback-statistics': "../../../../lib/knockback-statistics"
     shim:
       underscore:
         exports: '_'

@@ -6,8 +6,8 @@ try
       'backbone': "../../../../vendor/backbone-1.1.2",
       'knockout': "../../../../vendor/knockout-3.1.0",
       'knockback': "../../../../knockback-core",
-      'knockback-formatting': "../../../../lib/formatting",
-      'knockback-statistics': "../../../../lib/statistics"
+      'knockback-formatting': "../../../../lib/knockback-formatting",
+      'knockback-statistics': "../../../../lib/knockback-statistics"
     shim:
       underscore:
         exports: '_'
