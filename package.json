@@ -42,6 +42,7 @@
     "event-stream": "*",
     "module-bundler": "*",
     "queue-async": "*",
+    "async": "*",
     "vinyl-fs": "*",
     "webpack": "*",
     "webpack-dev-server": "*"
