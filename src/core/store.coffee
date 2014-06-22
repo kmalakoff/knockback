@@ -9,7 +9,7 @@ ko = require 'knockout'
 #   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 #     store: kb.utils.wrappedStore(co)
 #   });
-class kb.Store
+module.exports = class kb.Store
   # Used to either register yourself with the existing store or to create a new store.
   #
   # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)

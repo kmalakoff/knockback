@@ -83,4 +83,4 @@ gulp.task 'test', ['release'], ->
     .on 'end', ->
       gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
         .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-        .pipe(mochaPhantomJS());
+        .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)

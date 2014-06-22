@@ -725,7 +725,7 @@ module.exports = require('./lib/chai');
 require.register("chai/lib/chai.js", function(exports, require, module){
 /*!
  * chai
- * Copyright(c) 2011-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -736,7 +736,7 @@ var used = []
  * Chai version
  */
 
-exports.version = '1.8.1';
+exports.version = '1.9.1';
 
 /*!
  * Assertion Error
@@ -768,6 +768,13 @@ exports.use = function (fn) {
 
   return this;
 };
+
+/*!
+ * Configuration
+ */
+
+var config = require('./chai/config');
+exports.config = config;
 
 /*!
  * Primary `Assertion` prototype
@@ -809,9 +816,11 @@ require.register("chai/lib/chai/assertion.js", function(exports, require, module
 /*!
  * chai
  * http://chaijs.com
- * Copyright(c) 2011-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
+
+var config = require('./config');
 
 module.exports = function (_chai, util) {
   /*!
@@ -841,33 +850,27 @@ module.exports = function (_chai, util) {
     flag(this, 'message', msg);
   }
 
-  /*!
-    * ### Assertion.includeStack
-    *
-    * User configurable property, influences whether stack trace
-    * is included in Assertion error message. Default of false
-    * suppresses stack trace in the error message
-    *
-    *     Assertion.includeStack = true;  // enable stack on error
-    *
-    * @api public
-    */
+  Object.defineProperty(Assertion, 'includeStack', {
+    get: function() {
+      console.warn('Assertion.includeStack is deprecated, use chai.config.includeStack instead.');
+      return config.includeStack;
+    },
+    set: function(value) {
+      console.warn('Assertion.includeStack is deprecated, use chai.config.includeStack instead.');
+      config.includeStack = value;
+    }
+  });
 
-  Assertion.includeStack = false;
-
-  /*!
-   * ### Assertion.showDiff
-   *
-   * User configurable property, influences whether or not
-   * the `showDiff` flag should be included in the thrown
-   * AssertionErrors. `false` will always be `false`; `true`
-   * will be true when the assertion has requested a diff
-   * be shown.
-   *
-   * @api public
-   */
-
-  Assertion.showDiff = true;
+  Object.defineProperty(Assertion, 'showDiff', {
+    get: function() {
+      console.warn('Assertion.showDiff is deprecated, use chai.config.showDiff instead.');
+      return config.showDiff;
+    },
+    set: function(value) {
+      console.warn('Assertion.showDiff is deprecated, use chai.config.showDiff instead.');
+      config.showDiff = value;
+    }
+  });
 
   Assertion.addProperty = function (name, fn) {
     util.addProperty(this.prototype, name, fn);
@@ -889,6 +892,10 @@ module.exports = function (_chai, util) {
     util.overwriteMethod(this.prototype, name, fn);
   };
 
+  Assertion.overwriteChainableMethod = function (name, fn, chainingBehavior) {
+    util.overwriteChainableMethod(this.prototype, name, fn, chainingBehavior);
+  };
+
   /*!
    * ### .assert(expression, message, negateMessage, expected, actual)
    *
@@ -906,7 +913,7 @@ module.exports = function (_chai, util) {
   Assertion.prototype.assert = function (expr, msg, negateMsg, expected, _actual, showDiff) {
     var ok = util.test(this, arguments);
     if (true !== showDiff) showDiff = false;
-    if (true !== Assertion.showDiff) showDiff = false;
+    if (true !== config.showDiff) showDiff = false;
 
     if (!ok) {
       var msg = util.getMessage(this, arguments)
@@ -915,7 +922,7 @@ module.exports = function (_chai, util) {
           actual: actual
         , expected: expected
         , showDiff: showDiff
-      }, (Assertion.includeStack) ? this.assert : flag(this, 'ssfi'));
+      }, (config.includeStack) ? this.assert : flag(this, 'ssfi'));
     }
   };
 
@@ -938,11 +945,64 @@ module.exports = function (_chai, util) {
 };
 
 });
+require.register("chai/lib/chai/config.js", function(exports, require, module){
+module.exports = {
+
+  /**
+   * ### config.includeStack
+   *
+   * User configurable property, influences whether stack trace
+   * is included in Assertion error message. Default of false
+   * suppresses stack trace in the error message.
+   *
+   *     chai.config.includeStack = true;  // enable stack on error
+   *
+   * @param {Boolean}
+   * @api public
+   */
+
+   includeStack: false,
+
+  /**
+   * ### config.showDiff
+   *
+   * User configurable property, influences whether or not
+   * the `showDiff` flag should be included in the thrown
+   * AssertionErrors. `false` will always be `false`; `true`
+   * will be true when the assertion has requested a diff
+   * be shown.
+   *
+   * @param {Boolean}
+   * @api public
+   */
+
+  showDiff: true,
+
+  /**
+   * ### config.truncateThreshold
+   *
+   * User configurable property, sets length threshold for actual and
+   * expected values in assertion errors. If this threshold is exceeded,
+   * the value is truncated.
+   *
+   * Set it to zero if you want to disable truncating altogether.
+   *
+   *     chai.config.truncateThreshold = 0;  // disable truncating
+   *
+   * @param {Number}
+   * @api public
+   */
+
+  truncateThreshold: 40
+
+};
+
+});
 require.register("chai/lib/chai/core/assertions.js", function(exports, require, module){
 /*!
  * chai
  * http://chaijs.com
- * Copyright(c) 2011-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -954,9 +1014,9 @@ module.exports = function (chai, _) {
   /**
    * ### Language Chains
    *
-   * The following are provide as chainable getters to
+   * The following are provided as chainable getters to
    * improve the readability of your assertions. They
-   * do not provide an testing capability unless they
+   * do not provide testing capabilities unless they
    * have been overwritten by a plugin.
    *
    * **Chains**
@@ -967,6 +1027,7 @@ module.exports = function (chai, _) {
    * - is
    * - that
    * - and
+   * - has
    * - have
    * - with
    * - at
@@ -978,7 +1039,7 @@ module.exports = function (chai, _) {
    */
 
   [ 'to', 'be', 'been'
-  , 'is', 'and', 'have'
+  , 'is', 'and', 'has', 'have'
   , 'with', 'that', 'at'
   , 'of', 'same' ].forEach(function (chain) {
     Assertion.addProperty(chain, function () {
@@ -1086,9 +1147,28 @@ module.exports = function (chai, _) {
 
   function include (val, msg) {
     if (msg) flag(this, 'message', msg);
-    var obj = flag(this, 'object')
+    var obj = flag(this, 'object');
+    var expected = false;
+    if (_.type(obj) === 'array' && _.type(val) === 'object') {
+      for (var i in obj) {
+        if (_.eql(obj[i], val)) {
+          expected = true;
+          break;
+        }
+      }
+    } else if (_.type(val) === 'object') {
+      if (!flag(this, 'negate')) {
+        for (var k in val) new Assertion(obj).property(k, val[k]);
+        return;
+      }
+      var subset = {}
+      for (var k in val) subset[k] = obj[k]
+      expected = _.eql(subset, val);
+    } else {
+      expected = obj && ~obj.indexOf(val)
+    }
     this.assert(
-        ~obj.indexOf(val)
+        expected
       , 'expected #{this} to include ' + _.inspect(val)
       , 'expected #{this} to not include ' + _.inspect(val));
   }
@@ -1943,6 +2023,7 @@ module.exports = function (chai, _) {
    * @param {String|RegExp} expected error message
    * @param {String} message _optional_
    * @see https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Error#Error_types
+   * @returns error for chaining (null if no error)
    * @api public
    */
 
@@ -1967,7 +2048,10 @@ module.exports = function (chai, _) {
       constructor = null;
       errMsg = null;
     } else if (typeof constructor === 'function') {
-      name = (new constructor()).name;
+      name = constructor.prototype.name || constructor.name;
+      if (name === 'Error' && constructor !== Error) {
+        name = (new constructor()).name;
+      }
     } else {
       constructor = null;
     }
@@ -1981,12 +2065,14 @@ module.exports = function (chai, _) {
             err === desiredError
           , 'expected #{this} to throw #{exp} but #{act} was thrown'
           , 'expected #{this} to not throw #{exp}'
-          , desiredError
-          , err
+          , (desiredError instanceof Error ? desiredError.toString() : desiredError)
+          , (err instanceof Error ? err.toString() : err)
         );
 
+        flag(this, 'object', err);
         return this;
       }
+
       // next, check constructor
       if (constructor) {
         this.assert(
@@ -1994,11 +2080,15 @@ module.exports = function (chai, _) {
           , 'expected #{this} to throw #{exp} but #{act} was thrown'
           , 'expected #{this} to not throw #{exp} but #{act} was thrown'
           , name
-          , err
+          , (err instanceof Error ? err.toString() : err)
         );
 
-        if (!errMsg) return this;
+        if (!errMsg) {
+          flag(this, 'object', err);
+          return this;
+        }
       }
+
       // next, check message
       var message = 'object' === _.type(err) && "message" in err
         ? err.message
@@ -2013,6 +2103,7 @@ module.exports = function (chai, _) {
           , message
         );
 
+        flag(this, 'object', err);
         return this;
       } else if ((message != null) && errMsg && 'string' === typeof errMsg) {
         this.assert(
@@ -2023,6 +2114,7 @@ module.exports = function (chai, _) {
           , message
         );
 
+        flag(this, 'object', err);
         return this;
       } else {
         thrown = true;
@@ -2045,9 +2137,11 @@ module.exports = function (chai, _) {
         thrown === true
       , 'expected #{this} to throw ' + expectedThrown + actuallyGot
       , 'expected #{this} to not throw ' + expectedThrown + actuallyGot
-      , desiredError
-      , thrownError
+      , (desiredError instanceof Error ? desiredError.toString() : desiredError)
+      , (thrownError instanceof Error ? thrownError.toString() : thrownError)
     );
+
+    flag(this, 'object', thrownError);
   };
 
   Assertion.addMethod('throw', assertThrows);
@@ -2159,9 +2253,13 @@ module.exports = function (chai, _) {
     );
   });
 
-  function isSubsetOf(subset, superset) {
+  function isSubsetOf(subset, superset, cmp) {
     return subset.every(function(elem) {
-      return superset.indexOf(elem) !== -1;
+      if (!cmp) return superset.indexOf(elem) !== -1;
+
+      return superset.some(function(elem2) {
+        return cmp(elem, elem2);
+      });
     })
   }
 
@@ -2169,13 +2267,17 @@ module.exports = function (chai, _) {
    * ### .members(set)
    *
    * Asserts that the target is a superset of `set`,
-   * or that the target and `set` have the same members.
+   * or that the target and `set` have the same strictly-equal (===) members.
+   * Alternately, if the `deep` flag is set, set members are compared for deep
+   * equality.
    *
    *     expect([1, 2, 3]).to.include.members([3, 2]);
    *     expect([1, 2, 3]).to.not.include.members([3, 2, 8]);
    *
    *     expect([4, 2]).to.have.members([2, 4]);
    *     expect([5, 2]).to.not.have.members([5, 2, 1]);
+   *
+   *     expect([{ id: 1 }]).to.deep.include.members([{ id: 1 }]);
    *
    * @name members
    * @param {Array} set
@@ -2190,9 +2292,11 @@ module.exports = function (chai, _) {
     new Assertion(obj).to.be.an('array');
     new Assertion(subset).to.be.an('array');
 
+    var cmp = flag(this, 'deep') ? _.eql : undefined;
+
     if (flag(this, 'contains')) {
       return this.assert(
-          isSubsetOf(subset, obj)
+          isSubsetOf(subset, obj, cmp)
         , 'expected #{this} to be a superset of #{act}'
         , 'expected #{this} to not be a superset of #{act}'
         , obj
@@ -2201,7 +2305,7 @@ module.exports = function (chai, _) {
     }
 
     this.assert(
-        isSubsetOf(obj, subset) && isSubsetOf(subset, obj)
+        isSubsetOf(obj, subset, cmp) && isSubsetOf(subset, obj, cmp)
         , 'expected #{this} to have the same members as #{act}'
         , 'expected #{this} to not have the same members as #{act}'
         , obj
@@ -2214,7 +2318,7 @@ module.exports = function (chai, _) {
 require.register("chai/lib/chai/interface/assert.js", function(exports, require, module){
 /*!
  * chai
- * Copyright(c) 2011-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -2247,7 +2351,7 @@ module.exports = function (chai, util) {
    */
 
   var assert = chai.assert = function (express, errmsg) {
-    var test = new Assertion(null);
+    var test = new Assertion(null, null, chai.assert);
     test.assert(
         express
       , errmsg
@@ -2269,13 +2373,12 @@ module.exports = function (chai, util) {
    */
 
   assert.fail = function (actual, expected, message, operator) {
-    throw new chai.AssertionError({
+    message = message || 'assert.fail()';
+    throw new chai.AssertionError(message, {
         actual: actual
       , expected: expected
-      , message: message
       , operator: operator
-      , stackStartFunction: assert.fail
-    });
+    }, assert.fail);
   };
 
   /**
@@ -2329,7 +2432,7 @@ module.exports = function (chai, util) {
    */
 
   assert.equal = function (act, exp, msg) {
-    var test = new Assertion(act, msg);
+    var test = new Assertion(act, msg, assert.equal);
 
     test.assert(
         exp == flag(test, 'object')
@@ -2355,7 +2458,7 @@ module.exports = function (chai, util) {
    */
 
   assert.notEqual = function (act, exp, msg) {
-    var test = new Assertion(act, msg);
+    var test = new Assertion(act, msg, assert.notEqual);
 
     test.assert(
         exp != flag(test, 'object')
@@ -2606,8 +2709,8 @@ module.exports = function (chai, util) {
    * Asserts that `value` is _not_ an object.
    *
    *     var selection = 'chai'
-   *     assert.isObject(selection, 'tea selection is not an object');
-   *     assert.isObject(null, 'null is not an object');
+   *     assert.isNotObject(selection, 'tea selection is not an object');
+   *     assert.isNotObject(null, 'null is not an object');
    *
    * @name isNotObject
    * @param {Mixed} value
@@ -2871,19 +2974,7 @@ module.exports = function (chai, util) {
    */
 
   assert.include = function (exp, inc, msg) {
-    var obj = new Assertion(exp, msg);
-
-    if (Array.isArray(exp)) {
-      obj.to.include(inc);
-    } else if ('string' === typeof exp) {
-      obj.to.contain.string(inc);
-    } else {
-      throw new chai.AssertionError(
-          'expected an array or string'
-        , null
-        , assert.include
-      );
-    }
+    new Assertion(exp, msg, assert.include).include(inc);
   };
 
   /**
@@ -2903,19 +2994,7 @@ module.exports = function (chai, util) {
    */
 
   assert.notInclude = function (exp, inc, msg) {
-    var obj = new Assertion(exp, msg);
-
-    if (Array.isArray(exp)) {
-      obj.to.not.include(inc);
-    } else if ('string' === typeof exp) {
-      obj.to.not.contain.string(inc);
-    } else {
-      throw new chai.AssertionError(
-          'expected an array or string'
-        , null
-        , assert.notInclude
-      );
-    }
+    new Assertion(exp, msg, assert.notInclude).not.include(inc);
   };
 
   /**
@@ -3159,7 +3238,8 @@ module.exports = function (chai, util) {
       errt = null;
     }
 
-    new Assertion(fn, msg).to.Throw(errt, errs);
+    var assertErr = new Assertion(fn, msg).to.Throw(errt, errs);
+    return flag(assertErr, 'object');
   };
 
   /**
@@ -3297,7 +3377,7 @@ module.exports = function (chai, util) {
 require.register("chai/lib/chai/interface/expect.js", function(exports, require, module){
 /*!
  * chai
- * Copyright(c) 2011-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3312,7 +3392,7 @@ module.exports = function (chai, util) {
 require.register("chai/lib/chai/interface/should.js", function(exports, require, module){
 /*!
  * chai
- * Copyright(c) 2011-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2011-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3320,31 +3400,33 @@ module.exports = function (chai, util) {
   var Assertion = chai.Assertion;
 
   function loadShould () {
+    // explicitly define this method as function as to have it's name to include as `ssfi`
+    function shouldGetter() {
+      if (this instanceof String || this instanceof Number) {
+        return new Assertion(this.constructor(this), null, shouldGetter);
+      } else if (this instanceof Boolean) {
+        return new Assertion(this == true, null, shouldGetter);
+      }
+      return new Assertion(this, null, shouldGetter);
+    }
+    function shouldSetter(value) {
+      // See https://github.com/chaijs/chai/issues/86: this makes
+      // `whatever.should = someValue` actually set `someValue`, which is
+      // especially useful for `global.should = require('chai').should()`.
+      //
+      // Note that we have to use [[DefineProperty]] instead of [[Put]]
+      // since otherwise we would trigger this very setter!
+      Object.defineProperty(this, 'should', {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    }
     // modify Object.prototype to have `should`
-    Object.defineProperty(Object.prototype, 'should',
-      {
-        set: function (value) {
-          // See https://github.com/chaijs/chai/issues/86: this makes
-          // `whatever.should = someValue` actually set `someValue`, which is
-          // especially useful for `global.should = require('chai').should()`.
-          //
-          // Note that we have to use [[DefineProperty]] instead of [[Put]]
-          // since otherwise we would trigger this very setter!
-          Object.defineProperty(this, 'should', {
-            value: value,
-            enumerable: true,
-            configurable: true,
-            writable: true
-          });
-        }
-      , get: function(){
-          if (this instanceof String || this instanceof Number) {
-            return new Assertion(this.constructor(this));
-          } else if (this instanceof Boolean) {
-            return new Assertion(this == true);
-          }
-          return new Assertion(this);
-        }
+    Object.defineProperty(Object.prototype, 'should', {
+      set: shouldSetter
+      , get: shouldGetter
       , configurable: true
     });
 
@@ -3391,7 +3473,7 @@ module.exports = function (chai, util) {
 require.register("chai/lib/chai/utils/addChainableMethod.js", function(exports, require, module){
 /*!
  * Chai - addChainingMethod utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3400,6 +3482,8 @@ require.register("chai/lib/chai/utils/addChainableMethod.js", function(exports, 
  */
 
 var transferFlags = require('./transferFlags');
+var flag = require('./flag');
+var config = require('../config');
 
 /*!
  * Module variables
@@ -3446,15 +3530,30 @@ var call  = Function.prototype.call,
  */
 
 module.exports = function (ctx, name, method, chainingBehavior) {
-  if (typeof chainingBehavior !== 'function')
+  if (typeof chainingBehavior !== 'function') {
     chainingBehavior = function () { };
+  }
+
+  var chainableBehavior = {
+      method: method
+    , chainingBehavior: chainingBehavior
+  };
+
+  // save the methods so we can overwrite them later, if we need to.
+  if (!ctx.__methods) {
+    ctx.__methods = {};
+  }
+  ctx.__methods[name] = chainableBehavior;
 
   Object.defineProperty(ctx, name,
     { get: function () {
-        chainingBehavior.call(this);
+        chainableBehavior.chainingBehavior.call(this);
 
-        var assert = function () {
-          var result = method.apply(this, arguments);
+        var assert = function assert() {
+          var old_ssfi = flag(this, 'ssfi');
+          if (old_ssfi && config.includeStack === false)
+            flag(this, 'ssfi', assert);
+          var result = chainableBehavior.method.apply(this, arguments);
           return result === undefined ? this : result;
         };
 
@@ -3488,9 +3587,11 @@ module.exports = function (ctx, name, method, chainingBehavior) {
 require.register("chai/lib/chai/utils/addMethod.js", function(exports, require, module){
 /*!
  * Chai - addMethod utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
+
+var config = require('../config');
 
 /**
  * ### .addMethod (ctx, name, method)
@@ -3516,9 +3617,13 @@ require.register("chai/lib/chai/utils/addMethod.js", function(exports, require, 
  * @name addMethod
  * @api public
  */
+var flag = require('./flag');
 
 module.exports = function (ctx, name, method) {
   ctx[name] = function () {
+    var old_ssfi = flag(this, 'ssfi');
+    if (old_ssfi && config.includeStack === false)
+      flag(this, 'ssfi', ctx[name]);
     var result = method.apply(this, arguments);
     return result === undefined ? this : result;
   };
@@ -3528,7 +3633,7 @@ module.exports = function (ctx, name, method) {
 require.register("chai/lib/chai/utils/addProperty.js", function(exports, require, module){
 /*!
  * Chai - addProperty utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3571,7 +3676,7 @@ module.exports = function (ctx, name, getter) {
 require.register("chai/lib/chai/utils/flag.js", function(exports, require, module){
 /*!
  * Chai - flag utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3606,7 +3711,7 @@ module.exports = function (obj, key, value) {
 require.register("chai/lib/chai/utils/getActual.js", function(exports, require, module){
 /*!
  * Chai - getActual utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3620,15 +3725,14 @@ require.register("chai/lib/chai/utils/getActual.js", function(exports, require, 
  */
 
 module.exports = function (obj, args) {
-  var actual = args[4];
-  return 'undefined' !== typeof actual ? actual : obj._obj;
+  return args.length > 4 ? args[4] : obj._obj;
 };
 
 });
 require.register("chai/lib/chai/utils/getEnumerableProperties.js", function(exports, require, module){
 /*!
  * Chai - getEnumerableProperties utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3656,7 +3760,7 @@ module.exports = function getEnumerableProperties(object) {
 require.register("chai/lib/chai/utils/getMessage.js", function(exports, require, module){
 /*!
  * Chai - message composition utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3708,7 +3812,7 @@ module.exports = function (obj, args) {
 require.register("chai/lib/chai/utils/getName.js", function(exports, require, module){
 /*!
  * Chai - getName utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3731,7 +3835,7 @@ module.exports = function (func) {
 require.register("chai/lib/chai/utils/getPathValue.js", function(exports, require, module){
 /*!
  * Chai - getPathValue utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * @see https://github.com/logicalparadox/filtr
  * MIT Licensed
  */
@@ -3836,7 +3940,7 @@ function _getPathValue (parsed, obj) {
 require.register("chai/lib/chai/utils/getProperties.js", function(exports, require, module){
 /*!
  * Chai - getProperties utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -3979,6 +4083,12 @@ exports.overwriteMethod = require('./overwriteMethod');
  */
 
 exports.addChainableMethod = require('./addChainableMethod');
+
+/*!
+ * Overwrite chainable method
+ */
+
+exports.overwriteChainableMethod = require('./overwriteChainableMethod');
 
 
 });
@@ -4308,7 +4418,7 @@ function objectToString(o) {
 require.register("chai/lib/chai/utils/objDisplay.js", function(exports, require, module){
 /*!
  * Chai - flag utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -4317,6 +4427,7 @@ require.register("chai/lib/chai/utils/objDisplay.js", function(exports, require,
  */
 
 var inspect = require('./inspect');
+var config = require('../config');
 
 /**
  * ### .objDisplay (object)
@@ -4334,7 +4445,7 @@ module.exports = function (obj) {
   var str = inspect(obj)
     , type = Object.prototype.toString.call(obj);
 
-  if (str.length >= 40) {
+  if (config.truncateThreshold && str.length >= config.truncateThreshold) {
     if (type === '[object Function]') {
       return !obj.name || obj.name === ''
         ? '[Function]'
@@ -4359,7 +4470,7 @@ module.exports = function (obj) {
 require.register("chai/lib/chai/utils/overwriteMethod.js", function(exports, require, module){
 /*!
  * Chai - overwriteMethod utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -4413,7 +4524,7 @@ module.exports = function (ctx, name, method) {
 require.register("chai/lib/chai/utils/overwriteProperty.js", function(exports, require, module){
 /*!
  * Chai - overwriteProperty utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -4467,10 +4578,66 @@ module.exports = function (ctx, name, getter) {
 };
 
 });
+require.register("chai/lib/chai/utils/overwriteChainableMethod.js", function(exports, require, module){
+/*!
+ * Chai - overwriteChainableMethod utility
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
+ * MIT Licensed
+ */
+
+/**
+ * ### overwriteChainableMethod (ctx, name, fn)
+ *
+ * Overwites an already existing chainable method
+ * and provides access to the previous function or
+ * property.  Must return functions to be used for
+ * name.
+ *
+ *     utils.overwriteChainableMethod(chai.Assertion.prototype, 'length',
+ *       function (_super) {
+ *       }
+ *     , function (_super) {
+ *       }
+ *     );
+ *
+ * Can also be accessed directly from `chai.Assertion`.
+ *
+ *     chai.Assertion.overwriteChainableMethod('foo', fn, fn);
+ *
+ * Then can be used as any other assertion.
+ *
+ *     expect(myFoo).to.have.length(3);
+ *     expect(myFoo).to.have.length.above(3);
+ *
+ * @param {Object} ctx object whose method / property is to be overwritten
+ * @param {String} name of method / property to overwrite
+ * @param {Function} method function that returns a function to be used for name
+ * @param {Function} chainingBehavior function that returns a function to be used for property
+ * @name overwriteChainableMethod
+ * @api public
+ */
+
+module.exports = function (ctx, name, method, chainingBehavior) {
+  var chainableBehavior = ctx.__methods[name];
+
+  var _chainingBehavior = chainableBehavior.chainingBehavior;
+  chainableBehavior.chainingBehavior = function () {
+    var result = chainingBehavior(_chainingBehavior).call(this);
+    return result === undefined ? this : result;
+  };
+
+  var _method = chainableBehavior.method;
+  chainableBehavior.method = function () {
+    var result = method(_method).apply(this, arguments);
+    return result === undefined ? this : result;
+  };
+};
+
+});
 require.register("chai/lib/chai/utils/test.js", function(exports, require, module){
 /*!
  * Chai - test utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -4499,7 +4666,7 @@ module.exports = function (obj, args) {
 require.register("chai/lib/chai/utils/transferFlags.js", function(exports, require, module){
 /*!
  * Chai - transferFlags utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -4546,7 +4713,7 @@ module.exports = function (assertion, object, includeAll) {
 require.register("chai/lib/chai/utils/type.js", function(exports, require, module){
 /*!
  * Chai - type utility
- * Copyright(c) 2012-2013 Jake Luer <jake@alogicalparadox.com>
+ * Copyright(c) 2012-2014 Jake Luer <jake@alogicalparadox.com>
  * MIT Licensed
  */
 
@@ -4593,6 +4760,8 @@ module.exports = function (obj) {
 });
 
 
+
+
 require.alias("chaijs-assertion-error/index.js", "chai/deps/assertion-error/index.js");
 require.alias("chaijs-assertion-error/index.js", "chai/deps/assertion-error/index.js");
 require.alias("chaijs-assertion-error/index.js", "assertion-error/index.js");
@@ -4607,7 +4776,7 @@ require.alias("chaijs-deep-eql/lib/eql.js", "chaijs-deep-eql/index.js");
 require.alias("chai/index.js", "chai/index.js");if (typeof exports == "object") {
   module.exports = require("chai");
 } else if (typeof define == "function" && define.amd) {
-  define(function(){ return require("chai"); });
+  define([], function(){ return require("chai"); });
 } else {
   this["chai"] = require("chai");
 }})();

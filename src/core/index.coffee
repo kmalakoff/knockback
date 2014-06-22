@@ -3,6 +3,10 @@
 
 # ensure the client symbols are resolved
 if window? and require.shim
+
+  console.log "KNOCKOUT", window._?.keys(window)
+
+
   require.shim([
     {symbol: '_', path: 'lodash', alias: 'underscore', optional: true}, {symbol: '_', path: 'underscore'}
     {symbol: 'Backbone', path: 'backbone'}
