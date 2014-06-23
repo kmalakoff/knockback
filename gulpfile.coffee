@@ -3,19 +3,18 @@ _ = require 'underscore'
 es = require 'event-stream'
 Queue = require 'queue-async'
 Async = require 'async'
-vinyl = require 'vinyl-fs'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
-coffee = require 'gulp-coffee'
 compile = require 'gulp-compile-js'
 modules = require 'gulp-module-system'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
-mochaPhantomJS = require 'gulp-mocha-phantomjs'
 concat = require 'gulp-concat'
 shell = require 'gulp-shell'
+requireSrc = require 'gulp-require-src'
+mochaPhantomJS = require 'gulp-mocha-phantomjs'
 
 HEADER = """
 /*
@@ -44,22 +43,6 @@ LIBRARIES.push {paths: ['src/core/**/*.coffee'].concat(MODULE_ADD_PATHS), module
 ALL_LIBRARY_FILES = (path.join(library.destination, library.modules.file_name) for library in LIBRARIES)
 ALL_LIBRARY_FILES.push path.join(library.destination, library.stack_file_name) for library in LIBRARIES when library.stack_file_name
 ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBRARY_FILES
-
-packagePath = (file_path) ->
-  paths = file_path.split('node_modules')
-  paths.push("#{paths.pop().split('/').slice(0,2).join('/')}/package.json")
-  return paths.join('node_modules')
-
-copyDependencies = (module_names, destination, callback) ->
-  queue = new Queue()
-  for module_name in module_names
-    do (module_name) -> queue.defer (callback) ->
-      file_path = require.resolve(module_name).replace(__dirname, '.')
-      gulp.src(file_path)
-        .pipe(rename (file) -> package_info = require(packagePath(file_path)); file.basename = "#{package_info.name}-#{package_info.version}"; return file)
-        .pipe(gulp.dest(path.join(destination)))
-        .on 'end', callback
-  queue.await callback
 
 copyLibraryFiles = (destination, callback) ->
   gulp.src(ALL_LIBRARY_FILES.concat('README.md'))
@@ -113,9 +96,8 @@ gulp.task 'test', ['minify'], (callback) ->
   queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
 
   # copy dependent libraries
-  library_package = require './package.json'
-  queue.defer (callback) -> copyDependencies(_.keys(library_package.dependencies), 'vendor', callback)
-  queue.defer (callback) -> copyDependencies(_.keys(library_package.optionalDependencies), 'vendor/optional', callback)
+  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on 'end', callback
+  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on 'end', callback
 
   # build tests
   queue.defer (callback) ->
