@@ -1,11 +1,10 @@
 /*
-  knockback-core-stack.js
-  (c) 2011-2014 Kevin Malakoff.
-  Knockback is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  knockback-core-stack.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 //     Underscore.js 1.6.0
 //     http://underscorejs.org

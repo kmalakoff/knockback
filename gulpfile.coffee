@@ -18,13 +18,12 @@ mochaPhantomJS = require 'gulp-mocha-phantomjs'
 
 HEADER = """
 /*
-  <%= file.path.split('/').splice(-1)[0].replace('.min', '') %>
-  (c) 2011-#{(new Date()).getFullYear()} Kevin Malakoff.
-  Knockback is freely distributable under the MIT license.
-  See the following for full license details:
-    https://github.com/kmalakoff/knockback/blob/master/LICENSE
+  <%= file.path.split('/').splice(-1)[0].replace('.min', '') %> <%= pkg.version %>
+  Copyright (c)  2011-#{(new Date()).getFullYear()} Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */\n
 """
 
@@ -63,7 +62,7 @@ cachedStackBuild = (library) ->
 buildLibrary = (library, callback) ->
   helper = (stream, file_name, callback) ->
     stream
-      .pipe(header(HEADER, {file_name: file_name}))
+      .pipe(header(HEADER, {file_name: file_name, pkg: require('./package.json')}))
       .pipe(gulp.dest(library.destination))
       .on 'end', callback
 
@@ -79,7 +78,7 @@ gulp.task 'minify', ['build'], (callback) ->
   gulp.src(['*.js', '!*.min.js', 'lib/*.js', '!lib/*.min.js'])
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
-    .pipe(header(HEADER))
+    .pipe(header(HEADER, {pkg: require('./package.json')}))
     .pipe(gulp.dest((file) -> file.base))
     .on 'end', callback # somewhere there is an extra callback in gulp. do I need to listen to more events?
 
