@@ -1,10 +1,8 @@
 path = require 'path'
-fs = require 'fs'
 _ = require 'underscore'
 es = require 'event-stream'
 Queue = require 'queue-async'
 Async = require 'async'
-File = require 'vinyl'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -17,6 +15,7 @@ header = require 'gulp-header'
 mochaPhantomJS = require 'gulp-mocha-phantomjs'
 concat = require 'gulp-concat'
 shell = require 'gulp-shell'
+requireSrc = require 'gulp-require-src'
 
 HEADER = """
 /*
@@ -45,41 +44,6 @@ LIBRARIES.push {paths: ['src/core/**/*.coffee'].concat(MODULE_ADD_PATHS), module
 ALL_LIBRARY_FILES = (path.join(library.destination, library.modules.file_name) for library in LIBRARIES)
 ALL_LIBRARY_FILES.push path.join(library.destination, library.stack_file_name) for library in LIBRARIES when library.stack_file_name
 ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBRARY_FILES
-
-packagePath = (file_path) ->
-  paths = file_path.split('node_modules')
-  paths.push("#{paths.pop().split('/').slice(0,2).join('/')}/package.json")
-  return paths.join('node_modules')
-
-# add coffeescript compiling
-coffeescript = require 'coffee-script'
-require.extensions['.coffee'] ?= (module, filename) ->
-  content = coffeescript.compile fs.readFileSync filename, 'utf8', {filename}
-  module._compile content, filename
-
-copyDependencies = (module_names, destination, callback) ->
-  files = []
-  for module_name in module_names
-    file_path = require.resolve(module_name)
-    files.push(file = new File({
-      cwd: __dirname
-      path: relative_path = file_path.replace(__dirname, '')
-      base: relative_path.replace(path.basename(relative_path), '')
-      contents: new Buffer(fs.readFileSync(file_path, 'utf8'))
-    }))
-
-  es.readArray(files)
-    .pipe(es.map (file, callback) ->
-      try
-        package_info = require(path.resolve(packagePath(path.join(file.cwd, file.path))))
-        # file = file.clone()
-        versioned_filename = "#{package_info.name}-#{package_info.version}#{path.extname(file.path)}"
-        file.path = path.join(file.path.replace(path.basename(file.path), ''), versioned_filename)
-      catch err then {}
-      callback(null, file)
-    )
-    .pipe(gulp.dest(destination))
-    .on 'end', callback
 
 copyLibraryFiles = (destination, callback) ->
   gulp.src(ALL_LIBRARY_FILES.concat('README.md'))
@@ -133,9 +97,8 @@ gulp.task 'test', ['minify'], (callback) ->
   queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
 
   # copy dependent libraries
-  library_package = require './package.json'
-  queue.defer (callback) -> copyDependencies(_.keys(library_package.dependencies), 'vendor', callback)
-  queue.defer (callback) -> copyDependencies(_.keys(library_package.optionalDependencies), 'vendor/optional', callback)
+  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on 'end', callback
+  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on 'end', callback
 
   # build tests
   queue.defer (callback) ->

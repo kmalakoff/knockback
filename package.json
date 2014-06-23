@@ -39,11 +39,11 @@
     "gulp-concat": "*",
     "gulp-mocha-phantomjs": "*",
     "gulp-shell": "*",
+    "gulp-require-src": "git+https://github.com/kmalakoff/gulp-require-src",
     "event-stream": "*",
     "module-bundler": "*",
     "queue-async": "*",
-    "async": "*",
-    "vinyl": "*"
+    "async": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
