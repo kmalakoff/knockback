@@ -132,6 +132,15 @@ if (typeof require !== "undefined" && require !== null) globals.requires.push(re
 }).call(this);
 var require = globals.require;
 require.register('collection-observable', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, kb, ko, _,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -577,6 +586,15 @@ kb.collectionObservable = function(collection, options) {
 
 });
 require.register('event-watcher', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, ko, _,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
@@ -797,6 +815,15 @@ kb.emitterObservable = function(emitter, observable) {
 
 });
 require.register('factory', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, _;
 
 kb = require('./kb');
@@ -870,6 +897,15 @@ kb.Factory = (function() {
 
 });
 require.register('index', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var Backbone, component, err, kb, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
 
 if (this.Parse) {
@@ -942,6 +978,15 @@ for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
 
 });
 require.register('inject', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, ko, onReady, _, _ko_applyBindings;
 
 kb = require('./kb');
@@ -1084,6 +1129,15 @@ if (typeof document !== "undefined" && document !== null) {
 
 });
 require.register('kb', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var copyProps, kb, ko, _;
 
 _ = require('underscore');
@@ -1354,6 +1408,15 @@ module.exports = kb = (function() {
 
 });
 require.register('observable', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, ko, _;
 
 kb = require('./kb');
@@ -1594,6 +1657,15 @@ kb.observable = function(model, options, view_model) {
 
 });
 require.register('orm', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, kb, _;
 
 kb = require('./kb');
@@ -1842,6 +1914,15 @@ kb.orm.addAdapter(new ORMAdapter_Supermodel());
 
 });
 require.register('store', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, ko, _;
 
 kb = require('./kb');
@@ -2030,6 +2111,15 @@ module.exports = kb.Store = (function() {
 
 });
 require.register('utils', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, ko, _, _argumentsAddKey, _keyArrayToObject, _mergeArray, _mergeObject, _wrappedKey;
 
 kb = require('./kb');
@@ -2309,6 +2399,15 @@ kb.utils = (function() {
 
 });
 require.register('view-model', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var kb, ko, _;
 
 kb = require('./kb');
@@ -2517,6 +2616,15 @@ kb.viewModel = function(model, options, view_model) {
 
 });
 require.register('default-observable', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var err, kb, ko, _;
 
 try {
@@ -2573,6 +2681,15 @@ kb.defaultObservable = function(target, default_value) {
 
 });
 require.register('extensions', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var err, kb, ko, _;
 
 try {
@@ -2628,6 +2745,15 @@ kb.utils.setToDefault = function(obj) {
 
 });
 require.register('formatted-observable', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var arraySlice, err, kb, ko, _;
 
 try {
@@ -2759,6 +2885,15 @@ kb.formattedObservable = function(format, args) {
 
 });
 require.register('localized-observable', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var err, kb, ko, _;
 
 try {
@@ -2865,6 +3000,15 @@ kb.localizedObservable = function(value, options, view_model) {
 
 });
 require.register('triggered-observable', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var err, kb, ko, _;
 
 try {
@@ -2933,6 +3077,15 @@ kb.triggeredObservable = function(emitter, event_selector) {
 
 });
 require.register('validation', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var callOrGet, err, kb, ko, _;
 
 try {
@@ -3090,6 +3243,15 @@ kb.formValidator = function(view_model, el) {
 
 });
 require.register('validators', function(exports, require, module) {
+
+/*
+  knockback.js 0.18.6
+  Copyright (c)  2011-2014 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+ */
 var EMAIL_REGEXP, NUMBER_REGEXP, URL_REGEXP, err, kb, ko, _;
 
 try {

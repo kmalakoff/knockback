@@ -51,7 +51,7 @@ cachedBuild = (library) ->
   root_paths = (root_path.replace('/**/*.coffee', '') for root_path in library.paths when root_path.indexOf('/**/*.coffee') >= 0)
   return gulp.src(library.paths)
     .pipe(es.map (file, callback) -> file.path = file.path.replace("#{path.resolve(dir)}/", '') for dir in root_paths; callback(null, file))
-    .pipe(compile({coffee: {bare: true}}))
+    .pipe(compile({coffee: {bare: true, header: false}}))
     .pipe(modules(library.modules))
     .pipe(es.map((file, callback) -> console.log "Compiled #{library.modules.file_name}"; callback(null, file)))
 
@@ -62,7 +62,7 @@ cachedStackBuild = (library) ->
 buildLibrary = (library, callback) ->
   helper = (stream, file_name, callback) ->
     stream
-      .pipe(header(HEADER, {file_name: file_name, pkg: require('./package.json')}))
+      .pipe(header(HEADER, {pkg: require('./package.json')}))
       .pipe(gulp.dest(library.destination))
       .on 'end', callback
 
@@ -101,7 +101,7 @@ gulp.task 'test', ['minify'], (callback) ->
   # build tests
   queue.defer (callback) ->
     gulp.src('test/**/test*.coffee')
-      .pipe(compile({coffee: {bare: true}}))
+      .pipe(compile({coffee: {bare: true, header: false}}))
       .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
       .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
       .pipe(gulp.dest('./test'))
