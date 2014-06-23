@@ -1,9 +1,10 @@
 path = require 'path'
+fs = require 'fs'
 _ = require 'underscore'
 es = require 'event-stream'
 Queue = require 'queue-async'
 Async = require 'async'
-vinyl = require 'vinyl-fs'
+File = require 'vinyl'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -50,16 +51,35 @@ packagePath = (file_path) ->
   paths.push("#{paths.pop().split('/').slice(0,2).join('/')}/package.json")
   return paths.join('node_modules')
 
+# add coffeescript compiling
+coffeescript = require 'coffee-script'
+require.extensions['.coffee'] ?= (module, filename) ->
+  content = coffeescript.compile fs.readFileSync filename, 'utf8', {filename}
+  module._compile content, filename
+
 copyDependencies = (module_names, destination, callback) ->
-  queue = new Queue()
+  files = []
   for module_name in module_names
-    do (module_name) -> queue.defer (callback) ->
-      file_path = require.resolve(module_name).replace(__dirname, '.')
-      gulp.src(file_path)
-        .pipe(rename (file) -> package_info = require(packagePath(file_path)); file.basename = "#{package_info.name}-#{package_info.version}"; return file)
-        .pipe(gulp.dest(path.join(destination)))
-        .on 'end', callback
-  queue.await callback
+    file_path = require.resolve(module_name)
+    files.push(file = new File({
+      cwd: __dirname
+      path: relative_path = file_path.replace(__dirname, '')
+      base: relative_path.replace(path.basename(relative_path), '')
+      contents: new Buffer(fs.readFileSync(file_path, 'utf8'))
+    }))
+
+  es.readArray(files)
+    .pipe(es.map (file, callback) ->
+      try
+        package_info = require(path.resolve(packagePath(path.join(file.cwd, file.path))))
+        # file = file.clone()
+        versioned_filename = "#{package_info.name}-#{package_info.version}#{path.extname(file.path)}"
+        file.path = path.join(file.path.replace(path.basename(file.path), ''), versioned_filename)
+      catch err then {}
+      callback(null, file)
+    )
+    .pipe(gulp.dest(destination))
+    .on 'end', callback
 
 copyLibraryFiles = (destination, callback) ->
   gulp.src(ALL_LIBRARY_FILES.concat('README.md'))

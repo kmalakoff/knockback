@@ -43,7 +43,7 @@
     "module-bundler": "*",
     "queue-async": "*",
     "async": "*",
-    "vinyl-fs": "*"
+    "vinyl": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
