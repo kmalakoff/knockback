@@ -6,16 +6,15 @@ Async = require 'async'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
-coffee = require 'gulp-coffee'
 compile = require 'gulp-compile-js'
 modules = require 'gulp-module-system'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
-mochaPhantomJS = require 'gulp-mocha-phantomjs'
 concat = require 'gulp-concat'
 shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
+mochaPhantomJS = require 'gulp-mocha-phantomjs'
 
 HEADER = """
 /*
