@@ -1,16 +1,27 @@
 {
-  "author"        : {"name": "Kevin Malakoff", "url": "https://github.com/kmalakoff"},
-  "name"          : "knockback",
-  "version"       : "0.18.6",
-  "description"   : "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
-  "keywords"      : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
-  "main"          : "knockback.js",
-  "private"       : true,
-
-  "url"           : "http://kmalakoff.github.com/knockback/",
-  "homepage"      : "http://kmalakoff.github.com/knockback/",
-  "repository"    : {"type": "git", "url": "http://github.com/kmalakoff/knockback.git"},
-
+  "author": {
+    "name": "Kevin Malakoff",
+    "url": "https://github.com/kmalakoff"
+  },
+  "name": "knockback",
+  "version": "0.18.6",
+  "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
+  "keywords": [
+    "knockback",
+    "knockbackjs",
+    "backbone",
+    "backbonejs",
+    "knockout",
+    "knockoutjs"
+  ],
+  "main": "knockback.js",
+  "private": true,
+  "url": "http://kmalakoff.github.com/knockback/",
+  "homepage": "http://kmalakoff.github.com/knockback/",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kmalakoff/knockback.git"
+  },
   "scripts": {
     "test": "gulp test --require coffee-script/register",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
@@ -25,33 +36,39 @@
     "knockout": ">=1.2.1"
   },
   "devDependencies": {
-    "coffee-script": "*",
+    "async": "*",
+    "chai": "^1.9.1",
     "codo": "2.x",
-    "gulp": "*",
-    "gulp-util": "*",
-    "gulp-uglify": "*",
-    "gulp-rename": "*",
-    "gulp-zip": "*",
-    "gulp-compile-js": "*",
-    "gulp-module-system": "*",
-    "gulp-header": "*",
-    "gulp-concat": "*",
-    "gulp-mocha-phantomjs": "*",
-    "gulp-shell": "*",
-    "gulp-require-src": "*",
+    "coffee-script": "*",
     "event-stream": "*",
+    "gulp": "*",
+    "gulp-compile-js": "*",
+    "gulp-concat": "*",
+    "gulp-header": "*",
+    "gulp-mocha-phantomjs": "*",
+    "gulp-module-system": "*",
+    "gulp-rename": "*",
+    "gulp-require-src": "*",
+    "gulp-shell": "*",
+    "gulp-uglify": "*",
+    "gulp-util": "*",
+    "gulp-zip": "*",
+    "karma": "*",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-cli": "*",
+    "karma-coffee-preprocessor": "*",
+    "karma-mocha": "^0.1.4",
+    "mocha": "^1.20.1",
     "module-bundler": "*",
-    "queue-async": "*",
-    "async": "*"
+    "queue-async": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
     "backbone-modelref": "0.1.x",
     "lodash": "2.x",
-
     "backbone-orm": "0.5.x",
     "moment": "2.x",
-
     "backbone-associations": "0.5.x",
     "supermodel": "0.0.x"
   },
