@@ -2,7 +2,7 @@ module.exports = {
   entry: './src/core/index.coffee',
   output: {
     path: './',
-    filename: 'knockback.js',
+    filename: 'knockback-core.js',
     library: 'knockback',
     libraryTarget: 'umd'
   },
@@ -21,6 +21,13 @@ module.exports = {
     "underscore": "_",
     "backbone": "Backbone",
     "knockout": "ko",
-    "jquery": "jQuery"
+    "jquery": "jQuery",
+
+    "../defaults/default-observable": "default-observable",
+    "../formatting/formatted-observable": "formatted-observable",
+    "../localization/localized-observable": "localized-observable",
+    "../statistics/statistics": "statistics",
+    "../triggering/triggered-observable": "triggered-observable",
+    "../validation/validation": "validation"
   }
 }

@@ -1,4 +1,4 @@
-try kb = require 'knockback' catch err then kb = require './kb'
+try kb = require 'knockback' catch err then kb = require '../core/kb'
 _ = require 'underscore'
 ko = require 'knockout'
 
