@@ -16,9 +16,19 @@ config.set({
     './vendor/underscore-1.6.0.js',
     './vendor/backbone-1.1.2.js',
     './vendor/knockout-3.1.0.js',
-    './knockback-core.js',
+    './knockback.js',
     './lib/knockback-statistics.js',
-    'test_karma/**/*.coffee'
+
+    './vendor/optional/backbone-modelref-0.1.5.js',
+    './test_karma/_examples/build/_localization_examples.js',
+    './vendor/optional/backbone-modelref-0.1.5.js',
+    './vendor/test/globalize/globalize.js',
+    './vendor/test/globalize/globalize.culture.en-GB.js',
+    './vendor/test/globalize/globalize.culture.fr-FR.js',
+
+    './vendor/optional/backbone-relational-0.8.8.js',
+
+    'test_karma/**/*.tests.coffee'
   ],
 
 
