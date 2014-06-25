@@ -1,5 +1,5 @@
 path = require 'path'
-_ = require 'underscore'
+_ = require 'lodash'
 es = require 'event-stream'
 Queue = require 'queue-async'
 Async = require 'async'
@@ -14,7 +14,7 @@ header = require 'gulp-header'
 concat = require 'gulp-concat'
 shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
-mochaPhantomJS = require 'gulp-mocha-phantomjs'
+karma = require('karma').server
 
 HEADER = """
 /*
@@ -89,41 +89,48 @@ gulp.task 'update_packages', (callback) ->
   queue.await callback
 gulp.task 'release', ['test', 'update_packages'], ->
 
-gulp.task 'test', ['minify'], (callback) ->
+DEPENDENT_FILES = [
+    './vendor/test/jquery-1.7.2.js',
+    './vendor/underscore-1.6.0.js',
+    './vendor/backbone-1.1.2.js',
+    './vendor/knockout-3.1.0.js',
+    './knockback.js',
+    './lib/knockback-statistics.js',
+
+    './vendor/optional/backbone-modelref-0.1.5.js',
+    './test_karma/_examples/build/_localization_examples.js',
+    './vendor/optional/backbone-modelref-0.1.5.js',
+    './vendor/test/globalize/globalize.js',
+    './vendor/test/globalize/globalize.culture.en-GB.js',
+    './vendor/test/globalize/globalize.culture.fr-FR.js',
+
+    './vendor/optional/backbone-relational-0.8.8.js'
+  ]
+
+# gulp.task 'test', ['minify'], (callback) ->
+gulp.task 'test', (callback) ->
   queue = new Queue(1)
 
-  queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
+  # queue.defer (callback) -> buildLibrary {paths: ["test_karma/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
 
-  # copy dependent libraries
-  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on 'end', callback
-  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on 'end', callback
+  # # copy dependent libraries
+  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on 'end', callback
+  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on 'end', callback
 
-  # build tests
-  queue.defer (callback) ->
-    gulp.src('test/**/test*.coffee')
-      .pipe(compile({coffee: {bare: true, header: false}}))
-      .pipe(rename (file_path) -> file_path.dirname += '/build'; file_path)
-      .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-      .pipe(gulp.dest('./test'))
-      .on 'end', callback
+  # # build test bundled modules
+  # queue.defer (callback) ->
+  #   count = 0
+  #   Writable = require('stream').Writable
+  #   ws = Writable({objectMode: true})
+  #   ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
 
-  # build test bundled modules
-  queue.defer (callback) ->
-    count = 0
-    Writable = require('stream').Writable
-    ws = Writable({objectMode: true})
-    ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
-
-    gulp.src('test/**/_bundle-config.coffee')
-      .pipe(es.map((file, callback) -> count++; callback(null, file)))
-      .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
-      .pipe(ws)
+  #   gulp.src('test/**/_bundle-config.coffee')
+  #     .pipe(es.map((file, callback) -> count++; callback(null, file)))
+  #     .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
+  #     .pipe(ws)
 
   # run tests
   queue.defer (callback) ->
-    gulp.src(['test/**/*.html', '!test/all_tests.html', '!test/issues/**/*.html', '!test/interactive/**/*.html'])
-      .pipe(es.map((file, callback) -> console.log "Compiled #{file.path.split('/').slice(-4).join('/')}"; callback(null, file)))
-      .pipe(mochaPhantomJS().on 'error', (err) -> gutil.log)
-      .on 'end', callback
+    karma.start(_.defaults({singleRun: true, files: DEPENDENT_FILES.concat('./test_karma/knockback/**/*.coffee')}, require('./test_karma/karma.config.js')), callback)
 
   queue.await callback

@@ -1,8 +1,7 @@
-module.exports = function(config) {
-config.set({
+module.exports = {
 
   // base path that will be used to resolve all patterns (eg. files, exclude)
-  basePath: '..',
+  basePath: '.',
 
 
   // frameworks to use
@@ -26,9 +25,7 @@ config.set({
     './vendor/test/globalize/globalize.culture.en-GB.js',
     './vendor/test/globalize/globalize.culture.fr-FR.js',
 
-    './vendor/optional/backbone-relational-0.8.8.js',
-
-    'test_karma/**/*.tests.coffee'
+    './vendor/optional/backbone-relational-0.8.8.js'
   ],
 
 
@@ -72,7 +69,7 @@ config.set({
 
   // level of logging
   // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-  logLevel: config.LOG_INFO,
+  // logLevel: config.LOG_INFO,
 
 
   // enable / disable watching file and executing tests whenever any file changes
@@ -87,5 +84,4 @@ config.set({
   // Continuous Integration mode
   // if true, Karma captures browsers, runs the tests and exits
   singleRun: true
-});
 };
