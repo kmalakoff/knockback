@@ -1,5 +1,5 @@
 module.exports =
-  'test/module_systems/commonjs/build/bundle-latest.js':
+  'test/bundles/build/commonjs-latest.js':
     underscore: 'underscore'
     backbone: 'backbone'
     'backbone-modelref': 'backbone-modelref'

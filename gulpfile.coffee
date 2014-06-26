@@ -107,7 +107,7 @@ gulp.task 'test', (callback) ->
   #   ws = Writable({objectMode: true})
   #   ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
 
-  #   gulp.src('test/**/_bundle-config.coffee')
+  #   gulp.src('test/bundles/**/*.coffee')
   #     .pipe(es.map((file, callback) -> count++; callback(null, file)))
   #     .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
   #     .pipe(ws)

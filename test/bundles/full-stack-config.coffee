@@ -1,5 +1,5 @@
 module.exports =
-  'test/full-stack/build/bundle-underscore-core.js':
+  'test/bundles/build/full-stack-underscore-core.js':
     underscore: 'vendor/underscore-1.6.0.js'
     backbone: 'vendor/backbone-1.1.2.js'
     'backbone-modelref': 'backbone-modelref'
@@ -11,7 +11,7 @@ module.exports =
       Backbone: 'backbone'
       ko: 'knockout'
 
-  'test/full-stack/build/bundle-underscore.js':
+  'test/bundles/build/full-stack-underscore.js':
     underscore: 'vendor/underscore-1.6.0.js'
     backbone: 'vendor/backbone-1.1.2.js'
     'backbone-modelref': 'backbone-modelref'
@@ -24,7 +24,7 @@ module.exports =
       Backbone: 'backbone'
       ko: 'knockout'
 
-  'test/full-stack/build/bundle-lodash-core.js':
+  'test/bundles/build/full-stack-lodash-core.js':
     lodash: 'vendor/optional/lodash-2.4.1.js'
     backbone: 'vendor/backbone-1.1.2.js'
     'backbone-modelref': 'backbone-modelref'
@@ -38,7 +38,7 @@ module.exports =
       Backbone: 'backbone'
       ko: 'knockout'
 
-  'test/full-stack/build/bundle-lodash.js':
+  'test/bundles/build/full-stack-lodash.js':
     lodash: 'vendor/optional/lodash-2.4.1.js'
     backbone: 'vendor/backbone-1.1.2.js'
     'backbone-modelref': 'backbone-modelref'
