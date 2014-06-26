@@ -113,7 +113,7 @@ gulp.task 'test', (callback) ->
   #     .pipe(ws)
 
   # run tests
-  for files in require('./config/karma_files')
-    do (files) -> queue.defer (callback) -> karma.start(_.defaults({singleRun: true, files: files}, karma_config), callback)
+  for file_info in require('./config/karma_files')
+    do (file_info) -> queue.defer (callback) -> console.log "RUNNING TESTS: #{file_info.name}"; karma.start(_.defaults({singleRun: true, files: file_info.files}, karma_config), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await callback

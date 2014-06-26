@@ -7,8 +7,8 @@ module.exports =
     options: {bare: true, sourceMap: false}
     transformPath: (path) -> path.replace(/\.coffee$/, '.js')
 
-  reporters: ['progress']
+  reporters: ['dots']
   port: 9876
   colors: true
   logLevel: 'INFO'
-  browsers: ['Chrome'] #'Firefox', 'Safari'],
+  browsers: ['PhantomJS'] #, 'Chrome', 'Firefox', 'Safari']

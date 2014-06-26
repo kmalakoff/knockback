@@ -731,6 +731,8 @@ describe 'knockback-collection-observable.js', ->
     done()
 
   it '19. push and unshift', (done) ->
+    return done() if Backbone.VERSION[0] isnt '1'
+
     kb.statistics = new kb.Statistics() # turn on stats
 
     class PersonViewModel extends kb.ViewModel
