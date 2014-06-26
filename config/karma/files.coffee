@@ -37,7 +37,9 @@ CORE =
 
 module.exports = FILES = []
 
-# full library
+###############################
+# Full Library
+###############################
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('full') >= 0 and test_name.indexOf('stack') < 0)
   for dep_name, dep_files of REQUIRED_DEPENDENCIES
     if dep_name.indexOf('backbone') >= 0 # Backbone
@@ -45,12 +47,16 @@ for test_name, test_files of KNOCKBACK when (test_name.indexOf('full') >= 0 and 
     else # Parse
       FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, './test/knockback/**/*.tests.coffee'])})
 
-# core library
+###############################
+# Core Library
+###############################
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('core') >= 0 and test_name.indexOf('stack') < 0)
   for core_name, core_files of CORE
     FILES.push({name: "#{core_name}_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, core_files])})
 
+###############################
 # ORM
+###############################
 ORM_TESTS =
   backbone_orm: [KNOCKBACK.full, './vendor/optional/moment-2.7.0.js', './vendor/optional/backbone-orm-0.5.17.js', './test/ecosystem/**/backbone-orm*.tests.coffee']
   backbone_relational: [KNOCKBACK.full, './vendor/optional/backbone-relational-0.8.8.js', './test/ecosystem/**/backbone-relational*.tests.coffee']
@@ -60,19 +66,25 @@ ORM_TESTS =
 for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')
   FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
 
+###############################
 # CommonJS
+###############################
 COMMONJS_TESTS =
   latest: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/commonjs-latest.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
 FILES.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
 
-# Full Stack - Bundled Dependencies
+###############################
+# Stack Libraries - Bundled Dependencies
+###############################
 STACK_TESTS =
   lodash: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/full-stack-lodash.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
   underscore: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/full-stack-underscore.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
   full: ['./vendor/test/jquery-1.11.1.min.js', './knockback-full-stack.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
-# Core Stack - Bundled Dependencies
+# Full Stack
 FILES.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
+
+# Core Stack
 for core_name, core_files of CORE
   FILES.push({name: "core-stack_#{test_name}_#{core_name}", files: _.flatten([test_files, core_files])}) for test_name, test_files of STACK_TESTS

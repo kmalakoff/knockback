@@ -14,8 +14,7 @@ header = require 'gulp-header'
 concat = require 'gulp-concat'
 shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
-karma = require('karma').server
-karma_config = require('./config/karma')
+karmaRun = require('./config/karma/run')
 
 HEADER = """
 /*
@@ -113,7 +112,6 @@ gulp.task 'test', (callback) ->
   #     .pipe(ws)
 
   # run tests
-  for file_info in require('./config/karma_files')
-    do (file_info) -> queue.defer (callback) -> console.log "RUNNING TESTS: #{file_info.name}"; karma.start(_.defaults({singleRun: true, files: file_info.files}, karma_config), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
+  queue.defer (callback) -> karmaRun(callback)
 
   queue.await callback
