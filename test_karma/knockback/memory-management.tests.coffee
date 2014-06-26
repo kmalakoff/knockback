@@ -16,8 +16,6 @@ describe 'knockback.js memory management', ->
   class RefCountableViewModel
     constructor: ->
       RefCountableViewModel.view_models.push(this)
-
-      # reference counting
       @ref_count = 1
 
     refCount: -> return @ref_count

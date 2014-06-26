@@ -9,10 +9,8 @@ KNOCKBACK =
   core_stack: ['./knockback-core-stack.js', './lib/knockback-statistics.js']
 
 DEPENDENCIES =
-  latest: ['./vendor/test/jquery-1.7.2.js', './vendor/underscore-1.6.0.js', './vendor/backbone-1.1.2.js', './vendor/knockout-3.1.0.js']
-  legacy: ['./vendor/test/jquery-1.7.2.js', './vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js']
-  legacy_bb1: ['./vendor/test/jquery-1.7.2.js', './vendor/underscore-1.6.0.js', './vendor/backbone-0.9.2.js', './vendor/knockout-3.1.0.js']
-  legacy_bb2: ['./vendor/test/jquery-1.7.2.js', './vendor/underscore-1.6.0.js', './vendor/backbone-0.9.10.js', './vendor/knockout-3.1.0.js']
+  latest: ['./vendor/test/jquery-1.11.1.min.js', './vendor/underscore-1.6.0.js', './vendor/backbone-1.1.2.js', './vendor/knockout-3.1.0.js']
+  legacy: ['./vendor/test/jquery-1.11.1.min.js', './vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js']
 
 LOCALIZATION = [
   './test_karma/_examples/build/_localization_examples.js'
@@ -38,12 +36,23 @@ CORE =
   triggering: ['./lib/knockback-triggering.js', './test_karma/knockback/triggering.tests.coffee']
   validation: ['./lib/knockback-validation.js', './test_karma/knockback/validation.tests.coffee']
 
-TESTS =
-  knockback_full: [KNOCKBACK.full, LOCALIZATION, MODEL_REF, './test_karma/knockback/**/*tests.coffee']
-  knockback_full_min: [KNOCKBACK.full_min, LOCALIZATION, MODEL_REF, './test_karma/knockback/**/*tests.coffee']
-TESTS["knockback_core_#{core_name}"] = [DEPENDENCIES.latest, KNOCKBACK.core, core_files] for core_name, core_files of CORE
-TESTS["knockback_core_min_#{core_name}"] = [DEPENDENCIES.latest, KNOCKBACK.core_min, core_files] for core_name, core_files of CORE
 
 module.exports = FILES = []
+
+KNOCKBACK_TESTS =
+  knockback_full: [KNOCKBACK.full, LOCALIZATION, MODEL_REF, './test_karma/knockback/**/*.tests.coffee']
+  knockback_full_min: [KNOCKBACK.full_min, LOCALIZATION, MODEL_REF, './test_karma/knockback/**/*.tests.coffee']
+KNOCKBACK_TESTS["knockback_core_#{core_name}"] = [DEPENDENCIES.latest, KNOCKBACK.core, core_files] for core_name, core_files of CORE
+KNOCKBACK_TESTS["knockback_core_min_#{core_name}"] = [DEPENDENCIES.latest, KNOCKBACK.core_min, core_files] for core_name, core_files of CORE
+
 for dep_name, dep_files of DEPENDENCIES
-  FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of TESTS
+  FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of KNOCKBACK_TESTS
+
+ECOSYSTEM_TESTS =
+  backbone_orm: [KNOCKBACK.full, './vendor/optional/moment-2.7.0.js', './vendor/optional/backbone-orm-0.5.16.js', './test_karma/ecosystem/**/backbone-orm*.tests.coffee']
+  backbone_relational: [KNOCKBACK.full, './vendor/optional/backbone-relational-0.8.8.js', './test_karma/ecosystem/**/backbone-relational*.tests.coffee']
+  backbone_associations: [KNOCKBACK.full, './vendor/optional/backbone-associations-0.5.5.js', './test_karma/ecosystem/**/backbone-associations*.tests.coffee']
+  supermodel: [KNOCKBACK.full, './vendor/optional/supermodel-0.0.4.js', './test_karma/ecosystem/**/supermodel*.tests.coffee']
+
+for dep_name, dep_files of _.pick(DEPENDENCIES, 'latest')
+  FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ECOSYSTEM_TESTS
