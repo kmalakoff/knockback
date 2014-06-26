@@ -35,24 +35,26 @@ CORE =
   validation: ['./lib/knockback-validation.js', './test/knockback/validation.tests.coffee']
 
 
-module.exports = FILES = []
+module.exports = {}
 
 ###############################
 # Full Library
 ###############################
+full = module.exports.full = []
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('full') >= 0 and test_name.indexOf('stack') < 0)
   for dep_name, dep_files of REQUIRED_DEPENDENCIES
     if dep_name.indexOf('backbone') >= 0 # Backbone
-      FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee'])})
+      full.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee'])})
     else # Parse
-      FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, './test/knockback/**/*.tests.coffee'])})
+      full.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, './test/knockback/**/*.tests.coffee'])})
 
 ###############################
 # Core Library
 ###############################
+core = module.exports.core = []
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('core') >= 0 and test_name.indexOf('stack') < 0)
   for core_name, core_files of CORE
-    FILES.push({name: "#{core_name}_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, core_files])})
+    core.push({name: "#{core_name}_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, core_files])})
 
 ###############################
 # ORM
@@ -63,8 +65,9 @@ ORM_TESTS =
   backbone_associations: [KNOCKBACK.full, './vendor/optional/backbone-associations-0.5.5.js', './test/ecosystem/**/backbone-associations*.tests.coffee']
   supermodel: [KNOCKBACK.full, './vendor/optional/supermodel-0.0.4.js', './test/ecosystem/**/supermodel*.tests.coffee']
 
+orm = module.exports.orm = []
 for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')
-  FILES.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
+  orm.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
 
 ###############################
 # CommonJS
@@ -72,7 +75,8 @@ for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_la
 COMMONJS_TESTS =
   latest: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/commonjs-latest.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
-FILES.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
+commonjs = module.exports.commonjs = []
+commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
 
 ###############################
 # Stack Libraries - Bundled Dependencies
@@ -83,8 +87,10 @@ STACK_TESTS =
   full: ['./vendor/test/jquery-1.11.1.min.js', './knockback-full-stack.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
 # Full Stack
-FILES.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
+full_stack = module.exports.full_stack = []
+full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
 
 # Core Stack
+core_stack = module.exports.core_stack = []
 for core_name, core_files of CORE
-  FILES.push({name: "core-stack_#{test_name}_#{core_name}", files: _.flatten([test_files, core_files])}) for test_name, test_files of STACK_TESTS
+  core_stack.push({name: "core-stack_#{test_name}_#{core_name}", files: _.flatten([test_files, core_files])}) for test_name, test_files of STACK_TESTS
