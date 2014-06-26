@@ -94,7 +94,7 @@ gulp.task 'release', ['test', 'update_packages'], ->
 gulp.task 'test', (callback) ->
   queue = new Queue(1)
 
-  # queue.defer (callback) -> buildLibrary {paths: ["test_karma/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
+  # queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
 
   # # copy dependent libraries
   # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on 'end', callback
