@@ -56,3 +56,12 @@ COMMONJS_TESTS =
   latest: ['./vendor/test/jquery-1.11.1.min.js', './test/module_systems/commonjs/build/bundle-latest.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
 FILES.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
+
+STACK_TESTS =
+  lodash: ['./vendor/test/jquery-1.11.1.min.js', './test/full-stack/build/bundle-lodash.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+  underscore: ['./vendor/test/jquery-1.11.1.min.js', './test/full-stack/build/bundle-underscore.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+  full: ['./vendor/test/jquery-1.11.1.min.js', './knockback-full-stack.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+
+FILES.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
+for core_name, core_files of CORE
+  FILES.push({name: "core-stack_#{test_name}_#{core_name}", files: _.flatten([test_files, core_files])}) for test_name, test_files of STACK_TESTS
