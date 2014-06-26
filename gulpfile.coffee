@@ -46,7 +46,7 @@ ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBR
 
 copyLibraryFiles = (destination, callback) ->
   gulp.src(ALL_LIBRARY_FILES.concat('README.md'))
-    .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on 'end', callback
+    .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on('end', callback)
 
 cachedBuild = (library) ->
   root_paths = (root_path.replace('/**/*.coffee', '') for root_path in library.paths when root_path.indexOf('/**/*.coffee') >= 0)
@@ -65,7 +65,7 @@ buildLibrary = (library, callback) ->
     stream
       .pipe(header(HEADER, {pkg: require('./package.json')}))
       .pipe(gulp.dest(library.destination))
-      .on 'end', callback
+      .on('end', callback)
 
   queue = new Queue(1)
   queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
@@ -81,7 +81,7 @@ gulp.task 'minify', ['build'], (callback) ->
     .pipe(rename({suffix: '.min'}))
     .pipe(header(HEADER, {pkg: require('./package.json')}))
     .pipe(gulp.dest((file) -> file.base))
-    .on 'end', callback # somewhere there is an extra callback in gulp. do I need to listen to more events?
+    .on('end', callback) # somewhere there is an extra callback in gulp. do I need to listen to more events?
 
 gulp.task 'update_packages', (callback) ->
   queue = new Queue(1)
@@ -96,21 +96,21 @@ gulp.task 'test', (callback) ->
 
   # queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
 
-  # # copy dependent libraries
-  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on 'end', callback
-  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on 'end', callback
+  # copy dependent libraries
+  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
+  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on('end', callback)
 
-  # # build test bundled modules
-  # queue.defer (callback) ->
-  #   count = 0
-  #   Writable = require('stream').Writable
-  #   ws = Writable({objectMode: true})
-  #   ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
+  # build test bundled modules
+  queue.defer (callback) ->
+    count = 0
+    Writable = require('stream').Writable
+    ws = Writable({objectMode: true})
+    ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
 
-  #   gulp.src('test/**/_bundle-config.coffee')
-  #     .pipe(es.map((file, callback) -> count++; callback(null, file)))
-  #     .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
-  #     .pipe(ws)
+    gulp.src('test/**/_bundle-config.coffee')
+      .pipe(es.map((file, callback) -> count++; callback(null, file)))
+      .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
+      .pipe(ws)
 
   # run tests
   for file_info in require('./config/karma_files')
