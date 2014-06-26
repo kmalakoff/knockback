@@ -1,5 +1,5 @@
 path = require 'path'
-_ = require 'lodash'
+_ = require 'underscore'
 es = require 'event-stream'
 Queue = require 'queue-async'
 Async = require 'async'
@@ -15,6 +15,7 @@ concat = require 'gulp-concat'
 shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
 karma = require('karma').server
+karma_config = require('./config/karma')
 
 HEADER = """
 /*
@@ -89,24 +90,6 @@ gulp.task 'update_packages', (callback) ->
   queue.await callback
 gulp.task 'release', ['test', 'update_packages'], ->
 
-DEPENDENT_FILES = [
-    './vendor/test/jquery-1.7.2.js',
-    './vendor/underscore-1.6.0.js',
-    './vendor/backbone-1.1.2.js',
-    './vendor/knockout-3.1.0.js',
-    './knockback.js',
-    './lib/knockback-statistics.js',
-
-    './vendor/optional/backbone-modelref-0.1.5.js',
-    './test_karma/_examples/build/_localization_examples.js',
-    './vendor/optional/backbone-modelref-0.1.5.js',
-    './vendor/test/globalize/globalize.js',
-    './vendor/test/globalize/globalize.culture.en-GB.js',
-    './vendor/test/globalize/globalize.culture.fr-FR.js',
-
-    './vendor/optional/backbone-relational-0.8.8.js'
-  ]
-
 # gulp.task 'test', ['minify'], (callback) ->
 gulp.task 'test', (callback) ->
   queue = new Queue(1)
@@ -130,7 +113,7 @@ gulp.task 'test', (callback) ->
   #     .pipe(ws)
 
   # run tests
-  queue.defer (callback) ->
-    karma.start(_.defaults({singleRun: true, files: DEPENDENT_FILES.concat('./test_karma/knockback/**/*.coffee')}, require('./test_karma/karma.config.js')), callback)
+  for files in require('./config/karma_files')
+    do (files) -> queue.defer (callback) -> karma.start(_.defaults({singleRun: true, files: files}, karma_config), callback)
 
   queue.await callback

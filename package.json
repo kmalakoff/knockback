@@ -41,7 +41,6 @@
     "codo": "2.x",
     "coffee-script": "*",
     "event-stream": "*",
-    "lodash": "*",
     "gulp": "*",
     "gulp-compile-js": "*",
     "gulp-concat": "*",
