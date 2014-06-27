@@ -7,7 +7,7 @@ es = require 'event-stream'
 gulp = require 'gulp'
 shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
-wrapAMD = require './gulp-wrap-amd-infer'
+wrapAMD = require 'gulp-wrap-amd-infer'
 
 buildLibrary = require '../build_library'
 
@@ -51,7 +51,8 @@ module.exports = (callback) ->
           shims: SHIMS
           karma: true
           post_load: POST_LOAD
-          name: (name) -> if (name is 'knockback-core.js') or ((name.indexOf('knockback-') < 0) and (name.indexOf('globalize') < 0)) then name.split('-').shift() else name}))
+          name: (name) -> if (name is 'knockback-core.js') or ((name.indexOf('knockback-') < 0) and (name.indexOf('globalize') < 0)) then name.split('-').shift() else name
+        }))
         .pipe(gulp.dest('test/build'))
         .on('end', callback)
 

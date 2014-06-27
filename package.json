@@ -49,6 +49,7 @@
     "gulp-module-system": "*",
     "gulp-rename": "*",
     "gulp-require-src": "*",
+    "gulp-wrap-amd-infer": "*",
     "gulp-shell": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
