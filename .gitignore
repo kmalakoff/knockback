@@ -1,6 +1,5 @@
 .DS_Store
 node_modules/
-build/
 doc/
 
 # web site noise
