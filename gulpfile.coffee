@@ -1,30 +1,18 @@
 path = require 'path'
 _ = require 'underscore'
-es = require 'event-stream'
 Queue = require 'queue-async'
 Async = require 'async'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
-compile = require 'gulp-compile-js'
-modules = require 'gulp-module-system'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
-concat = require 'gulp-concat'
 karmaGenerate = require('./config/karma/generate')
 karmaRun = require('./config/karma/run')
 
-HEADER = """
-/*
-  <%= file.path.split('/').splice(-1)[0].replace('.min', '') %> <%= pkg.version %>
-  Copyright (c)  2011-#{(new Date()).getFullYear()} Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/\n
-"""
+HEADER = require './config/header'
+buildLibrary = require './config/build_library'
 
 moduleToBuildOptions = (module) -> {paths: ["src/#{module}/**/*.coffee"], modules: {type: 'local-shim', file_name: "knockback-#{module}.js", umd: {symbol: "knockback-#{module}", dependencies: ['knockback']}}, destination: './lib/'}
 
@@ -33,7 +21,6 @@ LIBRARIES = (moduleToBuildOptions(module) for module in MODULES)
 LIBRARIES.push moduleToBuildOptions('statistics')
 
 # core and full variants
-STACK_PATHS = ['node_modules/underscore/underscore.js', 'node_modules/backbone/backbone.js', 'node_modules/knockout/build/output/knockout-latest.debug.js']
 MODULE_ADD_PATHS = _.flatten((["src/#{module}/**/*.coffee", "!src/#{module}/index.coffee"] for module in MODULES))
 LIBRARIES.push {paths: ['src/core/**/*.coffee'], modules: {type: 'local-shim', file_name: 'knockback-core.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-core-stack.js'}
 LIBRARIES.push {paths: ['src/core/**/*.coffee'].concat(MODULE_ADD_PATHS), modules: {type: 'local-shim', file_name: 'knockback.js', umd: {symbol: 'kb', dependencies: ['underscore', 'backbone', 'knockout']}}, destination: './', stack_file_name: 'knockback-full-stack.js'}
@@ -45,30 +32,6 @@ ALL_LIBRARY_FILES.push library.replace('.js', '.min.js') for library in ALL_LIBR
 copyLibraryFiles = (destination, callback) ->
   gulp.src(ALL_LIBRARY_FILES.concat('README.md'))
     .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on('end', callback)
-
-cachedBuild = (library) ->
-  root_paths = (root_path.replace('/**/*.coffee', '') for root_path in library.paths when root_path.indexOf('/**/*.coffee') >= 0)
-  return gulp.src(library.paths)
-    .pipe(es.map (file, callback) -> file.path = file.path.replace("#{path.resolve(dir)}/", '') for dir in root_paths; callback(null, file))
-    .pipe(compile({coffee: {bare: true, header: false}}))
-    .pipe(modules(library.modules))
-    .pipe(es.map((file, callback) -> console.log "Compiled #{library.modules.file_name}"; callback(null, file)))
-
-cachedStackBuild = (library) ->
-  es.merge(gulp.src(STACK_PATHS), cachedBuild(library))
-    .pipe(concat(library.stack_file_name))
-
-buildLibrary = (library, callback) ->
-  helper = (stream, file_name, callback) ->
-    stream
-      .pipe(header(HEADER, {pkg: require('./package.json')}))
-      .pipe(gulp.dest(library.destination))
-      .on('end', callback)
-
-  queue = new Queue(1)
-  queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
-  queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
-  queue.await callback
 
 gulp.task 'build', (callback) -> Async.map(LIBRARIES, buildLibrary, callback)
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
@@ -84,6 +47,5 @@ gulp.task 'minify', ['build'], (callback) ->
 gulp.task 'release', ['test'], (callback) ->
   copyLibraryFiles 'packages/npm', (err) -> return callback(err) if err; copyLibraryFiles('packages/nuget/Content/Scripts', callback)
 
-# gulp.task 'test', ['minify'], (callback) ->
-gulp.task 'test', (callback) ->
+gulp.task 'test', ['minify'], (callback) ->
   karmaGenerate (err) -> return callback(err) if err; karmaRun(callback)

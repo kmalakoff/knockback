@@ -15,7 +15,7 @@ REQUIRED_DEPENDENCIES =
   backbone_lodash_legacy: ['./vendor/test/jquery-1.11.1.min.js', './vendor/optional/lodash-2.4.1.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js']
   parse_latest: ['./vendor/test/jquery-1.11.1.min.js', './vendor/optional/parse-1.2.0.js', './vendor/knockout-1.2.1.js']
 
-LOCALIZATION = ['./test/_examples/build/knockback-examples-localization.js', './vendor/test/globalize/globalize.js', './vendor/test/globalize/globalize.culture.en-GB.js', './vendor/test/globalize/globalize.culture.fr-FR.js']
+LOCALIZATION = ['./test/build/knockback-examples-localization.js', './vendor/test/globalize/globalize.js', './vendor/test/globalize/globalize.culture.en-GB.js', './vendor/test/globalize/globalize.culture.fr-FR.js']
 
 MODEL_REF = './vendor/optional/backbone-modelref-0.1.5.js'
 
@@ -73,7 +73,7 @@ for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_la
 # CommonJS
 ###############################
 COMMONJS_TESTS =
-  latest: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/commonjs-latest.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+  latest: ['./vendor/test/jquery-1.11.1.min.js', './test/build/bundle-commonjs-latest.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
 commonjs = module.exports.commonjs = []
 commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
@@ -82,8 +82,8 @@ commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for
 # Stack Libraries - Bundled Dependencies
 ###############################
 STACK_TESTS =
-  lodash: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/full-stack-lodash.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
-  underscore: ['./vendor/test/jquery-1.11.1.min.js', './test/bundles/build/full-stack-underscore.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+  lodash: ['./vendor/test/jquery-1.11.1.min.js', './test/build/bundle-full-stack-lodash.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+  underscore: ['./vendor/test/jquery-1.11.1.min.js', './test/build/bundle-full-stack-underscore.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
   full: ['./vendor/test/jquery-1.11.1.min.js', './knockback-full-stack.js', './lib/knockback-statistics.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
 # Full Stack
