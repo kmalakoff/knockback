@@ -51,4 +51,4 @@ gulp.task 'test', ['minify'], (callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> karmaGenerate(callback)
   queue.defer (callback) -> karmaRun(callback)
-  queue.await (err) -> callback(); process.exit(if err then 1 else 0)
+  queue.await (err) -> callback(err); process.exit(if err then 1 else 0)

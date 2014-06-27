@@ -26,6 +26,22 @@
       "deps": [
         "underscore"
       ]
+    },
+    "knockback": {
+      "deps": [
+        "backbone",
+        "knockout"
+      ]
+    },
+    "globalize.culture.en": {
+      "deps": [
+        "globalize"
+      ]
+    },
+    "globalize.culture.fr": {
+      "deps": [
+        "globalize"
+      ]
     }
   }
 });

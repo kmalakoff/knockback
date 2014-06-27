@@ -21,6 +21,12 @@
       "deps": [
         "underscore"
       ]
+    },
+    "knockback": {
+      "deps": [
+        "backbone",
+        "knockout"
+      ]
     }
   }
 });
