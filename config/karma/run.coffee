@@ -1,3 +1,4 @@
+path = require 'path'
 _ = require 'underscore'
 Queue = require 'queue-async'
 karma = require('karma').server
@@ -15,7 +16,7 @@ STANDARD_CONFIG =
   port: 9876
   colors: true
   logLevel: 'INFO'
-  browsers: ['PhantomJS'] #, 'Chrome', 'Firefox', 'Safari']
+  browsers: ['PhantomJS']#, ['Chrome'] #['PhantomJS'] #, 'Chrome', 'Firefox', 'Safari']
 
 TEST_GROUPS = require('./test_groups')
 
@@ -27,8 +28,13 @@ module.exports = (callback) ->
     for test in tests
       do (test) -> queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: true, files: test.files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
-  # # AMD
-  # for test in TEST_GROUPS.full
-  #   do (test) -> queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: true, files: test.files}, STANDARD_CONFIG), (return_value) -> console.log "RETURN VALUE: #{return_value}"; callback(new Error "Tests failed: #{return_value}" if return_value) )
+  # AMD
+  # for test in TEST_GROUPS.core when (test.name.indexOf('simple_') < 0) and (test.name.indexOf('_min') < 0)
+  #   do (test) ->
+  #     files = []
+  #     files.push({pattern: file}) for file in ['./vendor/test/require-2.1.9.js']
+  #     files.push({pattern: file, included: false}) for file in test.files.slice(0, -1)
+  #     files.push({pattern: file}) for file in [path.join('./test/build', "#{test.name}.js")]
+  #     queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: false, files: files}, STANDARD_CONFIG), (return_value) -> console.log "RETURN VALUE: #{return_value}"; callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await callback

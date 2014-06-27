@@ -18,7 +18,7 @@ module.exports =
     'backbone-relational': 'backbone-relational'
     knockout: 'vendor/knockout-3.1.0.js'
     knockback: 'knockback.js'
-    'knockback-examples-localization': 'test/_examples/build/_localization_examples.js'
+    'knockback-examples-localization': 'test/_examples/build/knockback-examples-localization.js'
     _publish:
       _: 'underscore'
       Backbone: 'backbone'
@@ -45,7 +45,7 @@ module.exports =
     'backbone-relational': 'backbone-relational'
     knockout: 'vendor/knockout-3.1.0.js'
     knockback: 'knockback.js'
-    'knockback-examples-localization': 'test/_examples/build/_localization_examples.js'
+    'knockback-examples-localization': 'test/_examples/build/knockback-examples-localization.js'
     _alias:
       underscore: 'lodash'
     _publish:

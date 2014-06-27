@@ -2617,7 +2617,9 @@ kb.viewModel = function(model, options, view_model) {
 });
 
   if (typeof define == 'function' && define.amd) {
-    define(["require","underscore","backbone","knockout"], function(){ return require('index'); });
+    define(["require","underscore","backbone","knockout"], function(){
+      return require('index');
+    });
   }
   else if (typeof exports == 'object') {
     module.exports = require('index');

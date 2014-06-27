@@ -12,8 +12,7 @@ rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
 concat = require 'gulp-concat'
-shell = require 'gulp-shell'
-requireSrc = require 'gulp-require-src'
+karmaGenerate = require('./config/karma/generate')
 karmaRun = require('./config/karma/run')
 
 HEADER = """
@@ -82,36 +81,9 @@ gulp.task 'minify', ['build'], (callback) ->
     .pipe(gulp.dest((file) -> file.base))
     .on('end', callback) # TODO: somewhere there is an extra callback in gulp. do I need to listen to more events?
 
-gulp.task 'update_packages', (callback) ->
-  queue = new Queue(1)
-  queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
-  queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
-  queue.await callback
-gulp.task 'release', ['test', 'update_packages'], ->
+gulp.task 'release', ['test'], (callback) ->
+  copyLibraryFiles 'packages/npm', (err) -> return callback(err) if err; copyLibraryFiles('packages/nuget/Content/Scripts', callback)
 
 # gulp.task 'test', ['minify'], (callback) ->
 gulp.task 'test', (callback) ->
-  queue = new Queue(1)
-
-  # queue.defer (callback) -> buildLibrary {paths: ["test/_examples/**/*.coffee"], modules: {type: 'local-shim', file_name: "_localization_examples.js", umd: {symbol: "knockback-locale-manager", dependencies: ['knockback']}}, destination: './test/_examples/build'}, callback
-
-  # copy dependent libraries
-  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
-  # queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on('end', callback)
-
-  # # build test bundled modules
-  # queue.defer (callback) ->
-  #   count = 0
-  #   Writable = require('stream').Writable
-  #   ws = Writable({objectMode: true})
-  #   ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
-
-  #   gulp.src('test/bundles/**/*.coffee')
-  #     .pipe(es.map((file, callback) -> count++; callback(null, file)))
-  #     .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
-  #     .pipe(ws)
-
-  # run tests
-  queue.defer (callback) -> karmaRun(callback)
-
-  queue.await callback
+  karmaGenerate (err) -> return callback(err) if err; karmaRun(callback)

@@ -15,7 +15,7 @@ REQUIRED_DEPENDENCIES =
   backbone_lodash_legacy: ['./vendor/test/jquery-1.11.1.min.js', './vendor/optional/lodash-2.4.1.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js']
   parse_latest: ['./vendor/test/jquery-1.11.1.min.js', './vendor/optional/parse-1.2.0.js', './vendor/knockout-1.2.1.js']
 
-LOCALIZATION = ['./test/_examples/build/_localization_examples.js', './vendor/test/globalize/globalize.js', './vendor/test/globalize/globalize.culture.en-GB.js', './vendor/test/globalize/globalize.culture.fr-FR.js']
+LOCALIZATION = ['./test/_examples/build/knockback-examples-localization.js', './vendor/test/globalize/globalize.js', './vendor/test/globalize/globalize.culture.en-GB.js', './vendor/test/globalize/globalize.culture.fr-FR.js']
 
 MODEL_REF = './vendor/optional/backbone-modelref-0.1.5.js'
 
