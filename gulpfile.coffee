@@ -37,12 +37,13 @@ gulp.task 'build', (callback) -> Async.map(LIBRARIES, buildLibrary, callback)
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary(library)
 
 gulp.task 'minify', ['build'], (callback) ->
-  gulp.src(['*.js', '!*.min.js', 'lib/*.js', '!lib/*.min.js'])
-    .pipe(uglify())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(header(HEADER, {pkg: require('./package.json')}))
-    .pipe(gulp.dest((file) -> file.base))
-    .on('end', callback) # TODO: somewhere there is an extra callback in gulp. do I need to listen to more events?
+  Async.map(LIBRARIES, buildLibrary.minifyLibrary, callback)
+  # gulp.src(['*.js', 'lib/*.js', '!*.min.js', '!lib/*.min.js'])
+  #   .pipe(uglify())
+  #   .pipe(rename({suffix: '.min'}))
+  #   .pipe(header(HEADER, {pkg: require('./package.json')}))
+  #   .pipe(gulp.dest((file) -> file.base))
+  #   .on('end', callback) # TODO: somewhere there is an extra callback in gulp. do I need to listen to more events?
 
 gulp.task 'release', ['test'], (callback) ->
   copyLibraryFiles 'packages/npm', (err) -> return callback(err) if err; copyLibraryFiles('packages/nuget/Content/Scripts', callback)
