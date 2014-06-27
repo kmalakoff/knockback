@@ -36,6 +36,6 @@ module.exports = (callback) ->
       files.push({pattern: file}) for file in ['./vendor/test/require-2.1.9.js']
       files.push({pattern: file, included: false}) for file in test.files.slice(0, -1)
       files.push({pattern: file}) for file in [path.join('./test/build', "#{test.name}.js")]
-      queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: true, files: files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
+      queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name} (AMD)"; karma.start(_.defaults({singleRun: true, files: files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await callback

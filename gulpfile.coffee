@@ -48,4 +48,7 @@ gulp.task 'release', ['test'], (callback) ->
   copyLibraryFiles 'packages/npm', (err) -> return callback(err) if err; copyLibraryFiles('packages/nuget/Content/Scripts', callback)
 
 gulp.task 'test', ['minify'], (callback) ->
-  karmaGenerate (err) -> return callback(err) if err; karmaRun(callback)
+  queue = new Queue(1)
+  queue.defer (callback) -> karmaGenerate(callback)
+  queue.defer (callback) -> karmaRun(callback)
+  queue.await (err) -> callback(); process.exit(if err then 1 else 0)
