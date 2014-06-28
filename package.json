@@ -37,13 +37,10 @@
   },
   "devDependencies": {
     "async": "*",
-<<<<<<< HEAD
     "codo": "2.x",
     "coffee-loader": "^0.7.2",
-=======
     "chai": "^1.9.1",
     "codo": "2.x",
->>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
     "coffee-script": "*",
     "event-stream": "*",
     "gulp": "*",
@@ -54,20 +51,15 @@
     "gulp-module-system": "*",
     "gulp-rename": "*",
     "gulp-require-src": "*",
-<<<<<<< HEAD
-=======
     "gulp-wrap-amd-infer": "*",
->>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
     "gulp-shell": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
     "gulp-zip": "*",
-<<<<<<< HEAD
     "module-bundler": "*",
     "queue-async": "*",
     "webpack": "*",
-    "webpack-dev-server": "*"
-=======
+    "webpack-dev-server": "*",
     "karma": "*",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.1.4",
@@ -82,7 +74,6 @@
     "module-bundler": "*",
     "queue-async": "*",
     "requirejs": "^2.1.14"
->>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",

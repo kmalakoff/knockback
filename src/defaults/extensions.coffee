@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-try kb = require 'knockback' catch err then kb = require '../core/kb'
-=======
 ###
   knockback.js 0.18.6
   Copyright (c)  2011-2014 Kevin Malakoff.
@@ -11,7 +8,6 @@ try kb = require 'knockback' catch err then kb = require '../core/kb'
 ###
 
 try kb = require 'knockback' catch err then kb = require './kb'
->>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
 _ = require 'underscore'
 ko = require 'knockout'
 
