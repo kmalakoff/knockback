@@ -37,8 +37,13 @@
   },
   "devDependencies": {
     "async": "*",
+<<<<<<< HEAD
     "codo": "2.x",
     "coffee-loader": "^0.7.2",
+=======
+    "chai": "^1.9.1",
+    "codo": "2.x",
+>>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
     "coffee-script": "*",
     "event-stream": "*",
     "gulp": "*",
@@ -49,14 +54,35 @@
     "gulp-module-system": "*",
     "gulp-rename": "*",
     "gulp-require-src": "*",
+<<<<<<< HEAD
+=======
+    "gulp-wrap-amd-infer": "*",
+>>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
     "gulp-shell": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
     "gulp-zip": "*",
+<<<<<<< HEAD
     "module-bundler": "*",
     "queue-async": "*",
     "webpack": "*",
     "webpack-dev-server": "*"
+=======
+    "karma": "*",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-cli": "*",
+    "karma-coffee-preprocessor": "*",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-mocha": "^0.1.4",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "karma-requirejs": "^0.2.2",
+    "karma-safari-launcher": "^0.1.1",
+    "mocha": "^1.20.1",
+    "module-bundler": "*",
+    "queue-async": "*",
+    "requirejs": "^2.1.14"
+>>>>>>> ec263e728855d379f1e44d8b94b29b32a5379f47
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",
