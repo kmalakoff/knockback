@@ -41,6 +41,7 @@
     "coffee-loader": "^0.7.2",
     "chai": "^1.9.1",
     "codo": "2.x",
+    "jquery": "*",
     "coffee-script": "*",
     "event-stream": "*",
     "gulp": "*",
