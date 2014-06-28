@@ -7,6 +7,7 @@ es = require 'event-stream'
 gulp = require 'gulp'
 shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
+compile = require 'gulp-compile-js'
 wrapAMD = require 'gulp-wrap-amd-infer'
 
 buildLibrary = require '../build_library'
@@ -46,6 +47,7 @@ module.exports = (callback) ->
   for test in TEST_GROUPS.core when (test.name.indexOf('simple_') < 0) and (test.name.indexOf('defaults_') < 0) and (test.name.indexOf('_min') < 0)
     do (test) -> queue.defer (callback) ->
       gulp.src(test.files.slice(-1)[0])
+        .pipe(compile({coffee: {bare: true, header: false}}))
         .pipe(wrapAMD({
           files: test.files.slice(0, -1)
           shims: SHIMS

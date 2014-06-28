@@ -29,24 +29,11 @@ kb._ = require 'underscore'
 kb.ko = require 'knockout'
 
 # required components
-require('./utils')
-require('./event-watcher')
-require('./store')
-require('./factory')
-require('./observable')
-require('./view-model')
-require('./utils')
-require('./collection-observable')
-require('./orm')
-require('./inject')
+require(component) for component in ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './orm', './inject']
 
 # optional components
-try require('../defaults/default-observable') catch err then {}
-try require('../formatting/formatted-observable') catch err then {}
-try require('../localization/localized-observable') catch err then {}
-try require('../statistics/statistics') catch err then {}
-try require('../triggering/triggered-observable') catch err then {}
-try require('../validation/validation') catch err then {}
+for component in ['./default-observable', './formatted-observable', './localized-observable', './statistics', './triggered-observable', './validation']
+  try require(component) catch err then {}
 
 # re-expose modules
 kb.modules = {}

@@ -52,7 +52,7 @@ module.exports.minifyLibrary = (library, callback) ->
       .pipe(uglify())
       .pipe(rename({suffix: '.min'}))
       .pipe(header(HEADER, {pkg: require('../package.json')}))
-      .pipe(gulp.dest((file) -> file.base))
+      .pipe(gulp.dest(library.destination))
       .on('end', callback)
 
   queue = new Queue(1)
