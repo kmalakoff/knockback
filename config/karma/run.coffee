@@ -36,7 +36,7 @@ module.exports = (callback) ->
       files = []
       files.push({pattern: file}) for file in ['./vendor/test/require-2.1.9.js']
       files.push({pattern: file, included: false}) for file in test.files.slice(0, -1)
-      files.push({pattern: file}) for file in ["./test/build/#{gutil.replaceExtension(path.basename(test.files.slice(-1)[0]), '.js')}"]
+      files.push({pattern: file}) for file in ["./_temp/#{gutil.replaceExtension(path.basename(test.files.slice(-1)[0]), '.js')}"]
       queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name} (AMD)"; karma.start(_.defaults({singleRun: true, files: files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await callback

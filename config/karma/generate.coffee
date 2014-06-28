@@ -25,7 +25,7 @@ POST_LOAD = 'window._ = window.Backbone = window.ko = window.kb = null;'
 
 module.exports = (callback) ->
   queue = new Queue(1)
-  queue.defer (callback) -> buildLibrary {paths: ["test/lib/**/*.coffee"], modules: {type: 'local-shim', file_name: 'knockback-examples-localization.js', umd: {symbol: 'knockback-locale-manager', dependencies: ['knockback']}}, destination: './test/build'}, callback
+  queue.defer (callback) -> buildLibrary {paths: ["test/lib/**/*.coffee"], modules: {type: 'local-shim', file_name: 'knockback-examples-localization.js', umd: {symbol: 'knockback-locale-manager', dependencies: ['knockback']}}, destination: './_temp'}, callback
 
   # # lock vendor until backbone-orm main updated
   # queue.defer (callback) -> requireSrc(_.keys(require('../../package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
@@ -55,7 +55,7 @@ module.exports = (callback) ->
           post_load: POST_LOAD
           name: (name) -> if (name is 'knockback-core.js') or ((name.indexOf('knockback-') < 0) and (name.indexOf('globalize') < 0)) then name.split('-').shift() else name
         }))
-        .pipe(gulp.dest('test/build'))
+        .pipe(gulp.dest('_temp'))
         .on('end', callback)
 
   queue.await callback

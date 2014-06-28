@@ -1,6 +1,7 @@
 .DS_Store
 node_modules/
 doc/
+_temp/
 
 # web site noise
 tutorials/*
