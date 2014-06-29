@@ -10,7 +10,7 @@ requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 wrapAMD = require 'gulp-wrap-amd-infer'
 
-buildLibrary = require '../build_library'
+buildLibrary = require '../build/build_library'
 buildWebpack = require '../webpack/build'
 
 TEST_GROUPS = require('./test_groups')
