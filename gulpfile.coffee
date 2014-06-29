@@ -7,6 +7,7 @@ webpack = require './config/gulp-webpack'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
+karma = require './config/karma/run'
 
 HEADER = module.exports = """
 /*
@@ -44,12 +45,9 @@ gulp.task 'release', ['test'], (callback) ->
       .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on('end', callback)
 
   queue = new Queue()
-  queue.defer (callback) -> copyLibraryFiles 'packages/npm', callback
+  queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
   queue.await callback
 
 gulp.task 'test', ['minify'], (callback) ->
-  queue = new Queue(1)
-  queue.defer (callback) -> require('./config/karma/generate')(callback)
-  queue.defer (callback) -> require('./config/karma/run')(callback)
-  queue.await (err) -> callback(err); process.exit(if err then 1 else 0)
+  karma (err) -> callback(err); process.exit(if err then 1 else 0)

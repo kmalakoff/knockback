@@ -4,6 +4,7 @@ Queue = require 'queue-async'
 Wrench = require 'wrench'
 karma = require('karma').server
 gutil = require 'gulp-util'
+generate = require './generate'
 
 STANDARD_CONFIG =
   basePath: '.'
@@ -24,6 +25,9 @@ TEST_GROUPS = require('./test_groups')
 
 module.exports = (callback) ->
   queue = new Queue(1)
+
+  # generate the libraries
+  queue.defer (callback) -> generate(callback)
 
   # STANDARD CONFIG
   for name, tests of TEST_GROUPS
