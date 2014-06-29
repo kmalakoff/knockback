@@ -27,18 +27,5 @@
 
     <file src="Content/Scripts/knockback-core.js" target="Content/Scripts/knockback-core.js" />
     <file src="Content/Scripts/knockback-core.min.js" target="Content/Scripts/knockback-core.min.js" />
-    <file src="Content/Scripts/knockback-core-stack.js" target="Content/Scripts/knockback-core-stack.js" />
-    <file src="Content/Scripts/knockback-core-stack.min.js" target="Content/Scripts/knockback-core-stack.min.js" />
-
-    <file src="Content/Scripts/lib/knockback-defaults.js" target="Content/Scripts/lib/knockback-defaults.js" />
-    <file src="Content/Scripts/lib/knockback-defaults.min.js" target="Content/Scripts/lib/knockback-defaults.min.js" />
-    <file src="Content/Scripts/lib/knockback-formatting.js" target="Content/Scripts/lib/knockback-formatting.js" />
-    <file src="Content/Scripts/lib/knockback-formatting.min.js" target="Content/Scripts/lib/knockback-formatting.min.js" />
-    <file src="Content/Scripts/lib/knockback-localization.js" target="Content/Scripts/lib/knockback-localization.js" />
-    <file src="Content/Scripts/lib/knockback-localization.min.js" target="Content/Scripts/lib/knockback-localization.min.js" />
-    <file src="Content/Scripts/lib/knockback-triggering.js" target="Content/Scripts/lib/knockback-triggering.js" />
-    <file src="Content/Scripts/lib/knockback-triggering.min.js" target="Content/Scripts/lib/knockback-triggering.min.js" />
-    <file src="Content/Scripts/lib/knockback-statistics.js" target="Content/Scripts/lib/knockback-statistics.js" />
-    <file src="Content/Scripts/lib/knockback-statistics.min.js" target="Content/Scripts/lib/knockback-statistics.min.js" />
   </files>
 </package>
