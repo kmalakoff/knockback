@@ -13,6 +13,7 @@ module.exports = -> es.map (file, callback) ->
     gutil.log stats.toString({})
     return callback(new Error "Webpack had #{stats.compilation.errors.length} errors") if stats.compilation.errors.length
 
+    # create a file
     file_path = path.resolve(path.join(config.output.path, config.output.filename))
     file = {cwd: __dirname, contents: new Buffer(fs.readFileSync(file_path, 'utf8'))}
     file.path = file_path.replace(__dirname, '')

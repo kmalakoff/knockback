@@ -12,7 +12,7 @@ compile = require 'gulp-compile-js'
 wrapAMD = require 'gulp-wrap-amd-infer'
 webpack = require '../gulp-webpack'
 
-TEST_GROUPS = require('./test_groups')
+TEST_GROUPS = require('../test_groups')
 
 SHIMS =
   underscore: {exports: '_'}

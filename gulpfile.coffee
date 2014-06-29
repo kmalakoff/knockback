@@ -19,7 +19,7 @@ HEADER = module.exports = """
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */\n
 """
-LIBRARY_FILES = require('./config/build/library_files')
+LIBRARY_FILES = require('./config/files').libraries
 
 gulp.task 'build', (callback) ->
   gulp.src('config/build/**/*.webpack.config.coffee', {read: false, buffer: false})
@@ -46,7 +46,7 @@ gulp.task 'test', ['minify'], (callback) ->
   karma (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'release', ['minify'], (callback) -> # manually call tests so doesn't return exit code
+gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so doesn't return exit code
   copyLibraryFiles = (destination, callback) ->
     gulp.src(LIBRARY_FILES.concat('README.md'))
       .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on('end', callback)

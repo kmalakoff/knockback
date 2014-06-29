@@ -21,7 +21,7 @@ STANDARD_CONFIG =
   logLevel: 'INFO'
   browsers: ['PhantomJS']
 
-TEST_GROUPS = require('./test_groups')
+TEST_GROUPS = require('../test_groups')
 
 module.exports = (callback) ->
   queue = new Queue(1)

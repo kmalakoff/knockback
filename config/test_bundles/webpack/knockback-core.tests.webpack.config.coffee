@@ -1,12 +1,8 @@
-fs = require 'fs'
 path = require 'path'
 _ = require 'underscore'
 
-ROOT = './test/knockback'
-FILES = _.map(_.filter(fs.readdirSync(ROOT), (file) -> path.extname(file) is '.coffee' and file.indexOf('core.tests.coffee') >= 0), (file) -> "#{ROOT}/#{file}")
-
 module.exports = _.extend  _.clone(require '../../webpack-base.config.coffee'), {
-  entry: FILES
+  entry: require('../../files').tests_core
   output:
     path: '.'
     filename: '_temp/webpack/knockback-core.tests.js'
