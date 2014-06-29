@@ -1,3 +1,5 @@
+_ = require 'underscore'
+
 module.exports =
   core: [
     './src/core/utils.coffee'
@@ -11,12 +13,4 @@ module.exports =
     './src/core/orm.coffee'
     './src/core/inject.coffee'
     './src/core/statistics.coffee'
-  ]
-
-  plugins: [
-    './src/defaults/default-observable.coffee'
-    './src/formatting/formatted-observable.coffee'
-    './src/localization/localized-observable.coffee'
-    './src/triggering/triggered-observable.coffee'
-    './src/validation/validation.coffee'
   ]
