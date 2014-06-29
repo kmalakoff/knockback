@@ -1,3 +1,4 @@
+fs = require 'fs'
 path = require 'path'
 
 CONFIGS = ['./knockback-core.webpack.config', './knockback-core.webpack.config', './knockback-core.webpack.config']

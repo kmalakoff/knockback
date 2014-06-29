@@ -1,8 +1,12 @@
-FILES = require './files'
+fs = require 'fs'
+path = require 'path'
 _ = require 'underscore'
 
+ROOT = './src/core'
+FILES = _.map(_.filter(fs.readdirSync(ROOT), (file) -> path.extname(file) is '.coffee' and file isnt 'index.coffee'), (file) -> "#{ROOT}/#{file}")
+
 module.exports = _.extend  _.clone(require '../webpack-base.config.coffee'), {
-  entry: _.flatten([FILES.core, ['./src/core/index.coffee']])
+  entry: _.flatten([FILES, ['./src/core/index.coffee']])
   output:
     path: '.'
     filename: 'knockback-core.js'
