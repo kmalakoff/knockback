@@ -9,8 +9,7 @@ shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 wrapAMD = require 'gulp-wrap-amd-infer'
-
-buildWebpack = require '../webpack/build'
+webpack = require '../gulp-webpack'
 
 TEST_GROUPS = require('./test_groups')
 
@@ -26,14 +25,15 @@ POST_LOAD = 'window._ = window.Backbone = window.ko = window.kb = null;'
 module.exports = (callback) ->
   queue = new Queue(1)
 
+  # queue.defer (callback) ->
+  #   gulp.src(['knockback.js', 'package.json'])
+  #     .pipe(gulp.dest('node_modules/knockback'))
+  #     .on('end', callback)
+
   queue.defer (callback) ->
-    gulp.src(['knockback.js', 'package.json'])
-      .pipe(gulp.dest('node_modules/knockback'))
-      .on('end', callback)
-
-  # queue.defer (callback) -> buildWebpack require('../test_bundles/test-webpack.config'), callback
-
-  queue.defer (callback) -> buildWebpack(require('../test_bundles/knockback-examples-localization.webpack.config'), callback)
+    gulp.src('config/test_bundles/**/*.webpack.config.coffee', {read: false, buffer: false})
+      .pipe(webpack())
+      .pipe(es.writeArray (err, array) -> callback(err))
 
   # # lock vendor until backbone-orm main updated
   # queue.defer (callback) -> requireSrc(_.keys(require('../../package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
@@ -41,15 +41,9 @@ module.exports = (callback) ->
 
   # build test bundled modules
   queue.defer (callback) ->
-    count = 0
-    Writable = require('stream').Writable
-    ws = Writable({objectMode: true})
-    ws._write = (chunk, enc, next) -> next(); callback() if --count is 0
-
-    gulp.src('config/**/*mbundle.config.coffee')
-      .pipe(es.map((file, callback) -> count++; callback(null, file)))
+    gulp.src('config/test_bundles/**/*.mbundle.config.coffee', {read: false, buffer: false})
       .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
-      .pipe(ws)
+      .pipe(es.writeArray (err, array) -> callback())
 
   # wrap AMD tests
   # for test in TEST_GROUPS.core when (test.name.indexOf('simple_') < 0) and (test.name.indexOf('defaults_') < 0) and (test.name.indexOf('_min') < 0)

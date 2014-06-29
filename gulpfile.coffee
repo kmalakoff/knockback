@@ -27,7 +27,6 @@ gulp.task 'release', ['test'], (callback) ->
   queue.await callback
 
 gulp.task 'test', ['minify'], (callback) ->
-# gulp.task 'test', (callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> karmaGenerate(callback)
   queue.defer (callback) -> karmaRun(callback)

@@ -1,10 +1,10 @@
 Queue = require 'queue-async'
+es = require 'event-stream'
 
-buildWebpack = require '../webpack/build'
+gulp = require 'gulp'
+webpack = require '../gulp-webpack'
 
 module.exports = (callback) ->
-  queue = new Queue(1)
-  queue.defer (callback) -> buildWebpack(require('../webpack/knockback.webpack.config'), callback)
-  queue.defer (callback) -> buildWebpack(require('../webpack/knockback-core.webpack.config'), callback)
-  queue.defer (callback) -> buildWebpack(require('../webpack/knockback-full-stack.webpack.config'), callback)
-  queue.await callback
+  gulp.src('config/test_bundles/**/*.webpack.config.coffee', {read: false, buffer: false})
+    .pipe(webpack())
+    .pipe(es.writeArray (err, array) -> callback(err))

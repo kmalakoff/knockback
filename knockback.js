@@ -2348,7 +2348,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	if (typeof window !== "undefined" && window !== null) {
 	  window._ || (window._ = kb._);
-	  console.log('kb.Parse, kb.Backbone', !!kb.Parse, !!kb.Backbone);
 	  if (kb.Backbone) {
 	    window.Backbone || (window.Backbone = kb.Backbone);
 	  }
