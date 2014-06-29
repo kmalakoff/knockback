@@ -43,6 +43,7 @@
     "coffee-script": "*",
     "event-stream": "*",
     "gulp": "*",
+    "gulp-browserify": "^0.5.0",
     "gulp-compile-js": "*",
     "gulp-concat": "*",
     "gulp-header": "*",

@@ -19,7 +19,7 @@ STANDARD_CONFIG =
   port: 9876
   colors: true
   logLevel: 'INFO'
-  browsers: ['PhantomJS']
+  browsers: ['Chrome']
 
 TEST_GROUPS = require('../test_groups')
 
@@ -32,8 +32,8 @@ module.exports = (callback) ->
   # STANDARD CONFIG
   for name, tests of TEST_GROUPS
     for test in tests
-      do (test) -> queue.defer (callback) -> gutil.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: true, files: test.files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
+      do (test) -> queue.defer (callback) -> gutil.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: false, files: test.files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await (err) ->
-    Wrench.rmdirSyncRecursive('./_temp', true)
+    # Wrench.rmdirSyncRecursive('./_temp', true)
     callback(err)
