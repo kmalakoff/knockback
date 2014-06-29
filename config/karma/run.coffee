@@ -49,5 +49,5 @@ module.exports = (callback) ->
   #   do (test) -> queue.defer (callback) -> console.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: true, files: test.files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await (err) ->
-    # Wrench.rmdirSyncRecursive('./_temp', true)
+    Wrench.rmdirSyncRecursive('./_temp', true)
     callback(err)

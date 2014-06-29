@@ -1,3 +1,5 @@
+fs = require 'fs'
+path = require 'path'
 _ = require 'underscore'
 
 KNOCKBACK =
@@ -27,9 +29,6 @@ ORM =
   supermodel_legacy: ['./vendor/optional/supermodel-0.0.1.js']
   supermodel: ['./vendor/optional/supermodel-0.0.4.js']
 
-CORE =
-  simple: ['./test/knockback/core.tests.coffee', './test/knockback/collection-observable.tests.coffee', './test/knockback/inject.tests.coffee', './test/knockback/memory-management.tests.coffee', './test/knockback/observable.tests.coffee', './test/knockback/memory-management.tests.coffee', './test/knockback/utils.tests.coffee', './test/knockback/view-model.tests.coffee']
-
 module.exports = {}
 
 ###############################
@@ -46,10 +45,13 @@ for test_name, test_files of KNOCKBACK when (test_name.indexOf('full') >= 0 and 
 ###############################
 # Core Library
 ###############################
+ROOT = './test/knockback'
+CORE_FILES = _.map(_.filter(fs.readdirSync(ROOT), (file) -> path.extname(file) is '.coffee' and file.indexOf('core.tests.coffee') >= 0), (file) -> "#{ROOT}/#{file}")
+
 core = module.exports.core = []
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('core') >= 0 and test_name.indexOf('stack') < 0)
-  for core_name, core_files of CORE
-    core.push({name: "#{core_name}_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, core_files])})
+  for core_files in CORE_FILES
+    core.push({name: "core_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, core_files])})
 
 ###############################
 # ORM
