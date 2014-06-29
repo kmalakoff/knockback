@@ -4,8 +4,6 @@ describe 'knockback-validation.js', ->
   kb = window.kb or require?('knockback')
   _ = kb._
 
-  window.kb = kb unless window.kb # make kb global for bindings
-
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
     assert.ok(!!_, '_')
@@ -49,6 +47,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator', (done) ->
+    window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
@@ -89,6 +88,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator with custom validators', (done) ->
+    window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
@@ -141,6 +141,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator with validation_options', (done) ->
+    window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
@@ -208,6 +209,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator with name', (done) ->
+    window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
@@ -278,6 +280,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator no name with validation_options', (done) ->
+    window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model =
@@ -355,6 +358,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator with inject and disable', (done) ->
+    window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
     window.MyViewModel = kb.ViewModel.extend({

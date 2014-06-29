@@ -1,5 +1,5 @@
 module.exports =
-  '_temp/bundle-lodash-legacy.js':
+  '_temp/commonjs/lodash-legacy.js':
     lodash: 'vendor/optional/lodash-0.3.2.js'
     backbone: 'vendor/backbone-0.5.1.js'
     'backbone-modelref': 'backbone-modelref'

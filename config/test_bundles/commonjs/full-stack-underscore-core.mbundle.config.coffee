@@ -1,5 +1,5 @@
 module.exports =
-  '_temp/bundle-full-stack-underscore-core.js':
+  '_temp/commonjs/full-stack-underscore-core.js':
     underscore: 'vendor/underscore-1.6.0.js'
     backbone: 'vendor/backbone-1.1.2.js'
     'backbone-modelref': 'backbone-modelref'

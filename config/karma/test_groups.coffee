@@ -1,6 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 _ = require 'underscore'
+gutil = require 'gulp-util'
 
 KNOCKBACK =
   full: ['./knockback.js']
@@ -29,29 +30,25 @@ ORM =
   supermodel_legacy: ['./vendor/optional/supermodel-0.0.1.js']
   supermodel: ['./vendor/optional/supermodel-0.0.4.js']
 
-module.exports = {}
+module.exports = TEST_GROUPS = {}
 
 ###############################
 # Full Library
 ###############################
-full = module.exports.full = []
+TEST_GROUPS.full = []
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('full') >= 0 and test_name.indexOf('stack') < 0)
   for dep_name, dep_files of REQUIRED_DEPENDENCIES
     if dep_name.indexOf('backbone') >= 0 # Backbone
-      full.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee'])})
+      TEST_GROUPS.full.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee'])})
     else # Parse
-      full.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, './test/knockback/**/*.tests.coffee'])})
+      TEST_GROUPS.full.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files, LOCALIZATION, './test/knockback/**/*.tests.coffee'])})
 
 ###############################
 # Core Library
 ###############################
-ROOT = './test/knockback'
-CORE_FILES = _.map(_.filter(fs.readdirSync(ROOT), (file) -> path.extname(file) is '.coffee' and file.indexOf('core.tests.coffee') >= 0), (file) -> "#{ROOT}/#{file}")
-
-core = module.exports.core = []
+TEST_GROUPS.core = []
 for test_name, test_files of KNOCKBACK when (test_name.indexOf('core') >= 0 and test_name.indexOf('stack') < 0)
-  for core_files in CORE_FILES
-    core.push({name: "core_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, core_files])})
+  TEST_GROUPS.core.push({name: "core_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, test_files, './test/knockback/**/*.core.tests.coffee'])})
 
 ###############################
 # ORM
@@ -62,27 +59,50 @@ ORM_TESTS =
   backbone_associations: [KNOCKBACK.full, './vendor/optional/backbone-associations-0.5.5.js', './test/ecosystem/**/backbone-associations*.tests.coffee']
   supermodel: [KNOCKBACK.full, './vendor/optional/supermodel-0.0.4.js', './test/ecosystem/**/supermodel*.tests.coffee']
 
-orm = module.exports.orm = []
+TEST_GROUPS.orm = []
 for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')
-  orm.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
+  TEST_GROUPS.orm.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
 
 ###############################
 # CommonJS
 ###############################
 COMMONJS_TESTS =
-  latest: ['./vendor/test/jquery-1.11.1.min.js', './_temp/bundle-commonjs-latest.js', LOCALIZATION_DEPENCIES, MODEL_REF, './test/knockback/**/*.tests.coffee']
+  latest: ['./vendor/test/jquery-1.11.1.min.js', './_temp/commonjs/latest.js', LOCALIZATION_DEPENCIES, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
-commonjs = module.exports.commonjs = []
-commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
+TEST_GROUPS.commonjs = []
+TEST_GROUPS.commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
 
 ###############################
 # Stack Libraries - Bundled Dependencies
 ###############################
 STACK_TESTS =
-  lodash: ['./vendor/test/jquery-1.11.1.min.js', './_temp/bundle-full-stack-lodash.js', LOCALIZATION_DEPENCIES, './test/knockback/**/*.tests.coffee']
-  underscore: ['./vendor/test/jquery-1.11.1.min.js', './_temp/bundle-full-stack-underscore.js', LOCALIZATION_DEPENCIES, './test/knockback/**/*.tests.coffee']
+  lodash: ['./vendor/test/jquery-1.11.1.min.js', './_temp/commonjs/full-stack-lodash.js', LOCALIZATION_DEPENCIES, './test/knockback/**/*.tests.coffee']
+  underscore: ['./vendor/test/jquery-1.11.1.min.js', './_temp/commonjs/full-stack-underscore.js', LOCALIZATION_DEPENCIES, './test/knockback/**/*.tests.coffee']
   full: ['./vendor/test/jquery-1.11.1.min.js', './knockback-full-stack.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
 
 # Full Stack
-full_stack = module.exports.full_stack = []
-full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
+TEST_GROUPS.full_stack = []
+TEST_GROUPS.full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
+
+###############################
+# AMD
+###############################
+TEST_GROUPS.amd = []
+for test in TEST_GROUPS.full.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
+  do (test) ->
+    files = []
+    files.push({pattern: file}) for file in ['./vendor/test/require-2.1.9.js']
+    files.push({pattern: file, included: false}) for file in test.files.slice(0, -1)
+    files.push({pattern: file}) for file in ["./_temp/amd/#{test.name}/#{gutil.replaceExtension(path.basename(test.files.slice(-1)[0]), '.js')}"]
+    TEST_GROUPS.amd.push({name: "amd_#{test.name}", files: files, original_files: test.files, destination: "_temp/amd/#{test.name}"})
+
+###############################
+# Webpack
+###############################
+WEBPACK_TESTS =
+  full: ['./temp/webpack/knockback.tests.js']
+  core: ['./temp/webpack/knockback-core.tests.js']
+
+# Full Stack
+TEST_GROUPS.webpack = []
+TEST_GROUPS.webpack.push({name: "webpack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
