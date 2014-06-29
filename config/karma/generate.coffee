@@ -10,7 +10,6 @@ requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 wrapAMD = require 'gulp-wrap-amd-infer'
 
-buildLibrary = require '../build/build_library'
 buildWebpack = require '../webpack/build'
 
 TEST_GROUPS = require('./test_groups')
@@ -34,7 +33,7 @@ module.exports = (callback) ->
 
   # queue.defer (callback) -> buildWebpack require('../test_bundles/test-webpack.config'), callback
 
-  queue.defer (callback) -> buildLibrary {paths: ["test/lib/**/*.coffee"], modules: {type: 'local-shim', file_name: 'knockback-examples-localization.js', umd: {symbol: 'knockback-locale-manager', dependencies: ['knockback']}}, destination: './_temp'}, callback
+  queue.defer (callback) -> buildWebpack(require('../test_bundles/knockback-examples-localization.webpack.config'), callback)
 
   # # lock vendor until backbone-orm main updated
   # queue.defer (callback) -> requireSrc(_.keys(require('../../package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
@@ -53,18 +52,18 @@ module.exports = (callback) ->
       .pipe(ws)
 
   # wrap AMD tests
-  for test in TEST_GROUPS.core when (test.name.indexOf('simple_') < 0) and (test.name.indexOf('defaults_') < 0) and (test.name.indexOf('_min') < 0)
-    do (test) -> queue.defer (callback) ->
-      gulp.src(test.files.slice(-1)[0])
-        .pipe(compile({coffee: {bare: true, header: false}}))
-        .pipe(wrapAMD({
-          files: test.files.slice(0, -1)
-          shims: SHIMS
-          karma: true
-          post_load: POST_LOAD
-          name: (name) -> if (name is 'knockback-core.js') or ((name.indexOf('knockback-') < 0) and (name.indexOf('globalize') < 0)) then name.split('-').shift() else name
-        }))
-        .pipe(gulp.dest('_temp'))
-        .on('end', callback)
+  # for test in TEST_GROUPS.core when (test.name.indexOf('simple_') < 0) and (test.name.indexOf('defaults_') < 0) and (test.name.indexOf('_min') < 0)
+  #   do (test) -> queue.defer (callback) ->
+  #     gulp.src(test.files.slice(-1)[0])
+  #       .pipe(compile({coffee: {bare: true, header: false}}))
+  #       .pipe(wrapAMD({
+  #         files: test.files.slice(0, -1)
+  #         shims: SHIMS
+  #         karma: true
+  #         post_load: POST_LOAD
+  #         name: (name) -> if (name is 'knockback-core.js') or ((name.indexOf('knockback-') < 0) and (name.indexOf('globalize') < 0)) then name.split('-').shift() else name
+  #       }))
+  #       .pipe(gulp.dest('_temp'))
+  #       .on('end', callback)
 
   queue.await callback

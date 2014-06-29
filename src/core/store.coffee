@@ -8,8 +8,7 @@
 ###
 
 kb = require './kb'
-_ = require 'underscore'
-ko = require 'knockout'
+_ = kb._; ko = kb.ko
 
 # Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 #

@@ -1,4 +1,4 @@
-try kb = require 'knockback' catch err then kb = require './kb'
+kb = require 'knockback'
 
 class kb.LocalizedString
   constructor: (@string_id) ->

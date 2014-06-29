@@ -8,8 +8,7 @@
 ###
 
 kb = require './kb'
-_ = require 'underscore'
-ko = require 'knockout'
+_ = kb._; ko = kb.ko
 
 # Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 #

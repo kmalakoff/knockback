@@ -74,7 +74,8 @@
     "mocha": "^1.20.1",
     "module-bundler": "*",
     "queue-async": "*",
-    "requirejs": "^2.1.14"
+    "requirejs": "2.x",
+    "wrench": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "0.8.x",

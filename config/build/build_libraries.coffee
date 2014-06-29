@@ -1,6 +1,10 @@
-LIBRARIES = require './libraries'
-Async = require 'async'
+Queue = require 'queue-async'
 
-buildLibrary = require './build_library'
+buildWebpack = require '../webpack/build'
 
-module.exports = (callback) -> Async.each LIBRARIES, buildLibrary, callback
+module.exports = (callback) ->
+  queue = new Queue(1)
+  queue.defer (callback) -> buildWebpack(require('../webpack/knockback.webpack.config'), callback)
+  queue.defer (callback) -> buildWebpack(require('../webpack/knockback-core.webpack.config'), callback)
+  queue.defer (callback) -> buildWebpack(require('../webpack/knockback-full-stack.webpack.config'), callback)
+  queue.await callback

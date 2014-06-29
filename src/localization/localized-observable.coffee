@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-try kb = require 'knockback' catch err then kb = require './kb'
-_ = require 'underscore'
-ko = require 'knockout'
+kb = require '../core/kb'
+_ = kb._; ko = kb.ko
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing

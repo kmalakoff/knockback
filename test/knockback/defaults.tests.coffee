@@ -4,7 +4,8 @@ describe 'knockback-defaults.js', ->
   kb = window.kb or require?('knockback')
   _ = kb._
   Backbone = kb.Backbone
-  require?('knockback-examples-localization')
+  Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
+  kb.LocaleManager or require?('knockback-examples-localization')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

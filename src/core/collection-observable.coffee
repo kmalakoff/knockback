@@ -8,8 +8,7 @@
 ###
 
 kb = require './kb'
-_ = require 'underscore'
-ko = require 'knockout'
+_ = kb._; ko = kb.ko
 
 COMPARE_EQUAL = 0
 COMPARE_ASCENDING = -1

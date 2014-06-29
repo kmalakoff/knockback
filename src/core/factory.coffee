@@ -8,7 +8,7 @@
 ###
 
 kb = require './kb'
-_ = require 'underscore'
+_ = kb._
 
 # Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 #

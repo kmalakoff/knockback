@@ -14,7 +14,7 @@ minifyLibraries = require './config/build/minify_libraries'
 
 gulp.task 'build', buildLibraries
 gulp.task 'watch', ['build'], -> LIBRARIES.map (library) -> gulp.watch library.paths, -> buildLibrary.buildLibrary(library)
-gulp.task 'minify', ['build'], minifyLibraries
+gulp.task 'minify', ['build'], (callback) -> minifyLibraries -> # TODO: somewhere there is an extra callback in gulp. do I need to listen to more events?
 
 gulp.task 'release', ['test'], (callback) ->
   copyLibraryFiles = (destination, callback) ->
@@ -27,6 +27,7 @@ gulp.task 'release', ['test'], (callback) ->
   queue.await callback
 
 gulp.task 'test', ['minify'], (callback) ->
+# gulp.task 'test', (callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> karmaGenerate(callback)
   queue.defer (callback) -> karmaRun(callback)

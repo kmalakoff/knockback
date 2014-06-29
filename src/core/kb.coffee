@@ -7,7 +7,6 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-_ = require 'underscore'
 ko = require 'knockout'
 
 # From Backbone.js (https:github.com/documentcloud/backbone)
@@ -274,3 +273,16 @@ module.exports = class kb
 
   @publishMethods: (observable, instance, methods) -> observable[fn] = kb._.bind(instance[fn], instance) for fn in methods; return
   @peek: (obs) -> return obs unless ko.isObservable(obs); return obs.peek() if obs.peek; return kb.ignore -> obs()
+
+if window?.Parse
+  Backbone = kb.Parse = window.Parse
+  _ = kb._ = window.Parse._
+else
+  Backbone = kb.Backbone = require 'backbone'
+  _ = kb._ = require 'underscore'
+kb.ko = ko
+
+# cache local references
+kb.Collection = Backbone.Collection
+kb.Model = Backbone.Object or Backbone.Model
+kb.Events = Backbone.Events

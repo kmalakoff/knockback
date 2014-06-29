@@ -7,34 +7,12 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-# use Parse
-(@Backbone = @Parse; @_ = @Parse._) if @Parse
-
-# ensure the client symbols are resolved
-if window? and require.shim
-  require.shim([
-    {symbol: '_', path: 'lodash', alias: 'underscore', optional: true}, {symbol: '_', path: 'underscore'}
-    {symbol: 'Backbone', path: 'backbone'}
-    {symbol: 'ko', path: 'knockout'}
-  ])
-
-module.exports = kb = require('./kb')
-
-# cache local references
-if @Parse then (Backbone = kb.Parse = @Parse) else (Backbone = kb.Backbone = require 'backbone')
-kb.Collection = Backbone.Collection
-kb.Model = Backbone.Object or Backbone.Model
-kb.Events = Backbone.Events
-kb._ = require 'underscore'
-kb.ko = require 'knockout'
-
-# required components
-require(component) for component in ['./utils', './event-watcher', './store', './factory', './observable', './view-model', './collection-observable', './orm', './inject']
-
-# optional components
-for component in ['./default-observable', './formatted-observable', './localized-observable', './statistics', './triggered-observable', './validation']
-  try require(component) catch err then {}
+module.exports = kb = require './kb'
 
 # re-expose modules
-kb.modules = {}
-kb.modules[component] = require(component) for component in ['underscore', 'backbone', 'knockout']
+kb.modules = {underscore: kb._, backbone: kb.Parse or kb.Backbone, knockout: kb.ko}
+if window?
+  window._ or window._ = kb._
+  (window.Backbone or window.Backbone = kb.Backbone) if kb.Backbone
+  (window.Parse or window.Parse = kb.Parse) if kb.Parse
+  window.ko or window.ko = kb.ko

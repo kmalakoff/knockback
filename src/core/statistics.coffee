@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-try kb = require 'knockback' catch err then kb = require './kb'
-_ = require 'underscore'
+kb = require './kb'
+_ = kb._
 
 # kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
 #

@@ -1,5 +1,5 @@
-try kb = require 'knockback' catch err then kb = require './kb'
-_ = require 'underscore'
+kb = require 'knockback'
+_ = kb._
 
 class kb.LocalizedStringLocalizer extends kb.LocalizedObservable
   read: (value) ->

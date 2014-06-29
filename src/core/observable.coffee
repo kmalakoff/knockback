@@ -8,8 +8,7 @@
 ###
 
 kb = require './kb'
-_ = require 'underscore'
-ko = require 'knockout'
+_ = kb._; ko = kb.ko
 
 # Base class for observing model attributes.
 #

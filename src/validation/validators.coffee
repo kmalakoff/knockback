@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-try kb = require 'knockback' catch err then kb = require './kb'
-_ = require 'underscore'
-ko = require 'knockout'
+kb = require '../core/kb'
+_ = kb._; ko = kb.ko
 
 # Regular expressions from Angular.js: https://github.com/angular/angular.js
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/
