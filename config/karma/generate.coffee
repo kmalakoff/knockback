@@ -9,9 +9,9 @@ shell = require 'gulp-shell'
 requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 wrapAMD = require 'gulp-wrap-amd-infer'
-webpack = require 'webpack'
 
 buildLibrary = require '../build_library'
+buildWebpack = require '../webpack/build'
 
 TEST_GROUPS = require('./test_groups')
 
@@ -27,17 +27,12 @@ POST_LOAD = 'window._ = window.Backbone = window.ko = window.kb = null;'
 module.exports = (callback) ->
   queue = new Queue(1)
 
-  # queue.defer (callback) ->
-  #   gulp.src(['knockback.js', 'package.json'])
-  #     .pipe(gulp.dest('node_modules/knockback'))
-  #     .on('end', callback)
+  queue.defer (callback) ->
+    gulp.src(['knockback.js', 'package.json'])
+      .pipe(gulp.dest('node_modules/knockback'))
+      .on('end', callback)
 
-  # queue.defer (callback) ->
-  #   webpack require('../test_bundles/test-webpack.config'), (err, stats) ->
-  #     console.log 'webpack', err, _.pluck(stats.compilation.warnings, 'message')
-  #     console.log 'webpack', err, _.pluck(stats.compilation.errors, 'message')
-  #     console.log 'webpack', err, (dep.replace(process.cwd(), '') for dep in stats.compilation.fileDependencies)
-  #     callback(err)
+  # queue.defer (callback) -> buildWebpack require('../test_bundles/test-webpack.config'), callback
 
   queue.defer (callback) -> buildLibrary {paths: ["test/lib/**/*.coffee"], modules: {type: 'local-shim', file_name: 'knockback-examples-localization.js', umd: {symbol: 'knockback-locale-manager', dependencies: ['knockback']}}, destination: './_temp'}, callback
 

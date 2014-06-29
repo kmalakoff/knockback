@@ -7526,7 +7526,7 @@ if (typeof require !== "undefined" && !!require) globals.requires.push(require);
       try { if (globals.require(item.path)) { return; } } catch (e) {}
 
       // use external require
-      try { for (var ext_i = 0, ext_length = globals.requires.length; ext_i < ext_length; ext_i++) {if (dep = globals.requires[ext_i](item.path)) break;}} catch (e) {}
+      for (var ext_i = 0, ext_length = globals.requires.length; ext_i < ext_length; ext_i++) {try {if (dep = globals.requires[ext_i](item.path)) break;} catch (e) {}}
 
       // use symbol path on window
       if (!dep && item.symbol) {

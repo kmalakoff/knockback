@@ -48,8 +48,7 @@ gulp.task 'minify', ['build'], (callback) ->
 gulp.task 'release', ['test'], (callback) ->
   copyLibraryFiles 'packages/npm', (err) -> return callback(err) if err; copyLibraryFiles('packages/nuget/Content/Scripts', callback)
 
-# gulp.task 'test', ['minify'], (callback) ->
-gulp.task 'test', (callback) ->
+gulp.task 'test', ['minify'], (callback) ->
   queue = new Queue(1)
   queue.defer (callback) -> karmaGenerate(callback)
   queue.defer (callback) -> karmaRun(callback)

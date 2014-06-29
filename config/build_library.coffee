@@ -30,7 +30,7 @@ module.exports = (library, callback) ->
       .pipe(gulp.dest(library.destination))
       .on('end', callback)
 
-  queue = new Queue(1)
+  queue = new Queue()
   queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
   queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
   queue.await callback
@@ -55,7 +55,7 @@ module.exports.minifyLibrary = (library, callback) ->
       .pipe(gulp.dest(library.destination))
       .on('end', callback)
 
-  queue = new Queue(1)
+  queue = new Queue()
   queue.defer((callback) -> helper(cachedBuild(library), library.modules.file_name, callback))
   queue.defer((callback) -> helper(cachedStackBuild(library), library.stack_file_name, callback)) if library.stack_file_name
   queue.await callback
