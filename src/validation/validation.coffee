@@ -9,6 +9,7 @@
 
 kb = require '../core/kb'
 _ = kb._; ko = kb.ko
+$ = kb.$
 
 require './validators'
 

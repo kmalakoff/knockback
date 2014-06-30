@@ -9,5 +9,5 @@ module.exports = _.extend  _.clone(require '../../webpack-base.config.coffee'), 
 }
 
 module.exports.resolve.alias =
-  knockback: path.resolve('./knockback-core.js')
+  knockback: path.resolve('./knockback.js')
   'knockback-examples-localization': path.resolve('./_temp/knockback-examples-localization.js')

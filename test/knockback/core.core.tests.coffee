@@ -1,7 +1,7 @@
 describe 'knockback_core utils', ->
   ko = window.ko or require?('knockout')
   kb = window.kb or require?('knockback')
-  _ = kb._
+  _ = kb._; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

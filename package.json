@@ -65,17 +65,16 @@
     "karma-firefox-launcher": "^0.1.3",
     "karma-mocha": "^0.1.4",
     "karma-phantomjs-launcher": "^0.1.4",
-    "karma-requirejs": "^0.2.2",
     "karma-safari-launcher": "^0.1.1",
     "mocha": "^1.20.1",
     "module-bundler": "*",
     "queue-async": "*",
-    "requirejs": "2.x",
-    "semver": "^2.3.1",
     "webpack": "*",
-    "wrench": "*"
+    "wrench": "*",
+    "requirejs": "*"
   },
   "optionalDependencies": {
+    "jquery": "*",
     "backbone-relational": "0.8.x",
     "backbone-modelref": "0.1.x",
     "lodash": "2.x",

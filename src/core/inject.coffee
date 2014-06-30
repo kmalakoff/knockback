@@ -9,6 +9,7 @@
 
 kb = require './kb'
 _ = kb._; ko = kb.ko
+$ = kb.$
 
 kb.RECUSIVE_AUTO_INJECT = true
 
@@ -170,8 +171,8 @@ kb.injectViewModels = kb.Inject.injectViewModels
 #############################
 if document?
   # use DOM library ready function
-  if @$
-    @$(->kb.injectViewModels())
+  if $
+    $(->kb.injectViewModels())
 
   # use simple ready check
   else

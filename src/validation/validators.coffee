@@ -9,6 +9,7 @@
 
 kb = require '../core/kb'
 _ = kb._; ko = kb.ko
+$ = kb.$
 
 # Regular expressions from Angular.js: https://github.com/angular/angular.js
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/
