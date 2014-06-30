@@ -19,7 +19,7 @@ STANDARD_CONFIG =
   port: 9876
   colors: true
   logLevel: 'INFO'
-  browsers: ['PhantomJS']
+  browsers: ['PhantomJS'] # ['Firefox', 'Chrome', 'Safari']
 
 TEST_GROUPS = require('../test_groups')
 
