@@ -132,4 +132,4 @@ BROWSERIFY_TESTS =
   core: {files: ['./vendor/optional/jquery-2.1.1.js', './_temp/browserify/knockback-core.tests.js'], build: {files: ['./test/knockback/**/*.core.tests.coffee'], options: {shim: BROWSERIFY_SHIMS.core}}}
 
 TEST_GROUPS.browserify = []
-TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: test_info.files, destination: test.files.slice(-1)[0], build: test_info.build}) for test_name, test_info of BROWSERIFY_TESTS
+TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: test_info.files, build: _.extend({destination: test_info.files.slice(-1)[0]}, test_info.build)}) for test_name, test_info of BROWSERIFY_TESTS
