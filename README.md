@@ -34,81 +34,6 @@ These resources can help you get started:
 * [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 
-#Download Latest (0.18.6):
-
-Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
-
-###Full
-
-Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
-
-* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback.min.js)
-* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-full-stack.min.js)
-
-###Core
-
-Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
-
-* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core.min.js)
-* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core-stack.min.js)
-
-###Distributions
-
-You can also find Knockback on your favorite distributions:
-
-* [npm registry](https://npmjs.org/package/knockback)
-* [NuGet Gallery](http://nuget.org/packages/Knockback.js)
-* [Bower](http://sindresorhus.com/bower-components/)
-* [Jam](http://jamjs.org/packages/#/details/knockback)
-
-###Dependencies
-
-* [Backbone.js](http://backbonejs.org/)
-* [Underscore.js](http://underscorejs.org/)
-* [Knockout.js](http://knockoutjs.com/)
-
-###Replaceable Dependencies
-
-* [LoDash](http://lodash.com/) - it you prefer LoDash to Underscore.js, we've got support for it!
-* [Parse](https://www.parse.com/) - instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
-
-###Compatible Components
-
-* [BackboneORM](http://vidigami.github.io/backbone-orm/) - A polystore ORM for Node.js and the browser
-* [Backbone-Relational.js](http://backbonerelational.org/) - Get and set relations (one-to-one, one-to-many, many-to-one) for Backbone models
-* [Backbone Associations](http://dhruvaray.github.io/backbone-associations/) - Create object hierarchies with Backbone models. Respond to hierarchy changes using regular Backbone events
-* [Supermodel.js](http://pathable.github.io/supermodel/) - Minimal Model Tracking for Backbonejs
-* [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
-* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
-* [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
-
-###Modules to Extend Core
-
-To minimize library size, you can choose to use Knockback Core and then extend it with the following modules.
-
-* 'knockback-defaults' - lib/defaults.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-formatting' - lib/formatting.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-localization' - lib/localization.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-triggering' - lib/triggering.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-validation' - lib/validation.js module. Comes bundled with knockback.js and knockback-full-stack.js.
-* 'knockback-statistics' - lib/statistics.js module. Not bundled with any library nor component.
-
-
-Why Write Knockback.js?
------------------------
-
-When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to "mix and match" the best features. I started with [Backbone.js](http://documentcloud.github.com/backbone/) and really loved the Models and Collections, and used [Brunch](http://brunch.io/) to get me up and running quickly.
-
-After a while, I found the view coding too slow so I wrote [Mixin.js](https://github.com/kmalakoff/mixin) to extract out reusable aspects of my views. When I was looking for my next productivity increase, an ex-work colleague suggested [Sproutcore](http://www.sproutcore.com/), but at the time, it wasn't yet micro-frameworky enough meaning I would need to learn something big and "to throw the baby out with the bathwater" as they say (it is hard to give up Backbone models and collections!). Then, I discovered [Knockout](http://knockoutjs.com/) and knew it was for me!
-
-Knockout provided just the right building blocks for a layer between my templates and data. As I used it more, I built additional functionality like [Backbone.ModelRefs](https://github.com/kmalakoff/backbone-modelref) for lazy model loading, localization helpers for truly dynamic views, and most recently, an easier way to sync collections and their model's view models.
-
-So here it is...the refactored and shareable version of my Backbone bindings for Knockout: Knockback.js
-
-Enjoy!
-
-Kevin
-
 An Example
 ----------
 
@@ -172,6 +97,70 @@ And now when you type in the input boxes, the values are properly transferred to
 Of course, this is just a simple example, but hopefully you get the picture.
 
 
+#Download Latest (0.18.6):
+
+Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
+
+###Full
+
+Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+
+* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback.min.js)
+* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-full-stack.min.js)
+
+###Core
+
+Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
+
+* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core.min.js)
+* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.18.6/knockback-core-stack.min.js)
+
+###Distributions
+
+You can also find Knockback on your favorite distributions:
+
+* [npm registry](https://npmjs.org/package/knockback)
+* [NuGet Gallery](http://nuget.org/packages/Knockback.js)
+* [Bower](http://sindresorhus.com/bower-components/)
+* [Jam](http://jamjs.org/packages/#/details/knockback)
+
+###Dependencies
+
+* [Backbone.js](http://backbonejs.org/)
+* [Underscore.js](http://underscorejs.org/)
+* [Knockout.js](http://knockoutjs.com/)
+
+###Replaceable Dependencies
+
+* [LoDash](http://lodash.com/) - it you prefer LoDash to Underscore.js, we've got support for it!
+* [Parse](https://www.parse.com/) - instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
+
+###Compatible Components
+
+* [BackboneORM](http://vidigami.github.io/backbone-orm/) - A polystore ORM for Node.js and the browser
+* [Backbone-Relational.js](http://backbonerelational.org/) - Get and set relations (one-to-one, one-to-many, many-to-one) for Backbone models
+* [Backbone Associations](http://dhruvaray.github.io/backbone-associations/) - Create object hierarchies with Backbone models. Respond to hierarchy changes using regular Backbone events
+* [Supermodel.js](http://pathable.github.io/supermodel/) - Minimal Model Tracking for Backbonejs
+* [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
+* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
+* [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
+
+
+Why Write Knockback.js?
+-----------------------
+
+When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to "mix and match" the best features. I started with [Backbone.js](http://documentcloud.github.com/backbone/) and really loved the Models and Collections, and used [Brunch](http://brunch.io/) to get me up and running quickly.
+
+After a while, I found the view coding too slow so I wrote [Mixin.js](https://github.com/kmalakoff/mixin) to extract out reusable aspects of my views. When I was looking for my next productivity increase, an ex-work colleague suggested [Sproutcore](http://www.sproutcore.com/), but at the time, it wasn't yet micro-frameworky enough meaning I would need to learn something big and "to throw the baby out with the bathwater" as they say (it is hard to give up Backbone models and collections!). Then, I discovered [Knockout](http://knockoutjs.com/) and knew it was for me!
+
+Knockout provided just the right building blocks for a layer between my templates and data. As I used it more, I built additional functionality like [Backbone.ModelRefs](https://github.com/kmalakoff/backbone-modelref) for lazy model loading, localization helpers for truly dynamic views, and most recently, an easier way to sync collections and their model's view models.
+
+So here it is...the refactored and shareable version of my Backbone bindings for Knockout: Knockback.js
+
+Enjoy!
+
+Kevin
+
 
 Building, Running and Testing the library
 -----------------------
@@ -181,10 +170,8 @@ Building, Running and Testing the library
 1. install node.js: http://nodejs.org
 2. install node packages: `npm install`
 
-###Testing:
-
-1. Run `npm test`
-
 ###Commands:
 
-Look at: https://github.com/kmalakoff/easy-bake
+1. Build: `npm run build`
+2. Build and run tests: `npm test`
+3. Build documents: `npm run docs`
