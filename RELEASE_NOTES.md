@@ -1,7 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 0.18.7
-* Renamed plugins to start with knockback-{plugin}
+* Removed standalone plugins. Just choose knockback if you need one or more plugins.
+* Change library building to use webpack.
 
 ## 0.18.6
 * Put AMD loader first due to webpack imcompatibity

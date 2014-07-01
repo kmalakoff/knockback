@@ -77,13 +77,21 @@ TEST_GROUPS.commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_
 ###############################
 # Stack Libraries - Bundled Dependencies
 ###############################
-STACK_TESTS =
-  lodash: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/full-stack-lodash.js', LOCALIZATION_DEPENCIES, './test/knockback/**/*.tests.coffee']
-  underscore: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/full-stack-underscore.js', LOCALIZATION_DEPENCIES, './test/knockback/**/*.tests.coffee']
-  full: ['./vendor/optional/jquery-2.1.1.js', './knockback-full-stack.js', LOCALIZATION, MODEL_REF, './test/knockback/**/*.tests.coffee']
+FULL_STACK_TESTS =
+  lodash: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/full-stack-lodash.js', LOCALIZATION_DEPENCIES]
+  underscore: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/full-stack-underscore.js', LOCALIZATION_DEPENCIES]
+  full: ['./vendor/optional/jquery-2.1.1.js', './knockback-full-stack.js', LOCALIZATION, MODEL_REF]
 
 TEST_GROUPS.full_stack = []
-TEST_GROUPS.full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of STACK_TESTS
+TEST_GROUPS.full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of FULL_STACK_TESTS
+
+CORE_STACK_TESTS =
+  lodash: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/core-stack-lodash.js']
+  underscore: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/core-stack-underscore.js']
+  core: ['./vendor/optional/jquery-2.1.1.js', './knockback-core-stack.js']
+
+TEST_GROUPS.full_stack = []
+TEST_GROUPS.full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.core.tests.coffee'])}) for test_name, test_files of CORE_STACK_TESTS
 
 ###############################
 # AMD

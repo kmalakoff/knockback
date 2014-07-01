@@ -3,7 +3,7 @@ _ = require 'underscore'
 Queue = require 'queue-async'
 
 gulp = require 'gulp'
-webpack = require './config/gulp-webpack'
+webpack = require './config/webpack/gulp-webpack'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'

@@ -1,5 +1,5 @@
 module.exports =
-  '_temp/commonjs/full-stack-lodash-core.js':
+  '_temp/commonjs/core-stack-lodash.js':
     lodash: 'vendor/optional/lodash-2.4.1.js'
     backbone: 'vendor/backbone-1.1.2.js'
     'backbone-modelref': 'backbone-modelref'

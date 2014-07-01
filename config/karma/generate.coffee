@@ -11,7 +11,7 @@ requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 concat = require 'gulp-concat'
 wrapAMD = require 'gulp-wrap-amd-infer'
-webpack = require '../gulp-webpack'
+webpack = require '../webpack/gulp-webpack'
 browserify = require 'gulp-browserify'
 
 TEST_GROUPS = require('../test_groups')
@@ -40,7 +40,7 @@ module.exports = (callback) ->
       .pipe(es.writeArray (err, array) -> callback())
 
   # build test browserify
-  for test in TEST_GROUPS.browserify
+  for test in TEST_GROUPS.browserify or []
     do (test) -> queue.defer (callback) ->
       gulp.src(test.build.files)
         .pipe(compile({coffee: {bare: true}}))
@@ -50,7 +50,7 @@ module.exports = (callback) ->
         .on('end', callback)
 
   # wrap AMD tests
-  for test in TEST_GROUPS.amd
+  for test in TEST_GROUPS.amd or []
     do (test) -> queue.defer (callback) ->
       gulp.src(test.build.files)
         .pipe(compile({coffee: {bare: true, header: false}}))
