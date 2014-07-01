@@ -47,14 +47,14 @@ gulp.task 'test', ['minify'], (callback) ->
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so doesn't return exit code
-  copyLibraryFiles = (destination, callback) ->
-    gulp.src(LIBRARY_FILES.concat(['README.md', 'component.json', 'bower.json']))
-      .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on('end', callback)
+  copyLibraryFiles = (destination, others, callback) ->
+    gulp.src(LIBRARY_FILES.concat(['README.md'].concat(others)))
+      .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
       .on('end', callback)
 
   queue = new Queue(1)
   queue.defer (callback) -> runTests(callback)
-  queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
-  queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
+  queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
+  queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
   queue.await (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455

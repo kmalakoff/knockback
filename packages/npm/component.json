@@ -1,0 +1,21 @@
+{
+  "name": "knockback",
+  "author": "Kevin Malakoff (https://github.com/kmalakoff)",
+  "version": "0.18.6",
+  "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
+  "keywords" : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
+  "repo": "kmalakoff/knockback",
+  "dependencies": {
+    "jashkenas/underscore": "*",
+    "jashkenas/backbone": "*",
+    "matchdav/knockout": "*"
+  },
+  "main": "knockback.js",
+  "scripts": [
+    "knockback.js",
+    "knockback.min.js",
+    "knockback-core.js",
+    "knockback-core.min.js"
+  ],
+  "license": "MIT"
+}

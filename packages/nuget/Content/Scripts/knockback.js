@@ -868,13 +868,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, onReady, _, _ko_applyBindings;
+	var $, kb, ko, onReady, _, _ko_applyBindings;
 
 	kb = __webpack_require__(5);
 
 	_ = kb._;
 
 	ko = kb.ko;
+
+	$ = kb.$;
 
 	kb.RECUSIVE_AUTO_INJECT = true;
 
@@ -994,8 +996,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.injectViewModels = kb.Inject.injectViewModels;
 
 	if (typeof document !== "undefined" && document !== null) {
-	  if (this.$) {
-	    this.$(function() {
+	  if ($) {
+	    $(function() {
 	      return kb.injectViewModels();
 	    });
 	  } else {
@@ -1303,6 +1305,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.Model = Backbone.Object || Backbone.Model;
 
 	kb.Events = Backbone.Events;
+
+	kb.$ = (typeof window !== "undefined" && window !== null ? window.jQuery : void 0) || (typeof window !== "undefined" && window !== null ? window.$ : void 0);
 
 
 /***/ },
@@ -3064,13 +3068,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var callOrGet, kb, ko, _;
+	var $, callOrGet, kb, ko, _;
 
 	kb = __webpack_require__(5);
 
 	_ = kb._;
 
 	ko = kb.ko;
+
+	$ = kb.$;
 
 	__webpack_require__(22);
 
@@ -3308,13 +3314,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var EMAIL_REGEXP, NUMBER_REGEXP, URL_REGEXP, kb, ko, _;
+	var $, EMAIL_REGEXP, NUMBER_REGEXP, URL_REGEXP, kb, ko, _;
 
 	kb = __webpack_require__(5);
 
 	_ = kb._;
 
 	ko = kb.ko;
+
+	$ = kb.$;
 
 	URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 
