@@ -20,15 +20,7 @@ REQUIRED_DEPENDENCIES =
 
 LOCALIZATION_DEPENCIES = ['./vendor/test/globalize/globalize.js', './vendor/test/globalize/globalize.culture.en-GB.js', './vendor/test/globalize/globalize.culture.fr-FR.js']
 LOCALIZATION = ['./_temp/knockback-examples-localization.js'].concat(LOCALIZATION_DEPENCIES)
-
 MODEL_REF = './vendor/optional/backbone-modelref-0.1.5.js'
-
-ORM =
-  backbone_orm: ['./vendor/optional/backbone-orm-0.5.17.js']
-  relational: ['./vendor/optional/backbone-relational-0.8.8.js']
-  associations: ['./vendor/optional/backbone-relational-0.5.4.js']
-  supermodel_legacy: ['./vendor/optional/supermodel-0.0.1.js']
-  supermodel: ['./vendor/optional/supermodel-0.0.4.js']
 
 FILES = require './files'
 
@@ -66,47 +58,9 @@ for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_la
   TEST_GROUPS.orm.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
 
 ###############################
-# CommonJS
-###############################
-COMMONJS_TESTS =
-  latest: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/latest.js', LOCALIZATION_DEPENCIES, MODEL_REF, './test/knockback/**/*.tests.coffee']
-
-TEST_GROUPS.commonjs = []
-TEST_GROUPS.commonjs.push({name: "commonjs_#{test_name}", files: _.flatten(test_files)}) for test_name, test_files of COMMONJS_TESTS
-
-###############################
-# Stack Libraries - Bundled Dependencies
-###############################
-FULL_STACK_TESTS =
-  lodash: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/full-stack-lodash.js', LOCALIZATION_DEPENCIES]
-  underscore: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/full-stack-underscore.js', LOCALIZATION_DEPENCIES]
-  full: ['./vendor/optional/jquery-2.1.1.js', './knockback-full-stack.js', LOCALIZATION, MODEL_REF]
-
-TEST_GROUPS.full_stack = []
-TEST_GROUPS.full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.tests.coffee'])}) for test_name, test_files of FULL_STACK_TESTS
-
-CORE_STACK_TESTS =
-  lodash: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/core-stack-lodash.js']
-  underscore: ['./vendor/optional/jquery-2.1.1.js', './_temp/commonjs/core-stack-underscore.js']
-  core: ['./vendor/optional/jquery-2.1.1.js', './knockback-core-stack.js']
-
-TEST_GROUPS.full_stack = []
-TEST_GROUPS.full_stack.push({name: "full-stack_#{test_name}", files: _.flatten([test_files, './test/knockback/**/*.core.tests.coffee'])}) for test_name, test_files of CORE_STACK_TESTS
-
-###############################
 # AMD
 ###############################
-AMD_OPTIONS =
-  karma: true,
-  shims:
-    underscore: {exports: '_'}
-    backbone: {exports: 'Backbone', deps: ['underscore']}
-    knockback: {deps: ['backbone', 'knockout']}
-    'globalize.culture.en-GB': {deps: ['globalize']}
-    'globalize.culture.fr-FR': {deps: ['globalize']}
-  post_load: 'window._ = window.Backbone = window.ko = window.kb = null;'
-  aliases: {'knockback-core': 'knockback', 'lodash': 'underscore'}
-
+AMD_OPTIONS = require './amd/gulp-options'
 TEST_GROUPS.amd = []
 for test in TEST_GROUPS.full.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
   files = []
@@ -118,26 +72,13 @@ for test in TEST_GROUPS.full.concat(TEST_GROUPS.core) when (test.name.indexOf('_
 ###############################
 # Webpack
 ###############################
-WEBPACK_TESTS =
-  full: _.flatten(['./vendor/optional/jquery-2.1.1.js', LOCALIZATION_DEPENCIES, './_temp/webpack/knockback.tests.js'])
-  core: ['./vendor/optional/jquery-2.1.1.js', './_temp/webpack/knockback-core.tests.js']
-
 TEST_GROUPS.webpack = []
-TEST_GROUPS.webpack.push({name: "webpack_#{test_name}", files: test_files}) for test_name, test_files of WEBPACK_TESTS
+for file in FILES.tests_webpack
+  TEST_GROUPS.webpack.push({name: "webpack_#{file.replace('.js', '')}", files: _.flatten(['./vendor/optional/jquery-2.1.1.js', (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), file])})
 
 ###############################
 # Browserify
 ###############################
-BROWSERIFY_SHIMS =
-  full:
-    knockback: {path: './knockback.js', exports: 'kb', depends: {jquery: 'jQuery', underscore: '_', backbone: 'Backbone', knockout: 'ko'}}
-    'knockback-examples-localization': {path: './_temp/knockback-examples-localization.js', exports: 'kbel', depends: {knockback: 'kb'}}
-  core:
-    knockback: {path: './knockback.js', exports: 'kb', depends: {jquery: 'jQuery', underscore: '_', backbone: 'Backbone', knockout: 'ko'}}
-
-BROWSERIFY_TESTS =
-  full: {files: _.flatten(['./vendor/optional/jquery-2.1.1.js', LOCALIZATION_DEPENCIES, './_temp/browserify/knockback.tests.js']), build: {files: ['./test/knockback/**/*.tests.coffee'], options: {shim: BROWSERIFY_SHIMS.full}}}
-  core: {files: ['./vendor/optional/jquery-2.1.1.js', './_temp/browserify/knockback-core.tests.js'], build: {files: ['./test/knockback/**/*.core.tests.coffee'], options: {shim: BROWSERIFY_SHIMS.core}}}
-
 TEST_GROUPS.browserify = []
-TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: test_info.files, build: _.extend({destination: test_info.files.slice(-1)[0]}, test_info.build)}) for test_name, test_info of BROWSERIFY_TESTS
+for test_name, test_info of require('./browserify/tests')
+  TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: _.flatten(['./vendor/optional/jquery-2.1.1.js', (if test_info.output.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), test_info.output]), build: {destination: test_info.output, options: test_info.options, files: test_info.files}})

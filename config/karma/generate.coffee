@@ -25,23 +25,19 @@ module.exports = (callback) ->
 
   # build webpack - 0 are dependencies that need to be built before webpack folder
   queue.defer (callback) ->
-    gulp.src('config/test_bundles/**/*.0.webpack.config.coffee', {read: false, buffer: false})
+    gulp.src('config/test_bundles/**/*.pre.webpack.config.coffee', {read: false, buffer: false})
       .pipe(webpack())
       .pipe(es.writeArray (err, array) -> callback(err))
   queue.defer (callback) ->
-    gulp.src('config/test_bundles/webpack/**/*.webpack.config.coffee', {read: false, buffer: false})
+    gulp.src(['config/test_bundles/**/*.webpack.config.coffee', '!config/test_bundles/**/*.pre.webpack.config.coffee'], {read: false, buffer: false})
       .pipe(webpack())
       .pipe(es.writeArray (err, array) -> callback(err))
-
-  # build commonjs
-  queue.defer (callback) ->
-    gulp.src('config/test_bundles/**/*.mbundle.config.coffee', {read: false, buffer: false})
-      .pipe(shell(['./node_modules/.bin/mbundle <%= file.path %>']))
-      .pipe(es.writeArray (err, array) -> callback())
 
   # build test browserify
   for test in TEST_GROUPS.browserify or []
     do (test) -> queue.defer (callback) ->
+      console.log "test", JSON.stringify(test)
+
       gulp.src(test.build.files)
         .pipe(compile({coffee: {bare: true}}))
         .pipe(concat(path.basename(test.build.destination)))

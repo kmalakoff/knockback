@@ -6,22 +6,8 @@ karma = require('karma').server
 gutil = require 'gulp-util'
 generate = require './generate'
 
-STANDARD_CONFIG =
-  basePath: '.'
-  frameworks: ['mocha', 'chai']
-  preprocessors: {'**/*.coffee': ['coffee']}
-
-  coffeePreprocessor:
-    options: {bare: true, sourceMap: false}
-    transformPath: (path) -> path.replace(/\.coffee$/, '.js')
-
-  reporters: ['dots']
-  port: 9876
-  colors: true
-  logLevel: 'INFO'
-  browsers: ['PhantomJS'] # ['Firefox', 'Chrome', 'Safari']
-
-TEST_GROUPS = require('../test_groups')
+TEST_GROUPS = require '../test_groups'
+BASE_CONFIG = require './base-config'
 
 module.exports = (callback) ->
   queue = new Queue(1)
@@ -30,7 +16,7 @@ module.exports = (callback) ->
 
   for name, tests of TEST_GROUPS
     for test in tests
-      do (test) -> queue.defer (callback) -> gutil.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({singleRun: true, files: test.files}, STANDARD_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
+      do (test) -> queue.defer (callback) -> gutil.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({files: test.files}, BASE_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
 
   queue.await (err) ->
     Wrench.rmdirSyncRecursive('./_temp', true)

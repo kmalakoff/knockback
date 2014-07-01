@@ -21,8 +21,8 @@ HEADER = module.exports = """
 """
 LIBRARY_FILES = require('./config/files').libraries
 
-gulp.task 'build', (callback) ->
-  gulp.src('config/build/**/*.webpack.config.coffee', {read: false, buffer: false})
+gulp.task 'build', buildLibraries = (callback) ->
+  gulp.src('config/library/**/*.webpack.config.coffee', {read: false, buffer: false})
     .pipe(webpack())
     .pipe(header(HEADER, {pkg: require('./package.json')}))
     .pipe(gulp.dest((file) -> file.base))
@@ -42,7 +42,8 @@ gulp.task 'minify', ['build'], (callback) ->
     .on('end', callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'test', ['minify'], (callback) ->
+gulp.task 'test', (callback) ->
+# gulp.task 'test', ['minify'], (callback) ->
   karma (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
