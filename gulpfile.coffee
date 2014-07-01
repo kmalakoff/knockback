@@ -22,7 +22,7 @@ HEADER = module.exports = """
 LIBRARY_FILES = require('./config/files').libraries
 
 gulp.task 'build', buildLibraries = (callback) ->
-  gulp.src('config/library/**/*.webpack.config.coffee', {read: false, buffer: false})
+  gulp.src('config/builds/library/**/*.webpack.config.coffee', {read: false, buffer: false})
     .pipe(webpack())
     .pipe(header(HEADER, {pkg: require('./package.json')}))
     .pipe(gulp.dest((file) -> file.base))
@@ -48,7 +48,7 @@ gulp.task 'test', ['minify'], (callback) ->
 
 gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so doesn't return exit code
   copyLibraryFiles = (destination, callback) ->
-    gulp.src(LIBRARY_FILES.concat('README.md'))
+    gulp.src(LIBRARY_FILES.concat(['README.md', 'component.json', 'bower.json']))
       .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, '')))).on('end', callback)
       .on('end', callback)
 

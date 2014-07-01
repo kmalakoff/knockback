@@ -1,6 +1,6 @@
 _ = require 'underscore'
 
-module.exports = _.extend  _.clone(require '../webpack/base-config.coffee'), {
+module.exports = _.extend  _.clone(require '../../webpack/base-config.coffee'), {
   entry: ['./test/lib/localized_string', './test/lib/localized_observables', './test/lib/locale_manager']
   output:
     path: './_temp'

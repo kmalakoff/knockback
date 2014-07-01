@@ -25,11 +25,11 @@ module.exports = (callback) ->
 
   # build webpack - 0 are dependencies that need to be built before webpack folder
   queue.defer (callback) ->
-    gulp.src('config/test_bundles/**/*.pre.webpack.config.coffee', {read: false, buffer: false})
+    gulp.src('config/builds/test/**/*.pre.webpack.config.coffee', {read: false, buffer: false})
       .pipe(webpack())
       .pipe(es.writeArray (err, array) -> callback(err))
   queue.defer (callback) ->
-    gulp.src(['config/test_bundles/**/*.webpack.config.coffee', '!config/test_bundles/**/*.pre.webpack.config.coffee'], {read: false, buffer: false})
+    gulp.src(['config/builds/test/**/*.webpack.config.coffee', '!config/builds/test/**/*.pre.webpack.config.coffee'], {read: false, buffer: false})
       .pipe(webpack())
       .pipe(es.writeArray (err, array) -> callback(err))
 
