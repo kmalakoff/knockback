@@ -1,8 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback-view-model.js', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._; $ = kb.$
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -550,6 +551,8 @@ describe 'knockback-view-model.js', ->
     done()
 
   it '14. model replacement with select', (done) ->
+    return done() unless $
+
     kb.statistics = new kb.Statistics()
 
     model_opts =
@@ -596,6 +599,8 @@ describe 'knockback-view-model.js', ->
     done()
 
   it '16. model replacement with input', (done) ->
+    return done() unless $
+
     kb.statistics = new kb.Statistics()
 
     model_opts =
@@ -638,6 +643,8 @@ describe 'knockback-view-model.js', ->
     done()
 
   it '17. model replacement with multiple selects and weird backbone bug', (done) ->
+    return done() unless $
+
     kb.statistics = new kb.Statistics()
 
     default_attrs =
@@ -652,7 +659,6 @@ describe 'knockback-view-model.js', ->
 
     model1 = new Model
     view_model = kb.viewModel(model1)
-
 
     el = $('''
       <div id="the_template1">

@@ -1,8 +1,10 @@
-describe 'knockback-inject.js', ->
+assert = assert or require?('chai').assert
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._; $ = kb.$
+describe 'knockback-inject.js', ->
+  return unless window? # only for the dom
+
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

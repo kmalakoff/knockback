@@ -1,8 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback-validation.js', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._; $ = kb.$
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

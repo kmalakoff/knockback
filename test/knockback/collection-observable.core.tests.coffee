@@ -1,8 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback-collection-observable.js', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

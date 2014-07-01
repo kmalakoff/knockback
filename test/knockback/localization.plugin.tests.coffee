@@ -1,8 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback-localized-observable.js', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko
   require?('knockback-examples-localization')
 
   it 'TEST DEPENDENCY MISSING', (done) ->

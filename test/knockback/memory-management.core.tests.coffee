@@ -1,8 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback.js memory management', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._; $ = kb.$
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -79,6 +80,8 @@ describe 'knockback.js memory management', ->
     done()
 
   it 'Releasing with nodes', (done) ->
+    return done() unless $
+
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model = kb.viewModel(new kb.Model({name: 'Bob'}))

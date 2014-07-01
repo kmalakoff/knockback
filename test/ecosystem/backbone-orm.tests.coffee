@@ -1,11 +1,9 @@
 describe 'Knockback.js with BackboneORM', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  _ = window._ or require?('underscore')
-  Backbone = window.Backbone or require?('backbone')
-  BackboneORM = window.BackboneORM or require?('backbone-orm')
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
+  kb = window?.kb or require?('knockback')
+  _ = kb._; Backbone = kb.Backbone; ko = kb.ko
+  BackboneORM = window?.BackboneORM or require?('backbone-orm')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

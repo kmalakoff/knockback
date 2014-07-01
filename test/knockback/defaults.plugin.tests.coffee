@@ -1,9 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback-defaults.js', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._
-  Backbone = kb.Backbone
+  kb = window?.kb or require?('knockback')
+  _ = kb._; Backbone = kb.Backbone; ko = kb.ko
   Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
   kb.LocaleManager or require?('knockback-examples-localization')
 

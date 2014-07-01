@@ -120,7 +120,6 @@ function bookVmcreate(model){
     };
 };
 
-
 var view_model = {   books: kb.collectionObservable(bs.get('books'), {
     view_model: bookViewModel,
     factories: {

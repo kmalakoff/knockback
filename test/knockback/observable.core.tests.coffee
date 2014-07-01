@@ -1,8 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'knockback-observable.js', ->
 
-  ko = window.ko or require?('knockout')
-  kb = window.kb or require?('knockback')
-  _ = kb._; $ = kb.$
+  kb = window?.kb or require?('knockback')
+  _ = kb._; ko = kb.ko
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -108,7 +109,7 @@ describe 'knockback-observable.js', ->
       @name = kb.observable(model, {key: 'name'})
       @formatted_name = ko.dependentObservable({
         read: @name,
-        write: ((value) -> @name($.trim(value))),
+        write: ((value) -> @name("#{value}".trim())),
         owner: @
       })
       return

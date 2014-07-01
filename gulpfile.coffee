@@ -7,7 +7,7 @@ webpack = require './config/webpack/gulp-webpack'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
-karma = require './config/karma/run'
+runTests = require './config/run_tests'
 
 HEADER = module.exports = """
 /*
@@ -43,7 +43,7 @@ gulp.task 'minify', ['build'], (callback) ->
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'test', ['minify'], (callback) ->
-  karma (err) -> process.exit(if err then 1 else 0)
+  runTests (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so doesn't return exit code
@@ -53,7 +53,7 @@ gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so 
       .on('end', callback)
 
   queue = new Queue(1)
-  queue.defer (callback) -> karma(callback)
+  queue.defer (callback) -> runTests(callback)
   queue.defer (callback) -> copyLibraryFiles('packages/npm', callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', callback)
   queue.await (err) -> process.exit(if err then 1 else 0)

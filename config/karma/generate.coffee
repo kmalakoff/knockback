@@ -36,8 +36,6 @@ module.exports = (callback) ->
   # build test browserify
   for test in TEST_GROUPS.browserify or []
     do (test) -> queue.defer (callback) ->
-      console.log "test", JSON.stringify(test)
-
       gulp.src(test.build.files)
         .pipe(compile({coffee: {bare: true}}))
         .pipe(concat(path.basename(test.build.destination)))

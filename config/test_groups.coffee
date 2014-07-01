@@ -63,11 +63,12 @@ for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_la
 AMD_OPTIONS = require './amd/gulp-options'
 TEST_GROUPS.amd = []
 for test in TEST_GROUPS.full.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
+  test_files = ['./node_modules/chai/chai.js'].concat(test.files)
   files = []
   files.push({pattern: file}) for file in ['./vendor/optional/requirejs-2.1.14.js']
-  files.push({pattern: file, included: false}) for file in test.files.slice(0, -1)
-  files.push({pattern: file}) for file in ["./_temp/amd/#{test.name}/#{gutil.replaceExtension(path.basename(test.files.slice(-1)[0]), '.js')}"]
-  TEST_GROUPS.amd.push({name: "amd_#{test.name}", files: files, build: {files: test.files, destination: "_temp/amd/#{test.name}", options: _.extend({files: test.files.slice(0, -1)}, AMD_OPTIONS)}})
+  files.push({pattern: file, included: false}) for file in test_files.slice(0, -1)
+  files.push({pattern: file}) for file in ["./_temp/amd/#{test.name}/#{gutil.replaceExtension(path.basename(test_files.slice(-1)[0]), '.js')}"]
+  TEST_GROUPS.amd.push({name: "amd_#{test.name}", files: files, build: {files: test_files, destination: "_temp/amd/#{test.name}", options: _.extend({files: test_files.slice(0, -1)}, AMD_OPTIONS)}})
 
 ###############################
 # Webpack
