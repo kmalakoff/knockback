@@ -1,6 +1,6 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
-## 0.18.7
+## 0.19.0
 * Removed standalone plugins. Just choose knockback if you need one or more plugins.
 * Change library building to use webpack.
 
