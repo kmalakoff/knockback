@@ -11,7 +11,7 @@ requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 concat = require 'gulp-concat'
 wrapAMD = require 'gulp-wrap-amd-infer'
-webpack = require '../webpack/gulp-webpack'
+webpack = require 'gulp-webpack-config'
 browserify = require 'gulp-browserify'
 
 TEST_GROUPS = require('../test_groups')
