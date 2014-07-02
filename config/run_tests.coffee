@@ -7,6 +7,8 @@ gutil = require 'gulp-util'
 karma = require './karma/run'
 mocha = require 'gulp-mocha'
 
+process.env.NODE_ENV = 'test'
+
 module.exports = (callback) ->
   queue = new Queue(1)
 
