@@ -7,15 +7,8 @@ gutil = require 'gulp-util'
 karma = require './karma/run'
 mocha = require 'gulp-mocha'
 
-process.env.NODE_ENV = 'test'
-
 module.exports = (callback) ->
   queue = new Queue(1)
-
-  # run browser tests
-  queue.defer (callback) ->
-    gutil.log 'Running Broswer tests'
-    karma(callback)
 
   # install knockback
   queue.defer (callback) ->
@@ -29,6 +22,12 @@ module.exports = (callback) ->
     gulp.src('test/knockback/**/*.core.tests.coffee')
       .pipe(mocha({}))
       .pipe(es.writeArray (err, array) -> callback(err))
+
+  # run browser tests
+  queue.defer (callback) ->
+    Wrench.rmdirSyncRecursive('node_modules/knockback', true)
+    gutil.log 'Running Browser tests'
+    karma(callback)
 
   queue.await (err) ->
     Wrench.rmdirSyncRecursive('node_modules/knockback', true)
