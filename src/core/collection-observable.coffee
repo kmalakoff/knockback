@@ -186,10 +186,10 @@ class kb.CollectionObservable
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
     observable = kb.utils.wrappedObservable(@)
-    collection = @_collection()
+    collection = @_collection.peek()
     if collection
       collection.unbind('all', @__kb._onCollectionChange)
-      array = observable(); array.splice(0, array.length) # clear the view models or models
+      array = observable.peek(); array.splice(0, array.length) # clear the view models or models
     @collection.dispose(); @_collection = observable.collection = @collection = null
     @_mapper.dispose(); @_mapper = null
     kb.release(@_filters); @_filters = null
