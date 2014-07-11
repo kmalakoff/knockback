@@ -246,10 +246,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CollectionObservable.prototype.destroy = function() {
 	    var array, collection, observable;
 	    observable = kb.utils.wrappedObservable(this);
-	    collection = this._collection();
+	    collection = kb.peek(this._collection);
 	    if (collection) {
 	      collection.unbind('all', this.__kb._onCollectionChange);
-	      array = observable();
+	      array = kb.peek(observable);
 	      array.splice(0, array.length);
 	    }
 	    this.collection.dispose();
