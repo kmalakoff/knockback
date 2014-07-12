@@ -2642,7 +2642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {
+	
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -2651,13 +2651,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, root, _;
-
-	root = typeof window !== "undefined" && window !== null ? window : global;
+	var kb, key, _i, _len, _ref;
 
 	module.exports = kb = __webpack_require__(5);
-
-	_ = kb._;
 
 	kb.modules = {
 	  underscore: kb._,
@@ -2665,9 +2661,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  knockout: kb.ko
 	};
 
-	_.defaults(root, _.pick(kb, '_', 'Backbone', 'Parse', 'ko', '$'));
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+	if (typeof window !== "undefined" && window !== null) {
+	  _ref = ['_', 'Backbone', 'Parse', 'ko', '$'];
+	  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	    key = _ref[_i];
+	    if (kb[key] && !window.hasOwnProperty(key)) {
+	      window[key] = kb[key];
+	    }
+	  }
+	}
+
 
 /***/ },
 /* 13 */

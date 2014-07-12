@@ -1,10 +1,86 @@
 assert = assert or require?('chai').assert
 
-describe 'knockback-localized-observable.js', ->
+kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
+_ = kb._; ko = kb.ko
+kb.Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
 
-  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  _ = kb._; ko = kb.ko
-  LocaleManager = window?.LocaleManager or require?('../../lib/locale_manager')
+unless Globalize
+  Globalize = require?('../../lib/globalize')
+  require?('../../lib/globalize.culture.en-GB.js'); require?('../../lib/globalize.culture.fr-FR.js')
+
+###############################
+class LocaleManager
+  @prototype extends kb.Events # Mix in kb.Events so callers can subscribe
+
+  constructor: (locale_identifier, @translations_by_locale) ->
+    @setLocale(locale_identifier) if locale_identifier
+
+  get: (string_id, parameters) ->
+    culture_map = @translations_by_locale[@locale_identifier] if @locale_identifier
+    return '' if not culture_map
+    string = if culture_map.hasOwnProperty(string_id) then culture_map[string_id] else ''
+    return string if arguments == 1
+    string = string.replace("{#{index}}", arg) for arg, index in Array.prototype.slice.call(arguments, 1)
+    return string
+
+  getLocale: -> return @locale_identifier
+
+  setLocale: (locale_identifier) ->
+    @locale_identifier = locale_identifier
+    @trigger('change', this)
+    @trigger("change:#{key}", value) for key, value of (@translations_by_locale[@locale_identifier] or {})
+    return
+
+  getLocales: ->
+    locales = []
+    locales.push(string_id) for string_id, value of @translations_by_locale
+    return locales
+
+class LocalizedString
+  constructor: (@string_id) ->
+    throw 'missing kb.locale_manager' unless kb.locale_manager
+    @string = kb.locale_manager.get(@string_id)
+
+kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+
+class LocalizedStringLocalizer extends kb.LocalizedObservable
+  constructor: (value, options, view_model) ->
+    super
+    return kb.utils.wrappedObservable(@)
+  read: (value) ->
+    return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
+
+class kb.LocalizedStringLocalizer extends kb.LocalizedObservable
+  read: (value) ->
+    return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
+
+# NOTE: dependency on globalize
+class kb.LongDateLocalizer extends kb.LocalizedObservable
+  constructor: (value, options, view_model) ->
+    return super # return the observable instead of this
+  read: (value) ->
+    return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())
+  write: (localized_string, value) ->
+    new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale())
+    return kb.utils.wrappedObservable(@).resetToCurrent() if not (new_value and _.isDate(new_value)) # reset if invalid
+    value.setTime(new_value.valueOf())
+
+# NOTE: dependency on globalize - notice the alternative formulation with extend
+kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
+  constructor: (value, options, view_model) ->
+    kb.LocalizedObservable.prototype.constructor.apply(this, arguments)
+    return kb.utils.wrappedObservable(@) # return the observable instead of this
+  read: (value) ->
+    return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
+  write: (localized_string, value) ->
+    new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
+    return kb.utils.wrappedObservable(@).resetToCurrent() if not (new_value and _.isDate(new_value)) # reset if invalid
+    value.setTime(new_value.valueOf())
+})
+###############################
+
+describe 'knockback-localized-observable.js', ->
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -12,7 +88,7 @@ describe 'knockback-localized-observable.js', ->
     assert.ok(!!kb.Model, 'kb.Model')
     assert.ok(!!kb.Collection, 'kb.Collection')
     assert.ok(!!kb, 'kb')
-    assert.ok(!!kb.LocaleManager, 'kb.LocaleManager')
+    assert.ok(!!Globalize, 'Globalize')
     done()
 
   locale_manager = new LocaleManager('en', {
@@ -33,16 +109,6 @@ describe 'knockback-localized-observable.js', ->
       formal_goodbye: 'Au revoir'
   })
 
-  kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
-
-  class LocalizedStringLocalizer extends kb.LocalizedObservable
-    constructor: (value, options, view_model) ->
-      super
-      return kb.utils.wrappedObservable(@)
-    read: (value) ->
-      return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
-
   it 'Localized greeting', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
@@ -52,7 +118,7 @@ describe 'knockback-localized-observable.js', ->
       @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: kb.LocalizedStringLocalizer})
       @
 
-    model = new kb.Contact({hello_greeting: new kb.LocalizedString('formal_hello'), goodbye_greeting: new kb.LocalizedString('formal_goodbye')})
+    model = new kb.Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
 
     kb.locale_manager.setLocale('en')
@@ -67,7 +133,7 @@ describe 'knockback-localized-observable.js', ->
     assert.equal(view_model.hello(), 'Bonjour', "fr-FR: Hello")
     assert.equal(view_model.goodbye(), 'Au revoir', "fr-FR: Goobye")
 
-    model.set({hello_greeting: new kb.LocalizedString('informal_hello'), goodbye_greeting: new kb.LocalizedString('informal_goodbye')})
+    model.set({hello_greeting: new LocalizedString('informal_hello'), goodbye_greeting: new LocalizedString('informal_goodbye')})
     kb.locale_manager.setLocale('en')
     assert.equal(view_model.hello(), 'Hi', "en: Hello")
     assert.equal(view_model.goodbye(), 'Bye', "en: Goobye")
@@ -156,7 +222,7 @@ describe 'knockback-localized-observable.js', ->
       @greeting = kb.observable(model, {key:@greeting_key, localizer: kb.LocalizedStringLocalizer})
       return
 
-    model = new kb.Contact({hello_greeting: new kb.LocalizedString('formal_hello'), goodbye_greeting: new kb.LocalizedString('formal_goodbye')})
+    model = new kb.Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
 
     assert.equal(view_model.greeting(), 'Hello', "en: Hello")
@@ -628,6 +694,246 @@ describe 'knockback-localized-observable.js', ->
     assert.equal(view_model.name(), 'Yoko', "Name changed")
     assert.equal(view_model.number(), '818-818-8181', "Number was changed")
     kb.locale_manager.setLocale('fr-FR')
+
+    # and cleanup after yourself when you are done.
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+describe 'knockback-defaults.js', ->
+
+  it 'TEST DEPENDENCY MISSING', (done) ->
+    assert.ok(!!ko, 'ko')
+    assert.ok(!!_, '_')
+    assert.ok(!!kb.Model, 'kb.Model')
+    assert.ok(!!kb.Collection, 'kb.Collection')
+    assert.ok(!!kb, 'kb')
+    assert.ok(!!Globalize, 'Globalize')
+    done()
+
+  locale_manager = new LocaleManager('en', {
+    'en': {loading: "Loading dude"}
+    'en-GB': {loading: "Loading sir"}
+    'fr-FR': {loading: "Chargement"}
+  })
+
+  if kb.Backbone
+    it '1. Standard use case: just enough to get the picture', (done) ->
+      kb.statistics = new kb.Statistics() # turn on stats
+      kb.locale_manager = locale_manager
+
+      ContactViewModel = (model) ->
+        @loading_message = new kb.LocalizedStringLocalizer(new LocalizedString('loading'))
+        @_auto = kb.viewModel(model, {keys: {
+          name:     {key:'name', default: @loading_message}
+          number:   {key:'number', default: @loading_message}
+          date:     {key:'date', default: @loading_message, localizer: kb.ShortDateLocalizer}
+        }}, this)
+        @
+
+      collection = new kb.ContactsCollection()
+      model_ref = new kb.Backbone.ModelRef(collection, 'b4')
+      view_model = new ContactViewModel(model_ref)
+
+      kb.locale_manager.setLocale('en')
+      assert.equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      assert.equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+      collection.add(collection.parse({id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)}))
+      model = collection.get('b4')
+
+      # get
+      assert.equal(view_model.name(), 'John', "It is a name")
+      assert.equal(view_model.number(), '555-555-5558', "Not so interesting number")
+      kb.locale_manager.setLocale('en-GB')
+      assert.equal(view_model.date(), '09/11/1940', "John's birthdate in Great Britain format")
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
+
+      # set from the view model
+      assert.equal(model.get('name'), 'John', "Name not changed")
+      assert.equal(view_model.name(), 'John', "Name not changed")
+      view_model.number('9222-222-222')
+      assert.equal(model.get('number'), '9222-222-222', "Number was changed")
+      assert.equal(view_model.number(), '9222-222-222', "Number was changed")
+      kb.locale_manager.setLocale('en-GB')
+      view_model.date('10/12/1963')
+      current_date = model.get('date')
+      assert.equal(current_date.getFullYear(), 1963, "year is good")
+      assert.equal(current_date.getMonth(), 11, "month is good")
+      assert.equal(current_date.getDate(), 10, "day is good")
+
+      # set from the model
+      model.set({name: 'Yoko', number: '818-818-8181'})
+      assert.equal(view_model.name(), 'Yoko', "Name changed")
+      assert.equal(view_model.number(), '818-818-8181', "Number was changed")
+      model.set({date: new Date(1940, 10, 9)})
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.date(), '09/11/1940', "John's birthdate in France format")
+      view_model.date('10/11/1940')
+      current_date = model.get('date')
+      assert.equal(current_date.getFullYear(), 1940, "year is good")
+      assert.equal(current_date.getMonth(), 10, "month is good")
+      assert.equal(current_date.getDate(), 10, "day is good")
+
+      # go back to loading state
+      collection.reset()
+      assert.equal(view_model.name(), 'Chargement', "Resets to default")
+      view_model._auto.setToDefault() # override default behavior and go back to loading state
+      kb.locale_manager.setLocale('en')
+      assert.equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      assert.equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+      # and cleanup after yourself when you are done.
+      kb.release(view_model)
+
+      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+      done()
+
+    it '2. Standard use case with kb.ViewModels', (done) ->
+      kb.statistics = new kb.Statistics() # turn on stats
+      kb.locale_manager = locale_manager
+
+      class ContactViewModel extends kb.ViewModel
+        constructor: (model) ->
+          super(model, {internals: ['name', 'number', 'date']})
+          @loading_message = new kb.LocalizedStringLocalizer(new LocalizedString('loading'))
+          @name = kb.defaultObservable(@_name, @loading_message)
+          @number = kb.defaultObservable(@_number, @loading_message)
+          @date = kb.defaultObservable(new kb.LongDateLocalizer(@_date), @loading_message)
+
+      collection = new kb.ContactsCollection()
+      model_ref = new kb.Backbone.ModelRef(collection, 'b4')
+      view_model = new ContactViewModel(model_ref)
+
+      kb.locale_manager.setLocale('en')
+      assert.equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      assert.equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+      collection.add(collection.parse({id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)}))
+      model = collection.get('b4')
+
+      # get
+      assert.equal(view_model.name(), 'John', "It is a name")
+      assert.equal(view_model.number(), '555-555-5558', "Not so interesting number")
+      kb.locale_manager.setLocale('en-GB')
+      assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+
+      # set from the view model
+      view_model.number('9222-222-222')
+      assert.equal(model.get('number'), '9222-222-222', "Number was changed")
+      assert.equal(view_model.number(), '9222-222-222', "Number was changed")
+      kb.locale_manager.setLocale('en-GB')
+      view_model.date('10 December 1963')
+      current_date = model.get('date')
+      assert.equal(current_date.getFullYear(), 1963, "year is good")
+      assert.equal(current_date.getMonth(), 11, "month is good")
+      assert.equal(current_date.getDate(), 10, "day is good")
+
+      # set from the model
+      model.set({name: 'Yoko', number: '818-818-8181'})
+      assert.equal(view_model.name(), 'Yoko', "Name changed")
+      assert.equal(view_model.number(), '818-818-8181', "Number was changed")
+      model.set({date: new Date(1940, 10, 9)})
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+      view_model.date('10 novembre 1940')
+      current_date = model.get('date')
+      assert.equal(current_date.getFullYear(), 1940, "year is good")
+      assert.equal(current_date.getMonth(), 10, "month is good")
+      assert.equal(current_date.getDate(), 10, "day is good")
+
+      # go back to loading state
+      collection.reset()
+      assert.equal(view_model.name(), 'Chargement', "Resets to default")
+      kb.utils.setToDefault(view_model)
+      kb.locale_manager.setLocale('en')
+      assert.equal(view_model.name(), 'Loading dude', "Is that what we want to convey?")
+      kb.locale_manager.setLocale('en-GB')
+      assert.equal(view_model.name(), 'Loading sir', "Maybe too formal")
+      kb.locale_manager.setLocale('fr-FR')
+      assert.equal(view_model.name(), 'Chargement', "Localize from day one. Good!")
+
+      # and cleanup after yourself when you are done.
+      kb.release(view_model)
+
+      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+      done()
+
+  it '3. internals test (Coffeescript inheritance)', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+    kb.locale_manager = locale_manager
+
+    class ContactViewModel extends kb.ViewModel
+      constructor: (model) ->
+        super(model, {internals: ['email', 'date']})
+        @email = kb.defaultObservable(@_email, 'your.name@yourplace.com')
+        @date = new kb.LongDateLocalizer(@_date)
+
+    birthdate = new Date(1940, 10, 9)
+    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    view_model = new ContactViewModel(model)
+
+    # check email
+    assert.equal(view_model._email(), undefined, "no email")
+    assert.equal(view_model.email(), 'your.name@yourplace.com', "default message")
+
+    view_model._email('j@imagine.com')
+    assert.equal(view_model._email(), 'j@imagine.com', "received email")
+    assert.equal(view_model.email(), 'j@imagine.com', "received email")
+
+    view_model.email('john@imagine.com')
+    assert.equal(view_model._email(), 'john@imagine.com', "received email")
+    assert.equal(view_model.email(), 'john@imagine.com', "received email")
+
+    # set from the view model
+    kb.locale_manager.setLocale('en-GB')
+    assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format")
+    view_model.date('10 December 1963')
+    current_date = model.get('date')
+    assert.equal(current_date.getFullYear(), 1963, "year is good")
+    assert.equal(current_date.getMonth(), 11, "month is good")
+    assert.equal(current_date.getDate(), 10, "day is good")
+    assert.equal(view_model._date().getFullYear(), 1963, "year is good")
+    assert.equal(view_model._date().getMonth(), 11, "month is good")
+    assert.equal(view_model._date().getDate(), 10, "day is good")
+
+    # set from the model
+    model.set({date: new Date(birthdate.valueOf())})
+    kb.locale_manager.setLocale('fr-FR')
+    assert.equal(view_model.date(), '09 novembre 1940', "John's birthdate in France format")
+    view_model.date('10 novembre 1940')
+    current_date = model.get('date')
+    assert.equal(current_date.getFullYear(), 1940, "year is good")
+    assert.equal(current_date.getMonth(), 10, "month is good")
+    assert.equal(current_date.getDate(), 10, "day is good")
+    assert.equal(view_model._date().getFullYear(), 1940, "year is good")
+    assert.equal(view_model._date().getMonth(), 10, "month is good")
+    assert.equal(view_model._date().getDate(), 10, "day is good")
+
+    # set from the automatically-generated date observable
+    view_model.date(new Date(birthdate.valueOf()))
+    kb.locale_manager.setLocale('fr-FR')
+    assert.equal(view_model.date(), '10 novembre 1940', "One past John's birthdate in France format")
+    current_date = model.get('date')
+    assert.equal(current_date.getFullYear(), 1940, "year is good")
+    assert.equal(current_date.getMonth(), 10, "month is good")
+    assert.equal(current_date.getDate(), 10, "day is good")
+    assert.equal(view_model._date().getFullYear(), 1940, "year is good")
+    assert.equal(view_model._date().getMonth(), 10, "month is good")
+    assert.equal(view_model._date().getDate(), 10, "day is good")
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)

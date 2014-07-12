@@ -7,10 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-root = if window? then window else global
 module.exports = kb = require './kb'
-_ = kb._
 
 # re-expose modules
 kb.modules = {underscore: kb._, backbone: kb.Parse or kb.Backbone, knockout: kb.ko}
-_.defaults(root, _.pick(kb, '_', 'Backbone', 'Parse', 'ko', '$'))
+if window?
+  window[key] = kb[key] for key in ['_', 'Backbone', 'Parse', 'ko', '$'] when kb[key] and not window.hasOwnProperty(key)

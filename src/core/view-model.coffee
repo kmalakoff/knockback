@@ -17,7 +17,7 @@ _ = kb._; ko = kb.ko
 #
 # @example Bulk kb.Observable create using 'key' Object to customize the kb.Observable created per attribute.
 #   var ContactViewModel = function(model) {
-#     this.loading_message = new kb.LocalizedStringLocalizer(new kb.LocalizedString('loading'));
+#     this.loading_message = new kb.LocalizedStringLocalizer(new LocalizedString('loading'));
 #     this._auto = kb.viewModel(model, {
 #       keys: {
 #         name: { key: 'name', 'default': this.loading_message },
