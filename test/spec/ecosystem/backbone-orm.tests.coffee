@@ -1,46 +1,38 @@
-describe 'Knockback.js with Backbone-Relational.js', ->
+assert = assert or require?('chai').assert
+
+describe 'Knockback.js with BackboneORM', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; Backbone = kb.Backbone; ko = kb.ko
-  Backbone?.Relational or require?('backbone-relational')
+  BackboneORM = window?.BackboneORM or require?('backbone-orm')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
     assert.ok(!!_, '_')
     assert.ok(!!Backbone, 'Backbone')
     assert.ok(!!kb, 'kb')
-    assert.ok(!!Backbone.Relational, 'Backbone.Relational')
+    assert.ok(!!BackboneORM, 'BackboneORM')
     assert.ok(!!kb, 'kb')
     done()
 
-  Backbone.Relational.store.addModelScope?(window)
+  BackboneORM.CacheSingletons.ModelCache.configure({enabled: true, max: 100})
 
-  window.Person = Backbone.RelationalModel.extend({
-    relations: [{
-      type: Backbone.HasMany
-      key: 'friends'
-      relatedModel: 'Person'
-    }, {
-      type: Backbone.HasOne
-      key: 'best_friend'
-      relatedModel: 'Person'
-      reverseRelation:
-        type: Backbone.HasMany
-        key: 'best_friends_with_me'
-    }]
-  })
+  class Person extends Backbone.Model
+    model_name: 'Person'
+    schema:
+      friends: -> ['hasMany', Person, foreign_key: 'friends_id', as: 'friends_with_me']
+      friends_with_me: -> ['hasMany', Person, foreign_key: 'friends_with_me_id', as: 'friends']
+      best_friend: -> ['belongsTo', Person, as: 'best_friends_with_me']
+      best_friends_with_me: -> ['hasMany', Person, as: 'best_friend']
+      occupies: -> ['belongsTo', Building, as: 'occupants']
+    sync: BackboneORM.sync(Person)
 
-  window.Building = Backbone.RelationalModel.extend({
-    relations: [{
-      type: Backbone.HasMany
-      key: 'occupants'
-      relatedModel: Person
-      reverseRelation:
-        type: Backbone.HasOne
-        key: 'occupies'
-    }]
-  })
+  class Building extends Backbone.Model
+    model_name: 'Building'
+    schema:
+      occupants: -> ['hasMany', Person, as: 'occupies']
+    sync: BackboneORM.sync(Building)
 
   it '1. Model with HasMany relations: A house with multiple people living in it', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -58,7 +50,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     our_house = new Building({
       id: 'house-1-1'
       location: 'in the middle of the street'
-      occupants: ['person-1-1', 'person-1-2']
+      occupants: [john, paul]
     })
 
     house_view_model = new kb.ViewModel(our_house)
@@ -102,7 +94,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     abbey_flats = new Building({
       id: 'house-2-1'
       location: 'one side of the street'
-      occupants: ['person-2-1', 'person-2-2', 'person-2-3', 'person-2-4']
+      occupants: [john, paul, george, ringo]
     })
     abbey_studios = new Building({
       id: 'studio-2-2'
@@ -171,25 +163,29 @@ describe 'Knockback.js with Backbone-Relational.js', ->
       id: 'person-3-3'
       name: 'George'
       friends: ['person-3-1', 'person-3-2', 'person-3-4']
+      best_friend: 'person-3-1'
     })
     john = new Person({
       id: 'person-3-1'
       name: 'John'
       friends: ['person-3-2', 'person-3-3', 'person-3-4']
-      best_friend: george
+      best_friend: 'person-3-3'
     })
-    george.set(best_friend: john)
     paul = new Person({
       id: 'person-3-2'
       name: 'Paul'
       friends: ['person-3-1', 'person-3-3', 'person-3-4']
-      best_friend: george
+      best_friend: 'person-3-3'
     })
     ringo = new Person({
       id: 'person-3-4'
       name: 'Ringo'
       friends: ['person-3-1', 'person-3-2', 'person-3-3']
     })
+
+    models = [george, john, paul, ringo]
+    model.save(->) for model in models
+    model.fetchRelated(->) for model in models
 
     john_view_model = new kb.ViewModel(john)
     assert.equal(john_view_model.name(), 'John', "Name is correct")
@@ -220,24 +216,23 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     done()
 
   it '4. After view model create, add models', (done) ->
-    Occupant = Backbone.RelationalModel.extend({})
+    class Occupant extends Backbone.Model
+      model_name: 'Person'
+      schema:
+        livesIn: -> ['belongsTo', House, as: 'occupants']
+      sync: BackboneORM.sync(Occupant)
 
-    House = Backbone.RelationalModel.extend({
-      relations: [{
-        type: Backbone.HasMany
-        key: 'occupants'
-        relatedModel: Occupant
-        reverseRelation:
-          key: 'livesIn'
-      }]
-    })
+    class House extends Backbone.Model
+      model_name: 'House'
+      schema:
+        occupants: ['hasMany', Occupant, as: 'livesIn']
+      sync: BackboneORM.sync(House)
 
-    bob = new Occupant({id: 'person-1', name: 'Bob'})
-    fred = new Occupant({id: 'person-2', name: 'Fred'})
+    bob = new Occupant({id: 'person-4-1', name: 'Bob'})
+    fred = new Occupant({id: 'person-4-2', name: 'Fred'})
 
     house = new House({
       location: 'In the middle of our street'
-      occupants: []
     })
 
     # confirm no occupants
@@ -253,41 +248,40 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     done()
 
   it '5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) ->
-    Book = Backbone.RelationalModel.extend({
+    class Book extends Backbone.Model
+      model_name: 'Book'
+      schema:
+        author: -> ['belongsTo', Author]
+      sync: BackboneORM.sync(Book)
+
       defaults:
         name: 'untitled'
       idAttribute: '_id'
-    })
-    Author = Backbone.RelationalModel.extend({
+
+    class Author extends Backbone.Model
+      model_name: 'Author'
+      schema:
+        books: ['hasMany', Book]
+      sync: BackboneORM.sync(Author)
+
       defaults:
         name: 'untitled'
       idAttribute: '_id'
-      relations:[{
-        type: 'HasMany'
-        key: 'books'
-        relatedModel: Book
-        includeInJSON: '_id'
-        reverseRelation:
-          key: 'author'
-          includeInJSON: '_id'
-      }]
-    })
-    BookStore = Backbone.RelationalModel.extend({
-      relations:[{
-        type: 'HasMany'
-        key: 'books'
-        relatedModel: Book
-      },{
-        type: 'HasMany'
-        key: 'authors'
-        relatedModel: Author
-      }]
-    })
+
+    class BookStore extends Backbone.Model
+      model_name: 'BookStore'
+      schema:
+        books: ['hasMany', Book]
+        authors: ['hasMany', Author]
+      sync: BackboneORM.sync(BookStore)
 
     bs = new BookStore({
-      books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],
+      books:[{_id: "b1", name: "Book One", author: "a1"}, {_id: "b2", name: "Book Two", author: "a1"}],
       authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
     })
+
+    model.save(->) for model in bs.get('authors').models
+    model.fetchRelated(->) for model in bs.get('books').models
 
     BookViewModel = kb.ViewModel.extend({
       constructor: (model) ->
@@ -326,10 +320,13 @@ describe 'Knockback.js with Backbone-Relational.js', ->
   it '6. Inferring observable types: from the start', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    person1 = new Person({id: 'person-6-1', name: 'Daddy'})
-    person2 = new Person({id: 'person-6-2', name: 'Mommy'})
-    house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: ['person-6-1', 'person-6-2']})
-    person1.get('friends').add(person2); person2.set({best_friend: person1})
+    person1 = new Person({id: 'person-6-1', name: 'Daddy', friends: ['person-6-2']})
+    person2 = new Person({id: 'person-6-2', name: 'Mommy', best_friend: 'person-6-1'})
+    house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: [person1, person2]})
+
+    models = [person1, person2]
+    model.save(->) for model in models
+    model.fetchRelated(->) for model in models
 
     view_model_person1 = kb.viewModel(person1)
     view_model_house1 = kb.viewModel(house)
@@ -374,8 +371,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
     # add some occupants
-    house.get('occupants').add(person1)
-    house.get('occupants').add(person2)
+    house.get('occupants').add(person1); house.get('occupants').add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
@@ -444,7 +440,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     person1 = new Person({id: 'person-8-1', name: 'Daddy'})
     person2 = new Person({id: 'person-8-2', name: 'Mommy'})
     family = new kb.Collection([person1, person2])
-    house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: ['person-8-1', 'person-8-2']})
+    house = new Building({id: 'house-8-1', name: 'Home Sweet Home', occupants: [person1, person2]})
     person1.get('friends').add(person2)
     person2.set({best_friend: person1})
 
@@ -500,6 +496,9 @@ describe 'Knockback.js with Backbone-Relational.js', ->
 
     person1 = new Person({id: 'person-8b-1', name: 'Daddy'})
     person2 = new Person({id: 'person-8b-2', name: 'Mommy'})
+    models = [person1, person2]
+    model.save(->) for model in models
+
     family = new kb.Collection([person1, person2])
     house = new Building({id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()]})
     house.set({occupants: [person1.toJSON(), person2.toJSON()]})
@@ -585,8 +584,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     # check occupants
-    house.get('occupants').add(person1)
-    house.get('occupants').add(person2)
+    house.get('occupants').add(person1); house.get('occupants').add(person2)
     assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
@@ -694,6 +692,9 @@ describe 'Knockback.js with Backbone-Relational.js', ->
       name: 'Ringo'
       friends: ['person-10-1', 'person-10-2', 'person-10-3']
     })
+    models = [george, john, paul, ringo]
+    model.save(->) for model in models
+    model.fetchRelated(->) for model in models
 
     FriendViewModel = (model) ->
       @name = kb.observable(model, 'name')
@@ -778,7 +779,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
       friends: ['person-11-1', 'person-11-2', 'person-11-3']
     })
 
-    class window.PersonViewModel extends kb.ViewModel
+    class PersonViewModel extends kb.ViewModel
       constructor: (model, options) ->
         super(model, {
           factories:
@@ -788,7 +789,7 @@ describe 'Knockback.js with Backbone-Relational.js', ->
           options: options
         })
 
-    class window.PersonCollection extends kb.CollectionObservable
+    class PersonCollection extends kb.CollectionObservable
       constructor: (collection, options) ->
         return super(collection, {
           factories:
@@ -815,92 +816,6 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.equal(view_model_george.__kb.factory, view_model_ringo.__kb.factory, "the factory should be shared: ringo")
 
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo])
-
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-    done()
-
-  it '12. Issue 96', (done) ->
-    kb.statistics = new kb.Statistics() # turn on stats
-
-    Parameter = Backbone.RelationalModel.extend({idAttribute: "ParameterName"})
-    ParameterCollection = Backbone.Collection.extend({model: Parameter})
-
-    Filter = Backbone.RelationalModel.extend({
-      relations:[{
-        type: Backbone.HasOne,
-        key: "Parameter",
-        keySource: "ParameterName",
-        relatedModel: Parameter,
-        includeInJSON: "ParameterName",
-        reverseRelation: {
-          key: "Filters",
-          type: Backbone.HasMany,
-          includeInJSON: false
-        }
-      }]
-    })
-
-    class StringParameterViewModel extends kb.ViewModel
-    class BooleanParameterViewModel extends kb.ViewModel
-
-    ParameterFactory =
-      create: (parameter, options) ->
-        switch (parameter.get("Type"))
-          when 0 then return new StringParameterViewModel(parameter, options)
-          when 1 then return new BooleanParameterViewModel(parameter, options)
-          else throw "Invalid parameter type attribute."
-
-    parameter_models = new ParameterCollection()
-    parameters = kb.collectionObservable(parameter_models, {factories: {"models": ParameterFactory}})
-
-    parameter_models.push({Type: 0})
-    parameter_models.push({Type: 1})
-
-    assert.ok(parameters()[0] instanceof StringParameterViewModel)
-    assert.ok(parameters()[1] instanceof BooleanParameterViewModel)
-
-    kb.release(parameters)
-
-    FilterGroup = Backbone.RelationalModel.extend({
-      relations:[{
-        type: Backbone.HasMany,
-        key: "Filters",
-        relatedModel: Filter
-      }]
-    })
-
-    class FilterViewModel extends kb.ViewModel
-
-    class FilterGroupViewModel extends kb.ViewModel
-      constructor: (model, options) ->
-        super model, {
-          factories:
-            "Filters.models": FilterViewModel
-            "Filters.models.Parameter": ParameterFactory
-          options: options
-        }
-
-    filter_group_model = new FilterGroup({Filters: [
-      {Name: 'String', Parameter: {Type: 0}}
-      {Name: 'Boolean', Parameter: {Type: 1}}
-    ]})
-
-    # LEGACY
-    unless filter_group_model.get('Filters').models[0].get('Parameter')
-      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-      return done()
-
-    filter_group = new FilterGroupViewModel(filter_group_model)
-
-    filter = filter_group.Filters()[0]
-    assert.equal(filter.Name(), 'String')
-    assert.ok(filter.Parameter() instanceof StringParameterViewModel)
-
-    filter = filter_group.Filters()[1]
-    assert.equal(filter.Name(), 'Boolean')
-    assert.ok(filter.Parameter() instanceof BooleanParameterViewModel)
-
-    kb.release(filter_group)
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()

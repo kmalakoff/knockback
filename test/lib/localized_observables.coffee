@@ -1,5 +1,6 @@
-kb = require 'knockback'
+kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../knockback')
 _ = kb._
+Globalize = require './globalize/globalize'
 
 class kb.LocalizedStringLocalizer extends kb.LocalizedObservable
   read: (value) ->

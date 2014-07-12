@@ -11,4 +11,3 @@ module.exports = _.extend  _.clone(require '../../webpack/base-config.coffee'), 
 module.exports.resolve.alias =
   underscore: path.resolve('./vendor/optional/lodash-2.4.1.js')
   knockback: path.resolve('./knockback.js')
-  'knockback-examples-localization': path.resolve('./_temp/knockback-examples-localization.js')

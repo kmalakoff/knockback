@@ -3,11 +3,11 @@ path = require 'path'
 _ = require 'underscore'
 Queue = require 'queue-async'
 es = require 'event-stream'
+Wrench = require 'wrench'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 shell = require 'gulp-shell'
-requireSrc = require 'gulp-require-src'
 compile = require 'gulp-compile-js'
 concat = require 'gulp-concat'
 wrapAMD = require 'gulp-wrap-amd-infer'
@@ -19,17 +19,15 @@ TEST_GROUPS = require('../test_groups')
 module.exports = (callback) ->
   queue = new Queue(1)
 
-  # # lock vendor until backbone-orm main updated
-  # queue.defer (callback) -> requireSrc(_.keys(require('../../package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
-  # queue.defer (callback) -> requireSrc(_.keys(require('../../package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on('end', callback)
+  # install knockback
+  queue.defer (callback) ->
+    gulp.src(['./knockback.js', './package.json'])
+      .pipe(gulp.dest('node_modules/knockback'))
+      .on('end', callback)
 
-  # build webpack - 0 are dependencies that need to be built before webpack folder
+  # build webpack
   queue.defer (callback) ->
-    gulp.src('config/builds/test/**/*.pre.webpack.config.coffee', {read: false, buffer: false})
-      .pipe(webpack())
-      .pipe(es.writeArray (err, array) -> callback(err))
-  queue.defer (callback) ->
-    gulp.src(['config/builds/test/**/*.webpack.config.coffee', '!config/builds/test/**/*.pre.webpack.config.coffee'], {read: false, buffer: false})
+    gulp.src(['config/builds/test/**/*.webpack.config.coffee'], {read: false, buffer: false})
       .pipe(webpack())
       .pipe(es.writeArray (err, array) -> callback(err))
 
@@ -52,4 +50,7 @@ module.exports = (callback) ->
         .pipe(gulp.dest(test.build.destination))
         .on('end', callback)
 
-  queue.await callback
+  # uninstall knockback
+  queue.await (err) ->
+    Wrench.rmdirSyncRecursive('node_modules/knockback', true)
+    callback(err)

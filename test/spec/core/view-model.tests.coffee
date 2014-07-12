@@ -2,7 +2,7 @@ assert = assert or require?('chai').assert
 
 describe 'knockback-view-model.js', ->
 
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->

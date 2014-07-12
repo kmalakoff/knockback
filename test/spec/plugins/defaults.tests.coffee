@@ -2,10 +2,10 @@ assert = assert or require?('chai').assert
 
 describe 'knockback-defaults.js', ->
 
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; Backbone = kb.Backbone; ko = kb.ko
   Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
-  kb.LocaleManager or require?('knockback-examples-localization')
+  kb.LocaleManager or= require?('../../lib/knockback-examples-localization')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -13,6 +13,7 @@ describe 'knockback-defaults.js', ->
     assert.ok(!!kb.Model, 'kb.Model')
     assert.ok(!!kb.Collection, 'kb.Collection')
     assert.ok(!!kb, 'kb')
+    assert.ok(!!kb.LocaleManager, 'kb.LocaleManager')
     done()
 
   kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })

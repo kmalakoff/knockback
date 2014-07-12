@@ -1,7 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'Knockback.js with Backbone.ModelRef.js', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; Backbone = kb.Backbone; ko = kb.ko
   Backbone.ModelRef = window?.Backbone.ModelRef or require?('backbone-modelref')
 

@@ -19,7 +19,7 @@ if ( typeof require !== "undefined"
 	&& typeof exports !== "undefined"
 	&& typeof module !== "undefined" ) {
 	// Assume CommonJS
-	Globalize = require( "globalize" );
+	Globalize = require( "./globalize" );
 } else {
 	// Global variable
 	Globalize = window.Globalize;

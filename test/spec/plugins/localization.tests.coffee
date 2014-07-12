@@ -2,9 +2,9 @@ assert = assert or require?('chai').assert
 
 describe 'knockback-localized-observable.js', ->
 
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko
-  require?('knockback-examples-localization')
+  kb.LocaleManager or= require?('../../lib/knockback-examples-localization')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -12,6 +12,7 @@ describe 'knockback-localized-observable.js', ->
     assert.ok(!!kb.Model, 'kb.Model')
     assert.ok(!!kb.Collection, 'kb.Collection')
     assert.ok(!!kb, 'kb')
+    assert.ok(!!kb.LocaleManager, 'kb.LocaleManager')
     done()
 
   locale_manager = new kb.LocaleManager('en', {

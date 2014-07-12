@@ -2,7 +2,7 @@ assert = assert or require?('chai').assert
 
 describe 'knockback-validation.js', ->
 
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
@@ -48,6 +48,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator', (done) ->
+    return done() unless window?
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -89,6 +90,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator with custom validators', (done) ->
+    return done() unless window?
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -142,6 +144,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator with validation_options', (done) ->
+    return done() unless window?
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -210,6 +213,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator with name', (done) ->
+    return done() unless window?
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -281,6 +285,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator no name with validation_options', (done) ->
+    return done() unless window?
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -359,6 +364,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator with inject and disable', (done) ->
+    return done() unless window?
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 

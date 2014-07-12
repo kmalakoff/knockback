@@ -1671,7 +1671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	      return update();
 	    };
-	    events = Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
+	    events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
 	    if (type === kb.TYPE_COLLECTION) {
 	      for (_i = 0, _len = events.length; _i < _len; _i++) {
 	        event = events[_i];

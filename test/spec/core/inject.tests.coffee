@@ -3,7 +3,7 @@ assert = assert or require?('chai').assert
 describe 'knockback-inject.js', ->
   return unless window? # only for the dom
 
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->

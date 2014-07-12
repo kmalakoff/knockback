@@ -1,7 +1,9 @@
+assert = assert or require?('chai').assert
+
 describe 'Knockback.js with Backbone-Relational.js', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  kb = window?.kb or require?('knockback')
+  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; Backbone = kb.Backbone; ko = kb.ko
   Backbone?.Relational or require?('backbone-relational')
 
@@ -14,14 +16,13 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  Backbone.Relational.store.addModelScope?(window)
-
-  class Person extends Backbone.RelationalModel
+  Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany
       key: 'friends'
-      relatedModel: Person
+      relatedModel: 'Person'
     }]
+  })
 
   # ref counted view model
   class RefCountableViewModel

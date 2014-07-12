@@ -28,7 +28,7 @@
     "build": "gulp build --require coffee-script/register",
     "watch": "gulp watch --require coffee-script/register",
     "release": "gulp release --require coffee-script/register",
-    "clean": "rm -rf lib/*"
+    "postinstall": "gulp postinstall --require coffee-script/register"
   },
   "dependencies": {
     "underscore": ">=1.1.7",
@@ -37,7 +37,8 @@
   },
   "devDependencies": {
     "async": "*",
-    "chai": "^1.9.1",
+    "mocha": "*",
+    "chai": "*",
     "codo": "2.x",
     "coffee-loader": "^0.7.2",
     "coffee-script": "*",
@@ -67,7 +68,6 @@
     "karma-mocha": "^0.1.4",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
-    "mocha": "^1.20.1",
     "queue-async": "*",
     "webpack": "*",
     "wrench": "*"
@@ -77,7 +77,7 @@
     "backbone-relational": "0.8.x",
     "backbone-modelref": "0.1.x",
     "lodash": "2.x",
-    "backbone-orm": "0.5.x",
+    "backbone-orm": "git+https://github.com/vidigami/backbone-orm#develop",
     "moment": "2.x",
     "backbone-associations": "0.5.x",
     "supermodel": "0.0.x"

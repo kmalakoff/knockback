@@ -1,6 +1,11 @@
-kb = require 'knockback'
+kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../knockback')
+require './localized_observables'
+require './localized_string'
 
-class kb.LocaleManager
+Globalize = require './globalize/globalize'
+require './globalize/globalize.culture.en-GB.js'; require './globalize/globalize.culture.fr-FR.js'
+
+module.exports = class kb.LocaleManager
   @prototype extends kb.Events # Mix in kb.Events so callers can subscribe
 
   constructor: (locale_identifier, @translations_by_locale) ->
@@ -17,11 +22,8 @@ class kb.LocaleManager
   getLocale: -> return @locale_identifier
   setLocale: (locale_identifier) ->
     @locale_identifier = locale_identifier
-    Globalize.culture = Globalize.findClosestCulture(locale_identifier)
     @trigger('change', this)
-    culture_map = @translations_by_locale[@locale_identifier]
-    return if not culture_map
-    @trigger("change:#{key}", value) for key, value of culture_map
+    @trigger("change:#{key}", value) for key, value of (@translations_by_locale[@locale_identifier] or {})
     return
   getLocales: ->
     locales = []

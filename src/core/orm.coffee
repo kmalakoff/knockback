@@ -55,7 +55,7 @@ class ORMAdapter_BackboneRelational
       update()
 
     # VERSIONING: pre Backbone-Relational 0.8.0
-    events = if Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
+    events = if kb.Backbone.Relation.prototype.sanitizeOptions then ['update', 'add', 'remove'] else ['change', 'add', 'remove']
     if type is kb.TYPE_COLLECTION
       model.bind("#{event}:#{key}", rel_fn) for event in events
     else
