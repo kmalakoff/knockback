@@ -1,25 +1,24 @@
-(function() {
+(function (root, callback) {
 
-  // Use exports if on the server.
-  var Supermodel;
-  if (typeof exports === 'undefined') {
-    Supermodel = this.Supermodel = {};
-  } else {
-    Supermodel = exports;
+  // AMD
+  if (typeof define !== 'undefined' && define.amd) {
+    define(['exports', 'backbone', 'underscore'], callback);
   }
+
+  // CommonJS
+  else if (typeof exports !== 'undefined') {
+    callback(exports, require('backbone'), require('underscore'));
+  }
+
+  // Globals
+  else {
+    callback(root.Supermodel = {}, root.Backbone, root._);
+  }
+
+}(this, function (Supermodel, Backbone, _) {
 
   // Current version.
   Supermodel.VERSION = '0.0.4';
-
-  // Require Underscore, if we're on the server, and it's not already present.
-  var _ = this._;
-  if (!_ && (typeof require !== 'undefined')) _ = require('underscore');
-
-  // Require Backbone, if we're on the server, and it's not already present.
-  var Backbone = this.Backbone;
-  if (!Backbone && (typeof require !== 'undefined')) {
-    Backbone = require('backbone');
-  }
 
   // # Association
   //
@@ -190,7 +189,7 @@
   var ManyToOne = function(model, options) {
     this.required(options, 'inverse', 'collection');
     Association.apply(this, arguments);
-    _.extend(this, _.pick(options, 'collection', 'inverse'));
+    _.extend(this, _.pick(options, 'collection', 'inverse', 'id'));
     model.all()
       .on('associate:' + this.name, this._associate, this)
       .on('dissociate:' + this.name, this._dissociate, this);
@@ -469,33 +468,43 @@
     // Create a new model after checking for existence of a model with the same
     // id.
     create: function(attrs, options) {
-      var model;
-      var all = this.all();
-      var cid = attrs && attrs[this.prototype.cidAttribute];
       var id = attrs && attrs[this.prototype.idAttribute];
 
+      var model = this.find(attrs);
+
+      if (!options) options = {};
+
       // If `attrs` belongs to an existing model, return it.
-      if (cid && (model = all.getByCid(cid)) && model.attributes === attrs) {
+      if (model && attrs === model.attributes) return model;
+
+      // If found by id, modify and return it.
+      if (id && model) {
+        model.set(model.parse(attrs), _.extend(options, {silent: false}));
         return model;
       }
-
-      // If a model already exists for `id`, return it.
-      if (id && (model = all.get(id))) {
-        model.parse(attrs);
-        model.set(attrs);
-        return model;
-      }
-
-      if (!id) return new this(attrs, options);
 
       // Throw if a model already exists with the same id in a superclass.
-      var ctor = this;
-      do {
-        if (!ctor.all().get(id)) continue;
+      var parent = this;
+      while (parent = parent.parent) {
+        if (!parent.all().get(id)) continue;
         throw new Error('Model with id "' + id + '" already exists.');
-      } while (ctor = ctor.parent);
+      }
+
+      // Ensure attributes are parsed.
+      options.parse = true;
 
       return new this(attrs, options);
+    },
+
+    // ## find
+    // Attempt to find an existing model matching the provided attrs
+    find: function(attrs, merge){
+      if (!attrs) return false;
+
+      var cid = attrs[this.prototype.cidAttribute];
+      var id = attrs[this.prototype.idAttribute];
+
+      return (cid || id) && this.all().get(cid || id) || false;
     },
 
     // Create associations for a model.
@@ -505,7 +514,7 @@
 
     // Return a collection of all models for a particular constructor.
     all: function() {
-      return this._all || (this._all = new Backbone.Collection());
+      return this._all || (this._all = new Backbone.Collection);
     },
 
     // Return a hash of all associations for a particular constructor.
@@ -517,10 +526,10 @@
     // respectively.  `reset` removes all model references to allow garbage
     // collection.
     reset: function() {
-      this._all = new Backbone.Collection();
+      this._all = null;
       this._associations = {};
     }
 
   });
 
-}).call(this);
+}));

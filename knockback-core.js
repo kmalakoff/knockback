@@ -1010,7 +1010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -1019,7 +1019,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var Backbone, copyProps, kb, ko, _;
+	var Backbone, copyProps, kb, ko, root, _;
+
+	root = typeof window !== "undefined" && window !== null ? window : global;
 
 	ko = __webpack_require__(13);
 
@@ -1285,9 +1287,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	if (typeof window !== "undefined" && window !== null ? window.Parse : void 0) {
-	  Backbone = kb.Parse = window.Parse;
-	  _ = kb._ = window.Parse._;
+	if (root.Parse) {
+	  Backbone = kb.Parse = root.Parse;
+	  _ = kb._ = root.Parse._;
 	} else {
 	  Backbone = kb.Backbone = __webpack_require__(14);
 	  _ = kb._ = __webpack_require__(15);
@@ -1301,8 +1303,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.Events = Backbone.Events;
 
-	kb.$ = (typeof window !== "undefined" && window !== null ? window.jQuery : void 0) || (typeof window !== "undefined" && window !== null ? window.$ : void 0);
-
+	kb.$ = root.jQuery || root.$;
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 6 */
@@ -1560,7 +1563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -1569,7 +1572,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, kb, _;
+	var AssociatedModel, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, RelationalModel, Supermodel, kb, root, _;
+
+	root = typeof window !== "undefined" && window !== null ? window : global;
 
 	kb = __webpack_require__(5);
 
@@ -1627,17 +1632,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.orm = new ORM();
 
+	RelationalModel = null;
+
 	ORMAdapter_BackboneRelational = (function() {
 	  function ORMAdapter_BackboneRelational() {}
 
 	  ORMAdapter_BackboneRelational.prototype.isAvailable = function() {
 	    var _ref;
-	    return !!((_ref = kb.Backbone) != null ? _ref.RelationalModel : void 0);
+	    return !!(RelationalModel = (_ref = kb.Backbone) != null ? _ref.RelationalModel : void 0);
 	  };
 
 	  ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
 	    var relation;
-	    if (!(model instanceof kb.Backbone.RelationalModel)) {
+	    if (!(model instanceof RelationalModel)) {
 	      return null;
 	    }
 	    if (!(relation = _.find(model.getRelations(), function(test) {
@@ -1694,16 +1701,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.orm.addAdapter(new ORMAdapter_BackboneRelational());
 
+	AssociatedModel = null;
+
 	ORMAdapter_BackboneAssociations = (function() {
 	  function ORMAdapter_BackboneAssociations() {}
 
 	  ORMAdapter_BackboneAssociations.prototype.isAvailable = function() {
 	    var _ref;
-	    return !!((_ref = kb.Backbone) != null ? _ref.AssociatedModel : void 0);
+	    return !!(AssociatedModel = (_ref = kb.Backbone) != null ? _ref.AssociatedModel : void 0);
 	  };
 
 	  ORMAdapter_BackboneAssociations.prototype.keys = function(model) {
-	    if (!(model instanceof kb.Backbone.AssociatedModel)) {
+	    if (!(model instanceof AssociatedModel)) {
 	      return null;
 	    }
 	    return _.map(model.relations, function(test) {
@@ -1713,7 +1722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  ORMAdapter_BackboneAssociations.prototype.relationType = function(model, key) {
 	    var relation;
-	    if (!(model instanceof kb.Backbone.AssociatedModel)) {
+	    if (!(model instanceof AssociatedModel)) {
 	      return null;
 	    }
 	    if (!(relation = _.find(model.relations, function(test) {
@@ -1734,11 +1743,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
 
+	Supermodel = null;
+
 	ORMAdapter_Supermodel = (function() {
 	  function ORMAdapter_Supermodel() {}
 
 	  ORMAdapter_Supermodel.prototype.isAvailable = function() {
-	    return !!(typeof window !== "undefined" && window !== null ? window.Supermodel : void 0);
+	    return !!(Supermodel = root.Supermodel);
 	  };
 
 	  ORMAdapter_Supermodel.prototype.keys = function(model) {
@@ -1799,7 +1810,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	kb.orm.addAdapter(new ORMAdapter_Supermodel());
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 8 */
@@ -2630,7 +2642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -2639,9 +2651,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb;
+	var kb, root, _;
+
+	root = typeof window !== "undefined" && window !== null ? window : global;
 
 	module.exports = kb = __webpack_require__(5);
+
+	_ = kb._;
 
 	kb.modules = {
 	  underscore: kb._,
@@ -2649,17 +2665,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  knockout: kb.ko
 	};
 
-	if (typeof window !== "undefined" && window !== null) {
-	  window._ || (window._ = kb._);
-	  if (kb.Backbone) {
-	    window.Backbone || (window.Backbone = kb.Backbone);
-	  }
-	  if (kb.Parse) {
-	    window.Parse || (window.Parse = kb.Parse);
-	  }
-	  window.ko || (window.ko = kb.ko);
-	}
-
+	_.defaults(root, _.pick(kb, '_', 'Backbone', 'Parse', 'ko', '$'));
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 13 */

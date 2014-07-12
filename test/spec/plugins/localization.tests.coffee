@@ -4,7 +4,7 @@ describe 'knockback-localized-observable.js', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko
-  kb.LocaleManager or= require?('../../lib/knockback-examples-localization')
+  LocaleManager = window?.LocaleManager or require?('../../lib/locale_manager')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -15,7 +15,7 @@ describe 'knockback-localized-observable.js', ->
     assert.ok(!!kb.LocaleManager, 'kb.LocaleManager')
     done()
 
-  locale_manager = new kb.LocaleManager('en', {
+  locale_manager = new LocaleManager('en', {
     'en':
       formal_hello: 'Hello'
       formal_goodbye: 'Goodbye'

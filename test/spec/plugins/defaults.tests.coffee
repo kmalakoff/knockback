@@ -5,7 +5,7 @@ describe 'knockback-defaults.js', ->
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; Backbone = kb.Backbone; ko = kb.ko
   Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
-  kb.LocaleManager or= require?('../../lib/knockback-examples-localization')
+  LocaleManager = window?.LocaleManager or require?('../../lib/locale_manager')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -19,7 +19,7 @@ describe 'knockback-defaults.js', ->
   kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
   kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
 
-  locale_manager = new kb.LocaleManager('en', {
+  locale_manager = new LocaleManager('en', {
     'en': {loading: "Loading dude"}
     'en-GB': {loading: "Loading sir"}
     'fr-FR': {loading: "Chargement"}

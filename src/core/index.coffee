@@ -7,12 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
+root = if window? then window else global
 module.exports = kb = require './kb'
+_ = kb._
 
 # re-expose modules
 kb.modules = {underscore: kb._, backbone: kb.Parse or kb.Backbone, knockout: kb.ko}
-if window?
-  window._ or window._ = kb._
-  (window.Backbone or window.Backbone = kb.Backbone) if kb.Backbone
-  (window.Parse or window.Parse = kb.Parse) if kb.Parse
-  window.ko or window.ko = kb.ko
+_.defaults(root, _.pick(kb, '_', 'Backbone', 'Parse', 'ko', '$'))

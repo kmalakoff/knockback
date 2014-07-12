@@ -1,6 +1,9 @@
+root = if window? then window else global
 assert = assert or require?('chai').assert
 
 describe 'Knockback.js with Backbone-Relational.js', ->
+
+  after: -> delete root.Person
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
@@ -16,7 +19,9 @@ describe 'Knockback.js with Backbone-Relational.js', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  Person = Backbone.RelationalModel.extend({
+  Backbone.Relational.store = new Backbone.Store(); Backbone.Relational.store.addModelScope?(root)
+
+  root.Person = Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany
       key: 'friends'

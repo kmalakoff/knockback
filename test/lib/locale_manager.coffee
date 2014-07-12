@@ -1,4 +1,4 @@
-kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../knockback')
+kb = window?.kb; try kb or= require?('knockback')
 require './localized_observables'
 require './localized_string'
 

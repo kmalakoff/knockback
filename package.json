@@ -79,8 +79,8 @@
     "lodash": "2.x",
     "backbone-orm": "git+https://github.com/vidigami/backbone-orm#develop",
     "moment": "2.x",
-    "backbone-associations": "0.5.x",
-    "supermodel": "0.0.x"
+    "backbone-associations": "0.6.x",
+    "supermodel": "git+https://github.com/pathable/supermodel"
   },
   "jam": {
     "dependencies": {

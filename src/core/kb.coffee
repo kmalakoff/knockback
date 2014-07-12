@@ -7,6 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
+root = if window? then window else global
 ko = require 'knockout'
 
 # From Backbone.js (https:github.com/documentcloud/backbone)
@@ -274,9 +275,9 @@ module.exports = class kb
   @publishMethods: (observable, instance, methods) -> observable[fn] = kb._.bind(instance[fn], instance) for fn in methods; return
   @peek: (obs) -> return obs unless ko.isObservable(obs); return obs.peek() if obs.peek; return kb.ignore -> obs()
 
-if window?.Parse
-  Backbone = kb.Parse = window.Parse
-  _ = kb._ = window.Parse._
+if root.Parse
+  Backbone = kb.Parse = root.Parse
+  _ = kb._ = root.Parse._
 else
   Backbone = kb.Backbone = require 'backbone'
   _ = kb._ = require 'underscore'
@@ -287,4 +288,4 @@ kb.Collection = Backbone.Collection
 kb.Model = Backbone.Object or Backbone.Model
 kb.Events = Backbone.Events
 
-kb.$ = window?.jQuery or window?.$
+kb.$ = root.jQuery or root.$ # or require 'jquery' # webpack optionals

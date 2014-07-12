@@ -7,6 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
+root = if window? then window else global
+
 kb = require './kb'
 _ = kb._
 
@@ -37,14 +39,14 @@ kb.orm = new ORM()
 ###############################
 # Backbone Relational
 ###############################
+RelationalModel = null # lazy check
+
 # @nodoc
 class ORMAdapter_BackboneRelational
-  isAvailable: ->
-    # try kb.Backbone?.RelationalModel or require?('backbone-relational') catch
-    return !!kb.Backbone?.RelationalModel
+  isAvailable: -> return !!RelationalModel = kb.Backbone?.RelationalModel # or require?('backbone-relational')?.RelationalModel # webpack optionals
 
   relationType: (model, key) ->
-    return null unless model instanceof kb.Backbone.RelationalModel
+    return null unless model instanceof RelationalModel
     return null unless relation = _.find(model.getRelations(), (test) -> return test.key is key)
     return if (relation.collectionType or _.isArray(relation.keyContents)) then kb.TYPE_COLLECTION else kb.TYPE_MODEL
 
@@ -73,18 +75,18 @@ kb.orm.addAdapter(new ORMAdapter_BackboneRelational())
 ###############################
 # Backbone Associations
 ###############################
+AssociatedModel = null # lazy check
+
 # @nodoc
 class ORMAdapter_BackboneAssociations
-  isAvailable: ->
-    # try kb.Backbone?.AssociatedModel or require?('backbone-associations') catch
-    return !!kb.Backbone?.AssociatedModel
+  isAvailable: -> return !!AssociatedModel = kb.Backbone?.AssociatedModel # or require?('backbone-associations')?.AssociatedModel # webpack optionals
 
   keys: (model) ->
-    return null unless model instanceof kb.Backbone.AssociatedModel
+    return null unless model instanceof AssociatedModel
     return _.map(model.relations, (test) -> test.key)
 
   relationType: (model, key) ->
-    return null unless model instanceof kb.Backbone.AssociatedModel
+    return null unless model instanceof AssociatedModel
     return null unless relation = _.find(model.relations, (test) -> return test.key is key)
     return if (relation.type is 'Many') then kb.TYPE_COLLECTION else kb.TYPE_MODEL
 
@@ -92,11 +94,11 @@ kb.orm.addAdapter(new ORMAdapter_BackboneAssociations())
 ###############################
 
 ###############################
+Supermodel = null # lazy check
+
 # @nodoc
 class ORMAdapter_Supermodel
-  isAvailable: ->
-    # try window?.Supermodel or require?('supermodel') catch
-    return !!window?.Supermodel
+  isAvailable: -> return !!Supermodel = root.Supermodel # or require?('supermodel') # webpack optionals
 
   keys: (model) ->
     return null unless model instanceof Supermodel.Model

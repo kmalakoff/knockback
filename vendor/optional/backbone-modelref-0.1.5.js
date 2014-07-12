@@ -298,7 +298,7 @@ Backbone.ModelRef.prototype.unbindLoadingStates = function(params) {
   return this.model();
 };
 
-if (typeof exports !== 'undefined') {
+if (typeof module !== 'undefined') {
   module.exports = Backbone.ModelRef;
 }
 

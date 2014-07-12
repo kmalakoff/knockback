@@ -1,11 +1,13 @@
+root = if window? then window else global
 assert = assert or require?('chai').assert
 
 describe 'Knockback.js with Backbone Supermodel', ->
 
+  root.Supermodel = Supermodel = window?.Supermodel or require?('supermodel')
+
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; Backbone = kb.Backbone; ko = kb.ko
-  Supermodel = window?.Supermodel or require?('supermodel')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -15,8 +17,6 @@ describe 'Knockback.js with Backbone Supermodel', ->
     assert.ok(!!Supermodel, 'Supermodel')
     assert.ok(!!kb, 'kb')
     done()
-
-  return console.log 'TODO: get supermodel working'
 
   class Person extends Supermodel.Model
   class BestFriends extends Supermodel.Model
@@ -762,7 +762,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
     paul.friends().reset([john, george, ringo]); paul.best_friend(george)
     ringo.friends().reset([john, paul, george])
 
-    class window.PersonViewModel extends kb.ViewModel
+    class PersonViewModel extends kb.ViewModel
       constructor: (model, options) ->
         super(model, {
           factories:
@@ -772,7 +772,7 @@ describe 'Knockback.js with Backbone Supermodel', ->
           options: options
         })
 
-    class window.PersonCollection extends kb.CollectionObservable
+    class PersonCollection extends kb.CollectionObservable
       constructor: (collection, options) ->
         return super(collection, {
           factories:
