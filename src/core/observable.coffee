@@ -144,8 +144,7 @@ class kb.Observable
     kb.utils.wrappedDestroy(@)
 
   # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Collection, it will hold a CollectionObservable.
-  value: ->
-    return @__kb_value
+  value: -> return @__kb_value
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: ->

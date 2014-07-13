@@ -3,6 +3,7 @@ _ = require 'underscore'
 Queue = require 'queue-async'
 
 gulp = require 'gulp'
+gutil = require 'gulp-util'
 requireSrc = require 'gulp-require-src'
 webpack = require 'gulp-webpack-config'
 rename = require 'gulp-rename'
@@ -29,6 +30,7 @@ gulp.task 'postinstall', (callback) ->
   queue.await callback
 
 gulp.task 'build', buildLibraries = (callback) ->
+  errors = []
   gulp.src('config/builds/library/**/*.webpack.config.coffee', {read: false, buffer: false})
     .pipe(webpack())
     .pipe(header(HEADER, {pkg: require('./package.json')}))
@@ -37,7 +39,7 @@ gulp.task 'build', buildLibraries = (callback) ->
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'watch', ['build'], ->
-  gulp.watch './src/**/*.coffee', (callback) -> buildLibraries(callback)
+  gulp.watch './src/**/*.coffee', -> buildLibraries(->)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'minify', ['build'], (callback) ->

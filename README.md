@@ -181,3 +181,10 @@ To run all tests (Node.js only):
 ```
 mocha --grep '' test/**/*.tests.coffee
 ```
+
+To run all tests (Node.js only) with TDD:
+
+```
+npm run watch
+mocha --grep '' test/**/*.tests.coffee --watch
+```
