@@ -175,3 +175,9 @@ Building, Running and Testing the library
 1. Build: `npm run build`
 2. Build and run tests: `npm test`
 3. Build documents: `npm run docs`
+
+To run all tests (Node.js only):
+
+```
+mocha --grep '' test/**/*.tests.coffee
+```

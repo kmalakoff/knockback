@@ -11,11 +11,11 @@ module.exports = (callback) ->
   queue = new Queue(1)
 
   # run node tests
-  # queue.defer (callback) ->
-  #   gutil.log 'Running Node.js tests'
-  #   gulp.src('test/spec/**/*.tests.coffee')
-  #     .pipe(mocha({}))
-  #     .pipe es.writeArray (err, array) -> callback(err)
+  queue.defer (callback) ->
+    gutil.log 'Running Node.js tests'
+    gulp.src('test/spec/**/*.tests.coffee')
+      .pipe(mocha({}))
+      .pipe es.writeArray (err, array) -> callback(err)
 
   # run browser tests
   queue.defer (callback) ->

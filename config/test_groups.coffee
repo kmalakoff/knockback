@@ -43,18 +43,18 @@ TEST_GROUPS.core = []
 for test_name, library_files of KNOCKBACK when (test_name.indexOf('core') >= 0 and test_name.indexOf('stack') < 0)
   TEST_GROUPS.core.push({name: "core_#{test_name}", files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.coffee'])})
 
-# ###############################
-# # ORM
-# ###############################
-# ORM_TESTS =
-#   backbone_orm: [KNOCKBACK.full, './vendor/optional/moment-2.7.0.js', './vendor/optional/backbone-orm-0.6.0.js', './test/spec/ecosystem/**/backbone-orm*.tests.coffee']
-#   backbone_relational: [KNOCKBACK.full, './vendor/optional/backbone-relational-0.8.8.js', './test/spec/ecosystem/**/backbone-relational*.tests.coffee']
-#   backbone_associations: [KNOCKBACK.full, './vendor/optional/backbone-associations-0.6.2.js', './test/spec/ecosystem/**/backbone-associations*.tests.coffee']
-#   supermodel: [KNOCKBACK.full, './vendor/optional/supermodel-0.0.4.js', './test/spec/ecosystem/**/supermodel*.tests.coffee']
+###############################
+# ORM
+###############################
+ORM_TESTS =
+  backbone_orm: [KNOCKBACK.full, './vendor/optional/moment-2.7.0.js', './vendor/optional/backbone-orm-0.6.0.js', './test/spec/ecosystem/**/backbone-orm*.tests.coffee']
+  backbone_relational: [KNOCKBACK.full, './vendor/optional/backbone-relational-0.8.8.js', './test/spec/ecosystem/**/backbone-relational*.tests.coffee']
+  backbone_associations: [KNOCKBACK.full, './vendor/optional/backbone-associations-0.6.2.js', './test/spec/ecosystem/**/backbone-associations*.tests.coffee']
+  supermodel: [KNOCKBACK.full, './vendor/optional/supermodel-0.0.4.js', './test/spec/ecosystem/**/supermodel*.tests.coffee']
 
-# TEST_GROUPS.orm = []
-# for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')
-#   TEST_GROUPS.orm.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
+TEST_GROUPS.orm = []
+for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')
+  TEST_GROUPS.orm.push({name: "#{dep_name}_#{test_name}", files: _.flatten([dep_files, test_files])}) for test_name, test_files of ORM_TESTS
 
 ###############################
 # AMD
@@ -62,29 +62,27 @@ for test_name, library_files of KNOCKBACK when (test_name.indexOf('core') >= 0 a
 AMD_OPTIONS = require './amd/gulp-options'
 TEST_GROUPS.amd = []
 for test in TEST_GROUPS.full.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
-  test_files = ['./node_modules/chai/chai.js'].concat(test.files); files = []; test_patterns = []; test_dependencies = []
+  test_files = ['./node_modules/chai/chai.js'].concat(test.files); files = []; test_patterns = []; path_files = []
   files.push({pattern: './vendor/optional/requirejs-2.1.14.js'})
   for file in test_files
-    if file.indexOf('*') >= 0
+    if file.indexOf('.tests.') >= 0
       test_patterns.push(file)
     else
-      files.push({pattern: file, included: true})
-      test_dependencies.push(file)
-  TEST_GROUPS.amd.push({name: "amd_#{test.name}", files: files, build: {files: test_patterns, destination: "_temp/amd/#{test.name}", options: _.extend({files: test_dependencies}, AMD_OPTIONS)}})
+      files.push({pattern: file, included: false})
+      path_files.push(file)
+  files.push("_temp/amd/#{test.name}/**/*.js")
+  TEST_GROUPS.amd.push({name: "amd_#{test.name}", files: files, build: {files: test_patterns, destination: "_temp/amd/#{test.name}", options: _.extend({path_files: path_files}, AMD_OPTIONS)}})
 
-TEST_GROUPS.full = []
-TEST_GROUPS.core = []
+###############################
+# Webpack
+###############################
+TEST_GROUPS.webpack = []
+for file in FILES.tests_webpack
+  TEST_GROUPS.webpack.push({name: "webpack_#{file.replace('.js', '')}", files: _.flatten(['./vendor/optional/jquery-2.1.1.js', (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), file])})
 
-# ###############################
-# # Webpack
-# ###############################
-# TEST_GROUPS.webpack = []
-# for file in FILES.tests_webpack
-#   TEST_GROUPS.webpack.push({name: "webpack_#{file.replace('.js', '')}", files: _.flatten(['./vendor/optional/jquery-2.1.1.js', (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), file])})
-
-# ###############################
-# # Browserify
-# ###############################
-# TEST_GROUPS.browserify = []
-# for test_name, test_info of require('./browserify/tests')
-#   TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: _.flatten(['./vendor/optional/jquery-2.1.1.js', (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), test_info.output]), build: {destination: test_info.output, options: test_info.options, files: test_info.files}})
+###############################
+# Browserify
+###############################
+TEST_GROUPS.browserify = []
+for test_name, test_info of require('./browserify/tests')
+  TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: _.flatten(['./vendor/optional/jquery-2.1.1.js', (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), test_info.output]), build: {destination: test_info.output, options: test_info.options, files: test_info.files}})
