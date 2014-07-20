@@ -23,12 +23,13 @@
     "url": "http://github.com/kmalakoff/knockback.git"
   },
   "scripts": {
-    "test": "gulp test --require coffee-script/register",
+    "test": "gulp test",
+    "test-quick": "gulp test-node-quick",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
-    "build": "gulp build --require coffee-script/register",
-    "watch": "gulp watch --require coffee-script/register",
-    "release": "gulp release --require coffee-script/register",
-    "postinstall": "gulp postinstall --require coffee-script/register"
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "release": "gulp release",
+    "postinstall": "gulp postinstall"
   },
   "dependencies": {
     "underscore": ">=1.1.7",
@@ -36,8 +37,7 @@
     "knockout": ">=1.2.1"
   },
   "devDependencies": {
-    "async": "*",
-    "mocha": "*",
+    "async": "^0.9.0",
     "chai": "*",
     "codo": "2.x",
     "coffee-loader": "^0.7.2",
@@ -50,12 +50,12 @@
     "gulp-header": "*",
     "gulp-mocha": "^0.4.1",
     "gulp-mocha-phantomjs": "*",
-    "gulp-webpack-config": "*",
     "gulp-rename": "*",
     "gulp-require-src": "*",
     "gulp-shell": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
+    "gulp-webpack-config": "*",
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
     "jquery": "*",
@@ -68,8 +68,9 @@
     "karma-mocha": "^0.1.4",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
+    "mocha": "*",
     "queue-async": "*",
-    "webpack": "*",
+    "webpack": "git+https://github.com/forivall/webpack#master",
     "wrench": "*"
   },
   "optionalDependencies": {
@@ -77,7 +78,7 @@
     "backbone-relational": "0.8.x",
     "backbone-modelref": "0.1.x",
     "lodash": "2.x",
-    "backbone-orm": "git+https://github.com/vidigami/backbone-orm#develop",
+    "backbone-orm": "0.6.x",
     "moment": "2.x",
     "backbone-associations": "0.6.x",
     "supermodel": "git+https://github.com/pathable/supermodel"

@@ -17,6 +17,8 @@ browserify = require 'gulp-browserify'
 TEST_GROUPS = require('../test_groups')
 
 module.exports = (callback) ->
+  return callback() if process.argv[2]?.indexOf?('quick') >= 0 # quick
+
   queue = new Queue(1)
 
   # install knockback

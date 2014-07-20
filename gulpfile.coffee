@@ -1,6 +1,8 @@
 path = require 'path'
 _ = require 'underscore'
 Queue = require 'queue-async'
+Async = require 'async'
+es = require 'event-stream'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -9,7 +11,7 @@ webpack = require 'gulp-webpack-config'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
-runTests = null  # require './config/run_tests'  # this require is slow
+mocha = require 'gulp-mocha'
 
 HEADER = module.exports = """
 /*
@@ -51,10 +53,24 @@ gulp.task 'minify', ['build'], (callback) ->
     .on('end', callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'test', ['minify'], (callback) ->
-  runTests or= require './config/run_tests'
-  runTests (err) -> process.exit(if err then 1 else 0)
+gulp.task 'test-node', ['minify'], testNode = (callback) ->
+  gutil.log 'Running Node.js tests'
+  gulp.src('test/spec/**/*.tests.coffee')
+    .pipe(mocha({}))
+    .pipe es.writeArray (err, array) ->
+      callback(err)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
+
+gulp.task 'test-browsers', ['minify'], testBrowsers = (callback) ->
+  gutil.log 'Running Browser tests'
+  (require './config/karma/run')(callback)
+  return # promises workaround: https://github.com/gulpjs/gulp/issues/455
+
+gulp.task 'test', ['minify'], (callback) ->
+  Async.series [testNode, testBrowsers], (err) -> process.exit(if err then 1 else 0)
+  return # promises workaround: https://github.com/gulpjs/gulp/issues/455
+
+gulp.task 'test-quick', ['build'], testNode
 
 gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so doesn't return exit code
   copyLibraryFiles = (destination, others, callback) ->
@@ -63,7 +79,7 @@ gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so 
       .on('end', callback)
 
   queue = new Queue(1)
-  queue.defer (callback) -> runTests(callback)
+  queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
   queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
   queue.await (err) -> process.exit(if err then 1 else 0)

@@ -3,18 +3,18 @@
   Copyright (c) 2013-2014 Vidigami
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/vidigami/backbone-orm
-  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+  Dependencies: Backbone.js and Underscore.js.
 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("underscore"), require("backbone"), require("moment"), (function webpackLoadOptionalExternalModule() { try { return require("stream"); } catch(e) {} }()));
+		module.exports = factory(require("underscore"), require("backbone"), (function webpackLoadOptionalExternalModule() { try { return require("stream"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["underscore", "backbone", "moment", "stream"], factory);
+		define(["underscore", "backbone"], (function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) { return factory(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__, root["stream"]); }));
 	else if(typeof exports === 'object')
-		exports["BackboneORM"] = factory(require("underscore"), require("backbone"), require("moment"), (function webpackLoadOptionalExternalModule() { try { return require("stream"); } catch(e) {} }()));
+		exports["BackboneORM"] = factory(require("underscore"), require("backbone"), (function webpackLoadOptionalExternalModule() { try { return require("stream"); } catch(e) {} }()));
 	else
-		root["BackboneORM"] = factory(root["_"], root["Backbone"], root["moment"], root["stream"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__) {
+		root["BackboneORM"] = factory(root["_"], root["Backbone"], root["stream"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -67,40 +67,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var e;
+	var BackboneORM, publish;
 
-	module.exports = {
-	  sync: __webpack_require__(13),
-	  Utils: __webpack_require__(5),
-	  JSONUtils: __webpack_require__(6),
-	  Queue: __webpack_require__(7),
-	  DatabaseURL: __webpack_require__(8),
-	  Fabricator: __webpack_require__(9),
-	  MemoryStore: __webpack_require__(14),
-	  Cursor: __webpack_require__(10),
-	  Schema: __webpack_require__(11),
-	  ConnectionPool: __webpack_require__(12),
-	  CacheSingletons: __webpack_require__(15),
-	  modules: {
-	    url: __webpack_require__(16),
-	    querystring: __webpack_require__(17),
-	    'lru-cache': __webpack_require__(19),
-	    underscore: __webpack_require__(1),
-	    backbone: __webpack_require__(2),
-	    moment: __webpack_require__(3),
-	    inflection: __webpack_require__(20)
-	  },
+	module.exports = BackboneORM = __webpack_require__(4);
+
+	publish = {
+	  configure: __webpack_require__(6),
+	  sync: __webpack_require__(5),
+	  Utils: __webpack_require__(7),
+	  JSONUtils: __webpack_require__(8),
+	  DateUtils: __webpack_require__(9),
+	  Queue: __webpack_require__(10),
+	  DatabaseURL: __webpack_require__(11),
+	  Fabricator: __webpack_require__(12),
+	  MemoryStore: __webpack_require__(16),
+	  Cursor: __webpack_require__(13),
+	  Schema: __webpack_require__(14),
+	  ConnectionPool: __webpack_require__(15),
+	  BaseConvention: __webpack_require__(17),
 	  _: __webpack_require__(1),
 	  Backbone: __webpack_require__(2)
 	};
 
+	publish._.extend(BackboneORM, publish);
+
+	BackboneORM.modules = {
+	  underscore: __webpack_require__(1),
+	  backbone: __webpack_require__(2),
+	  url: __webpack_require__(18),
+	  querystring: __webpack_require__(19),
+	  'lru-cache': __webpack_require__(25),
+	  inflection: __webpack_require__(26)
+	};
+
 	try {
-	  module.exports.modules.stream = __webpack_require__(4);
-	} catch (_error) {
-	  e = _error;
-	}
+	  BackboneORM.modules.stream = __webpack_require__(3);
+	} catch (_error) {}
 
 
 /***/ },
@@ -119,14 +123,15 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
+	if(typeof __WEBPACK_EXTERNAL_MODULE_3__ === 'undefined') {var e = new Error("Cannot find module \"stream\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
 	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
 
 /***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	if(typeof __WEBPACK_EXTERNAL_MODULE_4__ === 'undefined') {var e = new Error("Cannot find module \"stream\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
-	module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
+	module.exports = {};
+
 
 /***/ },
 /* 5 */
@@ -138,31 +143,265 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Backbone, DatabaseURL, JSONUtils, Queue, S4, URL, Utils, inflection, modelExtensions, _,
+	var Backbone, BackboneORM, CAPABILITIES, DESTROY_BATCH_LIMIT, JSONUtils, MemoryCursor, MemorySync, Queue, Schema, Utils, _;
+
+	_ = __webpack_require__(1);
+
+	Backbone = __webpack_require__(2);
+
+	BackboneORM = __webpack_require__(4);
+
+	Queue = __webpack_require__(10);
+
+	MemoryCursor = __webpack_require__(20);
+
+	Schema = __webpack_require__(14);
+
+	Utils = __webpack_require__(7);
+
+	JSONUtils = __webpack_require__(8);
+
+	DESTROY_BATCH_LIMIT = 1000;
+
+	CAPABILITIES = {
+	  embed: true,
+	  json: true,
+	  self_reference: true
+	};
+
+	MemorySync = (function() {
+	  function MemorySync(model_type) {
+	    var _base;
+	    this.model_type = model_type;
+	    this.model_type.model_name = Utils.findOrGenerateModelName(this.model_type);
+	    this.schema = new Schema(this.model_type, {
+	      id: {
+	        type: 'Integer'
+	      }
+	    });
+	    this.store = (_base = this.model_type).store || (_base.store = {});
+	    this.id = 0;
+	  }
+
+	  MemorySync.prototype.initialize = function() {
+	    if (this.is_initialized) {
+	      return;
+	    }
+	    this.is_initialized = true;
+	    return this.schema.initialize();
+	  };
+
+	  MemorySync.prototype.read = function(model, options) {
+	    var id, model_json;
+	    if (model.models) {
+	      return options.success((function() {
+	        var _ref, _results;
+	        _ref = this.store;
+	        _results = [];
+	        for (id in _ref) {
+	          model_json = _ref[id];
+	          _results.push(JSONUtils.deepClone(model_json));
+	        }
+	        return _results;
+	      }).call(this));
+	    } else {
+	      if (_.isUndefined(this.store[model.id])) {
+	        return options.error(new Error("Model not found with id: " + model.id));
+	      }
+	      return options.success(JSONUtils.deepClone(this.store[model.id]));
+	    }
+	  };
+
+	  MemorySync.prototype.create = function(model, options) {
+	    var attributes, model_json;
+	    (attributes = {})[this.model_type.prototype.idAttribute] = ++this.id;
+	    model.set(attributes);
+	    model_json = this.store[model.id] = model.toJSON();
+	    return options.success(JSONUtils.deepClone(model_json));
+	  };
+
+	  MemorySync.prototype.update = function(model, options) {
+	    var model_json;
+	    this.store[model.id] = model_json = model.toJSON();
+	    return options.success(JSONUtils.deepClone(model_json));
+	  };
+
+	  MemorySync.prototype["delete"] = function(model, options) {
+	    if (!this.store[model.id]) {
+	      return options.error(new Error('Model not found'));
+	    }
+	    delete this.store[model.id];
+	    return options.success();
+	  };
+
+	  MemorySync.prototype.resetSchema = function(options, callback) {
+	    return this.destroy({}, callback);
+	  };
+
+	  MemorySync.prototype.cursor = function(query) {
+	    if (query == null) {
+	      query = {};
+	    }
+	    return new MemoryCursor(query, _.pick(this, ['model_type', 'store']));
+	  };
+
+	  MemorySync.prototype.destroy = function(query, callback) {
+	    var _ref;
+	    if (arguments.length === 1) {
+	      _ref = [{}, query], query = _ref[0], callback = _ref[1];
+	    }
+	    return this.model_type.each(_.extend({
+	      $each: {
+	        limit: DESTROY_BATCH_LIMIT,
+	        json: true
+	      }
+	    }, query), ((function(_this) {
+	      return function(model_json, callback) {
+	        return Utils.patchRemoveByJSON(_this.model_type, model_json, function(err) {
+	          if (!err) {
+	            delete _this.store[model_json[_this.model_type.prototype.idAttribute]];
+	          }
+	          return callback(err);
+	        });
+	      };
+	    })(this)), callback);
+	  };
+
+	  return MemorySync;
+
+	})();
+
+	module.exports = function(type) {
+	  var model_type, sync, sync_fn;
+	  if (Utils.isCollection(new type())) {
+	    model_type = Utils.configureCollectionModelType(type, module.exports);
+	    return type.prototype.sync = model_type.prototype.sync;
+	  }
+	  sync = new MemorySync(type);
+	  type.prototype.sync = sync_fn = function(method, model, options) {
+	    if (options == null) {
+	      options = {};
+	    }
+	    sync.initialize();
+	    if (method === 'createSync') {
+	      return module.exports.apply(null, Array.prototype.slice.call(arguments, 1));
+	    }
+	    if (method === 'sync') {
+	      return sync;
+	    }
+	    if (method === 'isRemote') {
+	      return false;
+	    }
+	    if (method === 'schema') {
+	      return sync.schema;
+	    }
+	    if (method === 'tableName') {
+	      return void 0;
+	    }
+	    if (sync[method]) {
+	      return sync[method].apply(sync, Array.prototype.slice.call(arguments, 1));
+	    } else {
+	      return void 0;
+	    }
+	  };
+	  Utils.configureModelType(type);
+	  return BackboneORM.model_cache.configureSync(type, sync_fn);
+	};
+
+	module.exports.Sync = MemorySync;
+
+	module.exports.Cursor = MemoryCursor;
+
+	module.exports.capabilities = function(url) {
+	  return CAPABILITIES;
+	};
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ALL_CONVENTIONS, BackboneORM, configure, _;
+
+	_ = __webpack_require__(1);
+
+	BackboneORM = __webpack_require__(4);
+
+	ALL_CONVENTIONS = {
+	  "default": __webpack_require__(21),
+	  underscore: __webpack_require__(21),
+	  camelize: __webpack_require__(22),
+	  classify: __webpack_require__(23)
+	};
+
+	BackboneORM.naming_conventions = ALL_CONVENTIONS["default"];
+
+	BackboneORM.model_cache = new (__webpack_require__(24))();
+
+	module.exports = configure = function(options) {
+	  var convention, key, value, _results;
+	  if (options == null) {
+	    options = {};
+	  }
+	  _results = [];
+	  for (key in options) {
+	    value = options[key];
+	    switch (key) {
+	      case 'model_cache':
+	        _results.push(BackboneORM.model_cache.configure(options.model_cache));
+	        break;
+	      case 'naming_conventions':
+	        if (_.isString(value)) {
+	          if (convention = ALL_CONVENTIONS[value]) {
+	            BackboneORM.naming_conventions = convention;
+	            continue;
+	          }
+	          _results.push(console.log("BackboneORM configure: could not find naming_conventions: " + value + ". Available: " + (_.keys(ALL_CONVENTIONS).join(', '))));
+	        } else {
+	          _results.push(BackboneORM.naming_conventions = value);
+	        }
+	        break;
+	      default:
+	        _results.push(BackboneORM[key] = value);
+	    }
+	  }
+	  return _results;
+	};
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var Backbone, BackboneORM, DatabaseURL, JSONUtils, Queue, URL, Utils, modelExtensions, _,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-	URL = __webpack_require__(16);
-
-	DatabaseURL = __webpack_require__(8);
+	URL = __webpack_require__(18);
 
 	Backbone = __webpack_require__(2);
 
 	_ = __webpack_require__(1);
 
-	inflection = __webpack_require__(20);
+	BackboneORM = __webpack_require__(4);
 
-	Queue = __webpack_require__(7);
+	DatabaseURL = __webpack_require__(11);
 
-	JSONUtils = __webpack_require__(6);
+	Queue = __webpack_require__(10);
+
+	JSONUtils = __webpack_require__(8);
 
 	modelExtensions = null;
-
-	S4 = function() {
-	  return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-	};
 
 	module.exports = Utils = (function() {
 	  function Utils() {}
@@ -197,6 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (options.verbose) {
 	        console.log("" + (model_types.length - failed_schemas.length) + " schemas dropped.");
 	      }
+	      BackboneORM.model_cache.reset();
 	      if (failed_schemas.length) {
 	        return callback(new Error("Failed to migrate schemas: " + (failed_schemas.join(', '))));
 	      }
@@ -204,18 +444,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  };
 
-	  Utils.guid = function() {
-	    return S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4();
-	  };
-
-	  Utils.toString = function(json) {
-	    var err;
-	    try {
-	      return JSON.stringify(json);
-	    } catch (_error) {
-	      err = _error;
-	      return 'Failed to inspect';
-	    }
+	  Utils.debounceCallback = function(callback) {
+	    var debounced_callback;
+	    return debounced_callback = function() {
+	      if (debounced_callback.was_called) {
+	        return;
+	      }
+	      debounced_callback.was_called = true;
+	      return callback.apply(null, Array.prototype.slice.call(arguments, 0));
+	    };
 	  };
 
 	  Utils.bbCallback = function(callback) {
@@ -333,9 +570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Utils.configureModelType = function(type) {
-	    if (!modelExtensions) {
-	      modelExtensions = __webpack_require__(21);
-	    }
+	    modelExtensions || (modelExtensions = __webpack_require__(27));
 	    return modelExtensions(type);
 	  };
 
@@ -543,13 +778,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	    if (desc) {
-	      if (Utils.toString(model[field]) < Utils.toString(other_model[field])) {
+	      if (JSONUtils.stringify(model[field]) < JSONUtils.stringify(other_model[field])) {
 	        return 1;
 	      } else {
 	        return -1;
 	      }
 	    } else {
-	      if (Utils.toString(model[field]) > Utils.toString(other_model[field])) {
+	      if (JSONUtils.stringify(model[field]) > JSONUtils.stringify(other_model[field])) {
 	        return 1;
 	      } else {
 	        return -1;
@@ -563,7 +798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -572,20 +807,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var JSONUtils, Queue, Utils, moment, _;
+	var JSONUtils, Queue, Utils, _;
 
 	_ = __webpack_require__(1);
 
-	moment = __webpack_require__(3);
+	Queue = __webpack_require__(10);
 
-	Queue = __webpack_require__(7);
-
-	Utils = __webpack_require__(5);
+	Utils = __webpack_require__(7);
 
 	module.exports = JSONUtils = (function() {
 	  function JSONUtils() {}
+
+	  JSONUtils.stringify = function(json) {
+	    var err;
+	    try {
+	      return JSON.stringify(json);
+	    } catch (_error) {
+	      err = _error;
+	      return 'Failed to stringify';
+	    }
+	  };
 
 	  JSONUtils.parseParams = function(params) {
 	    var key, result, value;
@@ -597,8 +840,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	  };
 
-	  JSONUtils.parse = function(values) {
-	    var date, err, key, match, result, value;
+	  JSONUtils.parse = function(values, model_type) {
+	    var date, key, match, parsed_values, result, value;
 	    if (_.isNull(values) || (values === 'null')) {
 	      return null;
 	    }
@@ -606,22 +849,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return values;
 	    }
 	    if (_.isArray(values)) {
-	      return _.map(values, JSONUtils.parse);
+	      return (function() {
+	        var _i, _len, _results;
+	        _results = [];
+	        for (_i = 0, _len = values.length; _i < _len; _i++) {
+	          value = values[_i];
+	          _results.push(JSONUtils.parse(value));
+	        }
+	        return _results;
+	      })();
 	    }
 	    if (_.isObject(values)) {
 	      result = {};
 	      for (key in values) {
 	        value = values[key];
 	        result[key] = JSONUtils.parse(value);
+	        if (!(_.isString(result[key]) && result[key].length)) {
+	          continue;
+	        }
+	        if (key[0] === '$') {
+	          if (!_.isNaN(value = +result[key])) {
+	            result[key] = value;
+	          }
+	        } else if ((model_type != null ? model_type.schema().idType(key) : void 0) === 'Integer') {
+	          if (_.isNaN(value = +result[key])) {
+	            console.log("Warning: failed to convert '" + key + "' type to integer. Model: " + model_type.model_name + " value: " + result[key]);
+	            continue;
+	          }
+	          result[key] = value;
+	        }
 	      }
 	      return result;
 	    } else if (_.isString(values)) {
 	      if ((values.length >= 20) && values[values.length - 1] === 'Z') {
-	        date = moment.utc(values);
-	        if (date && date.isValid()) {
-	          return date.toDate();
-	        } else {
+	        if (_.isNaN((date = new Date(values)).getTime())) {
 	          return values;
+	        } else {
+	          return date;
 	        }
 	      }
 	      if (values === 'true') {
@@ -633,12 +897,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (match = /^\"(.*)\"$/.exec(values)) {
 	        return match[0];
 	      }
-	      try {
-	        if (values = JSON.parse(values)) {
-	          return JSONUtils.parse(values);
-	        }
-	      } catch (_error) {
-	        err = _error;
+	      if (values[0] === '{' || values[0] === '[') {
+	        try {
+	          if (parsed_values = JSON.parse(values)) {
+	            return JSONUtils.parse(parsed_values);
+	          }
+	        } catch (_error) {}
 	      }
 	    }
 	    return values;
@@ -653,14 +917,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return 'null';
 	    }
 	    if (_.isArray(values)) {
-	      return Utils.toString(values);
+	      return JSONUtils.stringify(values);
 	    }
 	    if (_.isDate(values) || values.toJSON) {
 	      return values.toJSON();
 	    }
 	    if (_.isObject(values)) {
 	      if (depth > 0) {
-	        return Utils.toString(values);
+	        return JSONUtils.stringify(values);
 	      }
 	      result = {};
 	      for (key in values) {
@@ -939,7 +1203,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return String.prototype.slice.call(obj);
 	    }
 	    if (_.isDate(obj)) {
-	      return new Date(obj.valueOf());
+	      return new Date(obj.getTime());
 	    }
 	    if (_.isFunction(obj.clone)) {
 	      return obj.clone();
@@ -965,7 +1229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -974,7 +1238,85 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var DateUtils, UNITS_TO_MS, _;
+
+	_ = __webpack_require__(1);
+
+	UNITS_TO_MS = {
+	  milliseconds: {
+	    milliseconds: 1
+	  },
+	  seconds: {
+	    milliseconds: 1000
+	  },
+	  minutes: {
+	    milliseconds: 60 * 1000
+	  },
+	  hours: {
+	    milliseconds: 24 * 60 * 1000
+	  },
+	  days: {
+	    days: 1
+	  },
+	  weeks: {
+	    days: 7
+	  },
+	  months: {
+	    months: 1
+	  },
+	  years: {
+	    years: 1
+	  }
+	};
+
+	module.exports = DateUtils = (function() {
+	  function DateUtils() {}
+
+	  DateUtils.durationAsMilliseconds = function(count, units) {
+	    var lookup;
+	    if (!(lookup = UNITS_TO_MS[units])) {
+	      throw new Error("DateUtils.durationAsMilliseconds :Unrecognized units: " + units);
+	    }
+	    if (lookup.milliseconds) {
+	      return count * lookup.milliseconds;
+	    }
+	    if (lookup.days) {
+	      return count * 864e5 * lookup.days;
+	    }
+	    if (lookup.months) {
+	      return count * lookup.months * 2592e6;
+	    }
+	    if (lookup.years) {
+	      return count * lookup.years * 31536e6;
+	    }
+	  };
+
+	  DateUtils.isBefore = function(mv, tv) {
+	    return mv.getTime() < tv.getTime();
+	  };
+
+	  DateUtils.isAfter = function(mv, tv) {
+	    return mv.getTime() > tv.getTime();
+	  };
+
+	  return DateUtils;
+
+	})();
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
 	var Queue,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -1040,7 +1382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1049,15 +1391,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var DatabaseURL, SUPPORTED_KEYS, URL, inflection, _;
+	var BackboneORM, DatabaseURL, SUPPORTED_KEYS, URL, _;
 
 	_ = __webpack_require__(1);
 
-	inflection = __webpack_require__(20);
+	URL = __webpack_require__(18);
 
-	URL = __webpack_require__(16);
+	BackboneORM = __webpack_require__(4);
 
 	SUPPORTED_KEYS = ['protocol', 'slashes', 'auth', 'host', 'hostname', 'port', 'search', 'query', 'hash', 'href'];
 
@@ -1153,7 +1495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  DatabaseURL.prototype.modelName = function() {
 	    if (this.table) {
-	      return inflection.classify(inflection.singularize(this.table));
+	      return BackboneORM.naming_conventions.modelName(this.table, false);
 	    } else {
 	      return null;
 	    }
@@ -1165,16 +1507,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Fabricator, Queue, moment, _;
+	var Fabricator, Queue, _;
 
 	_ = __webpack_require__(1);
 
-	moment = __webpack_require__(3);
-
-	Queue = __webpack_require__(7);
+	Queue = __webpack_require__(10);
 
 	module.exports = Fabricator = (function() {
 	  function Fabricator() {}
@@ -1232,14 +1572,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Fabricator.uniqueString = Fabricator.uniqueId;
 
 	  Fabricator.date = function(start, step_ms) {
-	    var current_ms, _ref;
+	    var current_ms, now, _ref;
+	    now = new Date();
 	    if (arguments.length === 0) {
-	      return moment.utc().toDate();
+	      return now;
 	    }
 	    if (arguments.length === 1) {
-	      _ref = [moment.utc().toDate(), start], start = _ref[0], step_ms = _ref[1];
+	      _ref = [now, start], start = _ref[0], step_ms = _ref[1];
 	    }
-	    current_ms = start.valueOf();
+	    current_ms = start.getTime();
 	    return function() {
 	      var current;
 	      current = new Date(current_ms);
@@ -1254,7 +1595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1263,14 +1604,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
 	var CURSOR_KEYS, Cursor, Utils, _,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 	_ = __webpack_require__(1);
 
-	Utils = __webpack_require__(5);
+	Utils = __webpack_require__(7);
 
 	CURSOR_KEYS = ['$count', '$exists', '$zero', '$one', '$offset', '$limit', '$page', '$sort', '$white_list', '$select', '$include', '$values', '$ids', '$or'];
 
@@ -1421,7 +1762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Cursor.prototype.toModels = function(callback) {
 	    if (this._cursor.$values) {
-	      return callback(new Error("Cannot call toModels on cursor with values for model " + this.model_type.model_name + ". Values: " + (Utils.toString(this._cursor.$values))));
+	      return callback(new Error("Cannot call toModels on cursor with values for model " + this.model_type.model_name + ". Values: " + (JSONUtils.stringify(this._cursor.$values))));
 	    }
 	    return this.toJSON((function(_this) {
 	      return function(err, json) {
@@ -1682,7 +2023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1691,9 +2032,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Backbone, DatabaseURL, Many, One, RELATION_VARIANTS, Schema, Utils, inflection, _,
+	var Backbone, BackboneORM, DatabaseURL, Many, One, RELATION_VARIANTS, Schema, Utils, _,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1701,15 +2042,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Backbone = __webpack_require__(2);
 
-	inflection = __webpack_require__(20);
+	BackboneORM = __webpack_require__(4);
 
-	One = __webpack_require__(22);
+	One = __webpack_require__(28);
 
-	Many = __webpack_require__(23);
+	Many = __webpack_require__(29);
 
-	DatabaseURL = __webpack_require__(8);
+	DatabaseURL = __webpack_require__(11);
 
-	Utils = __webpack_require__(5);
+	Utils = __webpack_require__(7);
 
 	RELATION_VARIANTS = {
 	  'hasOne': 'hasOne',
@@ -1724,8 +2065,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	module.exports = Schema = (function() {
-	  function Schema(model_type) {
+	  function Schema(model_type, type_overrides) {
 	    this.model_type = model_type;
+	    this.type_overrides = type_overrides != null ? type_overrides : {};
 	    this.raw = _.clone(_.result(new this.model_type(), 'schema') || {});
 	    this.fields = {};
 	    this.relations = {};
@@ -1748,6 +2090,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	      relation = _ref1[key];
 	      relation.initialize();
 	    }
+	  };
+
+	  Schema.prototype.type = function(key, type) {
+	    var _base, _ref, _ref1, _ref2, _ref3;
+	    if (arguments.length === 2) {
+	      return ((_base = this.type_overrides)[key] || (_base[key] = {}))['type'] = type;
+	    } else {
+	      return ((_ref = this.type_overrides[key]) != null ? _ref.type : void 0) || ((_ref1 = this.fields[key]) != null ? _ref1.type : void 0) || ((_ref2 = this.relation(key)) != null ? _ref2.reverse_model_type : void 0) || ((_ref3 = this.reverseRelation(key)) != null ? _ref3.model_type : void 0);
+	    }
+	  };
+
+	  Schema.prototype.idType = function(key) {
+	    var index, other, type;
+	    if ((index = key.indexOf('.')) >= 0) {
+	      other = key.substr(index + 1);
+	      key = key.substr(0, index);
+	    }
+	    if (!(type = this.type(key))) {
+	      return;
+	    }
+	    return (typeof type.schema === "function" ? type.schema().type(other || 'id') : void 0) || type;
 	  };
 
 	  Schema.prototype.relation = function(key) {
@@ -1824,7 +2187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Schema.prototype.generateBelongsTo = function(reverse_model_type) {
 	    var key, relation;
-	    key = inflection.underscore(reverse_model_type.model_name);
+	    key = BackboneORM.naming_conventions.attribute(reverse_model_type.model_name);
 	    if (relation = this.relations[key]) {
 	      return relation;
 	    }
@@ -1843,31 +2206,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Schema.joinTableURL = function(relation) {
-	    var model_name1, model_name2;
-	    model_name1 = inflection.pluralize(inflection.underscore(relation.model_type.model_name));
-	    model_name2 = inflection.pluralize(inflection.underscore(relation.reverse_relation.model_type.model_name));
-	    if (model_name1.localeCompare(model_name2) < 0) {
-	      return "" + model_name1 + "_" + model_name2;
+	    var table_name1, table_name2;
+	    table_name1 = BackboneORM.naming_conventions.tableName(relation.model_type.model_name);
+	    table_name2 = BackboneORM.naming_conventions.tableName(relation.reverse_relation.model_type.model_name);
+	    if (table_name1.localeCompare(table_name2) < 0) {
+	      return "" + table_name1 + "_" + table_name2;
 	    } else {
-	      return "" + model_name2 + "_" + model_name1;
+	      return "" + table_name2 + "_" + table_name1;
 	    }
 	  };
 
 	  Schema.prototype.generateJoinTable = function(relation) {
-	    var JoinTable, name, schema, url;
+	    var JoinTable, name, schema, type, url, _ref;
 	    schema = {};
 	    schema[relation.join_key] = [
-	      'Integer', {
+	      type = relation.model_type.schema().type('id'), {
 	        indexed: true
 	      }
 	    ];
 	    schema[relation.reverse_relation.join_key] = [
-	      'Integer', {
+	      ((_ref = relation.reverse_model_type) != null ? _ref.schema().type('id') : void 0) || type, {
 	        indexed: true
 	      }
 	    ];
 	    url = Schema.joinTableURL(relation);
-	    name = inflection.pluralize(inflection.classify(url));
+	    name = BackboneORM.naming_conventions.modelName(url, true);
 	    try {
 	      JoinTable = (function(_super) {
 	        __extends(JoinTable, _super);
@@ -1920,7 +2283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (!(type = RELATION_VARIANTS[options.type])) {
 	      if (!_.isString(options.type)) {
-	        throw new Error("Unexpected type name is not a string: " + (Utils.toString(options)));
+	        throw new Error("Unexpected type name is not a string: " + (JSONUtils.stringify(options)));
 	      }
 	      return this.fields[key] = options;
 	    }
@@ -1958,7 +2321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      options = options.slice(1);
 	    }
 	    if (options.length > 1) {
-	      throw new Error("Unexpected field options array: " + (Utils.toString(options)));
+	      throw new Error("Unexpected field options array: " + (JSONUtils.stringify(options)));
 	    }
 	    if (options.length === 1) {
 	      _.extend(result, options[0]);
@@ -1972,7 +2335,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1981,11 +2344,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
 	var MemoryStore;
 
-	MemoryStore = __webpack_require__(14);
+	MemoryStore = __webpack_require__(16);
 
 	module.exports = new MemoryStore({
 	  destroy: function(url, connection) {
@@ -1995,7 +2358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2004,183 +2367,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Backbone, DESTROY_BATCH_LIMIT, JSONUtils, MemoryCursor, MemorySync, ModelCache, Queue, Schema, Utils, _;
-
-	_ = __webpack_require__(1);
-
-	Backbone = __webpack_require__(2);
-
-	Queue = __webpack_require__(7);
-
-	MemoryCursor = __webpack_require__(18);
-
-	Schema = __webpack_require__(11);
-
-	Utils = __webpack_require__(5);
-
-	JSONUtils = __webpack_require__(6);
-
-	ModelCache = __webpack_require__(15).ModelCache;
-
-	DESTROY_BATCH_LIMIT = 1000;
-
-	MemorySync = (function() {
-	  function MemorySync(model_type) {
-	    var _base;
-	    this.model_type = model_type;
-	    this.model_type.model_name = Utils.findOrGenerateModelName(this.model_type);
-	    this.schema = new Schema(this.model_type);
-	    this.store = (_base = this.model_type).store || (_base.store = {});
-	  }
-
-	  MemorySync.prototype.initialize = function() {
-	    if (this.is_initialized) {
-	      return;
-	    }
-	    this.is_initialized = true;
-	    return this.schema.initialize();
-	  };
-
-	  MemorySync.prototype.read = function(model, options) {
-	    var id, model_json;
-	    if (model.models) {
-	      return options.success((function() {
-	        var _ref, _results;
-	        _ref = this.store;
-	        _results = [];
-	        for (id in _ref) {
-	          model_json = _ref[id];
-	          _results.push(JSONUtils.deepClone(model_json));
-	        }
-	        return _results;
-	      }).call(this));
-	    } else {
-	      if (_.isUndefined(this.store[model.id])) {
-	        return options.error(new Error("Model not found with id: " + model.id));
-	      }
-	      return options.success(JSONUtils.deepClone(this.store[model.id]));
-	    }
-	  };
-
-	  MemorySync.prototype.create = function(model, options) {
-	    var attributes, model_json;
-	    (attributes = {})[this.model_type.prototype.idAttribute] = Utils.guid();
-	    model.set(attributes);
-	    model_json = this.store[model.id] = model.toJSON();
-	    return options.success(JSONUtils.deepClone(model_json));
-	  };
-
-	  MemorySync.prototype.update = function(model, options) {
-	    var model_json;
-	    this.store[model.id] = model_json = model.toJSON();
-	    return options.success(JSONUtils.deepClone(model_json));
-	  };
-
-	  MemorySync.prototype["delete"] = function(model, options) {
-	    if (!this.store[model.id]) {
-	      return options.error(new Error('Model not found'));
-	    }
-	    delete this.store[model.id];
-	    return options.success();
-	  };
-
-	  MemorySync.prototype.resetSchema = function(options, callback) {
-	    return this.destroy({}, callback);
-	  };
-
-	  MemorySync.prototype.cursor = function(query) {
-	    if (query == null) {
-	      query = {};
-	    }
-	    return new MemoryCursor(query, _.pick(this, ['model_type', 'store']));
-	  };
-
-	  MemorySync.prototype.destroy = function(query, callback) {
-	    return this.model_type.each(_.extend({
-	      $each: {
-	        limit: DESTROY_BATCH_LIMIT,
-	        json: true
-	      }
-	    }, query), ((function(_this) {
-	      return function(model_json, callback) {
-	        return Utils.patchRemoveByJSON(_this.model_type, model_json, function(err) {
-	          if (!err) {
-	            delete _this.store[model_json[_this.model_type.prototype.idAttribute]];
-	          }
-	          return callback(err);
-	        });
-	      };
-	    })(this)), callback);
-	  };
-
-	  return MemorySync;
-
-	})();
-
-	module.exports = function(type) {
-	  var model_type, sync, sync_fn;
-	  if (Utils.isCollection(new type())) {
-	    model_type = Utils.configureCollectionModelType(type, module.exports);
-	    return type.prototype.sync = model_type.prototype.sync;
-	  }
-	  sync = new MemorySync(type);
-	  type.prototype.sync = sync_fn = function(method, model, options) {
-	    if (options == null) {
-	      options = {};
-	    }
-	    sync.initialize();
-	    if (method === 'createSync') {
-	      return module.exports.apply(null, Array.prototype.slice.call(arguments, 1));
-	    }
-	    if (method === 'sync') {
-	      return sync;
-	    }
-	    if (method === 'isRemote') {
-	      return false;
-	    }
-	    if (method === 'schema') {
-	      return sync.schema;
-	    }
-	    if (method === 'tableName') {
-	      return void 0;
-	    }
-	    if (sync[method]) {
-	      return sync[method].apply(sync, Array.prototype.slice.call(arguments, 1));
-	    } else {
-	      return void 0;
-	    }
-	  };
-	  Utils.configureModelType(type);
-	  return ModelCache.configureSync(type, sync_fn);
-	};
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var LRU, MemoryStore, inflection, _,
+	var LRU, MemoryStore, _,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
 	_ = __webpack_require__(1);
 
-	LRU = __webpack_require__(19);
-
-	inflection = __webpack_require__(20);
+	LRU = __webpack_require__(25);
 
 	module.exports = MemoryStore = (function() {
 	  function MemoryStore(options) {
-	    var key, normalized_options, value;
+	    var max_age;
 	    if (options == null) {
 	      options = {};
 	    }
@@ -2189,16 +2387,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.destroy = __bind(this.destroy, this);
 	    this.get = __bind(this.get, this);
 	    this.set = __bind(this.set, this);
-	    normalized_options = {};
-	    for (key in options) {
-	      value = options[key];
-	      if (key === 'destroy') {
-	        normalized_options.dispose = value;
-	      } else {
-	        normalized_options[this._normalizeKey(key)] = value;
-	      }
+	    if (max_age = options.max_age) {
+	      (options = _.omit(options, 'max_age'))['maxAge'] = max_age;
 	    }
-	    this.cache = new LRU(normalized_options);
+	    this.cache = new LRU(options);
 	  }
 
 	  MemoryStore.prototype.set = function(key, value, callback) {
@@ -2239,14 +2431,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this;
 	  };
 
-	  MemoryStore.prototype._normalizeKey = function(key) {
-	    key = inflection.underscore(key);
-	    if (key.indexOf('_') < 0) {
-	      return key.toLowerCase();
-	    }
-	    return inflection.camelize(key);
-	  };
-
 	  MemoryStore.prototype.forEach = function(callback) {
 	    return this.cache.forEach(callback);
 	  };
@@ -2257,24 +2441,43 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	module.exports = {
-	  ModelCache: new (__webpack_require__(24))()
-	};
+	var BaseConvention, inflection;
+
+	inflection = __webpack_require__(26);
+
+	module.exports = BaseConvention = (function() {
+	  function BaseConvention() {}
+
+	  BaseConvention.modelName = function(table_name, plural) {
+	    return inflection[plural ? 'pluralize' : 'singularize'](inflection.classify(table_name));
+	  };
+
+	  BaseConvention.tableName = function(model_name) {
+	    return inflection.pluralize(inflection.underscore(model_name));
+	  };
+
+	  BaseConvention.foreignKey = function(model_name, plural) {
+	    if (plural) {
+	      return inflection.singularize(inflection.underscore(model_name)) + '_ids';
+	    } else {
+	      return inflection.underscore(model_name) + '_id';
+	    }
+	  };
+
+	  BaseConvention.attribute = function(model_name, plural) {
+	    return inflection[plural ? 'pluralize' : 'singularize'](inflection.underscore(model_name));
+	  };
+
+	  return BaseConvention;
+
+	})();
 
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// Copyright Joyent, Inc. and other Node contributors.
@@ -2299,8 +2502,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	// USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 	var punycode = { encode : function (s) { return s } };
-	var util = __webpack_require__(25);
-	var shims = __webpack_require__(26);
+	var _ = __webpack_require__(1);
+	var shims = __webpack_require__(30);
 
 	exports.parse = urlParse;
 	exports.resolve = urlResolve;
@@ -2372,10 +2575,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      'gopher:': true,
 	      'file:': true
 	    },
-	    querystring = __webpack_require__(17);
+	    querystring = __webpack_require__(19);
 
 	function urlParse(url, parseQueryString, slashesDenoteHost) {
-	  if (url && util.isObject(url) && url instanceof Url) return url;
+	  if (url && _.isObject(url) && url instanceof Url) return url;
 
 	  var u = new Url;
 	  u.parse(url, parseQueryString, slashesDenoteHost);
@@ -2383,15 +2586,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	Url.prototype.parse = function(url, parseQueryString, slashesDenoteHost) {
-	  if (!util.isString(url)) {
+	  if (!_.isString(url)) {
 	    throw new TypeError("Parameter 'url' must be a string, not " + typeof url);
 	  }
+
+	  // Copy chrome, IE, opera backslash-handling behavior.
+	  // See: https://code.google.com/p/chromium/issues/detail?id=25916
+	  var hashSplit = url.split('#');
+	  hashSplit[0] = hashSplit[0].replace(/\\/g, '/');
+	  url = hashSplit.join('#');
 
 	  var rest = url;
 
 	  // trim before proceeding.
 	  // This is to support parse stuff like "  http://foo.com  \n"
-	  rest = shims.trim(rest);
+	  rest = rest.trim();
 
 	  var proto = protocolPattern.exec(rest);
 	  if (proto) {
@@ -2621,7 +2830,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // If it's an obj, this is a no-op.
 	  // this way, you can call url_format() on strings
 	  // to clean up potentially wonky urls.
-	  if (util.isString(obj)) obj = urlParse(obj);
+	  if (_.isString(obj)) obj = urlParse(obj);
 	  if (!(obj instanceof Url)) return Url.prototype.format.call(obj);
 	  return obj.format();
 	}
@@ -2652,14 +2861,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  if (this.query &&
-	      util.isObject(this.query) &&
-	      shims.keys(this.query).length) {
+	      _.isObject(this.query) &&
+	      Object.keys(this.query).length) {
 	    query = querystring.stringify(this.query);
 	  }
 
 	  var search = this.search || (query && ('?' + query)) || '';
 
-	  if (protocol && shims.substr(protocol, -1) !== ':') protocol += ':';
+	  if (protocol && protocol.substr(-1) !== ':') protocol += ':';
 
 	  // only the slashedProtocols get the //.  Not mailto:, xmpp:, etc.
 	  // unless they had them to begin with.
@@ -2696,14 +2905,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	Url.prototype.resolveObject = function(relative) {
-	  if (util.isString(relative)) {
+	  if (_.isString(relative)) {
 	    var rel = new Url();
 	    rel.parse(relative, false, true);
 	    relative = rel;
 	  }
 
 	  var result = new Url();
-	  shims.forEach(shims.keys(this), function(k) {
+	  Object.keys(this).forEach(function(k) {
 	    result[k] = this[k];
 	  }, this);
 
@@ -2720,7 +2929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // hrefs like //foo/bar always cut to the protocol.
 	  if (relative.slashes && !relative.protocol) {
 	    // take everything except the protocol from relative
-	    shims.forEach(shims.keys(relative), function(k) {
+	    Object.keys(relative).forEach(function(k) {
 	      if (k !== 'protocol')
 	        result[k] = relative[k];
 	    });
@@ -2745,7 +2954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // because that's known to be hostless.
 	    // anything else is assumed to be absolute.
 	    if (!slashedProtocol[relative.protocol]) {
-	      shims.forEach(shims.keys(relative), function(k) {
+	      Object.keys(relative).forEach(function(k) {
 	        result[k] = relative[k];
 	      });
 	      result.href = result.format();
@@ -2836,7 +3045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    srcPath = srcPath.concat(relPath);
 	    result.search = relative.search;
 	    result.query = relative.query;
-	  } else if (!util.isNullOrUndefined(relative.search)) {
+	  } else if (!(_.isNull(relative.search) || _.isUndefined(relative.search))) {
 	    // just pull out the search.
 	    // like href='?foo'.
 	    // Put this after the other two cases because it simplifies the booleans
@@ -2855,7 +3064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    result.search = relative.search;
 	    result.query = relative.query;
 	    //to support http.request
-	    if (!util.isNull(result.pathname) || !util.isNull(result.search)) {
+	    if (!_.isNull(result.pathname) || !_.isNull(result.search)) {
 	      result.path = (result.pathname ? result.pathname : '') +
 	                    (result.search ? result.search : '');
 	    }
@@ -2890,7 +3099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var up = 0;
 	  for (var i = srcPath.length; i >= 0; i--) {
 	    last = srcPath[i];
-	    if (last == '.') {
+	    if (last === '.') {
 	      srcPath.splice(i, 1);
 	    } else if (last === '..') {
 	      srcPath.splice(i, 1);
@@ -2913,7 +3122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    srcPath.unshift('');
 	  }
 
-	  if (hasTrailingSlash && (shims.substr(srcPath.join('/'), -1) !== '/')) {
+	  if (hasTrailingSlash && (srcPath.join('/').substr(-1) !== '/')) {
 	    srcPath.push('');
 	  }
 
@@ -2949,7 +3158,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  //to support request.http
-	  if (!util.isNull(result.pathname) || !util.isNull(result.search)) {
+	  if (!_.isNull(result.pathname) || !_.isNull(result.search)) {
 	    result.path = (result.pathname ? result.pathname : '') +
 	                  (result.search ? result.search : '');
 	  }
@@ -2974,10 +3183,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// Copyright Joyent, Inc. and other Node contributors.
+	/* WEBPACK VAR INJECTION */(function(Buffer) {// Copyright Joyent, Inc. and other Node contributors.
 	//
 	// Permission is hereby granted, free of charge, to any person obtaining a
 	// copy of this software and associated documentation files (the
@@ -3001,128 +3210,201 @@ return /******/ (function(modules) { // webpackBootstrap
 	// Query String Utilities
 
 	var QueryString = exports;
-	var util = __webpack_require__(25);
-	var shims = __webpack_require__(26);
+	var _ = __webpack_require__(1);
+
 
 	// If obj.hasOwnProperty has been overridden, then calling
 	// obj.hasOwnProperty(prop) will break.
 	// See: https://github.com/joyent/node/issues/1707
 	function hasOwnProperty(obj, prop) {
-	return Object.prototype.hasOwnProperty.call(obj, prop);
+	  return Object.prototype.hasOwnProperty.call(obj, prop);
 	}
 
 
 	function charCode(c) {
-	return c.charCodeAt(0);
+	  return c.charCodeAt(0);
 	}
 
-	// TODO support returning arbitrary buffers.
+
+	// a safe fast alternative to decodeURIComponent
+	QueryString.unescapeBuffer = function(s, decodeSpaces) {
+	  var out = new Buffer(s.length);
+	  var state = 'CHAR'; // states: CHAR, HEX0, HEX1
+	  var n, m, hexchar;
+
+	  for (var inIndex = 0, outIndex = 0; inIndex <= s.length; inIndex++) {
+	    var c = s.charCodeAt(inIndex);
+	    switch (state) {
+	      case 'CHAR':
+	        switch (c) {
+	          case charCode('%'):
+	            n = 0;
+	            m = 0;
+	            state = 'HEX0';
+	            break;
+	          case charCode('+'):
+	            if (decodeSpaces) c = charCode(' ');
+	            // pass thru
+	          default:
+	            out[outIndex++] = c;
+	            break;
+	        }
+	        break;
+
+	      case 'HEX0':
+	        state = 'HEX1';
+	        hexchar = c;
+	        if (charCode('0') <= c && c <= charCode('9')) {
+	          n = c - charCode('0');
+	        } else if (charCode('a') <= c && c <= charCode('f')) {
+	          n = c - charCode('a') + 10;
+	        } else if (charCode('A') <= c && c <= charCode('F')) {
+	          n = c - charCode('A') + 10;
+	        } else {
+	          out[outIndex++] = charCode('%');
+	          out[outIndex++] = c;
+	          state = 'CHAR';
+	          break;
+	        }
+	        break;
+
+	      case 'HEX1':
+	        state = 'CHAR';
+	        if (charCode('0') <= c && c <= charCode('9')) {
+	          m = c - charCode('0');
+	        } else if (charCode('a') <= c && c <= charCode('f')) {
+	          m = c - charCode('a') + 10;
+	        } else if (charCode('A') <= c && c <= charCode('F')) {
+	          m = c - charCode('A') + 10;
+	        } else {
+	          out[outIndex++] = charCode('%');
+	          out[outIndex++] = hexchar;
+	          out[outIndex++] = c;
+	          break;
+	        }
+	        out[outIndex++] = 16 * n + m;
+	        break;
+	    }
+	  }
+
+	  // TODO support returning arbitrary buffers.
+
+	  return out.slice(0, outIndex - 1);
+	};
+
 
 	QueryString.unescape = function(s, decodeSpaces) {
-	return decodeURIComponent(s/*, decodeSpaces*/);
+	  return QueryString.unescapeBuffer(s, decodeSpaces).toString();
 	};
 
 
 	QueryString.escape = function(str) {
-	return encodeURIComponent(str);
+	  return encodeURIComponent(str);
 	};
 
 	var stringifyPrimitive = function(v) {
-	if (util.isString(v))
-	  return v;
-	if (util.isBoolean(v))
-	  return v ? 'true' : 'false';
-	if (util.isNumber(v))
-	  return isFinite(v) ? v : '';
-	return '';
+	  if (_.isString(v))
+	    return v;
+	  if (_.isBoolean(v))
+	    return v ? 'true' : 'false';
+	  if (_.isNumber(v))
+	    return isFinite(v) ? v : '';
+	  return '';
 	};
 
 
-	QueryString.stringify = QueryString.encode = function(obj, sep, eq, name) {
-	sep = sep || '&';
-	eq = eq || '=';
-	if (util.isNull(obj)) {
-	  obj = undefined;
-	}
+	QueryString.stringify = QueryString.encode = function(obj, sep, eq, options) {
+	  sep = sep || '&';
+	  eq = eq || '=';
+	  if (_.isNull(obj)) {
+	    obj = undefined;
+	  }
 
-	if (util.isObject(obj)) {
-	  return shims.map(shims.keys(obj), function(k) {
-	    var ks = QueryString.escape(stringifyPrimitive(k)) + eq;
-	    if (util.isArray(obj[k])) {
-	      return shims.map(obj[k], function(v) {
-	        return ks + QueryString.escape(stringifyPrimitive(v));
-	      }).join(sep);
-	    } else {
-	      return ks + QueryString.escape(stringifyPrimitive(obj[k]));
-	    }
-	  }).join(sep);
+	  var encode = QueryString.escape;
+	  if (options && typeof options.encodeURIComponent === 'function') {
+	    encode = options.encodeURIComponent;
+	  }
 
-	}
-
-	if (!name) return '';
-	return QueryString.escape(stringifyPrimitive(name)) + eq +
-	       QueryString.escape(stringifyPrimitive(obj));
+	  if (_.isObject(obj)) {
+	    return Object.keys(obj).map(function(k) {
+	      var ks = encode(stringifyPrimitive(k)) + eq;
+	      if (_.isArray(obj[k])) {
+	        return obj[k].map(function(v) {
+	          return ks + encode(stringifyPrimitive(v));
+	        }).join(sep);
+	      } else {
+	        return ks + encode(stringifyPrimitive(obj[k]));
+	      }
+	    }).join(sep);
+	  }
+	  return '';
 	};
 
 	// Parse a key=val string.
 	QueryString.parse = QueryString.decode = function(qs, sep, eq, options) {
-	sep = sep || '&';
-	eq = eq || '=';
-	var obj = {};
+	  sep = sep || '&';
+	  eq = eq || '=';
+	  var obj = {};
 
-	if (!util.isString(qs) || qs.length === 0) {
+	  if (!_.isString(qs) || qs.length === 0) {
+	    return obj;
+	  }
+
+	  var regexp = /\+/g;
+	  qs = qs.split(sep);
+
+	  var maxKeys = 1000;
+	  if (options && _.isNumber(options.maxKeys)) {
+	    maxKeys = options.maxKeys;
+	  }
+
+	  var len = qs.length;
+	  // maxKeys <= 0 means that we should not limit keys count
+	  if (maxKeys > 0 && len > maxKeys) {
+	    len = maxKeys;
+	  }
+
+	  var decode = decodeURIComponent;
+	  if (options && typeof options.decodeURIComponent === 'function') {
+	    decode = options.decodeURIComponent;
+	  }
+
+	  for (var i = 0; i < len; ++i) {
+	    var x = qs[i].replace(regexp, '%20'),
+	        idx = x.indexOf(eq),
+	        kstr, vstr, k, v;
+
+	    if (idx >= 0) {
+	      kstr = x.substr(0, idx);
+	      vstr = x.substr(idx + 1);
+	    } else {
+	      kstr = x;
+	      vstr = '';
+	    }
+
+	    try {
+	      k = decode(kstr);
+	      v = decode(vstr);
+	    } catch (e) {
+	      k = QueryString.unescape(kstr, true);
+	      v = QueryString.unescape(vstr, true);
+	    }
+
+	    if (!hasOwnProperty(obj, k)) {
+	      obj[k] = v;
+	    } else if (_.isArray(obj[k])) {
+	      obj[k].push(v);
+	    } else {
+	      obj[k] = [obj[k], v];
+	    }
+	  }
+
 	  return obj;
-	}
-
-	var regexp = /\+/g;
-	qs = qs.split(sep);
-
-	var maxKeys = 1000;
-	if (options && util.isNumber(options.maxKeys)) {
-	  maxKeys = options.maxKeys;
-	}
-
-	var len = qs.length;
-	// maxKeys <= 0 means that we should not limit keys count
-	if (maxKeys > 0 && len > maxKeys) {
-	  len = maxKeys;
-	}
-
-	for (var i = 0; i < len; ++i) {
-	  var x = qs[i].replace(regexp, '%20'),
-	      idx = x.indexOf(eq),
-	      kstr, vstr, k, v;
-
-	  if (idx >= 0) {
-	    kstr = x.substr(0, idx);
-	    vstr = x.substr(idx + 1);
-	  } else {
-	    kstr = x;
-	    vstr = '';
-	  }
-
-	  try {
-	    k = decodeURIComponent(kstr);
-	    v = decodeURIComponent(vstr);
-	  } catch (e) {
-	    k = QueryString.unescape(kstr, true);
-	    v = QueryString.unescape(vstr, true);
-	  }
-
-	  if (!hasOwnProperty(obj, k)) {
-	    obj[k] = v;
-	  } else if (util.isArray(obj[k])) {
-	    obj[k].push(v);
-	  } else {
-	    obj[k] = [obj[k], v];
-	  }
-	}
-
-	return obj;
 	};
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32).Buffer))
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3131,26 +3413,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Cursor, IS_MATCH_FNS, IS_MATCH_OPERATORS, JSONUtils, MemoryCursor, Queue, Utils, inflection, mergeQuery, moment, valueToArray, _,
+	var Cursor, DateUtils, IS_MATCH_FNS, IS_MATCH_OPERATORS, JSONUtils, MemoryCursor, Queue, Utils, mergeQuery, valueToArray, _,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	_ = __webpack_require__(1);
 
-	moment = __webpack_require__(3);
+	Queue = __webpack_require__(10);
 
-	inflection = __webpack_require__(20);
+	Utils = __webpack_require__(7);
 
-	Queue = __webpack_require__(7);
+	JSONUtils = __webpack_require__(8);
 
-	Utils = __webpack_require__(5);
+	DateUtils = __webpack_require__(9);
 
-	JSONUtils = __webpack_require__(6);
-
-	Cursor = __webpack_require__(10);
+	Cursor = __webpack_require__(13);
 
 	IS_MATCH_FNS = {
 	  $ne: function(mv, tv) {
@@ -3160,36 +3440,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (_.isNull(tv)) {
 	      throw Error('Cannot compare to null');
 	    }
-	    return (_.isDate(tv) ? moment(mv).isBefore(tv) : mv < tv);
+	    return (_.isDate(tv) ? DateUtils.isBefore(mv, tv) : mv < tv);
 	  },
 	  $lte: function(mv, tv) {
-	    var mvm;
 	    if (_.isNull(tv)) {
 	      throw Error('Cannot compare to null');
 	    }
 	    if (_.isDate(tv)) {
-	      mvm = moment(mv);
-	      return mvm.isBefore(tv) || mvm.isSame(tv);
+	      return !DateUtils.isAfter(mv, tv);
 	    } else {
-	      return (mv < tv) || _.isEqual(mv, tv);
+	      return mv <= tv;
 	    }
 	  },
 	  $gt: function(mv, tv) {
 	    if (_.isNull(tv)) {
 	      throw Error('Cannot compare to null');
 	    }
-	    return (_.isDate(tv) ? moment(mv).isAfter(tv) : mv > tv);
+	    return (_.isDate(tv) ? DateUtils.isAfter(mv, tv) : mv > tv);
 	  },
 	  $gte: function(mv, tv) {
-	    var mvm;
 	    if (_.isNull(tv)) {
 	      throw Error('Cannot compare to null');
 	    }
 	    if (_.isDate(tv)) {
-	      mvm = moment(mv);
-	      return mvm.isAfter(tv) || mvm.isSame(tv);
+	      return !DateUtils.isBefore(mv, tv);
 	    } else {
-	      return (mv > tv) || _.isEqual(mv, tv);
+	      return mv >= tv;
 	    }
 	  }
 	};
@@ -3248,7 +3524,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _ref2 = _this.store;
 	              for (id in _ref2) {
 	                model_json = _ref2[id];
-	                if (_.contains(_this._cursor.$ids, id) && _.isEqual(_.pick(model_json, keys), find_query)) {
+	                if (_.contains(_this._cursor.$ids, model_json.id) && _.isEqual(_.pick(model_json, keys), find_query)) {
 	                  json.push(JSONUtils.deepClone(model_json));
 	                }
 	              }
@@ -3259,15 +3535,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _fn = function(model_json) {
 	                return find_queue.defer(function(callback) {
 	                  var find_keys, next;
+	                  if (exists && json.length) {
+	                    return callback();
+	                  }
 	                  find_keys = _.keys(find_query);
 	                  next = function(err, is_match) {
-	                    if (err) {
+	                    if (err || !is_match) {
 	                      return callback(err);
 	                    }
-	                    if (!is_match) {
-	                      return callback();
-	                    }
-	                    if (!find_keys.length || (exists && (keys.length !== find_keys.length))) {
+	                    if (!find_keys.length) {
 	                      json.push(JSONUtils.deepClone(model_json));
 	                      return callback();
 	                    }
@@ -3314,7 +3590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _ref4 = _this.store;
 	              for (id in _ref4) {
 	                model_json = _ref4[id];
-	                if (_.contains(_this._cursor.$ids, id)) {
+	                if (_.contains(_this._cursor.$ids, model_json.id)) {
 	                  json.push(JSONUtils.deepClone(model_json));
 	                }
 	              }
@@ -3466,7 +3742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return queue.defer(function(callback) {
 	              var related_query;
 	              if (reverse_relation.embed) {
-	                throw Error("Embedded find is not yet supported. @_find: " + (Utils.toString(_this._find)));
+	                throw Error("Embedded find is not yet supported. @_find: " + (JSONUtils.stringify(_this._find)));
 	                (related_query = {}).id = value;
 	                return reverse_relation.model_type.cursor(related_query).toJSON(function(err, models_json) {
 	                  if (err) {
@@ -3606,7 +3882,195 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var BaseConvention, UnderscoreConvention, inflection,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	inflection = __webpack_require__(26);
+
+	BaseConvention = __webpack_require__(17);
+
+	module.exports = UnderscoreConvention = (function(_super) {
+	  __extends(UnderscoreConvention, _super);
+
+	  function UnderscoreConvention() {
+	    return UnderscoreConvention.__super__.constructor.apply(this, arguments);
+	  }
+
+	  UnderscoreConvention.attribute = function(model_name, plural) {
+	    return inflection[plural ? 'pluralize' : 'singularize'](inflection.underscore(model_name));
+	  };
+
+	  return UnderscoreConvention;
+
+	})(BaseConvention);
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var BaseConvention, CamelizeConvention, inflection,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	inflection = __webpack_require__(26);
+
+	BaseConvention = __webpack_require__(17);
+
+	module.exports = CamelizeConvention = (function(_super) {
+	  __extends(CamelizeConvention, _super);
+
+	  function CamelizeConvention() {
+	    return CamelizeConvention.__super__.constructor.apply(this, arguments);
+	  }
+
+	  CamelizeConvention.attribute = function(model_name, plural) {
+	    return inflection[plural ? 'pluralize' : 'singularize'](inflection.camelize(model_name, true));
+	  };
+
+	  return CamelizeConvention;
+
+	})(BaseConvention);
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var BaseConvention, ClassifyConvention, inflection,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	inflection = __webpack_require__(26);
+
+	BaseConvention = __webpack_require__(17);
+
+	module.exports = ClassifyConvention = (function(_super) {
+	  __extends(ClassifyConvention, _super);
+
+	  function ClassifyConvention() {
+	    return ClassifyConvention.__super__.constructor.apply(this, arguments);
+	  }
+
+	  ClassifyConvention.attribute = function(model_name, plural) {
+	    return inflection[plural ? 'pluralize' : 'singularize'](inflection.camelize(model_name, false));
+	  };
+
+	  return ClassifyConvention;
+
+	})(BaseConvention);
+
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var Backbone, MemoryStore, ModelCache, Queue, _;
+
+	Backbone = __webpack_require__(2);
+
+	_ = __webpack_require__(1);
+
+	Queue = __webpack_require__(10);
+
+	MemoryStore = __webpack_require__(16);
+
+	module.exports = ModelCache = (function() {
+	  function ModelCache() {
+	    this.enabled = false;
+	    this.caches = {};
+	    this.options = {
+	      modelTypes: {}
+	    };
+	    this.verbose = false;
+	  }
+
+	  ModelCache.prototype.configure = function(options) {
+	    var key, value, value_key, value_value, values, _base;
+	    if (options == null) {
+	      options = {};
+	    }
+	    this.enabled = options.enabled;
+	    for (key in options) {
+	      value = options[key];
+	      if (_.isObject(value)) {
+	        (_base = this.options)[key] || (_base[key] = {});
+	        values = this.options[key];
+	        for (value_key in value) {
+	          value_value = value[value_key];
+	          values[value_key] = value_value;
+	        }
+	      } else {
+	        this.options[key] = value;
+	      }
+	    }
+	    return this.reset();
+	  };
+
+	  ModelCache.prototype.configureSync = function(model_type, sync_fn) {
+	    if (model_type.prototype._orm_never_cache || !this.createCache(model_type)) {
+	      return sync_fn;
+	    }
+	    return (__webpack_require__(31))(model_type, sync_fn);
+	  };
+
+	  ModelCache.prototype.reset = function() {
+	    var key, value, _ref, _results;
+	    _ref = this.caches;
+	    _results = [];
+	    for (key in _ref) {
+	      value = _ref[key];
+	      _results.push(this.createCache(value.model_type));
+	    }
+	    return _results;
+	  };
+
+	  ModelCache.prototype.createCache = function(model_type) {
+	    var cache_info, cuid, model_name, options;
+	    if (!(model_name = model_type != null ? model_type.model_name : void 0)) {
+	      throw new Error("Missing model name for cache");
+	    }
+	    cuid = model_type.cuid || (model_type.cuid = _.uniqueId('cuid'));
+	    if (cache_info = this.caches[cuid]) {
+	      delete this.caches[cuid];
+	      cache_info.cache.reset();
+	      cache_info.model_type.cache = null;
+	    }
+	    if (!this.enabled) {
+	      return null;
+	    }
+	    if (!(options = this.options.modelTypes[model_name])) {
+	      if (!(this.options.store || this.options.max || this.options.max_age)) {
+	        return null;
+	      }
+	      options = this.options;
+	    }
+	    cache_info = this.caches[cuid] = {
+	      cache: (typeof options.store === "function" ? options.store() : void 0) || new MemoryStore(options),
+	      model_type: model_type
+	    };
+	    return model_type.cache = cache_info.cache;
+	  };
+
+	  return ModelCache;
+
+	})();
+
+
+/***/ },
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	;(function () { // closure for web browsers
@@ -3864,7 +4328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -4508,7 +4972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -4517,29 +4981,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Backbone, DatabaseURL, ModelStream, Queue, Utils, modelEach, modelInterval, moment, _;
+	var Backbone, DatabaseURL, ModelStream, Queue, Utils, modelEach, modelInterval, _;
 
 	_ = __webpack_require__(1);
 
 	Backbone = __webpack_require__(2);
 
-	moment = __webpack_require__(3);
+	Queue = __webpack_require__(10);
 
-	Queue = __webpack_require__(7);
+	Utils = __webpack_require__(7);
 
-	Utils = __webpack_require__(5);
+	DatabaseURL = __webpack_require__(11);
 
-	ModelStream = __webpack_require__(27);
+	ModelStream = __webpack_require__(33);
 
-	modelEach = __webpack_require__(28);
+	modelEach = __webpack_require__(34);
 
-	modelInterval = __webpack_require__(29);
+	modelInterval = __webpack_require__(35);
 
-	DatabaseURL = __webpack_require__(8);
-
-	__webpack_require__(30);
+	__webpack_require__(36);
 
 	module.exports = function(model_type) {
 	  var BackboneModelExtensions, fn, key, overrides, _findOrClone, _results;
@@ -4643,7 +5105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (arguments.length === 2) {
 	      _ref = [{}, query], query = _ref[0], callback = _ref[1];
 	    } else if (arguments.length === 3) {
-	      _ref1 = [moment.utc().toDate(), {}, query], options = _ref1[0], query = _ref1[1], callback = _ref1[2];
+	      _ref1 = [new Date(), {}, query], options = _ref1[0], query = _ref1[1], callback = _ref1[2];
 	    } else {
 	      query = _.clone(query);
 	    }
@@ -5228,7 +5690,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -5237,9 +5699,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Backbone, One, Queue, Utils, inflection, _,
+	var Backbone, BackboneORM, One, Queue, Utils, _,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -5247,11 +5709,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Backbone = __webpack_require__(2);
 
-	inflection = __webpack_require__(20);
+	BackboneORM = __webpack_require__(4);
 
-	Queue = __webpack_require__(7);
+	Queue = __webpack_require__(10);
 
-	Utils = __webpack_require__(5);
+	Utils = __webpack_require__(7);
 
 	module.exports = One = (function(_super) {
 	  __extends(One, _super);
@@ -5264,20 +5726,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = options[key];
 	      this[key] = value;
 	    }
-	    this.virtual_id_accessor || (this.virtual_id_accessor = "" + this.key + "_id");
+	    this.virtual_id_accessor || (this.virtual_id_accessor = BackboneORM.naming_conventions.foreignKey(this.key));
 	    if (!this.join_key) {
-	      this.join_key = this.foreign_key || inflection.foreign_key(this.model_type.model_name);
+	      this.join_key = this.foreign_key || BackboneORM.naming_conventions.foreignKey(this.model_type.model_name);
 	    }
 	    if (!this.foreign_key) {
-	      this.foreign_key = inflection.foreign_key(this.type === 'belongsTo' ? this.key : this.as || this.model_type.model_name);
+	      this.foreign_key = BackboneORM.naming_conventions.foreignKey(this.type === 'belongsTo' ? this.key : this.as || this.model_type.model_name);
 	    }
 	  }
 
 	  One.prototype.initialize = function() {
+	    var _ref;
 	    this.reverse_relation = this._findOrGenerateReverseRelation(this);
 	    if (this.embed && this.reverse_relation && this.reverse_relation.embed) {
 	      throw new Error("Both relationship directions cannot embed (" + this.model_type.model_name + " and " + this.reverse_model_type.model_name + "). Choose one or the other.");
 	    }
+	    if (this.embed) {
+	      this.model_type.schema().type('id', this.reverse_model_type.schema().type('id'));
+	    }
+	    return (_ref = this.reverse_model_type) != null ? _ref.schema().type(this.foreign_key, this.model_type) : void 0;
 	  };
 
 	  One.prototype.initializeModel = function(model) {
@@ -5708,11 +6175,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return One;
 
-	})(__webpack_require__(31));
+	})(__webpack_require__(37));
 
 
 /***/ },
-/* 23 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -5721,9 +6188,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
-	var Backbone, Many, Queue, Utils, inflection, _,
+	var Backbone, BackboneORM, Many, Queue, Utils, _,
 	  __hasProp = {}.hasOwnProperty,
 	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -5731,11 +6198,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_ = __webpack_require__(1);
 
-	inflection = __webpack_require__(20);
+	BackboneORM = __webpack_require__(4);
 
-	Queue = __webpack_require__(7);
+	Queue = __webpack_require__(10);
 
-	Utils = __webpack_require__(5);
+	Utils = __webpack_require__(7);
 
 	module.exports = Many = (function(_super) {
 	  __extends(Many, _super);
@@ -5748,13 +6215,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = options[key];
 	      this[key] = value;
 	    }
-	    this.virtual_id_accessor || (this.virtual_id_accessor = "" + (inflection.singularize(this.key)) + "_ids");
+	    this.virtual_id_accessor || (this.virtual_id_accessor = BackboneORM.naming_conventions.foreignKey(this.key, true));
 	    if (!this.join_key) {
-	      this.join_key = this.foreign_key || inflection.foreign_key(this.model_type.model_name);
+	      this.join_key = this.foreign_key || BackboneORM.naming_conventions.foreignKey(this.model_type.model_name);
 	    }
 	    if (!this.foreign_key) {
-	      this.foreign_key = inflection.foreign_key(this.as || this.model_type.model_name);
+	      this.foreign_key = BackboneORM.naming_conventions.foreignKey(this.as || this.model_type.model_name);
 	    }
+	    this._adding_ids = {};
 	    if (!this.collection_type) {
 	      reverse_model_type = this.reverse_model_type;
 	      Collection = (function(_super1) {
@@ -5774,13 +6242,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  Many.prototype.initialize = function() {
-	    var _ref;
+	    var _ref, _ref1;
 	    this.reverse_relation = this._findOrGenerateReverseRelation(this);
 	    if (this.embed && this.reverse_relation && this.reverse_relation.embed) {
 	      throw new Error("Both relationship directions cannot embed (" + this.model_type.model_name + " and " + this.reverse_model_type.model_name + "). Choose one or the other.");
 	    }
 	    if (((_ref = this.reverse_relation) != null ? _ref.type : void 0) === 'hasOne') {
 	      throw new Error("The reverse of a hasMany relation should be `belongsTo`, not `hasOne` (" + this.model_type.model_name + " and " + this.reverse_model_type.model_name + ").");
+	    }
+	    if (this.embed) {
+	      this.model_type.schema().type('id', this.reverse_model_type.schema().type('id'));
+	    }
+	    if ((_ref1 = this.reverse_model_type) != null) {
+	      _ref1.schema().type(this.foreign_key, this.model_type);
 	    }
 	    if (this.reverse_relation.type === 'hasMany') {
 	      return this.join_table = this.findOrGenerateJoinTable(this);
@@ -5812,7 +6286,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = [];
 	    }
 	    if (!_.isArray(value)) {
-	      throw new Error("HasMany.set: Unexpected type to set " + key + ". Expecting array: " + (Utils.toString(value)));
+	      throw new Error("HasMany.set: Unexpected type to set " + key + ". Expecting array: " + (JSONUtils.stringify(value)));
 	    }
 	    Utils.orSet(model, 'rel_dirty', {})[this.key] = true;
 	    model.setLoaded(this.key, _.all(value, function(item) {
@@ -5924,7 +6398,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Many.prototype.add = function(model, related_model) {
-	    var collection, current_related_model;
+	    var adding_count, collection, current_related_model, return_value;
+	    if (related_model.id) {
+	      adding_count = this._adding_ids[related_model.id] = (this._adding_ids[related_model.id] || 0) + 1;
+	    }
 	    collection = this._ensureCollection(model);
 	    current_related_model = collection.get(related_model.id);
 	    if (current_related_model === related_model) {
@@ -5936,7 +6413,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this.reverse_model_type.cache && related_model.id) {
 	      this.reverse_model_type.cache.set(related_model.id, related_model);
 	    }
-	    return collection.add(related_model);
+	    return_value = collection.add(related_model, {
+	      silent: adding_count > 1
+	    });
+	    if (related_model.id) {
+	      this._adding_ids[related_model.id]--;
+	    }
+	    return return_value;
 	  };
 
 	  Many.prototype.remove = function(model, related_model) {
@@ -5998,18 +6481,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	              return callback(new Error("Many.patchAdd: cannot add an new model. Please save first."));
 	            }
 	            add = function(callback) {
-	              var attributes, join;
-	              attributes = {};
-	              attributes[_this.foreign_key] = model.id;
+	              var attributes;
+	              (attributes = {})[_this.foreign_key] = model.id;
 	              attributes[_this.reverse_relation.foreign_key] = related_id;
-	              join = new _this.join_table(attributes);
-	              return join.save(callback);
+	              return _this.join_table.exists(attributes, function(err, exists) {
+	                if (err) {
+	                  return callback(err);
+	                }
+	                if (exists) {
+	                  return callback(new Error("Join already exists: " + (JSON.stringify(attributes))));
+	                }
+	                return new _this.join_table(attributes).save(callback);
+	              });
 	            };
 	            if (_this.reverse_relation.type === 'hasMany') {
 	              return add(callback);
 	            }
-	            (query = {})[_this.reverse_relation.foreign_key] = related_id;
-	            return _this.join_table.find(query, function(err, join_table_json) {
+	            (query = {
+	              $one: true
+	            })[_this.reverse_relation.foreign_key] = related_id;
+	            return _this.join_table.cursor(query).toJSON(function(err, join_table_json) {
 	              if (err) {
 	                return callback(err);
 	              }
@@ -6312,197 +6803,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return Many;
 
-	})(__webpack_require__(31));
+	})(__webpack_require__(37));
 
 
 /***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var Backbone, MEMORY_STORE_KEYS, MemoryStore, ModelCache, Queue, _;
-
-	Backbone = __webpack_require__(2);
-
-	_ = __webpack_require__(1);
-
-	Queue = __webpack_require__(7);
-
-	MemoryStore = __webpack_require__(14);
-
-	MEMORY_STORE_KEYS = ['max', 'max_age', 'destroy'];
-
-	module.exports = ModelCache = (function() {
-	  function ModelCache() {
-	    this.enabled = false;
-	    this.caches = {};
-	    this.options = {
-	      modelTypes: {}
-	    };
-	    this.verbose = false;
-	  }
-
-	  ModelCache.prototype.configure = function(options) {
-	    var key, value, value_key, value_value, values, _base;
-	    if (options == null) {
-	      options = {};
-	    }
-	    this.enabled = options.enabled;
-	    this.reset(function() {});
-	    for (key in options) {
-	      value = options[key];
-	      if (_.isObject(value)) {
-	        (_base = this.options)[key] || (_base[key] = {});
-	        values = this.options[key];
-	        for (value_key in value) {
-	          value_value = value[value_key];
-	          values[value_key] = value_value;
-	        }
-	      } else {
-	        this.options[key] = value;
-	      }
-	    }
-	    return this;
-	  };
-
-	  ModelCache.prototype.configureSync = function(model_type, sync_fn) {
-	    var cache;
-	    if (model_type.prototype._orm_never_cache || !(cache = this.getOrCreateCache(model_type.model_name))) {
-	      return sync_fn;
-	    }
-	    model_type.cache = cache;
-	    return __webpack_require__(32)(model_type, sync_fn);
-	  };
-
-	  ModelCache.prototype.reset = function(callback) {
-	    var key, queue, value, _fn, _ref;
-	    queue = new Queue();
-	    _ref = this.caches;
-	    _fn = function(value) {
-	      return queue.defer(function(callback) {
-	        return value.reset(callback);
-	      });
-	    };
-	    for (key in _ref) {
-	      value = _ref[key];
-	      _fn(value);
-	    }
-	    return queue.await(callback);
-	  };
-
-	  ModelCache.prototype.hardReset = function() {
-	    var key, value, _ref;
-	    this.reset(function() {});
-	    _ref = this.caches;
-	    for (key in _ref) {
-	      value = _ref[key];
-	      delete this.caches[key];
-	    }
-	    return this;
-	  };
-
-	  ModelCache.prototype.getOrCreateCache = function(model_name) {
-	    var model_cache, options, _base;
-	    if (!this.enabled) {
-	      return null;
-	    }
-	    if (!model_name) {
-	      throw new Error("Missing model name for cache");
-	    }
-	    if (model_cache = this.caches[model_name]) {
-	      return model_cache;
-	    }
-	    if (options = this.options.modelTypes[model_name]) {
-	      return this.caches[model_name] = (typeof options.store === "function" ? options.store() : void 0) || new MemoryStore(_.pick(options, MEMORY_STORE_KEYS));
-	    } else if (this.options.store || this.options.max || this.options.max_age) {
-	      return this.caches[model_name] = (typeof (_base = this.options).store === "function" ? _base.store() : void 0) || new MemoryStore(_.pick(this.options, MEMORY_STORE_KEYS));
-	    }
-	    return null;
-	  };
-
-	  return ModelCache;
-
-	})();
-
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// Copyright Joyent, Inc. and other Node contributors.
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a
-	// copy of this software and associated documentation files (the
-	// "Software"), to deal in the Software without restriction, including
-	// without limitation the rights to use, copy, modify, merge, publish,
-	// distribute, sublicense, and/or sell copies of the Software, and to permit
-	// persons to whom the Software is furnished to do so, subject to the
-	// following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included
-	// in all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-	// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-	// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-	var shims = __webpack_require__(26);
-
-	// NOTE: These type checking functions intentionally don't use `instanceof`
-	// because it is fragile and can be easily faked with `Object.create()`.
-	function isArray(ar) {
-	return shims.isArray(ar);
-	}
-	exports.isArray = isArray;
-
-	function isBoolean(arg) {
-	return typeof arg === 'boolean';
-	}
-	exports.isBoolean = isBoolean;
-
-	function isNull(arg) {
-	return arg === null;
-	}
-	exports.isNull = isNull;
-
-	function isNullOrUndefined(arg) {
-	return arg == null;
-	}
-	exports.isNullOrUndefined = isNullOrUndefined;
-
-	function isNumber(arg) {
-	return typeof arg === 'number';
-	}
-	exports.isNumber = isNumber;
-
-	function isString(arg) {
-	return typeof arg === 'string';
-	}
-	exports.isString = isString;
-
-	function isObject(arg) {
-	return typeof arg === 'object' && arg;
-	}
-	exports.isObject = isObject;
-
-	function objectToString(o) {
-	return Object.prototype.toString.call(o);
-	}
-
-
-/***/ },
-/* 26 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	//
@@ -6511,74 +6816,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	// the other modules.
 	//
 
-	var toString = Object.prototype.toString;
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-	// Array.isArray is supported in IE9
-	function isArray(xs) {
-	  return toString.call(xs) === '[object Array]';
-	}
-	exports.isArray = typeof Array.isArray === 'function' ? Array.isArray : isArray;
-
-	// Array.prototype.indexOf is supported in IE9
-	exports.indexOf = function indexOf(xs, x) {
-	  if (xs.indexOf) return xs.indexOf(x);
-	  for (var i = 0; i < xs.length; i++) {
-	    if (x === xs[i]) return i;
-	  }
-	  return -1;
-	};
-
-	// Array.prototype.filter is supported in IE9
-	exports.filter = function filter(xs, fn) {
-	  if (xs.filter) return xs.filter(fn);
-	  var res = [];
-	  for (var i = 0; i < xs.length; i++) {
-	    if (fn(xs[i], i, xs)) res.push(xs[i]);
-	  }
-	  return res;
-	};
-
 	// Array.prototype.forEach is supported in IE9
 	exports.forEach = function forEach(xs, fn, self) {
 	  if (xs.forEach) return xs.forEach(fn, self);
 	  for (var i = 0; i < xs.length; i++) {
 	    fn.call(self, xs[i], i, xs);
 	  }
-	};
-
-	// Array.prototype.map is supported in IE9
-	exports.map = function map(xs, fn) {
-	  if (xs.map) return xs.map(fn);
-	  var out = new Array(xs.length);
-	  for (var i = 0; i < xs.length; i++) {
-	    out[i] = fn(xs[i], i, xs);
-	  }
-	  return out;
-	};
-
-	// Array.prototype.reduce is supported in IE9
-	exports.reduce = function reduce(array, callback, opt_initialValue) {
-	  if (array.reduce) return array.reduce(callback, opt_initialValue);
-	  var value, isValueSet = false;
-
-	  if (2 < arguments.length) {
-	    value = opt_initialValue;
-	    isValueSet = true;
-	  }
-	  for (var i = 0, l = array.length; l > i; ++i) {
-	    if (array.hasOwnProperty(i)) {
-	      if (isValueSet) {
-	        value = callback(value, array[i], i, array);
-	      }
-	      else {
-	        value = array[i];
-	        isValueSet = true;
-	      }
-	    }
-	  }
-
-	  return value;
 	};
 
 	// String.prototype.substr - negative index don't work in IE8
@@ -6602,502 +6845,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return str.replace(/^\s+|\s+$/g, '');
 	};
 
-	// Function.prototype.bind is supported in IE9
-	exports.bind = function () {
-	  var args = Array.prototype.slice.call(arguments);
-	  var fn = args.shift();
-	  if (fn.bind) return fn.bind.apply(fn, args);
-	  var self = args.shift();
-	  return function () {
-	    fn.apply(self, args.concat([Array.prototype.slice.call(arguments)]));
-	  };
-	};
-
-	// Object.create is supported in IE9
-	function create(prototype, properties) {
-	  var object;
-	  if (prototype === null) {
-	    object = { '__proto__' : null };
-	  }
-	  else {
-	    if (typeof prototype !== 'object') {
-	      throw new TypeError(
-	        'typeof prototype[' + (typeof prototype) + '] != \'object\''
-	      );
-	    }
-	    var Type = function () {};
-	    Type.prototype = prototype;
-	    object = new Type();
-	    object.__proto__ = prototype;
-	  }
-	  if (typeof properties !== 'undefined' && Object.defineProperties) {
-	    Object.defineProperties(object, properties);
-	  }
-	  return object;
-	}
-	exports.create = typeof Object.create === 'function' ? Object.create : create;
-
-	// Object.keys and Object.getOwnPropertyNames is supported in IE9 however
-	// they do show a description and number property on Error objects
-	function notObject(object) {
-	  return ((typeof object != "object" && typeof object != "function") || object === null);
-	}
-
-	function keysShim(object) {
-	  if (notObject(object)) {
-	    throw new TypeError("Object.keys called on a non-object");
-	  }
-
-	  var result = [];
-	  for (var name in object) {
-	    if (hasOwnProperty.call(object, name)) {
-	      result.push(name);
-	    }
-	  }
-	  return result;
-	}
-
-	// getOwnPropertyNames is almost the same as Object.keys one key feature
-	//  is that it returns hidden properties, since that can't be implemented,
-	//  this feature gets reduced so it just shows the length property on arrays
-	function propertyShim(object) {
-	  if (notObject(object)) {
-	    throw new TypeError("Object.getOwnPropertyNames called on a non-object");
-	  }
-
-	  var result = keysShim(object);
-	  if (exports.isArray(object) && exports.indexOf(object, 'length') === -1) {
-	    result.push('length');
-	  }
-	  return result;
-	}
-
-	var keys = typeof Object.keys === 'function' ? Object.keys : keysShim;
-	var getOwnPropertyNames = typeof Object.getOwnPropertyNames === 'function' ?
-	  Object.getOwnPropertyNames : propertyShim;
-
-	if (new Error().hasOwnProperty('description')) {
-	  var ERROR_PROPERTY_FILTER = function (obj, array) {
-	    if (toString.call(obj) === '[object Error]') {
-	      array = exports.filter(array, function (name) {
-	        return name !== 'description' && name !== 'number' && name !== 'message';
-	      });
-	    }
-	    return array;
-	  };
-
-	  exports.keys = function (object) {
-	    return ERROR_PROPERTY_FILTER(object, keys(object));
-	  };
-	  exports.getOwnPropertyNames = function (object) {
-	    return ERROR_PROPERTY_FILTER(object, getOwnPropertyNames(object));
-	  };
-	} else {
-	  exports.keys = keys;
-	  exports.getOwnPropertyNames = getOwnPropertyNames;
-	}
-
-	// Object.getOwnPropertyDescriptor - supported in IE8 but only on dom elements
-	function valueObject(value, key) {
-	  return { value: value[key] };
-	}
-
-	if (typeof Object.getOwnPropertyDescriptor === 'function') {
-	  try {
-	    Object.getOwnPropertyDescriptor({'a': 1}, 'a');
-	    exports.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-	  } catch (e) {
-	    // IE8 dom element issue - use a try catch and default to valueObject
-	    exports.getOwnPropertyDescriptor = function (value, key) {
-	      try {
-	        return Object.getOwnPropertyDescriptor(value, key);
-	      } catch (e) {
-	        return valueObject(value, key);
-	      }
-	    };
-	  }
-	} else {
-	  exports.getOwnPropertyDescriptor = valueObject;
-	}
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var ModelStream, e, stream,
-	  __hasProp = {}.hasOwnProperty,
-	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-	try {
-	  stream = __webpack_require__(4);
-	} catch (_error) {
-	  e = _error;
-	}
-
-	if (stream != null ? stream.Readable : void 0) {
-	  module.exports = ModelStream = (function(_super) {
-	    __extends(ModelStream, _super);
-
-	    function ModelStream(model_type, query) {
-	      this.model_type = model_type;
-	      this.query = query != null ? query : {};
-	      ModelStream.__super__.constructor.call(this, {
-	        objectMode: true
-	      });
-	    }
-
-	    ModelStream.prototype._read = function() {
-	      var done;
-	      if (this.ended || this.started) {
-	        return;
-	      }
-	      this.started = true;
-	      done = (function(_this) {
-	        return function(err) {
-	          _this.ended = true;
-	          if (err) {
-	            _this.emit('error', err);
-	          }
-	          return _this.push(null);
-	        };
-	      })(this);
-	      return this.model_type.each(this.query, ((function(_this) {
-	        return function(model, callback) {
-	          _this.push(model);
-	          return callback();
-	        };
-	      })(this)), done);
-	    };
-
-	    return ModelStream;
-
-	  })(stream.Readable);
-	}
-
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var Cursor, Queue, _;
-
-	_ = __webpack_require__(1);
-
-	Queue = __webpack_require__(7);
-
-	Cursor = null;
-
-	module.exports = function(model_type, query, iterator, callback) {
-	  var method, model_limit, options, parsed_query, processed_count, runBatch;
-	  if (!Cursor) {
-	    Cursor = __webpack_require__(10);
-	  }
-	  options = query.$each || {};
-	  method = options.json ? 'toJSON' : 'toModels';
-	  processed_count = 0;
-	  parsed_query = Cursor.parseQuery(_.omit(query, '$each'));
-	  _.defaults(parsed_query.cursor, {
-	    $offset: 0,
-	    $sort: 'id'
-	  });
-	  model_limit = parsed_query.cursor.$limit || Infinity;
-	  if (options.fetch) {
-	    parsed_query.cursor.$limit = options.fetch;
-	  }
-	  runBatch = function() {
-	    var cursor;
-	    cursor = model_type.cursor(parsed_query);
-	    return cursor[method].call(cursor, function(err, models) {
-	      var model, queue, _fn, _i, _len;
-	      if (err || !models) {
-	        return callback(new Error("Failed to get models. Error: " + err));
-	      }
-	      if (!models.length) {
-	        return callback(null, processed_count);
-	      }
-	      queue = new Queue(options.threads);
-	      _fn = function(model) {
-	        return queue.defer(function(callback) {
-	          return iterator(model, callback);
-	        });
-	      };
-	      for (_i = 0, _len = models.length; _i < _len; _i++) {
-	        model = models[_i];
-	        if (processed_count++ >= model_limit) {
-	          break;
-	        }
-	        _fn(model);
-	      }
-	      return queue.await(function(err) {
-	        if (err) {
-	          return callback(err);
-	        }
-	        if ((processed_count >= model_limit) || (models.length < parsed_query.cursor.$limit) || !parsed_query.cursor.$limit) {
-	          return callback(null, processed_count);
-	        }
-	        parsed_query.cursor.$offset += parsed_query.cursor.$limit;
-	        return runBatch();
-	      });
-	    });
-	  };
-	  return runBatch();
-	};
-
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var INTERVAL_TYPES, Queue, Utils, moment, _;
-
-	_ = __webpack_require__(1);
-
-	moment = __webpack_require__(3);
-
-	Queue = __webpack_require__(7);
-
-	Utils = __webpack_require__(5);
-
-	INTERVAL_TYPES = ['milliseconds', 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
-
-	module.exports = function(model_type, query, iterator, callback) {
-	  var iteration_info, key, no_models, options, queue, range;
-	  options = query.$interval || {};
-	  if (!(key = options.key)) {
-	    throw new Error('missing option: key');
-	  }
-	  if (!options.type) {
-	    throw new Error('missing option: type');
-	  }
-	  if (!_.contains(INTERVAL_TYPES, options.type)) {
-	    throw new Error("type is not recognized: " + options.type + ", " + (_.contains(INTERVAL_TYPES, options.type)));
-	  }
-	  iteration_info = _.clone(options);
-	  if (!iteration_info.range) {
-	    iteration_info.range = {};
-	  }
-	  range = iteration_info.range;
-	  no_models = false;
-	  queue = new Queue(1);
-	  queue.defer(function(callback) {
-	    var start;
-	    if (!(start = range.$gte || range.$gt)) {
-	      return model_type.cursor(query).limit(1).sort(key).toModels(function(err, models) {
-	        if (err) {
-	          return callback(err);
-	        }
-	        if (!models.length) {
-	          no_models = true;
-	          return callback();
-	        }
-	        range.start = iteration_info.first = models[0].get(key);
-	        return callback();
-	      });
-	    } else {
-	      range.start = start;
-	      return model_type.findOneNearestDate(start, {
-	        key: key,
-	        reverse: true
-	      }, query, function(err, model) {
-	        if (err) {
-	          return callback(err);
-	        }
-	        if (!model) {
-	          no_models = true;
-	          return callback();
-	        }
-	        iteration_info.first = model.get(key);
-	        return callback();
-	      });
-	    }
-	  });
-	  queue.defer(function(callback) {
-	    var end;
-	    if (no_models) {
-	      return callback();
-	    }
-	    if (!(end = range.$lte || range.$lt)) {
-	      return model_type.cursor(query).limit(1).sort("-" + key).toModels(function(err, models) {
-	        if (err) {
-	          return callback(err);
-	        }
-	        if (!models.length) {
-	          no_models = true;
-	          return callback();
-	        }
-	        range.end = iteration_info.last = models[0].get(key);
-	        return callback();
-	      });
-	    } else {
-	      range.end = end;
-	      return model_type.findOneNearestDate(end, {
-	        key: key
-	      }, query, function(err, model) {
-	        if (err) {
-	          return callback(err);
-	        }
-	        if (!model) {
-	          no_models = true;
-	          return callback();
-	        }
-	        iteration_info.last = model.get(key);
-	        return callback();
-	      });
-	    }
-	  });
-	  return queue.await(function(err) {
-	    var length_ms, processed_count, runInterval, start_ms;
-	    if (err) {
-	      return callback(err);
-	    }
-	    if (no_models) {
-	      return callback();
-	    }
-	    start_ms = range.start.getTime();
-	    length_ms = moment.duration((_.isUndefined(options.length) ? 1 : options.length), options.type).asMilliseconds();
-	    if (!length_ms) {
-	      throw Error("length_ms is invalid: " + length_ms + " for range: " + (Utils.toString(range)));
-	    }
-	    query = _.omit(query, '$interval');
-	    query.$sort = [key];
-	    processed_count = 0;
-	    iteration_info.index = 0;
-	    runInterval = function(current) {
-	      if (current.isAfter(range.end)) {
-	        return callback();
-	      }
-	      query[key] = {
-	        $gte: current.toDate(),
-	        $lte: iteration_info.last
-	      };
-	      return model_type.findOne(query, function(err, model) {
-	        var next;
-	        if (err) {
-	          return callback(err);
-	        }
-	        if (!model) {
-	          return callback();
-	        }
-	        next = model.get(key);
-	        iteration_info.index = Math.floor((next.getTime() - start_ms) / length_ms);
-	        current = moment.utc(range.start).add({
-	          milliseconds: iteration_info.index * length_ms
-	        });
-	        iteration_info.start = current.toDate();
-	        next = current.clone().add({
-	          milliseconds: length_ms
-	        });
-	        iteration_info.end = next.toDate();
-	        query[key] = {
-	          $gte: current.toDate(),
-	          $lt: next.toDate()
-	        };
-	        return iterator(query, iteration_info, function(err) {
-	          if (err) {
-	            return callback(err);
-	          }
-	          return runInterval(next);
-	        });
-	      });
-	    };
-	    return runInterval(moment(range.start));
-	  });
-	};
-
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var Backbone, Utils, collection_type, fn, key, overrides, _;
-
-	_ = __webpack_require__(1);
-
-	Backbone = __webpack_require__(2);
-
-	Utils = __webpack_require__(5);
-
-	collection_type = Backbone.Collection;
-
-	overrides = {
-	  fetch: function(options) {
-	    var callback;
-	    if (_.isFunction(callback = arguments[arguments.length - 1])) {
-	      switch (arguments.length) {
-	        case 1:
-	          options = Utils.wrapOptions({}, callback);
-	          break;
-	        case 2:
-	          options = Utils.wrapOptions(options, callback);
-	      }
-	    }
-	    return collection_type.prototype._orm_original_fns.fetch.call(this, Utils.wrapOptions(options, (function(_this) {
-	      return function(err, model, resp, options) {
-	        if (err) {
-	          return typeof options.error === "function" ? options.error(_this, resp, options) : void 0;
-	        }
-	        return typeof options.success === "function" ? options.success(model, resp, options) : void 0;
-	      };
-	    })(this)));
-	  },
-	  _prepareModel: function(attrs, options) {
-	    var id, is_new, model;
-	    if (!Utils.isModel(attrs) && (id = Utils.dataId(attrs))) {
-	      if (this.model.cache) {
-	        is_new = !!this.model.cache.get(id);
-	      }
-	      model = Utils.updateOrNew(attrs, this.model);
-	      if (is_new && !model._validate(attrs, options)) {
-	        this.trigger('invalid', this, attrs, options);
-	        return false;
-	      }
-	      return model;
-	    }
-	    return collection_type.prototype._orm_original_fns._prepareModel.call(this, attrs, options);
-	  }
-	};
-
-	if (!collection_type.prototype._orm_original_fns) {
-	  collection_type.prototype._orm_original_fns = {};
-	  for (key in overrides) {
-	    fn = overrides[key];
-	    collection_type.prototype._orm_original_fns[key] = collection_type.prototype[key];
-	    collection_type.prototype[key] = fn;
-	  }
-	}
-
 
 /***/ },
 /* 31 */
@@ -7109,202 +6856,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
-	 */
-	var Backbone, Queue, Relation, Utils, inflection, _;
-
-	_ = __webpack_require__(1);
-
-	Backbone = __webpack_require__(2);
-
-	inflection = __webpack_require__(20);
-
-	Queue = __webpack_require__(7);
-
-	Utils = __webpack_require__(5);
-
-	module.exports = Relation = (function() {
-	  function Relation() {}
-
-	  Relation.prototype.isEmbedded = function() {
-	    return !!(this.embed || (this.reverse_relation && this.reverse_relation.embed));
-	  };
-
-	  Relation.prototype.isVirtual = function() {
-	    return !!(this.virtual || (this.reverse_relation && this.reverse_relation.virtual));
-	  };
-
-	  Relation.prototype.findOrGenerateJoinTable = function() {
-	    var join_table;
-	    if (join_table = this.join_table || this.reverse_relation.join_table) {
-	      return join_table;
-	    }
-	    return this.model_type.schema().generateJoinTable(this);
-	  };
-
-	  Relation.prototype._findOrGenerateReverseRelation = function() {
-	    var key_root, model_type, reverse_model_type, reverse_relation;
-	    model_type = this.model_type;
-	    reverse_model_type = this.reverse_model_type;
-	    if (!_.isFunction(reverse_model_type.schema)) {
-	      reverse_model_type.sync = model_type.createSync(reverse_model_type);
-	    }
-	    key_root = this.as || inflection.underscore(model_type.model_name);
-	    reverse_relation = reverse_model_type.relation(key_root);
-	    if (!reverse_relation) {
-	      reverse_relation = reverse_model_type.relation(inflection.singularize(key_root));
-	    }
-	    if (!reverse_relation) {
-	      reverse_relation = reverse_model_type.relation(inflection.pluralize(key_root));
-	    }
-	    if (!reverse_relation && (this.type !== 'belongsTo')) {
-	      reverse_relation = reverse_model_type.schema().generateBelongsTo(model_type);
-	    }
-	    if (reverse_relation && !reverse_relation.reverse_relation) {
-	      reverse_relation.reverse_relation = this;
-	    }
-	    return reverse_relation;
-	  };
-
-	  Relation.prototype._saveRelated = function(model, related_models, callback) {
-	    if (this.embed || !this.reverse_relation || (this.type === 'belongsTo')) {
-	      return callback();
-	    }
-	    if (this.isVirtual()) {
-	      return callback();
-	    }
-	    return this.cursor(model, this.key).toJSON((function(_this) {
-	      return function(err, json) {
-	        var added_id, added_ids, changes, queue, related_id, related_ids, related_json, related_model, test, _fn, _fn1, _fn2, _i, _j, _k, _len, _len1, _len2, _ref;
-	        if (err) {
-	          return callback(err);
-	        }
-	        if (!_.isArray(json)) {
-	          json = (json ? [json] : []);
-	        }
-	        queue = new Queue(1);
-	        related_ids = _.pluck(related_models, 'id');
-	        changes = _.groupBy(json, function(test) {
-	          if (_.contains(related_ids, test.id)) {
-	            return 'kept';
-	          } else {
-	            return 'removed';
-	          }
-	        });
-	        added_ids = changes.kept ? _.difference(related_ids, (function() {
-	          var _i, _len, _ref, _results;
-	          _ref = changes.kept;
-	          _results = [];
-	          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-	            test = _ref[_i];
-	            _results.push(test.id);
-	          }
-	          return _results;
-	        })()) : related_ids;
-	        if (changes.removed) {
-	          if (_this.join_table) {
-	            queue.defer(function(callback) {
-	              var query, related_json;
-	              query = {};
-	              query[_this.reverse_relation.join_key] = {
-	                $in: (function() {
-	                  var _i, _len, _ref, _results;
-	                  _ref = changes.removed;
-	                  _results = [];
-	                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-	                    related_json = _ref[_i];
-	                    _results.push(related_json[this.reverse_model_type.prototype.idAttribute]);
-	                  }
-	                  return _results;
-	                }).call(_this)
-	              };
-	              return _this.join_table.destroy(query, callback);
-	            });
-	          } else {
-	            _ref = changes.removed;
-	            _fn = function(related_json) {
-	              return queue.defer(function(callback) {
-	                related_json[_this.reverse_relation.foreign_key] = null;
-	                return Utils.modelJSONSave(related_json, _this.reverse_model_type, callback);
-	              });
-	            };
-	            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-	              related_json = _ref[_i];
-	              _fn(related_json);
-	            }
-	          }
-	        }
-	        if (added_ids.length) {
-	          if (_this.join_table) {
-	            _fn1 = function(related_id) {
-	              return queue.defer(function(callback) {
-	                var attributes, join;
-	                attributes = {};
-	                attributes[_this.foreign_key] = model.id;
-	                attributes[_this.reverse_relation.foreign_key] = related_id;
-	                join = new _this.join_table(attributes);
-	                return join.save(callback);
-	              });
-	            };
-	            for (_j = 0, _len1 = added_ids.length; _j < _len1; _j++) {
-	              related_id = added_ids[_j];
-	              _fn1(related_id);
-	            }
-	          } else {
-	            _fn2 = function(related_model) {
-	              return queue.defer(function(callback) {
-	                return related_model.save(function(err, saved_model) {
-	                  var cache;
-	                  if (!err && (cache = _this.reverse_model_type.cache)) {
-	                    cache.set(saved_model.id, saved_model);
-	                  }
-	                  return callback(err);
-	                });
-	              });
-	            };
-	            for (_k = 0, _len2 = added_ids.length; _k < _len2; _k++) {
-	              added_id = added_ids[_k];
-	              related_model = _.find(related_models, function(test) {
-	                return test.id === added_id;
-	              });
-	              if (!_this.reverse_relation._hasChanged(related_model)) {
-	                continue;
-	              }
-	              _fn2(related_model);
-	            }
-	          }
-	        }
-	        return queue.await(callback);
-	      };
-	    })(this));
-	  };
-
-	  return Relation;
-
-	})();
-
-
-/***/ },
-/* 32 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  backbone-orm.js 0.6.0
-	  Copyright (c) 2013-2014 Vidigami
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
 	var CacheCursor, CacheSync, DESTROY_BATCH_LIMIT, DESTROY_THREADS, Schema, Utils, bbCallback, _;
 
 	_ = __webpack_require__(1);
 
-	CacheCursor = __webpack_require__(33);
+	CacheCursor = __webpack_require__(38);
 
-	Schema = __webpack_require__(11);
+	Schema = __webpack_require__(14);
 
-	Utils = __webpack_require__(5);
+	Utils = __webpack_require__(7);
 
 	bbCallback = Utils.bbCallback;
 
@@ -7453,6 +7015,1169 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(Buffer) {/*!
+	 * The buffer module from node.js, for the browser.
+	 *
+	 * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+	 * @license  MIT
+	 */
+
+	var base64 = __webpack_require__(40)
+	var ieee754 = __webpack_require__(39)
+
+	exports.Buffer = Buffer
+	exports.SlowBuffer = Buffer
+	exports.INSPECT_MAX_BYTES = 50
+	Buffer.poolSize = 8192
+
+	/**
+	 * If `Buffer._useTypedArrays`:
+	 *   === true    Use Uint8Array implementation (fastest)
+	 *   === false   Use Object implementation (compatible down to IE6)
+	 */
+	Buffer._useTypedArrays = (function () {
+	  // Detect if browser supports Typed Arrays. Supported browsers are IE 10+, Firefox 4+,
+	  // Chrome 7+, Safari 5.1+, Opera 11.6+, iOS 4.2+. If the browser does not support adding
+	  // properties to `Uint8Array` instances, then that's the same as no `Uint8Array` support
+	  // because we need to be able to add all the node Buffer API methods. This is an issue
+	  // in Firefox 4-29. Now fixed: https://bugzilla.mozilla.org/show_bug.cgi?id=695438
+	  try {
+	    var buf = new ArrayBuffer(0)
+	    var arr = new Uint8Array(buf)
+	    arr.foo = function () { return 42 }
+	    return 42 === arr.foo() &&
+	        typeof arr.subarray === 'function' // Chrome 9-10 lack `subarray`
+	  } catch (e) {
+	    return false
+	  }
+	})()
+
+	/**
+	 * Class: Buffer
+	 * =============
+	 *
+	 * The Buffer constructor returns instances of `Uint8Array` that are augmented
+	 * with function properties for all the node `Buffer` API functions. We use
+	 * `Uint8Array` so that square bracket notation works as expected -- it returns
+	 * a single octet.
+	 *
+	 * By augmenting the instances, we can avoid modifying the `Uint8Array`
+	 * prototype.
+	 */
+	function Buffer (subject, encoding, noZero) {
+	  if (!(this instanceof Buffer))
+	    return new Buffer(subject, encoding, noZero)
+
+	  var type = typeof subject
+
+	  // Find the length
+	  var length
+	  if (type === 'number')
+	    length = subject > 0 ? subject >>> 0 : 0
+	  else if (type === 'string') {
+	    if (encoding === 'base64')
+	      subject = base64clean(subject)
+	    length = Buffer.byteLength(subject, encoding)
+	  } else if (type === 'object' && subject !== null) { // assume object is array-like
+	    if (subject.type === 'Buffer' && Array.isArray(subject.data))
+	      subject = subject.data
+	    length = +subject.length > 0 ? Math.floor(+subject.length) : 0
+	  } else
+	    throw new Error('First argument needs to be a number, array or string.')
+
+	  var buf
+	  if (Buffer._useTypedArrays) {
+	    // Preferred: Return an augmented `Uint8Array` instance for best performance
+	    buf = Buffer._augment(new Uint8Array(length))
+	  } else {
+	    // Fallback: Return THIS instance of Buffer (created by `new`)
+	    buf = this
+	    buf.length = length
+	    buf._isBuffer = true
+	  }
+
+	  var i
+	  if (Buffer._useTypedArrays && typeof subject.byteLength === 'number') {
+	    // Speed optimization -- use set if we're copying from a typed array
+	    buf._set(subject)
+	  } else if (isArrayish(subject)) {
+	    // Treat array-ish objects as a byte array
+	    if (Buffer.isBuffer(subject)) {
+	      for (i = 0; i < length; i++)
+	        buf[i] = subject.readUInt8(i)
+	    } else {
+	      for (i = 0; i < length; i++)
+	        buf[i] = ((subject[i] % 256) + 256) % 256
+	    }
+	  } else if (type === 'string') {
+	    buf.write(subject, 0, encoding)
+	  } else if (type === 'number' && !Buffer._useTypedArrays && !noZero) {
+	    for (i = 0; i < length; i++) {
+	      buf[i] = 0
+	    }
+	  }
+
+	  return buf
+	}
+
+	// STATIC METHODS
+	// ==============
+
+	Buffer.isEncoding = function (encoding) {
+	  switch (String(encoding).toLowerCase()) {
+	    case 'hex':
+	    case 'utf8':
+	    case 'utf-8':
+	    case 'ascii':
+	    case 'binary':
+	    case 'base64':
+	    case 'raw':
+	    case 'ucs2':
+	    case 'ucs-2':
+	    case 'utf16le':
+	    case 'utf-16le':
+	      return true
+	    default:
+	      return false
+	  }
+	}
+
+	Buffer.isBuffer = function (b) {
+	  return !!(b != null && b._isBuffer)
+	}
+
+	Buffer.byteLength = function (str, encoding) {
+	  var ret
+	  str = str.toString()
+	  switch (encoding || 'utf8') {
+	    case 'hex':
+	      ret = str.length / 2
+	      break
+	    case 'utf8':
+	    case 'utf-8':
+	      ret = utf8ToBytes(str).length
+	      break
+	    case 'ascii':
+	    case 'binary':
+	    case 'raw':
+	      ret = str.length
+	      break
+	    case 'base64':
+	      ret = base64ToBytes(str).length
+	      break
+	    case 'ucs2':
+	    case 'ucs-2':
+	    case 'utf16le':
+	    case 'utf-16le':
+	      ret = str.length * 2
+	      break
+	    default:
+	      throw new Error('Unknown encoding')
+	  }
+	  return ret
+	}
+
+	Buffer.concat = function (list, totalLength) {
+	  assert(isArray(list), 'Usage: Buffer.concat(list[, length])')
+
+	  if (list.length === 0) {
+	    return new Buffer(0)
+	  } else if (list.length === 1) {
+	    return list[0]
+	  }
+
+	  var i
+	  if (totalLength === undefined) {
+	    totalLength = 0
+	    for (i = 0; i < list.length; i++) {
+	      totalLength += list[i].length
+	    }
+	  }
+
+	  var buf = new Buffer(totalLength)
+	  var pos = 0
+	  for (i = 0; i < list.length; i++) {
+	    var item = list[i]
+	    item.copy(buf, pos)
+	    pos += item.length
+	  }
+	  return buf
+	}
+
+	Buffer.compare = function (a, b) {
+	  assert(Buffer.isBuffer(a) && Buffer.isBuffer(b), 'Arguments must be Buffers')
+	  var x = a.length
+	  var y = b.length
+	  for (var i = 0, len = Math.min(x, y); i < len && a[i] === b[i]; i++) {}
+	  if (i !== len) {
+	    x = a[i]
+	    y = b[i]
+	  }
+	  if (x < y) {
+	    return -1
+	  }
+	  if (y < x) {
+	    return 1
+	  }
+	  return 0
+	}
+
+	// BUFFER INSTANCE METHODS
+	// =======================
+
+	function hexWrite (buf, string, offset, length) {
+	  offset = Number(offset) || 0
+	  var remaining = buf.length - offset
+	  if (!length) {
+	    length = remaining
+	  } else {
+	    length = Number(length)
+	    if (length > remaining) {
+	      length = remaining
+	    }
+	  }
+
+	  // must be an even number of digits
+	  var strLen = string.length
+	  assert(strLen % 2 === 0, 'Invalid hex string')
+
+	  if (length > strLen / 2) {
+	    length = strLen / 2
+	  }
+	  for (var i = 0; i < length; i++) {
+	    var byte = parseInt(string.substr(i * 2, 2), 16)
+	    assert(!isNaN(byte), 'Invalid hex string')
+	    buf[offset + i] = byte
+	  }
+	  return i
+	}
+
+	function utf8Write (buf, string, offset, length) {
+	  var charsWritten = blitBuffer(utf8ToBytes(string), buf, offset, length)
+	  return charsWritten
+	}
+
+	function asciiWrite (buf, string, offset, length) {
+	  var charsWritten = blitBuffer(asciiToBytes(string), buf, offset, length)
+	  return charsWritten
+	}
+
+	function binaryWrite (buf, string, offset, length) {
+	  return asciiWrite(buf, string, offset, length)
+	}
+
+	function base64Write (buf, string, offset, length) {
+	  var charsWritten = blitBuffer(base64ToBytes(string), buf, offset, length)
+	  return charsWritten
+	}
+
+	function utf16leWrite (buf, string, offset, length) {
+	  var charsWritten = blitBuffer(utf16leToBytes(string), buf, offset, length)
+	  return charsWritten
+	}
+
+	Buffer.prototype.write = function (string, offset, length, encoding) {
+	  // Support both (string, offset, length, encoding)
+	  // and the legacy (string, encoding, offset, length)
+	  if (isFinite(offset)) {
+	    if (!isFinite(length)) {
+	      encoding = length
+	      length = undefined
+	    }
+	  } else {  // legacy
+	    var swap = encoding
+	    encoding = offset
+	    offset = length
+	    length = swap
+	  }
+
+	  offset = Number(offset) || 0
+	  var remaining = this.length - offset
+	  if (!length) {
+	    length = remaining
+	  } else {
+	    length = Number(length)
+	    if (length > remaining) {
+	      length = remaining
+	    }
+	  }
+	  encoding = String(encoding || 'utf8').toLowerCase()
+
+	  var ret
+	  switch (encoding) {
+	    case 'hex':
+	      ret = hexWrite(this, string, offset, length)
+	      break
+	    case 'utf8':
+	    case 'utf-8':
+	      ret = utf8Write(this, string, offset, length)
+	      break
+	    case 'ascii':
+	      ret = asciiWrite(this, string, offset, length)
+	      break
+	    case 'binary':
+	      ret = binaryWrite(this, string, offset, length)
+	      break
+	    case 'base64':
+	      ret = base64Write(this, string, offset, length)
+	      break
+	    case 'ucs2':
+	    case 'ucs-2':
+	    case 'utf16le':
+	    case 'utf-16le':
+	      ret = utf16leWrite(this, string, offset, length)
+	      break
+	    default:
+	      throw new Error('Unknown encoding')
+	  }
+	  return ret
+	}
+
+	Buffer.prototype.toString = function (encoding, start, end) {
+	  var self = this
+
+	  encoding = String(encoding || 'utf8').toLowerCase()
+	  start = Number(start) || 0
+	  end = (end === undefined) ? self.length : Number(end)
+
+	  // Fastpath empty strings
+	  if (end === start)
+	    return ''
+
+	  var ret
+	  switch (encoding) {
+	    case 'hex':
+	      ret = hexSlice(self, start, end)
+	      break
+	    case 'utf8':
+	    case 'utf-8':
+	      ret = utf8Slice(self, start, end)
+	      break
+	    case 'ascii':
+	      ret = asciiSlice(self, start, end)
+	      break
+	    case 'binary':
+	      ret = binarySlice(self, start, end)
+	      break
+	    case 'base64':
+	      ret = base64Slice(self, start, end)
+	      break
+	    case 'ucs2':
+	    case 'ucs-2':
+	    case 'utf16le':
+	    case 'utf-16le':
+	      ret = utf16leSlice(self, start, end)
+	      break
+	    default:
+	      throw new Error('Unknown encoding')
+	  }
+	  return ret
+	}
+
+	Buffer.prototype.toJSON = function () {
+	  return {
+	    type: 'Buffer',
+	    data: Array.prototype.slice.call(this._arr || this, 0)
+	  }
+	}
+
+	Buffer.prototype.equals = function (b) {
+	  assert(Buffer.isBuffer(b), 'Argument must be a Buffer')
+	  return Buffer.compare(this, b) === 0
+	}
+
+	Buffer.prototype.compare = function (b) {
+	  assert(Buffer.isBuffer(b), 'Argument must be a Buffer')
+	  return Buffer.compare(this, b)
+	}
+
+	// copy(targetBuffer, targetStart=0, sourceStart=0, sourceEnd=buffer.length)
+	Buffer.prototype.copy = function (target, target_start, start, end) {
+	  var source = this
+
+	  if (!start) start = 0
+	  if (!end && end !== 0) end = this.length
+	  if (!target_start) target_start = 0
+
+	  // Copy 0 bytes; we're done
+	  if (end === start) return
+	  if (target.length === 0 || source.length === 0) return
+
+	  // Fatal error conditions
+	  assert(end >= start, 'sourceEnd < sourceStart')
+	  assert(target_start >= 0 && target_start < target.length,
+	      'targetStart out of bounds')
+	  assert(start >= 0 && start < source.length, 'sourceStart out of bounds')
+	  assert(end >= 0 && end <= source.length, 'sourceEnd out of bounds')
+
+	  // Are we oob?
+	  if (end > this.length)
+	    end = this.length
+	  if (target.length - target_start < end - start)
+	    end = target.length - target_start + start
+
+	  var len = end - start
+
+	  if (len < 100 || !Buffer._useTypedArrays) {
+	    for (var i = 0; i < len; i++) {
+	      target[i + target_start] = this[i + start]
+	    }
+	  } else {
+	    target._set(this.subarray(start, start + len), target_start)
+	  }
+	}
+
+	function base64Slice (buf, start, end) {
+	  if (start === 0 && end === buf.length) {
+	    return base64.fromByteArray(buf)
+	  } else {
+	    return base64.fromByteArray(buf.slice(start, end))
+	  }
+	}
+
+	function utf8Slice (buf, start, end) {
+	  var res = ''
+	  var tmp = ''
+	  end = Math.min(buf.length, end)
+
+	  for (var i = start; i < end; i++) {
+	    if (buf[i] <= 0x7F) {
+	      res += decodeUtf8Char(tmp) + String.fromCharCode(buf[i])
+	      tmp = ''
+	    } else {
+	      tmp += '%' + buf[i].toString(16)
+	    }
+	  }
+
+	  return res + decodeUtf8Char(tmp)
+	}
+
+	function asciiSlice (buf, start, end) {
+	  var ret = ''
+	  end = Math.min(buf.length, end)
+
+	  for (var i = start; i < end; i++) {
+	    ret += String.fromCharCode(buf[i])
+	  }
+	  return ret
+	}
+
+	function binarySlice (buf, start, end) {
+	  return asciiSlice(buf, start, end)
+	}
+
+	function hexSlice (buf, start, end) {
+	  var len = buf.length
+
+	  if (!start || start < 0) start = 0
+	  if (!end || end < 0 || end > len) end = len
+
+	  var out = ''
+	  for (var i = start; i < end; i++) {
+	    out += toHex(buf[i])
+	  }
+	  return out
+	}
+
+	function utf16leSlice (buf, start, end) {
+	  var bytes = buf.slice(start, end)
+	  var res = ''
+	  for (var i = 0; i < bytes.length; i += 2) {
+	    res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256)
+	  }
+	  return res
+	}
+
+	Buffer.prototype.slice = function (start, end) {
+	  var len = this.length
+	  start = ~~start
+	  end = end === undefined ? len : ~~end
+
+	  if (start < 0) {
+	    start += len;
+	    if (start < 0)
+	      start = 0
+	  } else if (start > len) {
+	    start = len
+	  }
+
+	  if (end < 0) {
+	    end += len
+	    if (end < 0)
+	      end = 0
+	  } else if (end > len) {
+	    end = len
+	  }
+
+	  if (end < start)
+	    end = start
+
+	  if (Buffer._useTypedArrays) {
+	    return Buffer._augment(this.subarray(start, end))
+	  } else {
+	    var sliceLen = end - start
+	    var newBuf = new Buffer(sliceLen, undefined, true)
+	    for (var i = 0; i < sliceLen; i++) {
+	      newBuf[i] = this[i + start]
+	    }
+	    return newBuf
+	  }
+	}
+
+	// `get` will be removed in Node 0.13+
+	Buffer.prototype.get = function (offset) {
+	  console.log('.get() is deprecated. Access using array indexes instead.')
+	  return this.readUInt8(offset)
+	}
+
+	// `set` will be removed in Node 0.13+
+	Buffer.prototype.set = function (v, offset) {
+	  console.log('.set() is deprecated. Access using array indexes instead.')
+	  return this.writeUInt8(v, offset)
+	}
+
+	Buffer.prototype.readUInt8 = function (offset, noAssert) {
+	  if (!noAssert) {
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset < this.length, 'Trying to read beyond buffer length')
+	  }
+
+	  if (offset >= this.length)
+	    return
+
+	  return this[offset]
+	}
+
+	function readUInt16 (buf, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 1 < buf.length, 'Trying to read beyond buffer length')
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  var val
+	  if (littleEndian) {
+	    val = buf[offset]
+	    if (offset + 1 < len)
+	      val |= buf[offset + 1] << 8
+	  } else {
+	    val = buf[offset] << 8
+	    if (offset + 1 < len)
+	      val |= buf[offset + 1]
+	  }
+	  return val
+	}
+
+	Buffer.prototype.readUInt16LE = function (offset, noAssert) {
+	  return readUInt16(this, offset, true, noAssert)
+	}
+
+	Buffer.prototype.readUInt16BE = function (offset, noAssert) {
+	  return readUInt16(this, offset, false, noAssert)
+	}
+
+	function readUInt32 (buf, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 3 < buf.length, 'Trying to read beyond buffer length')
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  var val
+	  if (littleEndian) {
+	    if (offset + 2 < len)
+	      val = buf[offset + 2] << 16
+	    if (offset + 1 < len)
+	      val |= buf[offset + 1] << 8
+	    val |= buf[offset]
+	    if (offset + 3 < len)
+	      val = val + (buf[offset + 3] << 24 >>> 0)
+	  } else {
+	    if (offset + 1 < len)
+	      val = buf[offset + 1] << 16
+	    if (offset + 2 < len)
+	      val |= buf[offset + 2] << 8
+	    if (offset + 3 < len)
+	      val |= buf[offset + 3]
+	    val = val + (buf[offset] << 24 >>> 0)
+	  }
+	  return val
+	}
+
+	Buffer.prototype.readUInt32LE = function (offset, noAssert) {
+	  return readUInt32(this, offset, true, noAssert)
+	}
+
+	Buffer.prototype.readUInt32BE = function (offset, noAssert) {
+	  return readUInt32(this, offset, false, noAssert)
+	}
+
+	Buffer.prototype.readInt8 = function (offset, noAssert) {
+	  if (!noAssert) {
+	    assert(offset !== undefined && offset !== null,
+	        'missing offset')
+	    assert(offset < this.length, 'Trying to read beyond buffer length')
+	  }
+
+	  if (offset >= this.length)
+	    return
+
+	  var neg = this[offset] & 0x80
+	  if (neg)
+	    return (0xff - this[offset] + 1) * -1
+	  else
+	    return this[offset]
+	}
+
+	function readInt16 (buf, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 1 < buf.length, 'Trying to read beyond buffer length')
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  var val = readUInt16(buf, offset, littleEndian, true)
+	  var neg = val & 0x8000
+	  if (neg)
+	    return (0xffff - val + 1) * -1
+	  else
+	    return val
+	}
+
+	Buffer.prototype.readInt16LE = function (offset, noAssert) {
+	  return readInt16(this, offset, true, noAssert)
+	}
+
+	Buffer.prototype.readInt16BE = function (offset, noAssert) {
+	  return readInt16(this, offset, false, noAssert)
+	}
+
+	function readInt32 (buf, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 3 < buf.length, 'Trying to read beyond buffer length')
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  var val = readUInt32(buf, offset, littleEndian, true)
+	  var neg = val & 0x80000000
+	  if (neg)
+	    return (0xffffffff - val + 1) * -1
+	  else
+	    return val
+	}
+
+	Buffer.prototype.readInt32LE = function (offset, noAssert) {
+	  return readInt32(this, offset, true, noAssert)
+	}
+
+	Buffer.prototype.readInt32BE = function (offset, noAssert) {
+	  return readInt32(this, offset, false, noAssert)
+	}
+
+	function readFloat (buf, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset + 3 < buf.length, 'Trying to read beyond buffer length')
+	  }
+
+	  return ieee754.read(buf, offset, littleEndian, 23, 4)
+	}
+
+	Buffer.prototype.readFloatLE = function (offset, noAssert) {
+	  return readFloat(this, offset, true, noAssert)
+	}
+
+	Buffer.prototype.readFloatBE = function (offset, noAssert) {
+	  return readFloat(this, offset, false, noAssert)
+	}
+
+	function readDouble (buf, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset + 7 < buf.length, 'Trying to read beyond buffer length')
+	  }
+
+	  return ieee754.read(buf, offset, littleEndian, 52, 8)
+	}
+
+	Buffer.prototype.readDoubleLE = function (offset, noAssert) {
+	  return readDouble(this, offset, true, noAssert)
+	}
+
+	Buffer.prototype.readDoubleBE = function (offset, noAssert) {
+	  return readDouble(this, offset, false, noAssert)
+	}
+
+	Buffer.prototype.writeUInt8 = function (value, offset, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset < this.length, 'trying to write beyond buffer length')
+	    verifuint(value, 0xff)
+	  }
+
+	  if (offset >= this.length) return
+
+	  this[offset] = value
+	  return offset + 1
+	}
+
+	function writeUInt16 (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 1 < buf.length, 'trying to write beyond buffer length')
+	    verifuint(value, 0xffff)
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  for (var i = 0, j = Math.min(len - offset, 2); i < j; i++) {
+	    buf[offset + i] =
+	        (value & (0xff << (8 * (littleEndian ? i : 1 - i)))) >>>
+	            (littleEndian ? i : 1 - i) * 8
+	  }
+	  return offset + 2
+	}
+
+	Buffer.prototype.writeUInt16LE = function (value, offset, noAssert) {
+	  return writeUInt16(this, value, offset, true, noAssert)
+	}
+
+	Buffer.prototype.writeUInt16BE = function (value, offset, noAssert) {
+	  return writeUInt16(this, value, offset, false, noAssert)
+	}
+
+	function writeUInt32 (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 3 < buf.length, 'trying to write beyond buffer length')
+	    verifuint(value, 0xffffffff)
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  for (var i = 0, j = Math.min(len - offset, 4); i < j; i++) {
+	    buf[offset + i] =
+	        (value >>> (littleEndian ? i : 3 - i) * 8) & 0xff
+	  }
+	  return offset + 4
+	}
+
+	Buffer.prototype.writeUInt32LE = function (value, offset, noAssert) {
+	  return writeUInt32(this, value, offset, true, noAssert)
+	}
+
+	Buffer.prototype.writeUInt32BE = function (value, offset, noAssert) {
+	  return writeUInt32(this, value, offset, false, noAssert)
+	}
+
+	Buffer.prototype.writeInt8 = function (value, offset, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset < this.length, 'Trying to write beyond buffer length')
+	    verifsint(value, 0x7f, -0x80)
+	  }
+
+	  if (offset >= this.length)
+	    return
+
+	  if (value >= 0)
+	    this.writeUInt8(value, offset, noAssert)
+	  else
+	    this.writeUInt8(0xff + value + 1, offset, noAssert)
+	  return offset + 1
+	}
+
+	function writeInt16 (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 1 < buf.length, 'Trying to write beyond buffer length')
+	    verifsint(value, 0x7fff, -0x8000)
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  if (value >= 0)
+	    writeUInt16(buf, value, offset, littleEndian, noAssert)
+	  else
+	    writeUInt16(buf, 0xffff + value + 1, offset, littleEndian, noAssert)
+	  return offset + 2
+	}
+
+	Buffer.prototype.writeInt16LE = function (value, offset, noAssert) {
+	  return writeInt16(this, value, offset, true, noAssert)
+	}
+
+	Buffer.prototype.writeInt16BE = function (value, offset, noAssert) {
+	  return writeInt16(this, value, offset, false, noAssert)
+	}
+
+	function writeInt32 (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 3 < buf.length, 'Trying to write beyond buffer length')
+	    verifsint(value, 0x7fffffff, -0x80000000)
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  if (value >= 0)
+	    writeUInt32(buf, value, offset, littleEndian, noAssert)
+	  else
+	    writeUInt32(buf, 0xffffffff + value + 1, offset, littleEndian, noAssert)
+	  return offset + 4
+	}
+
+	Buffer.prototype.writeInt32LE = function (value, offset, noAssert) {
+	  return writeInt32(this, value, offset, true, noAssert)
+	}
+
+	Buffer.prototype.writeInt32BE = function (value, offset, noAssert) {
+	  return writeInt32(this, value, offset, false, noAssert)
+	}
+
+	function writeFloat (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 3 < buf.length, 'Trying to write beyond buffer length')
+	    verifIEEE754(value, 3.4028234663852886e+38, -3.4028234663852886e+38)
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  ieee754.write(buf, value, offset, littleEndian, 23, 4)
+	  return offset + 4
+	}
+
+	Buffer.prototype.writeFloatLE = function (value, offset, noAssert) {
+	  return writeFloat(this, value, offset, true, noAssert)
+	}
+
+	Buffer.prototype.writeFloatBE = function (value, offset, noAssert) {
+	  return writeFloat(this, value, offset, false, noAssert)
+	}
+
+	function writeDouble (buf, value, offset, littleEndian, noAssert) {
+	  if (!noAssert) {
+	    assert(value !== undefined && value !== null, 'missing value')
+	    assert(typeof littleEndian === 'boolean', 'missing or invalid endian')
+	    assert(offset !== undefined && offset !== null, 'missing offset')
+	    assert(offset + 7 < buf.length,
+	        'Trying to write beyond buffer length')
+	    verifIEEE754(value, 1.7976931348623157E+308, -1.7976931348623157E+308)
+	  }
+
+	  var len = buf.length
+	  if (offset >= len)
+	    return
+
+	  ieee754.write(buf, value, offset, littleEndian, 52, 8)
+	  return offset + 8
+	}
+
+	Buffer.prototype.writeDoubleLE = function (value, offset, noAssert) {
+	  return writeDouble(this, value, offset, true, noAssert)
+	}
+
+	Buffer.prototype.writeDoubleBE = function (value, offset, noAssert) {
+	  return writeDouble(this, value, offset, false, noAssert)
+	}
+
+	// fill(value, start=0, end=buffer.length)
+	Buffer.prototype.fill = function (value, start, end) {
+	  if (!value) value = 0
+	  if (!start) start = 0
+	  if (!end) end = this.length
+
+	  assert(end >= start, 'end < start')
+
+	  // Fill 0 bytes; we're done
+	  if (end === start) return
+	  if (this.length === 0) return
+
+	  assert(start >= 0 && start < this.length, 'start out of bounds')
+	  assert(end >= 0 && end <= this.length, 'end out of bounds')
+
+	  var i
+	  if (typeof value === 'number') {
+	    for (i = start; i < end; i++) {
+	      this[i] = value
+	    }
+	  } else {
+	    var bytes = utf8ToBytes(value.toString())
+	    var len = bytes.length
+	    for (i = start; i < end; i++) {
+	      this[i] = bytes[i % len]
+	    }
+	  }
+
+	  return this
+	}
+
+	Buffer.prototype.inspect = function () {
+	  var out = []
+	  var len = this.length
+	  for (var i = 0; i < len; i++) {
+	    out[i] = toHex(this[i])
+	    if (i === exports.INSPECT_MAX_BYTES) {
+	      out[i + 1] = '...'
+	      break
+	    }
+	  }
+	  return '<Buffer ' + out.join(' ') + '>'
+	}
+
+	/**
+	 * Creates a new `ArrayBuffer` with the *copied* memory of the buffer instance.
+	 * Added in Node 0.12. Only available in browsers that support ArrayBuffer.
+	 */
+	Buffer.prototype.toArrayBuffer = function () {
+	  if (typeof Uint8Array !== 'undefined') {
+	    if (Buffer._useTypedArrays) {
+	      return (new Buffer(this)).buffer
+	    } else {
+	      var buf = new Uint8Array(this.length)
+	      for (var i = 0, len = buf.length; i < len; i += 1) {
+	        buf[i] = this[i]
+	      }
+	      return buf.buffer
+	    }
+	  } else {
+	    throw new Error('Buffer.toArrayBuffer not supported in this browser')
+	  }
+	}
+
+	// HELPER FUNCTIONS
+	// ================
+
+	var BP = Buffer.prototype
+
+	/**
+	 * Augment a Uint8Array *instance* (not the Uint8Array class!) with Buffer methods
+	 */
+	Buffer._augment = function (arr) {
+	  arr._isBuffer = true
+
+	  // save reference to original Uint8Array get/set methods before overwriting
+	  arr._get = arr.get
+	  arr._set = arr.set
+
+	  // deprecated, will be removed in node 0.13+
+	  arr.get = BP.get
+	  arr.set = BP.set
+
+	  arr.write = BP.write
+	  arr.toString = BP.toString
+	  arr.toLocaleString = BP.toString
+	  arr.toJSON = BP.toJSON
+	  arr.equals = BP.equals
+	  arr.compare = BP.compare
+	  arr.copy = BP.copy
+	  arr.slice = BP.slice
+	  arr.readUInt8 = BP.readUInt8
+	  arr.readUInt16LE = BP.readUInt16LE
+	  arr.readUInt16BE = BP.readUInt16BE
+	  arr.readUInt32LE = BP.readUInt32LE
+	  arr.readUInt32BE = BP.readUInt32BE
+	  arr.readInt8 = BP.readInt8
+	  arr.readInt16LE = BP.readInt16LE
+	  arr.readInt16BE = BP.readInt16BE
+	  arr.readInt32LE = BP.readInt32LE
+	  arr.readInt32BE = BP.readInt32BE
+	  arr.readFloatLE = BP.readFloatLE
+	  arr.readFloatBE = BP.readFloatBE
+	  arr.readDoubleLE = BP.readDoubleLE
+	  arr.readDoubleBE = BP.readDoubleBE
+	  arr.writeUInt8 = BP.writeUInt8
+	  arr.writeUInt16LE = BP.writeUInt16LE
+	  arr.writeUInt16BE = BP.writeUInt16BE
+	  arr.writeUInt32LE = BP.writeUInt32LE
+	  arr.writeUInt32BE = BP.writeUInt32BE
+	  arr.writeInt8 = BP.writeInt8
+	  arr.writeInt16LE = BP.writeInt16LE
+	  arr.writeInt16BE = BP.writeInt16BE
+	  arr.writeInt32LE = BP.writeInt32LE
+	  arr.writeInt32BE = BP.writeInt32BE
+	  arr.writeFloatLE = BP.writeFloatLE
+	  arr.writeFloatBE = BP.writeFloatBE
+	  arr.writeDoubleLE = BP.writeDoubleLE
+	  arr.writeDoubleBE = BP.writeDoubleBE
+	  arr.fill = BP.fill
+	  arr.inspect = BP.inspect
+	  arr.toArrayBuffer = BP.toArrayBuffer
+
+	  return arr
+	}
+
+	var INVALID_BASE64_RE = /[^+\/0-9A-z]/g
+
+	function base64clean (str) {
+	  // Node strips out invalid characters like \n and \t from the string, base64-js does not
+	  str = stringtrim(str).replace(INVALID_BASE64_RE, '')
+	  // Node allows for non-padded base64 strings (missing trailing ===), base64-js does not
+	  while (str.length % 4 !== 0) {
+	    str = str + '='
+	  }
+	  return str
+	}
+
+	function stringtrim (str) {
+	  if (str.trim) return str.trim()
+	  return str.replace(/^\s+|\s+$/g, '')
+	}
+
+	function isArray (subject) {
+	  return (Array.isArray || function (subject) {
+	    return Object.prototype.toString.call(subject) === '[object Array]'
+	  })(subject)
+	}
+
+	function isArrayish (subject) {
+	  return isArray(subject) || Buffer.isBuffer(subject) ||
+	      subject && typeof subject === 'object' &&
+	      typeof subject.length === 'number'
+	}
+
+	function toHex (n) {
+	  if (n < 16) return '0' + n.toString(16)
+	  return n.toString(16)
+	}
+
+	function utf8ToBytes (str) {
+	  var byteArray = []
+	  for (var i = 0; i < str.length; i++) {
+	    var b = str.charCodeAt(i)
+	    if (b <= 0x7F) {
+	      byteArray.push(b)
+	    } else {
+	      var start = i
+	      if (b >= 0xD800 && b <= 0xDFFF) i++
+	      var h = encodeURIComponent(str.slice(start, i+1)).substr(1).split('%')
+	      for (var j = 0; j < h.length; j++) {
+	        byteArray.push(parseInt(h[j], 16))
+	      }
+	    }
+	  }
+	  return byteArray
+	}
+
+	function asciiToBytes (str) {
+	  var byteArray = []
+	  for (var i = 0; i < str.length; i++) {
+	    // Node's code seems to be doing this and not & 0x7F..
+	    byteArray.push(str.charCodeAt(i) & 0xFF)
+	  }
+	  return byteArray
+	}
+
+	function utf16leToBytes (str) {
+	  var c, hi, lo
+	  var byteArray = []
+	  for (var i = 0; i < str.length; i++) {
+	    c = str.charCodeAt(i)
+	    hi = c >> 8
+	    lo = c % 256
+	    byteArray.push(lo)
+	    byteArray.push(hi)
+	  }
+
+	  return byteArray
+	}
+
+	function base64ToBytes (str) {
+	  return base64.toByteArray(str)
+	}
+
+	function blitBuffer (src, dst, offset, length) {
+	  for (var i = 0; i < length; i++) {
+	    if ((i + offset >= dst.length) || (i >= src.length))
+	      break
+	    dst[i + offset] = src[i]
+	  }
+	  return i
+	}
+
+	function decodeUtf8Char (str) {
+	  try {
+	    return decodeURIComponent(str)
+	  } catch (err) {
+	    return String.fromCharCode(0xFFFD) // UTF 8 invalid char
+	  }
+	}
+
+	/*
+	 * We have to make sure that the value is a valid integer. This means that it
+	 * is non-negative. It has no fractional component and that it does not
+	 * exceed the maximum allowed value.
+	 */
+	function verifuint (value, max) {
+	  assert(typeof value === 'number', 'cannot write a non-number as a number')
+	  assert(value >= 0, 'specified a negative value for writing an unsigned value')
+	  assert(value <= max, 'value is larger than maximum value for type')
+	  assert(Math.floor(value) === value, 'value has a fractional component')
+	}
+
+	function verifsint (value, max, min) {
+	  assert(typeof value === 'number', 'cannot write a non-number as a number')
+	  assert(value <= max, 'value larger than maximum allowed value')
+	  assert(value >= min, 'value smaller than minimum allowed value')
+	  assert(Math.floor(value) === value, 'value has a fractional component')
+	}
+
+	function verifIEEE754 (value, max, min) {
+	  assert(typeof value === 'number', 'cannot write a non-number as a number')
+	  assert(value <= max, 'value larger than maximum allowed value')
+	  assert(value >= min, 'value smaller than minimum allowed value')
+	}
+
+	function assert (test, message) {
+	  if (!test) throw new Error(message || 'Failed assertion')
+	}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(32).Buffer))
+
+/***/ },
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -7462,7 +8187,564 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Copyright (c) 2013-2014 Vidigami
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/vidigami/backbone-orm
-	  Dependencies: Backbone.js, Underscore.js, and Moment.js.
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var ModelStream, stream,
+	  __hasProp = {}.hasOwnProperty,
+	  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+	try {
+	  stream = __webpack_require__(3);
+	} catch (_error) {}
+
+	if (stream != null ? stream.Readable : void 0) {
+	  module.exports = ModelStream = (function(_super) {
+	    __extends(ModelStream, _super);
+
+	    function ModelStream(model_type, query) {
+	      this.model_type = model_type;
+	      this.query = query != null ? query : {};
+	      ModelStream.__super__.constructor.call(this, {
+	        objectMode: true
+	      });
+	    }
+
+	    ModelStream.prototype._read = function() {
+	      var done;
+	      if (this.ended || this.started) {
+	        return;
+	      }
+	      this.started = true;
+	      done = (function(_this) {
+	        return function(err) {
+	          _this.ended = true;
+	          if (err) {
+	            _this.emit('error', err);
+	          }
+	          return _this.push(null);
+	        };
+	      })(this);
+	      return this.model_type.each(this.query, ((function(_this) {
+	        return function(model, callback) {
+	          _this.push(model);
+	          return callback();
+	        };
+	      })(this)), done);
+	    };
+
+	    return ModelStream;
+
+	  })(stream.Readable);
+	}
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var Cursor, Queue, _;
+
+	_ = __webpack_require__(1);
+
+	Queue = __webpack_require__(10);
+
+	Cursor = null;
+
+	module.exports = function(model_type, query, iterator, callback) {
+	  var method, model_limit, options, parsed_query, processed_count, runBatch;
+	  if (!Cursor) {
+	    Cursor = __webpack_require__(20);
+	  }
+	  options = query.$each || {};
+	  method = options.json ? 'toJSON' : 'toModels';
+	  processed_count = 0;
+	  parsed_query = Cursor.parseQuery(_.omit(query, '$each'));
+	  _.defaults(parsed_query.cursor, {
+	    $offset: 0,
+	    $sort: 'id'
+	  });
+	  model_limit = parsed_query.cursor.$limit || Infinity;
+	  if (options.fetch) {
+	    parsed_query.cursor.$limit = options.fetch;
+	  }
+	  runBatch = function() {
+	    var cursor;
+	    cursor = model_type.cursor(parsed_query);
+	    return cursor[method].call(cursor, function(err, models) {
+	      var model, queue, _fn, _i, _len;
+	      if (err || !models) {
+	        return callback(new Error("Failed to get models. Error: " + err));
+	      }
+	      if (!models.length) {
+	        return callback(null, processed_count);
+	      }
+	      queue = new Queue(options.threads);
+	      _fn = function(model) {
+	        return queue.defer(function(callback) {
+	          return iterator(model, callback);
+	        });
+	      };
+	      for (_i = 0, _len = models.length; _i < _len; _i++) {
+	        model = models[_i];
+	        if (processed_count++ >= model_limit) {
+	          break;
+	        }
+	        _fn(model);
+	      }
+	      return queue.await(function(err) {
+	        if (err) {
+	          return callback(err);
+	        }
+	        if ((processed_count >= model_limit) || (models.length < parsed_query.cursor.$limit) || !parsed_query.cursor.$limit) {
+	          return callback(null, processed_count);
+	        }
+	        parsed_query.cursor.$offset += parsed_query.cursor.$limit;
+	        return runBatch();
+	      });
+	    });
+	  };
+	  return runBatch();
+	};
+
+
+/***/ },
+/* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var DateUtils, INTERVAL_TYPES, Queue, Utils, _;
+
+	_ = __webpack_require__(1);
+
+	Queue = __webpack_require__(10);
+
+	Utils = __webpack_require__(7);
+
+	DateUtils = __webpack_require__(9);
+
+	INTERVAL_TYPES = ['milliseconds', 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months', 'years'];
+
+	module.exports = function(model_type, query, iterator, callback) {
+	  var iteration_info, key, no_models, options, queue, range;
+	  options = query.$interval || {};
+	  if (!(key = options.key)) {
+	    throw new Error('missing option: key');
+	  }
+	  if (!options.type) {
+	    throw new Error('missing option: type');
+	  }
+	  if (!_.contains(INTERVAL_TYPES, options.type)) {
+	    throw new Error("type is not recognized: " + options.type + ", " + (_.contains(INTERVAL_TYPES, options.type)));
+	  }
+	  iteration_info = _.clone(options);
+	  if (!iteration_info.range) {
+	    iteration_info.range = {};
+	  }
+	  range = iteration_info.range;
+	  no_models = false;
+	  queue = new Queue(1);
+	  queue.defer(function(callback) {
+	    var start;
+	    if (!(start = range.$gte || range.$gt)) {
+	      return model_type.cursor(query).limit(1).sort(key).toModels(function(err, models) {
+	        if (err) {
+	          return callback(err);
+	        }
+	        if (!models.length) {
+	          no_models = true;
+	          return callback();
+	        }
+	        range.start = iteration_info.first = models[0].get(key);
+	        return callback();
+	      });
+	    } else {
+	      range.start = start;
+	      return model_type.findOneNearestDate(start, {
+	        key: key,
+	        reverse: true
+	      }, query, function(err, model) {
+	        if (err) {
+	          return callback(err);
+	        }
+	        if (!model) {
+	          no_models = true;
+	          return callback();
+	        }
+	        iteration_info.first = model.get(key);
+	        return callback();
+	      });
+	    }
+	  });
+	  queue.defer(function(callback) {
+	    var end;
+	    if (no_models) {
+	      return callback();
+	    }
+	    if (!(end = range.$lte || range.$lt)) {
+	      return model_type.cursor(query).limit(1).sort("-" + key).toModels(function(err, models) {
+	        if (err) {
+	          return callback(err);
+	        }
+	        if (!models.length) {
+	          no_models = true;
+	          return callback();
+	        }
+	        range.end = iteration_info.last = models[0].get(key);
+	        return callback();
+	      });
+	    } else {
+	      range.end = end;
+	      return model_type.findOneNearestDate(end, {
+	        key: key
+	      }, query, function(err, model) {
+	        if (err) {
+	          return callback(err);
+	        }
+	        if (!model) {
+	          no_models = true;
+	          return callback();
+	        }
+	        iteration_info.last = model.get(key);
+	        return callback();
+	      });
+	    }
+	  });
+	  return queue.await(function(err) {
+	    var length_ms, processed_count, runInterval, start_ms;
+	    if (err) {
+	      return callback(err);
+	    }
+	    if (no_models) {
+	      return callback();
+	    }
+	    start_ms = range.start.getTime();
+	    length_ms = DateUtils.durationAsMilliseconds((_.isUndefined(options.length) ? 1 : options.length), options.type);
+	    if (!length_ms) {
+	      throw Error("length_ms is invalid: " + length_ms + " for range: " + (JSONUtils.stringify(range)));
+	    }
+	    query = _.omit(query, '$interval');
+	    query.$sort = [key];
+	    processed_count = 0;
+	    iteration_info.index = 0;
+	    runInterval = function(current) {
+	      if (DateUtils.isAfter(current, range.end)) {
+	        return callback();
+	      }
+	      query[key] = {
+	        $gte: current,
+	        $lte: iteration_info.last
+	      };
+	      return model_type.findOne(query, function(err, model) {
+	        var next;
+	        if (err) {
+	          return callback(err);
+	        }
+	        if (!model) {
+	          return callback();
+	        }
+	        next = model.get(key);
+	        iteration_info.index = Math.floor((next.getTime() - start_ms) / length_ms);
+	        current = new Date(range.start.getTime() + iteration_info.index * length_ms);
+	        iteration_info.start = current;
+	        next = new Date(current.getTime() + length_ms);
+	        iteration_info.end = next;
+	        query[key] = {
+	          $gte: current,
+	          $lt: next
+	        };
+	        return iterator(query, iteration_info, function(err) {
+	          if (err) {
+	            return callback(err);
+	          }
+	          return runInterval(next);
+	        });
+	      });
+	    };
+	    return runInterval(range.start);
+	  });
+	};
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var Backbone, Utils, collection_type, fn, key, overrides, _;
+
+	_ = __webpack_require__(1);
+
+	Backbone = __webpack_require__(2);
+
+	Utils = __webpack_require__(7);
+
+	collection_type = Backbone.Collection;
+
+	overrides = {
+	  fetch: function(options) {
+	    var callback;
+	    if (_.isFunction(callback = arguments[arguments.length - 1])) {
+	      switch (arguments.length) {
+	        case 1:
+	          options = Utils.wrapOptions({}, callback);
+	          break;
+	        case 2:
+	          options = Utils.wrapOptions(options, callback);
+	      }
+	    }
+	    return collection_type.prototype._orm_original_fns.fetch.call(this, Utils.wrapOptions(options, (function(_this) {
+	      return function(err, model, resp, options) {
+	        if (err) {
+	          return typeof options.error === "function" ? options.error(_this, resp, options) : void 0;
+	        }
+	        return typeof options.success === "function" ? options.success(model, resp, options) : void 0;
+	      };
+	    })(this)));
+	  },
+	  _prepareModel: function(attrs, options) {
+	    var id, is_new, model;
+	    if (!Utils.isModel(attrs) && (id = Utils.dataId(attrs))) {
+	      if (this.model.cache) {
+	        is_new = !!this.model.cache.get(id);
+	      }
+	      model = Utils.updateOrNew(attrs, this.model);
+	      if (is_new && !model._validate(attrs, options)) {
+	        this.trigger('invalid', this, attrs, options);
+	        return false;
+	      }
+	      return model;
+	    }
+	    return collection_type.prototype._orm_original_fns._prepareModel.call(this, attrs, options);
+	  }
+	};
+
+	if (!collection_type.prototype._orm_original_fns) {
+	  collection_type.prototype._orm_original_fns = {};
+	  for (key in overrides) {
+	    fn = overrides[key];
+	    collection_type.prototype._orm_original_fns[key] = collection_type.prototype[key];
+	    collection_type.prototype[key] = fn;
+	  }
+	}
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
+	 */
+	var Backbone, BackboneORM, Queue, Relation, Utils, _;
+
+	_ = __webpack_require__(1);
+
+	Backbone = __webpack_require__(2);
+
+	BackboneORM = __webpack_require__(4);
+
+	Queue = __webpack_require__(10);
+
+	Utils = __webpack_require__(7);
+
+	module.exports = Relation = (function() {
+	  function Relation() {}
+
+	  Relation.prototype.isEmbedded = function() {
+	    return !!(this.embed || (this.reverse_relation && this.reverse_relation.embed));
+	  };
+
+	  Relation.prototype.isVirtual = function() {
+	    return !!(this.virtual || (this.reverse_relation && this.reverse_relation.virtual));
+	  };
+
+	  Relation.prototype.findOrGenerateJoinTable = function() {
+	    var join_table;
+	    if (join_table = this.join_table || this.reverse_relation.join_table) {
+	      return join_table;
+	    }
+	    return this.model_type.schema().generateJoinTable(this);
+	  };
+
+	  Relation.prototype._findOrGenerateReverseRelation = function() {
+	    var model_type, reverse_model_type, reverse_relation;
+	    model_type = this.model_type;
+	    reverse_model_type = this.reverse_model_type;
+	    if (!_.isFunction(reverse_model_type.schema)) {
+	      reverse_model_type.sync = model_type.createSync(reverse_model_type);
+	    }
+	    reverse_relation = reverse_model_type.relation(this.as);
+	    if (!reverse_relation) {
+	      reverse_relation = reverse_model_type.relation(BackboneORM.naming_conventions.attribute(model_type.model_name, false));
+	    }
+	    if (!reverse_relation) {
+	      reverse_relation = reverse_model_type.relation(BackboneORM.naming_conventions.attribute(model_type.model_name, true));
+	    }
+	    if (!reverse_relation && (this.type !== 'belongsTo')) {
+	      reverse_relation = reverse_model_type.schema().generateBelongsTo(model_type);
+	    }
+	    if (reverse_relation && !reverse_relation.reverse_relation) {
+	      reverse_relation.reverse_relation = this;
+	    }
+	    return reverse_relation;
+	  };
+
+	  Relation.prototype._saveRelated = function(model, related_models, callback) {
+	    if (this.embed || !this.reverse_relation || (this.type === 'belongsTo')) {
+	      return callback();
+	    }
+	    if (this.isVirtual()) {
+	      return callback();
+	    }
+	    return this.cursor(model, this.key).toJSON((function(_this) {
+	      return function(err, json) {
+	        var added_id, added_ids, changes, queue, related_id, related_ids, related_json, related_model, test, _fn, _fn1, _fn2, _i, _j, _k, _len, _len1, _len2, _ref;
+	        if (err) {
+	          return callback(err);
+	        }
+	        if (!_.isArray(json)) {
+	          json = (json ? [json] : []);
+	        }
+	        queue = new Queue(1);
+	        related_ids = _.pluck(related_models, 'id');
+	        changes = _.groupBy(json, function(test) {
+	          if (_.contains(related_ids, test.id)) {
+	            return 'kept';
+	          } else {
+	            return 'removed';
+	          }
+	        });
+	        added_ids = changes.kept ? _.difference(related_ids, (function() {
+	          var _i, _len, _ref, _results;
+	          _ref = changes.kept;
+	          _results = [];
+	          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	            test = _ref[_i];
+	            _results.push(test.id);
+	          }
+	          return _results;
+	        })()) : related_ids;
+	        if (changes.removed) {
+	          if (_this.join_table) {
+	            queue.defer(function(callback) {
+	              var query, related_json;
+	              query = {};
+	              query[_this.reverse_relation.join_key] = {
+	                $in: (function() {
+	                  var _i, _len, _ref, _results;
+	                  _ref = changes.removed;
+	                  _results = [];
+	                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	                    related_json = _ref[_i];
+	                    _results.push(related_json[this.reverse_model_type.prototype.idAttribute]);
+	                  }
+	                  return _results;
+	                }).call(_this)
+	              };
+	              return _this.join_table.destroy(query, callback);
+	            });
+	          } else {
+	            _ref = changes.removed;
+	            _fn = function(related_json) {
+	              return queue.defer(function(callback) {
+	                related_json[_this.reverse_relation.foreign_key] = null;
+	                return Utils.modelJSONSave(related_json, _this.reverse_model_type, callback);
+	              });
+	            };
+	            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	              related_json = _ref[_i];
+	              _fn(related_json);
+	            }
+	          }
+	        }
+	        if (added_ids.length) {
+	          if (_this.join_table) {
+	            _fn1 = function(related_id) {
+	              return queue.defer(function(callback) {
+	                var attributes, join;
+	                attributes = {};
+	                attributes[_this.foreign_key] = model.id;
+	                attributes[_this.reverse_relation.foreign_key] = related_id;
+	                join = new _this.join_table(attributes);
+	                return join.save(callback);
+	              });
+	            };
+	            for (_j = 0, _len1 = added_ids.length; _j < _len1; _j++) {
+	              related_id = added_ids[_j];
+	              _fn1(related_id);
+	            }
+	          } else {
+	            _fn2 = function(related_model) {
+	              return queue.defer(function(callback) {
+	                return related_model.save(function(err, saved_model) {
+	                  var cache;
+	                  if (!err && (cache = _this.reverse_model_type.cache)) {
+	                    cache.set(saved_model.id, saved_model);
+	                  }
+	                  return callback(err);
+	                });
+	              });
+	            };
+	            for (_k = 0, _len2 = added_ids.length; _k < _len2; _k++) {
+	              added_id = added_ids[_k];
+	              related_model = _.find(related_models, function(test) {
+	                return test.id === added_id;
+	              });
+	              if (!_this.reverse_relation._hasChanged(related_model)) {
+	                continue;
+	              }
+	              _fn2(related_model);
+	            }
+	          }
+	        }
+	        return queue.await(callback);
+	      };
+	    })(this));
+	  };
+
+	  return Relation;
+
+	})();
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  backbone-orm.js 0.6.0
+	  Copyright (c) 2013-2014 Vidigami
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/vidigami/backbone-orm
+	  Dependencies: Backbone.js and Underscore.js.
 	 */
 	var CacheCursor, _,
 	  __hasProp = {}.hasOwnProperty,
@@ -7483,7 +8765,223 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return CacheCursor;
 
-	})(__webpack_require__(10));
+	})(__webpack_require__(20));
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports.read = function(buffer, offset, isLE, mLen, nBytes) {
+	  var e, m,
+	      eLen = nBytes * 8 - mLen - 1,
+	      eMax = (1 << eLen) - 1,
+	      eBias = eMax >> 1,
+	      nBits = -7,
+	      i = isLE ? (nBytes - 1) : 0,
+	      d = isLE ? -1 : 1,
+	      s = buffer[offset + i];
+
+	  i += d;
+
+	  e = s & ((1 << (-nBits)) - 1);
+	  s >>= (-nBits);
+	  nBits += eLen;
+	  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+	  m = e & ((1 << (-nBits)) - 1);
+	  e >>= (-nBits);
+	  nBits += mLen;
+	  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
+
+	  if (e === 0) {
+	    e = 1 - eBias;
+	  } else if (e === eMax) {
+	    return m ? NaN : ((s ? -1 : 1) * Infinity);
+	  } else {
+	    m = m + Math.pow(2, mLen);
+	    e = e - eBias;
+	  }
+	  return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
+	};
+
+	exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
+	  var e, m, c,
+	      eLen = nBytes * 8 - mLen - 1,
+	      eMax = (1 << eLen) - 1,
+	      eBias = eMax >> 1,
+	      rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0),
+	      i = isLE ? 0 : (nBytes - 1),
+	      d = isLE ? 1 : -1,
+	      s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0;
+
+	  value = Math.abs(value);
+
+	  if (isNaN(value) || value === Infinity) {
+	    m = isNaN(value) ? 1 : 0;
+	    e = eMax;
+	  } else {
+	    e = Math.floor(Math.log(value) / Math.LN2);
+	    if (value * (c = Math.pow(2, -e)) < 1) {
+	      e--;
+	      c *= 2;
+	    }
+	    if (e + eBias >= 1) {
+	      value += rt / c;
+	    } else {
+	      value += rt * Math.pow(2, 1 - eBias);
+	    }
+	    if (value * c >= 2) {
+	      e++;
+	      c /= 2;
+	    }
+
+	    if (e + eBias >= eMax) {
+	      m = 0;
+	      e = eMax;
+	    } else if (e + eBias >= 1) {
+	      m = (value * c - 1) * Math.pow(2, mLen);
+	      e = e + eBias;
+	    } else {
+	      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+	      e = 0;
+	    }
+	  }
+
+	  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8);
+
+	  e = (e << mLen) | m;
+	  eLen += mLen;
+	  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8);
+
+	  buffer[offset + i - d] |= s * 128;
+	};
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+	;(function (exports) {
+		'use strict';
+
+	  var Arr = (typeof Uint8Array !== 'undefined')
+	    ? Uint8Array
+	    : Array
+
+		var PLUS   = '+'.charCodeAt(0)
+		var SLASH  = '/'.charCodeAt(0)
+		var NUMBER = '0'.charCodeAt(0)
+		var LOWER  = 'a'.charCodeAt(0)
+		var UPPER  = 'A'.charCodeAt(0)
+
+		function decode (elt) {
+			var code = elt.charCodeAt(0)
+			if (code === PLUS)
+				return 62 // '+'
+			if (code === SLASH)
+				return 63 // '/'
+			if (code < NUMBER)
+				return -1 //no match
+			if (code < NUMBER + 10)
+				return code - NUMBER + 26 + 26
+			if (code < UPPER + 26)
+				return code - UPPER
+			if (code < LOWER + 26)
+				return code - LOWER + 26
+		}
+
+		function b64ToByteArray (b64) {
+			var i, j, l, tmp, placeHolders, arr
+
+			if (b64.length % 4 > 0) {
+				throw new Error('Invalid string. Length must be a multiple of 4')
+			}
+
+			// the number of equal signs (place holders)
+			// if there are two placeholders, than the two characters before it
+			// represent one byte
+			// if there is only one, then the three characters before it represent 2 bytes
+			// this is just a cheap hack to not do indexOf twice
+			var len = b64.length
+			placeHolders = '=' === b64.charAt(len - 2) ? 2 : '=' === b64.charAt(len - 1) ? 1 : 0
+
+			// base64 is 4/3 + up to two characters of the original data
+			arr = new Arr(b64.length * 3 / 4 - placeHolders)
+
+			// if there are placeholders, only get up to the last complete 4 chars
+			l = placeHolders > 0 ? b64.length - 4 : b64.length
+
+			var L = 0
+
+			function push (v) {
+				arr[L++] = v
+			}
+
+			for (i = 0, j = 0; i < l; i += 4, j += 3) {
+				tmp = (decode(b64.charAt(i)) << 18) | (decode(b64.charAt(i + 1)) << 12) | (decode(b64.charAt(i + 2)) << 6) | decode(b64.charAt(i + 3))
+				push((tmp & 0xFF0000) >> 16)
+				push((tmp & 0xFF00) >> 8)
+				push(tmp & 0xFF)
+			}
+
+			if (placeHolders === 2) {
+				tmp = (decode(b64.charAt(i)) << 2) | (decode(b64.charAt(i + 1)) >> 4)
+				push(tmp & 0xFF)
+			} else if (placeHolders === 1) {
+				tmp = (decode(b64.charAt(i)) << 10) | (decode(b64.charAt(i + 1)) << 4) | (decode(b64.charAt(i + 2)) >> 2)
+				push((tmp >> 8) & 0xFF)
+				push(tmp & 0xFF)
+			}
+
+			return arr
+		}
+
+		function uint8ToBase64 (uint8) {
+			var i,
+				extraBytes = uint8.length % 3, // if we have 1 byte left, pad 2 bytes
+				output = "",
+				temp, length
+
+			function encode (num) {
+				return lookup.charAt(num)
+			}
+
+			function tripletToBase64 (num) {
+				return encode(num >> 18 & 0x3F) + encode(num >> 12 & 0x3F) + encode(num >> 6 & 0x3F) + encode(num & 0x3F)
+			}
+
+			// go through the array every three bytes, we'll deal with trailing stuff later
+			for (i = 0, length = uint8.length - extraBytes; i < length; i += 3) {
+				temp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+				output += tripletToBase64(temp)
+			}
+
+			// pad the end with zeros, but make sure to not forget the extra bytes
+			switch (extraBytes) {
+				case 1:
+					temp = uint8[uint8.length - 1]
+					output += encode(temp >> 2)
+					output += encode((temp << 4) & 0x3F)
+					output += '=='
+					break
+				case 2:
+					temp = (uint8[uint8.length - 2] << 8) + (uint8[uint8.length - 1])
+					output += encode(temp >> 10)
+					output += encode((temp >> 4) & 0x3F)
+					output += encode((temp << 2) & 0x3F)
+					output += '='
+					break
+			}
+
+			return output
+		}
+
+		exports.toByteArray = b64ToByteArray
+		exports.fromByteArray = uint8ToBase64
+	}(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
 
 /***/ }

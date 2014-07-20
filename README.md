@@ -176,13 +176,15 @@ Building, Running and Testing the library
 2. Build and run tests: `npm test`
 3. Build documents: `npm run docs`
 
+# One Time
 To run all tests (Node.js only):
 
 ```
 mocha --grep '' test/**/*.tests.coffee
 ```
 
-To run all tests (Node.js only) with TDD:
+# TDD
+To run all tests (Node.js only) in multiple terminals run:
 
 ```
 npm run watch

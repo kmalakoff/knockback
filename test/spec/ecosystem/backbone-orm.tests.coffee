@@ -16,7 +16,7 @@ describe 'Knockback.js with BackboneORM', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  BackboneORM.CacheSingletons.ModelCache.configure({enabled: true, max: 100})
+  BackboneORM.configure(model_cache: {enabled: true, max: 100})
 
   class Person extends Backbone.Model
     model_name: 'Person'
