@@ -17,7 +17,10 @@ module.exports = (callback) ->
   TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if process.argv[2]?.indexOf?('quick') >= 0 # quick
   for name, tests of TEST_GROUPS
     for test in tests
-      do (test) -> queue.defer (callback) -> gutil.log "RUNNING TESTS: #{test.name}"; karma.start(_.defaults({files: test.files}, BASE_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value) )
+      do (test) -> queue.defer (callback) ->
+        gutil.log "RUNNING TESTS: #{test.name}"
+        gutil.log "#{JSON.stringify test.files}"
+        karma.start _.defaults({files: test.files}, BASE_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value)
 
   queue.await (err) ->
     Wrench.rmdirSyncRecursive('./_temp', true) unless err

@@ -8,14 +8,14 @@
 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("knockout"), require("backbone"), require("underscore"));
+		module.exports = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["knockout", "backbone", "underscore"], factory);
+		define(["knockout", "backbone", "underscore"], (function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_18__, __WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__) { return factory(__WEBPACK_EXTERNAL_MODULE_18__, __WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__, root["jQuery"]); }));
 	else if(typeof exports === 'object')
-		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"));
+		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else
-		root["kb"] = factory(root["ko"], root["Backbone"], root["_"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_18__, __WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__) {
+		root["kb"] = factory(root["ko"], root["Backbone"], root["_"], root["jQuery"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_18__, __WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -246,10 +246,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CollectionObservable.prototype.destroy = function() {
 	    var array, collection, observable;
 	    observable = kb.utils.wrappedObservable(this);
-	    collection = this._collection();
+	    collection = kb.peek(this._collection);
 	    if (collection) {
 	      collection.unbind('all', this.__kb._onCollectionChange);
-	      array = observable();
+	      array = kb.peek(observable);
 	      array.splice(0, array.length);
 	    }
 	    this.collection.dispose();
@@ -859,7 +859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -868,7 +868,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var $, kb, ko, onReady, _, _ko_applyBindings;
+	var $, kb, ko, onReady, window, _, _ko_applyBindings;
+
+	window = window != null ? window : global;
 
 	kb = __webpack_require__(5);
 
@@ -952,8 +954,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        findElements(child_el);
 	      }
 	    };
-	    if (!root && (typeof document !== "undefined" && document !== null)) {
-	      root = document;
+	    if (!root && (window != null ? window.document : void 0)) {
+	      root = window.document;
 	    }
 	    findElements(root);
 	    for (_i = 0, _len = results.length; _i < _len; _i++) {
@@ -1009,13 +1011,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })();
 	  }
 	}
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -1024,7 +1027,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var Backbone, copyProps, kb, ko, _;
+	var Backbone, copyProps, kb, ko, window, _;
+
+	window = window != null ? window : global;
 
 	ko = __webpack_require__(18);
 
@@ -1195,11 +1200,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.renderTemplate = function(template, view_model, options) {
-	    var el, observable;
+	    var document, el, observable;
 	    if (options == null) {
 	      options = {};
 	    }
-	    if (typeof document === "undefined" || document === null) {
+	    if (!(document = window != null ? window.document : void 0)) {
 	      return typeof console !== "undefined" && console !== null ? console.log('renderTemplate: document is undefined') : void 0;
 	    }
 	    el = document.createElement('div');
@@ -1290,7 +1295,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	if (typeof window !== "undefined" && window !== null ? window.Parse : void 0) {
+	if (window.Parse) {
 	  Backbone = kb.Parse = window.Parse;
 	  _ = kb._ = window.Parse._;
 	} else {
@@ -1306,8 +1311,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.Events = Backbone.Events;
 
-	kb.$ = (typeof window !== "undefined" && window !== null ? window.jQuery : void 0) || (typeof window !== "undefined" && window !== null ? window.$ : void 0);
+	kb.$ = window.jQuery || window.$;
 
+	try {
+	  kb.$ || (kb.$ = __webpack_require__(21));
+	} catch (_error) {}
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 6 */
@@ -1565,7 +1575,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -1574,7 +1584,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, kb, _;
+	var AssociatedModel, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, RelationalModel, Supermodel, kb, root, _;
+
+	root = typeof window !== "undefined" && window !== null ? window : global;
 
 	kb = __webpack_require__(5);
 
@@ -1632,17 +1644,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.orm = new ORM();
 
+	RelationalModel = null;
+
 	ORMAdapter_BackboneRelational = (function() {
 	  function ORMAdapter_BackboneRelational() {}
 
 	  ORMAdapter_BackboneRelational.prototype.isAvailable = function() {
 	    var _ref;
-	    return !!((_ref = kb.Backbone) != null ? _ref.RelationalModel : void 0);
+	    return !!(RelationalModel = (_ref = kb.Backbone) != null ? _ref.RelationalModel : void 0);
 	  };
 
 	  ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
 	    var relation;
-	    if (!(model instanceof kb.Backbone.RelationalModel)) {
+	    if (!(model instanceof RelationalModel)) {
 	      return null;
 	    }
 	    if (!(relation = _.find(model.getRelations(), function(test) {
@@ -1671,7 +1685,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	      return update();
 	    };
-	    events = Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
+	    events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
 	    if (type === kb.TYPE_COLLECTION) {
 	      for (_i = 0, _len = events.length; _i < _len; _i++) {
 	        event = events[_i];
@@ -1699,16 +1713,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.orm.addAdapter(new ORMAdapter_BackboneRelational());
 
+	AssociatedModel = null;
+
 	ORMAdapter_BackboneAssociations = (function() {
 	  function ORMAdapter_BackboneAssociations() {}
 
 	  ORMAdapter_BackboneAssociations.prototype.isAvailable = function() {
 	    var _ref;
-	    return !!((_ref = kb.Backbone) != null ? _ref.AssociatedModel : void 0);
+	    return !!(AssociatedModel = (_ref = kb.Backbone) != null ? _ref.AssociatedModel : void 0);
 	  };
 
 	  ORMAdapter_BackboneAssociations.prototype.keys = function(model) {
-	    if (!(model instanceof kb.Backbone.AssociatedModel)) {
+	    if (!(model instanceof AssociatedModel)) {
 	      return null;
 	    }
 	    return _.map(model.relations, function(test) {
@@ -1718,7 +1734,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  ORMAdapter_BackboneAssociations.prototype.relationType = function(model, key) {
 	    var relation;
-	    if (!(model instanceof kb.Backbone.AssociatedModel)) {
+	    if (!(model instanceof AssociatedModel)) {
 	      return null;
 	    }
 	    if (!(relation = _.find(model.relations, function(test) {
@@ -1739,11 +1755,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
 
+	Supermodel = null;
+
 	ORMAdapter_Supermodel = (function() {
 	  function ORMAdapter_Supermodel() {}
 
 	  ORMAdapter_Supermodel.prototype.isAvailable = function() {
-	    return !!(typeof window !== "undefined" && window !== null ? window.Supermodel : void 0);
+	    return !!(Supermodel = root.Supermodel);
 	  };
 
 	  ORMAdapter_Supermodel.prototype.keys = function(model) {
@@ -1804,7 +1822,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	kb.orm.addAdapter(new ORMAdapter_Supermodel());
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 8 */
@@ -2644,7 +2663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb;
+	var kb, key, _i, _len, _ref;
 
 	module.exports = kb = __webpack_require__(5);
 
@@ -2655,14 +2674,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	if (typeof window !== "undefined" && window !== null) {
-	  window._ || (window._ = kb._);
-	  if (kb.Backbone) {
-	    window.Backbone || (window.Backbone = kb.Backbone);
+	  _ref = ['_', 'Backbone', 'Parse', 'ko', '$'];
+	  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	    key = _ref[_i];
+	    if (kb[key] && !window.hasOwnProperty(key)) {
+	      window[key] = kb[key];
+	    }
 	  }
-	  if (kb.Parse) {
-	    window.Parse || (window.Parse = kb.Parse);
-	  }
-	  window.ko || (window.ko = kb.ko);
 	}
 
 
@@ -2687,7 +2705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	ko = kb.ko;
 
-	__webpack_require__(21);
+	__webpack_require__(22);
 
 	module.exports = kb.DefaultObservable = (function() {
 	  function DefaultObservable(target_observable, dv) {
@@ -3078,7 +3096,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	$ = kb.$;
 
-	__webpack_require__(22);
+	__webpack_require__(23);
 
 	callOrGet = function(value) {
 	  value = ko.utils.unwrapObservable(value);
@@ -3243,6 +3261,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
+	if(typeof __WEBPACK_EXTERNAL_MODULE_21__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
+	module.exports = __WEBPACK_EXTERNAL_MODULE_21__;
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
 	
 	/*
 	  knockback.js 0.18.6
@@ -3302,7 +3327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	

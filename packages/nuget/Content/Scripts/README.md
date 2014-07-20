@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/kmalakoff/knockback.png)](http://travis-ci.org/kmalakoff/knockback)
+[![Build Status](https://secure.travis-ci.org/kmalakoff/knockback.png)](http://travis-ci.org/kmalakoff/knockback#master)
 
 ![logo](https://github.com/kmalakoff/knockback/raw/master/media/logo.png)
 
@@ -175,3 +175,18 @@ Building, Running and Testing the library
 1. Build: `npm run build`
 2. Build and run tests: `npm test`
 3. Build documents: `npm run docs`
+
+# One Time
+To run all tests (Node.js only):
+
+```
+mocha --grep '' test/**/*.tests.coffee
+```
+
+# TDD
+To run all tests (Node.js only) in multiple terminals run:
+
+```
+npm run watch
+mocha --grep '' test/**/*.tests.coffee --watch
+```
