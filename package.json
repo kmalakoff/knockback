@@ -24,7 +24,7 @@
   },
   "scripts": {
     "test": "gulp test",
-    "test-quick": "gulp test-node-quick",
+    "test-quick": "gulp test-quick",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
     "build": "gulp build",
     "watch": "gulp watch",
@@ -58,6 +58,7 @@
     "gulp-webpack-config": "*",
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
+    "gulp-nuget-mono": "*",
     "jquery": "*",
     "karma": "*",
     "karma-chai": "^0.1.0",

@@ -12,6 +12,7 @@ rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
 mocha = require 'gulp-mocha'
+nuget = require 'gulp-nuget-mono'
 
 HEADER = module.exports = """
 /*
@@ -58,8 +59,7 @@ gulp.task 'test-node', ['minify'], testNode = (callback) ->
   require './test/lib/node_jquery_xhr' # ensure that globals for the target backend are loaded
   gulp.src('test/spec/**/*.tests.coffee')
     .pipe(mocha({}))
-    .pipe es.writeArray (err, array) ->
-      callback(err)
+    .pipe es.writeArray callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'test-browsers', ['minify'], testBrowsers = (callback) ->
@@ -73,7 +73,7 @@ gulp.task 'test', ['minify'], (callback) ->
 
 gulp.task 'test-quick', ['build'], testNode
 
-gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so doesn't return exit code
+gulp.task 'publish', ['minify'], (callback) ->
   copyLibraryFiles = (destination, others, callback) ->
     gulp.src(LIBRARY_FILES.concat(['README.md'].concat(others)))
       .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
@@ -83,5 +83,9 @@ gulp.task 'release', ['minify'], (callback) -> # minify: manually call tests so 
   queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
   queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
+  queue.defer (callback) ->
+    gulp.src('packages/nuget/*.nuspec')
+      .pipe(nuget({pack: true, push: true}))
+      .pipe es.writeArray callback
   queue.await (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
