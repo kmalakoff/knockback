@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-root = if window? then window else global
+window = if window? then window else global
 ko = require 'knockout'
 
 # From Backbone.js (https:github.com/documentcloud/backbone)
@@ -223,7 +223,7 @@ module.exports = class kb
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @renderTemplate: (template, view_model, options={}) ->
-    return console?.log 'renderTemplate: document is undefined' unless document?
+    return console?.log 'renderTemplate: document is undefined' unless document = window?.document
 
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
@@ -275,9 +275,9 @@ module.exports = class kb
   @publishMethods: (observable, instance, methods) -> observable[fn] = kb._.bind(instance[fn], instance) for fn in methods; return
   @peek: (obs) -> return obs unless ko.isObservable(obs); return obs.peek() if obs.peek; return kb.ignore -> obs()
 
-if root.Parse
-  Backbone = kb.Parse = root.Parse
-  _ = kb._ = root.Parse._
+if window.Parse
+  Backbone = kb.Parse = window.Parse
+  _ = kb._ = window.Parse._
 else
   Backbone = kb.Backbone = require 'backbone'
   _ = kb._ = require 'underscore'
@@ -288,4 +288,5 @@ kb.Collection = Backbone.Collection
 kb.Model = Backbone.Object or Backbone.Model
 kb.Events = Backbone.Events
 
-kb.$ = root.jQuery or root.$ # or require 'jquery' # webpack optionals
+kb.$ = window.jQuery or window.$
+try kb.$ or= require 'jquery' # webpack optionals

@@ -1,6 +1,7 @@
 assert = assert or require?('chai').assert
 
 describe 'knockback-validation.js', ->
+  window = if window? then window else global
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$
@@ -48,7 +49,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator', (done) ->
-    return done() unless window?
+    return done() unless $
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -90,7 +91,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator with custom validators', (done) ->
-    return done() unless window?
+    return done() unless $
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -144,7 +145,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.inputValidator with validation_options', (done) ->
-    return done() unless window?
+    return done() unless $
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -213,7 +214,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator with name', (done) ->
-    return done() unless window?
+    return done() unless $
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -285,7 +286,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator no name with validation_options', (done) ->
-    return done() unless window?
+    return done() unless $
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -364,7 +365,7 @@ describe 'knockback-validation.js', ->
     done()
 
   it 'kb.formValidator with inject and disable', (done) ->
-    return done() unless window?
+    return done() unless $
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 

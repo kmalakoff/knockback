@@ -55,6 +55,7 @@ gulp.task 'minify', ['build'], (callback) ->
 
 gulp.task 'test-node', ['minify'], testNode = (callback) ->
   gutil.log 'Running Node.js tests'
+  require './test/lib/node_jquery_xhr' # ensure that globals for the target backend are loaded
   gulp.src('test/spec/**/*.tests.coffee')
     .pipe(mocha({}))
     .pipe es.writeArray (err, array) ->

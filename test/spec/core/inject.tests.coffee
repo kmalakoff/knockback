@@ -1,10 +1,11 @@
 assert = assert or require?('chai').assert
 
 describe 'knockback-inject.js', ->
-  return unless window? # only for the dom
+  window = if window? then window else global
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$
+  return unless $ # no jquery
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -14,6 +15,7 @@ describe 'knockback-inject.js', ->
     assert.ok(!!kb, 'kb')
     done()
 
+  window.kb = kb
   window.appCreate = (view_model) -> view_model.app_create = true
 
   window.app = (view_model) ->
@@ -32,14 +34,14 @@ describe 'knockback-inject.js', ->
 
     return @ # return self
 
-  class window.SuperClass
+  window.SuperClass = class SuperClass
     constructor: ->
       @super_class = true
       kb.statistics.register('SuperClass', @)
     destroy: ->
       kb.statistics.unregister('SuperClass', @)
 
-  class window.SubClass extends SuperClass
+  window.SubClass = class SubClass extends SuperClass
     constructor: ->
       super
       @sub_class = true

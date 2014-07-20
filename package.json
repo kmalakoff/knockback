@@ -68,6 +68,7 @@
     "karma-mocha": "^0.1.4",
     "karma-phantomjs-launcher": "^0.1.4",
     "karma-safari-launcher": "^0.1.1",
+    "node-jquery-xhr": "^1.8.3",
     "mocha": "*",
     "queue-async": "*",
     "webpack": "git+https://github.com/forivall/webpack#master",

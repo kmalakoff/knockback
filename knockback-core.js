@@ -8,14 +8,14 @@
 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("knockout"), require("backbone"), require("underscore"));
+		module.exports = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["knockout", "backbone", "underscore"], factory);
+		define(["knockout", "backbone", "underscore"], (function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_13__, __WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__) { return factory(__WEBPACK_EXTERNAL_MODULE_13__, __WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__, root["jQuery"]); }));
 	else if(typeof exports === 'object')
-		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"));
+		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else
-		root["kb"] = factory(root["ko"], root["Backbone"], root["_"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_13__, __WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__) {
+		root["kb"] = factory(root["ko"], root["Backbone"], root["_"], root["jQuery"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_13__, __WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -854,7 +854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -863,7 +863,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var $, kb, ko, onReady, _, _ko_applyBindings;
+	var $, kb, ko, onReady, window, _, _ko_applyBindings;
+
+	window = window != null ? window : global;
 
 	kb = __webpack_require__(5);
 
@@ -947,8 +949,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        findElements(child_el);
 	      }
 	    };
-	    if (!root && (typeof document !== "undefined" && document !== null)) {
-	      root = document;
+	    if (!root && (window != null ? window.document : void 0)) {
+	      root = window.document;
 	    }
 	    findElements(root);
 	    for (_i = 0, _len = results.length; _i < _len; _i++) {
@@ -1004,7 +1006,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })();
 	  }
 	}
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 5 */
@@ -1019,9 +1022,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var Backbone, copyProps, kb, ko, root, _;
+	var Backbone, copyProps, kb, ko, window, _;
 
-	root = typeof window !== "undefined" && window !== null ? window : global;
+	window = window != null ? window : global;
 
 	ko = __webpack_require__(13);
 
@@ -1192,11 +1195,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.renderTemplate = function(template, view_model, options) {
-	    var el, observable;
+	    var document, el, observable;
 	    if (options == null) {
 	      options = {};
 	    }
-	    if (typeof document === "undefined" || document === null) {
+	    if (!(document = window != null ? window.document : void 0)) {
 	      return typeof console !== "undefined" && console !== null ? console.log('renderTemplate: document is undefined') : void 0;
 	    }
 	    el = document.createElement('div');
@@ -1287,9 +1290,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	if (root.Parse) {
-	  Backbone = kb.Parse = root.Parse;
-	  _ = kb._ = root.Parse._;
+	if (window.Parse) {
+	  Backbone = kb.Parse = window.Parse;
+	  _ = kb._ = window.Parse._;
 	} else {
 	  Backbone = kb.Backbone = __webpack_require__(14);
 	  _ = kb._ = __webpack_require__(15);
@@ -1303,7 +1306,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.Events = Backbone.Events;
 
-	kb.$ = root.jQuery || root.$;
+	kb.$ = window.jQuery || window.$;
+
+	try {
+	  kb.$ || (kb.$ = __webpack_require__(16));
+	} catch (_error) {}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -2689,6 +2696,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_15__;
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	if(typeof __WEBPACK_EXTERNAL_MODULE_16__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
+	module.exports = __WEBPACK_EXTERNAL_MODULE_16__;
 
 /***/ }
 /******/ ])

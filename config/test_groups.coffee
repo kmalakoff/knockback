@@ -14,7 +14,7 @@ KNOCKBACK =
 REQUIRED_DEPENDENCIES =
   backbone_underscore_latest: ['./vendor/optional/jquery-2.1.1.js', './vendor/underscore-1.6.0.js', './vendor/backbone-1.1.2.js', './vendor/knockout-3.1.0.js']
   backbone_underscore_legacy: ['./vendor/optional/jquery-2.1.1.js', './vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js']
-  backbone_lodash_latest: ['./vendor/optional/jquery-2.1.1.js', './vendor/optional/lodash-0.3.2.js', './vendor/backbone-1.1.2.js', './vendor/knockout-3.1.0.js']
+  backbone_lodash_latest: ['./vendor/optional/lodash-0.3.2.js', './vendor/backbone-1.1.2.js', './vendor/knockout-3.1.0.js']
   backbone_lodash_legacy: ['./vendor/optional/jquery-2.1.1.js', './vendor/optional/lodash-2.4.1.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js']
   parse_latest: ['./vendor/optional/jquery-2.1.1.js', './vendor/optional/parse-1.2.0.js', './vendor/knockout-1.2.1.js']
 

@@ -15,7 +15,7 @@
 		exports["kb"] = factory(require("jquery"));
 	else
 		root["kb"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_16__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_13__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -854,7 +854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	
+	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 0.18.6
 	  Copyright (c)  2011-2014 Kevin Malakoff.
@@ -863,7 +863,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var $, kb, ko, onReady, _, _ko_applyBindings;
+	var $, kb, ko, onReady, window, _, _ko_applyBindings;
+
+	window = window != null ? window : global;
 
 	kb = __webpack_require__(5);
 
@@ -947,8 +949,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        findElements(child_el);
 	      }
 	    };
-	    if (!root && (typeof document !== "undefined" && document !== null)) {
-	      root = document;
+	    if (!root && (window != null ? window.document : void 0)) {
+	      root = window.document;
 	    }
 	    findElements(root);
 	    for (_i = 0, _len = results.length; _i < _len; _i++) {
@@ -1004,7 +1006,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })();
 	  }
 	}
-
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 5 */
@@ -1019,11 +1022,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var Backbone, copyProps, kb, ko, root, _;
+	var Backbone, copyProps, kb, ko, window, _;
 
-	root = typeof window !== "undefined" && window !== null ? window : global;
+	window = window != null ? window : global;
 
-	ko = __webpack_require__(15);
+	ko = __webpack_require__(16);
 
 	copyProps = function(dest, source) {
 	  var key, value;
@@ -1192,11 +1195,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.renderTemplate = function(template, view_model, options) {
-	    var el, observable;
+	    var document, el, observable;
 	    if (options == null) {
 	      options = {};
 	    }
-	    if (typeof document === "undefined" || document === null) {
+	    if (!(document = window != null ? window.document : void 0)) {
 	      return typeof console !== "undefined" && console !== null ? console.log('renderTemplate: document is undefined') : void 0;
 	    }
 	    el = document.createElement('div');
@@ -1287,12 +1290,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	if (root.Parse) {
-	  Backbone = kb.Parse = root.Parse;
-	  _ = kb._ = root.Parse._;
+	if (window.Parse) {
+	  Backbone = kb.Parse = window.Parse;
+	  _ = kb._ = window.Parse._;
 	} else {
-	  Backbone = kb.Backbone = __webpack_require__(13);
-	  _ = kb._ = __webpack_require__(14);
+	  Backbone = kb.Backbone = __webpack_require__(14);
+	  _ = kb._ = __webpack_require__(15);
 	}
 
 	kb.ko = ko;
@@ -1303,7 +1306,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.Events = Backbone.Events;
 
-	kb.$ = root.jQuery || root.$;
+	kb.$ = window.jQuery || window.$;
+
+	try {
+	  kb.$ || (kb.$ = __webpack_require__(13));
+	} catch (_error) {}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
@@ -2676,6 +2683,12 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
+	module.exports = __WEBPACK_EXTERNAL_MODULE_13__;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.1.2
 
 	//     (c) 2010-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -2687,7 +2700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(14), __webpack_require__(16), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(15), __webpack_require__(13), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -4287,7 +4300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.6.0
@@ -5636,7 +5649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module) {// Knockout JavaScript library v3.1.0
@@ -10110,12 +10123,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17)(module)))
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_16__;
 
 /***/ },
 /* 17 */

@@ -7,6 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
+window = if window? then window else global
+
 kb = require './kb'
 _ = kb._; ko = kb.ko
 $ = kb.$
@@ -133,7 +135,7 @@ class kb.Inject
           results.push({el: el, view_model: {}, binding: attr.value})
       findElements(child_el) for child_el in el.childNodes
       return
-    root = document if not root and document?
+    root = window.document if not root and window?.document
     findElements(root)
 
     # bind the view models
