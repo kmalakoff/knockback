@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -84,7 +84,7 @@
 <p><a href="index.html">Knockback.js</a> provides an a few helpers to inject ViewModels into your HTML Views in a similar way to <a href="http://angularjs.org/">AngularJS&#39;s</a> <code>ng-app</code> so you can build up an application by dynamically binding observables directly from your HTML.</p>
 <p>The following examples show how you might port AngularJS samples to Knockback to help you compare approaches. There&#39;s nothing complicated here, just a <code>kb-inject</code> attribute and a custom <code>inject</code> Knockout binding to add observables to your ViewModel.</p>
 <p>The main way to bind a View when your page is loaded, is to use a <code>kb-inject</code> attribute on your HTML elements. You can optionally provide some hooks if you like:</p>
-<p>For more examples and information, please see the <a href="doc/class/kb/Inject.html#injectViewModels-static">API Documentation</a>.</p>
+<p>For more examples and information, please see the <a href="doc/classes/kb.html#injectViewModels-class">API Documentation</a>.</p>
 
         <pre>&lt;!-- BIND WITHOUT PARAMETERS - create a new view model and bind the hierachy --&gt;
 &lt;html kb-inject&gt;
@@ -92,13 +92,13 @@
 &lt;/html&gt;
 
 &lt;!-- BIND WITH PARAMETERS - create a custom view model and callback after bind --&gt;
-&lt;html kb-inject=&quot;view_model: {name: ko.observable('')}, afterBinding: yourFunction&quot;&gt;
+&lt;html kb-inject=&quot;view_model: {name: ko.observable(&#39;&#39;)}, afterBinding: yourFunction&quot;&gt;
   &lt;!-- YOUR VIEW HERE !! --&gt;
 &lt;/html&gt;
 </pre><p>In addition to help you inject observables to your ViewModel, you can use the &#39;inject&#39; custom binding. It accepts an object to extend your ViewModel or a function of the form yourFunction(view_model, element) to allow you to extend the view model by hand:</p>
 
         <pre>&lt;!-- INJECT A TO EXTEND YOUR VIEW MODEL --&gt;
-&lt;div data-bind=&quot;inject: {name: ko.observable('')}&quot;&gt;&lt;/div&gt;
+&lt;div data-bind=&quot;inject: {name: ko.observable(&#39;&#39;)}&quot;&gt;&lt;/div&gt;
 
 &lt;!-- INJECT A USING A CUSTOM FUNCTION --&gt;
 &lt;div data-bind=&quot;inject: ProjectAppController&quot;&gt;&lt;/div&gt;
@@ -107,21 +107,21 @@
 <p>There are a few helpers to get us started:</p>
 
         <pre data-for="cs"># helper to toggle classes
-ko.bindingHandlers['classes'] =
+ko.bindingHandlers[&#39;classes&#39;] =
   update: (element, value_accessor) -&gt;
     for key, state of ko.utils.unwrapObservable(value_accessor())
-      $(element)[if ko.utils.unwrapObservable(state) then 'addClass' else 'removeClass'](key)
+      $(element)[if ko.utils.unwrapObservable(state) then &#39;addClass&#39; else &#39;removeClass&#39;](key)
     return
 
 # helpers to manage push state
 window.loadUrl = (url) -&gt; Backbone.history.loadUrl(url)
 window.loadUrlFn = (url) -&gt; return -&gt; Backbone.history.loadUrl(url)</pre>
         <pre data-for="js">// helper to toggle classes
-ko.bindingHandlers['classes'] = {
+ko.bindingHandlers[&#39;classes&#39;] = {
   update: function(element, value_accessor) {
     var classes = ko.utils.unwrapObservable(value_accessor());
     for (var key in classes) {
-      $(element)[ko.utils.unwrapObservable(classes[key]) ? 'addClass' : 'removeClass'](key);
+      $(element)[ko.utils.unwrapObservable(classes[key]) ? &#39;addClass&#39; : &#39;removeClass&#39;](key);
     }
 }};
 
@@ -133,11 +133,11 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
         <div class="row-fluid">
           <div class="span8">
             <h4>View (HTML)</h4>
-            <pre>&lt;div kb-inject=&quot;yourName: ko.observable('')&quot;&gt;
+            <pre>&lt;div kb-inject=&quot;yourName: ko.observable(&#39;&#39;)&quot;&gt;
   &lt;label&gt;Name:&lt;/label&gt;
-  &lt;input type=&quot;text&quot; data-bind=&quot;value: yourName, valueUpdate: 'keyup'&quot; placeholder=&quot;Enter a name here&quot;&gt;
+  &lt;input type=&quot;text&quot; data-bind=&quot;value: yourName, valueUpdate: &#39;keyup&#39;&quot; placeholder=&quot;Enter a name here&quot;&gt;
   &lt;hr&gt;
-  &lt;h1 data-bind=&quot;text: 'Hello ' + yourName() + '!'&quot;&gt;&lt;/h1&gt;
+  &lt;h1 data-bind=&quot;text: &#39;Hello &#39; + yourName() + &#39;!&#39;&quot;&gt;&lt;/h1&gt;
 &lt;/div&gt;</pre>
           </div>
           <div class="span4">
@@ -152,7 +152,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
           </div>
         </div><p>You could have just as easily written the first line like:</p>
 
-        <pre>&lt;div data-bind=&quot;inject: {yourName: ko.observable('')}&quot; kb-inject&gt;
+        <pre>&lt;div data-bind=&quot;inject: {yourName: ko.observable(&#39;&#39;)}&quot; kb-inject&gt;
 </pre><h2 id="todo-example">Todo Example</h2>
 <p>The todo example uses a custom &#39;TodoCtrl&#39; inject function to add some functions and observables to your view model. Then you can bind them to your HTML using standard Knockout bindings.</p>
 
@@ -168,7 +168,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
                 <pre>&lt;div kb-inject&gt;
   &lt;h2&gt;Todo&lt;/h2&gt;
   &lt;div data-bind=&quot;inject: TodoCtrl&quot;&gt;
-    &lt;span data-bind=&quot;text: remaining() + ' of ' + todos().length + ' remaining'&quot;&gt;&lt;/span&gt;
+    &lt;span data-bind=&quot;text: remaining() + &#39; of &#39; + todos().length + &#39; remaining&#39;&quot;&gt;&lt;/span&gt;
     [ &lt;a href=&quot;&quot; data-bind=&quot;click: archive&quot;&gt;archive&lt;/a&gt; ]
     &lt;ul class=&quot;unstyled&quot; data-bind=&quot;foreach: todos&quot;&gt;
       &lt;li&gt;
@@ -187,14 +187,14 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
               <div id="kbi_todo_view_model" class="tab-pane">
                 <pre data-for="cs">TodoCtrl = (view_model) -&gt;
   view_model.todos = ko.observableArray([
-    {text:'learn knockback', done:ko.observable(true)},
-    {text:'build a knockback app', done:ko.observable(false)}]
+    {text:&#39;learn knockback&#39;, done:ko.observable(true)},
+    {text:&#39;build a knockback app&#39;, done:ko.observable(false)}]
   )
 
-  view_model.todoText = ko.observable('')
+  view_model.todoText = ko.observable(&#39;&#39;)
   view_model.addTodo = -&gt;
     view_model.todos.push({text:view_model.todoText(), done:ko.observable(false)})
-    view_model.todoText('')
+    view_model.todoText(&#39;&#39;)
 
   view_model.remaining = ko.computed(-&gt;
     return _.reduce(view_model.todos(), ((count, todo) -&gt; return count + (if todo.done() then 0 else 1)), 0)
@@ -205,14 +205,14 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
   return</pre>
                 <pre data-for="js">var TodoCtrl = function(view_model) {
   view_model.todos = ko.observableArray([
-    {text: 'learn knockback', done: ko.observable(true)},
-    {text: 'build a knockback app', done: ko.observable(false)}
+    {text: &#39;learn knockback&#39;, done: ko.observable(true)},
+    {text: &#39;build a knockback app&#39;, done: ko.observable(false)}
   ]);
 
-  view_model.todoText = ko.observable('');
+  view_model.todoText = ko.observable(&#39;&#39;);
   view_model.addTodo = function() {
     view_model.todos.push({text: view_model.todoText(), done: ko.observable(false)});
-    view_model.todoText('');
+    view_model.todoText(&#39;&#39;);
   };
 
   view_model.remaining = ko.computed(function() {
@@ -257,7 +257,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
             </div>
           </div>
         </div><h2 id="project-example">Project Example</h2>
-<p>Before we start the example, you should review the <a href="doc/class/kb/Validation.html">validations documentation</a>.
+<p>Before we start the example, you should review the <a href="doc/classes/kb/Validation.html">validations documentation</a>.
 Now on with the example! This example shows:</p>
 <ul>
 <li>how you can set up a Backbone.Router to control an embedded page using the &#39;kb-inject&#39; afterBinding callback</li>
@@ -343,13 +343,13 @@ Now on with the example! This example shows:</p>
               <div id="kbi_project_list_view" class="tab-pane">
                 <pre>&lt;script type=&quot;text/x-jquery-tmpl&quot; id=&quot;list.html&quot;&gt;
   &lt;div&gt;
-    &lt;input type=&quot;text&quot; class=&quot;search-query&quot; placeholder=&quot;Search&quot; data-bind=&quot;value: filter, valueUpdate: 'keyup'&quot;&gt;
+    &lt;input type=&quot;text&quot; class=&quot;search-query&quot; placeholder=&quot;Search&quot; data-bind=&quot;value: filter, valueUpdate: &#39;keyup&#39;&quot;&gt;
     &lt;table&gt;
       &lt;thead&gt;
       &lt;tr&gt;
         &lt;th&gt;Project&lt;/th&gt;
         &lt;th&gt;Description&lt;/th&gt;
-        &lt;th&gt;&lt;a data-bind=&quot;click: loadUrlFn('new')&quot;&gt;&lt;i class=&quot;icon-plus-sign&quot;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/th&gt;
+        &lt;th&gt;&lt;a data-bind=&quot;click: loadUrlFn(&#39;new&#39;)&quot;&gt;&lt;i class=&quot;icon-plus-sign&quot;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/th&gt;
       &lt;/tr&gt;
       &lt;/thead&gt;
       &lt;tbody&gt;
@@ -358,7 +358,7 @@ Now on with the example! This example shows:</p>
           &lt;td&gt;&lt;a data-bind=&quot;attr: {href: site}, text: name&quot;target=&quot;_blank&quot;&gt;&lt;/a&gt;&lt;/td&gt;
           &lt;td data-bind=&quot;text: description&quot;&gt;&lt;/td&gt;
           &lt;td&gt;
-            &lt;a data-bind=&quot;click: loadUrlFn('edit/' + id())&quot;&gt;&lt;i class=&quot;icon-pencil&quot;&gt;&lt;/i&gt;&lt;/a&gt;
+            &lt;a data-bind=&quot;click: loadUrlFn(&#39;edit/&#39; + id())&quot;&gt;&lt;i class=&quot;icon-pencil&quot;&gt;&lt;/i&gt;&lt;/a&gt;
           &lt;/td&gt;
         &lt;/tr&gt;
       &lt;!-- /ko --&gt;
@@ -372,14 +372,14 @@ Now on with the example! This example shows:</p>
   &lt;form name=&quot;myForm&quot; data-bind=&quot;inject: kb.formValidator&quot;&gt;
     &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.name().$error_count}&quot;&gt;
       &lt;label&gt;Name&lt;/label&gt;
-      &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name, valueUpdate: 'keyup'&quot; required&gt;
+      &lt;input type=&quot;text&quot; name=&quot;name&quot; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot; required&gt;
       &lt;span data-bind=&quot;visible: $myForm.name().required&quot; class=&quot;help-inline&quot;&gt;
           Required&lt;/span&gt;
     &lt;/div&gt;
 
     &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.site().$error_count}&quot;&gt;
       &lt;label&gt;Website&lt;/label&gt;
-      &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site, valueUpdate: 'keyup'&quot; required&gt;
+      &lt;input type=&quot;url&quot; name=&quot;site&quot; data-bind=&quot;value: site, valueUpdate: &#39;keyup&#39;&quot; required&gt;
       &lt;span data-bind=&quot;visible: $myForm.site().required&quot; class=&quot;help-inline&quot;&gt;
           Required&lt;/span&gt;
       &lt;span data-bind=&quot;visible: $myForm.site().url&quot; class=&quot;help-inline&quot;&gt;
@@ -390,7 +390,7 @@ Now on with the example! This example shows:</p>
     &lt;textarea name=&quot;description&quot; data-bind=&quot;value: description&quot;&gt;&lt;/textarea&gt;
 
     &lt;br&gt;
-    &lt;a class=&quot;btn&quot; data-bind=&quot;click: loadUrlFn('')&quot;&gt;Cancel&lt;/a&gt;
+    &lt;a class=&quot;btn&quot; data-bind=&quot;click: loadUrlFn(&#39;&#39;)&quot;&gt;Cancel&lt;/a&gt;
     &lt;button data-bind=&quot;click: save, disable: isClean() || $myForm.$error_count()&quot;
             class=&quot;btn btn-primary&quot;&gt;Save&lt;/button&gt;
     &lt;button data-bind=&quot;click: onDelete&quot;
@@ -400,7 +400,7 @@ Now on with the example! This example shows:</p>
               </div>
               <div id="kbi_project_app_controller" class="tab-pane">
                 <pre data-for="cs">ProjectAppController = (view_model, element) -&gt;
-  knockback_model = {id: 'id_kb', name: 'Knockback.js', description: 'Backbone.js + Knockout.js is amazingly!', site: 'http://kmalakoff.github.com/knockback/'}
+  knockback_model = {id: &#39;id_kb&#39;, name: &#39;Knockback.js&#39;, description: &#39;Backbone.js + Knockout.js is amazingly!&#39;, site: &#39;http://kmalakoff.github.com/knockback/&#39;}
   projects = new ProjectCollection([knockback_model])
   projects.fetch()
 
@@ -410,16 +410,16 @@ Now on with the example! This example shows:</p>
     element.appendChild(active_el = el)
 
   router = new Backbone.Router()
-  router.route('*path', null, -&gt; _.defer(loadUrlFn('')))
-  router.route('', null, -&gt;
-    loadPage(kb.renderTemplate('list.html', new ProjectListViewModel(projects)))
+  router.route(&#39;*path&#39;, null, -&gt; _.defer(loadUrlFn(&#39;&#39;)))
+  router.route(&#39;&#39;, null, -&gt;
+    loadPage(kb.renderTemplate(&#39;list.html&#39;, new ProjectListViewModel(projects)))
   )
-  router.route('new', null, -&gt;
-    loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(new Project(), projects)))
+  router.route(&#39;new&#39;, null, -&gt;
+    loadPage(kb.renderTemplate(&#39;detail.html&#39;, new ProjectViewModel(new Project(), projects)))
   )
-  router.route('edit/:projectId', null, (project_id) -&gt;
-    (loadUrl(''); return) unless project = projects.get(project_id) # not a valid project
-    loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(project)))
+  router.route(&#39;edit/:projectId&#39;, null, (project_id) -&gt;
+    (loadUrl(&#39;&#39;); return) unless project = projects.get(project_id) # not a valid project
+    loadPage(kb.renderTemplate(&#39;detail.html&#39;, new ProjectViewModel(project)))
   )
   return
 
@@ -427,7 +427,7 @@ Now on with the example! This example shows:</p>
 projectAppStartRouting = -&gt;
   Backbone.history.start({pushState: true, root: window.location.pathname}) unless Backbone.History.started</pre>
                 <pre data-for="js">var ProjectAppController = function(view_model, element) {
-  var knockback_model = {id: 'id_kb', name: 'Knockback.js', description: 'Backbone.js + Knockout.js is amazingly!', site: 'http://kmalakoff.github.com/knockback/'};
+  var knockback_model = {id: &#39;id_kb&#39;, name: &#39;Knockback.js&#39;, description: &#39;Backbone.js + Knockout.js is amazingly!&#39;, site: &#39;http://kmalakoff.github.com/knockback/&#39;};
   var projects = new ProjectCollection([knockback_model]);
   projects.fetch();
 
@@ -437,17 +437,17 @@ projectAppStartRouting = -&gt;
     return element.appendChild(active_el = el);
   };
   router = new Backbone.Router();
-  router.route('*path', null, function() {_.defer(loadUrlFn('')); });
-  router.route('', null, function() {
-    return loadPage(kb.renderTemplate('list.html', new ProjectListViewModel(projects)));
+  router.route(&#39;*path&#39;, null, function() {_.defer(loadUrlFn(&#39;&#39;)); });
+  router.route(&#39;&#39;, null, function() {
+    return loadPage(kb.renderTemplate(&#39;list.html&#39;, new ProjectListViewModel(projects)));
   });
-  router.route('new', null, function() {
-    return loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(new Project(), projects)));
+  router.route(&#39;new&#39;, null, function() {
+    return loadPage(kb.renderTemplate(&#39;detail.html&#39;, new ProjectViewModel(new Project(), projects)));
   });
-  router.route('edit/:projectId', null, function(project_id) {
+  router.route(&#39;edit/:projectId&#39;, null, function(project_id) {
     var project;
-    if (!(project = projects.get(project_id))) {loadUrl(''); return; } // not a valid project
-    return loadPage(kb.renderTemplate('detail.html', new ProjectViewModel(project)));
+    if (!(project = projects.get(project_id))) {loadUrl(&#39;&#39;); return; } // not a valid project
+    return loadPage(kb.renderTemplate(&#39;detail.html&#39;, new ProjectViewModel(project)));
   });
 };
 
@@ -459,8 +459,8 @@ var projectAppStartRouting = function() {
 };</pre>
               </div>
               <div id="kbi_project_collection" class="tab-pane">
-                <pre data-for="cs">PROJECTS_BASE_URL = 'https://api.mongolab.com/api/1/databases/angularjs/collections/projects'
-PROJECTS_API_KEY_PARAM = 'apiKey=4f847ad3e4b08a2eed5f3b54'
+                <pre data-for="cs">PROJECTS_BASE_URL = &#39;https://api.mongolab.com/api/1/databases/angularjs/collections/projects&#39;
+PROJECTS_API_KEY_PARAM = &#39;apiKey=4f847ad3e4b08a2eed5f3b54&#39;
 
 Project = Backbone.Model.extend({
   url: -&gt; &quot;#{PROJECTS_BASE_URL}/#{@id}?#{PROJECTS_API_KEY_PARAM}&quot;
@@ -470,8 +470,8 @@ ProjectCollection = Backbone.Collection.extend({
   parse: (data) -&gt; return _.map(data, (item) -&gt; item.id = item._id.$oid; return item) # remap the ids
   model: Project
 })</pre>
-                <pre data-for="js">var PROJECTS_BASE_URL = 'https://api.mongolab.com/api/1/databases/angularjs/collections/projects';
-var PROJECTS_API_KEY_PARAM = 'apiKey=4f847ad3e4b08a2eed5f3b54';
+                <pre data-for="js">var PROJECTS_BASE_URL = &#39;https://api.mongolab.com/api/1/databases/angularjs/collections/projects&#39;;
+var PROJECTS_API_KEY_PARAM = &#39;apiKey=4f847ad3e4b08a2eed5f3b54&#39;;
 
 var Project = Backbone.Model.extend({
   url: function() { return &quot;&quot; + PROJECTS_BASE_URL + &quot;/&quot; + this.id + &quot;?&quot; + PROJECTS_API_KEY_PARAM;}
@@ -483,26 +483,26 @@ var Project = Backbone.Model.extend({
               </div>
               <div id="kbi_project_list_view_model" class="tab-pane">
                 <pre data-for="cs">ProjectListViewModel = (projects) -&gt;
-  @filter = ko.observable('')
+  @filter = ko.observable(&#39;&#39;)
   @projects = kb.collectionObservable(projects, {
     view_model: ProjectViewModel
-    sort_attribute: 'name'
+    sort_attribute: &#39;name&#39;
     filters: [(model) =&gt;
       return true unless filter = @filter()
-      return (model.get('name').search(filter) &gt;= 0)
+      return (model.get(&#39;name&#39;).search(filter) &gt;= 0)
     ]
   })
   return</pre>
                 <pre data-for="js">var ProjectListViewModel = function(projects) {
   var _this = this;
-  this.filter = ko.observable('');
+  this.filter = ko.observable(&#39;&#39;);
   this.projects = kb.collectionObservable(projects, {
     view_model: ProjectViewModel,
-    sort_attribute: 'name',
+    sort_attribute: &#39;name&#39;,
     filters: [function(model) {
       var filter = _this.filter();
       if (!filter) return true;
-      return model.get('name').search(filter) &gt;= 0;
+      return model.get(&#39;name&#39;).search(filter) &gt;= 0;
     }]
   });
 };</pre>
@@ -510,45 +510,45 @@ var Project = Backbone.Model.extend({
               <div id="kbi_project_view_model" class="tab-pane">
                 <pre data-for="cs">ProjectViewModel = kb.ViewModel.extend({
   constructor: (project, projects) -&gt;
-    kb.ViewModel.prototype.constructor.call(@, project, {requires: ['id', 'name', 'site', 'description']})
+    kb.ViewModel.prototype.constructor.call(@, project, {requires: [&#39;id&#39;, &#39;name&#39;, &#39;site&#39;, &#39;description&#39;]})
 
     start_attributes = _.clone(project.attributes)
-    @model_changed = kb.triggeredObservable(project, 'change')
+    @model_changed = kb.triggeredObservable(project, &#39;change&#39;)
     @isClean = ko.computed(=&gt;
       @model_changed() # create a depdendency
       return _.isEqual(start_attributes, project.attributes)
     )
     @onDelete = -&gt; # destroy() is reserved for ViewModel lifecycle
       project.destroy() unless project.isNew()
-      loadUrl('')
+      loadUrl(&#39;&#39;)
       return false
     @save = -&gt;
       projects.add(project) if project.isNew()
       project.save()
-      loadUrl('')
+      loadUrl(&#39;&#39;)
       return false
     return
 })</pre>
                 <pre data-for="js">var ProjectViewModel = kb.ViewModel.extend({
   constructor: function(project, projects) {
     var _this = this;
-    kb.ViewModel.prototype.constructor.call(this, project, {requires: ['id', 'name', 'site', 'description']});
+    kb.ViewModel.prototype.constructor.call(this, project, {requires: [&#39;id&#39;, &#39;name&#39;, &#39;site&#39;, &#39;description&#39;]});
 
     var start_attributes = _.clone(project.attributes);
-    this.model_changed = kb.triggeredObservable(project, 'change');
+    this.model_changed = kb.triggeredObservable(project, &#39;change&#39;);
     this.isClean = ko.computed(function() {
       _this.model_changed(); //create a depdendency
       return _.isEqual(start_attributes, project.attributes);
     });
     this.onDelete = function() { // destroy() is reserved for ViewModel lifecycle
       if (!project.isNew()) project.destroy();
-      loadUrl('');
+      loadUrl(&#39;&#39;);
       return false;
     };
     this.save = function() {
       if (project.isNew()) projects.add(project);
       project.save();
-      loadUrl('');
+      loadUrl(&#39;&#39;);
       return false;
     };
   }

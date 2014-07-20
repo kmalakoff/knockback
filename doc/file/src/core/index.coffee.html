@@ -3,68 +3,62 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <script src='../../javascript/application.js'></script>
-  <script src='../../javascript/search.js'></script>
-  <link rel='stylesheet' href='../../stylesheets/application.css' type='text/css'>
+  <script src='../../../javascript/application.js'></script>
+  <script src='../../../javascript/search.js'></script>
+  <link rel='stylesheet' href='../../../stylesheets/application.css' type='text/css'>
 </head>
   <body>
-    <div id='base' data-path='../../'></div>
+    <div id='base' data-path='../../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../extra/README.md.html' title='Knockback.js'>
+    <a href='../../../extra/README.md.html' title='Knockback.js'>
       Knockback.js
     </a>
     &raquo;
-    <a href='../../alphabetical_index.html' title='Index'>
+    <a href='../../../alphabetical_index.html' title='Index'>
       Index
     </a>
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>component-imports.coffee</span>
+    <span class='title'>core</span>
+    &raquo;
+    <span class='title'>index.coffee</span>
   </div>
 </div>
     <div id='content'>
       <h1>
         File:
-        component-imports.coffee
+        index.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src</td>
+          <td>src&#47;core</td>
         </tr>
       </table>
       <h2>Variables Summary</h2>
       <dl class='constants'>
-  <dt id='_-variable'>
-    _
+  <dt id='kb.modules-variable'>
+    kb.modules
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>kb</code></pre>
-    
-  </dd>
-  <dt id='ko-variable'>
-    ko
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>kb</code></pre>
-    
-  </dd>
-  <dt id='_unwrapObservable-variable'>
-    _unwrapObservable
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>ko</code></pre>
-    
+    <pre><code class='coffeescript'>{
+  underscore: kb._,
+  backbone: kb.Parse || kb.Backbone,
+  knockout: kb.ko
+}</code></pre>
+    <div class='docstring'>
+  <p>re-expose modules</p>
+</div>
+<div class='tags'>
+</div>
   </dd>
 </dl>
     </div>
     <div id='footer'>
-  June 15, 14 13:52:15 by
+  July 20, 14 03:24:13 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

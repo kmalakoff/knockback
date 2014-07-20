@@ -30,7 +30,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;core&#47;core.coffee</td>
+          <td>src&#47;core&#47;kb.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -46,7 +46,7 @@
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>&#39;0.18.5&#39;</code></pre>
+    <pre><code class='coffeescript'>&#39;0.18.6&#39;</code></pre>
     <div class='docstring'>
   <p>Knockback library semantic version</p>
 </div>
@@ -112,6 +112,14 @@
 </div>
 <div class='tags'>
 </div>
+  </dd>
+  <dt id='extend-variable'>
+    extend
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>extend</code></pre>
+    
   </dd>
 </dl>
       <h2>Class Method Summary</h2>
@@ -217,6 +225,51 @@
         .
 (void)
 <b>setValue</b><span>(model, key, value)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_throwMissing-static'>
+        .
+(void)
+<b>_throwMissing</b><span>(instance, message)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      <h6 id="-">#</h6> 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_throwUnexpected-static'>
+        .
+(void)
+<b>_throwUnexpected</b><span>(instance, message)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#publishMethods-static'>
+        .
+(void)
+<b>publishMethods</b><span>(observable, instance, methods)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#peek-static'>
+        .
+(void)
+<b>peek</b><span>(obs)</span>
       </a>
     </span>
     <span class='desc'>
@@ -486,6 +539,47 @@ ko.removeNode(el); &#47;&#47; removes el from the DOM and calls kb.release(view_
       .
 (void)
 <b>setValue</b><span>(model, key, value)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_throwMissing-static'>
+      .
+(void)
+<b>_throwMissing</b><span>(instance, message)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <h6 id="-">#</h6><p>INTERNAL HELPERS</p><h6 id="-">#</h6>
+
+</div>
+<div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_throwUnexpected-static'>
+      .
+(void)
+<b>_throwUnexpected</b><span>(instance, message)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='publishMethods-static'>
+      .
+(void)
+<b>publishMethods</b><span>(observable, instance, methods)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='peek-static'>
+      .
+(void)
+<b>peek</b><span>(obs)</span>
       <br>
     </p>
     
@@ -775,7 +869,7 @@ ko.removeNode(el); &#47;&#47; removes el from the DOM and calls kb.release(view_
 </div>
     </div>
     <div id='footer'>
-  June 15, 14 13:52:15 by
+  July 20, 14 03:24:13 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

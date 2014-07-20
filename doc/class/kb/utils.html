@@ -41,17 +41,6 @@
 </div>
 <div class='tags'>
 </div>
-      <h2>Variables Summary</h2>
-      <dl class='constants'>
-  <dt id='collapseOptions-variable'>
-    collapseOptions
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>_collapseOptions</code></pre>
-    
-  </dd>
-</dl>
       <h2>Class Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -244,6 +233,30 @@
     </span>
     <span class='desc'>
       Helper to check an object for having a Model signature. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#collapseOptions-static'>
+        .
+(void)
+<b>collapseOptions</b><span>(options)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Helper to merge options including ViewmModel options like <code>keys</code> and <code>factories</code> 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#unwrapModels-static'>
+        .
+(void)
+<b>unwrapModels</b><span>(obj)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      used for attribute setting to ensure all model attributes have their underlying models 
     </span>
   </li>
 </ul>
@@ -1099,10 +1112,56 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL</code></pre
   </ul>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='collapseOptions-static'>
+      .
+(void)
+<b>collapseOptions</b><span>(options)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Helper to merge options including ViewmModel options like <code>keys</code> and <code>factories</code></p>
+  <div class='examples'>
+    <h3>Examples:</h3>
+    <h4>
+      
+    </h4>
+    <pre><code class='coffeescript'>kb.utils.collapseOptions(options);</code></pre>
+  </div>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>obj</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>the object to test </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='unwrapModels-static'>
+      .
+(void)
+<b>unwrapModels</b><span>(obj)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>used for attribute setting to ensure all model attributes have their underlying models</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
-  June 15, 14 13:52:15 by
+  July 20, 14 03:24:13 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

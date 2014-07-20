@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.18.5.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -101,7 +101,7 @@
                   <p>Here is some pseudo-HTML for the model node:</p>
                   <pre>&lt;li data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
   &lt;div data-bind=&quot;click: function(){ opened(!opened()) }&quot;&gt;
-    &lt;span data-bind=&quot;text: (opened() ? '- ' : '+ ' )&quot;&gt;&lt;/span&gt;
+    &lt;span data-bind=&quot;text: (opened() ? &#39;- &#39; : &#39;+ &#39; )&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
 
@@ -110,7 +110,7 @@
     &lt;!-- IF SIMPLE --&gt;
       &lt;fieldset&gt;
         &lt;label&gt;&lt;/label&gt;
-        &lt;input type='text'&gt;
+        &lt;input type=&#39;text&#39;&gt;
       &lt;/fieldset&gt;
 
     &lt;!-- ELSE IF MODEL --&gt;
@@ -133,7 +133,7 @@
                   <p>Here is some pseudo-HTML for the collection node:</p>
                   <pre>&lt;li data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
   &lt;div data-bind=&quot;click: function(){ opened(!opened()) }&quot;&gt;
-    &lt;span data-bind=&quot;text: (opened() ? '- ' : '+ ' )&quot;&gt;&lt;/span&gt;
+    &lt;span data-bind=&quot;text: (opened() ? &#39;- &#39; : &#39;+ &#39; )&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
 
@@ -160,10 +160,10 @@
                     </ol>
                   </p>
                   <h3>Graph Generation</h3>
-                  <P><span>By default, a</span><a href="doc/class/kb/ViewModel.html"> kb.ViewModel</a><span>will generate a kb.ViewModel for each of its nested models and a kb.collectionObservable for each of its nested collections when used like:</span>
+                  <P><span>By default, a</span><a href="doc/classes/kb/ViewModel.html"> kb.ViewModel</a><span>will generate a kb.ViewModel for each of its nested models and a kb.collectionObservable for each of its nested collections when used like:</span>
                     <pre>kb.viewModel(my_model)</pre>
                   </P>
-                  <P><span>Also, a</span><a href="doc/class/kb/CollectionObservable.html"> kb.CollectionObservable</a><span>can easily be configured to generate a kb.ViewModel for each of its models when configured like:</span>
+                  <P><span>Also, a</span><a href="doc/classes/kb/CollectionObservable.html"> kb.CollectionObservable</a><span>can easily be configured to generate a kb.ViewModel for each of its models when configured like:</span>
                     <pre>kb.collectionObservable(my_collection, {view_model: kb.ViewModel})</pre>
                   </P>
                   <P>What this means is that Knockback takes care of circular references between Backbone.Models or Backbone.Collections so you don't have to. In the case of circular references, you just need to be careful to handle cycles correctly when you traverse the nodes in the graph.</P>
@@ -174,7 +174,7 @@
                   <p>Updating the 'kbi_model_node' pseudo HTML:</p>
                   <pre>&lt;li data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
   &lt;div data-bind=&quot;click: function(){ opened(!opened()) }&quot;&gt;
-    &lt;span data-bind=&quot;text: (opened() ? '- ' : '+ ' )&quot;&gt;&lt;/span&gt;
+    &lt;span data-bind=&quot;text: (opened() ? &#39;- &#39; : &#39;+ &#39; )&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
 
@@ -184,14 +184,14 @@
       &lt;!-- IF SIMPLE --&gt;
         &lt;fieldset&gt;
           &lt;label&gt;&lt;/label&gt;
-          &lt;input type='text'&gt;
+          &lt;input type=&#39;text&#39;&gt;
         &lt;/fieldset&gt;
 
       &lt;!-- ELSE IF MODEL --&gt;
-        &lt;ul data-bind=&quot;template: {name: 'kbi_model_node', data: kbi.nvm(attribute_name, false, node)}&quot;&gt;&lt;/ul&gt;
+        &lt;ul data-bind=&quot;template: {name: &#39;kbi_model_node&#39;, data: kbi.nvm(attribute_name, false, node)}&quot;&gt;&lt;/ul&gt;
 
       &lt;!-- ELSE IF COLLECTION --&gt;
-        &lt;ul data-bind=&quot;template: {name: 'kbi_collection_node', data: kbi.nvm(attribute_name+'[]', true, node)}&quot;&gt;&lt;/ul&gt;
+        &lt;ul data-bind=&quot;template: {name: &#39;kbi_collection_node&#39;, data: kbi.nvm(attribute_name+&#39;[]&#39;, true, node)}&quot;&gt;&lt;/ul&gt;
 
   &lt;!-- /ko --&gt;
 &lt;/li&gt;
@@ -199,13 +199,13 @@
                   <p>Updating the 'kbi_collection_node' pseudo HTML:</p>
                   <pre>&lt;li data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
   &lt;div data-bind=&quot;click: function(){ opened(!opened()) }&quot;&gt;
-    &lt;span data-bind=&quot;text: (opened() ? '- ' : '+ ' )&quot;&gt;&lt;/span&gt;
+    &lt;span data-bind=&quot;text: (opened() ? &#39;- &#39; : &#39;+ &#39; )&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
 
   &lt;!-- ko if: opened --&gt;
     &lt;!-- FOREACH MODEL --&gt;
-      &lt;ul data-bind=&quot;template: {name: 'kbi_model_node', data: kbi.nvm('['+$index()+']', false, node)}&quot;&gt;&lt;/ul&gt;
+      &lt;ul data-bind=&quot;template: {name: &#39;kbi_model_node&#39;, data: kbi.nvm(&#39;[&#39;+$index()+&#39;]&#39;, false, node)}&quot;&gt;&lt;/ul&gt;
   &lt;!-- /ko --&gt;
 &lt;/li&gt;
 </pre>
@@ -258,7 +258,7 @@
                         <p><span>Updating the pseudo-HTML for the model node:</span>
                           <pre>&lt;li data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
   &lt;div data-bind=&quot;click: function(){ opened(!opened()) }&quot;&gt;
-    &lt;span data-bind=&quot;text: (opened() ? '- ' : '+ ' )&quot;&gt;&lt;/span&gt;
+    &lt;span data-bind=&quot;text: (opened() ? &#39;- &#39; : &#39;+ &#39; )&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
 
@@ -268,16 +268,16 @@
       &lt;!-- ko if: (kb.utils.valueType($parent.node[$data]) == kb.TYPE_SIMPLE) --&gt;
         &lt;fieldset&gt;
           &lt;label data-bind=&quot;text: $data&quot;&gt; &lt;/label&gt;
-          &lt;input type='text' data-bind=&quot;value: $parent.node[$data]&quot;&gt;
+          &lt;input type=&#39;text&#39; data-bind=&quot;value: $parent.node[$data]&quot;&gt;
         &lt;/fieldset&gt;
       &lt;!-- /ko --&gt;
 
       &lt;!-- ko if: (kb.utils.valueType($parent.node[$data]) == kb.TYPE_MODEL) --&gt;
-        &lt;ul data-bind=&quot;template: {name: 'kbi_model_node', data: kbi.nvm($data, false, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
+        &lt;ul data-bind=&quot;template: {name: &#39;kbi_model_node&#39;, data: kbi.nvm($data, false, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
       &lt;!-- /ko --&gt;
 
       &lt;!-- ko if: (kb.utils.valueType($parent.node[$data]) == kb.TYPE_COLLECTION) --&gt;
-        &lt;ul data-bind=&quot;template: {name: 'kbi_collection_node', data: kbi.nvm($data+'[]', true, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
+        &lt;ul data-bind=&quot;template: {name: &#39;kbi_collection_node&#39;, data: kbi.nvm($data+&#39;[]&#39;, true, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
       &lt;!-- /ko --&gt;
 
     &lt;!-- /ko --&gt;
@@ -337,24 +337,24 @@
   - vendor</pre>
                       <pre>&lt;!doctype html&gt;
 &lt;head&gt;
-  &lt;meta charset='utf-8'&gt;
-  &lt;meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'&gt;
+  &lt;meta charset=&#39;utf-8&#39;&gt;
+  &lt;meta http-equiv=&#39;X-UA-Compatible&#39; content=&#39;IE=edge,chrome=1&#39;&gt;
   &lt;title&gt;Knockback Inspector&lt;/title&gt;
 
   &lt;!-- DEPENDENCIES --&gt;
-  &lt;script src='vendor/jquery-1.9.1.js'&gt;&lt;/script&gt;
-  &lt;script src='vendor/knockback-core-stack-0.18.5.js'&gt;&lt;/script&gt;
-  &lt;script src='vendor/backbone-relational-0.8.8.js'&gt;&lt;/script&gt;
+  &lt;script src=&#39;vendor/jquery-1.9.1.js&#39;&gt;&lt;/script&gt;
+  &lt;script src=&#39;vendor/knockback-core-stack-0.19.0.js&#39;&gt;&lt;/script&gt;
+  &lt;script src=&#39;vendor/backbone-relational-0.8.8.js&#39;&gt;&lt;/script&gt;
 
   &lt;!-- APPLICATION STYLING --&gt;
-  &lt;style type='text/css'&gt;
+  &lt;style type=&#39;text/css&#39;&gt;
   #content {width: 800px; margin: 0 auto; background-color: #F5E0FF; border-radius: 5px;}
   h1 {text-align: center; font-size: 2em; color: #fff; background-color: #CC66FF; border-radius: 5px;}
   &lt;/style&gt;
 
 &lt;/head&gt;
 &lt;body&gt;
-  &lt;div id='content'&gt;
+  &lt;div id=&#39;content&#39;&gt;
     &lt;h1&gt;Knockback Inspector&lt;/h1&gt;
   &lt;/div&gt;
 &lt;/body&gt;
@@ -424,33 +424,33 @@ this.kbi.VERSION = '0.1.0';</pre>
                       <p>Finally, let's update the index.html file to include /javjs/kbi_core.js, to display the version number using Knockback.js, and to add some styling:</p>
                       <pre>&lt;!doctype html&gt;
 &lt;head&gt;
-  &lt;meta charset='utf-8'&gt;
-  &lt;meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'&gt;
-  &lt;title class='inspector_title' data-bind=&quot;text: title&quot;&gt;&lt;/title&gt;
+  &lt;meta charset=&#39;utf-8&#39;&gt;
+  &lt;meta http-equiv=&#39;X-UA-Compatible&#39; content=&#39;IE=edge,chrome=1&#39;&gt;
+  &lt;title class=&#39;inspector_title&#39; data-bind=&quot;text: title&quot;&gt;&lt;/title&gt;
 
   &lt;!-- DEPENDENCIES --&gt;
-  &lt;script src='vendor/jquery-1.9.1.js'&gt;&lt;/script&gt;
-  &lt;script src='vendor/knockback-core-stack-0.18.5.js'&gt;&lt;/script&gt;
-  &lt;script src='vendor/backbone-relational-0.8.8.js'&gt;&lt;/script&gt;
+  &lt;script src=&#39;vendor/jquery-1.9.1.js&#39;&gt;&lt;/script&gt;
+  &lt;script src=&#39;vendor/knockback-core-stack-0.19.0.js&#39;&gt;&lt;/script&gt;
+  &lt;script src=&#39;vendor/backbone-relational-0.8.8.js&#39;&gt;&lt;/script&gt;
 
   &lt;!-- KNOCKBACK-INSPECTOR LIBRARY --&gt;
-  &lt;script src='js/lib/kbi_core.js'&gt;&lt;/script&gt;
+  &lt;script src=&#39;js/lib/kbi_core.js&#39;&gt;&lt;/script&gt;
 
   &lt;!-- APPLICATION STYLING --&gt;
-  &lt;style type='text/css'&gt;
+  &lt;style type=&#39;text/css&#39;&gt;
   #content {width: 800px; margin: 0 auto; background-color: #F5E0FF; border-radius: 5px;}
   h1 {text-align: center; font-size: 2em; color: #fff; background-color: #CC66FF; border-radius: 5px;}
   &lt;/style&gt;
 
 &lt;/head&gt;
 &lt;body&gt;
-  &lt;div id='content'&gt;
-    &lt;h1 class='inspector_title' data-bind=&quot;text: title&quot;&gt;&lt;/h1&gt;
+  &lt;div id=&#39;content&#39;&gt;
+    &lt;h1 class=&#39;inspector_title&#39; data-bind=&quot;text: title&quot;&gt;&lt;/h1&gt;
 
     &lt;!-- Step 1: Setting up the Project --&gt;
-    &lt;script type='text/javascript'&gt;
-      var   app_model = new Backbone.Model({title: 'Knockback Inspector (' + kbi.VERSION + ')'});
-      $('.inspector_title').each(function(){ ko.applyBindings(kb.viewModel(app_model), this); });
+    &lt;script type=&#39;text/javascript&#39;&gt;
+      var   app_model = new Backbone.Model({title: &#39;Knockback Inspector (&#39; + kbi.VERSION + &#39;)&#39;});
+      $(&#39;.inspector_title&#39;).each(function(){ ko.applyBindings(kb.viewModel(app_model), this); });
     &lt;/script&gt;
 
   &lt;/div&gt;
@@ -464,9 +464,9 @@ this.kbi.VERSION = '0.1.0';</pre>
                           </li>
                           <li><span>To use Knockback.js, we create a Backbone.Model with a an attribute called 'title' and then use Knockout.js to bind each DOM element with the 'inspector_title' class to a kb.ViewModel using the kb.viewModel factory function:</span>
                             <pre>&lt;!-- Step 1: Setting up the Project --&gt;
-&lt;script type='text/javascript'&gt;
-  var   app_model = new Backbone.Model({title: 'Knockback Inspector (' + kbi.VERSION + ')'});
-  $('.inspector_title').each(function(){ ko.applyBindings(kb.viewModel(app_model), this); });
+&lt;script type=&#39;text/javascript&#39;&gt;
+  var   app_model = new Backbone.Model({title: &#39;Knockback Inspector (&#39; + kbi.VERSION + &#39;)&#39;});
+  $(&#39;.inspector_title&#39;).each(function(){ ko.applyBindings(kb.viewModel(app_model), this); });
 &lt;/script&gt;
 </pre>
                           </li>
@@ -484,27 +484,27 @@ this.kbi.VERSION = '0.1.0';</pre>
                 <div class="accordion-inner">
                   <p><span>This step shows how to render a Backbone.Model with a relations in a collection-typed attribute named friends. First, let's put the following in index.html inside the content div:</span>
                     <pre>&lt;body&gt;
-  &lt;div id='content'&gt;
+  &lt;div id=&#39;content&#39;&gt;
     ...
 
     &lt;!-- Step 2: Rendering a Backbone.Model using kb.ViewModel --&gt;
-    &lt;ul id='backbone_model' class='kbi root' data-bind=&quot;template: {name: 'kbi_model_node', data: kbi.nvm('root', true, $data)}&quot;&gt;&lt;/ul&gt;
-    &lt;script type='text/javascript'&gt;
-      var model1 = new Backbone.Model({name: 'Model1', pet: 'frog', friends: new Backbone.Collection([])});
-      var model2 = new Backbone.Model({name: 'Model2', pet: 'dog', friends: new Backbone.Collection([])});
-      var model3 = new Backbone.Model({name: 'Model3', pet: '(none)', friends: new Backbone.Collection([])});
-      model1.get('friends').reset([model2, model3]);
-      model2.get('friends').reset([model1, model3]);
-      model3.get('friends').reset([model1, model2]);
+    &lt;ul id=&#39;backbone_model&#39; class=&#39;kbi root&#39; data-bind=&quot;template: {name: &#39;kbi_model_node&#39;, data: kbi.nvm(&#39;root&#39;, true, $data)}&quot;&gt;&lt;/ul&gt;
+    &lt;script type=&#39;text/javascript&#39;&gt;
+      var model1 = new Backbone.Model({name: &#39;Model1&#39;, pet: &#39;frog&#39;, friends: new Backbone.Collection([])});
+      var model2 = new Backbone.Model({name: &#39;Model2&#39;, pet: &#39;dog&#39;, friends: new Backbone.Collection([])});
+      var model3 = new Backbone.Model({name: &#39;Model3&#39;, pet: &#39;(none)&#39;, friends: new Backbone.Collection([])});
+      model1.get(&#39;friends&#39;).reset([model2, model3]);
+      model2.get(&#39;friends&#39;).reset([model1, model3]);
+      model3.get(&#39;friends&#39;).reset([model1, model2]);
 
-      ko.applyBindings(kb.viewModel(model1), $('#backbone_model')[0]);
+      ko.applyBindings(kb.viewModel(model1), $(&#39;#backbone_model&#39;)[0]);
     &lt;/script&gt;
 
     ...
   &lt;/div&gt;
 &lt;/body&gt;
 </pre><span>You should recognize the unordered list HTML from the Control Flow and Library Architecture sections (if not, please review those sections):</span>
-                    <pre>&lt;ul id='backbone_model' class='kbi root' data-bind=&quot;template: {name: 'kbi_model_node', data: kbi.nvm('root', true, $data)}&quot;&gt;&lt;/ul&gt;
+                    <pre>&lt;ul id=&#39;backbone_model&#39; class=&#39;kbi root&#39; data-bind=&quot;template: {name: &#39;kbi_model_node&#39;, data: kbi.nvm(&#39;root&#39;, true, $data)}&quot;&gt;&lt;/ul&gt;
 </pre><span>This unordered list tag starts a new tree in the DOM that is found by jQuery using the #backbone_model id selector and is bound by Knockout.js using:</span>
                     <pre>ko.applyBindings(kb.viewModel(model1), $('#backbone_model')[0]);</pre><span>Because Knockout is binding directly to the kb.ViewModel in ko.applyBindings, we can access the kb.ViewModel using $data when the kbi.nvm is created.</span>
                   </p>
@@ -572,9 +572,9 @@ kbi.nodeViewModel = kbi.nvm = function(name, opened, node) { return new kbi.Node
                   <h3>Template: 'kbi_model_node'</h3>
                   <div data-for="cs">
                     <h4>Create /src/views/kbi_model_node_view.coffee:</h4>
-                    <pre>kbi.ModelNodeView = """&lt;li class='kbi' data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
-  &lt;div class='kbi model' data-bind=&quot;click: function(){ opened(!opened()); }&quot;&gt;
-    &lt;span data-bind=&quot;text: (opened() ? '- ' : '+ ' )&quot;&gt;&lt;/span&gt;
+                    <pre>kbi.ModelNodeView = """&lt;li class=&#39;kbi&#39; data-bind=&quot;css: {opened: opened, closed: !opened()}&quot;&gt;
+  &lt;div class=&#39;kbi model&#39; data-bind=&quot;click: function(){ opened(!opened()); }&quot;&gt;
+    &lt;span data-bind=&quot;text: (opened() ? &#39;- &#39; : &#39;+ &#39; )&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
   &lt;/div&gt;
 
@@ -582,18 +582,18 @@ kbi.nodeViewModel = kbi.nvm = function(name, opened, node) { return new kbi.Node
     &lt;!-- ko foreach: attribute_names --&gt;
 
       &lt;!-- ko if: (kb.utils.valueType($parent.node[$data]) == kb.TYPE_SIMPLE) --&gt;
-        &lt;fieldset class='kbi'&gt;
+        &lt;fieldset class=&#39;kbi&#39;&gt;
           &lt;label data-bind=&quot;text: $data&quot;&gt; &lt;/label&gt;
-          &lt;input type='text' data-bind=&quot;value: $parent.node[$data]&quot;&gt;
+          &lt;input type=&#39;text&#39; data-bind=&quot;value: $parent.node[$data]&quot;&gt;
         &lt;/fieldset&gt;
       &lt;!-- /ko --&gt;
 
       &lt;!-- ko if: (kb.utils.valueType($parent.node[$data]) == kb.TYPE_MODEL) --&gt;
-        &lt;ul class='kbi' data-bind=&quot;template: {name: 'kbi_model_node', data: kbi.nvm($data, false, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
+        &lt;ul class=&#39;kbi&#39; data-bind=&quot;template: {name: &#39;kbi_model_node&#39;, data: kbi.nvm($data, false, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
       &lt;!-- /ko --&gt;
 
       &lt;!-- ko if: (kb.utils.valueType($parent.node[$data]) == kb.TYPE_COLLECTION) --&gt;
-        &lt;ul class='kbi' data-bind=&quot;template: {name: 'kbi_collection_node', data: kbi.nvm($data+'[]', true, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
+        &lt;ul class=&#39;kbi&#39; data-bind=&quot;template: {name: &#39;kbi_collection_node&#39;, data: kbi.nvm($data+&#39;[]&#39;, true, $parent.node[$data])}&quot;&gt;&lt;/ul&gt;
       &lt;!-- /ko --&gt;
 
     &lt;!-- /ko --&gt;
@@ -682,8 +682,8 @@ kbi.TemplateEngine.prototype.makeTemplateSource = function(template) {
                   <p><span>Setting the template engine is done in the index.html file rather than the library so you can hook up your own template engine implementation as you need depending on which template engine you are using.</span></p>
                   <p><span>For this tutorial, add the following to index.html after the Knockout-Inspector library, but before you use a 'kbi_model_node' or 'kbi_collection_node' template:</span>
                     <pre>      &lt;!-- KNOCKOUT INITIALIZATION --&gt;
-      &lt;script type='text/javascript'&gt;
-        // set the template engine so Knockout can find 'kbi_model_node' and 'kbi_collection_node' templates
+      &lt;script type=&#39;text/javascript&#39;&gt;
+        // set the template engine so Knockout can find &#39;kbi_model_node&#39; and &#39;kbi_collection_node&#39; templates
         ko.setTemplateEngine(new kbi.TemplateEngine());
       &lt;/script&gt;
 </pre>
@@ -692,11 +692,11 @@ kbi.TemplateEngine.prototype.makeTemplateSource = function(template) {
                   <h2>Hooking up the library</h2>
                   <p>Finally, add all of the javascript files to index.html and try it out!</p>
                   <pre>&lt;!-- KNOCKBACK-INSPECTOR LIBRARY --&gt;
-&lt;script src='js/lib/kbi_core.js'&gt;&lt;/script&gt;
-&lt;script src='js/view_models/kbi_node_view_model.js'&gt;&lt;/script&gt;
-&lt;script src='js/views/kbi_collection_node_view.js'&gt;&lt;/script&gt;
-&lt;script src='js/views/kbi_model_node_view.js'&gt;&lt;/script&gt;
-&lt;script src='js/lib/kbi_string_template_engine.js'&gt;&lt;/script&gt;
+&lt;script src=&#39;js/lib/kbi_core.js&#39;&gt;&lt;/script&gt;
+&lt;script src=&#39;js/view_models/kbi_node_view_model.js&#39;&gt;&lt;/script&gt;
+&lt;script src=&#39;js/views/kbi_collection_node_view.js&#39;&gt;&lt;/script&gt;
+&lt;script src=&#39;js/views/kbi_model_node_view.js&#39;&gt;&lt;/script&gt;
+&lt;script src=&#39;js/lib/kbi_string_template_engine.js&#39;&gt;&lt;/script&gt;
 </pre>
                   <p><span>You should see something like:</span><br><img src="img/tutorial_inspector/screen_shot_step2.png" class="screen_shot"><br></p>
                 </div>
@@ -707,33 +707,33 @@ kbi.TemplateEngine.prototype.makeTemplateSource = function(template) {
               <div id="collapseStep3" style="height: 0px;" class="accordion-body collapse">
                 <div class="accordion-inner">
                   <p><span>Because we already have an implementation for 'kbi_collection_node' and kbi.NodeViewModel can be used with both kb.ViewModels and kb.CollectionObservables, we should be able to render a tree starting with a kb.CollectionObservable as follows:</span>
-                    <pre>&lt;ul data-bind=&quot;template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, kb.collectionObservable(collection, {view_model: kb.ViewModel}))}&quot;&gt;&lt;/ul&gt;
+                    <pre>&lt;ul data-bind=&quot;template: {name: &#39;kbi_collection_node&#39;, data: kbi.nvm(&#39;root&#39;, true, kb.collectionObservable(collection, {view_model: kb.ViewModel}))}&quot;&gt;&lt;/ul&gt;
 </pre><span><strong>Note:</strong> the kb.CollectionObservable requires the view_model option because by default it stores the collection models rather than generating kb.ViewModels.</span>
                   </p>
                   <p><span>Let's use Backbone-Relational to generate some relations and then render the relations:</span>
                     <pre>&lt;!-- Step 3: Rendering a BackboneRelational using kb.CollectionObservable --&gt;
-&lt;ul id='backbone_relational' class='kbi root' data-bind=&quot;template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, $data)}&quot;&gt;&lt;/ul&gt;
-&lt;script type='text/javascript'&gt;
+&lt;ul id=&#39;backbone_relational&#39; class=&#39;kbi root&#39; data-bind=&quot;template: {name: &#39;kbi_collection_node&#39;, data: kbi.nvm(&#39;root&#39;, true, $data)}&quot;&gt;&lt;/ul&gt;
+&lt;script type=&#39;text/javascript&#39;&gt;
   var Person = Backbone.RelationalModel.extend({});
   var House = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany,
-      key: 'occupants',
-      relatedModel: 'Person',
+      key: &#39;occupants&#39;,
+      relatedModel: &#39;Person&#39;,
       reverseRelation: {
-        key: 'livesIn'
+        key: &#39;livesIn&#39;
       }
     }]
   });
 
-  var bob = new Person({id: 'person-1', name: 'Bob'});
-  var fred = new Person({id: 'person-2', name: 'Fred'});
+  var bob = new Person({id: &#39;person-1&#39;, name: &#39;Bob&#39;});
+  var fred = new Person({id: &#39;person-2&#39;, name: &#39;Fred&#39;});
   var house = new House({
-    location: 'In the middle of our street',
-    occupants: ['person-1', 'person-2']
+    location: &#39;In the middle of our street&#39;,
+    occupants: [&#39;person-1&#39;, &#39;person-2&#39;]
   });
 
-  ko.applyBindings(kb.collectionObservable(house.get('occupants'), {view_model: kb.ViewModel}), $('#backbone_relational')[0]);
+  ko.applyBindings(kb.collectionObservable(house.get(&#39;occupants&#39;), {view_model: kb.ViewModel}), $(&#39;#backbone_relational&#39;)[0]);
 &lt;/script&gt;</pre>
                   </p>
                   <p><span>It just works!</span><br><img src="img/tutorial_inspector/screen_shot_step3.png" class="screen_shot"><br></p>
@@ -807,26 +807,26 @@ kbi.FetchedCollection = Backbone.Collection.extend({
                   <p>When parsing the data, kbi.FetchedModel generates kbi.FetchedModel when it encounters a JSON object, generates a kbi.FetchedCollection when it encounters a JSON array, and otherwise, it just stores the simple type in the attribute.</p>
                   <p><span>We can use the kbi.FetchedCollection and a kb.CollectionObservable to render a tree of the data returned from a Twitter query as follows:</span>
                     <pre>&lt;!-- Step 4: Rendering a Twitter Query using kb.CollectionObservable --&gt;
-&lt;ul class='kbi root' id='fetched_collection'&gt;
-  &lt;li class='kbi'&gt;
-    &lt;fieldset class='kbi'&gt;
+&lt;ul class=&#39;kbi root&#39; id=&#39;fetched_collection&#39;&gt;
+  &lt;li class=&#39;kbi&#39;&gt;
+    &lt;fieldset class=&#39;kbi&#39;&gt;
       &lt;label&gt;URL&lt;/label&gt;
-      &lt;input type='text' data-bind=&quot;value: url&quot;&gt;
+      &lt;input type=&#39;text&#39; data-bind=&quot;value: url&quot;&gt;
     &lt;/fieldset&gt;
-    &lt;ul class='kbi' data-bind=&quot;template: {name: 'kbi_collection_node', data: kbi.nvm('root', true, collection)}&quot;&gt;&lt;/ul&gt;
+    &lt;ul class=&#39;kbi&#39; data-bind=&quot;template: {name: &#39;kbi_collection_node&#39;, data: kbi.nvm(&#39;root&#39;, true, collection)}&quot;&gt;&lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;script type='text/javascript'&gt;
-  var   custom_url_model = new Backbone.Model({url: '', collection: new kbi.FetchedCollection()});
+&lt;script type=&#39;text/javascript&#39;&gt;
+  var   custom_url_model = new Backbone.Model({url: &#39;&#39;, collection: new kbi.FetchedCollection()});
   var   view_model = kb.viewModel(custom_url_model);
   view_model.url.subscribe(function(url){
     custom_url_model.get(kb.TYPE_COLLECTION).url = url;
     custom_url_model.get(kb.TYPE_COLLECTION).fetch();
   });
 
-  ko.applyBindings(view_model, $('#fetched_collection')[0]);
-  view_model.url('http://search.twitter.com/search.json?q=knockbackjs&amp;callback=?');
+  ko.applyBindings(view_model, $(&#39;#fetched_collection&#39;)[0]);
+  view_model.url(&#39;http://search.twitter.com/search.json?q=knockbackjs&amp;callback=?&#39;);
 &lt;/script&gt;
 </pre>
                     <p><span>To explain:</span>
