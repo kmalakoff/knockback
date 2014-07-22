@@ -12,7 +12,11 @@ rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
 header = require 'gulp-header'
 mocha = require 'gulp-mocha'
-nuget = require 'gulp-nuget-mono'
+nuget = require 'nuget'
+nugetGulp = -> es.map (file, callback) ->
+  nuget.pack file, (err, nupkg_file) ->
+    return callback(err) if err
+    nuget.push nupkg_file, (err) -> if err then gutil.log(err) else callback()
 
 HEADER = module.exports = """
 /*
@@ -58,7 +62,7 @@ gulp.task 'test-node', ['minify'], testNode = (callback) ->
   gutil.log 'Running Node.js tests'
   require './test/lib/node_jquery_xhr' # ensure that globals for the target backend are loaded
   gulp.src('test/spec/**/*.tests.coffee')
-    .pipe(mocha({}))
+    .pipe(mocha())
     .pipe es.writeArray callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
@@ -85,7 +89,7 @@ gulp.task 'publish', ['minify'], (callback) ->
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
   queue.defer (callback) ->
     gulp.src('packages/nuget/*.nuspec')
-      .pipe(nuget({pack: true, push: true}))
-      .pipe es.writeArray callback
+      .pipe(nugetGulp())
+      .on('end', callback)
   queue.await (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455

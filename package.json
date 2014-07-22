@@ -28,8 +28,7 @@
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
     "build": "gulp build",
     "watch": "gulp watch",
-    "release": "gulp release",
-    "postinstall": "gulp postinstall"
+    "release": "gulp release"
   },
   "dependencies": {
     "underscore": ">=1.1.7",
@@ -58,7 +57,6 @@
     "gulp-webpack-config": "*",
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
-    "gulp-nuget-mono": "*",
     "jquery": "*",
     "karma": "*",
     "karma-chai": "^0.1.0",
@@ -73,6 +71,7 @@
     "mocha": "*",
     "queue-async": "*",
     "webpack": "git+https://github.com/forivall/webpack#master",
+    "nuget": "*",
     "wrench": "*"
   },
   "optionalDependencies": {
