@@ -6,7 +6,7 @@ module.exports = _.extend  _.clone(require '../../webpack/base-config.coffee'), 
   entry: _.flatten([require('../../files').src_core, './src/core/index.coffee'])
   output:
     library: 'kb'
-    libraryTarget: 'umd'
+    libraryTarget: 'umd2'
 
   externals: [
     {jquery: {optional: true, root: 'jQuery', amd: 'jquery', commonjs: 'jquery', commonjs2: 'jquery'}}
