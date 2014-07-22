@@ -35,9 +35,9 @@ gulp.task 'postinstall', (callback) ->
 gulp.task 'build', buildLibraries = (callback) ->
   errors = []
   gulp.src('config/builds/library/**/*.webpack.config.coffee', {read: false, buffer: false})
-    .pipe(webpack())
+    .pipe(webpack({no_delete: true}))
     .pipe(header(HEADER, {pkg: require('./package.json')}))
-    .pipe(gulp.dest((file) -> file.base))
+    .pipe(gulp.dest('.'))
     .on('end', callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 

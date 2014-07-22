@@ -31,7 +31,8 @@ module.exports = (callback) ->
   queue.defer (callback) ->
     gulp.src(['config/builds/test/**/*.webpack.config.coffee'], {read: false, buffer: false})
       .pipe(webpack())
-      .pipe(es.writeArray (err, array) -> callback(err))
+      .pipe(gulp.dest('_temp/webpack'))
+      .on('end', callback)
 
   # build test browserify
   for test in TEST_GROUPS.browserify or []
