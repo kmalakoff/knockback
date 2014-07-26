@@ -24,11 +24,7 @@
   },
   "scripts": {
     "test": "gulp test",
-    "test-quick": "gulp test-quick",
-    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
-    "build": "gulp build",
-    "watch": "gulp watch",
-    "release": "gulp release"
+    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
   },
   "dependencies": {
     "underscore": ">=1.1.7",
