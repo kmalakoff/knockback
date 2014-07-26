@@ -7,4 +7,4 @@ module.exports =
     'globalize.culture.en-GB': {deps: ['globalize']}
     'globalize.culture.fr-FR': {deps: ['globalize']}
   post_load: 'window._ = window.Backbone = window.ko = window.kb = null;'
-  aliases: {'knockback-core': 'knockback', 'lodash': 'underscore'}
+  aliases: {'knockback-core': 'knockback', 'lodash': 'underscore', 'knockout-latest.debug': 'knockout'}
