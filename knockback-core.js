@@ -1303,28 +1303,29 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ko, _extend;
+	var kb, ko, _extend, _ref, _ref1;
 
-	ko = __webpack_require__(5).ko;
+	ko = (kb = __webpack_require__(5)).ko;
 
-	_extend = ko.subscribable.fn.extend;
-
-	ko.subscribable.fn.extend = function() {
-	  var target, _dispose;
-	  target = _extend.apply(this, arguments);
-	  if (target !== this && this.release) {
-	    _dispose = target.dispose;
-	    target.dispose = (function(_this) {
-	      return function() {
-	        if (_dispose != null) {
-	          _dispose.apply(target, arguments);
-	        }
-	        return _this.release();
-	      };
-	    })(this);
-	  }
-	  return target;
-	};
+	if ((_ref = ko.subscribable) != null ? (_ref1 = _ref.fn) != null ? _ref1.extend : void 0 : void 0) {
+	  _extend = ko.subscribable.fn.extend;
+	  ko.subscribable.fn.extend = function() {
+	    var target, _dispose;
+	    target = _extend.apply(this, arguments);
+	    if (target !== this && kb.isReleaseable(this)) {
+	      _dispose = target.dispose;
+	      target.dispose = (function(_this) {
+	        return function() {
+	          if (_dispose != null) {
+	            _dispose.apply(target, arguments);
+	          }
+	          return kb.release(_this);
+	        };
+	      })(this);
+	    }
+	    return target;
+	  };
+	}
 
 
 /***/ },
