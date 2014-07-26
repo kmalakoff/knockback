@@ -119,7 +119,7 @@ class kb.Observable
         else if not _.isUndefined(new_value)
           @update(new_value)
     )
-    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
+    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
     @__kb_value or @update() # wasn't loaded so create
 
     # wrap ourselves with a localizer

@@ -15,9 +15,9 @@ KNOCKBACK =
 
 REQUIRED_DEPENDENCIES =
   backbone_underscore_latest: (resolveModule(module_name) for module_name in ['jquery', 'underscore', 'backbone', 'knockout'])
-  backbone_underscore_legacy: (resolveModule(module_name) for module_name in ['jquery']).concat(['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js'])
+  backbone_underscore_legacy: ['./vendor/jquery-1.8.3.js', './vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
   backbone_lodash_latest: (resolveModule(module_name) for module_name in ['lodash', 'backbone', 'knockout'])
-  backbone_lodash_legacy: (resolveModule(module_name) for module_name in ['jquery']).concat(['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-1.2.1.js'])
+  backbone_lodash_legacy: ['./vendor/jquery-1.8.3.js', './vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
   parse_latest: (resolveModule(module_name) for module_name in ['jquery', 'knockout', 'parse'])
   parse_legacy: (resolveModule(module_name) for module_name in ['jquery', 'knockout']).concat(['./vendor/parse-1.2.0.js'])
 

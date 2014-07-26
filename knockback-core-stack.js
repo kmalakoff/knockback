@@ -569,13 +569,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.__kb.callbacks = {};
 	    this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
 	    this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
+	    this.ee = null;
 	    if (callback_options) {
 	      this.registerCallbacks(obj, callback_options);
 	    }
 	    if (emitter) {
 	      this.emitter(emitter);
-	    } else {
-	      this.ee = null;
 	    }
 	  }
 
@@ -601,7 +600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.model_ref.retain();
 	      this.model_ref.bind('loaded', this.__kb._onModelLoaded);
 	      this.model_ref.bind('unloaded', this.__kb._onModelUnloaded);
-	      new_emitter = this.model_ref.model();
+	      new_emitter = this.model_ref.model() || null;
 	    } else {
 	      delete this.model_ref;
 	    }
@@ -1371,12 +1370,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this._model = ko.observable();
 	        observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
 	          read: function() {
-	            var arg, args, _i, _len, _model, _ref1;
+	            var arg, args, _i, _len, _model, _ref1, _ref2;
 	            _model = _this._model();
 	            _ref1 = args = [_this.key].concat(_this.args || []);
 	            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
 	              arg = _ref1[_i];
 	              ko.utils.unwrapObservable(arg);
+	            }
+	            if ((_ref2 = kb.utils.wrappedEventWatcher(_this)) != null) {
+	              _ref2.emitter(_model || null);
 	            }
 	            if (_this.read) {
 	              _this.update(_this.read.apply(_this._vm, args));
@@ -1436,7 +1438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        kb.EventWatcher.useOptionsOrCreate({
 	          event_watcher: event_watcher
-	        }, model, _this, {
+	        }, model || null, _this, {
 	          emitter: _this.model,
 	          update: _.bind(_this.update, _this),
 	          key: _this.key,
