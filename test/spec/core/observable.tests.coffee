@@ -333,3 +333,33 @@ describe 'knockback-observable.js @quick', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/108
+  it '10. should be able to change models', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    values = []
+
+    m1 = new kb.Model({n: 'm1'})
+    m2 = new kb.Model({n: 'm2'})
+    o = kb.observable(m1, 'n')
+
+    o.subscribe (nv) -> values.push(nv)
+
+    m1.set({n: 'm1_2'})
+    assert.deepEqual(values, ['m1_2'])
+
+    o.model(m2)
+    assert.deepEqual(values, ['m1_2', 'm2'])
+
+    m1.set({n: 'm1_3'})
+    assert.deepEqual(values, ['m1_2', 'm2'])
+
+    m2.set({n: 'm2_2'})
+    assert.deepEqual(values, ['m1_2', 'm2', 'm2_2'])
+
+    m1.set({n: 'm1_4'})
+    assert.deepEqual(values, ['m1_2', 'm2', 'm2_2'])
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

@@ -37,9 +37,9 @@ class kb.EventWatcher
     @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
     @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
+    @ee = null
     @registerCallbacks(obj, callback_options) if callback_options
-
-    if emitter then @emitter(emitter) else (@ee = null)
+    @emitter(emitter) if emitter
 
   # Required clean up function to break cycles, release view emitters, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
@@ -70,7 +70,7 @@ class kb.EventWatcher
       @model_ref = new_emitter; @model_ref.retain()
       @model_ref.bind('loaded', @__kb._onModelLoaded)
       @model_ref.bind('unloaded', @__kb._onModelUnloaded)
-      new_emitter = @model_ref.model()
+      new_emitter = @model_ref.model() or null
     else
       delete @model_ref
     previous_emitter = @ee

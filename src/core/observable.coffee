@@ -73,6 +73,7 @@ class kb.Observable
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
       read: =>
         _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
+        kb.utils.wrappedEventWatcher(@)?.emitter(_model or null) # update the event watcher
         if @read
           @update(@read.apply(@_vm, args))
         else if !_.isUndefined(_model)
