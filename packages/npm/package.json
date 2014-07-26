@@ -13,6 +13,6 @@
   "optionalDependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
-    "knockout": ">=1.2.1"
+    "knockout": ">=2.2.1"
   }
 }

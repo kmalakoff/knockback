@@ -29,7 +29,7 @@
   "dependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
-    "knockout": ">=1.2.1"
+    "knockout": ">=2.1.0"
   },
   "devDependencies": {
     "async": "^0.9.0",
@@ -86,7 +86,7 @@
     "dependencies": {
       "underscore": ">=1.1.7",
       "backbone": ">=0.5.1",
-      "knockout": ">=1.2.1"
+      "knockout": ">=2.2.1"
     }
   }
 }
