@@ -41,8 +41,8 @@ class LocalizedString
     throw 'missing kb.locale_manager' unless kb.locale_manager
     @string = kb.locale_manager.get(@string_id)
 
-kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+ContactsCollection = kb.Collection.extend({ model: Contact })
 
 class LocalizedStringLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
@@ -118,7 +118,7 @@ describe 'knockback-localized-observable.js @quick', ->
       @goodbye = kb.observable(model, {key:'goodbye_greeting', localizer: kb.LocalizedStringLocalizer})
       @
 
-    model = new kb.Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
+    model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
 
     kb.locale_manager.setLocale('en')
@@ -172,7 +172,7 @@ describe 'knockback-localized-observable.js @quick', ->
       @
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
@@ -222,7 +222,7 @@ describe 'knockback-localized-observable.js @quick', ->
       @greeting = kb.observable(model, {key:@greeting_key, localizer: kb.LocalizedStringLocalizer})
       return
 
-    model = new kb.Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
+    model = new Contact({hello_greeting: new LocalizedString('formal_hello'), goodbye_greeting: new LocalizedString('formal_goodbye')})
     view_model = new ContactViewModelGreeting(model)
 
     assert.equal(view_model.greeting(), 'Hello', "en: Hello")
@@ -252,7 +252,7 @@ describe 'knockback-localized-observable.js @quick', ->
         @date = new kb.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email
@@ -325,7 +325,7 @@ describe 'knockback-localized-observable.js @quick', ->
     })
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email
@@ -393,7 +393,7 @@ describe 'knockback-localized-observable.js @quick', ->
         @date = new kb.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
@@ -449,7 +449,7 @@ describe 'knockback-localized-observable.js @quick', ->
         @date = new kb.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModelDate(model)
 
     # set from the view model
@@ -505,13 +505,13 @@ describe 'knockback-localized-observable.js @quick', ->
         @date = new kb.LongDateLocalizer(@_date)
 
     john_birthdate = new Date(1940, 10, 9)
-    john = new kb.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
+    john = new Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
     paul_birthdate = new Date(1942, 6, 18)
-    paul = new kb.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
+    paul = new Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
     george_birthdate = new Date(1943, 2, 25)
-    george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
+    george = new Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
-    ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
+    ringo = new Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
     major_duo = new kb.Collection([john, paul])
     minor_duo = new kb.Collection([george, ringo])
     nested_model = new kb.Model({
@@ -618,7 +618,7 @@ describe 'knockback-localized-observable.js @quick', ->
       }}, this)
       return
 
-    model = new kb.Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
+    model = new Contact({name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9)})
     view_model = new ContactViewModel(model)
 
     # get
@@ -671,7 +671,7 @@ describe 'knockback-localized-observable.js @quick', ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
 
-    model = new kb.Contact({name: 'John', number: '555-555-5558'})
+    model = new Contact({name: 'John', number: '555-555-5558'})
     view_model = kb.viewModel(model, ['name', 'number'])
 
     # get
@@ -732,7 +732,7 @@ describe 'knockback-defaults.js @quick', ->
         }}, this)
         @
 
-      collection = new kb.ContactsCollection()
+      collection = new ContactsCollection()
       model_ref = new kb.Backbone.ModelRef(collection, 'b4')
       view_model = new ContactViewModel(model_ref)
 
@@ -809,7 +809,7 @@ describe 'knockback-defaults.js @quick', ->
           @number = kb.defaultObservable(@_number, @loading_message)
           @date = kb.defaultObservable(new kb.LongDateLocalizer(@_date), @loading_message)
 
-      collection = new kb.ContactsCollection()
+      collection = new ContactsCollection()
       model_ref = new kb.Backbone.ModelRef(collection, 'b4')
       view_model = new ContactViewModel(model_ref)
 
@@ -883,7 +883,7 @@ describe 'knockback-defaults.js @quick', ->
         @date = new kb.LongDateLocalizer(@_date)
 
     birthdate = new Date(1940, 10, 9)
-    model = new kb.Contact({name: 'John', date: new Date(birthdate.valueOf())})
+    model = new Contact({name: 'John', date: new Date(birthdate.valueOf())})
     view_model = new ContactViewModel(model)
 
     # check email

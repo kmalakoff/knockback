@@ -14,8 +14,8 @@ describe 'knockback-formatted-observable.js @quick', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+  Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  ContactsCollection = kb.Collection.extend({ model: Contact })
 
   it 'Various scenarios', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -30,7 +30,7 @@ describe 'knockback-formatted-observable.js @quick', ->
         @name_number_name = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}', @_name, @_number)
         @name_number_name_song = kb.formattedObservable('Name: {0}, #: {1}, Name: {0}, Song: "{2}"', @_name, @_number, @favorite_song)
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556', favorite_song: 'Yellow Submarine'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556', favorite_song: 'Yellow Submarine'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -130,7 +130,7 @@ describe 'knockback-formatted-observable.js @quick', ->
         @name = ko.dependentObservable(=> return "First: #{@_name()}")
         @number = kb.formattedObservable('#: {0}', @_number)
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get

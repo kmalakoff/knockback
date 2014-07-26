@@ -13,8 +13,8 @@ describe 'knockback-observable.js @quick', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+  Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  ContactsCollection = kb.Collection.extend({ model: Contact })
 
   it '1. Standard use case: direct attributes with read and write', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -24,7 +24,7 @@ describe 'knockback-observable.js @quick', ->
       @number = kb.observable(model, {key:'number'})
       return
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModel(model)
 
     # get
@@ -61,7 +61,7 @@ describe 'knockback-observable.js @quick', ->
       })
       return
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -95,7 +95,7 @@ describe 'knockback-observable.js @quick', ->
       @number = kb.observable(model, {key:'number', read: ((key, arg) -> args.push(arg); return model.get('number')), args: 'number' })
       return
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
     assert.ok(_.isEqual(args, ['name', 1, 'number']) or _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']) , "got the args: #{args.join(', ')}") # TODO: reduce number of calls on old Backbone?
 
@@ -114,7 +114,7 @@ describe 'knockback-observable.js @quick', ->
       })
       return
 
-    model = new kb.Contact({name: 'Ringo'})
+    model = new Contact({name: 'Ringo'})
     view_model = new ContactViewModel(model)
 
     # get

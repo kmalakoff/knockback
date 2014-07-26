@@ -12,12 +12,12 @@ describe 'money-patches @quick', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
 
   it 'allows fixes memory management for extended', (done) ->
     console.log 'EXTENDERS'
 
-    # new kb.Contact
+    # new Contact
 
     # observable = kb.observable(model, {key: field}).extend(extenderA: { ... } ).extend( extenderB: { ... } );
 

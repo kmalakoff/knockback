@@ -13,8 +13,8 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+  Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  ContactsCollection = kb.Collection.extend({ model: Contact })
 
   ContactViewModel = (model) ->
     @name = kb.observable(model, 'name')
@@ -36,7 +36,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '2. Basic Usage: collection observable with ko.dependentObservable', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection)
     view_model =
       count: ko.dependentObservable(->return collection_observable().length )
@@ -44,12 +44,12 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(collection.length, 0, "no models")
     assert.equal(view_model.count(), 0, "no count")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "2 models")
     assert.equal(view_model.count(), 2, "2 count")
 
-    collection.add(new kb.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     assert.equal(collection.length, 3, "3 models")
     assert.equal(view_model.count(), 3, "3 count")
 
@@ -67,7 +67,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '3. Basic Usage: collection observable with ko.dependentObservable', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, factories: {models: ContactViewModel})
 
     view_model =
@@ -76,12 +76,12 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(collection.length, 0, "no models")
     assert.equal(view_model.count(), 0, "no count")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "2 models")
     assert.equal(view_model.count(), 2, "2 count")
 
-    collection.add(new kb.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     assert.equal(collection.length, 3, "3 models")
     assert.equal(view_model.count(), 3, "3 count")
     assert.ok(collection_observable()[2] instanceof ContactViewModel, 'correct type from factory')
@@ -100,15 +100,15 @@ describe 'knockback-collection-observable.js @quick', ->
   it '4. Basic Usage: no view models', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
 
     collection_observable = kb.collectionObservable(collection, {models_only: true})
 
     assert.equal(collection.length, 0, "no models")
     assert.equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -143,7 +143,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '5. Basic Usage: no sorting and no callbacks', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       factories:
         models: {create: (model) -> return new ContactViewModel(model)}
@@ -152,8 +152,8 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(collection.length, 0, "no models")
     assert.equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5556'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -186,7 +186,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '6. Collection sync sorting with sort_attribute', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
 
     collection_observable = kb.collectionObservable(collection, {
       view_model:           ContactViewModelClass
@@ -196,8 +196,8 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(collection.length, 0, "no models")
     assert.equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -205,7 +205,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     assert.equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
-    collection.add(new kb.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     assert.equal(collection.length, 3, "three models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -244,13 +244,13 @@ describe 'knockback-collection-observable.js @quick', ->
       return 0
 
     # without view models
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       models_only:  true
       comparator:   sortNumber
     })
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -262,13 +262,13 @@ describe 'knockback-collection-observable.js @quick', ->
     kb.release(collection_observable)
 
     # with view models
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model:   ContactViewModelClass
       comparator:   sortNumber
     })
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -286,7 +286,7 @@ describe 'knockback-collection-observable.js @quick', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     kb.NameSortedContactsCollection = kb.Collection.extend({
-      model: kb.Contact
+      model: Contact
       comparator: (model) -> return model.get('name')
     })
     collection = new kb.NameSortedContactsCollection()
@@ -298,8 +298,8 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(collection.length, 0, "no models")
     assert.equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'George', "George is first")
     assert.equal(collection.models[1].get('name'), 'Ringo', "Ringo is second")
@@ -307,7 +307,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     assert.equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
-    collection.add(new kb.Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
+    collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5557'}))
     assert.equal(collection.length, 3, "three models")
     assert.equal(collection.models[0].get('name'), 'George', "George is first")
     assert.equal(collection.models[1].get('name'), 'Paul', "Paul is second")
@@ -336,7 +336,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '9. Collection sync dynamically changing the sorting function', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new kb.ContactsCollection()
+    collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, {
       view_model:       ContactViewModel
     })
@@ -344,8 +344,8 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(collection.length, 0, "no models")
     assert.equal(collection_observable().length, 0, "no view models")
 
-    collection.add(new kb.Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
-    collection.add(new kb.Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
+    collection.add(new Contact({id: 'b1', name: 'Ringo', number: '555-555-5556'}))
+    collection.add(new Contact({id: 'b2', name: 'George', number: '555-555-5555'}))
     assert.equal(collection.length, 2, "two models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -359,7 +359,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.utils.wrappedModel(collection_observable()[0]).get('name'), 'George', "George is first - sorting worked!")
     assert.equal(kb.utils.wrappedModel(collection_observable()[1]).get('name'), 'Ringo', "Ringo is second - sorting worked!")
 
-    collection.add(new kb.Contact({id: 'b3', name: 'Paul', number: '555-555-5554'}))
+    collection.add(new Contact({id: 'b3', name: 'Paul', number: '555-555-5554'}))
     assert.equal(collection.length, 3, "three models")
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is first")
     assert.equal(collection.models[1].get('name'), 'George', "George is second")
@@ -402,13 +402,13 @@ describe 'knockback-collection-observable.js @quick', ->
         super(model, _.extend({requires: ['date']}, options))
 
     john_birthdate = new Date(1940, 10, 9)
-    john = new kb.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
+    john = new Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
     paul_birthdate = new Date(1942, 6, 18)
-    paul = new kb.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
+    paul = new Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
     george_birthdate = new Date(1943, 2, 25)
-    george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
+    george = new Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
-    ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
+    ringo = new Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
     major_duo = new kb.Collection([john, paul])
     minor_duo = new kb.Collection([george, ringo])
 
@@ -698,7 +698,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '17. Test auto-generate collections', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    models = (new kb.Contact({id: id}) for id in [1..4])
+    models = (new Contact({id: id}) for id in [1..4])
     class PersonViewModel extends kb.ViewModel
     collection_observable = kb.collectionObservable({view_model: PersonViewModel})
 
@@ -707,7 +707,7 @@ describe 'knockback-collection-observable.js @quick', ->
 
     for view_models in collection_observable()
       assert.ok(!!view_models.date())
-      assert.ok(view_models.model() instanceof kb.Contact)
+      assert.ok(view_models.model() instanceof Contact)
 
     kb.release(collection_observable)
 
@@ -717,14 +717,14 @@ describe 'knockback-collection-observable.js @quick', ->
   it '18. Test auto-generate collections with model array', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    models = (new kb.Contact({id: id}) for id in [1..4])
+    models = (new Contact({id: id}) for id in [1..4])
     class PersonViewModel extends kb.ViewModel
     collection_observable = kb.collectionObservable(models, {view_model: PersonViewModel})
     assert.equal(collection_observable.collection().length, 4)
 
     for view_models in collection_observable()
       assert.ok(!!view_models.date())
-      assert.ok(view_models.model() instanceof kb.Contact)
+      assert.ok(view_models.model() instanceof Contact)
 
     kb.release(collection_observable)
 
@@ -737,7 +737,7 @@ describe 'knockback-collection-observable.js @quick', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class PersonViewModel extends kb.ViewModel
-    collection_observable = kb.collectionObservable(new kb.ContactsCollection(), {view_model: PersonViewModel})
+    collection_observable = kb.collectionObservable(new ContactsCollection(), {view_model: PersonViewModel})
 
     # LEGACY
     if collection_observable.collection().push
@@ -747,7 +747,7 @@ describe 'knockback-collection-observable.js @quick', ->
       collection_observable.collection().push(null)
       assert.equal(collection_observable.collection().length, 0)
       assert.equal(collection_observable().length, 0)
-      collection_observable.collection().push(new kb.Contact())
+      collection_observable.collection().push(new Contact())
       assert.equal(collection_observable.collection().length, 1)
       assert.equal(collection_observable().length, 1)
       collection_observable.collection().reset()
@@ -762,7 +762,7 @@ describe 'knockback-collection-observable.js @quick', ->
       collection_observable.collection().unshift(null)
       assert.equal(collection_observable.collection().length, 0)
       assert.equal(collection_observable().length, 0)
-      collection_observable.collection().unshift(new kb.Contact())
+      collection_observable.collection().unshift(new Contact())
       assert.equal(collection_observable.collection().length, 1)
       assert.equal(collection_observable().length, 1)
       collection_observable.collection().reset()
@@ -777,7 +777,7 @@ describe 'knockback-collection-observable.js @quick', ->
   it '20. Auto compact for collections', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    models = (new kb.Contact({id: id}) for id in [1..4])
+    models = (new Contact({id: id}) for id in [1..4])
     class PersonViewModel extends kb.ViewModel
     collection_observable = kb.collectionObservable(models, {view_model: PersonViewModel, auto_compact: true})
     assert.equal(collection_observable.collection().length, 4)
@@ -786,7 +786,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(previous_view_models.length, 4)
     assert.equal(kb.statistics.registeredStatsString('all released'), 'ViewModel: 4\n CollectionObservable: 1', "Expected stats")
 
-    collection_observable.collection().add(new kb.Contact({id: 5}))
+    collection_observable.collection().add(new Contact({id: 5}))
     new_view_models = collection_observable()
     assert.equal(new_view_models.length, 5)
     assert.equal(previous_view_models.length, 4)

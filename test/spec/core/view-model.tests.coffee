@@ -16,8 +16,8 @@ describe 'knockback-view-model.js @quick', ->
   # LEGACY
   ko.computed = ko.dependentObservable unless ko.computed
 
-  kb.Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  kb.ContactsCollection = kb.Collection.extend({ model: kb.Contact })
+  Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
+  ContactsCollection = kb.Collection.extend({ model: Contact })
 
   class TestViewModel extends kb.ViewModel
     constructor: ->
@@ -29,7 +29,7 @@ describe 'knockback-view-model.js @quick', ->
   it '1. Standard use case: read and write', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = kb.viewModel(model)
 
     # get
@@ -60,7 +60,7 @@ describe 'knockback-view-model.js @quick', ->
         super(model, {internals: ['name', 'number']})
         @name = ko.dependentObservable(=> return "First: #{@_name()}")
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -96,7 +96,7 @@ describe 'knockback-view-model.js @quick', ->
       }, view_model)
       return view_model
 
-    model = new kb.Contact({name: 'Ringo', number: '555-555-5556'})
+    model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
 
     # get
@@ -265,13 +265,13 @@ describe 'knockback-view-model.js @quick', ->
         super(model, _.extend({requires: ['date']}, options))
 
     john_birthdate = new Date(1940, 10, 9)
-    john = new kb.Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
+    john = new Contact({name: 'John', date: new Date(john_birthdate.valueOf())})
     paul_birthdate = new Date(1942, 6, 18)
-    paul = new kb.Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
+    paul = new Contact({name: 'Paul', date: new Date(paul_birthdate.valueOf())})
     george_birthdate = new Date(1943, 2, 25)
-    george = new kb.Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
+    george = new Contact({name: 'George', date: new Date(george_birthdate.valueOf())})
     ringo_birthdate = new Date(1940, 7, 7)
-    ringo = new kb.Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
+    ringo = new Contact({name: 'Ringo', date: new Date(ringo_birthdate.valueOf())})
     major_duo = new kb.Collection([john, paul])
     minor_duo = new kb.Collection([george, ringo])
     nested_model = new kb.Model({
