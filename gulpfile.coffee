@@ -6,7 +6,6 @@ es = require 'event-stream'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
-requireSrc = require 'gulp-require-src'
 webpack = require 'gulp-webpack-config'
 rename = require 'gulp-rename'
 uglify = require 'gulp-uglify'
@@ -29,12 +28,6 @@ HEADER = module.exports = """
 */\n
 """
 LIBRARY_FILES = require('./config/files').libraries
-
-gulp.task 'postinstall', (callback) ->
-  queue = new Queue(1)
-  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').dependencies), {version: true}).pipe(gulp.dest('vendor')).on('end', callback)
-  queue.defer (callback) -> requireSrc(_.keys(require('./package.json').optionalDependencies), {version: true}).pipe(gulp.dest('vendor/optional')).on('end', callback)
-  queue.await callback
 
 gulp.task 'build', buildLibraries = (callback) ->
   errors = []
@@ -62,7 +55,7 @@ gulp.task 'test-node', ['minify'], testNode = (callback) ->
   gutil.log 'Running Node.js tests'
   require './test/lib/node_jquery_xhr' # ensure that globals for the target backend are loaded
   gulp.src('test/spec/**/*.tests.coffee')
-    .pipe(mocha())
+    .pipe(mocha({reporter: 'dot'}))
     .pipe es.writeArray callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 

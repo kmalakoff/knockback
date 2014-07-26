@@ -72,13 +72,14 @@
   },
   "optionalDependencies": {
     "jquery": "*",
-    "backbone-relational": "0.8.x",
-    "backbone-modelref": "0.1.x",
-    "lodash": "2.x",
-    "backbone-orm": "0.6.x",
+    "backbone-relational": "*",
+    "backbone-modelref": "*",
+    "lodash": "*",
+    "backbone-orm": "*",
     "moment": "2.x",
-    "backbone-associations": "0.6.x",
-    "supermodel": "git+https://github.com/pathable/supermodel"
+    "backbone-associations": "*",
+    "supermodel": "git+https://github.com/pathable/supermodel",
+    "parse": "*"
   },
   "jam": {
     "dependencies": {
