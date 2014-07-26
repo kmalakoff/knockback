@@ -80,7 +80,7 @@ kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 })
 ###############################
 
-describe 'knockback-localized-observable.js', ->
+describe 'knockback-localized-observable.js @quick', ->
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -701,7 +701,7 @@ describe 'knockback-localized-observable.js', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-describe 'knockback-defaults.js', ->
+describe 'knockback-defaults.js @quick', ->
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

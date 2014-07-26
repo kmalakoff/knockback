@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'knockback.js memory management', ->
+describe 'knockback.js memory management @quick', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$

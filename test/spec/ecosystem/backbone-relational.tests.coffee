@@ -1,7 +1,7 @@
 root = if window? then window else global
 assert = assert or require?('chai').assert
 
-describe 'Knockback.js with Backbone-Relational.js', ->
+describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
   after: -> delete root.Person; delete root.Building
 

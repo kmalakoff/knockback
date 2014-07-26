@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'knockback-view-model.js', ->
+describe 'knockback-view-model.js @quick', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   _ = kb._; ko = kb.ko; $ = kb.$

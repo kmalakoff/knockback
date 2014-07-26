@@ -6,9 +6,9 @@ gutil = require 'gulp-util'
 resolveModule = (module_name) -> path.relative('.', require.resolve(module_name))
 
 KNOCKBACK =
-  full: ['./knockback.js']
-  full_min: ['./knockback.min.js']
-  full_stack: ['./knockback-full-stack.js']
+  browser_globals: ['./knockback.js']
+  browser_globals_min: ['./knockback.min.js']
+  browser_globals_stack: ['./knockback-browser_globals-stack.js']
   core: ['./knockback-core.js']
   core_min: ['./knockback-core.min.js']
   core_stack: ['./knockback-core-stack.js']
@@ -30,13 +30,13 @@ module.exports = TEST_GROUPS = {}
 ###############################
 # Full Library
 ###############################
-TEST_GROUPS.full = []
-for library_name, library_files of KNOCKBACK when (library_name.indexOf('full') >= 0 and library_name.indexOf('stack') < 0)
+TEST_GROUPS.browser_globals = []
+for library_name, library_files of KNOCKBACK when (library_name.indexOf('browser_globals') >= 0 and library_name.indexOf('stack') < 0)
   for dep_name, dep_files of REQUIRED_DEPENDENCIES
     if dep_name.indexOf('backbone') >= 0 # Backbone
-      TEST_GROUPS.full.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])})
+      TEST_GROUPS.browser_globals.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])})
     else # Parse
-      TEST_GROUPS.full.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])})
+      TEST_GROUPS.browser_globals.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])})
 
 ###############################
 # Core Library
@@ -49,10 +49,10 @@ for test_name, library_files of KNOCKBACK when (test_name.indexOf('core') >= 0 a
 # ORM
 ###############################
 ORM_TESTS =
-  backbone_orm: [KNOCKBACK.full, resolveModule('backbone-orm'), './test/spec/ecosystem/**/backbone-orm*.tests.coffee']
-  backbone_relational: [KNOCKBACK.full, resolveModule('backbone-relational'), './test/spec/ecosystem/**/backbone-relational*.tests.coffee']
-  backbone_associations: [KNOCKBACK.full, resolveModule('backbone-associations'), './test/spec/ecosystem/**/backbone-associations*.tests.coffee']
-  supermodel: [KNOCKBACK.full, resolveModule('supermodel'), './test/spec/ecosystem/**/supermodel*.tests.coffee']
+  backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/spec/ecosystem/**/backbone-orm*.tests.coffee']
+  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/spec/ecosystem/**/backbone-relational*.tests.coffee']
+  backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/spec/ecosystem/**/backbone-associations*.tests.coffee']
+  supermodel: [KNOCKBACK.browser_globals, resolveModule('supermodel'), './test/spec/ecosystem/**/supermodel*.tests.coffee']
 
 TEST_GROUPS.orm = []
 for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')
@@ -63,7 +63,7 @@ for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_la
 ###############################
 AMD_OPTIONS = require './amd/gulp-options'
 TEST_GROUPS.amd = []
-for test in TEST_GROUPS.full.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
+for test in TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
   test_files = ['./node_modules/chai/chai.js'].concat(test.files); files = []; test_patterns = []; path_files = []
   files.push({pattern: './test/lib/requirejs-2.1.14.js'})
   test_files.unshift(resolveModule('jquery')) unless resolveModule('jquery') in test_files # jQuery is required for Backbone using AMD

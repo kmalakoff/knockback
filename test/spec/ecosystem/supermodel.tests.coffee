@@ -1,7 +1,7 @@
 root = if window? then window else global
 assert = assert or require?('chai').assert
 
-describe 'Knockback.js with Backbone Supermodel', ->
+describe 'Knockback.js with Backbone Supermodel @supermodel', ->
 
   root.Supermodel = Supermodel = window?.Supermodel or require?('supermodel')
 

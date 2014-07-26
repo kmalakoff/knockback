@@ -51,24 +51,31 @@ gulp.task 'minify', ['build'], (callback) ->
     .on('end', callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'test-node', ['minify'], testNode = (callback) ->
-  gutil.log 'Running Node.js tests'
+testNodeFn = (options={}) -> (callback) ->
+  gutil.log "Running Node.js tests #{if options.quick then '(quick)' else ''}"
   require './test/lib/node_jquery_xhr' # ensure that globals for the target backend are loaded
+  mocha_options = if options.quick then {grep: '@quick'} else {}
   gulp.src('test/spec/**/*.tests.coffee')
-    .pipe(mocha({reporter: 'dot'}))
+    .pipe(mocha(_.extend({reporter: 'dot'}, mocha_options)))
     .pipe es.writeArray callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'test-browsers', ['minify'], testBrowsers = (callback) ->
-  gutil.log 'Running Browser tests'
-  (require './config/karma/run')(callback)
+testBrowsersFn = (options={}) -> (callback) ->
+  gutil.log "Running Browser tests #{if options.quick then '(quick)' else ''}"
+  (require './config/karma/run')(options, callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
+gulp.task 'test-node', ['minify'], testNodeFn()
+gulp.task 'test-browsers', ['minify'], testBrowsersFn()
 gulp.task 'test', ['minify'], (callback) ->
-  Async.series [testNode, testBrowsers], (err) -> process.exit(if err then 1 else 0)
+  Async.series [testNodeFn(), testBrowsersFn()], (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'test-quick', ['build'], testNode
+gulp.task 'test-node-quick', ['build'], testNodeFn({quick: true})
+gulp.task 'test-browsers-quick', ['build'], testBrowsersFn({quick: true})
+gulp.task 'test-quick', ['build'], (callback) ->
+  Async.series [testNodeFn({quick: true}), testBrowsersFn({quick: true})], (err) -> if err then process.exit(1) else callback(err)
+  return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'publish', ['minify'], (callback) ->
   copyLibraryFiles = (destination, others, callback) ->
@@ -77,12 +84,12 @@ gulp.task 'publish', ['minify'], (callback) ->
       .on('end', callback)
 
   queue = new Queue(1)
-  queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
+  queue.defer (callback) -> Async.series [testNodeFn(), testBrowsersFn()], callback
   queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
-  queue.defer (callback) ->
-    gulp.src('packages/nuget/*.nuspec')
-      .pipe(nugetGulp())
-      .on('end', callback)
+  # queue.defer (callback) ->
+  #   gulp.src('packages/nuget/*.nuspec')
+  #     .pipe(nugetGulp())
+  #     .on('end', callback)
   queue.await (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
