@@ -4,7 +4,7 @@ describe 'knockback-validation.js @quick', ->
   window = if window? then window else global
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  _ = kb._; ko = kb.ko; $ = kb.$
+  {_, ko, $} = kb
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

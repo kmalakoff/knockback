@@ -1,7 +1,7 @@
 assert = assert or require?('chai').assert
 
 kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-_ = kb._; ko = kb.ko
+{_, ko} = kb
 kb.Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
 
 unless Globalize

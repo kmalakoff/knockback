@@ -7,8 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-kb = require './kb'
-_ = kb._
+{_} = kb = require './kb'
 
 # Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 #

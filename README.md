@@ -162,31 +162,23 @@ Enjoy!
 Kevin
 
 
-Building, Running and Testing the library
------------------------
 
-###Installing:
+### For Contributors
 
-1. install node.js: http://nodejs.org
-2. install node packages: `npm install`
-
-###Commands:
-
-1. Build: `npm run build`
-2. Build and run tests: `npm test`
-3. Build documents: `npm run docs`
-
-# One Time
-To run all tests (Node.js only):
+To build the library for Node.js and browsers:
 
 ```
-mocha --grep '' test/**/*.tests.coffee
+$ gulp build
 ```
 
-# TDD
-To run all tests (Node.js only) in multiple terminals run:
+Please run tests before submitting a pull request:
 
 ```
-npm run watch
-mocha --grep '' test/**/*.tests.coffee --watch
+$ gulp test-quick
+```
+
+and eventually all tests:
+
+```
+$ npm test
 ```

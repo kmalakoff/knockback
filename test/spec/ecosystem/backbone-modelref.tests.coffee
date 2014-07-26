@@ -4,7 +4,7 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
 
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  _ = kb._; Backbone = kb.Backbone; ko = kb.ko
+  {_, Backbone, ko} = kb
   Backbone.ModelRef = window?.Backbone.ModelRef or require?('backbone-modelref')
 
   it 'TEST DEPENDENCY MISSING', (done) ->

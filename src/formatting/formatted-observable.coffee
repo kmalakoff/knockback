@@ -7,8 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-kb = require '../core/kb'
-_ = kb._; ko = kb.ko
+{_, ko} = kb = require '../core/kb'
 
 arraySlice = Array.prototype.slice
 

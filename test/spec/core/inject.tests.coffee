@@ -4,7 +4,7 @@ describe 'knockback-inject.js @quick', ->
   window = if window? then window else global
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  _ = kb._; ko = kb.ko; $ = kb.$
+  {_, ko, $} = kb
   return unless $ # no jquery
 
   it 'TEST DEPENDENCY MISSING', (done) ->

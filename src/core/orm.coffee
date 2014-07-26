@@ -9,8 +9,7 @@
 
 root = if window? then window else global
 
-kb = require './kb'
-_ = kb._
+{_} = kb = require './kb'
 
 # @nodoc
 class ORM

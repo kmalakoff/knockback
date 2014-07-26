@@ -3,7 +3,7 @@ assert = assert or require?('chai').assert
 describe 'knockback-triggered-observable.js @quick', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  _ = kb._; ko = kb.ko
+  {_, ko} = kb
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

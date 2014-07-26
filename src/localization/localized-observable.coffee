@@ -7,8 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-kb = require '../core/kb'
-_ = kb._; ko = kb.ko
+{_, ko} = kb = require '../core/kb'
 
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing

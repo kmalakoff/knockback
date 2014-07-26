@@ -7,8 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-kb = require './kb'
-_ = kb._; ko = kb.ko
+{_, ko} = kb = require './kb'
 
 # Base class for ViewModels for Models.
 #

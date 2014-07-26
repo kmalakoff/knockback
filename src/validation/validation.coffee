@@ -7,9 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-kb = require '../core/kb'
-_ = kb._; ko = kb.ko
-$ = kb.$
+{_, ko, $} = kb = require '../core/kb'
 
 require './validators'
 

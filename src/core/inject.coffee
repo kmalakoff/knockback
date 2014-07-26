@@ -9,9 +9,7 @@
 
 window = if window? then window else global
 
-kb = require './kb'
-_ = kb._; ko = kb.ko
-$ = kb.$
+{_, ko, $} = kb = require './kb'
 
 kb.RECUSIVE_AUTO_INJECT = true
 
