@@ -108,3 +108,16 @@ describe 'knockback_core utils @quick', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/103
+  it 'kb.release handling type changes', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model = new kb.Model()
+    model.set({foo: [1,2,3]})
+    observable = kb.viewModel(model)
+    model.set({foo: null})
+    kb.release(observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

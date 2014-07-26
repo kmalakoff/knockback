@@ -1513,6 +1513,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (value.collection() !== new_value) {
 	        return value.collection(new_value);
 	      }
+	    } else if (this.value_type !== new_type) {
+	      return this._updateValueObservable(new_value);
 	    } else {
 	      if (value() !== new_value) {
 	        return value(new_value);

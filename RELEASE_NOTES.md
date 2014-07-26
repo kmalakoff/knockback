@@ -5,6 +5,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * Patched Knockout extend to release observables: https://github.com/kmalakoff/knockback/issues/124
 * Fixed event emitter not being updated when model changed: https://github.com/kmalakoff/knockback/issues/108
 * Fixed defaults considering 0 as empty: https://github.com/kmalakoff/knockback/issues/114
+* Fixed setting array attribute to null: https://github.com/kmalakoff/knockback/issues/103
 
 ## 0.19.0
 * Removed standalone plugins. Just choose knockback if you need one or more plugins.
