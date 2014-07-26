@@ -4,6 +4,9 @@ kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('..
 {_, ko} = kb
 kb.Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
 
+# LEGACY
+ko.computed = ko.dependentObservable unless ko.computed
+
 unless Globalize
   Globalize = require?('../../lib/globalize')
   require?('../../lib/globalize.culture.en-GB.js'); require?('../../lib/globalize.culture.fr-FR.js')
@@ -937,6 +940,28 @@ describe 'knockback-defaults.js @quick', ->
 
     # and cleanup after yourself when you are done.
     kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  # https://github.com/kmalakoff/knockback/issues/114
+  it '4. 0 should not behave as null', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model = new Contact()
+    casebutton = kb.observable(model, {key:'casebutton', 'default': 99});
+    casecond = ko.computed ->
+      switch casebutton()
+        when 0 then return 'Open'
+        when 1 then return 'Closed'
+        else return 'Unknown'
+
+    assert.equal(casebutton(), 99)
+    assert.equal(casecond(), 'Unknown')
+
+    model.set({casebutton: 0})
+    assert.equal(casebutton(), 0)
+    assert.equal(casecond(), 'Open')
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()

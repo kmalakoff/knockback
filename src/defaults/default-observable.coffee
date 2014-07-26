@@ -25,7 +25,8 @@ module.exports = class kb.DefaultObservable
   constructor: (target_observable, @dv) -> # @dv is default value
     observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
       read: =>
-        return if (current_target = ko.utils.unwrapObservable(target_observable())) then current_target else ko.utils.unwrapObservable(@dv)
+        current_target = ko.utils.unwrapObservable(target_observable())
+        return if _.isNull(current_target) or _.isUndefined(current_target) then ko.utils.unwrapObservable(@dv) else current_target
       write: (value) -> target_observable(value)
     }))
 

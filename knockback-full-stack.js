@@ -2707,10 +2707,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      read: (function(_this) {
 	        return function() {
 	          var current_target;
-	          if ((current_target = ko.utils.unwrapObservable(target_observable()))) {
-	            return current_target;
-	          } else {
+	          current_target = ko.utils.unwrapObservable(target_observable());
+	          if (_.isNull(current_target) || _.isUndefined(current_target)) {
 	            return ko.utils.unwrapObservable(_this.dv);
+	          } else {
+	            return current_target;
 	          }
 	        };
 	      })(this),
