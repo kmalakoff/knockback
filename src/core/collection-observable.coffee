@@ -50,7 +50,7 @@ kb.compare = (value_a, value_b) ->
 #     });
 #
 # @method #collection()
-#   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed collection.
+#   Dual-purpose getter/setter ko.computed for the observed collection.
 #   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 #
 class kb.CollectionObservable
@@ -122,7 +122,7 @@ class kb.CollectionObservable
 
     # start the processing
     @_collection = ko.observable(collection)
-    observable.collection = @collection = ko.dependentObservable(
+    observable.collection = @collection = ko.computed {
       read: => return @_collection()
       write: (new_collection) => kb.ignore =>
         return if ((previous_collection = @_collection()) is new_collection) # no change
@@ -135,11 +135,11 @@ class kb.CollectionObservable
 
         # update references (including notification)
         @_collection(new_collection)
-    )
+    }
     collection.bind('all', @__kb._onCollectionChange) if collection # bind now
 
     # observable that will re-trigger when sort or filters or collection changes
-    @_mapper = ko.dependentObservable(=>
+    @_mapper = ko.computed =>
       comparator = @_comparator() # create dependency
       filters = @_filters() # create dependency
       (ko.utils.unwrapObservable(filter) for filter in filters) if filters # create a dependency
@@ -172,7 +172,6 @@ class kb.CollectionObservable
       @in_edit++
       observable(view_models)
       @in_edit--
-    )
 
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))

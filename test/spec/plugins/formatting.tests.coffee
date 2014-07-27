@@ -23,7 +23,7 @@ describe 'knockback-formatted-observable.js @quick', ->
     class ContactViewModelCustom extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number']})
-        @name = ko.dependentObservable(=> return "Name: #{@_name()}")
+        @name = ko.computed(=> return "Name: #{@_name()}")
         @number = kb.formattedObservable('#: {0}', @_number)
         @name_number = kb.formattedObservable('Name: {0}, #: {1}', @_name, @_number)
         @number_name = kb.formattedObservable('#: {1}, Name: {0}', @_name, @_number)
@@ -127,7 +127,7 @@ describe 'knockback-formatted-observable.js @quick', ->
     class ContactViewModelCustom extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number']})
-        @name = ko.dependentObservable(=> return "First: #{@_name()}")
+        @name = ko.computed(=> return "First: #{@_name()}")
         @number = kb.formattedObservable('#: {0}', @_number)
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})

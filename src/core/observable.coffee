@@ -25,7 +25,7 @@
 #   name.setToDefault(); // name is (none)
 #
 # @method #model()
-#   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
+#   Dual-purpose getter/setter ko.computed for the observed model.
 #   @return [Model|ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
 #   @example
 #     var observable = kb.observable(new Backbone.Model({name: 'bob'}), 'name');
@@ -75,7 +75,7 @@ class kb.Observable
     @_wait = ko.observable(true)
 
     # watch the model for changes
-    observable = kb.utils.wrappedObservable @, ko.dependentObservable {
+    observable = kb.utils.wrappedObservable @, ko.computed {
       read: =>
         return if @_wait?()
         _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
@@ -100,7 +100,7 @@ class kb.Observable
     }
 
     # use external model observable or create
-    observable.model = @model = ko.dependentObservable {
+    observable.model = @model = ko.computed {
       read: => ko.utils.unwrapObservable(@_model)
       write: (new_model) => kb.ignore => return if kb.wasReleased(@); kb.utils.wrappedEventWatcher(@).emitter(new_model)
     }

@@ -263,7 +263,7 @@ module.exports = class kb
   #
   # @example
   #   kb.ignore(fn);
-  @ignore = ko.dependencyDetection?.ignore or (callback, callbackTarget, callbackArgs) -> value = null; ko.dependentObservable(-> value = callback.apply(callbackTarget, callbackArgs || [])).dispose(); return value
+  @ignore = ko.dependencyDetection?.ignore or (callback, callbackTarget, callbackArgs) -> value = null; ko.computed(-> value = callback.apply(callbackTarget, callbackArgs || [])).dispose(); return value
   @extend = extend
 
   ####################################

@@ -49,13 +49,13 @@
 #     var ViewModel = kb.ViewModel.extend({
 #       constructor: function(model){
 #         kb.ViewModel.prototype.constructor.apply(this, arguments);
-#         this.full_name = ko.dependentObservable(function() { return this.first_name() + " " + this.last_name(); }, this);
+#         this.full_name = ko.computed(function() { return this.first_name() + " " + this.last_name(); }, this);
 #       }
 #     });
 #     var view_model = new ViewModel(model);
 #
 # @method #model()
-#   Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.
+#   Dual-purpose getter/setter ko.computed for the observed model.
 #   @return [Model|ModelRef|void] getter: the model whose attributes are being observed (can be null) OR setter: void
 #   @example
 #     var view_model = kb.viewModel(new Backbone.Model({name: 'bob'}));
@@ -111,7 +111,7 @@ class kb.ViewModel
 
     # create an observable model function and use watcher
     _mdl = kb._wrappedKey(@, '_mdl', ko.observable())
-    @model = ko.dependentObservable(
+    @model = ko.computed {
       read: => _mdl(); return kb.utils.wrappedObject(@)
       write: (new_model) => kb.ignore =>
         return if (kb.utils.wrappedObject(@) is new_model) # no change
@@ -135,7 +135,7 @@ class kb.ViewModel
             @createObservables(new_model, missing)
         _mdl(new_model)
         return
-    )
+    }
     event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @model}))
 
     # collect requires and internls first because they could be used to define the include order

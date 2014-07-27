@@ -33,13 +33,13 @@ describe 'knockback-collection-observable.js @quick', ->
       value = @test()
       value = @name()
 
-  it '2. Basic Usage: collection observable with ko.dependentObservable', (done) ->
+  it '2. Basic Usage: collection observable with ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection)
     view_model =
-      count: ko.dependentObservable(->return collection_observable().length )
+      count: ko.computed(->return collection_observable().length )
 
     assert.equal(collection.length, 0, "no models")
     assert.equal(view_model.count(), 0, "no count")
@@ -64,14 +64,14 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '3. Basic Usage: collection observable with ko.dependentObservable', (done) ->
+  it '3. Basic Usage: collection observable with ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection = new ContactsCollection()
     collection_observable = kb.collectionObservable(collection, factories: {models: ContactViewModel})
 
     view_model =
-      count: ko.dependentObservable(-> return collection_observable().length)
+      count: ko.computed(-> return collection_observable().length)
 
     assert.equal(collection.length, 0, "no models")
     assert.equal(view_model.count(), 0, "no count")
@@ -523,7 +523,7 @@ describe 'knockback-collection-observable.js @quick', ->
     collection_observable5 = kb.collectionObservable(collection, {filters: [5]})
     collection_observable6 = kb.collectionObservable(collection, {filters: (model) -> model.get('name') isnt 'George'})
     collection_observable7 = kb.collectionObservable(collection, {filters: [((model) -> model.get('name') isnt 'Bob'), ((model) -> return model.get('name') isnt 'Fred')]})
-    observable1 = ko.dependentObservable(-> _.filter(collection_observable6(), (vm) -> vm.name() is 'Bob'))
+    observable1 = ko.computed(-> _.filter(collection_observable6(), (vm) -> vm.name() is 'Bob'))
 
     assert.equal(_.map(_.pluck(collection_observable1(), 'name'), (o) -> o()).join(', '), 'Bob, Fred, George')
     assert.equal(_.map(_.pluck(collection_observable2(), 'name'), (o) -> o()).join(', '), 'Bob')
@@ -594,7 +594,7 @@ describe 'knockback-collection-observable.js @quick', ->
     collection_observable = kb.collectionObservable(collection)
 
     count = 0
-    ko.dependentObservable(-> collection_observable.collection(); count++)
+    ko.computed(-> collection_observable.collection(); count++)
     assert.ok(collection_observable()[0] instanceof kb.ViewModel, 'is a kb.ViewModel')
 
     collection_observable.collection(null)
@@ -613,7 +613,7 @@ describe 'knockback-collection-observable.js @quick', ->
     collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
     count = 0
-    ko.dependentObservable(-> collection_observable.collection(); count++)
+    ko.computed(-> collection_observable.collection(); count++)
     assert.ok(collection_observable()[0] instanceof kb.ViewModel, 'is a kb.ViewModel')
 
     collection_observable.collection(null)
@@ -632,7 +632,7 @@ describe 'knockback-collection-observable.js @quick', ->
     collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}])
 
     count = 0
-    ko.dependentObservable(-> collection_observable.collection(); count++)
+    ko.computed(-> collection_observable.collection(); count++)
     assert.ok(collection_observable()[0] instanceof ContactViewModel, 'is a ContactViewModel')
 
     collection_observable.collection(null)
@@ -643,34 +643,34 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '17. collection changes do not cause dependencies inside ko.dependentObservable', (done) ->
+  it '17. collection changes do not cause dependencies inside ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection_observable = kb.collectionObservable({view_model: TestViewModel})
     collection = collection_observable.collection()
 
     count_manual = 0
-    ko.dependentObservable ->
+    ko.computed ->
       collection_observable([new TestViewModel(new kb.Model({id: 10, name: 'Manual'}))]) # should not depend
       count_manual++
 
     count_reset = 0
-    ko.dependentObservable ->
+    ko.computed ->
       collection.reset([{id: 20, name: 'Reset1'}, {id: 21, name: 'Reset2'}]) # should not depend
       count_reset++
 
     count_add = 0
-    ko.dependentObservable ->
+    ko.computed ->
       collection.add([{id: 30, name: 'Add1'}, {id: 31, name: 'Add2'}]) # should not depend
       count_add++
 
     count_remove = 0
-    ko.dependentObservable ->
+    ko.computed ->
       collection.remove(collection.at(0))
       count_remove++
 
     observable_count = 0
-    ko.dependentObservable ->
+    ko.computed ->
       collection_observable() # should depend
       observable_count++
 

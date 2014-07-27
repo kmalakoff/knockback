@@ -4,9 +4,6 @@ kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('..
 {_, ko} = kb
 kb.Backbone.ModelRef or require?('backbone-modelref') if kb.Backbone
 
-# LEGACY
-ko.computed = ko.dependentObservable unless ko.computed
-
 unless Globalize
   Globalize = require?('../../lib/globalize')
   require?('../../lib/globalize.culture.en-GB.js'); require?('../../lib/globalize.culture.fr-FR.js')

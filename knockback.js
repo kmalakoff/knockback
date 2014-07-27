@@ -168,7 +168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        kb.publishMethods(observable, _this, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']);
 	        _this._collection = ko.observable(collection);
-	        observable.collection = _this.collection = ko.dependentObservable({
+	        observable.collection = _this.collection = ko.computed({
 	          read: function() {
 	            return _this._collection();
 	          },
@@ -191,7 +191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (collection) {
 	          collection.bind('all', _this.__kb._onCollectionChange);
 	        }
-	        _this._mapper = ko.dependentObservable(function() {
+	        _this._mapper = ko.computed(function() {
 	          var comparator, current_collection, filter, filters, models, view_models, _i, _len;
 	          comparator = _this._comparator();
 	          filters = _this._filters();
@@ -918,7 +918,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Inject() {}
 
 	  Inject.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-	    var inject, result, wrapper;
+	    var inject;
 	    inject = function(data) {
 	      var key, target, value;
 	      if (_.isFunction(data)) {
@@ -949,11 +949,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (nested) {
 	      return inject(data);
 	    } else {
-	      result = (wrapper = ko.dependentObservable(function() {
+	      return kb.ignore(function() {
 	        return inject(data);
-	      }))();
-	      wrapper.dispose();
-	      return result;
+	      });
 	    }
 	  };
 
@@ -1282,7 +1280,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  kb.ignore = ((_ref = ko.dependencyDetection) != null ? _ref.ignore : void 0) || function(callback, callbackTarget, callbackArgs) {
 	    var value;
 	    value = null;
-	    ko.dependentObservable(function() {
+	    ko.computed(function() {
 	      return value = callback.apply(callbackTarget, callbackArgs || []);
 	    }).dispose();
 	    return value;
@@ -1435,7 +1433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        _this._model(kb.utils.wrappedEventWatcher(_this).ee);
 	        _this._wait = ko.observable(true);
-	        observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
+	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
 	            var arg, args, _i, _len, _model, _ref1;
 	            if (typeof _this._wait === "function" ? _this._wait() : void 0) {
@@ -1475,7 +1473,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          },
 	          owner: _this._vm
 	        }));
-	        observable.model = _this.model = ko.dependentObservable({
+	        observable.model = _this.model = ko.computed({
 	          read: function() {
 	            return ko.utils.unwrapObservable(_this._model);
 	          },
@@ -2303,7 +2301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
 	        _mdl = kb._wrappedKey(_this, '_mdl', ko.observable());
-	        _this.model = ko.dependentObservable({
+	        _this.model = ko.computed({
 	          read: function() {
 	            _mdl();
 	            return kb.utils.wrappedObject(_this);
@@ -2532,7 +2530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function DefaultObservable(target_observable, dv) {
 	    var observable;
 	    this.dv = dv;
-	    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+	    observable = kb.utils.wrappedObservable(this, ko.computed({
 	      read: (function(_this) {
 	        return function() {
 	          var current_target;
@@ -2666,7 +2664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      observable_args = arraySlice.call(arguments, 1);
 	    }
-	    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+	    observable = kb.utils.wrappedObservable(this, ko.computed({
 	      read: function() {
 	        var arg, _i, _len;
 	        args = [ko.utils.unwrapObservable(format)];
@@ -2740,7 +2738,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = ko.utils.unwrapObservable(this.value);
 	    }
 	    this.vo = ko.observable(!value ? null : this.read(value, null));
-	    observable = kb.utils.wrappedObservable(this, ko.dependentObservable({
+	    observable = kb.utils.wrappedObservable(this, ko.computed({
 	      read: (function(_this) {
 	        return function() {
 	          if (_this.value) {
@@ -2836,7 +2834,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    emitter || kb._throwMissing(this, 'emitter');
 	    this.event_selector || kb._throwMissing(this, 'event_selector');
 	    this.vo = ko.observable();
-	    observable = kb.utils.wrappedObservable(this, ko.dependentObservable((function(_this) {
+	    observable = kb.utils.wrappedObservable(this, ko.computed((function(_this) {
 	      return function() {
 	        return _this.vo();
 	      };
@@ -2923,7 +2921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    validation_options = {};
 	  }
 	  (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
-	  return ko.dependentObservable(function() {
+	  return ko.computed(function() {
 	    var active_index, current_value, disabled, identifier, identifier_index, priorities, results, validator;
 	    results = {
 	      $error_count: 0
@@ -3012,7 +3010,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    validator = kb.inputValidator(view_model, input_el, validation_options);
 	    !validator || validators.push(results[name] = validator);
 	  }
-	  results.$error_count = ko.dependentObservable(function() {
+	  results.$error_count = ko.computed(function() {
 	    var error_count, _j, _len1;
 	    error_count = 0;
 	    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
@@ -3021,10 +3019,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return error_count;
 	  });
-	  results.$valid = ko.dependentObservable(function() {
+	  results.$valid = ko.computed(function() {
 	    return results.$error_count() === 0;
 	  });
-	  results.$enabled = ko.dependentObservable(function() {
+	  results.$enabled = ko.computed(function() {
 	    var enabled, _j, _len1;
 	    enabled = true;
 	    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
@@ -3033,7 +3031,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return enabled;
 	  });
-	  results.$disabled = ko.dependentObservable(function() {
+	  results.$disabled = ko.computed(function() {
 	    return !results.$enabled();
 	  });
 	  if (form_name) {

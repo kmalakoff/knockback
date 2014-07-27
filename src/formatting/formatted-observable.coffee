@@ -79,7 +79,7 @@ module.exports = class kb.FormattedObservable
     else
       observable_args = arraySlice.call(arguments, 1)
 
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
+    observable = kb.utils.wrappedObservable @, ko.computed {
       read: ->
         args = [ko.utils.unwrapObservable(format)]
         args.push(ko.utils.unwrapObservable(arg)) for arg in observable_args
@@ -91,7 +91,7 @@ module.exports = class kb.FormattedObservable
           observable_args[index](matches[index])
           index++
         return
-    }))
+    }
 
     return observable
 

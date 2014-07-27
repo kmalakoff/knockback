@@ -22,7 +22,7 @@ describe 'knockback-triggered-observable.js @quick', ->
 
     view_model =
       triggered_observable: kb.triggeredObservable(model, 'change')
-    view_model.counter = ko.dependentObservable(->
+    view_model.counter = ko.computed(->
       view_model.triggered_observable() # add a dependency
       return trigger_count++
     )

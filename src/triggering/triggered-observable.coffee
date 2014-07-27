@@ -20,7 +20,7 @@
 #   var view_emitter = {
 #     triggered_observable: kb.triggeredObservable(emitter, 'change')
 #   };
-#   view_emitter.counter = ko.dependentObservable(function() {
+#   view_emitter.counter = ko.computed(function() {
 #     view_emitter.triggered_observable() // add a dependency
 #     return trigger_count++
 #   });
@@ -41,7 +41,7 @@ module.exports = class kb.TriggeredObservable
 
     # internal state
     @vo = ko.observable()
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(=> @vo()))
+    observable = kb.utils.wrappedObservable(@, ko.computed(=> @vo()))
 
     # publish public interface on the observable and return instead of this
     kb.publishMethods(observable, @, ['destroy'])

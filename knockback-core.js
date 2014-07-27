@@ -163,7 +163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        kb.publishMethods(observable, _this, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']);
 	        _this._collection = ko.observable(collection);
-	        observable.collection = _this.collection = ko.dependentObservable({
+	        observable.collection = _this.collection = ko.computed({
 	          read: function() {
 	            return _this._collection();
 	          },
@@ -186,7 +186,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (collection) {
 	          collection.bind('all', _this.__kb._onCollectionChange);
 	        }
-	        _this._mapper = ko.dependentObservable(function() {
+	        _this._mapper = ko.computed(function() {
 	          var comparator, current_collection, filter, filters, models, view_models, _i, _len;
 	          comparator = _this._comparator();
 	          filters = _this._filters();
@@ -913,7 +913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Inject() {}
 
 	  Inject.inject = function(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-	    var inject, result, wrapper;
+	    var inject;
 	    inject = function(data) {
 	      var key, target, value;
 	      if (_.isFunction(data)) {
@@ -944,11 +944,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (nested) {
 	      return inject(data);
 	    } else {
-	      result = (wrapper = ko.dependentObservable(function() {
+	      return kb.ignore(function() {
 	        return inject(data);
-	      }))();
-	      wrapper.dispose();
-	      return result;
+	      });
 	    }
 	  };
 
@@ -1277,7 +1275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  kb.ignore = ((_ref = ko.dependencyDetection) != null ? _ref.ignore : void 0) || function(callback, callbackTarget, callbackArgs) {
 	    var value;
 	    value = null;
-	    ko.dependentObservable(function() {
+	    ko.computed(function() {
 	      return value = callback.apply(callbackTarget, callbackArgs || []);
 	    }).dispose();
 	    return value;
@@ -1430,7 +1428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        _this._model(kb.utils.wrappedEventWatcher(_this).ee);
 	        _this._wait = ko.observable(true);
-	        observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
+	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
 	            var arg, args, _i, _len, _model, _ref1;
 	            if (typeof _this._wait === "function" ? _this._wait() : void 0) {
@@ -1470,7 +1468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          },
 	          owner: _this._vm
 	        }));
-	        observable.model = _this.model = ko.dependentObservable({
+	        observable.model = _this.model = ko.computed({
 	          read: function() {
 	            return ko.utils.unwrapObservable(_this._model);
 	          },
@@ -2298,7 +2296,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
 	        _mdl = kb._wrappedKey(_this, '_mdl', ko.observable());
-	        _this.model = ko.dependentObservable({
+	        _this.model = ko.computed({
 	          read: function() {
 	            _mdl();
 	            return kb.utils.wrappedObject(_this);

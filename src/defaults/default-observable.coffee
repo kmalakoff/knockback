@@ -23,12 +23,12 @@ module.exports = class kb.DefaultObservable
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
   constructor: (target_observable, @dv) -> # @dv is default value
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
+    observable = kb.utils.wrappedObservable @, ko.computed {
       read: =>
         current_target = ko.utils.unwrapObservable(target_observable())
         return if _.isNull(current_target) or _.isUndefined(current_target) then ko.utils.unwrapObservable(@dv) else current_target
       write: (value) -> target_observable(value)
-    }))
+    }
 
     # publish public interface on the observable and return instead of this
     kb.publishMethods(observable, @, ['destroy', 'setToDefault'])

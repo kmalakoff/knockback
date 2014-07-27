@@ -13,9 +13,6 @@ describe 'knockback-view-model.js @quick', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  # LEGACY
-  ko.computed = ko.dependentObservable unless ko.computed
-
   Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
   ContactsCollection = kb.Collection.extend({ model: Contact })
 
@@ -58,7 +55,7 @@ describe 'knockback-view-model.js @quick', ->
     class ContactViewModelCustom extends kb.ViewModel
       constructor: (model) ->
         super(model, {internals: ['name', 'number']})
-        @name = ko.dependentObservable(=> return "First: #{@_name()}")
+        @name = ko.computed(=> return "First: #{@_name()}")
 
     model = new Contact({name: 'Ringo', number: '555-555-5556'})
     view_model = new ContactViewModelCustom(model)
@@ -130,7 +127,7 @@ describe 'knockback-view-model.js @quick', ->
     class ContactViewModelFullName extends kb.ViewModel
       constructor: (model) ->
         super(model, {requires: ['first', 'last']})
-        @full_name = ko.dependentObservable(=> "Last: #{@last()}, First: #{@first()}")
+        @full_name = ko.computed(=> "Last: #{@last()}, First: #{@first()}")
 
     model = new kb.Model()
     view_model = new ContactViewModelFullName(model)
@@ -149,7 +146,7 @@ describe 'knockback-view-model.js @quick', ->
       constructor: (model) ->
         super(model, {requires: 'first'})
         @last = kb.observable(model, 'last')
-        @full_name = ko.dependentObservable(=> "Last: #{@last()}, First: #{@first()}")
+        @full_name = ko.computed(=> "Last: #{@last()}, First: #{@first()}")
 
     model = new kb.Model()
     view_model = new ContactViewModelFullName2(model)
@@ -513,7 +510,7 @@ describe 'knockback-view-model.js @quick', ->
     view_model = kb.viewModel(model)
 
     count = 0
-    ko.dependentObservable(-> view_model.model(); count++)
+    ko.computed(-> view_model.model(); count++)
 
     view_model.model(null)
     view_model.model(model)
@@ -792,39 +789,39 @@ describe 'knockback-view-model.js @quick', ->
     assert.deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}})
     done()
 
-  it '21. view model changes do not cause dependencies inside ko.dependentObservable', (done) ->
+  it '21. view model changes do not cause dependencies inside ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     view_model = new TestViewModel(new kb.Model({id: 1, name: 'Initial'}))
     model = view_model.model()
 
     count_manual = 0
-    ko.dependentObservable ->
+    ko.computed ->
       view_model.model(new kb.Model({id: 10, name: 'Manual'})) # should not depend
       count_manual++
 
     count_set_existing = 0
-    ko.dependentObservable ->
+    ko.computed ->
       model.set({name: 'Existing'}) # should not depend
       count_set_existing++
 
     count_set_new = 0
-    ko.dependentObservable ->
+    ko.computed ->
       model.set({new_attribute: 'New'}) # should not depend
       count_set_new++
 
     count_set_model = 0
-    ko.dependentObservable ->
+    ko.computed ->
       model.set({model: new kb.Model({name: 'NestedModel'})}) # should not depend
       count_set_model++
 
     count_set_collection = 0
-    ko.dependentObservable ->
+    ko.computed ->
       model.set({collection: new kb.Collection([{name: 'NestedModel'}])}) # should not depend
       count_set_collection++
 
     observable_count = 0
-    ko.dependentObservable ->
+    ko.computed ->
       view_model.model() # should depend
       observable_count++
 

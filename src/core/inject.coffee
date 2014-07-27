@@ -111,14 +111,7 @@ class kb.Inject
       return view_model
 
     # in recursive calls, we are already protected from propagating dependencies to the template
-    if nested
-      return inject(data)
-
-    # wrap to avoid dependencies propagating to the template since we are editing a ViewModel not binding
-    else
-      result = (wrapper = ko.dependentObservable(-> inject(data)))()
-      wrapper.dispose() # done with the wrapper
-      return result
+    return if nested then inject(data) else kb.ignore(-> inject(data))
 
   # Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered. Also, used with the data-bind `'inject'` custom binding.
   # @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.

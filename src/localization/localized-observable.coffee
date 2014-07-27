@@ -82,7 +82,7 @@ module.exports = class kb.LocalizedObservable
     # internal state
     value = ko.utils.unwrapObservable(@value) if @value
     @vo = ko.observable(if not value then null else @read(value, null))
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable({
+    observable = kb.utils.wrappedObservable @, ko.computed {
       read: =>
         ko.utils.unwrapObservable(@value) if @value
         @vo() # create a depdenency
@@ -95,7 +95,7 @@ module.exports = class kb.LocalizedObservable
         @__kb._onChange(value) if @__kb._onChange
 
       owner: @vm
-    }))
+    }
 
     # publish public interface on the observable and return instead of this
     kb.publishMethods(observable, @, ['destroy', 'observedValue', 'resetToCurrent'])

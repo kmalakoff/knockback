@@ -62,7 +62,7 @@ describe 'knockback.js memory management @quick', ->
       @prop1 = ko.observable()
       @prop2 = ko.observable(['test', 1, null, kb.viewModel(new kb.Model({name: 'name1'}))])
       @prop3 = ko.observableArray(['test', 1, null, kb.viewModel(new kb.Model({name: 'name1'}))])
-      @prop4 = ko.dependentObservable(-> return true)
+      @prop4 = ko.computed(-> return true)
       @prop5 = kb.observable(new kb.Model({name: 'name1'}), 'name')
       @prop6 = nested_view_model
       @prop7 = kb.collectionObservable(new kb.Collection(), {models_only: true})

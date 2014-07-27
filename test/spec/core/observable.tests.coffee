@@ -103,12 +103,12 @@ describe 'knockback-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '4. Standard use case: ko.dependentObservable', (done) ->
+  it '4. Standard use case: ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     ContactViewModel = (model) ->
       @name = kb.observable(model, {key: 'name'})
-      @formatted_name = ko.dependentObservable({
+      @formatted_name = ko.computed({
         read: @name,
         write: ((value) -> @name("#{value}".trim())),
         owner: @
@@ -278,7 +278,7 @@ describe 'knockback-observable.js @quick', ->
     observable = kb.observable(model, 'name')
 
     count = 0
-    ko.dependentObservable(-> observable.model(); count++)
+    ko.computed(-> observable.model(); count++)
 
     observable.model(null)
     observable.model(model)
@@ -288,19 +288,19 @@ describe 'knockback-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '8. view model changes do not cause dependencies inside ko.dependentObservable', (done) ->
+  it '8. view model changes do not cause dependencies inside ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     model = new kb.Model({id: 1, name: 'Initial'})
     observable = kb.observable(model, 'name')
 
     count_manual = 0
-    ko.dependentObservable ->
+    ko.computed ->
       observable('Manual')
       count_manual++
 
     observable_count = 0
-    ko.dependentObservable ->
+    ko.computed ->
       observable() # should depend
       observable_count++
 

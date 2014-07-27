@@ -132,7 +132,7 @@ module.exports = class kb.Validation
 #############################
 kb.valueValidator = (value, bindings, validation_options={}) ->
   (validation_options and not (typeof(validation_options) is 'function')) or (validation_options = {})
-  return ko.dependentObservable(->
+  return ko.computed(->
     results = {$error_count: 0}
     current_value = ko.utils.unwrapObservable(value)
     not ('disable' of validation_options) or (disabled = callOrGet(validation_options.disable))
@@ -204,22 +204,20 @@ kb.formValidator = (view_model, el) ->
     not validator or validators.push(results[name] = validator)
 
   # collect stats, error count and valid
-  results.$error_count = ko.dependentObservable(->
+  results.$error_count = ko.computed ->
     error_count = 0
     for validator in validators
       error_count += validator().$error_count
     return error_count
-  )
-  results.$valid = ko.dependentObservable(-> return results.$error_count() is 0)
+  results.$valid = ko.computed(-> return results.$error_count() is 0)
 
   # enabled and disabled
-  results.$enabled = ko.dependentObservable(->
+  results.$enabled = ko.computed ->
     enabled = true
     for validator in validators
       enabled &= validator().$enabled
     return enabled
-  )
-  results.$disabled = ko.dependentObservable(-> return not results.$enabled())
+  results.$disabled = ko.computed(-> return not results.$enabled())
 
   # if there is a name, add to the view_model with $scoping
   view_model["$#{form_name}"] = results if form_name

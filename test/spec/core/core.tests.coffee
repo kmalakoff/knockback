@@ -52,11 +52,11 @@ describe 'knockback_core utils @quick', ->
     counter_ignore = 0
 
     name = ko.observable('Bob')
-    counter_computed = ko.dependentObservable =>
+    counter_computed = ko.computed =>
       name()
       ++counter
 
-    counter_computed_ignore = ko.dependentObservable =>
+    counter_computed_ignore = ko.computed =>
       value = kb.ignore ->
         name()
         ++counter_ignore
