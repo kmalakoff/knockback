@@ -14,15 +14,14 @@ module.exports = (options={}, callback) ->
   queue.defer (callback) -> Wrench.rmdirSyncRecursive('./_temp', true); generate(options, callback)
 
   TEST_GROUPS = require '../test_groups'
-  TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if options.quick
-  karma_options = if options.quick then {client: {args: ['--grep', '@quick']}} else {}
+  TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if (options.tags or '').indexOf('@quick') >= 0
 
   for name, tests of TEST_GROUPS
     for test in tests
       do (test) -> queue.defer (callback) ->
         gutil.log "RUNNING TESTS: #{test.name}"
         gutil.log "#{JSON.stringify test.files}"
-        karma.start _.defaults({files: test.files}, karma_options, BASE_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value)
+        karma.start _.defaults({files: test.files, client: {args: ['--grep', options.tags or '']}}, BASE_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value)
 
   queue.await (err) ->
     Wrench.rmdirSyncRecursive('./_temp', true) unless err

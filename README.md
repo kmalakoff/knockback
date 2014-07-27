@@ -174,7 +174,7 @@ $ gulp build
 Please run tests before submitting a pull request:
 
 ```
-$ gulp test-quick
+$ gulp test --quick
 ```
 
 and eventually all tests:
