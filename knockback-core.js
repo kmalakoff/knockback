@@ -1928,25 +1928,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) {
 	        return value(new_value);
 	      }
-	      return this._updateWithAccessor(value, 'collection', new_value);
+	      if (kb.peek(value.collection) !== new_value) {
+	        return value.collection(new_value);
+	      }
 	    } else if (_.isUndefined(this.value_type) || this.value_type !== new_type) {
 	      return this._updateValueObservable(new_value);
 	    } else if (this.value_type === kb.TYPE_MODEL) {
-	      return this._updateWithAccessor(value, 'model', new_value);
+	      if (_.isFunction(value.model)) {
+	        if (kb.peek(value.model) !== new_value) {
+	          return value.model(new_value);
+	        }
+	      } else if (kb.utils.wrappedObject(value) !== new_value) {
+	        return this._updateValueObservable(new_value);
+	      }
 	    } else {
 	      if (value() !== new_value) {
 	        return value(new_value);
 	      }
-	    }
-	  };
-
-	  TypedValue.prototype._updateWithAccessor = function(value, key, new_value) {
-	    if (_.isFunction(value[key])) {
-	      if (value[key]() !== new_value) {
-	        return value[key](new_value);
-	      }
-	    } else if (kb.utils.wrappedObject(value) !== new_value) {
-	      return this._updateValueObservable(new_value);
 	    }
 	  };
 

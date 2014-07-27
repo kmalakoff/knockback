@@ -31,23 +31,20 @@ module.exports = class TypedValue
 
     if @value_type is kb.TYPE_COLLECTION
       return value(new_value) if @value_type is kb.TYPE_COLLECTION and new_type is kb.TYPE_ARRAY
-      @_updateWithAccessor(value, 'collection', new_value)
+      value.collection(new_value) if kb.peek(value.collection) isnt new_value
 
     else if _.isUndefined(@value_type) or @value_type isnt new_type
       @_updateValueObservable(new_value)
 
     else if @value_type is kb.TYPE_MODEL
-      @_updateWithAccessor(value, 'model', new_value)
+      if _.isFunction(value.model)
+        value.model(new_value) if kb.peek(value.model) isnt new_value
+
+      else if kb.utils.wrappedObject(value) isnt new_value
+        @_updateValueObservable(new_value)
 
     else # a simple observable
       value(new_value) if value() isnt new_value
-
-  _updateWithAccessor: (value, key, new_value) ->
-    if _.isFunction(value[key])
-      value[key](new_value) if value[key]() isnt new_value
-
-    else if kb.utils.wrappedObject(value) isnt new_value
-      @_updateValueObservable(new_value)
 
   _updateValueObservable: (new_value) ->
     create_options = @create_options
