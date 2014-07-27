@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'knockback-formatted-observable.js @quick', ->
+describe 'formatted-observable @quick', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko} = kb

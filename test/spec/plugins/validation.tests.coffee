@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'knockback-validation.js @quick', ->
+describe 'validation @quick', ->
   window = if window? then window else global
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')

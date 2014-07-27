@@ -206,9 +206,8 @@ class kb.utils
   @optionsPathJoin: (options, path) -> return _.defaults({path: @pathJoin(options.path, path)}, options)
 
   # Helper to find the creator constructor or function from a factory or ORM solution
-  @inferCreator: (value, factory, path, owner, key) ->
-    creator = factory.creatorForPath(value, path) if factory
-    return creator if creator
+  @inferCreator: (value, factory, path) ->
+    return creator if factory and creator = factory.creatorForPath(value, path)
 
     # try fallbacks
     return null                         unless value

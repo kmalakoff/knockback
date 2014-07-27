@@ -10,12 +10,12 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["knockout", "backbone", "underscore"], (function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__) { return factory(__WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, root["jQuery"]); }));
+		define(["knockout", "backbone", "underscore"], (function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__) { return factory(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__, root["jQuery"]); }));
 	else if(typeof exports === 'object')
 		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else
 		root["kb"] = factory(root["ko"], root["Backbone"], root["_"], root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_14__, __WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__, __WEBPACK_EXTERNAL_MODULE_18__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -74,7 +74,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(10);
 	__webpack_require__(11);
 	__webpack_require__(12);
-	module.exports = __webpack_require__(13);
+	__webpack_require__(13);
+	module.exports = __webpack_require__(14);
 
 
 /***/ },
@@ -541,9 +542,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	ALL_ORMS = {
 	  "default": null,
 	  'backbone-orm': null,
-	  'backbone-associations': __webpack_require__(18),
-	  'backbone-relational': __webpack_require__(19),
-	  supermodel: __webpack_require__(20)
+	  'backbone-associations': __webpack_require__(19),
+	  'backbone-relational': __webpack_require__(20),
+	  supermodel: __webpack_require__(21)
 	};
 
 	kb.orm = ALL_ORMS["default"];
@@ -1050,7 +1051,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	ko = __webpack_require__(14);
+	ko = __webpack_require__(15);
 
 	copyProps = function(dest, source) {
 	  var key, value;
@@ -1319,8 +1320,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Backbone = kb.Parse = window.Parse;
 	  _ = kb._ = window.Parse._;
 	} else {
-	  Backbone = kb.Backbone = __webpack_require__(15);
-	  _ = kb._ = __webpack_require__(16);
+	  Backbone = kb.Backbone = __webpack_require__(16);
+	  _ = kb._ = __webpack_require__(17);
 	}
 
 	kb.ko = ko;
@@ -1334,7 +1335,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.$ = window.jQuery || window.$;
 
 	try {
-	  kb.$ || (kb.$ = __webpack_require__(17));
+	  kb.$ || (kb.$ = __webpack_require__(18));
 	} catch (_error) {}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
@@ -1390,9 +1391,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var TypedValue, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	TypedValue = __webpack_require__(11);
 
 	kb.Observable = (function() {
 	  function Observable(model, options, _vm) {
@@ -1402,11 +1405,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var create_options, event_watcher, observable;
 	        options || kb._throwMissing(_this, 'options');
 	        if (_.isString(options) || ko.isObservable(options)) {
-	          create_options = _this.create_options = {
+	          create_options = {
 	            key: options
 	          };
 	        } else {
-	          create_options = _this.create_options = kb.utils.collapseOptions(options);
+	          create_options = kb.utils.collapseOptions(options);
 	        }
 	        _this.key = create_options.key;
 	        delete create_options.key;
@@ -1416,13 +1419,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        !create_options.write || (_this.write = create_options.write, delete create_options.write);
 	        event_watcher = create_options.event_watcher;
 	        delete create_options.event_watcher;
-	        _this._vo = ko.observable(null);
+	        _this._value = new TypedValue(create_options);
 	        _this._model = ko.observable();
 	        event_watcher = kb.EventWatcher.useOptionsOrCreate({
 	          event_watcher: event_watcher
 	        }, model || null, _this, {
 	          emitter: _this._model,
-	          update: _.bind(_this.update, _this),
+	          update: (function() {
+	            return kb.ignore(function() {
+	              return _this._update();
+	            });
+	          }),
 	          key: _this.key,
 	          path: create_options.path
 	        });
@@ -1430,24 +1437,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this._wait = ko.observable(true);
 	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
-	            var arg, args, _i, _len, _model, _ref1;
-	            if (typeof _this._wait === "function" ? _this._wait() : void 0) {
+	            if ((typeof _this._wait === "function" ? _this._wait() : void 0) || kb.wasReleased(_this)) {
 	              return;
 	            }
-	            _model = _this._model();
-	            _ref1 = args = [_this.key].concat(_this.args || []);
-	            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	              arg = _ref1[_i];
-	              ko.utils.unwrapObservable(arg);
-	            }
-	            if (_this.read) {
-	              _this.update(_this.read.apply(_this._vm, args));
-	            } else {
-	              kb.ignore(function() {
-	                return _this.update(kb.getValue(_model, kb.peek(_this.key), _this.args));
-	              });
-	            }
-	            return ko.utils.unwrapObservable(_this._vo());
+	            _this._update();
+	            return _this._value.value();
 	          },
 	          write: function(new_value) {
 	            return kb.ignore(function() {
@@ -1463,7 +1457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              } else if (_model) {
 	                kb.setValue(_model, kb.peek(_this.key), unwrapped_new_value);
 	              }
-	              return _this.update(new_value);
+	              return _this._value.update(new_value);
 	            });
 	          },
 	          owner: _this._vm
@@ -1511,113 +1505,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var observable;
 	    observable = kb.utils.wrappedObservable(this);
 	    this.__kb_released = true;
-	    kb.release(this.__kb_value);
-	    this.__kb_value = null;
+	    this._value.destroy();
+	    this._value = null;
 	    this.model.dispose();
 	    this.model = observable.model = null;
 	    return kb.utils.wrappedDestroy(this);
 	  };
 
 	  Observable.prototype.value = function() {
-	    return this.__kb_value;
+	    var _ref1;
+	    return (_ref1 = this._value) != null ? _ref1.peek() : void 0;
 	  };
 
 	  Observable.prototype.valueType = function() {
-	    var new_value;
-	    new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
-	    this.value_type || this._updateValueObservable(new_value);
-	    return this.value_type;
+	    var _ref1;
+	    return (_ref1 = this._value) != null ? _ref1.valueType(kb.peek(this._model), kb.peek(this.key)) : void 0;
 	  };
 
-	  Observable.prototype.update = function(new_value) {
-	    var new_type, value;
-	    if (this.__kb_released) {
-	      return;
+	  Observable.prototype._update = function() {
+	    var arg, args, _i, _len, _model, _ref1;
+	    _model = this._model();
+	    _ref1 = args = [this.key].concat(this.args || []);
+	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	      arg = _ref1[_i];
+	      ko.utils.unwrapObservable(arg);
 	    }
-	    if (!arguments.length) {
-	      new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
-	    }
-	    (new_value !== void 0) || (new_value = null);
-	    new_type = kb.utils.valueType(new_value);
-	    if (!this.__kb_value || (this.__kb_value.__kb_released || (this.__kb_value.__kb_null && new_value))) {
-	      this.__kb_value = void 0;
-	      this.value_type = void 0;
-	    }
-	    value = this.__kb_value;
-	    if (_.isUndefined(this.value_type) || (this.value_type !== new_type && new_type !== kb.TYPE_UNKNOWN)) {
-	      if ((this.value_type === kb.TYPE_COLLECTION) && (new_type === kb.TYPE_ARRAY)) {
-	        return value(new_value);
-	      } else {
-	        return this._updateValueObservable(new_value);
-	      }
-	    } else if (this.value_type === kb.TYPE_MODEL) {
-	      if (typeof value.model === 'function') {
-	        if (value.model() !== new_value) {
-	          return value.model(new_value);
-	        }
-	      } else if (kb.utils.wrappedObject(value) !== new_value) {
-	        return this._updateValueObservable(new_value);
-	      }
-	    } else if (this.value_type === kb.TYPE_COLLECTION) {
-	      if (value.collection() !== new_value) {
-	        return value.collection(new_value);
-	      }
-	    } else if (this.value_type !== new_type) {
-	      return this._updateValueObservable(new_value);
-	    } else {
-	      if (value() !== new_value) {
-	        return value(new_value);
-	      }
-	    }
-	  };
-
-	  Observable.prototype._updateValueObservable = function(new_value) {
-	    var create_options, creator, previous_value, value;
-	    create_options = this.create_options;
-	    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path, kb.peek(this._model), this.key);
-	    this.value_type = kb.TYPE_UNKNOWN;
-	    creator = create_options.creator;
-	    previous_value = this.__kb_value;
-	    this.__kb_value = void 0;
-	    if (previous_value) {
-	      kb.release(previous_value);
-	    }
-	    if (creator) {
-	      if (create_options.store) {
-	        value = create_options.store.findOrCreate(new_value, create_options);
-	      } else {
-	        if (creator.models_only) {
-	          value = new_value;
-	          this.value_type = kb.TYPE_SIMPLE;
-	        } else if (creator.create) {
-	          value = creator.create(new_value, create_options);
-	        } else {
-	          value = new creator(new_value, create_options);
-	        }
-	      }
-	    } else {
-	      if (_.isArray(new_value)) {
-	        this.value_type = kb.TYPE_ARRAY;
-	        value = ko.observableArray(new_value);
-	      } else {
-	        this.value_type = kb.TYPE_SIMPLE;
-	        value = ko.observable(new_value);
-	      }
-	    }
-	    if (this.value_type === kb.TYPE_UNKNOWN) {
-	      if (!ko.isObservable(value)) {
-	        this.value_type = kb.TYPE_MODEL;
-	        if (typeof value.model !== 'function') {
-	          kb.utils.wrappedObject(value, new_value);
-	        }
-	      } else if (value.__kb_is_co) {
-	        this.value_type = kb.TYPE_COLLECTION;
-	      } else {
-	        this.value_type = kb.TYPE_SIMPLE;
-	      }
-	    }
-	    this.__kb_value = value;
-	    return this._vo(value);
+	    return kb.ignore((function(_this) {
+	      return function() {
+	        return _this._value.update(_this.read ? _this.read.apply(_this._vm, args) : kb.getValue(_model, kb.peek(_this.key), _this.args));
+	      };
+	    })(this));
 	  };
 
 	  return Observable;
@@ -1967,6 +1884,132 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var TypedValue, kb, ko, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	module.exports = TypedValue = (function() {
+	  function TypedValue(create_options) {
+	    this.create_options = create_options;
+	    this._vo = ko.observable(null);
+	  }
+
+	  TypedValue.prototype.destroy = function() {
+	    this.__kb_released = true;
+	    kb.release(this.__kb_value);
+	    return this.__kb_value = null;
+	  };
+
+	  TypedValue.prototype.value = function() {
+	    return ko.utils.unwrapObservable(this._vo());
+	  };
+
+	  TypedValue.prototype.peek = function() {
+	    return this.__kb_value;
+	  };
+
+	  TypedValue.prototype.valueType = function(model, key) {
+	    this.value_type || this._updateValueObservable(kb.getValue(model, key));
+	    return this.value_type;
+	  };
+
+	  TypedValue.prototype.update = function(new_value) {
+	    var new_type, value;
+	    if (this.__kb_released) {
+	      return;
+	    }
+	    (new_value !== void 0) || (new_value = null);
+	    new_type = kb.utils.valueType(new_value);
+	    if (!this.__kb_value || (this.__kb_value.__kb_released || (this.__kb_value.__kb_null && new_value))) {
+	      this.__kb_value = void 0;
+	      this.value_type = void 0;
+	    }
+	    value = this.__kb_value;
+	    if (_.isUndefined(this.value_type) || (this.value_type !== new_type && new_type !== kb.TYPE_UNKNOWN)) {
+	      if ((this.value_type === kb.TYPE_COLLECTION) && (new_type === kb.TYPE_ARRAY)) {
+	        return value(new_value);
+	      } else {
+	        return this._updateValueObservable(new_value);
+	      }
+	    } else if (this.value_type === kb.TYPE_MODEL) {
+	      if (typeof value.model === 'function') {
+	        if (value.model() !== new_value) {
+	          return value.model(new_value);
+	        }
+	      } else if (kb.utils.wrappedObject(value) !== new_value) {
+	        return this._updateValueObservable(new_value);
+	      }
+	    } else if (this.value_type === kb.TYPE_COLLECTION) {
+	      if (value.collection() !== new_value) {
+	        return value.collection(new_value);
+	      }
+	    } else if (this.value_type !== new_type) {
+	      return this._updateValueObservable(new_value);
+	    } else {
+	      if (value() !== new_value) {
+	        return value(new_value);
+	      }
+	    }
+	  };
+
+	  TypedValue.prototype._updateValueObservable = function(new_value) {
+	    var create_options, creator, previous_value, value;
+	    create_options = this.create_options;
+	    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
+	    this.value_type = kb.TYPE_UNKNOWN;
+	    creator = create_options.creator;
+	    previous_value = this.__kb_value;
+	    this.__kb_value = void 0;
+	    if (previous_value) {
+	      kb.release(previous_value);
+	    }
+	    if (creator) {
+	      if (create_options.store) {
+	        value = create_options.store.findOrCreate(new_value, create_options);
+	      } else {
+	        if (creator.models_only) {
+	          value = new_value;
+	          this.value_type = kb.TYPE_SIMPLE;
+	        } else if (creator.create) {
+	          value = creator.create(new_value, create_options);
+	        } else {
+	          value = new creator(new_value, create_options);
+	        }
+	      }
+	    } else {
+	      if (_.isArray(new_value)) {
+	        this.value_type = kb.TYPE_ARRAY;
+	        value = ko.observableArray(new_value);
+	      } else {
+	        this.value_type = kb.TYPE_SIMPLE;
+	        value = ko.observable(new_value);
+	      }
+	    }
+	    if (this.value_type === kb.TYPE_UNKNOWN) {
+	      if (!ko.isObservable(value)) {
+	        this.value_type = kb.TYPE_MODEL;
+	        if (typeof value.model !== 'function') {
+	          kb.utils.wrappedObject(value, new_value);
+	        }
+	      } else if (value.__kb_is_co) {
+	        this.value_type = kb.TYPE_COLLECTION;
+	      } else {
+	        this.value_type = kb.TYPE_SIMPLE;
+	      }
+	    }
+	    this.__kb_value = value;
+	    return this._vo(value);
+	  };
+
+	  return TypedValue;
+
+	})();
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
 	
 	/*
 	  knockback.js 0.18.6
@@ -2124,12 +2167,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, options);
 	  };
 
-	  utils.inferCreator = function(value, factory, path, owner, key) {
+	  utils.inferCreator = function(value, factory, path) {
 	    var creator;
-	    if (factory) {
-	      creator = factory.creatorForPath(value, path);
-	    }
-	    if (creator) {
+	    if (factory && (creator = factory.creatorForPath(value, path))) {
 	      return creator;
 	    }
 	    if (!value) {
@@ -2251,7 +2291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2467,7 +2507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2503,12 +2543,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_14__;
-
-/***/ },
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2524,11 +2558,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	if(typeof __WEBPACK_EXTERNAL_MODULE_17__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
 	module.exports = __WEBPACK_EXTERNAL_MODULE_17__;
 
 /***/ },
 /* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	if(typeof __WEBPACK_EXTERNAL_MODULE_18__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
+	module.exports = __WEBPACK_EXTERNAL_MODULE_18__;
+
+/***/ },
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2585,7 +2625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2669,7 +2709,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
