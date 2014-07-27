@@ -34,8 +34,6 @@ class kb.EventWatcher
   constructor: (emitter, obj, callback_options) ->
     @__kb or= {}
     @__kb.callbacks = {}
-    @__kb._onModelLoaded = _.bind(@_onModelLoaded, @)
-    @__kb._onModelUnloaded = _.bind(@_onModelUnloaded, @)
 
     @ee = null
     @registerCallbacks(obj, callback_options) if callback_options
@@ -61,23 +59,22 @@ class kb.EventWatcher
 
     # clear and unbind previous
     if @model_ref
-      @model_ref.unbind('loaded', @__kb._onModelLoaded)
-      @model_ref.unbind('unloaded', @__kb._onModelUnloaded)
+      @model_ref.unbind('loaded', @_onModelLoaded)
+      @model_ref.unbind('unloaded', @_onModelUnloaded)
       @model_ref.release(); @model_ref = null
 
     # set up current
     if kb.Backbone and kb.Backbone.ModelRef and (new_emitter instanceof kb.Backbone.ModelRef)
       @model_ref = new_emitter; @model_ref.retain()
-      @model_ref.bind('loaded', @__kb._onModelLoaded)
-      @model_ref.bind('unloaded', @__kb._onModelUnloaded)
+      @model_ref.bind('loaded', @_onModelLoaded)
+      @model_ref.bind('unloaded', @_onModelUnloaded)
       new_emitter = @model_ref.model() or null
     else
       delete @model_ref
 
     # switch bindings
     if @ee isnt new_emitter
-      @_onModelUnloaded(previous_emitter) if previous_emitter = @ee
-      @_onModelLoaded(@ee) if @ee = new_emitter
+      if new_emitter then @_onModelLoaded(new_emitter) else @_onModelUnloaded(new_emitter)
     return new_emitter
 
   # Used to register callbacks for an emitter.
@@ -115,7 +112,8 @@ class kb.EventWatcher
     return
 
   releaseCallbacks: (obj) ->
-    @_onModelUnloaded(@ee) if @ee
+    @ee = null
+    @_unbindCallbacks(event_name, callbacks, kb.wasReleased(obj)) for event_name, callbacks of @__kb.callbacks # unbind all events
     delete @__kb.callbacks
 
   ####################################################
@@ -124,10 +122,11 @@ class kb.EventWatcher
 
   # @private
   # NOTE: this is called by registerCallbacks so the model could already be bound and we just want to bind the new info
+  # NOTE: this is called by emitter so it may be used to clear a previous emitter without triggering an intermediate change
   _onModelLoaded: (model) =>
     @ee = model
     for event_name, callbacks of @__kb.callbacks # bind all events
-      @_unbindCallbacks(event_name, callbacks) if callbacks.model and (callbacks.model isnt model)
+      @_unbindCallbacks(event_name, callbacks, true) if callbacks.model and (callbacks.model isnt model)
 
       (callbacks.model = model; model.bind(event_name, callbacks.fn)) unless callbacks.model
       for info in callbacks.list
@@ -142,11 +141,12 @@ class kb.EventWatcher
     @_unbindCallbacks(event_name, callbacks) for event_name, callbacks of @__kb.callbacks # unbind all events
     return
 
-  _unbindCallbacks: (event_name, callbacks) =>
+  _unbindCallbacks: (event_name, callbacks, skip_emitter) =>
     (callbacks.model.unbind(event_name, callbacks.fn); callbacks.model = null) if callbacks.model
     for info in callbacks.list
       (info.unbind_fn(); info.unbind_fn = null) if info.unbind_fn
-      info.emitter(null) if info.emitter and not kb.wasReleased(info.obj)
+      info.emitter(null) if info.emitter and not skip_emitter and not kb.wasReleased(info.obj)
+    return
 
 # factory function
 kb.emitterObservable = (emitter, observable) -> return new kb.EventWatcher(emitter, observable)

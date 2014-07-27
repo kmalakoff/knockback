@@ -643,7 +643,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '16. collection changes do not cause dependencies inside ko.dependentObservable', (done) ->
+  it '17. collection changes do not cause dependencies inside ko.dependentObservable', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     collection_observable = kb.collectionObservable({view_model: TestViewModel})
@@ -695,7 +695,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '17. Test auto-generate collections', (done) ->
+  it '18. Test auto-generate collections', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     models = (new Contact({id: id}) for id in [1..4])
@@ -714,7 +714,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '18. Test auto-generate collections with model array', (done) ->
+  it '19. Test auto-generate collections with model array', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     models = (new Contact({id: id}) for id in [1..4])
@@ -731,7 +731,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '19. push and unshift', (done) ->
+  it '20. push and unshift', (done) ->
     return done() if kb.Backbone and kb.Backbone.VERSION[0] isnt '1'
 
     kb.statistics = new kb.Statistics() # turn on stats
@@ -774,7 +774,7 @@ describe 'knockback-collection-observable.js @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '20. Auto compact for collections', (done) ->
+  it '21. Auto compact for collections', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     models = (new Contact({id: id}) for id in [1..4])

@@ -194,6 +194,13 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     john.friends().reset([paul, george, ringo]); john.best_friend(george)
     paul.friends().reset([john, george, ringo]); paul.best_friend(george)
     ringo.friends().reset([john, paul, george])
+
+    model_stats = {}
+    model_stats.george = {model: george, event_stats: kb.Statistics.eventsStats(george)}
+    model_stats.john = {model: john, event_stats: kb.Statistics.eventsStats(john)}
+    model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)}
+    model_stats.ringo = {model: ringo, event_stats: kb.Statistics.eventsStats(ringo)}
+
     john_view_model = new kb.ViewModel(john)
     assert.equal(john_view_model.name(), 'John', "Name is correct")
     for friend in john_view_model.friends()
@@ -219,6 +226,8 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     # assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
     kb.release(george_view_model); george_view_model = null
 
+    for name, stats of model_stats
+      assert.ok(kb.Statistics.eventsStats(stats.model).count is stats.event_stats.count, "All model events cleared to initial state. Expected: #{JSON.stringify(stats.event_stats)}. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 

@@ -626,8 +626,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._onModelLoaded = __bind(this._onModelLoaded, this);
 	    this.__kb || (this.__kb = {});
 	    this.__kb.callbacks = {};
-	    this.__kb._onModelLoaded = _.bind(this._onModelLoaded, this);
-	    this.__kb._onModelUnloaded = _.bind(this._onModelUnloaded, this);
 	    this.ee = null;
 	    if (callback_options) {
 	      this.registerCallbacks(obj, callback_options);
@@ -644,31 +642,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  EventWatcher.prototype.emitter = function(new_emitter) {
-	    var previous_emitter;
 	    if ((arguments.length === 0) || (this.ee === new_emitter)) {
 	      return this.ee;
 	    }
 	    if (this.model_ref) {
-	      this.model_ref.unbind('loaded', this.__kb._onModelLoaded);
-	      this.model_ref.unbind('unloaded', this.__kb._onModelUnloaded);
+	      this.model_ref.unbind('loaded', this._onModelLoaded);
+	      this.model_ref.unbind('unloaded', this._onModelUnloaded);
 	      this.model_ref.release();
 	      this.model_ref = null;
 	    }
 	    if (kb.Backbone && kb.Backbone.ModelRef && (new_emitter instanceof kb.Backbone.ModelRef)) {
 	      this.model_ref = new_emitter;
 	      this.model_ref.retain();
-	      this.model_ref.bind('loaded', this.__kb._onModelLoaded);
-	      this.model_ref.bind('unloaded', this.__kb._onModelUnloaded);
+	      this.model_ref.bind('loaded', this._onModelLoaded);
+	      this.model_ref.bind('unloaded', this._onModelUnloaded);
 	      new_emitter = this.model_ref.model() || null;
 	    } else {
 	      delete this.model_ref;
 	    }
 	    if (this.ee !== new_emitter) {
-	      if (previous_emitter = this.ee) {
-	        this._onModelUnloaded(previous_emitter);
-	      }
-	      if (this.ee = new_emitter) {
-	        this._onModelLoaded(this.ee);
+	      if (new_emitter) {
+	        this._onModelLoaded(new_emitter);
+	      } else {
+	        this._onModelUnloaded(new_emitter);
 	      }
 	    }
 	    return new_emitter;
@@ -728,8 +724,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  EventWatcher.prototype.releaseCallbacks = function(obj) {
-	    if (this.ee) {
-	      this._onModelUnloaded(this.ee);
+	    var callbacks, event_name, _ref1;
+	    this.ee = null;
+	    _ref1 = this.__kb.callbacks;
+	    for (event_name in _ref1) {
+	      callbacks = _ref1[event_name];
+	      this._unbindCallbacks(event_name, callbacks, kb.wasReleased(obj));
 	    }
 	    return delete this.__kb.callbacks;
 	  };
@@ -741,7 +741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (event_name in _ref1) {
 	      callbacks = _ref1[event_name];
 	      if (callbacks.model && (callbacks.model !== model)) {
-	        this._unbindCallbacks(event_name, callbacks);
+	        this._unbindCallbacks(event_name, callbacks, true);
 	      }
 	      if (!callbacks.model) {
 	        callbacks.model = model;
@@ -771,27 +771,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  EventWatcher.prototype._unbindCallbacks = function(event_name, callbacks) {
-	    var info, _i, _len, _ref1, _results;
+	  EventWatcher.prototype._unbindCallbacks = function(event_name, callbacks, skip_emitter) {
+	    var info, _i, _len, _ref1;
 	    if (callbacks.model) {
 	      callbacks.model.unbind(event_name, callbacks.fn);
 	      callbacks.model = null;
 	    }
 	    _ref1 = callbacks.list;
-	    _results = [];
 	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
 	      info = _ref1[_i];
 	      if (info.unbind_fn) {
 	        info.unbind_fn();
 	        info.unbind_fn = null;
 	      }
-	      if (info.emitter && !kb.wasReleased(info.obj)) {
-	        _results.push(info.emitter(null));
-	      } else {
-	        _results.push(void 0);
+	      if (info.emitter && !skip_emitter && !kb.wasReleased(info.obj)) {
+	        info.emitter(null);
 	      }
 	    }
-	    return _results;
 	  };
 
 	  return EventWatcher;
