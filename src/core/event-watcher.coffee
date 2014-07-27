@@ -74,7 +74,7 @@ class kb.EventWatcher
 
     # switch bindings
     if @ee isnt new_emitter
-      if new_emitter then @_onModelLoaded(new_emitter) else @_onModelUnloaded(new_emitter)
+      if new_emitter then @_onModelLoaded(new_emitter) else @_onModelUnloaded(@ee)
     return new_emitter
 
   # Used to register callbacks for an emitter.

@@ -70,17 +70,23 @@ class kb.Observable
     # set up basics
     @_vo = ko.observable(null) # create a value observable for the first dependency
     @_model = ko.observable()
-    observable = kb.utils.wrappedObservable(@, ko.dependentObservable(
+    event_watcher = kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @_model, update: _.bind(@update, @), key: @key, path: create_options.path})
+    @_model(kb.utils.wrappedEventWatcher(@).ee)
+    @_wait = ko.observable(true)
+
+    # watch the model for changes
+    observable = kb.utils.wrappedObservable @, ko.dependentObservable {
       read: =>
+        return if @_wait?()
         _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
-        kb.utils.wrappedEventWatcher(@)?.emitter(_model or null) # update the event watcher
         if @read
           @update(@read.apply(@_vm, args))
-        else if !_.isUndefined(_model)
+        else
           kb.ignore => @update(kb.getValue(_model, kb.peek(@key), @args))
         return ko.utils.unwrapObservable(@_vo())
 
       write: (new_value) => kb.ignore =>
+        return if kb.wasReleased(@)
         unwrapped_new_value = kb.utils.unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
         _model = kb.peek(@_model)
         if @write
@@ -91,7 +97,14 @@ class kb.Observable
         @update(new_value)
 
       owner: @_vm
-    ))
+    }
+
+    # use external model observable or create
+    observable.model = @model = ko.dependentObservable {
+      read: => ko.utils.unwrapObservable(@_model)
+      write: (new_model) => kb.ignore => return if kb.wasReleased(@); kb.utils.wrappedEventWatcher(@).emitter(new_model)
+    }
+
     observable.__kb_is_o = true # mark as a kb.Observable
     create_options.store = kb.utils.wrappedStore(observable, create_options.store)
     create_options.path = kb.utils.pathJoin(create_options.path, @key)
@@ -101,26 +114,10 @@ class kb.Observable
     else
       create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path)
     delete create_options.factories
+    @_wait(false); delete @_wait
 
     # publish public interface on the observable and return instead of this
     kb.publishMethods(observable, @, ['value', 'valueType', 'destroy'])
-
-    # use external model observable or create
-    observable.model = @model = ko.dependentObservable(
-      read: => ko.utils.unwrapObservable(@_model)
-      write: (new_model) => kb.ignore =>
-        return if @__kb_released or (kb.peek(@_model) is new_model) # destroyed or no change
-
-        # update references
-        new_value = kb.getValue(new_model, kb.peek(@key), @args)
-        @_model(new_model)
-        if not new_model
-          @update(null)
-        else if not _.isUndefined(new_value)
-          @update(new_value)
-    )
-    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: _.bind(@update, @), key: @key, path: create_options.path})
-    @__kb_value or @update() # wasn't loaded so create
 
     # wrap ourselves with a localizer
     if kb.LocalizedObservable and create_options.localizer

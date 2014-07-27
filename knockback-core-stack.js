@@ -664,7 +664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (new_emitter) {
 	        this._onModelLoaded(new_emitter);
 	      } else {
-	        this._onModelUnloaded(new_emitter);
+	        this._onModelUnloaded(this.ee);
 	      }
 	    }
 	    return new_emitter;
@@ -1420,21 +1420,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	        delete create_options.event_watcher;
 	        _this._vo = ko.observable(null);
 	        _this._model = ko.observable();
+	        event_watcher = kb.EventWatcher.useOptionsOrCreate({
+	          event_watcher: event_watcher
+	        }, model || null, _this, {
+	          emitter: _this._model,
+	          update: _.bind(_this.update, _this),
+	          key: _this.key,
+	          path: create_options.path
+	        });
+	        _this._model(kb.utils.wrappedEventWatcher(_this).ee);
+	        _this._wait = ko.observable(true);
 	        observable = kb.utils.wrappedObservable(_this, ko.dependentObservable({
 	          read: function() {
-	            var arg, args, _i, _len, _model, _ref1, _ref2;
+	            var arg, args, _i, _len, _model, _ref1;
+	            if (typeof _this._wait === "function" ? _this._wait() : void 0) {
+	              return;
+	            }
 	            _model = _this._model();
 	            _ref1 = args = [_this.key].concat(_this.args || []);
 	            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
 	              arg = _ref1[_i];
 	              ko.utils.unwrapObservable(arg);
 	            }
-	            if ((_ref2 = kb.utils.wrappedEventWatcher(_this)) != null) {
-	              _ref2.emitter(_model || null);
-	            }
 	            if (_this.read) {
 	              _this.update(_this.read.apply(_this._vm, args));
-	            } else if (!_.isUndefined(_model)) {
+	            } else {
 	              kb.ignore(function() {
 	                return _this.update(kb.getValue(_model, kb.peek(_this.key), _this.args));
 	              });
@@ -1444,6 +1454,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          write: function(new_value) {
 	            return kb.ignore(function() {
 	              var unwrapped_new_value, _model;
+	              if (kb.wasReleased(_this)) {
+	                return;
+	              }
 	              unwrapped_new_value = kb.utils.unwrapModels(new_value);
 	              _model = kb.peek(_this._model);
 	              if (_this.write) {
@@ -1457,6 +1470,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	          },
 	          owner: _this._vm
 	        }));
+	        observable.model = _this.model = ko.dependentObservable({
+	          read: function() {
+	            return ko.utils.unwrapObservable(_this._model);
+	          },
+	          write: function(new_model) {
+	            return kb.ignore(function() {
+	              if (kb.wasReleased(_this)) {
+	                return;
+	              }
+	              return kb.utils.wrappedEventWatcher(_this).emitter(new_model);
+	            });
+	          }
+	        });
 	        observable.__kb_is_o = true;
 	        create_options.store = kb.utils.wrappedStore(observable, create_options.store);
 	        create_options.path = kb.utils.pathJoin(create_options.path, _this.key);
@@ -1467,36 +1493,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
 	        }
 	        delete create_options.factories;
+	        _this._wait(false);
+	        delete _this._wait;
 	        kb.publishMethods(observable, _this, ['value', 'valueType', 'destroy']);
-	        observable.model = _this.model = ko.dependentObservable({
-	          read: function() {
-	            return ko.utils.unwrapObservable(_this._model);
-	          },
-	          write: function(new_model) {
-	            return kb.ignore(function() {
-	              var new_value;
-	              if (_this.__kb_released || (kb.peek(_this._model) === new_model)) {
-	                return;
-	              }
-	              new_value = kb.getValue(new_model, kb.peek(_this.key), _this.args);
-	              _this._model(new_model);
-	              if (!new_model) {
-	                return _this.update(null);
-	              } else if (!_.isUndefined(new_value)) {
-	                return _this.update(new_value);
-	              }
-	            });
-	          }
-	        });
-	        kb.EventWatcher.useOptionsOrCreate({
-	          event_watcher: event_watcher
-	        }, model || null, _this, {
-	          emitter: _this.model,
-	          update: _.bind(_this.update, _this),
-	          key: _this.key,
-	          path: create_options.path
-	        });
-	        _this.__kb_value || _this.update();
 	        if (kb.LocalizedObservable && create_options.localizer) {
 	          observable = new create_options.localizer(observable);
 	          delete create_options.localizer;
