@@ -83,7 +83,7 @@ module.exports = class kb.Store
     creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)
     creator = observable.constructor unless creator # default is to use the constructor
     @observable_records.push({obj: obj, observable: observable, creator: creator})
-    observable
+    return observable
 
   # @private
   findIndex: (obj, creator) ->
