@@ -947,6 +947,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
+  # https://github.com/kmalakoff/knockback/issues/82
   it '24. Issue 82 - mapObservables', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
