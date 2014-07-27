@@ -324,12 +324,11 @@ class kb.CollectionObservable
         return if (collection.indexOf(arg) == -1) # the model may have been removed before we got a chance to add it
         return if (view_model = @viewModelByModel(arg)) # it may have already been added by a change event
         @in_edit++
-        view_model = @_createViewModel(arg)
         if (comparator = @_comparator())
-          observable().push(view_model)
+          observable().push(@_createViewModel(arg))
           observable.sort(comparator)
         else
-          observable.splice(collection.indexOf(arg), 0, view_model)
+          observable.splice(collection.indexOf(arg), 0, @_createViewModel(arg))
         @in_edit--
 
       when 'remove', 'destroy' then @_onModelRemove(arg)

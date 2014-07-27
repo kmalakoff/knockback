@@ -391,12 +391,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              return;
 	            }
 	            _this.in_edit++;
-	            view_model = _this._createViewModel(arg);
 	            if ((comparator = _this._comparator())) {
-	              observable().push(view_model);
+	              observable().push(_this._createViewModel(arg));
 	              observable.sort(comparator);
 	            } else {
-	              observable.splice(collection.indexOf(arg), 0, view_model);
+	              observable.splice(collection.indexOf(arg), 0, _this._createViewModel(arg));
 	            }
 	            _this.in_edit--;
 	            break;
@@ -1722,21 +1721,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.clear = function() {
-	    var record, _i, _len, _ref1;
-	    _ref1 = this.observable_records.splice(0, this.observable_records.length);
-	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	      record = _ref1[_i];
+	    var observable_records, record, replaced_observables, _i, _len, _ref1, _ref2;
+	    _ref1 = [this.observable_records, []], observable_records = _ref1[0], this.observable_records = _ref1[1];
+	    for (_i = 0, _len = observable_records.length; _i < _len; _i++) {
+	      record = observable_records[_i];
 	      kb.release(record.observable);
 	    }
-	    kb.release(this.replaced_observables);
+	    _ref2 = [this.replaced_observables, []], replaced_observables = _ref2[0], this.replaced_observables = _ref2[1];
+	    kb.release(replaced_observables);
 	  };
 
 	  Store.prototype.compact = function() {
-	    var index, record, removals, _ref1, _ref2;
+	    var record, removals, _i, _len, _ref1, _ref2;
 	    removals = [];
 	    _ref1 = this.observable_records;
-	    for (index in _ref1) {
-	      record = _ref1[index];
+	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	      record = _ref1[_i];
 	      if ((_ref2 = record.observable) != null ? _ref2.__kb_released : void 0) {
 	        removals.push(record);
 	      }

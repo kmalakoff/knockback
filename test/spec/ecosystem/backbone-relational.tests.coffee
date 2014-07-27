@@ -841,6 +841,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
+  # https://github.com/kmalakoff/knockback/issues/96
   it '12. Issue 96', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -926,5 +927,43 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # # https://github.com/kmalakoff/knockback/issues/113
+  # it '13. Issue 113', (done) ->
+  #   kb.statistics = new kb.Statistics() # turn on stats
+
+  #   SubModel = Backbone.RelationalModel.extend({})
+  #   SubCollection = Backbone.Collection.extend({model: SubModel})
+  #   subCol = new SubCollection([{id: 1,name: 'aaron'}, {id: 2, name: 'bruce'}])
+  #   Model = Backbone.RelationalModel.extend({
+  #     relations: [{
+  #       type: Backbone.HasOne,
+  #       key: 'sub_model',
+  #       relatedModel: SubModel
+  #     }]
+  #   })
+
+  #   Collection = Backbone.Collection.extend({model: Model})
+  #   col = new Collection([{id: 1, sub_model: null}, {id: 2, sub_model: null}])
+
+  #   co = new kb.CollectionObservable(col)
+
+  #   col.models[0].set('sub_model', 1)
+  #   col.models[1].set('sub_model', 1)
+  #   assert.equal(col.models[0].get('sub_model').id, 1)
+  #   assert.equal(col.models[1].get('sub_model').id, 1)
+  #   assert.equal(co()[0].sub_model().id(), 1)
+  #   assert.equal(co()[1].sub_model().id(), 1)
+
+  #   col.models[0].set('sub_model', 2)
+  #   assert.equal(col.models[0].get('sub_model').id, 2)
+  #   assert.equal(col.models[1].get('sub_model').id, 1)
+  #   assert.equal(co()[0].sub_model().id(), 2)
+  #   assert.equal(co()[1].sub_model().id(), 1)
+
+  #   kb.release(co)
+
+  #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  #   done()
 
   it 'CLEANUP', -> kb.configure({orm: 'default'})

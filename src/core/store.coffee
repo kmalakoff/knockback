@@ -67,7 +67,7 @@ module.exports = class kb.Store
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
   #
-  # @example register an observable with th store
+  # @example register an observable with the store
   #   store.registerObservable(obj, observable, {creator: creator});
   register: (obj, observable, options) ->
     return unless observable # nothing to register
