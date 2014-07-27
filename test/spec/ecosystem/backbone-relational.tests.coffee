@@ -967,7 +967,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
   #   done()
 
   # https://github.com/kmalakoff/knockback/issues/122
-  it '13. Issue 122', (done) ->
+  it '14. Issue 122', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     Model2 = Backbone.RelationalModel.extend({})
@@ -992,7 +992,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     done()
 
   # https://github.com/kmalakoff/knockback/issues/126
-  it '13. Issue 126', (done) ->
+  it '15. Issue 126', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     root.Item = Item = Backbone.RelationalModel.extend({relations: [{type: Backbone.HasOne, key: 'related', relatedModel: 'OtherModel', includeInJSON: 'id'}]})
@@ -1011,5 +1011,6 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     # assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     ###########################
     done()
+
 
   it 'CLEANUP', -> kb.configure({orm: 'default'})
