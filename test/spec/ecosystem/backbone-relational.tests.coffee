@@ -1012,5 +1012,4 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     ###########################
     done()
 
-
   it 'CLEANUP', -> kb.configure({orm: 'default'})
