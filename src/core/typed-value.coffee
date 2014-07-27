@@ -34,7 +34,7 @@ module.exports = class TypedValue
       @_updateWithAccessor(value, 'collection', new_value)
 
     else if _.isUndefined(@value_type) or @value_type isnt new_type
-      @_updateValueObservable(new_value) # create new
+      @_updateValueObservable(new_value)
 
     else if @value_type is kb.TYPE_MODEL
       @_updateWithAccessor(value, 'model', new_value)
