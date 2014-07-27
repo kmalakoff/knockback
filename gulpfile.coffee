@@ -76,17 +76,17 @@ gulp.task 'test', ['minify'], (callback) ->
 
 gulp.task 'publish', ['minify'], (callback) ->
   copyLibraryFiles = (destination, others, callback) ->
-    gulp.src(LIBRARY_FILES.concat(['README.md'].concat(others)))
+    gulp.src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
       .pipe(gulp.dest((file) -> path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
       .on('end', callback)
 
   queue = new Queue(1)
-  queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
+  # queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
   queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
-  # queue.defer (callback) ->
-  #   gulp.src('packages/nuget/*.nuspec')
-  #     .pipe(nugetGulp())
-  #     .on('end', callback)
+  queue.defer (callback) ->
+    gulp.src('packages/nuget/*.nuspec')
+      .pipe(nugetGulp())
+      .on('end', callback)
   queue.await (err) -> process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
