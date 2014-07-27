@@ -966,4 +966,27 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
   #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   #   done()
 
+  # https://github.com/kmalakoff/knockback/issues/122
+  it '13. Issue 113', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+    Model2 = Backbone.RelationalModel.extend({})
+    Model1 = Backbone.RelationalModel.extend({relations: [{type: Backbone.HasOne, key: 'nested', relatedModel: Model2}]})
+
+    class ViewModel extends kb.ViewModel
+      constructor: (model, options) ->
+        super model, {requires: ['nested'], options: options}
+        @removeNested = => model.get('nested').destroy()
+        @addNested = => model.set({nested: new Model2()})
+        @hasNested = ko.computed => !!@nested()
+
+    view_model = new ViewModel(model = new Model1())
+    view_model.addNested()
+    assert.ok !!model.get('nested'), 'added a nested'
+    view_model.removeNested()
+    assert.ok !model.get('nested'), 'removed a nested'
+
   it 'CLEANUP', -> kb.configure({orm: 'default'})
