@@ -59,9 +59,8 @@ module.exports = class TypedValue
 
   _updateValueObservable: (new_value) ->
     create_options = @create_options
-    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path)
+    creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path)
     @value_type = kb.TYPE_UNKNOWN
-    creator = create_options.creator
 
     # release the previous value
     previous_value = @__kb_value; @__kb_value = undefined

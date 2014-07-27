@@ -84,11 +84,10 @@ class kb.Observable
       write: (new_value) => kb.ignore =>
         return if kb.wasReleased(@)
         unwrapped_new_value = kb.utils.unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
-        _model = kb.peek(@_model)
         if @write
           @write.call(@_vm, unwrapped_new_value)
-          new_value = kb.getValue(_model, kb.peek(@key), @args)
-        else if _model
+          new_value = kb.getValue(kb.peek(@_model), kb.peek(@key), @args)
+        else if _model = kb.peek(@_model)
           kb.setValue(_model, kb.peek(@key), unwrapped_new_value)
         @_value.update(new_value)
 

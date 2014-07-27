@@ -9,9 +9,10 @@ generate = require './generate'
 BASE_CONFIG = require './base-config'
 
 module.exports = (options={}, callback) ->
+  Wrench.rmdirSyncRecursive('./_temp', true)
+  Wrench.rmdirSyncRecursive('node_modules/knockback', true)
   queue = new Queue(1)
-
-  queue.defer (callback) -> Wrench.rmdirSyncRecursive('./_temp', true); generate(options, callback)
+  queue.defer (callback) -> generate(options, callback)
 
   TEST_GROUPS = require '../test_groups'
   TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if options.tags.indexOf('@quick') >= 0

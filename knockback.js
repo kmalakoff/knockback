@@ -1454,11 +1454,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	              }
 	              unwrapped_new_value = kb.utils.unwrapModels(new_value);
-	              _model = kb.peek(_this._model);
 	              if (_this.write) {
 	                _this.write.call(_this._vm, unwrapped_new_value);
-	                new_value = kb.getValue(_model, kb.peek(_this.key), _this.args);
-	              } else if (_model) {
+	                new_value = kb.getValue(kb.peek(_this._model), kb.peek(_this.key), _this.args);
+	              } else if (_model = kb.peek(_this._model)) {
 	                kb.setValue(_model, kb.peek(_this.key), unwrapped_new_value);
 	              }
 	              return _this._value.update(new_value);
@@ -1960,9 +1959,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  TypedValue.prototype._updateValueObservable = function(new_value) {
 	    var create_options, creator, previous_value, value;
 	    create_options = this.create_options;
-	    create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
+	    creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
 	    this.value_type = kb.TYPE_UNKNOWN;
-	    creator = create_options.creator;
 	    previous_value = this.__kb_value;
 	    this.__kb_value = void 0;
 	    if (previous_value) {
