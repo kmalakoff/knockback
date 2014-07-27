@@ -43,14 +43,17 @@ module.exports = class kb.Store
 
   # Manually clear the store.
   clear: ->
-    kb.release(record.observable) for record in @observable_records.splice(0, @observable_records.length)
-    kb.release(@replaced_observables)
+    [observable_records, @observable_records] = [@observable_records, []]
+    kb.release(record.observable) for record in observable_records
+
+    [replaced_observables, @replaced_observables] = [@replaced_observables, []]
+    kb.release(replaced_observables)
     return
 
   # Manually compact the store by searching for released view models.
   compact: ->
     removals = []
-    removals.push(record) for index, record of @observable_records when record.observable?.__kb_released
+    removals.push(record) for record in @observable_records when record.observable?.__kb_released
     @observable_records = _.difference(@observable_records, removals) if removals.length
     return
 
