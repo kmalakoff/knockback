@@ -991,4 +991,25 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
+  # https://github.com/kmalakoff/knockback/issues/126
+  it '13. Issue 126', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    root.Item = Item = Backbone.RelationalModel.extend({relations: [{type: Backbone.HasOne, key: 'related', relatedModel: 'OtherModel', includeInJSON: 'id'}]})
+    root.OtherModel = OtherModel = Backbone.RelationalModel.extend({defaults: {items: []}, relations: [{type: Backbone.HasMany, key: 'items', relatedModel: 'Item'}]})
+
+    ###########################
+    # ADD TESTING LOGIC HERE
+    # ONLY IF the model is not already cached in the store, knockback somewhere then makes those references null
+    # kb.getValue(_model, _peekObservable(_this.key), _this.args)
+    ###########################
+
+    ###########################
+    # ADD CLEANUP CODE HERE
+    # kb.release(view_model)
+
+    # assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    ###########################
+    done()
+
   it 'CLEANUP', -> kb.configure({orm: 'default'})
