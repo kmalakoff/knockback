@@ -5,11 +5,10 @@ describe 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
 
   after: -> delete root.Person; delete root.Building
 
-  window?.Backbone?.Associations or require?('backbone-associations')
-
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, Backbone, ko} = kb
+  require?('backbone-associations') unless Backbone?.Associations
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -17,9 +16,10 @@ describe 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
     assert.ok(!!Backbone, 'Backbone')
     assert.ok(!!kb, 'kb')
     assert.ok(!!Backbone.Associations, 'Backbone.Associations')
-    assert.ok(!!kb, 'kb')
+    kb.configure({orm: 'backbone-associations'})
     done()
 
+  return unless Backbone?.Associations
   Backbone.Associations.scopes.push(root)
 
   root.Person = Person = Backbone.AssociatedModel.extend({
@@ -67,6 +67,11 @@ describe 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
       occupants: [john, paul]
     })
 
+    model_stats = {}
+    model_stats.john = {model: john, event_stats: kb.Statistics.eventsStats(john)}
+    model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)}
+    model_stats.our_house = {model: our_house, event_stats: kb.Statistics.eventsStats(our_house)}
+
     house_view_model = new kb.ViewModel(our_house)
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count')
@@ -82,6 +87,11 @@ describe 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
 
     kb.release(house_view_model)
 
+    for name, stats of model_stats
+      assert.ok(kb.Statistics.eventsStats(stats.model).count is stats.event_stats.count, "All model events cleared to initial state. Expected: #{JSON.stringify(stats.event_stats)}. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
+    our_house.set({occupants: []})
+    for name, stats of model_stats
+      assert.ok(kb.Statistics.eventsStats(stats.model).count is 0, "All model events cleared (#{name}). Expected: 1. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
@@ -842,3 +852,6 @@ describe 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'CLEANUP', -> kb.configure({orm: 'default'})
+

@@ -9,6 +9,8 @@
 
 module.exports = kb = require './kb'
 
+kb.configure = require './configure'
+
 # re-expose modules
 kb.modules = {underscore: kb._, backbone: kb.Parse or kb.Backbone, knockout: kb.ko}
 if window?

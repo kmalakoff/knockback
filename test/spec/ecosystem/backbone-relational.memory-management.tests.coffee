@@ -8,7 +8,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, Backbone, ko} = kb
-  Backbone?.Relational or require?('backbone-relational')
+  require?('backbone-relational') unless Backbone?.Relational
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -16,9 +16,10 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     assert.ok(!!Backbone, 'Backbone')
     assert.ok(!!kb, 'kb')
     assert.ok(!!Backbone.Relational, 'Backbone.Relational')
-    assert.ok(!!kb, 'kb')
+    kb.configure({orm: 'backbone-relational'})
     done()
 
+  return unless Backbone?.Relational
   Backbone.Relational.store = new Backbone.Store(); Backbone.Relational.store.addModelScope?(root)
 
   root.Person = Person = Backbone.RelationalModel.extend({
@@ -203,3 +204,5 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'CLEANUP', -> kb.configure({orm: 'default'})

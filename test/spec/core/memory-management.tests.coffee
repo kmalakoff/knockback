@@ -84,7 +84,7 @@ describe 'knockback.js memory management @quick', ->
 
     kb.statistics = new kb.Statistics() # turn on stats
 
-    view_model = kb.viewModel(new kb.Model({name: 'Bob'}))
+    view_model = kb.viewModel(model = new kb.Model({name: 'Bob'}))
     collection_observable = kb.collectionObservable(new kb.Collection([new kb.Model({name: 'Fred'}), new kb.Model({name: 'Mary'})]))
 
     $vm_el = $('<div id="vm" data-bind="text: name"></div>')
@@ -94,11 +94,10 @@ describe 'knockback.js memory management @quick', ->
     kb.applyBindings(view_model, $vm_el[0])
     kb.applyBindings({co: collection_observable}, $co_el[0])
 
-    if ko.version
-      assert.equal($vm_el.text(), 'Bob', 'found Bob')
-      for child, index in $co_el.children()
-        name = if index then 'Mary' else 'Fred'
-        assert.equal($(child).text(), name, "found #{name}")
+    assert.equal($vm_el.text(), 'Bob', 'found Bob')
+    for child, index in $co_el.children()
+      name = if index then 'Mary' else 'Fred'
+      assert.equal($(child).text(), name, "found #{name}")
 
     assert.equal(kb.statistics.registeredCount('ViewModel'), 3, '3 bound view models')
     assert.equal(kb.statistics.registeredCount('CollectionObservable'), 1, '1 bound collection observable')
@@ -111,6 +110,7 @@ describe 'knockback.js memory management @quick', ->
     # dispose of the model node
     ko.removeNode($vm_el[0])
 
+    assert.ok(kb.Statistics.eventsStats(model).count is 0, "All model events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 

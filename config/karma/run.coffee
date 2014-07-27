@@ -14,7 +14,7 @@ module.exports = (options={}, callback) ->
   queue.defer (callback) -> Wrench.rmdirSyncRecursive('./_temp', true); generate(options, callback)
 
   TEST_GROUPS = require '../test_groups'
-  TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if (options.tags or '').indexOf('@quick') >= 0
+  TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if options.tags.indexOf('@quick') >= 0
 
   for name, tests of TEST_GROUPS
     for test in tests

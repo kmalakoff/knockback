@@ -1,3 +1,4 @@
+root = if window? then window else global
 assert = assert or require?('chai').assert
 
 describe 'Knockback.js with BackboneORM @backbone-orm', ->
@@ -5,15 +6,16 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, Backbone, ko} = kb
-  BackboneORM = window?.BackboneORM or require?('backbone-orm')
+  root.BackboneORM or= require?('backbone-orm')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
     assert.ok(!!_, '_')
     assert.ok(!!Backbone, 'Backbone')
     assert.ok(!!kb, 'kb')
-    assert.ok(!!BackboneORM, 'BackboneORM')
     assert.ok(!!kb, 'kb')
+    assert.ok(!!BackboneORM, 'BackboneORM')
+    kb.configure({orm: 'backbone-orm'}); kb.configure({orm: 'default'})
     done()
 
   BackboneORM.configure(model_cache: {enabled: true, max: 100})
@@ -53,6 +55,11 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
       occupants: [john, paul]
     })
 
+    model_stats = {}
+    model_stats.john = {model: john, event_stats: kb.Statistics.eventsStats(john)}
+    model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)}
+    model_stats.our_house = {model: our_house, event_stats: kb.Statistics.eventsStats(our_house)}
+
     house_view_model = new kb.ViewModel(our_house)
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count')
@@ -68,6 +75,13 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
 
     kb.release(house_view_model)
 
+    for name, stats of model_stats
+      assert.ok(kb.Statistics.eventsStats(stats.model).count is stats.event_stats.count, "All model events cleared to initial state. Expected: #{JSON.stringify(stats.event_stats)}. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
+    our_house.set({occupants: []})
+    for model in [john, paul]
+      assert.ok(kb.Statistics.eventsStats(model).count is 2, "All model events cleared. Expected: 2. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
+    for model in [our_house]
+      assert.ok(kb.Statistics.eventsStats(model).count is 0, "All model events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
@@ -819,3 +833,5 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'CLEANUP', -> kb.configure({orm: 'default'})

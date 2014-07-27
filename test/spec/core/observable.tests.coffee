@@ -46,6 +46,7 @@ describe 'knockback-observable.js @quick', ->
     # and cleanup after yourself when you are done.
     kb.release(view_model)
 
+    assert.ok(kb.Statistics.eventsStats(model).count is 0, "All model events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 

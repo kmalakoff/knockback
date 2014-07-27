@@ -1,3 +1,4 @@
+root = if window? then window else global
 assert = assert or require?('chai').assert
 
 describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
@@ -5,7 +6,7 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, Backbone, ko} = kb
-  Backbone.ModelRef = window?.Backbone.ModelRef or require?('backbone-modelref')
+  root.Backbone?.ModelRef or= require?('backbone-modelref')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -14,6 +15,8 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
     assert.ok(!!Backbone.ModelRef, 'Backbone.ModelRef')
     assert.ok(!!kb, 'kb')
     done()
+
+  return unless root.Backbone?.ModelRef
 
   Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
   ContactsCollection = kb.Collection.extend({ model: Contact })
@@ -123,3 +126,5 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'CLEANUP', -> delete Backbone.ModeRef

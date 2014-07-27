@@ -17,11 +17,6 @@ describe 'knockback_core utils @quick', ->
 
     kb.statistics = new kb.Statistics() # turn on stats
 
-    # not supported in older versions
-    unless ko.version
-       assert.ok(true)
-       return done()
-
     class ViewModel
       constructor: ->
         @name = ko.observable('Bob')

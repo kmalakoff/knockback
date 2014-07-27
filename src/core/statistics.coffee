@@ -79,3 +79,16 @@ module.exports = class kb.Statistics
     return @registered_tracker[key] if @registered_tracker.hasOwnProperty(key)
     type_tracker = []; @registered_tracker[key] = type_tracker
     return type_tracker
+
+  @eventsStats: (obj, key) ->
+    stats = {count: 0}
+
+    events = obj._events or obj._callbacks or {}
+    for key in (if key then [key] else _.keys(events)) when node = events[key]
+      if _.isArray(node)
+        stats[key] = _.compact(node).length
+      else
+        stats[key] = 0; tail = node.tail
+        stats[key]++ while ((node = node.next) isnt tail)
+      stats.count += stats[key]
+    return stats

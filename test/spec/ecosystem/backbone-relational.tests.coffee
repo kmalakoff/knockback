@@ -8,7 +8,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, Backbone, ko} = kb
-  Backbone?.Relational or require?('backbone-relational')
+  require?('backbone-relational') unless Backbone?.Relational
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -16,10 +16,13 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
     assert.ok(!!Backbone, 'Backbone')
     assert.ok(!!kb, 'kb')
     assert.ok(!!Backbone.Relational, 'Backbone.Relational')
-    assert.ok(!!kb, 'kb')
+    kb.configure({orm: 'backbone-relational'})
     done()
 
+  return unless Backbone?.Relational
+  kb.configure({orm: 'backbone-relational'})
   Backbone.Relational.store = new Backbone.Store(); Backbone.Relational.store.addModelScope?(root)
+
   root.Person = Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany
@@ -65,6 +68,11 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
       occupants: ['person-1-1', 'person-1-2']
     })
 
+    model_stats = {}
+    model_stats.john = {model: john, event_stats: kb.Statistics.eventsStats(john)}
+    model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)}
+    model_stats.our_house = {model: our_house, event_stats: kb.Statistics.eventsStats(our_house)}
+
     house_view_model = new kb.ViewModel(our_house)
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count')
@@ -80,6 +88,8 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
     kb.release(house_view_model)
 
+    for name, stats of model_stats
+      assert.ok(kb.Statistics.eventsStats(stats.model).count is stats.event_stats.count, "All model events cleared to initial state. Expected: #{JSON.stringify(stats.event_stats)}. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
@@ -908,3 +918,5 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'CLEANUP', -> kb.configure({orm: 'default'})

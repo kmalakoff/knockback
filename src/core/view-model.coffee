@@ -129,7 +129,7 @@ class kb.ViewModel
         if not (@__kb.keys or not new_model or not new_model.attributes) # only allow specific keys or nothing to add
           # NOTE: this does not remove keys that are different between the models
           keys = _.keys(new_model.attributes)
-          keys = _.union(keys, rel_keys) if new_model and (rel_keys = kb.orm.keys(new_model))
+          keys = _.union(keys, rel_keys) if new_model and (rel_keys = kb.orm?.keys?(new_model))
           missing = _.difference(keys, _.keys(@__kb.model_keys))
           if missing
             @createObservables(new_model, missing)
@@ -141,7 +141,7 @@ class kb.ViewModel
     # collect requires and internls first because they could be used to define the include order
     keys = options.requires
     keys = _.union(keys or [], @__kb.internals) if @__kb.internals
-    keys = _.union(keys or [], rel_keys) if model and (rel_keys = kb.orm.keys(model))
+    keys = _.union(keys or [], rel_keys) if model and (rel_keys = kb.orm?.keys?(model))
 
     # collect the important keys
     if options.keys # don't merge all the keys if keys are specified

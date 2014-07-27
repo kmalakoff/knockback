@@ -121,3 +121,19 @@ describe 'knockback_core utils @quick', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/101
+  it 'kb.release releases all events', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model = new kb.Model({id: 1, name: "Zebra", age: 22, genus: "Equus"});
+    assert.ok(kb.Statistics.eventsStats(model).count is 0, 'No events yet')
+
+    view_model = {model: kb.viewModel(model)}
+    assert.ok(kb.Statistics.eventsStats(model).count is 1, "There is 1 event. Expected: 1. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
+
+    kb.release(view_model)
+
+    assert.ok(kb.Statistics.eventsStats(model).count is 0, "All events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

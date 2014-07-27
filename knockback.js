@@ -98,7 +98,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, kb, ko, _, _ref,
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	COMPARE_EQUAL = 0;
 
@@ -539,6 +539,65 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var ALL_ORMS, kb, key, ko, value, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	ALL_ORMS = {
+	  "default": null,
+	  'backbone-orm': null,
+	  'backbone-associations': __webpack_require__(25),
+	  'backbone-relational': __webpack_require__(26),
+	  supermodel: __webpack_require__(27)
+	};
+
+	kb.orm = ALL_ORMS["default"];
+
+	for (key in ALL_ORMS) {
+	  value = ALL_ORMS[key];
+	  if (value && value.isAvailable()) {
+	    kb.orm = value;
+	    break;
+	  }
+	}
+
+	module.exports = function(options) {
+	  var orm, _results;
+	  if (options == null) {
+	    options = {};
+	  }
+	  _results = [];
+	  for (key in options) {
+	    value = options[key];
+	    switch (key) {
+	      case 'orm':
+	        if (_.isString(value)) {
+	          if (!ALL_ORMS.hasOwnProperty(value)) {
+	            console.log("Knockback configure: could not find orm: " + value + ". Available: " + (_.keys(ALL_ORMS).join(', ')));
+	            continue;
+	          }
+	          if ((orm = ALL_ORMS[value]) && !orm.isAvailable()) {
+	            console.log("Knockback configure: could not enable orm " + value + ". Make sure it is included before Knockback");
+	            continue;
+	          }
+	          kb.orm = orm;
+	          continue;
+	        } else {
+	          _results.push(kb.orm = value);
+	        }
+	        break;
+	      default:
+	        _results.push(kb[key] = value);
+	    }
+	  }
+	  return _results;
+	};
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
 	
 	/*
 	  knockback.js 0.18.6
@@ -549,10 +608,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
 	var kb, ko, _, _ref,
-	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.EventWatcher = (function() {
 	  EventWatcher.useOptionsOrCreate = function(options, emitter, obj, callback_options) {
@@ -568,6 +626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  function EventWatcher(emitter, obj, callback_options) {
+	    this._unbindCallbacks = __bind(this._unbindCallbacks, this);
 	    this._onModelUnloaded = __bind(this._onModelUnloaded, this);
 	    this._onModelLoaded = __bind(this._onModelLoaded, this);
 	    this.__kb || (this.__kb = {});
@@ -590,7 +649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  EventWatcher.prototype.emitter = function(new_emitter) {
-	    var callbacks, event_name, info, list, previous_emitter, _i, _len, _ref1;
+	    var previous_emitter;
 	    if ((arguments.length === 0) || (this.ee === new_emitter)) {
 	      return this.ee;
 	    }
@@ -609,122 +668,94 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      delete this.model_ref;
 	    }
-	    previous_emitter = this.ee;
-	    this.ee = new_emitter;
-	    _ref1 = this.__kb.callbacks;
-	    for (event_name in _ref1) {
-	      callbacks = _ref1[event_name];
-	      if (previous_emitter) {
-	        previous_emitter.unbind(event_name, callbacks.fn);
+	    if (this.ee !== new_emitter) {
+	      if (previous_emitter = this.ee) {
+	        this._onModelUnloaded(previous_emitter);
 	      }
-	      if (new_emitter) {
-	        this.ee.bind(event_name, callbacks.fn);
-	      }
-	      list = callbacks.list;
-	      for (_i = 0, _len = list.length; _i < _len; _i++) {
-	        info = list[_i];
-	        if (info.emitter) {
-	          info.emitter(this.ee);
-	        }
+	      if (this.ee = new_emitter) {
+	        this._onModelLoaded(this.ee);
 	      }
 	    }
 	    return new_emitter;
 	  };
 
 	  EventWatcher.prototype.registerCallbacks = function(obj, callback_info) {
-	    var callbacks, event_name, event_names, event_selector, info, list, _i, _len;
+	    var event_name, event_names, model, _fn, _i, _len;
 	    obj || kb._throwMissing(this, 'obj');
-	    callback_info || kb._throwMissing(this, 'info');
-	    event_selector = callback_info.event_selector ? callback_info.event_selector : 'change';
-	    event_names = event_selector.split(' ');
+	    callback_info || kb._throwMissing(this, 'callback_info');
+	    event_names = callback_info.event_selector ? callback_info.event_selector.split(' ') : ['change'];
+	    model = this.ee;
+	    _fn = (function(_this) {
+	      return function(event_name) {
+	        var callbacks, info;
+	        if (!(callbacks = _this.__kb.callbacks[event_name])) {
+	          callbacks = _this.__kb.callbacks[event_name] = {
+	            model: null,
+	            list: [],
+	            fn: function(model) {
+	              var info, _j, _len1, _ref1;
+	              _ref1 = callbacks.list;
+	              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+	                info = _ref1[_j];
+	                if (!info.update) {
+	                  continue;
+	                }
+	                if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
+	                  continue;
+	                }
+	                !kb.statistics || kb.statistics.addModelEvent({
+	                  name: event_name,
+	                  model: model,
+	                  key: info.key,
+	                  path: info.path
+	                });
+	                info.update();
+	              }
+	              return null;
+	            }
+	          };
+	        }
+	        callbacks.list.push(info = _.defaults({
+	          obj: obj
+	        }, callback_info));
+	        if (model) {
+	          return _this._onModelLoaded(model);
+	        }
+	      };
+	    })(this);
 	    for (_i = 0, _len = event_names.length; _i < _len; _i++) {
 	      event_name = event_names[_i];
 	      if (!event_name) {
 	        continue;
 	      }
-	      callbacks = this.__kb.callbacks[event_name];
-	      if (!callbacks) {
-	        list = [];
-	        callbacks = {
-	          list: list,
-	          fn: (function(_this) {
-	            return function(model) {
-	              var info, _j, _len1;
-	              for (_j = 0, _len1 = list.length; _j < _len1; _j++) {
-	                info = list[_j];
-	                if (info.update && !info.rel_fn) {
-	                  if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
-	                    continue;
-	                  }
-	                  !kb.statistics || kb.statistics.addModelEvent({
-	                    name: event_name,
-	                    model: model,
-	                    key: info.key,
-	                    path: info.path
-	                  });
-	                  info.update();
-	                }
-	              }
-	              return null;
-	            };
-	          })(this)
-	        };
-	        this.__kb.callbacks[event_name] = callbacks;
-	        if (this.ee) {
-	          this.ee.bind(event_name, callbacks.fn);
-	        }
-	      }
-	      info = _.defaults({
-	        obj: obj
-	      }, callback_info);
-	      callbacks.list.push(info);
-	    }
-	    if (this.ee) {
-	      if (__indexOf.call(event_names, 'change') >= 0) {
-	        info.unbind_fn = kb.orm.bind(this.ee, info.key, info.update, info.path);
-	      }
-	      info.emitter(this.ee) && info.emitter;
+	      _fn(event_name);
 	    }
 	  };
 
 	  EventWatcher.prototype.releaseCallbacks = function(obj) {
-	    var callbacks, event_name, index, info, _ref1, _ref2;
-	    if (!this.__kb.callbacks || !this.ee) {
-	      return;
+	    if (this.ee) {
+	      this._onModelUnloaded(this.ee);
 	    }
-	    _ref1 = this.__kb.callbacks;
-	    for (event_name in _ref1) {
-	      callbacks = _ref1[event_name];
-	      _ref2 = callbacks.list;
-	      for (index in _ref2) {
-	        info = _ref2[index];
-	        if (info.obj !== obj) {
-	          continue;
-	        }
-	        callbacks.list.splice(index, 1);
-	        if (info.unbind_fn) {
-	          info.unbind_fn();
-	          info.unbind_fn = null;
-	        }
-	        if (!kb.wasReleased(obj) && info.emitter) {
-	          info.emitter(null);
-	        }
-	        return;
-	      }
-	    }
+	    return delete this.__kb.callbacks;
 	  };
 
 	  EventWatcher.prototype._onModelLoaded = function(model) {
-	    var callbacks, event_name, info, _i, _len, _ref1, _ref2;
+	    var callbacks, event_name, info, _i, _len, _ref1, _ref2, _ref3;
 	    this.ee = model;
 	    _ref1 = this.__kb.callbacks;
 	    for (event_name in _ref1) {
 	      callbacks = _ref1[event_name];
-	      model.bind(event_name, callbacks.fn);
+	      if (callbacks.model && (callbacks.model !== model)) {
+	        this._unbindCallbacks(event_name, callbacks);
+	      }
+	      if (!callbacks.model) {
+	        callbacks.model = model;
+	        model.bind(event_name, callbacks.fn);
+	      }
 	      _ref2 = callbacks.list;
 	      for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
 	        info = _ref2[_i];
-	        info.unbind_fn = kb.orm.bind(model, info.key, info.update, info.path);
+	        info.unbind_fn || (info.unbind_fn = (_ref3 = kb.orm) != null ? _ref3.bind(model, info.key, info.update, info.path) : void 0);
 	        if (info.emitter) {
 	          info.emitter(model);
 	        }
@@ -733,24 +764,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  EventWatcher.prototype._onModelUnloaded = function(model) {
-	    var callbacks, event_name, info, list, _i, _len, _ref1;
+	    var callbacks, event_name, _ref1;
+	    if (this.ee !== model) {
+	      return;
+	    }
 	    this.ee = null;
 	    _ref1 = this.__kb.callbacks;
 	    for (event_name in _ref1) {
 	      callbacks = _ref1[event_name];
-	      model.unbind(event_name, callbacks.fn);
-	      list = callbacks.list;
-	      for (_i = 0, _len = list.length; _i < _len; _i++) {
-	        info = list[_i];
-	        if (info.unbind_fn) {
-	          info.unbind_fn();
-	          info.unbind_fn = null;
-	        }
-	        if (info.emitter) {
-	          info.emitter(null);
-	        }
+	      this._unbindCallbacks(event_name, callbacks);
+	    }
+	  };
+
+	  EventWatcher.prototype._unbindCallbacks = function(event_name, callbacks) {
+	    var info, _i, _len, _ref1, _results;
+	    if (callbacks.model) {
+	      callbacks.model.unbind(event_name, callbacks.fn);
+	      callbacks.model = null;
+	    }
+	    _ref1 = callbacks.list;
+	    _results = [];
+	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	      info = _ref1[_i];
+	      if (info.unbind_fn) {
+	        info.unbind_fn();
+	        info.unbind_fn = null;
+	      }
+	      if (info.emitter && !kb.wasReleased(info.obj)) {
+	        _results.push(info.emitter(null));
+	      } else {
+	        _results.push(void 0);
 	      }
 	    }
+	    return _results;
 	  };
 
 	  return EventWatcher;
@@ -763,7 +809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -777,7 +823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, _;
 
-	_ = (kb = __webpack_require__(5))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	kb.Factory = (function() {
 	  Factory.useOptionsOrCreate = function(options, obj, owner_path) {
@@ -846,7 +892,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -862,7 +908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
 	kb.RECUSIVE_AUTO_INJECT = true;
 
@@ -999,7 +1045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -1210,10 +1256,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.getValue = function(model, key, args) {
+	    var _ref;
 	    if (!model) {
 	      return;
 	    }
-	    if (_.isFunction(model[key]) && kb.orm.useFunction(model, key)) {
+	    if (_.isFunction(model[key]) && ((_ref = kb.orm) != null ? _ref.useFunction(model, key) : void 0)) {
 	      return model[key]();
 	    }
 	    if (!args) {
@@ -1225,11 +1272,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.setValue = function(model, key, value) {
-	    var attributes;
+	    var attributes, _ref;
 	    if (!model) {
 	      return;
 	    }
-	    if (_.isFunction(model[key]) && kb.orm.useFunction(model, key)) {
+	    if (_.isFunction(model[key]) && ((_ref = kb.orm) != null ? _ref.useFunction(model, key) : void 0)) {
 	      return model[key](value);
 	    }
 	    (attributes = {})[key] = value;
@@ -1304,12 +1351,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
+	
+	/*
+	  knockback.js 0.18.6
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
 	var kb, ko, _extend, _ref, _ref1;
 
-	ko = (kb = __webpack_require__(5)).ko;
+	ko = (kb = __webpack_require__(6)).ko;
 
 	if ((_ref = ko.subscribable) != null ? (_ref1 = _ref.fn) != null ? _ref1.extend : void 0 : void 0) {
 	  _extend = ko.subscribable.fn.extend;
@@ -1333,7 +1389,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1347,7 +1403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.Observable = (function() {
 	  function Observable(model, options, _vm) {
@@ -1586,258 +1642,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(global) {
-	/*
-	  knockback.js 0.18.6
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
-	var AssociatedModel, ORM, ORMAdapter_BackboneAssociations, ORMAdapter_BackboneRelational, ORMAdapter_Supermodel, RelationalModel, Supermodel, kb, root, _;
-
-	root = typeof window !== "undefined" && window !== null ? window : global;
-
-	_ = (kb = __webpack_require__(5))._;
-
-	ORM = (function() {
-	  function ORM() {
-	    this.adapters = [];
-	  }
-
-	  ORM.prototype.initialize = function() {
-	    this.adapters = _.select(this.adapters, function(adapter) {
-	      return adapter.isAvailable();
-	    });
-	    return this.initialized = true;
-	  };
-
-	  ORM.prototype.addAdapter = function(adapter) {
-	    this.adapters.push(adapter);
-	    return this.initialized = false;
-	  };
-
-	  ORM.prototype.keys = function(model) {
-	    return this._call('keys', arguments);
-	  };
-
-	  ORM.prototype.bind = function(model) {
-	    return this._call('bind', arguments);
-	  };
-
-	  ORM.prototype.useFunction = function(model) {
-	    return this._call('useFunction', arguments);
-	  };
-
-	  ORM.prototype._call = function(name, args) {
-	    var adpater, result, _i, _len, _ref;
-	    if (!this.adapters.length) {
-	      return;
-	    }
-	    if (!this.initialized) {
-	      this.initialize();
-	    }
-	    _ref = this.adapters;
-	    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-	      adpater = _ref[_i];
-	      if (adpater[name] && (result = adpater[name].apply(adpater, args))) {
-	        return result;
-	      }
-	    }
-	  };
-
-	  return ORM;
-
-	})();
-
-	kb.orm = new ORM();
-
-	RelationalModel = null;
-
-	ORMAdapter_BackboneRelational = (function() {
-	  function ORMAdapter_BackboneRelational() {}
-
-	  ORMAdapter_BackboneRelational.prototype.isAvailable = function() {
-	    var _ref;
-	    return !!(RelationalModel = (_ref = kb.Backbone) != null ? _ref.RelationalModel : void 0);
-	  };
-
-	  ORMAdapter_BackboneRelational.prototype.relationType = function(model, key) {
-	    var relation;
-	    if (!(model instanceof RelationalModel)) {
-	      return null;
-	    }
-	    if (!(relation = _.find(model.getRelations(), function(test) {
-	      return test.key === key;
-	    }))) {
-	      return null;
-	    }
-	    if (relation.collectionType || _.isArray(relation.keyContents)) {
-	      return kb.TYPE_COLLECTION;
-	    } else {
-	      return kb.TYPE_MODEL;
-	    }
-	  };
-
-	  ORMAdapter_BackboneRelational.prototype.bind = function(model, key, update, path) {
-	    var event, events, rel_fn, type, _i, _len;
-	    if (!(type = this.relationType(model, key))) {
-	      return null;
-	    }
-	    rel_fn = function(model) {
-	      !kb.statistics || kb.statistics.addModelEvent({
-	        name: 'update (relational)',
-	        model: model,
-	        key: key,
-	        path: path
-	      });
-	      return update();
-	    };
-	    events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-	    if (type === kb.TYPE_COLLECTION) {
-	      for (_i = 0, _len = events.length; _i < _len; _i++) {
-	        event = events[_i];
-	        model.bind("" + event + ":" + key, rel_fn);
-	      }
-	    } else {
-	      model.bind("" + events[0] + ":" + key, rel_fn);
-	    }
-	    return function() {
-	      var _j, _len1;
-	      if (type === kb.TYPE_COLLECTION) {
-	        for (_j = 0, _len1 = events.length; _j < _len1; _j++) {
-	          event = events[_j];
-	          model.unbind("" + event + ":" + key, rel_fn);
-	        }
-	      } else {
-	        model.unbind("" + events[0] + ":" + key, rel_fn);
-	      }
-	    };
-	  };
-
-	  return ORMAdapter_BackboneRelational;
-
-	})();
-
-	kb.orm.addAdapter(new ORMAdapter_BackboneRelational());
-
-	AssociatedModel = null;
-
-	ORMAdapter_BackboneAssociations = (function() {
-	  function ORMAdapter_BackboneAssociations() {}
-
-	  ORMAdapter_BackboneAssociations.prototype.isAvailable = function() {
-	    var _ref;
-	    return !!(AssociatedModel = (_ref = kb.Backbone) != null ? _ref.AssociatedModel : void 0);
-	  };
-
-	  ORMAdapter_BackboneAssociations.prototype.keys = function(model) {
-	    if (!(model instanceof AssociatedModel)) {
-	      return null;
-	    }
-	    return _.map(model.relations, function(test) {
-	      return test.key;
-	    });
-	  };
-
-	  ORMAdapter_BackboneAssociations.prototype.relationType = function(model, key) {
-	    var relation;
-	    if (!(model instanceof AssociatedModel)) {
-	      return null;
-	    }
-	    if (!(relation = _.find(model.relations, function(test) {
-	      return test.key === key;
-	    }))) {
-	      return null;
-	    }
-	    if (relation.type === 'Many') {
-	      return kb.TYPE_COLLECTION;
-	    } else {
-	      return kb.TYPE_MODEL;
-	    }
-	  };
-
-	  return ORMAdapter_BackboneAssociations;
-
-	})();
-
-	kb.orm.addAdapter(new ORMAdapter_BackboneAssociations());
-
-	Supermodel = null;
-
-	ORMAdapter_Supermodel = (function() {
-	  function ORMAdapter_Supermodel() {}
-
-	  ORMAdapter_Supermodel.prototype.isAvailable = function() {
-	    return !!(Supermodel = root.Supermodel);
-	  };
-
-	  ORMAdapter_Supermodel.prototype.keys = function(model) {
-	    if (!(model instanceof Supermodel.Model)) {
-	      return null;
-	    }
-	    return _.keys(model.constructor.associations());
-	  };
-
-	  ORMAdapter_Supermodel.prototype.relationType = function(model, key) {
-	    var relation;
-	    if (!(model instanceof Supermodel.Model)) {
-	      return null;
-	    }
-	    if (!(relation = model.constructor.associations()[key])) {
-	      return null;
-	    }
-	    if (relation.add) {
-	      return kb.TYPE_COLLECTION;
-	    } else {
-	      return kb.TYPE_MODEL;
-	    }
-	  };
-
-	  ORMAdapter_Supermodel.prototype.bind = function(model, key, update, path) {
-	    var rel_fn, type;
-	    if (!(type = this.relationType(model, key))) {
-	      return null;
-	    }
-	    rel_fn = function(model, other) {
-	      var previous, relation;
-	      !kb.statistics || kb.statistics.addModelEvent({
-	        name: 'update (supermodel)',
-	        model: model,
-	        key: key,
-	        path: path
-	      });
-	      relation = model.constructor.associations()[key];
-	      previous = model[relation.store];
-	      model[relation.store] = other;
-	      update(other);
-	      return model[relation.store] = previous;
-	    };
-	    if (type === kb.TYPE_MODEL) {
-	      model.bind("associate:" + key, rel_fn);
-	      return function() {
-	        return model.unbind("associate:" + key, rel_fn);
-	      };
-	    }
-	  };
-
-	  ORMAdapter_Supermodel.prototype.useFunction = function(model, key) {
-	    return !!this.relationType(model, key);
-	  };
-
-	  return ORMAdapter_Supermodel;
-
-	})();
-
-	kb.orm.addAdapter(new ORMAdapter_Supermodel());
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
-
-/***/ },
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1852,7 +1656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, _;
 
-	_ = (kb = __webpack_require__(5))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	module.exports = kb.Statistics = (function() {
 	  function Statistics() {
@@ -1944,6 +1748,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return type_tracker;
 	  };
 
+	  Statistics.eventsStats = function(obj, key) {
+	    var events, node, stats, tail, _i, _len, _ref;
+	    stats = {
+	      count: 0
+	    };
+	    events = obj._events || obj._callbacks || {};
+	    _ref = (key ? [key] : _.keys(events));
+	    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+	      key = _ref[_i];
+	      if (!(node = events[key])) {
+	        continue;
+	      }
+	      if (_.isArray(node)) {
+	        stats[key] = _.compact(node).length;
+	      } else {
+	        stats[key] = 0;
+	        tail = node.tail;
+	        while ((node = node.next) !== tail) {
+	          stats[key]++;
+	        }
+	      }
+	      stats.count += stats[key];
+	    }
+	    return stats;
+	  };
+
 	  return Statistics;
 
 	})();
@@ -1964,7 +1794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	module.exports = kb.Store = (function() {
 	  Store.useOptionsOrCreate = function(options, obj, observable) {
@@ -2160,7 +1990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _argumentsAddKey, _keyArrayToObject, _mergeArray, _mergeObject, _ref, _wrappedKey;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	_wrappedKey = kb._wrappedKey = function(obj, key, value) {
 	  if (arguments.length === 2) {
@@ -2447,7 +2277,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.ViewModel = (function() {
 	  ViewModel.extend = kb.extend;
@@ -2455,7 +2285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function ViewModel(model, options, view_model) {
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref1;
+	        var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref1, _ref2;
 	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
 	        options || (options = {});
 	        view_model || (view_model = {});
@@ -2485,7 +2315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          },
 	          write: function(new_model) {
 	            return kb.ignore(function() {
-	              var event_watcher, keys, missing, rel_keys;
+	              var event_watcher, keys, missing, rel_keys, _ref1;
 	              if (kb.utils.wrappedObject(_this) === new_model) {
 	                return;
 	              }
@@ -2502,7 +2332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              event_watcher.emitter(new_model);
 	              if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
 	                keys = _.keys(new_model.attributes);
-	                if (new_model && (rel_keys = kb.orm.keys(new_model))) {
+	                if (new_model && (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(new_model) : void 0 : void 0)) {
 	                  keys = _.union(keys, rel_keys);
 	                }
 	                missing = _.difference(keys, _.keys(_this.__kb.model_keys));
@@ -2521,15 +2351,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (_this.__kb.internals) {
 	          keys = _.union(keys || [], _this.__kb.internals);
 	        }
-	        if (model && (rel_keys = kb.orm.keys(model))) {
+	        if (model && (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0)) {
 	          keys = _.union(keys || [], rel_keys);
 	        }
 	        if (options.keys) {
 	          if (_.isObject(options.keys) && !_.isArray(options.keys)) {
 	            mapped_keys = {};
-	            _ref1 = options.keys;
-	            for (vm_key in _ref1) {
-	              mapping_info = _ref1[vm_key];
+	            _ref2 = options.keys;
+	            for (vm_key in _ref2) {
+	              mapping_info = _ref2[vm_key];
 	              mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
 	            }
 	            _this.__kb.keys = _.keys(mapped_keys);
@@ -2663,7 +2493,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, key, _i, _len, _ref;
 
-	module.exports = kb = __webpack_require__(5);
+	module.exports = kb = __webpack_require__(6);
+
+	kb.configure = __webpack_require__(2);
 
 	kb.modules = {
 	  underscore: kb._,
@@ -2697,7 +2529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	__webpack_require__(23);
 
@@ -2757,7 +2589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var arraySlice, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	arraySlice = Array.prototype.slice;
 
@@ -2891,7 +2723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.locale_manager || (kb.locale_manager = void 0);
 
@@ -3000,7 +2832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	module.exports = kb.TriggeredObservable = (function() {
 	  function TriggeredObservable(emitter, event_selector) {
@@ -3071,7 +2903,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var $, callOrGet, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
 	__webpack_require__(24);
 
@@ -3256,7 +3088,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.Observable.prototype.setToDefault = function() {
 	  var _ref1;
@@ -3314,7 +3146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var $, EMAIL_REGEXP, NUMBER_REGEXP, URL_REGEXP, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(5), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
 	URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 
@@ -3414,6 +3246,234 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	};
 
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.18.6
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var AssociatedModel, Backbone, BackboneAssociations, kb, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, Backbone = _ref.Backbone;
+
+	AssociatedModel = null;
+
+	module.exports = BackboneAssociations = (function() {
+	  function BackboneAssociations() {}
+
+	  BackboneAssociations.isAvailable = function() {
+	    return !!(AssociatedModel = Backbone != null ? Backbone.AssociatedModel : void 0);
+	  };
+
+	  BackboneAssociations.keys = function(model) {
+	    if (!(model instanceof AssociatedModel)) {
+	      return null;
+	    }
+	    return _.map(model.relations, function(test) {
+	      return test.key;
+	    });
+	  };
+
+	  BackboneAssociations.relationType = function(model, key) {
+	    var relation;
+	    if (!(model instanceof AssociatedModel)) {
+	      return null;
+	    }
+	    if (!(relation = _.find(model.relations, function(test) {
+	      return test.key === key;
+	    }))) {
+	      return null;
+	    }
+	    if (relation.type === 'Many') {
+	      return kb.TYPE_COLLECTION;
+	    } else {
+	      return kb.TYPE_MODEL;
+	    }
+	  };
+
+	  return BackboneAssociations;
+
+	})();
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.18.6
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var Backbone, BackboneRelational, RelationalModel, kb, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, Backbone = _ref.Backbone;
+
+	RelationalModel = null;
+
+	module.exports = BackboneRelational = (function() {
+	  function BackboneRelational() {}
+
+	  BackboneRelational.isAvailable = function() {
+	    return !!(RelationalModel = Backbone != null ? Backbone.RelationalModel : void 0);
+	  };
+
+	  BackboneRelational.relationType = function(model, key) {
+	    var relation;
+	    if (!(model instanceof RelationalModel)) {
+	      return null;
+	    }
+	    if (!(relation = _.find(model.getRelations(), function(test) {
+	      return test.key === key;
+	    }))) {
+	      return null;
+	    }
+	    if (relation.collectionType || _.isArray(relation.keyContents)) {
+	      return kb.TYPE_COLLECTION;
+	    } else {
+	      return kb.TYPE_MODEL;
+	    }
+	  };
+
+	  BackboneRelational.bind = function(model, key, update, path) {
+	    var event, events, rel_fn, type, _i, _len;
+	    if (!(type = this.relationType(model, key))) {
+	      return null;
+	    }
+	    rel_fn = function(model) {
+	      !kb.statistics || kb.statistics.addModelEvent({
+	        name: 'update (relational)',
+	        model: model,
+	        key: key,
+	        path: path
+	      });
+	      return update();
+	    };
+	    events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
+	    if (type === kb.TYPE_COLLECTION) {
+	      for (_i = 0, _len = events.length; _i < _len; _i++) {
+	        event = events[_i];
+	        model.bind("" + event + ":" + key, rel_fn);
+	      }
+	    } else {
+	      model.bind("" + events[0] + ":" + key, rel_fn);
+	    }
+	    return function() {
+	      var _j, _len1;
+	      if (type === kb.TYPE_COLLECTION) {
+	        for (_j = 0, _len1 = events.length; _j < _len1; _j++) {
+	          event = events[_j];
+	          model.unbind("" + event + ":" + key, rel_fn);
+	        }
+	      } else {
+	        model.unbind("" + events[0] + ":" + key, rel_fn);
+	      }
+	    };
+	  };
+
+	  return BackboneRelational;
+
+	})();
+
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(global) {
+	/*
+	  knockback.js 0.18.6
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var Supermodel, kb, root, _;
+
+	root = typeof window !== "undefined" && window !== null ? window : global;
+
+	_ = (kb = __webpack_require__(6))._;
+
+	Supermodel = null;
+
+	module.exports = Supermodel = (function() {
+	  function Supermodel() {}
+
+	  Supermodel.isAvailable = function() {
+	    return !!(Supermodel = root.Supermodel);
+	  };
+
+	  Supermodel.keys = function(model) {
+	    if (!(model instanceof Supermodel.Model)) {
+	      return null;
+	    }
+	    return _.keys(model.constructor.associations());
+	  };
+
+	  Supermodel.relationType = function(model, key) {
+	    var relation;
+	    if (!(model instanceof Supermodel.Model)) {
+	      return null;
+	    }
+	    if (!(relation = model.constructor.associations()[key])) {
+	      return null;
+	    }
+	    if (relation.add) {
+	      return kb.TYPE_COLLECTION;
+	    } else {
+	      return kb.TYPE_MODEL;
+	    }
+	  };
+
+	  Supermodel.bind = function(model, key, update, path) {
+	    var rel_fn, type;
+	    if (!(type = this.relationType(model, key))) {
+	      return null;
+	    }
+	    rel_fn = function(model, other) {
+	      var previous, relation;
+	      !kb.statistics || kb.statistics.addModelEvent({
+	        name: 'update (supermodel)',
+	        model: model,
+	        key: key,
+	        path: path
+	      });
+	      relation = model.constructor.associations()[key];
+	      previous = model[relation.store];
+	      model[relation.store] = other;
+	      update(other);
+	      return model[relation.store] = previous;
+	    };
+	    if (type === kb.TYPE_MODEL) {
+	      model.bind("associate:" + key, rel_fn);
+	      return function() {
+	        return model.unbind("associate:" + key, rel_fn);
+	      };
+	    }
+	  };
+
+	  Supermodel.useFunction = function(model, key) {
+	    return !!this.relationType(model, key);
+	  };
+
+	  return Supermodel;
+
+	})();
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }
 /******/ ])

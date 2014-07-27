@@ -780,6 +780,7 @@ describe 'knockback-collection-observable.js @quick', ->
     models = (new Contact({id: id}) for id in [1..4])
     class PersonViewModel extends kb.ViewModel
     collection_observable = kb.collectionObservable(models, {view_model: PersonViewModel, auto_compact: true})
+    collection = collection_observable.collection()
     assert.equal(collection_observable.collection().length, 4)
 
     previous_view_models = collection_observable().slice()
@@ -805,5 +806,9 @@ describe 'knockback-collection-observable.js @quick', ->
 
     kb.release(collection_observable)
 
+    assert.ok(kb.Statistics.eventsStats(collection).count is 0, "All collection events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(collection))}")
+    for model in models
+      collection.remove(model)
+      assert.ok(kb.Statistics.eventsStats(model).count is 0, "All model events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()

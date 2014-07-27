@@ -17,7 +17,7 @@ browserify = require 'gulp-browserify'
 TEST_GROUPS = require('../test_groups')
 
 module.exports = (options={}, callback) ->
-  return callback() if (options.tags or '').indexOf('@quick') >= 0
+  return callback() if options.tags.indexOf('@quick') >= 0
 
   queue = new Queue(1)
 
