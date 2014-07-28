@@ -79,7 +79,9 @@ class kb.Observable
     observable = kb.utils.wrappedObservable @, ko.computed {
       read: =>
         return if @_wait?() or kb.wasReleased(@)
-        @_update(); return @_value.value()
+        @_update()
+        return if kb.wasReleased(@)
+        return @_value.value()
 
       write: (new_value) => kb.ignore =>
         return if kb.wasReleased(@)

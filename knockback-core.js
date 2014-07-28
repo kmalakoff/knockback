@@ -1,5 +1,5 @@
 /*
-  knockback-core.js 0.19.0
+  knockback-core.js 0.19.1
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -1443,6 +1443,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	              return;
 	            }
 	            _this._update();
+	            if (kb.wasReleased(_this)) {
+	              return;
+	            }
 	            return _this._value.value();
 	          },
 	          write: function(new_value) {

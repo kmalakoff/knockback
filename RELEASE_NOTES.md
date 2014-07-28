@@ -10,7 +10,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * Fixed dynamic adding of keys: https://github.com/kmalakoff/knockback/issues/121
 * Added kb.configure to manually set the ORM solution: kb.configure({orm: 'backbone-relational'}). Knockback will try to infer the ORM solution of your choice, but if it is not loaded before Knockback, you can select it manally.
 
-## 0.19.0
+## 0.19.1
 * Removed standalone plugins. Just choose knockback if you need one or more plugins.
 * Change library building to use webpack.
 * Avoid creating dependencies in collectionObservable's destroy: https://github.com/kmalakoff/knockback/pull/120
