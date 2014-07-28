@@ -10,10 +10,11 @@ module.exports = class TypedValue
     kb.release(@__kb_value); @__kb_value = null
 
   value: -> ko.utils.unwrapObservable(@_vo())
-  peek: -> return @__kb_value
+  rawValue: -> return @__kb_value
 
   valueType: (model, key) ->
-    @value_type or @_updateValueObservable(kb.getValue(model, key)) # create so we can check the type
+    new_value = kb.getValue(model, key)
+    @value_type or @_updateValueObservable(new_value) # create so we can check the type
     return @value_type
 
   update: (new_value) ->

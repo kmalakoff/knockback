@@ -57,10 +57,7 @@ class kb.Observable
     options or kb._throwMissing(this, 'options')
 
     # copy create options
-    if _.isString(options) or ko.isObservable(options)
-      create_options = {key: options}
-    else
-      create_options = kb.utils.collapseOptions(options)
+    create_options = if _.isString(options) or ko.isObservable(options) then {key: options} else kb.utils.collapseOptions(options)
 
     # extract options
     @key = create_options.key; delete create_options.key; @key or kb._throwMissing(this, 'key')
@@ -73,34 +70,27 @@ class kb.Observable
     # set up basics
     @_value = new TypedValue(create_options)
     @_model = ko.observable()
-    event_watcher = kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @_model, update: (=> kb.ignore(=> @_update())), key: @key, path: create_options.path})
-    @_model(event_watcher.ee)
-    @_wait = ko.observable(true)
-
-    # watch the model for changes
     observable = kb.utils.wrappedObservable @, ko.computed {
       read: =>
-        return if @_wait?() or kb.wasReleased(@)
-        @_update()
+        _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
+        kb.utils.wrappedEventWatcher(@)?.emitter(_model or null) # update the event watcher
+        if @read
+          @_value.update(@read.apply(@_vm, args))
+        else if !_.isUndefined(_model)
+          kb.ignore => @_value.update(kb.getValue(_model, kb.peek(@key), @args))
         return @_value.value()
 
       write: (new_value) => kb.ignore =>
-        return if kb.wasReleased(@)
         unwrapped_new_value = kb.utils.unwrapModels(new_value) # unwrap for set (knockout may pass view models which are required for the observable but not the model)
+        _model = kb.peek(@_model)
         if @write
           @write.call(@_vm, unwrapped_new_value)
-          new_value = kb.getValue(kb.peek(@_model), kb.peek(@key), @args)
-        else if _model = kb.peek(@_model)
+          new_value = kb.getValue(_model, kb.peek(@key), @args)
+        else if _model
           kb.setValue(_model, kb.peek(@key), unwrapped_new_value)
         @_value.update(new_value)
 
       owner: @_vm
-    }
-
-    # use external model observable or create
-    observable.model = @model = ko.computed {
-      read: => ko.utils.unwrapObservable(@_model)
-      write: (new_model) => kb.ignore => return if kb.wasReleased(@); event_watcher.emitter(new_model)
     }
 
     observable.__kb_is_o = true # mark as a kb.Observable
@@ -112,10 +102,24 @@ class kb.Observable
     else
       create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path)
     delete create_options.factories
-    @_wait(false); delete @_wait
 
     # publish public interface on the observable and return instead of this
     kb.publishMethods(observable, @, KEYS_PUBLISH)
+
+    # use external model observable or create
+    observable.model = @model = ko.computed {
+      read: => ko.utils.unwrapObservable(@_model)
+      write: (new_model) => kb.ignore =>
+        return if @__kb_released or (kb.peek(@_model) is new_model) # destroyed or no change
+
+        # update references
+        new_value = kb.getValue(new_model, kb.peek(@key), @args)
+        @_model(new_model)
+        if not new_model then  @_value.update(null)
+        else if not _.isUndefined(new_value) then @_value.update(new_value)
+    }
+    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: (=> kb.ignore => @_value.update()), key: @key, path: create_options.path})
+    @_value.rawValue() or @_value.update() # wasn't loaded so create
 
     # wrap ourselves with a localizer
     if kb.LocalizedObservable and create_options.localizer
@@ -132,21 +136,16 @@ class kb.Observable
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
-    @__kb_released = true
     observable = kb.utils.wrappedObservable(@)
+    @__kb_released = true
     @_value.destroy(); @_value = null
     @model.dispose(); @model = observable.model = null
     kb.utils.wrappedDestroy(@)
 
   # @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Collection, it will hold a CollectionObservable.
-  value: -> @_value?.peek()
+  value: -> @_value.rawValue()
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
-  valueType: -> @_value?.valueType(kb.peek(@_model), kb.peek(@key))
-
-  # @nodoc
-  _update: ->
-    _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
-    kb.ignore => @_value.update(if @read then @read.apply(@_vm, args) else kb.getValue(_model, kb.peek(@key), @args))
+  valueType: -> @_value.valueType(kb.peek(@_model), kb.peek(@key))
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)
