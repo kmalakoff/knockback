@@ -975,19 +975,19 @@ describe 'view-model @quick @view-model', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  # # https://github.com/kmalakoff/knockback/issues/121
-  # it '25. Issue 121', (done) ->
-  #   kb.statistics = new kb.Statistics() # turn on stats
+  # https://github.com/kmalakoff/knockback/issues/121
+  it '25. Issue 121', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
 
-  #   view_model = kb.viewModel(model1 = new kb.Model())
-  #   model1.set({propB: 'val2'})
-  #   assert.equal view_model.propB(), 'val2'
+    view_model = kb.viewModel(model1 = new kb.Model())
+    model1.set({propB: 'val2'})
+    assert.equal view_model.propB(), 'val2'
 
-  #   model1.set({propA: 'val1', propB: 'val2.2'})
-  #   assert.equal view_model.propA(), 'val1'
-  #   assert.equal view_model.propB(), 'val2.2'
+    model1.set({propA: 'val1', propB: 'val2.2'})
+    assert.equal view_model.propA(), 'val1'
+    assert.equal view_model.propB(), 'val2.2'
 
-  #   kb.release(view_model)
+    kb.release(view_model)
 
-  #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-  #   done()
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

@@ -2317,7 +2317,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	updateObservables = function(model) {
 	  var keys, missing, rel_keys, _ref1;
-	  return;
 	  if (kb.wasReleased(this) || !model) {
 	    return;
 	  }

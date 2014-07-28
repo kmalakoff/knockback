@@ -11,7 +11,7 @@
 
 # @nodoc
 updateObservables = (model) ->
-  return
+  # return # NOTE: disabled due to performance - need to re-implement optimizally for https://github.com/kmalakoff/knockback/issues/121
   return if kb.wasReleased(@) or not model
 
   # NOTE: this does not remove keys that are different between the models
