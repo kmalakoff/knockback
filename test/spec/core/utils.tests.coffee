@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'knockback_core utils @quick', ->
+describe 'knockback_core utils @quick @utils', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko} = kb

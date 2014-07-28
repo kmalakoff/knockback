@@ -1,8 +1,7 @@
 assert = assert or require?('chai').assert
+window = if window? then window else global
 
-describe 'inject @quick', ->
-  window = if window? then window else global
-
+describe 'inject @quick @inject', ->
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko, $} = kb
   return unless $ # no jquery

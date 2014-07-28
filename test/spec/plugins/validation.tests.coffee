@@ -1,8 +1,7 @@
 assert = assert or require?('chai').assert
+window = if window? then window else global
 
-describe 'validation @quick', ->
-  window = if window? then window else global
-
+describe 'validation @quick @validation', ->
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko, $} = kb
 

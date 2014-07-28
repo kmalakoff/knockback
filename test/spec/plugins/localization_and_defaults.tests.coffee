@@ -80,7 +80,7 @@ kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 })
 ###############################
 
-describe 'localized-observable @quick', ->
+describe 'localized-observable @quick @localization', ->
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -701,7 +701,7 @@ describe 'localized-observable @quick', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-describe 'defaults @quick', ->
+describe 'defaults @quick @defaults', ->
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')

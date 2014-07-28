@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'money-patches @quick', ->
+describe 'money-patches @quick @monkey', ->
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko} = kb
 
