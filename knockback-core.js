@@ -1937,26 +1937,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.value_type = void 0;
 	    }
 	    value = this.__kb_value;
-	    if (_.isUndefined(this.value_type) || (this.value_type !== new_type && new_type !== kb.TYPE_UNKNOWN)) {
-	      if ((this.value_type === kb.TYPE_COLLECTION) && (new_type === kb.TYPE_ARRAY)) {
+	    if (this.value_type === kb.TYPE_COLLECTION) {
+	      if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) {
 	        return value(new_value);
-	      } else {
-	        return this._updateValueObservable(new_value);
 	      }
+	      if (kb.peek(value.collection) !== new_value) {
+	        return value.collection(new_value);
+	      }
+	    } else if (_.isUndefined(this.value_type) || this.value_type !== new_type) {
+	      return this._updateValueObservable(new_value);
 	    } else if (this.value_type === kb.TYPE_MODEL) {
-	      if (typeof value.model === 'function') {
-	        if (value.model() !== new_value) {
+	      if (_.isFunction(value.model)) {
+	        if (kb.peek(value.model) !== new_value) {
 	          return value.model(new_value);
 	        }
 	      } else if (kb.utils.wrappedObject(value) !== new_value) {
 	        return this._updateValueObservable(new_value);
 	      }
-	    } else if (this.value_type === kb.TYPE_COLLECTION) {
-	      if (value.collection() !== new_value) {
-	        return value.collection(new_value);
-	      }
-	    } else if (this.value_type !== new_type) {
-	      return this._updateValueObservable(new_value);
 	    } else {
 	      if (value() !== new_value) {
 	        return value(new_value);
