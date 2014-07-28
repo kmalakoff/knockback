@@ -30,22 +30,33 @@ module.exports = class TypedValue
       @value_type = undefined
     value = @__kb_value
 
-    if @value_type is kb.TYPE_COLLECTION
-      return value(new_value) if @value_type is kb.TYPE_COLLECTION and new_type is kb.TYPE_ARRAY
-      value.collection(new_value) if kb.peek(value.collection) isnt new_value
+    # create or change in type
+    if _.isUndefined(@value_type) or (@value_type isnt new_type and new_type isnt kb.TYPE_UNKNOWN)
 
-    else if _.isUndefined(@value_type) or @value_type isnt new_type
-      @_updateValueObservable(new_value)
+      # set the collection array
+      if (@value_type is kb.TYPE_COLLECTION) and (new_type is kb.TYPE_ARRAY)
+        value(new_value)
+
+      else
+        @_updateValueObservable(new_value) # create new
 
     else if @value_type is kb.TYPE_MODEL
-      if _.isFunction(value.model)
-        value.model(new_value) if kb.peek(value.model) isnt new_value
+      # use the get/set methods
+      if typeof(value.model) is 'function'
+        value.model(new_value) if value.model() isnt new_value # different so update
 
+      # different so create a new one (no way to update)
       else if kb.utils.wrappedObject(value) isnt new_value
-        @_updateValueObservable(new_value)
+        @_updateValueObservable(new_value) # create new
+
+    else if @value_type is kb.TYPE_COLLECTION
+      value.collection(new_value) if value.collection() isnt new_value # different so update
+
+    else if @value_type isnt new_type
+      @_updateValueObservable(new_value)
 
     else # a simple observable
-      value(new_value) if value() isnt new_value
+      value(new_value) if value() isnt new_value # different so update
 
   _updateValueObservable: (new_value) ->
     create_options = @create_options

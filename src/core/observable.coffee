@@ -120,7 +120,7 @@ class kb.Observable
         else if not _.isUndefined(new_value)
           @update(new_value)
     }
-    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: (=> kb.ignore => @_value.update()), key: @key, path: create_options.path})
+    kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: (=> kb.ignore => @update()), key: @key, path: create_options.path})
     @_value.rawValue() or @_value.update() # wasn't loaded so create
 
     # wrap ourselves with a localizer
@@ -156,6 +156,7 @@ class kb.Observable
   # @private
   update: (new_value) ->
     return if @__kb_released # destroyed, nothing to do
-    @_value.update.apply(@_value, arguments)
+    new_value = kb.getValue(kb.peek(@_model), kb.peek(@key)) unless arguments.length
+    @_value.update(new_value)
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)
