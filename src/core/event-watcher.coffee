@@ -109,7 +109,7 @@ class kb.EventWatcher
 
         callbacks.list.push(info = _.defaults({obj: obj}, callback_info)) # store the callback information
         @_onModelLoaded(model) if model
-    return
+    return @
 
   releaseCallbacks: (obj) ->
     @ee = null

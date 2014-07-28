@@ -93,7 +93,6 @@ class kb.CollectionObservable
 
     # bind callbacks
     @__kb or= {}
-    @__kb._onCollectionChange = _.bind(@_onCollectionChange, @)
 
     # options
     options = kb.utils.collapseOptions(options)
@@ -128,15 +127,15 @@ class kb.CollectionObservable
         return if ((previous_collection = @_collection()) is new_collection) # no change
 
         # clean up
-        previous_collection.unbind('all', @__kb._onCollectionChange) if previous_collection
+        previous_collection.unbind('all', @_onCollectionChange) if previous_collection
 
         # store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
-        new_collection.bind('all', @__kb._onCollectionChange) if new_collection
+        new_collection.bind('all', @_onCollectionChange) if new_collection
 
         # update references (including notification)
         @_collection(new_collection)
     }
-    collection.bind('all', @__kb._onCollectionChange) if collection # bind now
+    collection.bind('all', @_onCollectionChange) if collection # bind now
 
     # observable that will re-trigger when sort or filters or collection changes
     @_mapper = ko.computed =>
@@ -183,10 +182,11 @@ class kb.CollectionObservable
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
+    @__kb_released = true
     observable = kb.utils.wrappedObservable(@)
     collection = kb.peek(@_collection)
     if collection
-      collection.unbind('all', @__kb._onCollectionChange)
+      collection.unbind('all', @_onCollectionChange)
       array = kb.peek(observable); array.splice(0, array.length) # clear the view models or models
     @collection.dispose(); @_collection = observable.collection = @collection = null
     @_mapper.dispose(); @_mapper = null
@@ -307,7 +307,7 @@ class kb.CollectionObservable
     return factory
 
   # @private
-  _onCollectionChange: (event, arg) -> return kb.ignore =>
+  _onCollectionChange: (event, arg) => return kb.ignore =>
     return if @in_edit # we are doing the editing
 
     switch event

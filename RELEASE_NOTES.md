@@ -7,6 +7,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * Fixed defaults considering 0 as empty: https://github.com/kmalakoff/knockback/issues/114
 * Fixed setting array attribute to null: https://github.com/kmalakoff/knockback/issues/103
 * Fixed events being cleaned up: https://github.com/kmalakoff/knockback/issues/101
+* Fixed dynamic adding of keys: https://github.com/kmalakoff/knockback/issues/121
 * Added kb.configure to manually set the ORM solution: kb.configure({orm: 'backbone-relational'}). Knockback will try to infer the ORM solution of your choice, but if it is not loaded before Knockback, you can select it manally.
 
 ## 0.19.0

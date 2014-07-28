@@ -9,6 +9,18 @@
 
 {_, ko} = kb = require './kb'
 
+# @nodoc
+updateObservables = (model) ->
+  return if kb.wasReleased(@) or not model
+
+  # NOTE: this does not remove keys that are different between the models
+  keys = _.keys(model.attributes)
+  keys = _.union(keys, rel_keys) if rel_keys = kb.orm?.keys?(model)
+  keys = _.difference(keys, @__kb.excludes) if @__kb.excludes  # remove excludes
+  keys = _.difference(keys, @__kb.statics) if @__kb.statics  # remove statics
+  missing = _.difference(keys, _.keys(@__kb.model_keys))
+  @createObservables(model, missing) if missing.length
+
 # Base class for ViewModels for Models.
 #
 # @example How to create a ViewModel with first_name and last_name observables.
@@ -97,10 +109,7 @@ class kb.ViewModel
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
-    not options.internals or @__kb.internals = options.internals
-    not options.excludes or @__kb.excludes = options.excludes
-    not options.statics or @__kb.statics = options.statics
-    not options.static_defaults or @__kb.static_defaults = options.static_defaults
+    @__kb[key] = options[key] for key in ['internals', 'excludes', 'statics', 'static_defaults'] when options.hasOwnProperty(key)
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
@@ -109,36 +118,21 @@ class kb.ViewModel
     @__kb.path = options.path
     kb.Factory.useOptionsOrCreate(options, @, options.path)
 
-    # create an observable model function and use watcher
-    _mdl = kb._wrappedKey(@, '_mdl', ko.observable())
+    _model = kb._wrappedKey(@, '_model', ko.observable())
     @model = ko.computed {
-      read: => _mdl(); return kb.utils.wrappedObject(@)
+      read: => ko.utils.unwrapObservable(_model)
       write: (new_model) => kb.ignore =>
-        return if (kb.utils.wrappedObject(@) is new_model) # no change
+        return if kb.wasReleased(@)
+        return unless event_watcher
 
-        # SHARED NULL MODEL - keep it that way
-        (not new_model or kb._throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null
-
-        # update references
-        kb.utils.wrappedObject(@, new_model)
-        event_watcher = kb.utils.wrappedEventWatcher(@)
-        (_mdl(new_model); return) unless event_watcher # not yet initialized
-        event_watcher.emitter(new_model) # sync with event_watcher
-
-        # sync missing attributes
-        if not (@__kb.keys or not new_model or not new_model.attributes) # only allow specific keys or nothing to add
-          # NOTE: this does not remove keys that are different between the models
-          keys = _.keys(new_model.attributes)
-          keys = _.union(keys, rel_keys) if new_model and (rel_keys = kb.orm?.keys?(new_model))
-          missing = _.difference(keys, _.keys(@__kb.model_keys))
-          if missing
-            @createObservables(new_model, missing)
-        _mdl(new_model)
-        return
+        event_watcher.emitter(new_model)
+        kb.utils.wrappedObject(@, event_watcher.ee); _model(event_watcher.ee)
+        updateObservables.call(@, model) if model = event_watcher.ee
     }
-    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @model}))
+    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @_model, update: (=> kb.ignore => updateObservables.call(@, event_watcher?.ee))}))
+    kb.utils.wrappedObject(@, model = event_watcher.ee); _model(event_watcher.ee)
 
-    # collect requires and internls first because they could be used to define the include order
+    # collect requires and internals first because they could be used to define the include order
     keys = options.requires
     keys = _.union(keys or [], @__kb.internals) if @__kb.internals
     keys = _.union(keys or [], rel_keys) if model and (rel_keys = kb.orm?.keys?(model))
@@ -153,11 +147,8 @@ class kb.ViewModel
       else
         @__kb.keys = options.keys
         (keys = if keys then _.union(keys, @__kb.keys) else _.clone(@__kb.keys))
-    else
-      bb_model = event_watcher.emitter()
-      if bb_model and bb_model.attributes
-        attribute_keys = _.keys(bb_model.attributes)
-        keys = if keys then _.union(keys, attribute_keys) else attribute_keys
+    else if model
+      keys = if keys then _.union(keys, _.keys(model.attributes)) else _.keys(model.attributes)
     keys = _.difference(keys, @__kb.excludes) if keys and @__kb.excludes  # remove excludes
     keys = _.difference(keys, @__kb.statics) if keys and @__kb.statics  # remove statics
 
@@ -174,6 +165,7 @@ class kb.ViewModel
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
+    @__kb_released = true
     if @__kb.view_model isnt @ # clear the external references
       @__kb.view_model[vm_key] = null for vm_key of @__kb.vm_keys
     @__kb.view_model = null
@@ -195,7 +187,7 @@ class kb.ViewModel
 
     for key in keys
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
-      continue if @[vm_key] # already exists, skip
+      continue if @__kb.view_model[vm_key] # already exists, skip
 
       # add to the keys list
       @__kb.vm_keys[vm_key] = @__kb.model_keys[key] = true
@@ -215,7 +207,7 @@ class kb.ViewModel
   mapObservables: (model, mappings) ->
     create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
     for vm_key, mapping_info of mappings
-      continue if @[vm_key] # already exists, skip
+      continue if @__kb.view_model[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)
       mapping_info.key or= vm_key
 
@@ -227,8 +219,4 @@ class kb.ViewModel
     return
 
 # Factory function to create a kb.ViewModel.
-#
-# @mixin
-# @author Rockstar Ninja
-#
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)

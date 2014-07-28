@@ -92,6 +92,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
 	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, kb, ko, _, _ref,
+	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
@@ -124,6 +125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CollectionObservable.extend = kb.extend;
 
 	  function CollectionObservable(collection, options) {
+	    this._onCollectionChange = __bind(this._onCollectionChange, this);
 	    return kb.ignore((function(_this) {
 	      return function() {
 	        var create_options, observable, _ref1;
@@ -137,7 +139,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        observable.__kb_is_co = true;
 	        _this.in_edit = 0;
 	        _this.__kb || (_this.__kb = {});
-	        _this.__kb._onCollectionChange = _.bind(_this._onCollectionChange, _this);
 	        options = kb.utils.collapseOptions(options);
 	        if (options.auto_compact) {
 	          _this.auto_compact = true;
@@ -175,17 +176,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return;
 	              }
 	              if (previous_collection) {
-	                previous_collection.unbind('all', _this.__kb._onCollectionChange);
+	                previous_collection.unbind('all', _this._onCollectionChange);
 	              }
 	              if (new_collection) {
-	                new_collection.bind('all', _this.__kb._onCollectionChange);
+	                new_collection.bind('all', _this._onCollectionChange);
 	              }
 	              return _this._collection(new_collection);
 	            });
 	          }
 	        });
 	        if (collection) {
-	          collection.bind('all', _this.__kb._onCollectionChange);
+	          collection.bind('all', _this._onCollectionChange);
 	        }
 	        _this._mapper = ko.computed(function() {
 	          var comparator, current_collection, filter, filters, models, view_models, _i, _len;
@@ -238,10 +239,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  CollectionObservable.prototype.destroy = function() {
 	    var array, collection, observable;
+	    this.__kb_released = true;
 	    observable = kb.utils.wrappedObservable(this);
 	    collection = kb.peek(this._collection);
 	    if (collection) {
-	      collection.unbind('all', this.__kb._onCollectionChange);
+	      collection.unbind('all', this._onCollectionChange);
 	      array = kb.peek(observable);
 	      array.splice(0, array.length);
 	    }
@@ -721,6 +723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      _fn(event_name);
 	    }
+	    return this;
 	  };
 
 	  EventWatcher.prototype.releaseCallbacks = function(obj) {
@@ -1432,7 +1435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          key: _this.key,
 	          path: create_options.path
 	        });
-	        _this._model(kb.utils.wrappedEventWatcher(_this).ee);
+	        _this._model(event_watcher.ee);
 	        _this._wait = ko.observable(true);
 	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
@@ -1469,7 +1472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if (kb.wasReleased(_this)) {
 	                return;
 	              }
-	              return kb.utils.wrappedEventWatcher(_this).emitter(new_model);
+	              return event_watcher.emitter(new_model);
 	            });
 	          }
 	        });
@@ -1501,8 +1504,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Observable.prototype.destroy = function() {
 	    var observable;
-	    observable = kb.utils.wrappedObservable(this);
 	    this.__kb_released = true;
+	    observable = kb.utils.wrappedObservable(this);
 	    this._value.destroy();
 	    this._value = null;
 	    this.model.dispose();
@@ -2298,9 +2301,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var kb, ko, updateObservables, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	updateObservables = function(model) {
+	  var keys, missing, rel_keys, _ref1;
+	  if (kb.wasReleased(this) || !model) {
+	    return;
+	  }
+	  keys = _.keys(model.attributes);
+	  if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
+	    keys = _.union(keys, rel_keys);
+	  }
+	  if (this.__kb.excludes) {
+	    keys = _.difference(keys, this.__kb.excludes);
+	  }
+	  if (this.__kb.statics) {
+	    keys = _.difference(keys, this.__kb.statics);
+	  }
+	  missing = _.difference(keys, _.keys(this.__kb.model_keys));
+	  if (missing.length) {
+	    return this.createObservables(model, missing);
+	  }
+	};
 
 	kb.ViewModel = (function() {
 	  ViewModel.extend = kb.extend;
@@ -2308,7 +2332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function ViewModel(model, options, view_model) {
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var attribute_keys, bb_model, event_watcher, keys, mapped_keys, mapping_info, rel_keys, vm_key, _mdl, _ref1, _ref2;
+	        var event_watcher, key, keys, mapped_keys, mapping_info, rel_keys, vm_key, _i, _len, _model, _ref1, _ref2, _ref3;
 	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
 	        options || (options = {});
 	        view_model || (view_model = {});
@@ -2323,66 +2347,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.__kb.vm_keys = {};
 	        _this.__kb.model_keys = {};
 	        _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
-	        !options.internals || (_this.__kb.internals = options.internals);
-	        !options.excludes || (_this.__kb.excludes = options.excludes);
-	        !options.statics || (_this.__kb.statics = options.statics);
-	        !options.static_defaults || (_this.__kb.static_defaults = options.static_defaults);
+	        _ref1 = ['internals', 'excludes', 'statics', 'static_defaults'];
+	        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	          key = _ref1[_i];
+	          if (options.hasOwnProperty(key)) {
+	            _this.__kb[key] = options[key];
+	          }
+	        }
 	        kb.Store.useOptionsOrCreate(options, model, _this);
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
-	        _mdl = kb._wrappedKey(_this, '_mdl', ko.observable());
+	        _model = kb._wrappedKey(_this, '_model', ko.observable());
 	        _this.model = ko.computed({
 	          read: function() {
-	            _mdl();
-	            return kb.utils.wrappedObject(_this);
+	            return ko.utils.unwrapObservable(_model);
 	          },
 	          write: function(new_model) {
 	            return kb.ignore(function() {
-	              var event_watcher, keys, missing, rel_keys, _ref1;
-	              if (kb.utils.wrappedObject(_this) === new_model) {
+	              if (kb.wasReleased(_this)) {
 	                return;
 	              }
-	              if (_this.__kb_null) {
-	                !new_model || kb._throwUnexpected(_this, 'model set on shared null');
-	                return;
-	              }
-	              kb.utils.wrappedObject(_this, new_model);
-	              event_watcher = kb.utils.wrappedEventWatcher(_this);
 	              if (!event_watcher) {
-	                _mdl(new_model);
 	                return;
 	              }
 	              event_watcher.emitter(new_model);
-	              if (!(_this.__kb.keys || !new_model || !new_model.attributes)) {
-	                keys = _.keys(new_model.attributes);
-	                if (new_model && (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(new_model) : void 0 : void 0)) {
-	                  keys = _.union(keys, rel_keys);
-	                }
-	                missing = _.difference(keys, _.keys(_this.__kb.model_keys));
-	                if (missing) {
-	                  _this.createObservables(new_model, missing);
-	                }
+	              kb.utils.wrappedObject(_this, event_watcher.ee);
+	              _model(event_watcher.ee);
+	              if (model = event_watcher.ee) {
+	                return updateObservables.call(_this, model);
 	              }
-	              _mdl(new_model);
 	            });
 	          }
 	        });
 	        event_watcher = kb.utils.wrappedEventWatcher(_this, new kb.EventWatcher(model, _this, {
-	          emitter: _this.model
+	          emitter: _this._model,
+	          update: (function() {
+	            return kb.ignore(function() {
+	              return updateObservables.call(_this, event_watcher != null ? event_watcher.ee : void 0);
+	            });
+	          })
 	        }));
+	        kb.utils.wrappedObject(_this, model = event_watcher.ee);
+	        _model(event_watcher.ee);
 	        keys = options.requires;
 	        if (_this.__kb.internals) {
 	          keys = _.union(keys || [], _this.__kb.internals);
 	        }
-	        if (model && (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0)) {
+	        if (model && (rel_keys = (_ref2 = kb.orm) != null ? typeof _ref2.keys === "function" ? _ref2.keys(model) : void 0 : void 0)) {
 	          keys = _.union(keys || [], rel_keys);
 	        }
 	        if (options.keys) {
 	          if (_.isObject(options.keys) && !_.isArray(options.keys)) {
 	            mapped_keys = {};
-	            _ref2 = options.keys;
-	            for (vm_key in _ref2) {
-	              mapping_info = _ref2[vm_key];
+	            _ref3 = options.keys;
+	            for (vm_key in _ref3) {
+	              mapping_info = _ref3[vm_key];
 	              mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
 	            }
 	            _this.__kb.keys = _.keys(mapped_keys);
@@ -2390,12 +2409,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.__kb.keys = options.keys;
 	            keys = keys ? _.union(keys, _this.__kb.keys) : _.clone(_this.__kb.keys);
 	          }
-	        } else {
-	          bb_model = event_watcher.emitter();
-	          if (bb_model && bb_model.attributes) {
-	            attribute_keys = _.keys(bb_model.attributes);
-	            keys = keys ? _.union(keys, attribute_keys) : attribute_keys;
-	          }
+	        } else if (model) {
+	          keys = keys ? _.union(keys, _.keys(model.attributes)) : _.keys(model.attributes);
 	        }
 	        if (keys && _this.__kb.excludes) {
 	          keys = _.difference(keys, _this.__kb.excludes);
@@ -2420,6 +2435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  ViewModel.prototype.destroy = function() {
 	    var vm_key;
+	    this.__kb_released = true;
 	    if (this.__kb.view_model !== this) {
 	      for (vm_key in this.__kb.vm_keys) {
 	        this.__kb.view_model[vm_key] = null;
@@ -2453,7 +2469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (_i = 0, _len = keys.length; _i < _len; _i++) {
 	      key = keys[_i];
 	      vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
-	      if (this[vm_key]) {
+	      if (this.__kb.view_model[vm_key]) {
 	        continue;
 	      }
 	      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[key] = true;
@@ -2480,7 +2496,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    for (vm_key in mappings) {
 	      mapping_info = mappings[vm_key];
-	      if (this[vm_key]) {
+	      if (this.__kb.view_model[vm_key]) {
 	        continue;
 	      }
 	      mapping_info = _.isString(mapping_info) ? {

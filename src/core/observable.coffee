@@ -72,7 +72,7 @@ class kb.Observable
     @_value = new TypedValue(create_options)
     @_model = ko.observable()
     event_watcher = kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @_model, update: (=> kb.ignore(=> @_update())), key: @key, path: create_options.path})
-    @_model(kb.utils.wrappedEventWatcher(@).ee)
+    @_model(event_watcher.ee)
     @_wait = ko.observable(true)
 
     # watch the model for changes
@@ -97,7 +97,7 @@ class kb.Observable
     # use external model observable or create
     observable.model = @model = ko.computed {
       read: => ko.utils.unwrapObservable(@_model)
-      write: (new_model) => kb.ignore => return if kb.wasReleased(@); kb.utils.wrappedEventWatcher(@).emitter(new_model)
+      write: (new_model) => kb.ignore => return if kb.wasReleased(@); event_watcher.emitter(new_model)
     }
 
     observable.__kb_is_o = true # mark as a kb.Observable
@@ -129,8 +129,8 @@ class kb.Observable
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
-    observable = kb.utils.wrappedObservable(@)
     @__kb_released = true
+    observable = kb.utils.wrappedObservable(@)
     @_value.destroy(); @_value = null
     @model.dispose(); @model = observable.model = null
     kb.utils.wrappedDestroy(@)

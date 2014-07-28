@@ -1,6 +1,6 @@
 assert = assert or require?('chai').assert
 
-describe 'collection-observable @quick', ->
+describe 'collection-observable @quick @collection-observable', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko} = kb

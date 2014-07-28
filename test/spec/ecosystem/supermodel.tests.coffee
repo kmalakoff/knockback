@@ -346,40 +346,40 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '7a. Inferring observable types: late binding', (done) ->
-    kb.statistics = new kb.Statistics() # turn on stats
+  # it '7a. Inferring observable types: late binding', (done) ->
+  #   kb.statistics = new kb.Statistics() # turn on stats
 
-    person1 = Person.create({id: 'person-7-1', name: 'Daddy'})
-    person2 = Person.create({id: 'person-7-2', name: 'Mommy'})
-    house = Building.create({id: 'house-7-1', name: 'Home Sweet Home'})
+  #   person1 = Person.create({id: 'person-7-1', name: 'Daddy'})
+  #   person2 = Person.create({id: 'person-7-2', name: 'Mommy'})
+  #   house = Building.create({id: 'house-7-1', name: 'Home Sweet Home'})
 
-    view_model_person1 = kb.viewModel(person1)
-    view_model_house1 = kb.viewModel(house)
+  #   view_model_person1 = kb.viewModel(person1)
+  #   view_model_house1 = kb.viewModel(house)
 
-    # inferred the relationship types
-    assert.equal(view_model_person1.name(), 'Daddy', 'person1 name is Daddy')
-    assert.equal(view_model_person1.friends().length, 0, 'person1 has no friends')
-    # assert.equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has not best_friends')
-    assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
+  #   # inferred the relationship types
+  #   assert.equal(view_model_person1.name(), 'Daddy', 'person1 name is Daddy')
+  #   assert.equal(view_model_person1.friends().length, 0, 'person1 has no friends')
+  #   # assert.equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has not best_friends')
+  #   assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
-    # add some friends
-    person1.friends().add(person2); person2.best_friend(person1)
-    assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
-    assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
-    # assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+  #   # add some friends
+  #   person1.friends().add(person2); person2.best_friend(person1)
+  #   assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+  #   assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+  #   # assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
-    # add some occupants
-    house.occupants().add(person1); house.occupants().add(person2)
-    assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
-    assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
-    assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+  #   # add some occupants
+  #   house.occupants().add(person1); house.occupants().add(person2)
+  #   assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+  #   assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+  #   assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
 
-    # release
-    kb.release(view_model_person1)
-    kb.release(view_model_house1)
+  #   # release
+  #   kb.release(view_model_person1)
+  #   kb.release(view_model_house1)
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-    done()
+  #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  #   done()
 
   # it '7b. Inferring observable types: late binding (attribute setting)', (done) ->
   #   kb.statistics = new kb.Statistics() # turn on stats
@@ -532,69 +532,69 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
   #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   #   done()
 
-  it '9a. Customizing observable types: late binding', (done) ->
-    kb.statistics = new kb.Statistics() # turn on stats
+  # it '9a. Customizing observable types: late binding', (done) ->
+  #   kb.statistics = new kb.Statistics() # turn on stats
 
-    class FriendViewModel extends kb.ViewModel
-    class BestFriendViewModel extends kb.ViewModel
-    class PersonViewModel extends kb.ViewModel
-      constructor: (model, options) ->
-        super(model, {factories: {
-          'friends.models': FriendViewModel
-          'best_friend': BestFriendViewModel
-          'occupies': HouseViewModel
-        }, options: options})
-    class HouseViewModel extends kb.ViewModel
-      constructor: (model, options) ->
-        super(model, {factories: {
-          'occupants.models': PersonViewModel
-        }, options: options})
+  #   class FriendViewModel extends kb.ViewModel
+  #   class BestFriendViewModel extends kb.ViewModel
+  #   class PersonViewModel extends kb.ViewModel
+  #     constructor: (model, options) ->
+  #       super(model, {factories: {
+  #         'friends.models': FriendViewModel
+  #         'best_friend': BestFriendViewModel
+  #         'occupies': HouseViewModel
+  #       }, options: options})
+  #   class HouseViewModel extends kb.ViewModel
+  #     constructor: (model, options) ->
+  #       super(model, {factories: {
+  #         'occupants.models': PersonViewModel
+  #       }, options: options})
 
-    person1 = Person.create({id: 'person-9-1', name: 'Daddy'})
-    person2 = Person.create({id: 'person-9-2', name: 'Mommy'})
-    family = new kb.Collection([person1, person2])
-    house = Building.create({id: 'house-9-1', name: 'Home Sweet Home'})
+  #   person1 = Person.create({id: 'person-9-1', name: 'Daddy'})
+  #   person2 = Person.create({id: 'person-9-2', name: 'Mommy'})
+  #   family = new kb.Collection([person1, person2])
+  #   house = Building.create({id: 'house-9-1', name: 'Home Sweet Home'})
 
-    view_model_person1 = new PersonViewModel(person1)
-    view_model_person2 = new PersonViewModel(person2)
-    co_family = kb.collectionObservable(family, {view_model: PersonViewModel})
-    view_model_house1 = new HouseViewModel(house)
+  #   view_model_person1 = new PersonViewModel(person1)
+  #   view_model_person2 = new PersonViewModel(person2)
+  #   co_family = kb.collectionObservable(family, {view_model: PersonViewModel})
+  #   view_model_house1 = new HouseViewModel(house)
 
-    # check initial state
-    assert.equal(view_model_person1.friends().length, 0, 'person1 has no friends')
-    assert.equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has no best friends')
-    assert.ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
-    assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
-    assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
+  #   # check initial state
+  #   assert.equal(view_model_person1.friends().length, 0, 'person1 has no friends')
+  #   assert.equal(view_model_person1.best_friends_with_me().length, 0, 'person1 has no best friends')
+  #   assert.ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+  #   assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+  #   assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants')
 
-    # check friends
-    person1.friends().add(person2); person2.best_friend(person1)
-    assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
-    assert.ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
-    assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
-    assert.equal(view_model_person1.best_friends_with_me().length, 1, 'person1 has one best friends')
-    assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
-    assert.ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
-    assert.equal(view_model_person2.best_friend().name(), 'Daddy', 'person2 is best friends with Daddy')
-    assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
+  #   # check friends
+  #   person1.friends().add(person2); person2.best_friend(person1)
+  #   assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+  #   assert.ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel')
+  #   assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+  #   assert.equal(view_model_person1.best_friends_with_me().length, 1, 'person1 has one best friends')
+  #   assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+  #   assert.ok(view_model_person2.best_friend() instanceof BestFriendViewModel, 'person2 is best friends are BestFriendViewModel')
+  #   assert.equal(view_model_person2.best_friend().name(), 'Daddy', 'person2 is best friends with Daddy')
+  #   assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
-    # check occupants
-    house.occupants().add(person1); house.occupants().add(person2)
-    assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
-    assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
-    assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
-    assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
-    assert.ok(view_model_house1.occupants()[0].occupies() instanceof HouseViewModel, 'person1 occupies has HouseViewModel')
-    assert.equal(view_model_house1.occupants()[0].occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+  #   # check occupants
+  #   house.occupants().add(person1); house.occupants().add(person2)
+  #   assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+  #   assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+  #   assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it')
+  #   assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+  #   assert.ok(view_model_house1.occupants()[0].occupies() instanceof HouseViewModel, 'person1 occupies has HouseViewModel')
+  #   assert.equal(view_model_house1.occupants()[0].occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
 
-    # release
-    kb.release(view_model_person1)
-    kb.release(view_model_person2)
-    kb.release(co_family)
-    kb.release(view_model_house1)
+  #   # release
+  #   kb.release(view_model_person1)
+  #   kb.release(view_model_person2)
+  #   kb.release(co_family)
+  #   kb.release(view_model_house1)
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-    done()
+  #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+  #   done()
 
   # it '9b. Customizing observable types: late binding (atrributes setting)', (done) ->
   #   kb.statistics = new kb.Statistics() # turn on stats
