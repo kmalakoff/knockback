@@ -11,6 +11,7 @@
 
 # @nodoc
 updateObservables = (model) ->
+  return
   return if kb.wasReleased(@) or not model
 
   # NOTE: this does not remove keys that are different between the models
@@ -20,6 +21,8 @@ updateObservables = (model) ->
   keys = _.difference(keys, @__kb.statics) if @__kb.statics  # remove statics
   missing = _.difference(keys, _.keys(@__kb.model_keys))
   @createObservables(model, missing) if missing.length
+
+KEYS_OPTIONS = ['internals', 'excludes', 'statics', 'static_defaults']
 
 # Base class for ViewModels for Models.
 #
@@ -109,7 +112,7 @@ class kb.ViewModel
     @__kb.vm_keys = {}
     @__kb.model_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
-    @__kb[key] = options[key] for key in ['internals', 'excludes', 'statics', 'static_defaults'] when options.hasOwnProperty(key)
+    @__kb[key] = options[key] for key in KEYS_OPTIONS when options.hasOwnProperty(key)
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
