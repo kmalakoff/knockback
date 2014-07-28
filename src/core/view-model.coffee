@@ -122,8 +122,8 @@ class kb.ViewModel
     @model = ko.computed {
       read: => ko.utils.unwrapObservable(_model)
       write: (new_model) => kb.ignore =>
-        return if kb.wasReleased(@)
-        return unless event_watcher
+        return if (kb.utils.wrappedObject(@) is new_model) or kb.wasReleased(@) or not event_watcher
+        (not new_model or kb._throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null # SHARED NULL MODEL - keep it that way
 
         event_watcher.emitter(new_model)
         kb.utils.wrappedObject(@, event_watcher.ee); _model(event_watcher.ee)
