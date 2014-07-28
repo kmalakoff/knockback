@@ -75,9 +75,9 @@ class kb.Observable
         _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
         kb.utils.wrappedEventWatcher(@)?.emitter(_model or null) # update the event watcher
         if @read
-          @_value.update(@read.apply(@_vm, args))
+          @update(@read.apply(@_vm, args))
         else if !_.isUndefined(_model)
-          kb.ignore => @_value.update(kb.getValue(_model, kb.peek(@key), @args))
+          kb.ignore => @update(kb.getValue(_model, kb.peek(@key), @args))
         return @_value.value()
 
       write: (new_value) => kb.ignore =>
@@ -88,7 +88,7 @@ class kb.Observable
           new_value = kb.getValue(_model, kb.peek(@key), @args)
         else if _model
           kb.setValue(_model, kb.peek(@key), unwrapped_new_value)
-        @_value.update(new_value)
+        @update(new_value)
 
       owner: @_vm
     }
@@ -115,8 +115,10 @@ class kb.Observable
         # update references
         new_value = kb.getValue(new_model, kb.peek(@key), @args)
         @_model(new_model)
-        if not new_model then  @_value.update(null)
-        else if not _.isUndefined(new_value) then @_value.update(new_value)
+        if not new_model
+          @update(null)
+        else if not _.isUndefined(new_value)
+          @update(new_value)
     }
     kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: (=> kb.ignore => @_value.update()), key: @key, path: create_options.path})
     @_value.rawValue() or @_value.update() # wasn't loaded so create
@@ -147,5 +149,13 @@ class kb.Observable
 
   # @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.
   valueType: -> @_value.valueType(kb.peek(@_model), kb.peek(@key))
+
+  ####################################################
+  # Internal
+  ####################################################
+  # @private
+  update: (new_value) ->
+    return if @__kb_released # destroyed, nothing to do
+    @_value.update.apply(@_value, arguments)
 
 kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)
