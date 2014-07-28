@@ -10,6 +10,8 @@
 {_, ko} = kb = require './kb'
 TypedValue = require './typed-value'
 
+KEYS_PUBLISH = ['value', 'valueType', 'destroy']
+
 # Base class for observing model attributes.
 #
 # @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
@@ -80,7 +82,6 @@ class kb.Observable
       read: =>
         return if @_wait?() or kb.wasReleased(@)
         @_update()
-        return if kb.wasReleased(@)
         return @_value.value()
 
       write: (new_value) => kb.ignore =>
@@ -114,7 +115,7 @@ class kb.Observable
     @_wait(false); delete @_wait
 
     # publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, @, ['value', 'valueType', 'destroy'])
+    kb.publishMethods(observable, @, KEYS_PUBLISH)
 
     # wrap ourselves with a localizer
     if kb.LocalizedObservable and create_options.localizer

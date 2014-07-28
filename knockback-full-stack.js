@@ -96,7 +96,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, kb, ko, _, _ref,
+	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KEYS_PUBLISH, kb, ko, _, _ref,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -107,6 +107,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	COMPARE_ASCENDING = -1;
 
 	COMPARE_DESCENDING = 1;
+
+	KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'];
 
 	kb.compare = function(value_a, value_b) {
 	  if (_.isString(value_a)) {
@@ -168,7 +170,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (create_options.creator) {
 	          _this.models_only = create_options.creator.models_only;
 	        }
-	        kb.publishMethods(observable, _this, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']);
+	        kb.publishMethods(observable, _this, KEYS_PUBLISH);
 	        _this._collection = ko.observable(collection);
 	        observable.collection = _this.collection = ko.computed({
 	          read: function() {
@@ -1398,11 +1400,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var TypedValue, kb, ko, _, _ref;
+	var KEYS_PUBLISH, TypedValue, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	TypedValue = __webpack_require__(11);
+
+	KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 
 	kb.Observable = (function() {
 	  function Observable(model, options, _vm) {
@@ -1448,9 +1452,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	              return;
 	            }
 	            _this._update();
-	            if (kb.wasReleased(_this)) {
-	              return;
-	            }
 	            return _this._value.value();
 	          },
 	          write: function(new_value) {
@@ -1496,7 +1497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        delete create_options.factories;
 	        _this._wait(false);
 	        delete _this._wait;
-	        kb.publishMethods(observable, _this, ['value', 'valueType', 'destroy']);
+	        kb.publishMethods(observable, _this, KEYS_PUBLISH);
 	        if (kb.LocalizedObservable && create_options.localizer) {
 	          observable = new create_options.localizer(observable);
 	          delete create_options.localizer;
@@ -2309,12 +2310,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, updateObservables, _, _ref;
+	var KEYS_OPTIONS, kb, ko, updateObservables, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	updateObservables = function(model) {
 	  var keys, missing, rel_keys, _ref1;
+	  return;
 	  if (kb.wasReleased(this) || !model) {
 	    return;
 	  }
@@ -2334,13 +2336,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	KEYS_OPTIONS = ['internals', 'excludes', 'statics', 'static_defaults'];
+
 	kb.ViewModel = (function() {
 	  ViewModel.extend = kb.extend;
 
 	  function ViewModel(model, options, view_model) {
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var event_watcher, key, keys, mapped_keys, mapping_info, rel_keys, vm_key, _i, _len, _model, _ref1, _ref2, _ref3;
+	        var event_watcher, key, keys, mapped_keys, mapping_info, rel_keys, vm_key, _i, _len, _model, _ref1, _ref2;
 	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
 	        options || (options = {});
 	        view_model || (view_model = {});
@@ -2355,9 +2359,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.__kb.vm_keys = {};
 	        _this.__kb.model_keys = {};
 	        _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
-	        _ref1 = ['internals', 'excludes', 'statics', 'static_defaults'];
-	        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	          key = _ref1[_i];
+	        for (_i = 0, _len = KEYS_OPTIONS.length; _i < _len; _i++) {
+	          key = KEYS_OPTIONS[_i];
 	          if (options.hasOwnProperty(key)) {
 	            _this.__kb[key] = options[key];
 	          }
@@ -2372,10 +2375,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          },
 	          write: function(new_model) {
 	            return kb.ignore(function() {
-	              if (kb.wasReleased(_this)) {
+	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
-	              if (!event_watcher) {
+	              if (_this.__kb_null) {
+	                !new_model || kb._throwUnexpected(_this, 'model set on shared null');
 	                return;
 	              }
 	              event_watcher.emitter(new_model);
@@ -2401,15 +2405,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (_this.__kb.internals) {
 	          keys = _.union(keys || [], _this.__kb.internals);
 	        }
-	        if (model && (rel_keys = (_ref2 = kb.orm) != null ? typeof _ref2.keys === "function" ? _ref2.keys(model) : void 0 : void 0)) {
+	        if (model && (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0)) {
 	          keys = _.union(keys || [], rel_keys);
 	        }
 	        if (options.keys) {
 	          if (_.isObject(options.keys) && !_.isArray(options.keys)) {
 	            mapped_keys = {};
-	            _ref3 = options.keys;
-	            for (vm_key in _ref3) {
-	              mapping_info = _ref3[vm_key];
+	            _ref2 = options.keys;
+	            for (vm_key in _ref2) {
+	              mapping_info = _ref2[vm_key];
 	              mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
 	            }
 	            _this.__kb.keys = _.keys(mapped_keys);
@@ -2574,11 +2578,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var KEYS_PUBLISH, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	__webpack_require__(21);
+
+	KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
 	module.exports = kb.DefaultObservable = (function() {
 	  function DefaultObservable(target_observable, dv) {
@@ -2600,7 +2606,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return target_observable(value);
 	      }
 	    }));
-	    kb.publishMethods(observable, this, ['destroy', 'setToDefault']);
+	    kb.publishMethods(observable, this, KEYS_PUBLISH);
 	    return observable;
 	  }
 
@@ -2768,9 +2774,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var KEYS_PUBLISH, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
 	kb.locale_manager || (kb.locale_manager = void 0);
 
@@ -2814,7 +2822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      })(this),
 	      owner: this.vm
 	    }));
-	    kb.publishMethods(observable, this, ['destroy', 'observedValue', 'resetToCurrent']);
+	    kb.publishMethods(observable, this, KEYS_PUBLISH);
 	    kb.locale_manager.bind('change', this.__kb._onLocaleChange);
 	    if (options.hasOwnProperty('default')) {
 	      observable = kb.DefaultObservable && ko.defaultObservable(observable, options["default"]);
@@ -2877,9 +2885,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var KEYS_PUBLISH, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	KEYS_PUBLISH = ['destroy'];
 
 	module.exports = kb.TriggeredObservable = (function() {
 	  function TriggeredObservable(emitter, event_selector) {
@@ -2893,7 +2903,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _this.vo();
 	      };
 	    })(this)));
-	    kb.publishMethods(observable, this, ['destroy']);
+	    kb.publishMethods(observable, this, KEYS_PUBLISH);
 	    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, {
 	      emitter: _.bind(this.emitter, this),
 	      update: _.bind(this.update, this),

@@ -9,6 +9,8 @@
 
 {_, ko} = kb = require '../core/kb'
 
+KEYS_PUBLISH = ['destroy']
+
 # Class for observing emitter events.
 #
 # @example create an observable whose subscriptions are notified with the change event is triggered.
@@ -44,7 +46,7 @@ module.exports = class kb.TriggeredObservable
     observable = kb.utils.wrappedObservable(@, ko.computed(=> @vo()))
 
     # publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, @, ['destroy'])
+    kb.publishMethods(observable, @, KEYS_PUBLISH)
 
     # create emitter observable
     kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(emitter, @, {emitter: _.bind(@emitter, @), update: _.bind(@update, @), event_selector: @event_selector}))

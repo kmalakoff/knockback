@@ -13,6 +13,8 @@ COMPARE_EQUAL = 0
 COMPARE_ASCENDING = -1
 COMPARE_DESCENDING = 1
 
+KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']
+
 kb.compare = (value_a, value_b) ->
   # String compare
   return value_a.localeCompare("#{value_b}") if _.isString(value_a)
@@ -117,7 +119,7 @@ class kb.CollectionObservable
     @models_only = create_options.creator.models_only if create_options.creator
 
     # publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, @, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'])
+    kb.publishMethods(observable, @, KEYS_PUBLISH)
 
     # start the processing
     @_collection = ko.observable(collection)

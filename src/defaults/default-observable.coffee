@@ -10,6 +10,8 @@
 {_, ko} = kb = require '../core/kb'
 require './extensions'
 
+KEYS_PUBLISH = ['destroy', 'setToDefault']
+
 # Used to provide a default value when an observable is null, undefined, or the empty string.
 #
 # @example Provide a observable with observable and/or non observable default argument in the form of:
@@ -31,7 +33,7 @@ module.exports = class kb.DefaultObservable
     }
 
     # publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, @, ['destroy', 'setToDefault'])
+    kb.publishMethods(observable, @, KEYS_PUBLISH)
 
     return observable
 

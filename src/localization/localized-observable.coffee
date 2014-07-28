@@ -9,6 +9,8 @@
 
 {_, ko} = kb = require '../core/kb'
 
+KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent']
+
 # Locale Manager - if you are using localization, set this property.
 # It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 kb.locale_manager or= undefined
@@ -98,7 +100,7 @@ module.exports = class kb.LocalizedObservable
     }
 
     # publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, @, ['destroy', 'observedValue', 'resetToCurrent'])
+    kb.publishMethods(observable, @, KEYS_PUBLISH)
 
     # start
     kb.locale_manager.bind('change', @__kb._onLocaleChange)
