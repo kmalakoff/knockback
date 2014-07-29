@@ -566,11 +566,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = function(options) {
-	  var orm, _results;
+	  var orm;
 	  if (options == null) {
 	    options = {};
 	  }
-	  _results = [];
 	  for (key in options) {
 	    value = options[key];
 	    switch (key) {
@@ -587,14 +586,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          kb.orm = orm;
 	          continue;
 	        } else {
-	          _results.push(kb.orm = value);
+	          kb.orm = value;
 	        }
 	        break;
 	      default:
-	        _results.push(kb[key] = value);
+	        kb[key] = value;
 	    }
 	  }
-	  return _results;
 	};
 
 

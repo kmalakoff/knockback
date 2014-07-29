@@ -28,3 +28,4 @@ module.exports = (options={}) ->
 
       else
         kb[key] = value
+  return
