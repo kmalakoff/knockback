@@ -172,12 +172,11 @@ module.exports = class kb
     # observable or lifecycle managed
     if ko.isObservable(obj) and _.isArray(array = kb.peek(obj))
       if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
-        if obj.destroy
-          obj.destroy()
-        else if obj.dispose # we may be releasing our observable
-          obj.dispose()
-      else if array.length
-        ((array[index] = null; kb.release(value)) if kb.isReleaseable(value)) for index, value of array
+        obj.destroy() if obj.destroy
+      else
+        if array.length
+          ((array[index] = null; kb.release(value)) if kb.isReleaseable(value)) for index, value of array
+        obj.dispose() if obj.dispose # we may be releasing our observable
 
     # releaseable signature
     else if (typeof(obj.release) is 'function')
