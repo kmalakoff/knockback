@@ -1179,24 +1179,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    obj.__kb_released = true;
 	    if (ko.isObservable(obj) && _.isArray(array = kb.peek(obj))) {
 	      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
-	        if (obj.destroy) {
-	          obj.destroy();
-	        }
-	      } else {
-	        if (array.length) {
-	          for (index in array) {
-	            value = array[index];
-	            if (kb.isReleaseable(value)) {
-	              array[index] = null;
-	              kb.release(value);
-	            }
-	          }
-	        }
-	        if (obj.dispose) {
-	          obj.dispose();
+	        return obj.destroy();
+	      }
+	      for (index in array) {
+	        value = array[index];
+	        if (kb.isReleaseable(value)) {
+	          array[index] = null;
+	          kb.release(value);
 	        }
 	      }
-	    } else if (typeof obj.release === 'function') {
+	    }
+	    if (typeof obj.release === 'function') {
 	      obj.release();
 	    } else if (typeof obj.destroy === 'function') {
 	      obj.destroy();
@@ -1211,7 +1204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var key, value;
 	    for (key in obj) {
 	      value = obj[key];
-	      if ((key !== '__kb') && kb.isReleaseable(value)) {
+	      if (key !== '__kb' && kb.isReleaseable(value)) {
 	        obj[key] = null;
 	        kb.release(value);
 	      }

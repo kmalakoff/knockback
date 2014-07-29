@@ -164,37 +164,25 @@ module.exports = class kb
 
     # release array's items
     if _.isArray(obj)
-      ((obj[index] = null; kb.release(value)) if kb.isReleaseable(value)) for index, value of obj
+      (obj[index] = null; kb.release(value)) for index, value of obj when kb.isReleaseable(value)
       return
-
     obj.__kb_released = true # mark as released
 
     # observable or lifecycle managed
     if ko.isObservable(obj) and _.isArray(array = kb.peek(obj))
-      if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
-        obj.destroy() if obj.destroy
-      else
-        if array.length
-          ((array[index] = null; kb.release(value)) if kb.isReleaseable(value)) for index, value of array
-        obj.dispose() if obj.dispose # we may be releasing our observable
+      return obj.destroy() if obj.__kb_is_co or (obj.__kb_is_o and (obj.valueType() is kb.TYPE_COLLECTION))
+      (array[index] = null; kb.release(value)) for index, value of array when kb.isReleaseable(value)
 
     # releaseable signature
-    else if (typeof(obj.release) is 'function')
-      obj.release()
-    else if (typeof(obj.destroy) is 'function')
-      obj.destroy()
-    else if (typeof(obj.dispose) is 'function')
-      obj.dispose()
-
-    # view model
-    else if not ko.isObservable(obj)
-      @releaseKeys(obj)
-
+    if (typeof(obj.release) is 'function') then obj.release()
+    else if (typeof(obj.destroy) is 'function') then obj.destroy()
+    else if (typeof(obj.dispose) is 'function') then obj.dispose()
+    else if not ko.isObservable(obj) then @releaseKeys(obj) # view model
     return
 
   # Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
   @releaseKeys: (obj) ->
-    ((obj[key] = null; kb.release(value)) if (key isnt '__kb') and kb.isReleaseable(value)) for key, value of obj
+    (obj[key] = null; kb.release(value)) for key, value of obj when key isnt '__kb' and kb.isReleaseable(value)
     return
 
   # Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
