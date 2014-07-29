@@ -2342,22 +2342,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	assignViewModelKey = function(vm, key) {
 	  var vm_key;
 	  vm_key = vm.__kb.internals && _.contains(vm.__kb.internals, key) ? "_" + key : key;
-	  if (vm.__kb.view_model[vm_key]) {
+	  if (vm.__kb.view_model.hasOwnProperty(vm_key)) {
 	    return;
 	  }
-	  vm.__kb.vm_keys[vm_key] = true;
+	  vm.__kb.view_model[vm_key] = null;
 	  return vm_key;
 	};
 
 	createObservable = function(vm, model, key, create_options) {
 	  var vm_key;
-	  if (!(vm_key = assignViewModelKey(vm, key))) {
-	    return;
-	  }
 	  if (vm.__kb.excludes && _.contains(vm.__kb.excludes, key)) {
 	    return;
 	  }
 	  if (vm.__kb.statics && _.contains(vm.__kb.statics, key)) {
+	    return;
+	  }
+	  if (!(vm_key = assignViewModelKey(vm, key))) {
 	    return;
 	  }
 	  return vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm);
@@ -2373,6 +2373,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key);
 	      } else if (vm.__kb.static_defaults && vm_key in vm.__kb.static_defaults) {
 	        vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key];
+	      } else {
+	        delete vm.__kb.view_model[vm_key];
 	      }
 	    }
 	  }
@@ -2419,22 +2421,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ViewModel.extend = kb.extend;
 
 	  function ViewModel(model, options, view_model) {
+	    if (options == null) {
+	      options = {};
+	    }
 	    return kb.ignore((function(_this) {
 	      return function() {
 	        var create_options, event_watcher, key, _i, _len, _model;
 	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
-	        options || (options = {});
-	        view_model || (view_model = {});
-	        if (_.isArray(options)) {
-	          options = {
-	            keys: options
-	          };
-	        } else {
-	          options = kb.utils.collapseOptions(options);
-	        }
+	        options = _.isArray(options) ? {
+	          keys: options
+	        } : kb.utils.collapseOptions(options);
 	        _this.__kb || (_this.__kb = {});
-	        _this.__kb.vm_keys = {};
-	        _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
+	        _this.__kb.view_model = view_model || _this;
 	        for (_i = 0, _len = KEYS_OPTIONS.length; _i < _len; _i++) {
 	          key = KEYS_OPTIONS[_i];
 	          if (options.hasOwnProperty(key)) {

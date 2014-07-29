@@ -849,7 +849,7 @@ describe 'view-model @quick @view-model', ->
   it '22. statics and static defaults keyword', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    view_model = new kb.ViewModel(
+    view_model = kb.viewModel(
       new kb.Model({id: 1, name: 'Initial', date: new Date()}),
       {statics: ['name', 'author', 'description', 'tags'], static_defaults: {author: '(none)', description: null}}
     )

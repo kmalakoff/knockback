@@ -15,15 +15,15 @@ createOptions = (vm) => {store: kb.utils.wrappedStore(vm), factory: kb.utils.wra
 # @nodoc
 assignViewModelKey = (vm, key) ->
   vm_key = if vm.__kb.internals and _.contains(vm.__kb.internals, key) then "_#{key}" else key
-  return if vm.__kb.view_model[vm_key] # already exists, skip
-  vm.__kb.vm_keys[vm_key] = true
+  return if vm.__kb.view_model.hasOwnProperty(vm_key) # already exists, skip
+  vm.__kb.view_model[vm_key] = null
   return vm_key
 
 # @nodoc
 createObservable = (vm, model, key, create_options) ->
-  return unless vm_key = assignViewModelKey(vm, key)
   return if vm.__kb.excludes and _.contains(vm.__kb.excludes, key)
   return if vm.__kb.statics and _.contains(vm.__kb.statics, key)
+  return unless vm_key = assignViewModelKey(vm, key)
   vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm)
 
 # @nodoc
@@ -33,6 +33,8 @@ createStaticObservables = (vm, model) ->
       vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key)
     else if vm.__kb.static_defaults and vm_key of vm.__kb.static_defaults
       vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key]
+    else
+      delete vm.__kb.view_model[vm_key]
   return
 
 # @nodoc
@@ -125,20 +127,13 @@ class kb.ViewModel
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  constructor: (model, options, view_model) -> return kb.ignore =>
+  constructor: (model, options={}, view_model) -> return kb.ignore =>
     not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or kb._throwUnexpected(@, 'not a model')
 
-    options or= {}
-    view_model or= {}
-
     # bind and extract options
-    if _.isArray(options)
-      options = {keys: options}
-    else
-      options = kb.utils.collapseOptions(options)
+    options = if _.isArray(options) then {keys: options} else kb.utils.collapseOptions(options)
     @__kb or= {}
-    @__kb.vm_keys = {}
-    @__kb.view_model = if _.isUndefined(view_model) then @ else view_model
+    @__kb.view_model = view_model or @
     @__kb[key] = options[key] for key in KEYS_OPTIONS when options.hasOwnProperty(key)
 
     # always use a store to ensure recursive view models are handled correctly
