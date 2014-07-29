@@ -1442,9 +1442,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return _this.update(kb.getValue(_model, kb.peek(_this.key), _this.args));
 	              });
 	            }
-	            if (kb.wasReleased(_this)) {
-	              return;
-	            }
 	            return _this._value.value();
 	          },
 	          write: function(new_value) {
@@ -1938,28 +1935,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.value_type = void 0;
 	    }
 	    value = this.__kb_value;
-	    if (this.value_type === kb.TYPE_COLLECTION) {
-	      if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) {
-	        return value(new_value);
-	      }
-	      if (kb.peek(value.collection) !== new_value) {
-	        return value.collection(new_value);
-	      }
-	    } else if (_.isUndefined(this.value_type) || this.value_type !== new_type) {
-	      if (kb.peek(value) !== new_value) {
-	        return this._updateValueObservable(new_value);
-	      }
-	    } else if (this.value_type === kb.TYPE_MODEL) {
-	      if (_.isFunction(value.model)) {
-	        if (kb.peek(value.model) !== new_value) {
-	          return value.model(new_value);
+	    switch (this.value_type) {
+	      case kb.TYPE_COLLECTION:
+	        if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) {
+	          return value(new_value);
 	        }
-	      } else if (kb.utils.wrappedObject(value) !== new_value) {
-	        return this._updateValueObservable(new_value);
+	        if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
+	          if (_.isFunction(value.collection)) {
+	            if (kb.peek(value.collection) !== new_value) {
+	              value.collection(new_value);
+	            }
+	            return;
+	          }
+	        }
+	        break;
+	      case kb.TYPE_MODEL:
+	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
+	          if (_.isFunction(value.model)) {
+	            if (kb.peek(value.model) !== new_value) {
+	              value.model(new_value);
+	            }
+	          } else {
+	            if (kb.utils.wrappedObject(value) !== new_value) {
+	              this._updateValueObservable(new_value);
+	            }
+	          }
+	          return;
+	        }
+	    }
+	    if (this.value_type === new_type && !_.isUndefined(this.value_type)) {
+	      if (kb.peek(value) !== new_value) {
+	        return value(new_value);
 	      }
 	    } else {
 	      if (kb.peek(value) !== new_value) {
-	        return value(new_value);
+	        return this._updateValueObservable(new_value);
 	      }
 	    }
 	  };
