@@ -1421,6 +1421,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
 	            var arg, args, _j, _len1, _model, _ref1, _ref2;
+	            if (kb.wasReleased(_this)) {
+	              return;
+	            }
 	            _model = _this._model();
 	            _ref1 = args = [_this.key].concat(_this.args || []);
 	            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -2304,14 +2307,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var KEYS_OPTIONS, createObservable, kb, ko, updateObservables, _, _ref;
+	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, updateObservables, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	createObservable = function(vm, model, key, create_options) {
+	createOptions = (function(_this) {
+	  return function(vm) {
+	    return {
+	      store: kb.utils.wrappedStore(vm),
+	      factory: kb.utils.wrappedFactory(vm),
+	      path: vm.__kb.path,
+	      event_watcher: kb.utils.wrappedEventWatcher(vm)
+	    };
+	  };
+	})(this);
+
+	assignViewModelKey = function(vm, key) {
 	  var vm_key;
 	  vm_key = vm.__kb.internals && _.contains(vm.__kb.internals, key) ? "_" + key : key;
 	  if (vm.__kb.view_model[vm_key]) {
+	    return;
+	  }
+	  vm.__kb.vm_keys[vm_key] = true;
+	  return vm_key;
+	};
+
+	createObservable = function(vm, model, key, create_options) {
+	  var vm_key;
+	  if (!(vm_key = assignViewModelKey(vm, key))) {
 	    return;
 	  }
 	  if (vm.__kb.excludes && _.contains(vm.__kb.excludes, key)) {
@@ -2320,30 +2343,53 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (vm.__kb.statics && _.contains(vm.__kb.statics, key)) {
 	    return;
 	  }
-	  vm.__kb.vm_keys[vm_key] = true;
 	  return vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm);
 	};
 
-	updateObservables = function(model) {
-	  var create_options, key, rel_keys, _i, _len, _ref1;
-	  if (kb.wasReleased(this) || !model) {
-	    return;
+	createStaticObservables = function(model) {
+	  var key, vm_key, _i, _len, _ref1;
+	  _ref1 = this.__kb.statics;
+	  for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	    key = _ref1[_i];
+	    if (vm_key = assignViewModelKey(this, key)) {
+	      if (model.has(vm_key)) {
+	        this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
+	      } else if (this.__kb.static_defaults && vm_key in this.__kb.static_defaults) {
+	        this[vm_key] = this.__kb.view_model[vm_key] = this.__kb.static_defaults[vm_key];
+	      }
+	    }
 	  }
-	  create_options = {
-	    store: kb.utils.wrappedStore(this),
-	    factory: kb.utils.wrappedFactory(this),
-	    path: this.__kb.path,
-	    event_watcher: kb.utils.wrappedEventWatcher(this)
-	  };
-	  for (key in model.attributes) {
-	    createObservable(this, model, key, create_options);
-	  }
-	  if (!(rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0)) {
-	    return;
-	  }
-	  for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
-	    key = rel_keys[_i];
-	    createObservable(this, model, key, create_options);
+	};
+
+	updateObservables = function(model, keys, create_options) {
+	  var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
+	  create_options || (create_options = createOptions(this));
+	  if (!keys) {
+	    for (key in model.attributes) {
+	      createObservable(this, model, key, create_options);
+	    }
+	    if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
+	      for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
+	        key = rel_keys[_i];
+	        createObservable(this, model, key, create_options);
+	      }
+	    }
+	  } else if (_.isArray(keys)) {
+	    for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
+	      key = keys[_j];
+	      createObservable(this, model, key, create_options);
+	    }
+	  } else {
+	    for (key in keys) {
+	      mapping_info = keys[key];
+	      if (!(vm_key = assignViewModelKey(this, key))) {
+	        continue;
+	      }
+	      if (!_.isString(mapping_info)) {
+	        mapping_info.key || (mapping_info.key = vm_key);
+	      }
+	      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
+	    }
 	  }
 	};
 
@@ -2355,7 +2401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function ViewModel(model, options, view_model) {
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var event_watcher, key, keys, mapped_keys, mapping_info, rel_keys, vm_key, _i, _len, _model, _ref1, _ref2;
+	        var create_options, event_watcher, key, _i, _len, _model;
 	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
 	        options || (options = {});
 	        view_model || (view_model = {});
@@ -2396,7 +2442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              kb.utils.wrappedObject(_this, event_watcher.ee);
 	              _model(event_watcher.ee);
 	              if (model = event_watcher.ee) {
-	                return updateObservables.call(_this, model);
+	                return updateObservables.call(_this, model, null);
 	              }
 	            });
 	          }
@@ -2404,45 +2450,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	        event_watcher = kb.utils.wrappedEventWatcher(_this, new kb.EventWatcher(model, _this, {
 	          emitter: _this._model,
 	          update: (function() {
+	            return;
 	            return kb.ignore(function() {
-	              return updateObservables.call(_this, event_watcher != null ? event_watcher.ee : void 0);
+	              return updateObservables.call(_this, event_watcher != null ? event_watcher.ee : void 0, null);
 	            });
 	          })
 	        }));
 	        kb.utils.wrappedObject(_this, model = event_watcher.ee);
 	        _model(event_watcher.ee);
-	        keys = options.requires;
-	        if (_this.__kb.internals) {
-	          keys = _.union(keys || [], _this.__kb.internals);
+	        create_options = createOptions(_this);
+	        if (options.requires) {
+	          updateObservables.call(_this, model, options.requires, create_options);
 	        }
-	        if (model && (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0)) {
-	          keys = _.union(keys || [], rel_keys);
+	        if (_this.__kb.internals) {
+	          updateObservables.call(_this, model, _this.__kb.internals, create_options);
 	        }
 	        if (options.keys) {
-	          if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-	            mapped_keys = {};
-	            _ref2 = options.keys;
-	            for (vm_key in _ref2) {
-	              mapping_info = _ref2[vm_key];
-	              mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
-	            }
-	            _this.__kb.keys = _.keys(mapped_keys);
-	          } else {
-	            _this.__kb.keys = options.keys;
-	            keys = keys ? _.union(keys, _this.__kb.keys) : _.clone(_this.__kb.keys);
-	          }
+	          updateObservables.call(_this, model, options.keys, create_options);
 	        } else if (model) {
-	          keys = keys ? _.union(keys, _.keys(model.attributes)) : _.keys(model.attributes);
+	          updateObservables.call(_this, model, null, create_options);
 	        }
-	        if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-	          _this.mapObservables(model, options.keys);
-	        }
-	        if (_.isObject(options.requires) && !_.isArray(options.requires)) {
-	          _this.mapObservables(model, options.requires);
-	        }
-	        !options.mappings || _this.mapObservables(model, options.mappings);
-	        !keys || _this.createObservables(model, keys);
-	        _this.createStaticObservables(model);
+	        !options.mappings || updateObservables.call(_this, model, options.mappings, create_options);
+	        !_this.__kb.statics || createStaticObservables.call(_this, model);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };
@@ -2468,63 +2497,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      store: kb.utils.wrappedStore(this),
 	      factory: kb.utils.wrappedFactory(this)
 	    };
-	  };
-
-	  ViewModel.prototype.createObservables = function(model, keys, is_static) {
-	    var create_options, key, _i, _len;
-	    create_options = {
-	      store: kb.utils.wrappedStore(this),
-	      factory: kb.utils.wrappedFactory(this),
-	      path: this.__kb.path,
-	      event_watcher: kb.utils.wrappedEventWatcher(this)
-	    };
-	    for (_i = 0, _len = keys.length; _i < _len; _i++) {
-	      key = keys[_i];
-	      createObservable(this, model, key, create_options);
-	    }
-	  };
-
-	  ViewModel.prototype.createStaticObservables = function(model) {
-	    var key, vm_key, _i, _len, _ref1;
-	    if (!this.__kb.statics) {
-	      return;
-	    }
-	    _ref1 = this.__kb.statics;
-	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	      key = _ref1[_i];
-	      vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
-	      if (this.__kb.view_model[vm_key]) {
-	        continue;
-	      }
-	      this.__kb.vm_keys[vm_key] = true;
-	      if (model.has(vm_key)) {
-	        this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
-	      } else if (this.__kb.static_defaults && vm_key in this.__kb.static_defaults) {
-	        this[vm_key] = this.__kb.view_model[vm_key] = this.__kb.static_defaults[vm_key];
-	      }
-	    }
-	  };
-
-	  ViewModel.prototype.mapObservables = function(model, mappings) {
-	    var create_options, mapping_info, vm_key;
-	    create_options = {
-	      store: kb.utils.wrappedStore(this),
-	      factory: kb.utils.wrappedFactory(this),
-	      path: this.__kb.path,
-	      event_watcher: kb.utils.wrappedEventWatcher(this)
-	    };
-	    for (vm_key in mappings) {
-	      mapping_info = mappings[vm_key];
-	      if (this.__kb.view_model[vm_key]) {
-	        continue;
-	      }
-	      mapping_info = _.isString(mapping_info) ? {
-	        key: mapping_info
-	      } : _.clone(mapping_info);
-	      mapping_info.key || (mapping_info.key = vm_key);
-	      this.__kb.vm_keys[vm_key] = true;
-	      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
-	    }
 	  };
 
 	  return ViewModel;

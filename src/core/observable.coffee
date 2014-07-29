@@ -68,6 +68,7 @@ class kb.Observable
     @_model = ko.observable()
     observable = kb.utils.wrappedObservable @, ko.computed {
       read: =>
+        return if kb.wasReleased(@)
         _model = @_model(); ko.utils.unwrapObservable(arg) for arg in args = [@key].concat(@args or [])
         kb.utils.wrappedEventWatcher(@)?.emitter(_model or null) # update the event watcher
         if @read
