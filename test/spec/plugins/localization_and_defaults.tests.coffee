@@ -42,7 +42,7 @@ class LocalizedString
     @string = kb.locale_manager.get(@string_id)
 
 Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-ContactsCollection = kb.Collection.extend({ model: Contact })
+Contacts = kb.Collection.extend({model: Contact})
 
 class LocalizedStringLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
@@ -732,7 +732,7 @@ describe 'defaults @quick @defaults', ->
         }}, this)
         @
 
-      collection = new ContactsCollection()
+      collection = new Contacts()
       model_ref = new kb.Backbone.ModelRef(collection, 'b4')
       view_model = new ContactViewModel(model_ref)
 
@@ -809,7 +809,7 @@ describe 'defaults @quick @defaults', ->
           @number = kb.defaultObservable(@_number, @loading_message)
           @date = kb.defaultObservable(new kb.LongDateLocalizer(@_date), @loading_message)
 
-      collection = new ContactsCollection()
+      collection = new Contacts()
       model_ref = new kb.Backbone.ModelRef(collection, 'b4')
       view_model = new ContactViewModel(model_ref)
 

@@ -14,7 +14,7 @@ describe 'collection-observable @quick @collection-observable', ->
     done()
 
   Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  ContactsCollection = kb.Collection.extend({ model: Contact })
+  Contacts = kb.Collection.extend({model: Contact})
 
   ContactViewModel = (model) ->
     @name = kb.observable(model, 'name')
@@ -36,7 +36,7 @@ describe 'collection-observable @quick @collection-observable', ->
   it '2. Basic Usage: collection observable with ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
     collection_observable = kb.collectionObservable(collection)
     view_model =
       count: ko.computed(->return collection_observable().length )
@@ -67,7 +67,7 @@ describe 'collection-observable @quick @collection-observable', ->
   it '3. Basic Usage: collection observable with ko.computed', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
     collection_observable = kb.collectionObservable(collection, factories: {models: ContactViewModel})
 
     view_model =
@@ -100,7 +100,7 @@ describe 'collection-observable @quick @collection-observable', ->
   it '4. Basic Usage: no view models', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
 
     collection_observable = kb.collectionObservable(collection, {models_only: true})
 
@@ -143,7 +143,7 @@ describe 'collection-observable @quick @collection-observable', ->
   it '5. Basic Usage: no sorting and no callbacks', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
     collection_observable = kb.collectionObservable(collection, {
       factories:
         models: {create: (model) -> return new ContactViewModel(model)}
@@ -186,7 +186,7 @@ describe 'collection-observable @quick @collection-observable', ->
   it '6. Collection sync sorting with sort_attribute', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
 
     collection_observable = kb.collectionObservable(collection, {
       view_model:           ContactViewModelClass
@@ -244,7 +244,7 @@ describe 'collection-observable @quick @collection-observable', ->
       return 0
 
     # without view models
-    collection = new ContactsCollection()
+    collection = new Contacts()
     collection_observable = kb.collectionObservable(collection, {
       models_only:  true
       comparator:   sortNumber
@@ -262,7 +262,7 @@ describe 'collection-observable @quick @collection-observable', ->
     kb.release(collection_observable)
 
     # with view models
-    collection = new ContactsCollection()
+    collection = new Contacts()
     collection_observable = kb.collectionObservable(collection, {
       view_model:   ContactViewModelClass
       comparator:   sortNumber
@@ -285,11 +285,11 @@ describe 'collection-observable @quick @collection-observable', ->
   it '8. Collection sorting with callbacks', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    kb.NameSortedContactsCollection = kb.Collection.extend({
+    kb.NameSortedContacts = kb.Collection.extend({
       model: Contact
       comparator: (model) -> return model.get('name')
     })
-    collection = new kb.NameSortedContactsCollection()
+    collection = new kb.NameSortedContacts()
 
     collection_observable = kb.collectionObservable(collection, {
       view_model:       ContactViewModel    # view_model is legacy for view_model, it should be replaced with view_model or create
@@ -336,7 +336,7 @@ describe 'collection-observable @quick @collection-observable', ->
   it '9. Collection sync dynamically changing the sorting function', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
     collection_observable = kb.collectionObservable(collection, {
       view_model:       ContactViewModel
     })
@@ -737,7 +737,7 @@ describe 'collection-observable @quick @collection-observable', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class PersonViewModel extends kb.ViewModel
-    collection_observable = kb.collectionObservable(new ContactsCollection(), {view_model: PersonViewModel})
+    collection_observable = kb.collectionObservable(new Contacts(), {view_model: PersonViewModel})
 
     # LEGACY
     if collection_observable.collection().push

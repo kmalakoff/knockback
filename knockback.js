@@ -1186,16 +1186,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
 	        if (obj.destroy) {
 	          obj.destroy();
-	        } else if (obj.dispose) {
-	          obj.dispose();
 	        }
-	      } else if (array.length) {
-	        for (index in array) {
-	          value = array[index];
-	          if (kb.isReleaseable(value)) {
-	            array[index] = null;
-	            kb.release(value);
+	      } else {
+	        if (array.length) {
+	          for (index in array) {
+	            value = array[index];
+	            if (kb.isReleaseable(value)) {
+	              array[index] = null;
+	              kb.release(value);
+	            }
 	          }
+	        }
+	        if (obj.dispose) {
+	          obj.dispose();
 	        }
 	      }
 	    } else if (typeof obj.release === 'function') {

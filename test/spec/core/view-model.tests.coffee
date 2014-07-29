@@ -14,7 +14,7 @@ describe 'view-model @quick @view-model', ->
     done()
 
   Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  ContactsCollection = kb.Collection.extend({ model: Contact })
+  Contacts = kb.Collection.extend({model: Contact})
 
   class TestViewModel extends kb.ViewModel
     constructor: ->

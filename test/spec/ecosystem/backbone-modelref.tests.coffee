@@ -19,7 +19,7 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
   return unless root.Backbone?.ModelRef
 
   Contact = if kb.Parse then kb.Model.extend('Contact', { defaults: {name: '', number: 0, date: new Date()} }) else kb.Model.extend({ defaults: {name: '', number: 0, date: new Date()} })
-  ContactsCollection = kb.Collection.extend({ model: Contact })
+  Contacts = kb.Collection.extend({model: Contact})
 
   it 'Standard use case: just enough to get the picture', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -32,7 +32,7 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
       }}, this)
       return
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
     model_ref = new Backbone.ModelRef(collection, 'b4')
     view_model = new ContactViewModel(model_ref)
 
@@ -83,7 +83,7 @@ describe 'Knockback.js with Backbone.ModelRef.js @backbone-modelref', ->
       constructor: (model) ->
         super(model, {requires: ['name', 'number', 'date']})
 
-    collection = new ContactsCollection()
+    collection = new Contacts()
     model_ref = new Backbone.ModelRef(collection, 'b4')
     view_model = new ContactViewModel(model_ref)
 
