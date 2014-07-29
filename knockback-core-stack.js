@@ -1421,9 +1421,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
 	            var arg, args, _j, _len1, _model, _ref1, _ref2;
-	            if (kb.wasReleased(_this)) {
-	              return;
-	            }
 	            _model = _this._model();
 	            _ref1 = args = [_this.key].concat(_this.args || []);
 	            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -2346,49 +2343,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm);
 	};
 
-	createStaticObservables = function(model) {
+	createStaticObservables = function(vm, model) {
 	  var key, vm_key, _i, _len, _ref1;
-	  _ref1 = this.__kb.statics;
+	  _ref1 = vm.__kb.statics;
 	  for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
 	    key = _ref1[_i];
-	    if (vm_key = assignViewModelKey(this, key)) {
+	    if (vm_key = assignViewModelKey(vm, key)) {
 	      if (model.has(vm_key)) {
-	        this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
-	      } else if (this.__kb.static_defaults && vm_key in this.__kb.static_defaults) {
-	        this[vm_key] = this.__kb.view_model[vm_key] = this.__kb.static_defaults[vm_key];
+	        vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key);
+	      } else if (vm.__kb.static_defaults && vm_key in vm.__kb.static_defaults) {
+	        vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key];
 	      }
 	    }
 	  }
 	};
 
-	updateObservables = function(model, keys, create_options) {
+	updateObservables = function(vm, model, keys, create_options) {
 	  var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
-	  create_options || (create_options = createOptions(this));
+	  create_options || (create_options = createOptions(vm));
 	  if (!keys) {
 	    for (key in model.attributes) {
-	      createObservable(this, model, key, create_options);
+	      createObservable(vm, model, key, create_options);
 	    }
 	    if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
 	      for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
 	        key = rel_keys[_i];
-	        createObservable(this, model, key, create_options);
+	        createObservable(vm, model, key, create_options);
 	      }
 	    }
 	  } else if (_.isArray(keys)) {
 	    for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
 	      key = keys[_j];
-	      createObservable(this, model, key, create_options);
+	      createObservable(vm, model, key, create_options);
 	    }
 	  } else {
 	    for (key in keys) {
 	      mapping_info = keys[key];
-	      if (!(vm_key = assignViewModelKey(this, key))) {
+	      if (!(vm_key = assignViewModelKey(vm, key))) {
 	        continue;
 	      }
 	      if (!_.isString(mapping_info)) {
 	        mapping_info.key || (mapping_info.key = vm_key);
 	      }
-	      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
+	      vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, vm);
 	    }
 	  }
 	};
@@ -2441,18 +2438,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	              event_watcher.emitter(new_model);
 	              kb.utils.wrappedObject(_this, event_watcher.ee);
 	              _model(event_watcher.ee);
-	              if (model = event_watcher.ee) {
-	                return updateObservables.call(_this, model, null);
-	              }
+	              return !event_watcher.ee || updateObservables(_this, event_watcher.ee);
 	            });
 	          }
 	        });
 	        event_watcher = kb.utils.wrappedEventWatcher(_this, new kb.EventWatcher(model, _this, {
 	          emitter: _this._model,
 	          update: (function() {
-	            return;
 	            return kb.ignore(function() {
-	              return updateObservables.call(_this, event_watcher != null ? event_watcher.ee : void 0, null);
+	              return !(event_watcher != null ? event_watcher.ee : void 0) || updateObservables(_this, event_watcher != null ? event_watcher.ee : void 0);
 	            });
 	          })
 	        }));
@@ -2460,18 +2454,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _model(event_watcher.ee);
 	        create_options = createOptions(_this);
 	        if (options.requires) {
-	          updateObservables.call(_this, model, options.requires, create_options);
+	          updateObservables(_this, model, options.requires, create_options);
 	        }
 	        if (_this.__kb.internals) {
-	          updateObservables.call(_this, model, _this.__kb.internals, create_options);
+	          updateObservables(_this, model, _this.__kb.internals, create_options);
 	        }
 	        if (options.keys) {
-	          updateObservables.call(_this, model, options.keys, create_options);
+	          updateObservables(_this, model, options.keys, create_options);
 	        } else if (model) {
-	          updateObservables.call(_this, model, null, create_options);
+	          updateObservables(_this, model, null, create_options);
 	        }
-	        !options.mappings || updateObservables.call(_this, model, options.mappings, create_options);
-	        !_this.__kb.statics || createStaticObservables.call(_this, model);
+	        !options.mappings || updateObservables(_this, model, options.mappings, create_options);
+	        !_this.__kb.statics || createStaticObservables(_this, model);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };

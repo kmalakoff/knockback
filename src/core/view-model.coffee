@@ -27,26 +27,26 @@ createObservable = (vm, model, key, create_options) ->
   vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm)
 
 # @nodoc
-createStaticObservables = (model) ->
-  for key in @__kb.statics when vm_key = assignViewModelKey(@, key)
+createStaticObservables = (vm, model) ->
+  for key in vm.__kb.statics when vm_key = assignViewModelKey(vm, key)
     if model.has(vm_key)
-      @[vm_key] = @__kb.view_model[vm_key] = model.get(vm_key)
-    else if @__kb.static_defaults and vm_key of @__kb.static_defaults
-      @[vm_key] = @__kb.view_model[vm_key] = @__kb.static_defaults[vm_key]
+      vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key)
+    else if vm.__kb.static_defaults and vm_key of vm.__kb.static_defaults
+      vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key]
   return
 
 # @nodoc
-updateObservables = (model, keys, create_options) ->
-  create_options or= createOptions(@)
+updateObservables = (vm, model, keys, create_options) ->
+  create_options or= createOptions(vm)
   if not keys
-    createObservable(@, model, key, create_options) for key of model.attributes
-    (createObservable(@, model, key, create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
+    createObservable(vm, model, key, create_options) for key of model.attributes
+    (createObservable(vm, model, key, create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
   else if _.isArray(keys)
-    createObservable(@, model, key, create_options) for key in keys
+    createObservable(vm, model, key, create_options) for key in keys
   else
-    for key, mapping_info of keys when vm_key = assignViewModelKey(@, key)
+    for key, mapping_info of keys when vm_key = assignViewModelKey(vm, key)
       mapping_info.key or= vm_key unless _.isString(mapping_info)
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, @)
+      vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, vm)
   return
 
 KEYS_OPTIONS = ['internals', 'excludes', 'statics', 'static_defaults']
@@ -156,19 +156,19 @@ class kb.ViewModel
 
         event_watcher.emitter(new_model)
         kb.utils.wrappedObject(@, event_watcher.ee); _model(event_watcher.ee)
-        updateObservables.call(@, model, null) if model = event_watcher.ee
+        not event_watcher.ee or updateObservables(@, event_watcher.ee)
     }
-    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @_model, update: (=> return; kb.ignore => updateObservables.call(@, event_watcher?.ee, null))}))
+    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @_model, update: (=> kb.ignore => not event_watcher?.ee or updateObservables(@, event_watcher?.ee))}))
     kb.utils.wrappedObject(@, model = event_watcher.ee); _model(event_watcher.ee)
 
     # update the observables
     create_options = createOptions(@)
-    updateObservables.call(@, model, options.requires, create_options) if options.requires
-    updateObservables.call(@, model, @__kb.internals, create_options) if @__kb.internals
-    if options.keys then updateObservables.call(@, model, options.keys, create_options)
-    else if model then updateObservables.call(@, model, null, create_options)
-    not options.mappings or updateObservables.call(@, model, options.mappings, create_options)
-    !@__kb.statics or createStaticObservables.call(@, model)
+    updateObservables(@, model, options.requires, create_options) if options.requires
+    updateObservables(@, model, @__kb.internals, create_options) if @__kb.internals
+    if options.keys then updateObservables(@, model, options.keys, create_options)
+    else if model then updateObservables(@, model, null, create_options)
+    not options.mappings or updateObservables(@, model, options.mappings, create_options)
+    !@__kb.statics or createStaticObservables(@, model)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
     return @
