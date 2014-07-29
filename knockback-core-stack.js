@@ -2377,7 +2377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
 	  create_options || (create_options = createOptions(vm));
 	  if (!keys) {
-	    if (vm.__kb.keys) {
+	    if (vm.__kb.keys || !model) {
 	      return;
 	    }
 	    for (key in model.attributes) {
@@ -2408,7 +2408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	KEYS_OPTIONS = ['internals', 'excludes', 'statics', 'static_defaults'];
+	KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'];
 
 	kb.ViewModel = (function() {
 	  ViewModel.extend = kb.extend;
@@ -2436,7 +2436,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.__kb[key] = options[key];
 	          }
 	        }
-	        _this.__kb.keys = options.keys;
 	        kb.Store.useOptionsOrCreate(options, model, _this);
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
@@ -2472,19 +2471,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        kb.utils.wrappedObject(_this, model = event_watcher.ee);
 	        _model(event_watcher.ee);
 	        create_options = createOptions(_this);
-	        if (options.requires) {
-	          updateObservables(_this, model, options.requires, create_options);
-	        }
-	        if (_this.__kb.internals) {
-	          updateObservables(_this, model, _this.__kb.internals, create_options);
-	        }
-	        if (_this.__kb.keys) {
-	          updateObservables(_this, model, _this.__kb.keys, create_options);
-	        } else if (model) {
-	          updateObservables(_this, model, null, create_options);
-	        }
+	        !options.requires || updateObservables(_this, model, options.requires, create_options);
+	        !_this.__kb.internals || updateObservables(_this, model, _this.__kb.internals, create_options);
 	        !options.mappings || updateObservables(_this, model, options.mappings, create_options);
 	        !_this.__kb.statics || createStaticObservables(_this, model);
+	        updateObservables(_this, model, _this.__kb.keys, create_options);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };
