@@ -11,6 +11,7 @@
 TypedValue = require './typed-value'
 
 KEYS_PUBLISH = ['value', 'valueType', 'destroy']
+KEYS_INFO = ['args', 'read', 'write']
 
 # Base class for observing model attributes.
 #
@@ -53,17 +54,12 @@ class kb.Observable
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor does not return 'this' but a ko.observable
   # @note the constructor does not return 'this' but a ko.observable
-  constructor: (model, options, @_vm={}) -> return kb.ignore =>
-    options or kb._throwMissing(this, 'options')
+  constructor: (model, key_or_info, options, @_vm={}) -> return kb.ignore =>
+    key_or_info or kb._throwMissing(this, 'key_or_info')
+    @key = key_or_info.key or key_or_info
+    @[key] = key_or_info[key] for key in KEYS_INFO when key_or_info[key]
 
-    # copy create options
-    create_options = if _.isString(options) or ko.isObservable(options) then {key: options} else kb.utils.collapseOptions(options)
-
-    # extract options
-    @key = create_options.key; delete create_options.key; @key or kb._throwMissing(this, 'key')
-    not create_options.args or (@args = create_options.args; delete create_options.args)
-    not create_options.read or (@read = create_options.read; delete create_options.read)
-    not create_options.write or (@write = create_options.write; delete create_options.write)
+    create_options = kb.utils.collapseOptions(options)
     event_watcher = create_options.event_watcher
     delete create_options.event_watcher
 
@@ -123,15 +119,8 @@ class kb.Observable
     kb.EventWatcher.useOptionsOrCreate({event_watcher: event_watcher}, model or null, @, {emitter: @model, update: (=> kb.ignore => @update()), key: @key, path: create_options.path})
     @_value.rawValue() or @_value.update() # wasn't loaded so create
 
-    # wrap ourselves with a localizer
-    if kb.LocalizedObservable and create_options.localizer
-      observable = new create_options.localizer(observable)
-      delete create_options.localizer
-
-    # wrap ourselves with a default value
-    if kb.DefaultObservable and create_options.hasOwnProperty('default')
-      observable = kb.defaultObservable(observable, create_options.default)
-      delete create_options.default
+    observable = new key_or_info.localizer(observable) if kb.LocalizedObservable and key_or_info.localizer # wrap ourselves with a localizer
+    observable = kb.defaultObservable(observable, key_or_info.default) if kb.DefaultObservable and key_or_info.hasOwnProperty('default') # wrap ourselves with a default value
 
     return observable
 
@@ -159,4 +148,4 @@ class kb.Observable
     new_value = kb.getValue(kb.peek(@_model), kb.peek(@key)) unless arguments.length
     @_value.update(new_value)
 
-kb.observable = (model, options, view_model) -> new kb.Observable(model, options, view_model)
+kb.observable = (model, key, options, view_model) -> new kb.Observable(model, key, options, view_model)

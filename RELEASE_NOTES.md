@@ -1,6 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 0.19.1
+* BREAKING API CHANGE: kb.observable now splits share options out to the second parameter to give a new signature: kb.observable(model, key, share_options, view_model)
+* BREAKING API CHANGE: kb.ViewModel.createObservables and kb.ViewModel.mapObservables are not longer public APIs. Use kb.observable(model, key, share_options, vm) instead to add mapped observables.
+
 * Removed support for Knockout version < 2.1.0.
 * Patched Knockout extend to release observables: https://github.com/kmalakoff/knockback/issues/124
 * Fixed event emitter not being updated when model changed: https://github.com/kmalakoff/knockback/issues/108

@@ -214,8 +214,8 @@ describe 'observable @quick @observable', ->
     InferringViewModel = (model, options) ->
       @_auto = kb.viewModel(model, {keys: ['name', 'parent', 'children'], options: options}, @)
       @maybe_null_name = kb.observable(model, 'maybe_null_name')
-      @maybe_null_parent = kb.observable(model, {key: 'maybe_null_parent', factories: InferringViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
-      @maybe_null_children = kb.observable(model, {key: 'maybe_null_children', factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+      @maybe_null_parent = kb.observable(model, 'maybe_null_parent', {factories: InferringViewModel, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+      @maybe_null_children = kb.observable(model, 'maybe_null_children', {factories: ChildrenCollection, options: @_auto.shareOptions()}) # use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
       return
 
     parent = new kb.Model({id: _.uniqueId(), name: 'Daddy'})
@@ -322,10 +322,10 @@ describe 'observable @quick @observable', ->
     ViewModel = (model) ->
       @number = kb.observable(model, 'number')
       @formatted_number = kb.observable(model, {
-        key:'number'
+        key: 'number'
         read: -> return "#: #{@number()}"
         write: (value) -> @number(value.substring(3))
-      }, @)
+      }, {}, @)
       return
 
     view_model = new ViewModel(model)

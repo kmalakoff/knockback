@@ -10,17 +10,24 @@
 {_, ko} = kb = require './kb'
 
 # @nodoc
+createObservable = (vm, model, key, create_options) ->
+  vm_key = if vm.__kb.internals and _.contains(vm.__kb.internals, key) then "_#{key}" else key
+  return if vm.__kb.view_model[vm_key] # already exists, skip
+  return if vm.__kb.excludes and _.contains(vm.__kb.excludes, key)
+  return if vm.__kb.statics and _.contains(vm.__kb.statics, key)
+  vm.__kb.vm_keys[vm_key] = true
+  vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm)
+
+# @nodoc
 updateObservables = (model) ->
-  # return # NOTE: disabled due to performance - need to re-implement optimizally for https://github.com/kmalakoff/knockback/issues/121
   return if kb.wasReleased(@) or not model
 
-  # NOTE: this does not remove keys that are different between the models
-  keys = _.keys(model.attributes)
-  keys = _.union(keys, rel_keys) if rel_keys = kb.orm?.keys?(model)
-  keys = _.difference(keys, @__kb.excludes) if @__kb.excludes  # remove excludes
-  keys = _.difference(keys, @__kb.statics) if @__kb.statics  # remove statics
-  missing = _.difference(keys, _.keys(@__kb.model_keys))
-  @createObservables(model, missing) if missing.length
+  create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
+  createObservable(@, model, key, create_options) for key of model.attributes
+
+  return unless rel_keys = kb.orm?.keys?(model)
+  createObservable(@, model, key, create_options) for key in rel_keys
+  return
 
 KEYS_OPTIONS = ['internals', 'excludes', 'statics', 'static_defaults']
 
@@ -110,7 +117,6 @@ class kb.ViewModel
       options = kb.utils.collapseOptions(options)
     @__kb or= {}
     @__kb.vm_keys = {}
-    @__kb.model_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then this else view_model
     @__kb[key] = options[key] for key in KEYS_OPTIONS when options.hasOwnProperty(key)
 
@@ -152,15 +158,13 @@ class kb.ViewModel
         (keys = if keys then _.union(keys, @__kb.keys) else _.clone(@__kb.keys))
     else if model
       keys = if keys then _.union(keys, _.keys(model.attributes)) else _.keys(model.attributes)
-    keys = _.difference(keys, @__kb.excludes) if keys and @__kb.excludes  # remove excludes
-    keys = _.difference(keys, @__kb.statics) if keys and @__kb.statics  # remove statics
 
     # initialize
     @mapObservables(model, options.keys) if _.isObject(options.keys) and not _.isArray(options.keys)
     @mapObservables(model, options.requires) if _.isObject(options.requires) and not _.isArray(options.requires)
     not options.mappings or @mapObservables(model, options.mappings)
     not keys or @createObservables(model, keys)
-    not @__kb.statics or @createObservables(model, @__kb.statics, true)
+    @createStaticObservables(model)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
     return @
@@ -183,27 +187,20 @@ class kb.ViewModel
 
   # Manually add observables to the view model by keys if the obervables do not yet exist
   createObservables: (model, keys, is_static) ->
-    if is_static
-      static_defaults = @__kb.static_defaults or {}
-    else
-      create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
+    create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
+    createObservable(@, model, key, create_options) for key in keys
+    return
 
-    for key in keys
+  createStaticObservables: (model) ->
+    return unless @__kb.statics
+    for key in @__kb.statics
       vm_key = if @__kb.internals and _.contains(@__kb.internals, key) then "_#{key}" else key
       continue if @__kb.view_model[vm_key] # already exists, skip
-
-      # add to the keys list
-      @__kb.vm_keys[vm_key] = @__kb.model_keys[key] = true
-
-      # create
-      if is_static
-        if model.has(vm_key)
-          @[vm_key] = @__kb.view_model[vm_key] = model.get(vm_key)
-        else if vm_key of static_defaults
-          @[vm_key] = @__kb.view_model[vm_key] = static_defaults[vm_key]
-      else
-        create_options.key = key
-        @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, create_options, @)
+      @__kb.vm_keys[vm_key] = true
+      if model.has(vm_key)
+        @[vm_key] = @__kb.view_model[vm_key] = model.get(vm_key)
+      else if @__kb.static_defaults and vm_key of @__kb.static_defaults
+        @[vm_key] = @__kb.view_model[vm_key] = @__kb.static_defaults[vm_key]
     return
 
   # Manually add observables to the view model by object map if the obervables do not yet exist
@@ -213,12 +210,8 @@ class kb.ViewModel
       continue if @__kb.view_model[vm_key] # already exists, skip
       mapping_info = if _.isString(mapping_info) then {key: mapping_info} else _.clone(mapping_info)
       mapping_info.key or= vm_key
-
-      # add to the keys list
-      @__kb.vm_keys[vm_key] = @__kb.model_keys[mapping_info.key] = true
-
-      # create
-      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), @)
+      @__kb.vm_keys[vm_key] = true
+      @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, @)
     return
 
 # Factory function to create a kb.ViewModel.

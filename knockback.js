@@ -1394,7 +1394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var KEYS_PUBLISH, TypedValue, kb, ko, _, _ref;
+	var KEYS_INFO, KEYS_PUBLISH, TypedValue, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
@@ -1402,33 +1402,34 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 
+	KEYS_INFO = ['args', 'read', 'write'];
+
 	kb.Observable = (function() {
-	  function Observable(model, options, _vm) {
+	  function Observable(model, key_or_info, options, _vm) {
 	    this._vm = _vm != null ? _vm : {};
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var create_options, event_watcher, observable;
-	        options || kb._throwMissing(_this, 'options');
-	        create_options = _.isString(options) || ko.isObservable(options) ? {
-	          key: options
-	        } : kb.utils.collapseOptions(options);
-	        _this.key = create_options.key;
-	        delete create_options.key;
-	        _this.key || kb._throwMissing(_this, 'key');
-	        !create_options.args || (_this.args = create_options.args, delete create_options.args);
-	        !create_options.read || (_this.read = create_options.read, delete create_options.read);
-	        !create_options.write || (_this.write = create_options.write, delete create_options.write);
+	        var create_options, event_watcher, key, observable, _i, _len;
+	        key_or_info || kb._throwMissing(_this, 'key_or_info');
+	        _this.key = key_or_info.key || key_or_info;
+	        for (_i = 0, _len = KEYS_INFO.length; _i < _len; _i++) {
+	          key = KEYS_INFO[_i];
+	          if (key_or_info[key]) {
+	            _this[key] = key_or_info[key];
+	          }
+	        }
+	        create_options = kb.utils.collapseOptions(options);
 	        event_watcher = create_options.event_watcher;
 	        delete create_options.event_watcher;
 	        _this._value = new TypedValue(create_options);
 	        _this._model = ko.observable();
 	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
-	            var arg, args, _i, _len, _model, _ref1, _ref2;
+	            var arg, args, _j, _len1, _model, _ref1, _ref2;
 	            _model = _this._model();
 	            _ref1 = args = [_this.key].concat(_this.args || []);
-	            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	              arg = _ref1[_i];
+	            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+	              arg = _ref1[_j];
 	              ko.utils.unwrapObservable(arg);
 	            }
 	            if ((_ref2 = kb.utils.wrappedEventWatcher(_this)) != null) {
@@ -1503,13 +1504,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	          path: create_options.path
 	        });
 	        _this._value.rawValue() || _this._value.update();
-	        if (kb.LocalizedObservable && create_options.localizer) {
-	          observable = new create_options.localizer(observable);
-	          delete create_options.localizer;
+	        if (kb.LocalizedObservable && key_or_info.localizer) {
+	          observable = new key_or_info.localizer(observable);
 	        }
-	        if (kb.DefaultObservable && create_options.hasOwnProperty('default')) {
-	          observable = kb.defaultObservable(observable, create_options["default"]);
-	          delete create_options["default"];
+	        if (kb.DefaultObservable && key_or_info.hasOwnProperty('default')) {
+	          observable = kb.defaultObservable(observable, key_or_info["default"]);
 	        }
 	        return observable;
 	      };
@@ -1549,8 +1548,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	kb.observable = function(model, options, view_model) {
-	  return new kb.Observable(model, options, view_model);
+	kb.observable = function(model, key, options, view_model) {
+	  return new kb.Observable(model, key, options, view_model);
 	};
 
 
@@ -2310,28 +2309,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var KEYS_OPTIONS, kb, ko, updateObservables, _, _ref;
+	var KEYS_OPTIONS, createObservable, kb, ko, updateObservables, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
+	createObservable = function(vm, model, key, create_options) {
+	  var vm_key;
+	  vm_key = vm.__kb.internals && _.contains(vm.__kb.internals, key) ? "_" + key : key;
+	  if (vm.__kb.view_model[vm_key]) {
+	    return;
+	  }
+	  if (vm.__kb.excludes && _.contains(vm.__kb.excludes, key)) {
+	    return;
+	  }
+	  if (vm.__kb.statics && _.contains(vm.__kb.statics, key)) {
+	    return;
+	  }
+	  vm.__kb.vm_keys[vm_key] = true;
+	  return vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm);
+	};
+
 	updateObservables = function(model) {
-	  var keys, missing, rel_keys, _ref1;
+	  var create_options, key, rel_keys, _i, _len, _ref1;
 	  if (kb.wasReleased(this) || !model) {
 	    return;
 	  }
-	  keys = _.keys(model.attributes);
-	  if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
-	    keys = _.union(keys, rel_keys);
+	  create_options = {
+	    store: kb.utils.wrappedStore(this),
+	    factory: kb.utils.wrappedFactory(this),
+	    path: this.__kb.path,
+	    event_watcher: kb.utils.wrappedEventWatcher(this)
+	  };
+	  for (key in model.attributes) {
+	    createObservable(this, model, key, create_options);
 	  }
-	  if (this.__kb.excludes) {
-	    keys = _.difference(keys, this.__kb.excludes);
+	  if (!(rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0)) {
+	    return;
 	  }
-	  if (this.__kb.statics) {
-	    keys = _.difference(keys, this.__kb.statics);
-	  }
-	  missing = _.difference(keys, _.keys(this.__kb.model_keys));
-	  if (missing.length) {
-	    return this.createObservables(model, missing);
+	  for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
+	    key = rel_keys[_i];
+	    createObservable(this, model, key, create_options);
 	  }
 	};
 
@@ -2356,7 +2373,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        _this.__kb || (_this.__kb = {});
 	        _this.__kb.vm_keys = {};
-	        _this.__kb.model_keys = {};
 	        _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
 	        for (_i = 0, _len = KEYS_OPTIONS.length; _i < _len; _i++) {
 	          key = KEYS_OPTIONS[_i];
@@ -2423,12 +2439,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else if (model) {
 	          keys = keys ? _.union(keys, _.keys(model.attributes)) : _.keys(model.attributes);
 	        }
-	        if (keys && _this.__kb.excludes) {
-	          keys = _.difference(keys, _this.__kb.excludes);
-	        }
-	        if (keys && _this.__kb.statics) {
-	          keys = _.difference(keys, _this.__kb.statics);
-	        }
 	        if (_.isObject(options.keys) && !_.isArray(options.keys)) {
 	          _this.mapObservables(model, options.keys);
 	        }
@@ -2437,7 +2447,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        !options.mappings || _this.mapObservables(model, options.mappings);
 	        !keys || _this.createObservables(model, keys);
-	        !_this.__kb.statics || _this.createObservables(model, _this.__kb.statics, true);
+	        _this.createStaticObservables(model);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };
@@ -2466,33 +2476,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  ViewModel.prototype.createObservables = function(model, keys, is_static) {
-	    var create_options, key, static_defaults, vm_key, _i, _len;
-	    if (is_static) {
-	      static_defaults = this.__kb.static_defaults || {};
-	    } else {
-	      create_options = {
-	        store: kb.utils.wrappedStore(this),
-	        factory: kb.utils.wrappedFactory(this),
-	        path: this.__kb.path,
-	        event_watcher: kb.utils.wrappedEventWatcher(this)
-	      };
-	    }
+	    var create_options, key, _i, _len;
+	    create_options = {
+	      store: kb.utils.wrappedStore(this),
+	      factory: kb.utils.wrappedFactory(this),
+	      path: this.__kb.path,
+	      event_watcher: kb.utils.wrappedEventWatcher(this)
+	    };
 	    for (_i = 0, _len = keys.length; _i < _len; _i++) {
 	      key = keys[_i];
+	      createObservable(this, model, key, create_options);
+	    }
+	  };
+
+	  ViewModel.prototype.createStaticObservables = function(model) {
+	    var key, vm_key, _i, _len, _ref1;
+	    if (!this.__kb.statics) {
+	      return;
+	    }
+	    _ref1 = this.__kb.statics;
+	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	      key = _ref1[_i];
 	      vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
 	      if (this.__kb.view_model[vm_key]) {
 	        continue;
 	      }
-	      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[key] = true;
-	      if (is_static) {
-	        if (model.has(vm_key)) {
-	          this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
-	        } else if (vm_key in static_defaults) {
-	          this[vm_key] = this.__kb.view_model[vm_key] = static_defaults[vm_key];
-	        }
-	      } else {
-	        create_options.key = key;
-	        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, create_options, this);
+	      this.__kb.vm_keys[vm_key] = true;
+	      if (model.has(vm_key)) {
+	        this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
+	      } else if (this.__kb.static_defaults && vm_key in this.__kb.static_defaults) {
+	        this[vm_key] = this.__kb.view_model[vm_key] = this.__kb.static_defaults[vm_key];
 	      }
 	    }
 	  };
@@ -2514,8 +2527,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: mapping_info
 	      } : _.clone(mapping_info);
 	      mapping_info.key || (mapping_info.key = vm_key);
-	      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[mapping_info.key] = true;
-	      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), this);
+	      this.__kb.vm_keys[vm_key] = true;
+	      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
 	    }
 	  };
 
