@@ -1437,6 +1437,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                return _this.update(kb.getValue(_model, kb.peek(_this.key), _this.args));
 	              });
 	            }
+	            if (kb.wasReleased(_this)) {
+	              return;
+	            }
 	            return _this._value.value();
 	          },
 	          write: function(new_value) {
@@ -1938,7 +1941,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return value.collection(new_value);
 	      }
 	    } else if (_.isUndefined(this.value_type) || this.value_type !== new_type) {
-	      return this._updateValueObservable(new_value);
+	      if (kb.peek(value) !== new_value) {
+	        return this._updateValueObservable(new_value);
+	      }
 	    } else if (this.value_type === kb.TYPE_MODEL) {
 	      if (_.isFunction(value.model)) {
 	        if (kb.peek(value.model) !== new_value) {
@@ -1948,7 +1953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this._updateValueObservable(new_value);
 	      }
 	    } else {
-	      if (value() !== new_value) {
+	      if (kb.peek(value) !== new_value) {
 	        return value(new_value);
 	      }
 	    }
@@ -2362,6 +2367,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
 	  create_options || (create_options = createOptions(vm));
 	  if (!keys) {
+	    if (vm.__kb.keys) {
+	      return;
+	    }
 	    for (key in model.attributes) {
 	      createObservable(vm, model, key, create_options);
 	    }
@@ -2418,6 +2426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.__kb[key] = options[key];
 	          }
 	        }
+	        _this.__kb.keys = options.keys;
 	        kb.Store.useOptionsOrCreate(options, model, _this);
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
@@ -2459,8 +2468,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (_this.__kb.internals) {
 	          updateObservables(_this, model, _this.__kb.internals, create_options);
 	        }
-	        if (options.keys) {
-	          updateObservables(_this, model, options.keys, create_options);
+	        if (_this.__kb.keys) {
+	          updateObservables(_this, model, _this.__kb.keys, create_options);
 	        } else if (model) {
 	          updateObservables(_this, model, null, create_options);
 	        }

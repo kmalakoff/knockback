@@ -35,7 +35,7 @@ module.exports = class TypedValue
       value.collection(new_value) if kb.peek(value.collection) isnt new_value
 
     else if _.isUndefined(@value_type) or @value_type isnt new_type
-      @_updateValueObservable(new_value)
+      @_updateValueObservable(new_value) if kb.peek(value) isnt new_value
 
     else if @value_type is kb.TYPE_MODEL
       if _.isFunction(value.model)
@@ -45,7 +45,7 @@ module.exports = class TypedValue
         @_updateValueObservable(new_value)
 
     else # a simple observable
-      value(new_value) if value() isnt new_value
+      value(new_value) if kb.peek(value) isnt new_value
 
   _updateValueObservable: (new_value) ->
     create_options = @create_options

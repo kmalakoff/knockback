@@ -74,6 +74,7 @@ class kb.Observable
           @update(@read.apply(@_vm, args))
         else if !_.isUndefined(_model)
           kb.ignore => @update(kb.getValue(_model, kb.peek(@key), @args))
+        return if kb.wasReleased(@)
         return @_value.value()
 
       write: (new_value) => kb.ignore =>

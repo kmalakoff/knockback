@@ -39,6 +39,7 @@ createStaticObservables = (vm, model) ->
 updateObservables = (vm, model, keys, create_options) ->
   create_options or= createOptions(vm)
   if not keys
+    return if vm.__kb.keys # only use the keys provided
     createObservable(vm, model, key, create_options) for key of model.attributes
     (createObservable(vm, model, key, create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
   else if _.isArray(keys)
@@ -139,6 +140,7 @@ class kb.ViewModel
     @__kb.vm_keys = {}
     @__kb.view_model = if _.isUndefined(view_model) then @ else view_model
     @__kb[key] = options[key] for key in KEYS_OPTIONS when options.hasOwnProperty(key)
+    @__kb.keys = options.keys
 
     # always use a store to ensure recursive view models are handled correctly
     kb.Store.useOptionsOrCreate(options, model, @)
@@ -165,7 +167,7 @@ class kb.ViewModel
     create_options = createOptions(@)
     updateObservables(@, model, options.requires, create_options) if options.requires
     updateObservables(@, model, @__kb.internals, create_options) if @__kb.internals
-    if options.keys then updateObservables(@, model, options.keys, create_options)
+    if @__kb.keys then updateObservables(@, model, @__kb.keys, create_options)
     else if model then updateObservables(@, model, null, create_options)
     not options.mappings or updateObservables(@, model, options.mappings, create_options)
     !@__kb.statics or createStaticObservables(@, model)
