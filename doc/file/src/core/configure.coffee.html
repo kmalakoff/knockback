@@ -21,74 +21,51 @@
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>triggering</span>
+    <span class='title'>core</span>
     &raquo;
-    <span class='title'>triggered-observable.coffee</span>
+    <span class='title'>configure.coffee</span>
   </div>
 </div>
     <div id='content'>
       <h1>
         File:
-        triggered-observable.coffee
+        configure.coffee
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;triggering</td>
-        </tr>
-        <tr>
-          <td>
-            Classes:
-          </td>
-          <td>
-            <a href='../../../class/kb/TriggeredObservable.html'>
-              kb.TriggeredObservable
-            </a>
-          </td>
+          <td>src&#47;core</td>
         </tr>
       </table>
       <h2>Variables Summary</h2>
       <dl class='constants'>
-  <dt id='KEYS_PUBLISH-variable'>
-    KEYS_PUBLISH
+  <dt id='ALL_ORMS-variable'>
+    ALL_ORMS
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>[&#39;destroy&#39;]</code></pre>
+    <pre><code class='coffeescript'>{
+  &quot;default&quot;: null,
+  &#39;backbone-orm&#39;: null,
+  &#39;backbone-associations&#39;: require(&#39;.&#47;orms&#47;backbone-associations&#39;),
+  &#39;backbone-relational&#39;: require(&#39;.&#47;orms&#47;backbone-relational&#39;),
+  supermodel: require(&#39;.&#47;orms&#47;supermodel&#39;)
+}</code></pre>
     
   </dd>
-</dl>
-      <h2>Method Summary</h2>
-      <ul class='summary'>
-  <li>
-    <span class='signature'>
-      <a href='#kb-'>
-        ~
-(void)
-<b>kb</b><span>(emitter, event_selector)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      factory function 
-    </span>
-  </li>
-</ul>
-      <h2>Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='kb-'>
-      ~
-(void)
-<b>kb</b><span>(emitter, event_selector)</span>
-      <br>
-    </p>
+  <dt id='kb.orm-variable'>
+    kb.orm
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>ALL_ORMS</code></pre>
     <div class='docstring'>
-  <p>factory function</p>
+  <p>set up defaults</p>
 </div>
 <div class='tags'>
 </div>
-  </div>
-</div>
+  </dd>
+</dl>
     </div>
     <div id='footer'>
   July 29, 14 20:37:15 by

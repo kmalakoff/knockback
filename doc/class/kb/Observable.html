@@ -110,18 +110,6 @@ name.setToDefault(); &#47;&#47; name is (none)</code></pre>
   </li>
   <li>
     <span class='signature'>
-      <a href='#_updateValueObservable-dynamic'>
-        #
-(void)
-<b>_updateValueObservable</b><span>(new_value)</span>
-      </a>
-    </span>
-    <span class='note private title'>Private</span>
-    <span class='desc'>
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#model-dynamic'>
         #
 (Model|ModelRef|void)
@@ -129,7 +117,7 @@ name.setToDefault(); &#47;&#47; name is (none)</code></pre>
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model. 
+      Dual-purpose getter/setter ko.computed for the observed model. 
     </span>
   </li>
 </ul>
@@ -139,7 +127,7 @@ name.setToDefault(); &#47;&#47; name is (none)</code></pre>
     <p class='signature' id='constructor-dynamic'>
       #
 (ko.observable)
-<b>constructor</b><span>(model, options, _vm = {})</span>
+<b>constructor</b><span>(model, key_or_info, options, _vm = {})</span>
       <br>
     </p>
     <div class='docstring'>
@@ -367,17 +355,6 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='_updateValueObservable-dynamic'>
-      #
-(void)
-<b>_updateValueObservable</b><span>(new_value)</span>
-      <span class='note private'>Private</span>
-      <br>
-    </p>
-    <div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='model-dynamic'>
       #
 (Model|ModelRef|void)
@@ -385,7 +362,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.</p>
+  <p>Dual-purpose getter/setter ko.computed for the observed model.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -413,7 +390,7 @@ observable.model(new Backbone.Model({name: &#39;fred&#39;})); &#47;&#47; set</co
 </div>
     </div>
     <div id='footer'>
-  July 20, 14 03:24:13 by
+  July 29, 14 20:37:15 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

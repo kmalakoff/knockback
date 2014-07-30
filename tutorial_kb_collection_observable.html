@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -81,9 +81,9 @@
       <header class="page">
       </header>
       <content class="page"><h1 id="tutorial-kb-collectionobservable">Tutorial: kb.CollectionObservable</h1>
-<p><a href="index.html">Knockback.js</a> provides an <a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a> that watches Backbone.Collections when models are added, removed, and changed. In addition, kb.CollectionObservables can be used to sort models independently from the Backbone.Collection order, to bind HTML select elements, to render/edit <a href="tutorial_relational_models.html">model relationships</a>, and to filter collections.</p>
+<p><a href="index.html">Knockback.js</a> provides an <a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable</a> that watches Backbone.Collections when models are added, removed, and changed. In addition, kb.CollectionObservables can be used to sort models independently from the Backbone.Collection order, to bind HTML select elements, to render/edit <a href="tutorial_relational_models.html">model relationships</a>, and to filter collections.</p>
 <h2 id="sorting-models">Sorting Models</h2>
-<p>You can sort models using an <a href="doc/classes/kb/CollectionObservable.html#sortAttribute-instance">attribute name</a> or by providing a <a href="doc/classes/kb/CollectionObservable.html#sortedIndex-instance">sorted_index function</a>.</p>
+<p>You can sort models using an <a href="doc/class/kb/CollectionObservable.html#sortAttribute-dynamic">attribute name</a> or by providing a <a href="doc/class/kb/CollectionObservable.html#sortedIndex-dynamic">sorted_index function</a>.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -286,7 +286,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_collection_observable/kbco_html_select_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><p>One important constraint is that in order for <a href="http://knockoutjs.com/documentation/selectedOptions-binding.html">Knockout.js select bindings</a> to work, the same ViewModel instance needs to be included in each kb.CollectionObservable. You can use <a href="doc/classes/kb/CollectionObservable.html#shareOptions-instance">shareOptions</a> to share the kb.Store and hence ViewModels between kb.CollectionObservables.</p>
+        </div><p>One important constraint is that in order for <a href="http://knockoutjs.com/documentation/selectedOptions-binding.html">Knockout.js select bindings</a> to work, the same ViewModel instance needs to be included in each kb.CollectionObservable. You can use <a href="doc/class/kb/CollectionObservable.html#shareOptions-dynamic">shareOptions</a> to share the kb.Store and hence ViewModels between kb.CollectionObservables.</p>
 <p>Here is an adapted sample from <a href="http://kmalakoff.github.com/knockback-reference-app">Knockback Reference App</a>.</p>
 
         <div class="row-fluid">

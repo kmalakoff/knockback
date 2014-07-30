@@ -124,23 +124,11 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); &#47;&#47; ob
       <a href='#createObservables-dynamic'>
         #
 (void)
-<b>createObservables</b><span>(model, keys, is_static)</span>
+<b>createObservables</b><span>(model, keys, create_options)</span>
       </a>
     </span>
     <span class='desc'>
-      Manually add observables to the view model by keys if the obervables do not yet exist 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#mapObservables-dynamic'>
-        #
-(void)
-<b>mapObservables</b><span>(model, mappings)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Manually add observables to the view model by object map if the obervables do not yet exist 
+      create observables manually 
     </span>
   </li>
   <li>
@@ -152,7 +140,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); &#47;&#47; ob
       </a>
     </span>
     <span class='desc'>
-      Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model. 
+      Dual-purpose getter/setter ko.computed for the observed model. 
     </span>
   </li>
 </ul>
@@ -186,7 +174,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); &#47;&#47; ob
     <pre><code class='coffeescript'>var ViewModel = kb.ViewModel.extend({
   constructor: function(model){
     kb.ViewModel.prototype.constructor.apply(this, arguments);
-    this.full_name = ko.dependentObservable(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);
+    this.full_name = ko.computed(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);
   }
 });
 var view_model = new ViewModel(model);</code></pre>
@@ -236,7 +224,7 @@ var view_model = new ViewModel(model);</code></pre>
     <p class='signature' id='constructor-dynamic'>
       #
 (ko.observable)
-<b>constructor</b><span>(model, options, view_model)</span>
+<b>constructor</b><span>(model, options = {}, view_model)</span>
       <br>
     </p>
     <div class='docstring'>
@@ -439,24 +427,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     <p class='signature' id='createObservables-dynamic'>
       #
 (void)
-<b>createObservables</b><span>(model, keys, is_static)</span>
+<b>createObservables</b><span>(model, keys, create_options)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Manually add observables to the view model by keys if the obervables do not yet exist</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='mapObservables-dynamic'>
-      #
-(void)
-<b>mapObservables</b><span>(model, mappings)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Manually add observables to the view model by object map if the obervables do not yet exist</p>
+  <p>create observables manually</p>
 </div>
 <div class='tags'>
 </div>
@@ -469,7 +444,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
       <br>
     </p>
     <div class='docstring'>
-  <p>Dual-purpose getter/setter ko.dependentObservable/ko.computed for the observed model.</p>
+  <p>Dual-purpose getter/setter ko.computed for the observed model.</p>
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
@@ -497,7 +472,7 @@ view_model.model(new Backbone.Model({name: &#39;fred&#39;})); &#47;&#47; set</co
 </div>
     </div>
     <div id='footer'>
-  July 20, 14 03:24:13 by
+  July 29, 14 20:37:15 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

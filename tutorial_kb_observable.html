@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -202,7 +202,7 @@ ko.applyBindings(view_model, $(&#39;#kboo_default&#39;)[0]);</pre>
             </div>
           </div>
         </div><h2 id="dynamic-attribute-types">Dynamic Attribute Types</h2>
-<p>Since Knockback.js version 0.16.0, a kb.Observable can be created using the correct type before the attribute is loaded using the <a href="doc/classes/kb/ViewModel.html#constructor-instance">factories options</a> and change types when the attribute value changes.</p>
+<p>Since Knockback.js version 0.16.0, a kb.Observable can be created using the correct type before the attribute is loaded using the <a href="doc/class/kb/ViewModel.html#constructor-dynamic">factories options</a> and change types when the attribute value changes.</p>
 
         <pre data-for="cs">model = new Backbone.Model({reused: null})
 view_model = kb.viewModel(model)

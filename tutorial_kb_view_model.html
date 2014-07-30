@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -81,8 +81,8 @@
       <header class="page">
       </header>
       <content class="page"><h1 id="tutorial-kb-viewmodel">Tutorial: kb.ViewModel</h1>
-<p><a href="index.html">Knockback.js</a> has a helper called <a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a> to automatically generate observables for each attribute. Most likely you will use the <a href="doc/classes/kb.html#viewModel-class">kb.viewModel(model) factory method</a> to create a kb.ViewModel.</p>
-<p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/classes/kb/ViewModel.html#constructor-instance">constructor options</a> like &#39;keys&#39; or &#39;excludes&#39; to limit the attributes which have kb.Observables for them or &#39;requires&#39; to ensure that observables are created consistently irregardless of the Model.</p>
+<p><a href="index.html">Knockback.js</a> has a helper called <a href="doc/class/kb/ViewModel.html">kb.ViewModel</a> to automatically generate observables for each attribute. Most likely you will use the <a href="doc/class/kb/ViewModel.html#extend-static">kb.viewModel(model) factory method</a> to create a kb.ViewModel.</p>
+<p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/class/kb/ViewModel.html#constructor-dynamic">constructor options</a> like &#39;keys&#39; or &#39;excludes&#39; to limit the attributes which have kb.Observables for them or &#39;requires&#39; to ensure that observables are created consistently irregardless of the Model.</p>
 <p>In this case, Knockback will skip creating an observable for the &#39;id&#39; attribute:</p>
 
         <pre data-for="cs">view_model = kb.viewModel(new Backbone.Model({id: 20, name: 'Bob'}), {keys: ['name']})

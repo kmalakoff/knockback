@@ -89,13 +89,13 @@ ko.applyBindings(view_model)
 
 # and cleanup after yourself when you are done.
 kb.release(view_model)
-</code></pre><p>And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!</p><p>Of course, this is just a simple example, but hopefully you get the picture.</p><h1 id="download-latest-0-19-0-">Download Latest (0.19.0):</h1><p>Please see the <a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">release notes</a> for upgrade pointers.</p><h3 id="full">Full</h3><p>Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.</p><ul>
-<li>Full Library <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback.js">(dev, 64k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback.min.js">(min+gzip, 8k)</a></li>
-<li>Full Stack <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback-full-stack.js">(dev, 330k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback-full-stack.min.js">(min+gzip, 32k)</a></li>
+</code></pre><p>And now when you type in the input boxes, the values are properly transferred to the model and the dates are even localized!</p><p>Of course, this is just a simple example, but hopefully you get the picture.</p><h1 id="download-latest-0-19-1-">Download Latest (0.19.1):</h1><p>Please see the <a href="https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md">release notes</a> for upgrade pointers.</p><h3 id="full">Full</h3><p>Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.</p><ul>
+<li>Full Library <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback.js">(dev, 64k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback.min.js">(min+gzip, 8k)</a></li>
+<li>Full Stack <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback-full-stack.js">(dev, 330k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback-full-stack.min.js">(min+gzip, 32k)</a></li>
 </ul>
 <h3 id="core">Core</h3><p>Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.</p><ul>
-<li>Core Library <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback-core.js">(dev, 54k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback-core.min.js">(min+gzip, 7k)</a></li>
-<li>Core Stack <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback-core-stack.js">(dev, 315k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.0/knockback-core-stack.min.js">(min+gzip, 31k)</a></li>
+<li>Core Library <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback-core.js">(dev, 54k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback-core.min.js">(min+gzip, 7k)</a></li>
+<li>Core Stack <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback-core-stack.js">(dev, 315k)</a> or <a href="https://raw.github.com/kmalakoff/knockback/0.19.1/knockback-core-stack.min.js">(min+gzip, 31k)</a></li>
 </ul>
 <h3 id="distributions">Distributions</h3><p>You can also find Knockback on your favorite distributions:</p><ul>
 <li><a href="https://npmjs.org/package/knockback">npm registry</a></li>
@@ -124,26 +124,14 @@ kb.release(view_model)
 <li><a href="https://github.com/kmalakoff/knockback-navigators/">KnockbackNavigators.js</a> - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.</li>
 <li><a href="https://github.com/kmalakoff/knockback-inspector/">KnockbackInspector.js</a> - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).</li>
 </ul>
-<h2 id="why-write-knockback-js-">Why Write Knockback.js?</h2><p>When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to &quot;mix and match&quot; the best features. I started with <a href="http://documentcloud.github.com/backbone/">Backbone.js</a> and really loved the Models and Collections, and used <a href="http://brunch.io/">Brunch</a> to get me up and running quickly.</p><p>After a while, I found the view coding too slow so I wrote <a href="https://github.com/kmalakoff/mixin">Mixin.js</a> to extract out reusable aspects of my views. When I was looking for my next productivity increase, an ex-work colleague suggested <a href="http://www.sproutcore.com/">Sproutcore</a>, but at the time, it wasn&#39;t yet micro-frameworky enough meaning I would need to learn something big and &quot;to throw the baby out with the bathwater&quot; as they say (it is hard to give up Backbone models and collections!). Then, I discovered <a href="http://knockoutjs.com/">Knockout</a> and knew it was for me!</p><p>Knockout provided just the right building blocks for a layer between my templates and data. As I used it more, I built additional functionality like <a href="https://github.com/kmalakoff/backbone-modelref">Backbone.ModelRefs</a> for lazy model loading, localization helpers for truly dynamic views, and most recently, an easier way to sync collections and their model&#39;s view models.</p><p>So here it is...the refactored and shareable version of my Backbone bindings for Knockout: Knockback.js</p><p>Enjoy!</p><p>Kevin</p><h2 id="building-running-and-testing-the-library">Building, Running and Testing the library</h2>
-<h3 id="installing-">Installing:</h3>
-<ol>
-<li>install node.js: <a href="http://nodejs.org">http://nodejs.org</a></li>
-<li>install node packages: <code>npm install</code></li>
-</ol>
-<h3 id="commands-">Commands:</h3>
-<ol>
-<li>Build: <code>npm run build</code></li>
-<li>Build and run tests: <code>npm test</code></li>
-<li>Build documents: <code>npm run docs</code></li>
-</ol>
-<h1 id="one-time">One Time</h1><p>To run all tests (Node.js only):</p><pre><code>mocha --grep &#39;&#39; test/**/*.tests.coffee
-</code></pre><h1 id="tdd">TDD</h1><p>To run all tests (Node.js only) in multiple terminals run:</p><pre><code>npm run watch
-mocha --grep &#39;&#39; test/**/*.tests.coffee --watch
+<h2 id="why-write-knockback-js-">Why Write Knockback.js?</h2><p>When I was evaluating client-side frameworks, I liked lots of the pieces, but wanted to &quot;mix and match&quot; the best features. I started with <a href="http://documentcloud.github.com/backbone/">Backbone.js</a> and really loved the Models and Collections, and used <a href="http://brunch.io/">Brunch</a> to get me up and running quickly.</p><p>After a while, I found the view coding too slow so I wrote <a href="https://github.com/kmalakoff/mixin">Mixin.js</a> to extract out reusable aspects of my views. When I was looking for my next productivity increase, an ex-work colleague suggested <a href="http://www.sproutcore.com/">Sproutcore</a>, but at the time, it wasn&#39;t yet micro-frameworky enough meaning I would need to learn something big and &quot;to throw the baby out with the bathwater&quot; as they say (it is hard to give up Backbone models and collections!). Then, I discovered <a href="http://knockoutjs.com/">Knockout</a> and knew it was for me!</p><p>Knockout provided just the right building blocks for a layer between my templates and data. As I used it more, I built additional functionality like <a href="https://github.com/kmalakoff/backbone-modelref">Backbone.ModelRefs</a> for lazy model loading, localization helpers for truly dynamic views, and most recently, an easier way to sync collections and their model&#39;s view models.</p><p>So here it is...the refactored and shareable version of my Backbone bindings for Knockout: Knockback.js</p><p>Enjoy!</p><p>Kevin</p><h3 id="for-contributors">For Contributors</h3><p>To build the library for Node.js and browsers:</p><pre><code>$ gulp build
+</code></pre><p>Please run tests before submitting a pull request:</p><pre><code>$ gulp test --quick
+</code></pre><p>and eventually all tests:</p><pre><code>$ npm test
 </code></pre>
       </div>
     </div>
     <div id='footer'>
-  July 20, 14 03:24:13 by
+  July 29, 14 20:37:15 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

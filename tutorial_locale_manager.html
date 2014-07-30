@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -84,7 +84,7 @@
         <section>
           <h1>Tutorial: Custom Locale Manager</h1>
           <p><a href="index.html">Knockback.js</a><span> does not provide a Locale Manager implementation since it depends on how you want to store and where you want to manage your localized strings.</span></p>
-          <p><span>If you choose to use</span><a href="doc/classes/kb/LocalizedObservable.html"> kb.LocalizedObservable</a><span>, it assumes that you assign your implementation to 'kb.locale_manager'.</span></p>
+          <p><span>If you choose to use</span><a href="doc/class/kb/LocalizedObservable.html"> kb.LocalizedObservable</a><span>, it assumes that you assign your implementation to 'kb.locale_manager'.</span></p>
           <p></p>
           <h3>A Simple Implementation</h3>
           <p><span>Because Knockback actually only requires a</span><a href="docs.html#backbone_model_signature"> Backbone.Model-like signature</a><span>, a custom locale manager can be implemented quite easily. Here is an example:</span></p>
@@ -296,7 +296,7 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
           <p></p>
           <h3>Bulk Localized Form Labels</h3>
           <p></p>
-          <p><span>If you need to create a large number of localized labels, you could use</span><a href="doc/classes/kb/ViewModel.html"> kb.ViewModel</a><span> like:</span></p>
+          <p><span>If you need to create a large number of localized labels, you could use</span><a href="doc/class/kb/ViewModel.html"> kb.ViewModel</a><span> like:</span></p>
           <div class="row-fluid">
             <div class="span8">
               <ul class="nav nav-tabs">

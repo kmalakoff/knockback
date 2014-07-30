@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -86,7 +86,7 @@
           <p>You can use Knockback to bind Backbone Models/Collections to your HTML/templates (View) using Knockout. This allows server or application changes to Models/Collections to be propagated automatically to your views using `Backbone.sync`</p>
           <h2>Using with a Backbone.Model</h2>
           <h3>Creating a ko.observable() for each model attribute by hand:</h3>
-          <p><span>You can create a ViewModel with Knockout observables for each Backbone.Model attribute using</span><a href="doc/classes/kb/Observable.html">kb.observable</a><span> for simple attributes (as below) or</span><a href="doc/classes/kb/ViewModel.html">kb.ViewModel</a><span> for Backbone.Model attributes or</span><a href="doc/classes/kb/CollectionObservable.html">kb.CollectionObservable</a><span>.</span></p>
+          <p><span>You can create a ViewModel with Knockout observables for each Backbone.Model attribute using</span><a href="doc/class/kb/Observable.html">kb.observable</a><span> for simple attributes (as below) or</span><a href="doc/class/kb/ViewModel.html">kb.ViewModel</a><span> for Backbone.Model attributes or</span><a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable</a><span>.</span></p>
           <p>Creating a ViewModel by hand is the best way to create optimized ViewModels.</p>
           <div class="row-fluid">
             <div class="span8">
@@ -142,7 +142,7 @@ ko.applyBindings(view_model, $(&#39;#kb_observable&#39;)[0]);</pre>
             </div>
           </div>
           <h3>Creating a ko.observable() automatically for each model attribute:</h3>
-          <p><span>Creating a ViewModel with a Knockout observable for each Backbone.Model attribute automatically using a</span><a href="doc/classes/kb/ViewModel.html">kb.viewModel factory</a><span> is a good way to rapidly prototype. Of course, it creates more Knockout observables than required which can be expensive in terms of unneccessary bloat.</span></p>
+          <p><span>Creating a ViewModel with a Knockout observable for each Backbone.Model attribute automatically using a</span><a href="doc/class/kb/ViewModel.html">kb.viewModel factory</a><span> is a good way to rapidly prototype. Of course, it creates more Knockout observables than required which can be expensive in terms of unneccessary bloat.</span></p>
           <div class="row-fluid">
             <div class="span8">
               <ul class="nav nav-tabs">
@@ -186,12 +186,12 @@ ko.applyBindings(view_model, $(&#39;#kb_view_model_computed&#39;)[0]);</pre>
           </div>
           <h2>Using with a Backbone.Collection</h2>
           <h3>Create a kb.ViewModel automatically for each model in a collection:</h3>
-          <p><span>In Knockback.js, a</span><a href="doc/classes/kb/CollectionObservable.html"> kb.CollectionObservable</a><span> can be used with a Backbone.Collection for many different purposes</span>
+          <p><span>In Knockback.js, a</span><a href="doc/class/kb/CollectionObservable.html"> kb.CollectionObservable</a><span> can be used with a Backbone.Collection for many different purposes</span>
             <ul>
               <li><span>generating/maintaining a sorted ko.observableArray of ViewModels for a list view</span></li>
               <li><span>rendering</span><a href="tutorial_relational_models.html"> relationships between models</a></li>
               <li><span>providing a selection list for</span><a href="http://knockoutjs.com/documentation/selectedOptions-binding.html"> a selectedOptions binding</a><span> using Knockout.js</span></li>
-              <li><span>to</span><a href="doc/classes/kb/CollectionObservable.html#sorted_index"> sort the Backbone.Models</a><span> in a way distinctive to the Backbone.Collection models array</span></li>
+              <li><span>to</span><a href="doc/class/kb/CollectionObservable.html#sorted_index"> sort the Backbone.Models</a><span> in a way distinctive to the Backbone.Collection models array</span></li>
               <li><span>to<a href="https://github.com/kmalakoff/knockback-todos/blob/master/app/todos-classic/src/viewmodels/footer.coffee.txt"> update model counts automatically</a></span><span> when the model count changes</span></li>
               <li>and many more!</li>
             </ul>

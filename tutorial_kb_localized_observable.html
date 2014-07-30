@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.0.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.19.1.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -84,8 +84,8 @@
         <section>
           <h1>Tutorial: kb.LocalizedObservable</h1>
           <p><a href="index.html">Knockback.js</a><span> uses a convention of storing your custom Locale Manager in 'kb.locale_manager' so that it can be globally used to localize aspects of your application (please see the</span><a href="tutorial_locale_manager.html"> Custom Locale Manager</a><span> tutorial for usage examples).</span></p>
-          <p><span>The</span><a href="doc/classes/kb/LocalizedObservable.html"> kb.LocalizedObservable</a><span> watches the 'kb.locale_manager' instance for changes and updates itself accordingly.</span></p>
-          <p><span><span class='label label-important'>warning</span> This is one of the few cases where you are likely to derive from a Knockback class and where you need to know about <span class='label label-warning'>observable returned</span>. Basically, when you derive your own type of kb.LocalizedObservable, you need to return the wrapped observable rather than the instance itself from the constructor using</span><a href="doc/classes/kb/utils.html#wrapped_observable">kb.utils.wrappedObservable</a></p>
+          <p><span>The</span><a href="doc/class/kb/LocalizedObservable.html"> kb.LocalizedObservable</a><span> watches the 'kb.locale_manager' instance for changes and updates itself accordingly.</span></p>
+          <p><span><span class='label label-important'>warning</span> This is one of the few cases where you are likely to derive from a Knockback class and where you need to know about <span class='label label-warning'>observable returned</span>. Basically, when you derive your own type of kb.LocalizedObservable, you need to return the wrapped observable rather than the instance itself from the constructor using</span><a href="doc/class/kb/utils.html#wrapped_observable">kb.utils.wrappedObservable</a></p>
           <p><span>We'll use the following Locale Manager for these examples:</span>
             <pre data-for="cs">class LocaleManager
   constructor: (locale_identifier, @translations_by_locale) -&gt;

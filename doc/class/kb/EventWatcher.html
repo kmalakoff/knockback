@@ -116,6 +116,8 @@
     <span class='bound note title'>Bound</span>
     <span class='note private title'>Private</span>
     <span class='desc'>
+      NOTE: this is called by registerCallbacks so the model could already be bound and we just want to bind the new info NOTE: this is called by emitter so it may be used to clear a previous emitter without triggering an intermediate change
+
     </span>
   </li>
   <li>
@@ -128,6 +130,18 @@
     </span>
     <span class='bound note title'>Bound</span>
     <span class='note private title'>Private</span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_unbindCallbacks-dynamic'>
+        #
+(void)
+<b>_unbindCallbacks</b><span>(event_name, callbacks, skip_emitter)</span>
+      </a>
+    </span>
+    <span class='bound note title'>Bound</span>
     <span class='desc'>
     </span>
   </li>
@@ -433,7 +447,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
       <span class='note private'>Private</span>
       <br>
     </p>
-    <div class='tags'>
+    <div class='docstring'>
+  <p>NOTE: this is called by registerCallbacks so the model could already be bound and we just want to bind the new info
+NOTE: this is called by emitter so it may be used to clear a previous emitter without triggering an intermediate change</p>
+</div>
+<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -448,10 +466,20 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     <div class='tags'>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='_unbindCallbacks-dynamic'>
+      #
+(void)
+<b>_unbindCallbacks</b><span>(event_name, callbacks, skip_emitter)</span>
+      <span class='bound note'>Bound</span>
+      <br>
+    </p>
+    
+  </div>
 </div>
     </div>
     <div id='footer'>
-  July 20, 14 03:24:13 by
+  July 29, 14 20:37:14 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
