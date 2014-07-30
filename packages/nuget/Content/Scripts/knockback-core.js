@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, kb, ko, _, _ref,
+	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KEYS_PUBLISH, kb, ko, _, _ref,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -102,6 +102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	COMPARE_ASCENDING = -1;
 
 	COMPARE_DESCENDING = 1;
+
+	KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'];
 
 	kb.compare = function(value_a, value_b) {
 	  if (_.isString(value_a)) {
@@ -163,7 +165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (create_options.creator) {
 	          _this.models_only = create_options.creator.models_only;
 	        }
-	        kb.publishMethods(observable, _this, ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels']);
+	        kb.publishMethods(observable, _this, KEYS_PUBLISH);
 	        _this._collection = ko.observable(collection);
 	        observable.collection = _this.collection = ko.computed({
 	          read: function() {
@@ -559,11 +561,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = function(options) {
-	  var orm, _results;
+	  var orm;
 	  if (options == null) {
 	    options = {};
 	  }
-	  _results = [];
 	  for (key in options) {
 	    value = options[key];
 	    switch (key) {
@@ -580,14 +581,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	          kb.orm = orm;
 	          continue;
 	        } else {
-	          _results.push(kb.orm = value);
+	          kb.orm = value;
 	        }
 	        break;
 	      default:
-	        _results.push(kb[key] = value);
+	        kb[key] = value;
 	    }
 	  }
-	  return _results;
 	};
 
 
@@ -1177,21 +1177,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    obj.__kb_released = true;
 	    if (ko.isObservable(obj) && _.isArray(array = kb.peek(obj))) {
 	      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
-	        if (obj.destroy) {
-	          obj.destroy();
-	        } else if (obj.dispose) {
-	          obj.dispose();
-	        }
-	      } else if (array.length) {
-	        for (index in array) {
-	          value = array[index];
-	          if (kb.isReleaseable(value)) {
-	            array[index] = null;
-	            kb.release(value);
-	          }
+	        return obj.destroy();
+	      }
+	      for (index in array) {
+	        value = array[index];
+	        if (kb.isReleaseable(value)) {
+	          array[index] = null;
+	          kb.release(value);
 	        }
 	      }
-	    } else if (typeof obj.release === 'function') {
+	      if (typeof obj.dispose === 'function') {
+	        obj.dispose();
+	      }
+	      return;
+	    }
+	    if (typeof obj.release === 'function') {
 	      obj.release();
 	    } else if (typeof obj.destroy === 'function') {
 	      obj.destroy();
@@ -1206,7 +1206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var key, value;
 	    for (key in obj) {
 	      value = obj[key];
-	      if ((key !== '__kb') && kb.isReleaseable(value)) {
+	      if (key !== '__kb' && kb.isReleaseable(value)) {
 	        obj[key] = null;
 	        kb.release(value);
 	      }
@@ -1393,92 +1393,72 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var TypedValue, kb, ko, _, _ref;
+	var KEYS_INFO, KEYS_PUBLISH, TypedValue, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	TypedValue = __webpack_require__(11);
 
+	KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
+
+	KEYS_INFO = ['args', 'read', 'write'];
+
 	kb.Observable = (function() {
-	  function Observable(model, options, _vm) {
+	  function Observable(model, key_or_info, options, _vm) {
 	    this._vm = _vm != null ? _vm : {};
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var create_options, event_watcher, observable;
-	        options || kb._throwMissing(_this, 'options');
-	        if (_.isString(options) || ko.isObservable(options)) {
-	          create_options = {
-	            key: options
-	          };
-	        } else {
-	          create_options = kb.utils.collapseOptions(options);
+	        var create_options, event_watcher, key, observable, _i, _len;
+	        key_or_info || kb._throwMissing(_this, 'key_or_info');
+	        _this.key = key_or_info.key || key_or_info;
+	        for (_i = 0, _len = KEYS_INFO.length; _i < _len; _i++) {
+	          key = KEYS_INFO[_i];
+	          if (key_or_info[key]) {
+	            _this[key] = key_or_info[key];
+	          }
 	        }
-	        _this.key = create_options.key;
-	        delete create_options.key;
-	        _this.key || kb._throwMissing(_this, 'key');
-	        !create_options.args || (_this.args = create_options.args, delete create_options.args);
-	        !create_options.read || (_this.read = create_options.read, delete create_options.read);
-	        !create_options.write || (_this.write = create_options.write, delete create_options.write);
+	        create_options = kb.utils.collapseOptions(options);
 	        event_watcher = create_options.event_watcher;
 	        delete create_options.event_watcher;
 	        _this._value = new TypedValue(create_options);
 	        _this._model = ko.observable();
-	        event_watcher = kb.EventWatcher.useOptionsOrCreate({
-	          event_watcher: event_watcher
-	        }, model || null, _this, {
-	          emitter: _this._model,
-	          update: (function() {
-	            return kb.ignore(function() {
-	              return _this._update();
-	            });
-	          }),
-	          key: _this.key,
-	          path: create_options.path
-	        });
-	        _this._model(event_watcher.ee);
-	        _this._wait = ko.observable(true);
 	        observable = kb.utils.wrappedObservable(_this, ko.computed({
 	          read: function() {
-	            if ((typeof _this._wait === "function" ? _this._wait() : void 0) || kb.wasReleased(_this)) {
-	              return;
+	            var arg, args, _j, _len1, _model, _ref1, _ref2;
+	            _model = _this._model();
+	            _ref1 = args = [_this.key].concat(_this.args || []);
+	            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+	              arg = _ref1[_j];
+	              ko.utils.unwrapObservable(arg);
 	            }
-	            _this._update();
-	            if (kb.wasReleased(_this)) {
-	              return;
+	            if ((_ref2 = kb.utils.wrappedEventWatcher(_this)) != null) {
+	              _ref2.emitter(_model || null);
+	            }
+	            if (_this.read) {
+	              _this.update(_this.read.apply(_this._vm, args));
+	            } else if (!_.isUndefined(_model)) {
+	              kb.ignore(function() {
+	                return _this.update(kb.getValue(_model, kb.peek(_this.key), _this.args));
+	              });
 	            }
 	            return _this._value.value();
 	          },
 	          write: function(new_value) {
 	            return kb.ignore(function() {
 	              var unwrapped_new_value, _model;
-	              if (kb.wasReleased(_this)) {
-	                return;
-	              }
 	              unwrapped_new_value = kb.utils.unwrapModels(new_value);
+	              _model = kb.peek(_this._model);
 	              if (_this.write) {
 	                _this.write.call(_this._vm, unwrapped_new_value);
-	                new_value = kb.getValue(kb.peek(_this._model), kb.peek(_this.key), _this.args);
-	              } else if (_model = kb.peek(_this._model)) {
+	                new_value = kb.getValue(_model, kb.peek(_this.key), _this.args);
+	              } else if (_model) {
 	                kb.setValue(_model, kb.peek(_this.key), unwrapped_new_value);
 	              }
-	              return _this._value.update(new_value);
+	              return _this.update(new_value);
 	            });
 	          },
 	          owner: _this._vm
 	        }));
-	        observable.model = _this.model = ko.computed({
-	          read: function() {
-	            return ko.utils.unwrapObservable(_this._model);
-	          },
-	          write: function(new_model) {
-	            return kb.ignore(function() {
-	              if (kb.wasReleased(_this)) {
-	                return;
-	              }
-	              return event_watcher.emitter(new_model);
-	            });
-	          }
-	        });
 	        observable.__kb_is_o = true;
 	        create_options.store = kb.utils.wrappedStore(observable, create_options.store);
 	        create_options.path = kb.utils.pathJoin(create_options.path, _this.key);
@@ -1489,16 +1469,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	          create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
 	        }
 	        delete create_options.factories;
-	        _this._wait(false);
-	        delete _this._wait;
-	        kb.publishMethods(observable, _this, ['value', 'valueType', 'destroy']);
-	        if (kb.LocalizedObservable && create_options.localizer) {
-	          observable = new create_options.localizer(observable);
-	          delete create_options.localizer;
+	        kb.publishMethods(observable, _this, KEYS_PUBLISH);
+	        observable.model = _this.model = ko.computed({
+	          read: function() {
+	            return ko.utils.unwrapObservable(_this._model);
+	          },
+	          write: function(new_model) {
+	            return kb.ignore(function() {
+	              var new_value;
+	              if (_this.__kb_released || (kb.peek(_this._model) === new_model)) {
+	                return;
+	              }
+	              new_value = kb.getValue(new_model, kb.peek(_this.key), _this.args);
+	              _this._model(new_model);
+	              if (!new_model) {
+	                return _this.update(null);
+	              } else if (!_.isUndefined(new_value)) {
+	                return _this.update(new_value);
+	              }
+	            });
+	          }
+	        });
+	        kb.EventWatcher.useOptionsOrCreate({
+	          event_watcher: event_watcher
+	        }, model || null, _this, {
+	          emitter: _this.model,
+	          update: (function() {
+	            return kb.ignore(function() {
+	              return _this.update();
+	            });
+	          }),
+	          key: _this.key,
+	          path: create_options.path
+	        });
+	        _this._value.rawValue() || _this._value.update();
+	        if (kb.LocalizedObservable && key_or_info.localizer) {
+	          observable = new key_or_info.localizer(observable);
 	        }
-	        if (kb.DefaultObservable && create_options.hasOwnProperty('default')) {
-	          observable = kb.defaultObservable(observable, create_options["default"]);
-	          delete create_options["default"];
+	        if (kb.DefaultObservable && key_or_info.hasOwnProperty('default')) {
+	          observable = kb.defaultObservable(observable, key_or_info["default"]);
 	        }
 	        return observable;
 	      };
@@ -1507,8 +1516,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Observable.prototype.destroy = function() {
 	    var observable;
-	    this.__kb_released = true;
 	    observable = kb.utils.wrappedObservable(this);
+	    this.__kb_released = true;
 	    this._value.destroy();
 	    this._value = null;
 	    this.model.dispose();
@@ -1517,36 +1526,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Observable.prototype.value = function() {
-	    var _ref1;
-	    return (_ref1 = this._value) != null ? _ref1.peek() : void 0;
+	    return this._value.rawValue();
 	  };
 
 	  Observable.prototype.valueType = function() {
-	    var _ref1;
-	    return (_ref1 = this._value) != null ? _ref1.valueType(kb.peek(this._model), kb.peek(this.key)) : void 0;
+	    return this._value.valueType(kb.peek(this._model), kb.peek(this.key));
 	  };
 
-	  Observable.prototype._update = function() {
-	    var arg, args, _i, _len, _model, _ref1;
-	    _model = this._model();
-	    _ref1 = args = [this.key].concat(this.args || []);
-	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	      arg = _ref1[_i];
-	      ko.utils.unwrapObservable(arg);
+	  Observable.prototype.update = function(new_value) {
+	    if (this.__kb_released) {
+	      return;
 	    }
-	    return kb.ignore((function(_this) {
-	      return function() {
-	        return _this._value.update(_this.read ? _this.read.apply(_this._vm, args) : kb.getValue(_model, kb.peek(_this.key), _this.args));
-	      };
-	    })(this));
+	    if (!arguments.length) {
+	      new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
+	    }
+	    return this._value.update(new_value);
 	  };
 
 	  return Observable;
 
 	})();
 
-	kb.observable = function(model, options, view_model) {
-	  return new kb.Observable(model, options, view_model);
+	kb.observable = function(model, key, options, view_model) {
+	  return new kb.Observable(model, key, options, view_model);
 	};
 
 
@@ -1909,12 +1911,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ko.utils.unwrapObservable(this._vo());
 	  };
 
-	  TypedValue.prototype.peek = function() {
+	  TypedValue.prototype.rawValue = function() {
 	    return this.__kb_value;
 	  };
 
 	  TypedValue.prototype.valueType = function(model, key) {
-	    this.value_type || this._updateValueObservable(kb.getValue(model, key));
+	    var new_value;
+	    new_value = kb.getValue(model, key);
+	    this.value_type || this._updateValueObservable(new_value);
 	    return this.value_type;
 	  };
 
@@ -1930,26 +1934,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.value_type = void 0;
 	    }
 	    value = this.__kb_value;
-	    if (this.value_type === kb.TYPE_COLLECTION) {
-	      if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) {
-	        return value(new_value);
-	      }
-	      if (kb.peek(value.collection) !== new_value) {
-	        return value.collection(new_value);
-	      }
-	    } else if (_.isUndefined(this.value_type) || this.value_type !== new_type) {
-	      return this._updateValueObservable(new_value);
-	    } else if (this.value_type === kb.TYPE_MODEL) {
-	      if (_.isFunction(value.model)) {
-	        if (kb.peek(value.model) !== new_value) {
-	          return value.model(new_value);
+	    switch (this.value_type) {
+	      case kb.TYPE_COLLECTION:
+	        if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) {
+	          return value(new_value);
 	        }
-	      } else if (kb.utils.wrappedObject(value) !== new_value) {
-	        return this._updateValueObservable(new_value);
+	        if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
+	          if (_.isFunction(value.collection)) {
+	            if (kb.peek(value.collection) !== new_value) {
+	              value.collection(new_value);
+	            }
+	            return;
+	          }
+	        }
+	        break;
+	      case kb.TYPE_MODEL:
+	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
+	          if (_.isFunction(value.model)) {
+	            if (kb.peek(value.model) !== new_value) {
+	              value.model(new_value);
+	            }
+	          } else {
+	            if (kb.utils.wrappedObject(value) !== new_value) {
+	              this._updateValueObservable(new_value);
+	            }
+	          }
+	          return;
+	        }
+	    }
+	    if (this.value_type === new_type && !_.isUndefined(this.value_type)) {
+	      if (kb.peek(value) !== new_value) {
+	        return value(new_value);
 	      }
 	    } else {
-	      if (value() !== new_value) {
-	        return value(new_value);
+	      if (kb.peek(value) !== new_value) {
+	        return this._updateValueObservable(new_value);
 	      }
 	    }
 	  };
@@ -2304,55 +2323,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, updateObservables, _, _ref;
+	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	updateObservables = function(model) {
-	  var keys, missing, rel_keys, _ref1;
-	  if (kb.wasReleased(this) || !model) {
+	createOptions = (function(_this) {
+	  return function(vm) {
+	    return {
+	      store: kb.utils.wrappedStore(vm),
+	      factory: kb.utils.wrappedFactory(vm),
+	      path: vm.__kb.path,
+	      event_watcher: kb.utils.wrappedEventWatcher(vm)
+	    };
+	  };
+	})(this);
+
+	assignViewModelKey = function(vm, key) {
+	  var vm_key;
+	  vm_key = vm.__kb.internals && _.contains(vm.__kb.internals, key) ? "_" + key : key;
+	  if (vm.__kb.view_model.hasOwnProperty(vm_key)) {
 	    return;
 	  }
-	  keys = _.keys(model.attributes);
-	  if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
-	    keys = _.union(keys, rel_keys);
+	  vm.__kb.view_model[vm_key] = null;
+	  return vm_key;
+	};
+
+	createObservable = function(vm, model, key, create_options) {
+	  var vm_key;
+	  if (vm.__kb.excludes && _.contains(vm.__kb.excludes, key)) {
+	    return;
 	  }
-	  if (this.__kb.excludes) {
-	    keys = _.difference(keys, this.__kb.excludes);
+	  if (vm.__kb.statics && _.contains(vm.__kb.statics, key)) {
+	    return;
 	  }
-	  if (this.__kb.statics) {
-	    keys = _.difference(keys, this.__kb.statics);
+	  if (!(vm_key = assignViewModelKey(vm, key))) {
+	    return;
 	  }
-	  missing = _.difference(keys, _.keys(this.__kb.model_keys));
-	  if (missing.length) {
-	    return this.createObservables(model, missing);
+	  return vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm);
+	};
+
+	createStaticObservables = function(vm, model) {
+	  var key, vm_key, _i, _len, _ref1;
+	  _ref1 = vm.__kb.statics;
+	  for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	    key = _ref1[_i];
+	    if (vm_key = assignViewModelKey(vm, key)) {
+	      if (model.has(vm_key)) {
+	        vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key);
+	      } else if (vm.__kb.static_defaults && vm_key in vm.__kb.static_defaults) {
+	        vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key];
+	      } else {
+	        delete vm.__kb.view_model[vm_key];
+	      }
+	    }
 	  }
 	};
+
+	KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'];
 
 	kb.ViewModel = (function() {
 	  ViewModel.extend = kb.extend;
 
 	  function ViewModel(model, options, view_model) {
+	    if (options == null) {
+	      options = {};
+	    }
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var event_watcher, key, keys, mapped_keys, mapping_info, rel_keys, vm_key, _i, _len, _model, _ref1, _ref2, _ref3;
+	        var create_options, event_watcher, key, _i, _len, _model;
 	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
-	        options || (options = {});
-	        view_model || (view_model = {});
-	        if (_.isArray(options)) {
-	          options = {
-	            keys: options
-	          };
-	        } else {
-	          options = kb.utils.collapseOptions(options);
-	        }
+	        options = _.isArray(options) ? {
+	          keys: options
+	        } : kb.utils.collapseOptions(options);
 	        _this.__kb || (_this.__kb = {});
-	        _this.__kb.vm_keys = {};
-	        _this.__kb.model_keys = {};
-	        _this.__kb.view_model = _.isUndefined(view_model) ? _this : view_model;
-	        _ref1 = ['internals', 'excludes', 'statics', 'static_defaults'];
-	        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	          key = _ref1[_i];
+	        _this.__kb.view_model = view_model || _this;
+	        for (_i = 0, _len = KEYS_OPTIONS.length; _i < _len; _i++) {
+	          key = KEYS_OPTIONS[_i];
 	          if (options.hasOwnProperty(key)) {
 	            _this.__kb[key] = options[key];
 	          }
@@ -2367,18 +2413,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	          },
 	          write: function(new_model) {
 	            return kb.ignore(function() {
-	              if (kb.wasReleased(_this)) {
+	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
-	              if (!event_watcher) {
+	              if (_this.__kb_null) {
+	                !new_model || kb._throwUnexpected(_this, 'model set on shared null');
 	                return;
 	              }
 	              event_watcher.emitter(new_model);
 	              kb.utils.wrappedObject(_this, event_watcher.ee);
 	              _model(event_watcher.ee);
-	              if (model = event_watcher.ee) {
-	                return updateObservables.call(_this, model);
-	              }
+	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);
 	            });
 	          }
 	        });
@@ -2386,50 +2431,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	          emitter: _this._model,
 	          update: (function() {
 	            return kb.ignore(function() {
-	              return updateObservables.call(_this, event_watcher != null ? event_watcher.ee : void 0);
+	              return !(event_watcher != null ? event_watcher.ee : void 0) || _this.createObservables(event_watcher != null ? event_watcher.ee : void 0);
 	            });
 	          })
 	        }));
 	        kb.utils.wrappedObject(_this, model = event_watcher.ee);
 	        _model(event_watcher.ee);
-	        keys = options.requires;
-	        if (_this.__kb.internals) {
-	          keys = _.union(keys || [], _this.__kb.internals);
-	        }
-	        if (model && (rel_keys = (_ref2 = kb.orm) != null ? typeof _ref2.keys === "function" ? _ref2.keys(model) : void 0 : void 0)) {
-	          keys = _.union(keys || [], rel_keys);
-	        }
-	        if (options.keys) {
-	          if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-	            mapped_keys = {};
-	            _ref3 = options.keys;
-	            for (vm_key in _ref3) {
-	              mapping_info = _ref3[vm_key];
-	              mapped_keys[_.isString(mapping_info) ? mapping_info : (mapping_info.key ? mapping_info.key : vm_key)] = true;
-	            }
-	            _this.__kb.keys = _.keys(mapped_keys);
-	          } else {
-	            _this.__kb.keys = options.keys;
-	            keys = keys ? _.union(keys, _this.__kb.keys) : _.clone(_this.__kb.keys);
-	          }
-	        } else if (model) {
-	          keys = keys ? _.union(keys, _.keys(model.attributes)) : _.keys(model.attributes);
-	        }
-	        if (keys && _this.__kb.excludes) {
-	          keys = _.difference(keys, _this.__kb.excludes);
-	        }
-	        if (keys && _this.__kb.statics) {
-	          keys = _.difference(keys, _this.__kb.statics);
-	        }
-	        if (_.isObject(options.keys) && !_.isArray(options.keys)) {
-	          _this.mapObservables(model, options.keys);
-	        }
-	        if (_.isObject(options.requires) && !_.isArray(options.requires)) {
-	          _this.mapObservables(model, options.requires);
-	        }
-	        !options.mappings || _this.mapObservables(model, options.mappings);
-	        !keys || _this.createObservables(model, keys);
-	        !_this.__kb.statics || _this.createObservables(model, _this.__kb.statics, true);
+	        create_options = createOptions(_this);
+	        !options.requires || _this.createObservables(model, options.requires, create_options);
+	        !_this.__kb.internals || _this.createObservables(model, _this.__kb.internals, create_options);
+	        !options.mappings || _this.createObservables(model, options.mappings, create_options);
+	        !_this.__kb.statics || createStaticObservables(_this, model);
+	        _this.createObservables(model, _this.__kb.keys, create_options);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };
@@ -2457,57 +2470,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 
-	  ViewModel.prototype.createObservables = function(model, keys, is_static) {
-	    var create_options, key, static_defaults, vm_key, _i, _len;
-	    if (is_static) {
-	      static_defaults = this.__kb.static_defaults || {};
-	    } else {
-	      create_options = {
-	        store: kb.utils.wrappedStore(this),
-	        factory: kb.utils.wrappedFactory(this),
-	        path: this.__kb.path,
-	        event_watcher: kb.utils.wrappedEventWatcher(this)
-	      };
-	    }
-	    for (_i = 0, _len = keys.length; _i < _len; _i++) {
-	      key = keys[_i];
-	      vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
-	      if (this.__kb.view_model[vm_key]) {
-	        continue;
+	  ViewModel.prototype.createObservables = function(model, keys, create_options) {
+	    var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
+	    create_options || (create_options = createOptions(this));
+	    if (!keys) {
+	      if (this.__kb.keys || !model) {
+	        return;
 	      }
-	      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[key] = true;
-	      if (is_static) {
-	        if (model.has(vm_key)) {
-	          this[vm_key] = this.__kb.view_model[vm_key] = model.get(vm_key);
-	        } else if (vm_key in static_defaults) {
-	          this[vm_key] = this.__kb.view_model[vm_key] = static_defaults[vm_key];
+	      for (key in model.attributes) {
+	        createObservable(this, model, key, create_options);
+	      }
+	      if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
+	        for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
+	          key = rel_keys[_i];
+	          createObservable(this, model, key, create_options);
 	        }
-	      } else {
-	        create_options.key = key;
-	        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, create_options, this);
 	      }
-	    }
-	  };
-
-	  ViewModel.prototype.mapObservables = function(model, mappings) {
-	    var create_options, mapping_info, vm_key;
-	    create_options = {
-	      store: kb.utils.wrappedStore(this),
-	      factory: kb.utils.wrappedFactory(this),
-	      path: this.__kb.path,
-	      event_watcher: kb.utils.wrappedEventWatcher(this)
-	    };
-	    for (vm_key in mappings) {
-	      mapping_info = mappings[vm_key];
-	      if (this.__kb.view_model[vm_key]) {
-	        continue;
+	    } else if (_.isArray(keys)) {
+	      for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
+	        key = keys[_j];
+	        createObservable(this, model, key, create_options);
 	      }
-	      mapping_info = _.isString(mapping_info) ? {
-	        key: mapping_info
-	      } : _.clone(mapping_info);
-	      mapping_info.key || (mapping_info.key = vm_key);
-	      this.__kb.vm_keys[vm_key] = this.__kb.model_keys[mapping_info.key] = true;
-	      this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, _.defaults(mapping_info, create_options), this);
+	    } else {
+	      for (key in keys) {
+	        mapping_info = keys[key];
+	        if (!(vm_key = assignViewModelKey(this, key))) {
+	          continue;
+	        }
+	        if (!_.isString(mapping_info)) {
+	          mapping_info.key || (mapping_info.key = vm_key);
+	        }
+	        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
+	      }
 	    }
 	  };
 
