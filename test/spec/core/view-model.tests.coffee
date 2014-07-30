@@ -920,6 +920,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
+  # https://github.com/kmalakoff/knockback/issues/82
   it '24. Issue 82 - createObservables', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -935,10 +936,9 @@ describe 'view-model @quick @view-model', ->
       subVm.cid = ko.computed -> return model.cid
       return subVm;
 
-    vm = new kb.ViewModel(parent, {excludes : ['children']})
-
-    (share_options = vm.shareOptions()).factory.addPathMapping('children.models', subFactory);
-    vm.children = kb.observable(parent, 'children', share_options)
+    vm = new kb.ViewModel(parent, {excludes : ['children'], factories: {'children.models': subFactory}})
+    assert.ok(_.isUndefined(vm.children))
+    vm.children = kb.observable(parent, 'children', vm.shareOptions())
     assert.ok(vm.children()[0].cid())
 
     kb.release(vm)
