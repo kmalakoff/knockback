@@ -37,21 +37,6 @@ createStaticObservables = (vm, model) ->
       delete vm.__kb.view_model[vm_key]
   return
 
-# @nodoc
-updateObservables = (vm, model, keys, create_options) ->
-  create_options or= createOptions(vm)
-  if not keys
-    return if vm.__kb.keys or not model # only use the keys provided
-    createObservable(vm, model, key, create_options) for key of model.attributes
-    (createObservable(vm, model, key, create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
-  else if _.isArray(keys)
-    createObservable(vm, model, key, create_options) for key in keys
-  else
-    for key, mapping_info of keys when vm_key = assignViewModelKey(vm, key)
-      mapping_info.key or= vm_key unless _.isString(mapping_info)
-      vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, vm)
-  return
-
 KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults']
 
 # Base class for ViewModels for Models.
@@ -152,18 +137,18 @@ class kb.ViewModel
 
         event_watcher.emitter(new_model)
         kb.utils.wrappedObject(@, event_watcher.ee); _model(event_watcher.ee)
-        not event_watcher.ee or updateObservables(@, event_watcher.ee)
+        not event_watcher.ee or @createObservables(event_watcher.ee)
     }
-    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @_model, update: (=> kb.ignore => not event_watcher?.ee or updateObservables(@, event_watcher?.ee))}))
+    event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @_model, update: (=> kb.ignore => not event_watcher?.ee or @createObservables(event_watcher?.ee))}))
     kb.utils.wrappedObject(@, model = event_watcher.ee); _model(event_watcher.ee)
 
     # update the observables
     create_options = createOptions(@)
-    not options.requires or updateObservables(@, model, options.requires, create_options)
-    not @__kb.internals or updateObservables(@, model, @__kb.internals, create_options)
-    not options.mappings or updateObservables(@, model, options.mappings, create_options)
+    not options.requires or @createObservables(model, options.requires, create_options)
+    not @__kb.internals or @createObservables(model, @__kb.internals, create_options)
+    not options.mappings or @createObservables(model, options.mappings, create_options)
     not @__kb.statics or createStaticObservables(@, model)
-    updateObservables(@, model, @__kb.keys, create_options)
+    @createObservables(model, @__kb.keys, create_options)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
     return @
@@ -181,6 +166,21 @@ class kb.ViewModel
 
   # Get the options for a new view model that can be used for sharing view models.
   shareOptions: -> {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
+
+  # create observables manually
+  createObservables: (model, keys, create_options) ->
+    create_options or= createOptions(@)
+    if not keys
+      return if @__kb.keys or not model # only use the keys provided
+      createObservable(@, model, key, create_options) for key of model.attributes
+      (createObservable(@, model, key, create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
+    else if _.isArray(keys)
+      createObservable(@, model, key, create_options) for key in keys
+    else
+      for key, mapping_info of keys when vm_key = assignViewModelKey(@, key)
+        mapping_info.key or= vm_key unless _.isString(mapping_info)
+        @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, @)
+    return
 
 # Factory function to create a kb.ViewModel.
 kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)

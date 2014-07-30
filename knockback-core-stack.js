@@ -2323,7 +2323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, updateObservables, _, _ref;
+	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
@@ -2379,41 +2379,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
-	updateObservables = function(vm, model, keys, create_options) {
-	  var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
-	  create_options || (create_options = createOptions(vm));
-	  if (!keys) {
-	    if (vm.__kb.keys || !model) {
-	      return;
-	    }
-	    for (key in model.attributes) {
-	      createObservable(vm, model, key, create_options);
-	    }
-	    if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
-	      for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
-	        key = rel_keys[_i];
-	        createObservable(vm, model, key, create_options);
-	      }
-	    }
-	  } else if (_.isArray(keys)) {
-	    for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
-	      key = keys[_j];
-	      createObservable(vm, model, key, create_options);
-	    }
-	  } else {
-	    for (key in keys) {
-	      mapping_info = keys[key];
-	      if (!(vm_key = assignViewModelKey(vm, key))) {
-	        continue;
-	      }
-	      if (!_.isString(mapping_info)) {
-	        mapping_info.key || (mapping_info.key = vm_key);
-	      }
-	      vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, vm);
-	    }
-	  }
-	};
-
 	KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'];
 
 	kb.ViewModel = (function() {
@@ -2458,7 +2423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              event_watcher.emitter(new_model);
 	              kb.utils.wrappedObject(_this, event_watcher.ee);
 	              _model(event_watcher.ee);
-	              return !event_watcher.ee || updateObservables(_this, event_watcher.ee);
+	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);
 	            });
 	          }
 	        });
@@ -2466,18 +2431,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	          emitter: _this._model,
 	          update: (function() {
 	            return kb.ignore(function() {
-	              return !(event_watcher != null ? event_watcher.ee : void 0) || updateObservables(_this, event_watcher != null ? event_watcher.ee : void 0);
+	              return !(event_watcher != null ? event_watcher.ee : void 0) || _this.createObservables(event_watcher != null ? event_watcher.ee : void 0);
 	            });
 	          })
 	        }));
 	        kb.utils.wrappedObject(_this, model = event_watcher.ee);
 	        _model(event_watcher.ee);
 	        create_options = createOptions(_this);
-	        !options.requires || updateObservables(_this, model, options.requires, create_options);
-	        !_this.__kb.internals || updateObservables(_this, model, _this.__kb.internals, create_options);
-	        !options.mappings || updateObservables(_this, model, options.mappings, create_options);
+	        !options.requires || _this.createObservables(model, options.requires, create_options);
+	        !_this.__kb.internals || _this.createObservables(model, _this.__kb.internals, create_options);
+	        !options.mappings || _this.createObservables(model, options.mappings, create_options);
 	        !_this.__kb.statics || createStaticObservables(_this, model);
-	        updateObservables(_this, model, _this.__kb.keys, create_options);
+	        _this.createObservables(model, _this.__kb.keys, create_options);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };
@@ -2503,6 +2468,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	      store: kb.utils.wrappedStore(this),
 	      factory: kb.utils.wrappedFactory(this)
 	    };
+	  };
+
+	  ViewModel.prototype.createObservables = function(model, keys, create_options) {
+	    var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
+	    create_options || (create_options = createOptions(this));
+	    if (!keys) {
+	      if (this.__kb.keys || !model) {
+	        return;
+	      }
+	      for (key in model.attributes) {
+	        createObservable(this, model, key, create_options);
+	      }
+	      if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
+	        for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
+	          key = rel_keys[_i];
+	          createObservable(this, model, key, create_options);
+	        }
+	      }
+	    } else if (_.isArray(keys)) {
+	      for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
+	        key = keys[_j];
+	        createObservable(this, model, key, create_options);
+	      }
+	    } else {
+	      for (key in keys) {
+	        mapping_info = keys[key];
+	        if (!(vm_key = assignViewModelKey(this, key))) {
+	          continue;
+	        }
+	        if (!_.isString(mapping_info)) {
+	          mapping_info.key || (mapping_info.key = vm_key);
+	        }
+	        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
+	      }
+	    }
 	  };
 
 	  return ViewModel;
