@@ -69,3 +69,26 @@ describe 'money-patches @quick @monkey', ->
     delete ko.extenders.lazyArray
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/127
+  it 'extend monkey patch does not cause arrays to destroy', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class ViewModel
+      constructor: ->
+        @list1 = ko.observableArray(['sds1', 'sdsd1'])
+        @list2 = ko.observableArray(['sds2', 'sdsd2'])
+        @totalNumberOfItems = ko.computed => @list1().length + @list2().length
+
+    view_model = new ViewModel()
+    assert.deepEqual(view_model.list1(), ['sds1', 'sdsd1'])
+    assert.deepEqual(view_model.list2(), ['sds2', 'sdsd2'])
+    assert.equal view_model.totalNumberOfItems(), 4
+
+    assert.doesNotThrow -> kb.release(view_model)
+    assert.ok !view_model.list1
+    assert.ok !view_model.list2
+    assert.ok !view_model.totalNumberOfItems
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

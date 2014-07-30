@@ -1191,6 +1191,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          kb.release(value);
 	        }
 	      }
+	      if (typeof obj.dispose === 'function') {
+	        obj.dispose();
+	      }
+	      return;
 	    }
 	    if (typeof obj.release === 'function') {
 	      obj.release();
