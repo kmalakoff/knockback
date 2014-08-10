@@ -39,7 +39,7 @@ module.exports = class kb.Store
 
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
-  destroy: @::clear
+  destroy: -> @clear()
 
   # Manually clear the store
   clear: ->
@@ -86,6 +86,7 @@ module.exports = class kb.Store
     creator = creator.create if creator.create
     records = @observable_records[creator] or= []
     record = {obj: obj, observable: observable}
+
     if (index = @findIndex(obj, creator)) < 0 then records.push(record) else records[index] = record
     return observable
 
@@ -116,7 +117,9 @@ module.exports = class kb.Store
     return -1
 
   # @private
-  find: (obj, creator) -> return if (index = @findIndex(obj, creator)) < 0 then null else @observable_records[creator][index].observable
+  find: (obj, creator) ->
+    creator = creator.create if creator.create
+    return if (index = @findIndex(obj, creator)) < 0 then null else @observable_records[creator][index].observable
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
   #
