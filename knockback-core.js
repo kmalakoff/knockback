@@ -1719,42 +1719,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  function Store() {
-	    this.observable_records = [];
+	    this.observable_records = {};
 	    this.replaced_observables = [];
 	  }
 
-	  Store.prototype.destroy = function() {
-	    return this.clear();
-	  };
+	  Store.prototype.destroy = Store.prototype.clear;
 
 	  Store.prototype.clear = function() {
-	    var observable_records, record, replaced_observables, _i, _len, _ref1, _ref2;
-	    _ref1 = [this.observable_records, []], observable_records = _ref1[0], this.observable_records = _ref1[1];
-	    for (_i = 0, _len = observable_records.length; _i < _len; _i++) {
-	      record = observable_records[_i];
-	      kb.release(record.observable);
+	    var creator, observable_records, record, records, replaced_observables, _i, _len, _ref1, _ref2;
+	    _ref1 = [this.observable_records, {}], observable_records = _ref1[0], this.observable_records = _ref1[1];
+	    for (creator in observable_records) {
+	      records = observable_records[creator];
+	      for (_i = 0, _len = records.length; _i < _len; _i++) {
+	        record = records[_i];
+	        kb.release(record.observable);
+	      }
 	    }
 	    _ref2 = [this.replaced_observables, []], replaced_observables = _ref2[0], this.replaced_observables = _ref2[1];
 	    kb.release(replaced_observables);
 	  };
 
 	  Store.prototype.compact = function() {
-	    var record, removals, _i, _len, _ref1, _ref2;
-	    removals = [];
+	    var creator, record, records, removals, _i, _len, _ref1, _ref2;
 	    _ref1 = this.observable_records;
-	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	      record = _ref1[_i];
-	      if ((_ref2 = record.observable) != null ? _ref2.__kb_released : void 0) {
-	        removals.push(record);
+	    for (creator in _ref1) {
+	      records = _ref1[creator];
+	      removals = [];
+	      for (_i = 0, _len = records.length; _i < _len; _i++) {
+	        record = records[_i];
+	        if ((_ref2 = record.observable) != null ? _ref2.__kb_released : void 0) {
+	          removals.push(record);
+	        }
 	      }
-	    }
-	    if (removals.length) {
-	      this.observable_records = _.difference(this.observable_records, removals);
+	      if (removals.length) {
+	        this.observable_records[creator] = _.difference(records, removals);
+	      }
 	    }
 	  };
 
 	  Store.prototype.register = function(obj, observable, options) {
-	    var creator;
+	    var creator, index, record, records, _base;
 	    if (!observable) {
 	      return;
 	    }
@@ -1764,45 +1768,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	    kb.utils.wrappedObject(observable, obj);
 	    obj || (observable.__kb_null = true);
 	    creator = options.creator ? options.creator : (options.path && options.factory ? options.factory.creatorForPath(obj, options.path) : null);
-	    if (!creator) {
-	      creator = observable.constructor;
+	    creator || (creator = observable.constructor);
+	    if (creator.create) {
+	      creator = creator.create;
 	    }
-	    this.observable_records.push({
+	    records = (_base = this.observable_records)[creator] || (_base[creator] = []);
+	    record = {
 	      obj: obj,
-	      observable: observable,
-	      creator: creator
-	    });
+	      observable: observable
+	    };
+	    if ((index = this.findIndex(obj, creator)) < 0) {
+	      records.push(record);
+	    } else {
+	      records[index] = record;
+	    }
 	    return observable;
 	  };
 
 	  Store.prototype.findIndex = function(obj, creator) {
-	    var index, record, removals, _ref1;
-	    removals = [];
+	    var index, record, records, _ref1;
+	    creator = creator.create;
 	    if (!obj || (obj instanceof kb.Model)) {
-	      _ref1 = this.observable_records;
-	      for (index in _ref1) {
-	        record = _ref1[index];
+	      if (!((_ref1 = (records = this.observable_records[creator])) != null ? _ref1.length : void 0)) {
+	        return -1;
+	      }
+	      for (index in records) {
+	        record = records[index];
 	        if (!record.observable) {
-	          continue;
-	        }
-	        if (record.observable.__kb_released) {
-	          removals.push(record);
 	          continue;
 	        }
 	        if ((!obj && !record.observable.__kb_null) || (obj && (record.observable.__kb_null || (record.obj !== obj)))) {
 	          continue;
-	        } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
-	          if (removals.length) {
-	            this.observable_records = _.difference(this.observable_records, removals);
-	            return _.indexOf(this.observable_records, record);
-	          } else {
-	            return index;
-	          }
 	        }
+	        return index;
 	      }
-	    }
-	    if (removals.length) {
-	      this.observable_records = _.difference(this.observable_records, removals);
 	    }
 	    return -1;
 	  };
@@ -1812,20 +1811,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if ((index = this.findIndex(obj, creator)) < 0) {
 	      return null;
 	    } else {
-	      return this.observable_records[index].observable;
+	      return this.observable_records[creator][index].observable;
 	    }
-	  };
-
-	  Store.prototype.isRegistered = function(observable) {
-	    var record, _i, _len, _ref1;
-	    _ref1 = this.observable_records;
-	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-	      record = _ref1[_i];
-	      if (record.observable === observable) {
-	        return true;
-	      }
-	    }
-	    return false;
 	  };
 
 	  Store.prototype.findOrCreate = function(obj, options) {
@@ -1841,10 +1828,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else if (creator.models_only) {
 	      return obj;
 	    }
-	    if (creator) {
-	      observable = this.find(obj, creator);
-	    }
-	    if (observable) {
+	    if (creator && (observable = this.find(obj, creator))) {
 	      return observable;
 	    }
 	    observable = kb.ignore((function(_this) {
@@ -1857,9 +1841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return observable || ko.observable(null);
 	      };
 	    })(this));
-	    if (!ko.isObservable(observable)) {
-	      this.isRegistered(observable) || this.register(obj, observable, options);
-	    }
+	    this.register(obj, observable, options);
 	    return observable;
 	  };
 
@@ -1871,7 +1853,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        creator: creator
 	      });
 	    } else {
-	      record = this.observable_records[index];
+	      if (creator.create) {
+	        creator = creator.create;
+	      }
+	      record = this.observable_records[creator][index];
 	      (kb.utils.wrappedObject(record.observable) === obj) || kb._throwUnexpected(this, 'different object');
 	      if (record.observable !== observable) {
 	        (record.observable.constructor === observable.constructor) || kb._throwUnexpected(this, 'replacing different type');
