@@ -26,7 +26,8 @@ module.exports = class kb.Store
   #   kb.Store.useOptionsOrCreate(model, this, options);
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
-      options.store.register(obj, observable, options)
+      creator = options.factory.creatorForPath(obj, options.path) if (options.path and options.factory)
+      options.store.register(obj, observable, creator)
       return kb.utils.wrappedStore(observable, options.store)
     else
       kb.utils.wrappedStoreIsOwned(observable, true)
@@ -45,7 +46,7 @@ module.exports = class kb.Store
   clear: ->
     [observable_records, @observable_records] = [@observable_records, {}]
     for creator, records of observable_records
-      kb.release(record.observable) for record in records
+      kb.release(observable) for cid, observable of records
 
     [replaced_observables, @replaced_observables] = [@replaced_observables, []]
     kb.release(replaced_observables)
@@ -53,11 +54,8 @@ module.exports = class kb.Store
 
   # Manually compact the store by searching for released view models
   compact: ->
-    # TODO: optimize
     for creator, records of @observable_records
-      removals = []
-      removals.push(record) for record in records when record.observable?.__kb_released
-      @observable_records[creator] = _.difference(records, removals) if removals.length
+      delete records[cid] for cid, observable of records when observable.__kb_released
     return
 
   # Used to register a new view model with the store.
@@ -72,58 +70,18 @@ module.exports = class kb.Store
   #
   # @example register an observable with the store
   #   store.registerObservable(obj, observable, {creator: creator});
-  register: (obj, observable, options) ->
-    return unless observable # nothing to register
-    return if ko.isObservable(observable) or observable.__kb_is_co # only store view models not basic ko.observables nor kb.CollectionObservables
+  register: (obj, observable, creator) ->
+    return unless @canRegister(observable)
+    creator or= observable.constructor # default is to use the constructor
 
     # prepare the observable
     kb.utils.wrappedObject(observable, obj)
     obj or (observable.__kb_null = true) # register as shared null
 
-    # register the observable
-    creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)
-    creator or= observable.constructor # default is to use the constructor
-    creator = creator.create if creator.create
-
-    # console.log 'CID', obj?.cid, !!@observable_records[creator]
-    # console.log key for key of @observable_records
-
-    records = @observable_records[creator] or= []
-    record = {obj: obj, observable: observable}
-
-    if (index = @findIndex(obj, creator)) < 0 then records.push(record) else records[index] = record
+    (@observable_records[@createId(observable)] or= {})[@cid(obj)] = observable
     return observable
 
-  # @private
-  findIndex: (obj, creator) ->
-    creator = creator.create if creator.create
-
-    # removals = []
-    if not obj or (obj instanceof kb.Model)
-      return -1 unless (records = @observable_records[creator])?.length
-      for index, record of records
-        continue unless record.observable
-
-        # already released, release our references
-        # (removals.push(record); continue) if record.observable.__kb_released
-
-        # first pass doesn't match (both not null or both not same object)
-        continue if (not obj and not record.observable.__kb_null) or (obj and (record.observable.__kb_null or (record.obj isnt obj)))
-
-        # creator matches
-        return index # if ((record.creator is creator) or (record.creator.create and (record.creator.create is creator.create)))
-          # if removals.length
-          #   @observable_records = _.difference(@observable_records, removals)
-          #   return _.indexOf(@observable_records, record)
-          # else
-
-    # @observable_records = _.difference(@observable_records, removals) if removals.length
-    return -1
-
-  # @private
-  find: (obj, creator) ->
-    creator = creator.create if creator.create
-    return if (index = @findIndex(obj, creator)) < 0 then null else @observable_records[creator][index].observable
+  find: (obj, creator) -> return (@observable_records[@createId(creator)] or= {})[@cid(obj)]
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
   #
@@ -134,43 +92,44 @@ module.exports = class kb.Store
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
   #
-  # @example register an observable with th store
-  #   observable = store.findOrCreateObservable(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
+  # @example register an observable with the store
+  #   observable = store.findOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
   findOrCreate: (obj, options) ->
-    options.store = this
-    options.creator or (options.creator = kb.utils.inferCreator(obj, options.factory, options.path))
-    options.creator = kb.ViewModel if not options.creator and (obj instanceof kb.Model)
     creator = options.creator
+    creator or= kb.utils.inferCreator(obj, options.factory, options.path)
+    creator or= kb.ViewModel if not creator and (obj instanceof kb.Model)
 
     # no creator, create default and don't store
     return kb.utils.createFromDefaultCreator(obj, options) unless creator
     return obj if creator.models_only
+
     return observable if creator and observable = @find(obj, creator)
 
-    # create
     observable = kb.ignore =>
       observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
       return observable or ko.observable(null) # default to null
 
-    @register(obj, observable, options)
+    @register(obj, observable, creator)
     return observable
 
-  # @private
+  # @nodoc
   findOrReplace: (obj, creator, observable) ->
     obj or kb._throwUnexpected(@, 'obj missing')
 
-    # TODO: make more efficient by finding once
-    if (index = @findIndex(obj, creator)) < 0
-      return @register(obj, observable, {creator: creator})
-    else
-      creator = creator.create if creator.create
-      record = @observable_records[creator][index]
-      (kb.utils.wrappedObject(record.observable) is obj) or kb._throwUnexpected(@, 'different object') # same object
-      if (record.observable isnt observable) # a change
-        (record.observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
+    if current_observable = @find(obj, creator)
+      return if current_observable is observable # no change
+      (current_observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
+      @replaced_observables.push(current_observable)
 
-        # put the previous observable on the destroy list (but don't release until the store is released)
-        @replaced_observables.push(record.observable)
-        record.observable = observable
+    @register(obj, observable, creator)
+    return observable
 
-      return observable
+  # only store view models not basic ko.observables nor kb.CollectionObservables
+  # @nodoc
+  canRegister: (observable) -> return observable and not ko.isObservable(observable) and not observable.__kb_is_co
+
+  # @nodoc
+  cid: (obj) -> cid = if obj then obj.cid or= _.uniqueId('c') else 'null'
+  createId: (creator) ->
+    create = creator.create or creator
+    create_id = create.__kb_id or= _.uniqueId('kb')
