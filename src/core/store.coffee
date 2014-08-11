@@ -84,6 +84,10 @@ module.exports = class kb.Store
     creator = if options.creator then options.creator else (if (options.path and options.factory) then options.factory.creatorForPath(obj, options.path) else null)
     creator or= observable.constructor # default is to use the constructor
     creator = creator.create if creator.create
+
+    # console.log 'CID', obj?.cid, !!@observable_records[creator]
+    # console.log key for key of @observable_records
+
     records = @observable_records[creator] or= []
     record = {obj: obj, observable: observable}
 
@@ -92,7 +96,7 @@ module.exports = class kb.Store
 
   # @private
   findIndex: (obj, creator) ->
-    creator = creator.create
+    creator = creator.create if creator.create
 
     # removals = []
     if not obj or (obj instanceof kb.Model)
