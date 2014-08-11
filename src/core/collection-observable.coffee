@@ -336,22 +336,15 @@ class kb.CollectionObservable
       when 'remove', 'destroy' then @_onModelRemove(arg)
       when 'change'
         # filtered, remove
-        if not @_selectModel(arg)
-          @_onModelRemove(arg)
+        return @_onModelRemove(arg) unless @_selectModel(arg)
 
-        # not filtered, add
-        else
-          view_model = if @models_only then arg else @viewModelByModel(arg)
-          if view_model # arleady exists
-            if (comparator = @_comparator())
-              observable = kb.utils.wrappedObservable(@)
-              @in_edit++
-              observable.sort(comparator)
-              @in_edit--
+        view_model = if @models_only then arg else @viewModelByModel(arg)
+        return @_onCollectionChange('add', arg) unless view_model # add new
+        return unless (comparator = @_comparator())
 
-          # add new
-          else
-            @_onCollectionChange('add', arg)
+        @in_edit++
+        kb.utils.wrappedObservable(@).sort(comparator)
+        @in_edit--
 
     return
 

@@ -44,7 +44,7 @@ module.exports = class kb.Store
   # Manually clear the store
   clear: ->
     [observable_records, @observable_records] = [@observable_records, {}]
-    for creator, records of observable_records
+    for creator_id, records of observable_records
       kb.release(observable) for cid, observable of records
 
     [replaced_observables, @replaced_observables] = [@replaced_observables, []]
@@ -53,7 +53,7 @@ module.exports = class kb.Store
 
   # Manually compact the store by searching for released view models
   compact: ->
-    for creator, records of @observable_records
+    for creator_id, records of @observable_records
       delete records[cid] for cid, observable of records when observable.__kb_released
     return
 
@@ -77,10 +77,10 @@ module.exports = class kb.Store
     kb.utils.wrappedObject(observable, obj)
     obj or (observable.__kb_null = true) # register as shared null
 
-    (@observable_records[@createId(creator)] or= {})[@cid(obj)] = observable
+    (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
     return observable
 
-  find: (obj, creator) -> return (@observable_records[@createId(creator)] or= {})[@cid(obj)]
+  find: (obj, creator) -> return (@observable_records[@creatorId(creator)] or= {})[@cid(obj)]
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
   #
@@ -94,15 +94,9 @@ module.exports = class kb.Store
   # @example register an observable with the store
   #   observable = store.findOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
   findOrCreate: (obj, options) ->
-    creator = options.creator
-    creator or= kb.utils.inferCreator(obj, options.factory, options.path)
-    creator = kb.ViewModel if not creator and (obj instanceof kb.Model)
-
-    # no creator, create default and don't store
-    return kb.utils.createFromDefaultCreator(obj, options) unless creator
+    return kb.utils.createFromDefaultCreator(obj, options) unless creator = @creator(obj, options)
     return obj if creator.models_only
-
-    return observable if creator and observable = @find(obj, creator)
+    return observable if observable = @find(obj, creator)
 
     observable = kb.ignore =>
       options = _.defaults({store: @, creator: creator}, options) # set our own creator so we can register ourselves above
@@ -130,6 +124,12 @@ module.exports = class kb.Store
 
   # @nodoc
   cid: (obj) -> cid = if obj then obj.cid or= _.uniqueId('c') else 'null'
-  createId: (creator) ->
+  creatorId: (creator) ->
     create = creator.create or creator
     create_id = create.__kb_id or= _.uniqueId('kb')
+
+  creator: (obj, options) ->
+    return options.creator if options.creator
+    return creator if creator = kb.utils.inferCreator(obj, options.factory, options.path)
+    return kb.ViewModel if (obj instanceof kb.Model)
+    return
