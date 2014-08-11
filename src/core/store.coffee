@@ -129,7 +129,9 @@ module.exports = class kb.Store
   # @nodoc
   creatorId: (creator) ->
     create = creator.create or creator
-    create_id = create.__kb_id or= _.uniqueId('kb')
+    create.__kb_cids or= []
+    create.__kb_cids.push(match = {creator: creator, cid: _.uniqueId('kb')}) unless match = _.find(create.__kb_cids, (test) -> test.creator is creator)
+    return match.cid
 
   # @nodoc
   creator: (obj, options) ->
