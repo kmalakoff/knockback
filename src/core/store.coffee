@@ -143,20 +143,13 @@ module.exports = class kb.Store
     creator = options.creator
 
     # no creator, create default and don't store
-    if not creator
-      return kb.utils.createFromDefaultCreator(obj, options)
-    else if creator.models_only
-      return obj
-
-    # found existing
+    return kb.utils.createFromDefaultCreator(obj, options) unless creator
+    return obj if creator.models_only
     return observable if creator and observable = @find(obj, creator)
 
     # create
     observable = kb.ignore =>
-      if creator.create
-        observable = creator.create(obj, options)
-      else
-        observable = new creator(obj, options)
+      observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
       return observable or ko.observable(null) # default to null
 
     @register(obj, observable, options)
