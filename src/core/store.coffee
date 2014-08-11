@@ -26,8 +26,7 @@ module.exports = class kb.Store
   #   kb.Store.useOptionsOrCreate(model, this, options);
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
-      creator = options.factory.creatorForPath(obj, options.path) if (options.path and options.factory)
-      options.store.register(obj, observable, creator)
+      options.store.register(obj, observable, options.creator)
       return kb.utils.wrappedStore(observable, options.store)
     else
       kb.utils.wrappedStoreIsOwned(observable, true)
@@ -78,7 +77,7 @@ module.exports = class kb.Store
     kb.utils.wrappedObject(observable, obj)
     obj or (observable.__kb_null = true) # register as shared null
 
-    (@observable_records[@createId(observable)] or= {})[@cid(obj)] = observable
+    (@observable_records[@createId(creator)] or= {})[@cid(obj)] = observable
     return observable
 
   find: (obj, creator) -> return (@observable_records[@createId(creator)] or= {})[@cid(obj)]
@@ -97,7 +96,7 @@ module.exports = class kb.Store
   findOrCreate: (obj, options) ->
     creator = options.creator
     creator or= kb.utils.inferCreator(obj, options.factory, options.path)
-    creator or= kb.ViewModel if not creator and (obj instanceof kb.Model)
+    creator = kb.ViewModel if not creator and (obj instanceof kb.Model)
 
     # no creator, create default and don't store
     return kb.utils.createFromDefaultCreator(obj, options) unless creator
@@ -106,6 +105,7 @@ module.exports = class kb.Store
     return observable if creator and observable = @find(obj, creator)
 
     observable = kb.ignore =>
+      options = _.defaults({store: @, creator: creator}, options) # set our own creator so we can register ourselves above
       observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
       return observable or ko.observable(null) # default to null
 
