@@ -118,16 +118,20 @@ module.exports = class kb.Store
     @register(obj, observable, creator)
     return observable
 
-  # only store view models not basic ko.observables nor kb.CollectionObservables
   # @nodoc
-  canRegister: (observable) -> return observable and not ko.isObservable(observable) and not observable.__kb_is_co
+  canRegister: (observable) ->
+    # only register view models not basic ko.observables nor kb.CollectionObservables
+    return observable and not ko.isObservable(observable) and not observable.__kb_is_co
 
   # @nodoc
   cid: (obj) -> cid = if obj then obj.cid or= _.uniqueId('c') else 'null'
+
+  # @nodoc
   creatorId: (creator) ->
     create = creator.create or creator
     create_id = create.__kb_id or= _.uniqueId('kb')
 
+  # @nodoc
   creator: (obj, options) ->
     return options.creator if options.creator
     return creator if creator = kb.utils.inferCreator(obj, options.factory, options.path)
