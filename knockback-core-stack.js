@@ -1817,7 +1817,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return;
 	      }
 	      (current_observable.constructor === observable.constructor) || kb._throwUnexpected(this, 'replacing different type');
-	      this.replaced_observables.push(current_observable);
 	    }
 	    this.register(obj, observable, creator);
 	    return observable;

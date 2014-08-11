@@ -118,7 +118,6 @@ module.exports = class kb.Store
     if current_observable = @find(obj, creator)
       return if current_observable is observable # no change
       (current_observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
-      @replaced_observables.push(current_observable)
 
     @register(obj, observable, creator)
     return observable
