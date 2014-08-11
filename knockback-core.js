@@ -409,20 +409,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            break;
 	          case 'change':
 	            if (!_this._selectModel(arg)) {
-	              _this._onModelRemove(arg);
-	            } else {
-	              view_model = _this.models_only ? arg : _this.viewModelByModel(arg);
-	              if (view_model) {
-	                if ((comparator = _this._comparator())) {
-	                  observable = kb.utils.wrappedObservable(_this);
-	                  _this.in_edit++;
-	                  observable.sort(comparator);
-	                  _this.in_edit--;
-	                }
-	              } else {
-	                _this._onCollectionChange('add', arg);
-	              }
+	              return _this._onModelRemove(arg);
 	            }
+	            view_model = _this.models_only ? arg : _this.viewModelByModel(arg);
+	            if (!view_model) {
+	              return _this._onCollectionChange('add', arg);
+	            }
+	            if (!(comparator = _this._comparator())) {
+	              return;
+	            }
+	            _this.in_edit++;
+	            kb.utils.wrappedObservable(_this).sort(comparator);
+	            _this.in_edit--;
 	        }
 	      };
 	    })(this));
@@ -1728,24 +1726,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.clear = function() {
-	    var cid, creator, observable, observable_records, records, replaced_observables, _ref1, _ref2;
+	    var cid, creator_id, observable, observable_records, records, replaced_observables, _i, _len, _ref1, _ref2;
 	    _ref1 = [this.observable_records, {}], observable_records = _ref1[0], this.observable_records = _ref1[1];
-	    for (creator in observable_records) {
-	      records = observable_records[creator];
+	    for (creator_id in observable_records) {
+	      records = observable_records[creator_id];
 	      for (cid in records) {
 	        observable = records[cid];
-	        kb.release(observable);
+	        if (!observable.__kb_released) {
+	          kb.release(observable);
+	        }
 	      }
 	    }
 	    _ref2 = [this.replaced_observables, []], replaced_observables = _ref2[0], this.replaced_observables = _ref2[1];
-	    kb.release(replaced_observables);
+	    for (_i = 0, _len = replaced_observables.length; _i < _len; _i++) {
+	      observable = replaced_observables[_i];
+	      if (!observable.__kb_released) {
+	        kb.release(observable);
+	      }
+	    }
 	  };
 
 	  Store.prototype.compact = function() {
-	    var cid, creator, observable, records, _ref1;
+	    var cid, creator_id, observable, records, _ref1;
 	    _ref1 = this.observable_records;
-	    for (creator in _ref1) {
-	      records = _ref1[creator];
+	    for (creator_id in _ref1) {
+	      records = _ref1[creator_id];
 	      for (cid in records) {
 	        observable = records[cid];
 	        if (observable.__kb_released) {
@@ -1756,36 +1761,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.register = function(obj, observable, creator) {
-	    var _base, _name;
+	    var current_observable, _base, _name;
 	    if (!this.canRegister(observable)) {
 	      return;
 	    }
 	    creator || (creator = observable.constructor);
 	    kb.utils.wrappedObject(observable, obj);
 	    obj || (observable.__kb_null = true);
-	    ((_base = this.observable_records)[_name = this.createId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
+	    if (current_observable = this.find(obj, creator)) {
+	      this.replaced_observables.push(current_observable);
+	    }
+	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
 	    return observable;
 	  };
 
 	  Store.prototype.find = function(obj, creator) {
-	    var _base, _name;
-	    return ((_base = this.observable_records)[_name = this.createId(creator)] || (_base[_name] = {}))[this.cid(obj)];
+	    var observable, _base, _name, _ref1;
+	    if ((_ref1 = (observable = ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)])) != null ? _ref1.__kb_released : void 0) {
+	      delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
+	      return null;
+	    }
+	    return observable;
 	  };
 
 	  Store.prototype.findOrCreate = function(obj, options) {
 	    var creator, observable;
-	    creator = options.creator;
-	    creator || (creator = kb.utils.inferCreator(obj, options.factory, options.path));
-	    if (!creator && (obj instanceof kb.Model)) {
-	      creator = kb.ViewModel;
-	    }
-	    if (!creator) {
+	    if (!(creator = this.creator(obj, options))) {
 	      return kb.utils.createFromDefaultCreator(obj, options);
 	    }
 	    if (creator.models_only) {
 	      return obj;
 	    }
-	    if (creator && (observable = this.find(obj, creator))) {
+	    if (observable = this.find(obj, creator)) {
 	      return observable;
 	    }
 	    observable = kb.ignore((function(_this) {
@@ -1825,10 +1832,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return cid = obj ? obj.cid || (obj.cid = _.uniqueId('c')) : 'null';
 	  };
 
-	  Store.prototype.createId = function(creator) {
-	    var create, create_id;
+	  Store.prototype.creatorId = function(creator) {
+	    var create, item, _i, _len, _ref1;
 	    create = creator.create || creator;
-	    return create_id = create.__kb_id || (create.__kb_id = _.uniqueId('kb'));
+	    create.__kb_cids || (create.__kb_cids = []);
+	    _ref1 = create.__kb_cids;
+	    for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	      item = _ref1[_i];
+	      if (item.create === create) {
+	        return item.cid;
+	      }
+	    }
+	    create.__kb_cids.push(item = {
+	      create: create,
+	      cid: _.uniqueId('kb')
+	    });
+	    return item.cid;
+	  };
+
+	  Store.prototype.creator = function(obj, options) {
+	    var creator;
+	    if (options.creator) {
+	      return options.creator;
+	    }
+	    if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) {
+	      return creator;
+	    }
+	    if (obj instanceof kb.Model) {
+	      return kb.ViewModel;
+	    }
 	  };
 
 	  return Store;

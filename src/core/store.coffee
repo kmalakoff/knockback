@@ -45,10 +45,10 @@ module.exports = class kb.Store
   clear: ->
     [observable_records, @observable_records] = [@observable_records, {}]
     for creator_id, records of observable_records
-      kb.release(observable) for cid, observable of records
+      kb.release(observable) for cid, observable of records when not observable.__kb_released
 
     [replaced_observables, @replaced_observables] = [@replaced_observables, []]
-    kb.release(replaced_observables)
+    kb.release(observable) for observable in replaced_observables when not observable.__kb_released
     return
 
   # Manually compact the store by searching for released view models
@@ -68,7 +68,7 @@ module.exports = class kb.Store
   # @option options [kb.Factory] factory a factory used to create view models.
   #
   # @example register an observable with the store
-  #   store.registerObservable(obj, observable, {creator: creator});
+  #   store.registerObservable(obj, observable, creator);
   register: (obj, observable, creator) ->
     return unless @canRegister(observable)
     creator or= observable.constructor # default is to use the constructor
@@ -77,10 +77,15 @@ module.exports = class kb.Store
     kb.utils.wrappedObject(observable, obj)
     obj or (observable.__kb_null = true) # register as shared null
 
+    @replaced_observables.push(current_observable) if current_observable = @find(obj, creator)
     (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
     return observable
 
-  find: (obj, creator) -> return (@observable_records[@creatorId(creator)] or= {})[@cid(obj)]
+  find: (obj, creator) ->
+    if (observable = (@observable_records[@creatorId(creator)] or= {})[@cid(obj)])?.__kb_released
+      delete @observable_records[@creatorId(creator)][@cid(obj)]
+      return null
+    return observable
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
   #
@@ -130,8 +135,8 @@ module.exports = class kb.Store
   creatorId: (creator) ->
     create = creator.create or creator
     create.__kb_cids or= []
-    create.__kb_cids.push(match = {creator: creator, cid: _.uniqueId('kb')}) unless match = _.find(create.__kb_cids, (test) -> test.creator is creator)
-    return match.cid
+    return item.cid for item in create.__kb_cids when item.create is create
+    create.__kb_cids.push(item = {create: create, cid: _.uniqueId('kb')}); return item.cid
 
   # @nodoc
   creator: (obj, options) ->
