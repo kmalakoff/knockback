@@ -302,7 +302,6 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
     class BookStore extends Backbone.Model
       model_name: 'BookStore'
       schema:
-        id: [manual: true]
         books: ['hasMany', Book]
         authors: ['hasMany', Author]
       sync: BackboneORM.sync(BookStore)
