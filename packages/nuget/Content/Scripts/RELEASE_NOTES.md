@@ -18,7 +18,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * Avoid creating dependencies in collectionObservable's destroy: https://github.com/kmalakoff/knockback/pull/120
 * Improved server support (Node.js tested with jsdom)
 
-## 0.18.6
+## 0.19.1
 * Put AMD loader first due to webpack imcompatibity
 
 ## 0.18.5
