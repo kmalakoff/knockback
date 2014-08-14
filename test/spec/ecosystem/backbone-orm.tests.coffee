@@ -6,7 +6,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
   # import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, Backbone, ko} = kb
-  root.BackboneORM or= require?('backbone-orm')
+  {Queue} = root.BackboneORM or= require?('backbone-orm')
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -23,6 +23,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
   class Person extends Backbone.Model
     model_name: 'Person'
     schema:
+      id: [manual: true]
       friends: -> ['hasMany', Person, foreign_key: 'friends_id', as: 'friends_with_me']
       friends_with_me: -> ['hasMany', Person, foreign_key: 'friends_with_me_id', as: 'friends']
       best_friend: -> ['belongsTo', Person, as: 'best_friends_with_me']
@@ -33,6 +34,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
   class Building extends Backbone.Model
     model_name: 'Building'
     schema:
+      id: [manual: true]
       occupants: -> ['hasMany', Person, as: 'occupies']
     sync: BackboneORM.sync(Building)
 
@@ -198,44 +200,49 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
     })
 
     models = [george, john, paul, ringo]
-    model.save(->) for model in models
-    model.fetchRelated(->) for model in models
+    queue = new Queue(1)
+    for model in models
+      do (model) -> queue.defer (callback) -> model.save(callback)
+    for model in models
+      do (model) -> queue.defer (callback) -> model.fetchRelated(callback)
+    queue.await (err) ->
+      return done(err) if err
 
-    model_stats = {}
-    model_stats.george = {model: george, event_stats: kb.Statistics.eventsStats(george)}
-    model_stats.john = {model: john, event_stats: kb.Statistics.eventsStats(john)}
-    model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)}
-    model_stats.ringo = {model: ringo, event_stats: kb.Statistics.eventsStats(ringo)}
+      model_stats = {}
+      model_stats.george = {model: george, event_stats: kb.Statistics.eventsStats(george)}
+      model_stats.john = {model: john, event_stats: kb.Statistics.eventsStats(john)}
+      model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)}
+      model_stats.ringo = {model: ringo, event_stats: kb.Statistics.eventsStats(ringo)}
 
-    john_view_model = new kb.ViewModel(john)
-    assert.equal(john_view_model.name(), 'John', "Name is correct")
-    for friend in john_view_model.friends()
-      assert.ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
-    assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name')
-    assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
-    kb.release(john_view_model); john_view_model = null
+      john_view_model = new kb.ViewModel(john)
+      assert.equal(john_view_model.name(), 'John', "Name is correct")
+      for friend in john_view_model.friends()
+        assert.ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
+      assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name')
+      assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
+      kb.release(john_view_model); john_view_model = null
 
-    paul_view_model = new kb.ViewModel(paul)
-    assert.equal(paul_view_model.name(), 'Paul', "Name is correct")
-    for friend in paul_view_model.friends()
-      assert.ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
-    assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
-    assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
-    kb.release(paul_view_model); paul_view_model = null
+      paul_view_model = new kb.ViewModel(paul)
+      assert.equal(paul_view_model.name(), 'Paul', "Name is correct")
+      for friend in paul_view_model.friends()
+        assert.ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
+      assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
+      assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
+      kb.release(paul_view_model); paul_view_model = null
 
-    george_view_model = new kb.ViewModel(george)
-    assert.equal(george_view_model.name(), 'George', "Name is correct")
-    for friend in george_view_model.friends()
-      assert.ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
-    assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name')
-    assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
-    assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
-    kb.release(george_view_model); george_view_model = null
+      george_view_model = new kb.ViewModel(george)
+      assert.equal(george_view_model.name(), 'George', "Name is correct")
+      for friend in george_view_model.friends()
+        assert.ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
+      assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name')
+      assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
+      assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
+      kb.release(george_view_model); george_view_model = null
 
-    for name, stats of model_stats
-      assert.ok(kb.Statistics.eventsStats(stats.model).count is stats.event_stats.count, "All model events cleared to initial state. Expected: #{JSON.stringify(stats.event_stats)}. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-    done()
+      for name, stats of model_stats
+        assert.ok(kb.Statistics.eventsStats(stats.model).count is stats.event_stats.count, "All model events cleared to initial state. Expected: #{JSON.stringify(stats.event_stats)}. Actual: #{JSON.stringify(kb.Statistics.eventsStats(stats.model))}")
+      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+      done()
 
   it '4. After view model create, add models', (done) ->
     class Occupant extends Backbone.Model
@@ -273,6 +280,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
     class Book extends Backbone.Model
       model_name: 'Book'
       schema:
+        id: [manual: true]
         author: -> ['belongsTo', Author]
       sync: BackboneORM.sync(Book)
 
@@ -283,6 +291,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
     class Author extends Backbone.Model
       model_name: 'Author'
       schema:
+        id: [manual: true]
         books: ['hasMany', Book]
       sync: BackboneORM.sync(Author)
 
@@ -302,42 +311,47 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
       authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
     })
 
-    model.save(->) for model in bs.get('authors').models
-    model.fetchRelated(->) for model in bs.get('books').models
+    queue = new Queue(1)
+    for model in bs.get('authors').models
+      do (model) -> queue.defer (callback) -> model.save(callback)
+    for model in bs.get('books').models
+      do (model) -> queue.defer (callback) -> model.fetchRelated(callback)
+    queue.await (err) ->
+      return done(err) if err
 
-    BookViewModel = kb.ViewModel.extend({
-      constructor: (model) ->
-        kb.ViewModel.prototype.constructor.apply(this, arguments)
-        this.editMode = ko.observable()
+      BookViewModel = kb.ViewModel.extend({
+        constructor: (model) ->
+          kb.ViewModel.prototype.constructor.apply(this, arguments)
+          this.editMode = ko.observable()
 
-        @edit = =>
-          model._save = model.toJSON()
-          @editMode(true)
+          @edit = =>
+            model._save = model.toJSON()
+            @editMode(true)
 
-        @confirm = =>
-          model._save = null
-          @editMode(false)
+          @confirm = =>
+            model._save = null
+            @editMode(false)
 
-        @cancel = =>
-          model.set(model._save)
-          @editMode(false)
-        @
-    })
-
-    view_model = {
-      books: kb.collectionObservable(bs.get('books'), {
-        factories:
-          models: BookViewModel
-          'models.author.books.models': BookViewModel
+          @cancel = =>
+            model.set(model._save)
+            @editMode(false)
+          @
       })
-    }
 
-    for book in view_model.books()
-      author = book.author()
-      for authored_book in author.books()
-        authored_book.editMode(true)
-        assert.equal(authored_book.editMode(), true, 'edit mode set')
-    done()
+      view_model = {
+        books: kb.collectionObservable(bs.get('books'), {
+          factories:
+            models: BookViewModel
+            'models.author.books.models': BookViewModel
+        })
+      }
+
+      for book in view_model.books()
+        author = book.author()
+        for authored_book in author.books()
+          authored_book.editMode(true)
+          assert.equal(authored_book.editMode(), true, 'edit mode set')
+      done()
 
   it '6. Inferring observable types: from the start', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
@@ -347,28 +361,33 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
     house = new Building({id: 'house-6-1', name: 'Home Sweet Home', occupants: [person1, person2]})
 
     models = [person1, person2]
-    model.save(->) for model in models
-    model.fetchRelated(->) for model in models
+    queue = new Queue(1)
+    for model in models
+      do (model) -> queue.defer (callback) -> model.save(callback)
+    for model in models
+      do (model) -> queue.defer (callback) -> model.fetchRelated(callback)
+    queue.await (err) ->
+      return done(err) if err
 
-    view_model_person1 = kb.viewModel(person1)
-    view_model_house1 = kb.viewModel(house)
+      view_model_person1 = kb.viewModel(person1)
+      view_model_house1 = kb.viewModel(house)
 
-    # check friends
-    assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
-    assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
-    assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
+      # check friends
+      assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend')
+      assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy')
+      assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
-    # check occupants
-    assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
-    assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
-    assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
+      # check occupants
+      assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
+      assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants')
+      assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it')
 
-    # release
-    kb.release(view_model_person1)
-    kb.release(view_model_house1)
+      # release
+      kb.release(view_model_person1)
+      kb.release(view_model_house1)
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
-    done()
+      assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+      done()
 
   it '7a. Inferring observable types: late binding', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
