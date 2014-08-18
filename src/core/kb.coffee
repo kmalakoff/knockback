@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.1
+  knockback.js 0.19.2
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -103,7 +103,7 @@ var extend = function (protoProps, classProps) {
 module.exports = class kb
 
   # Knockback library semantic version
-  @VERSION: '0.19.1'
+  @VERSION: '0.19.2'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -216,7 +216,7 @@ module.exports = class kb
 
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-    el = el.children[0] if el.children.length is 1 # do not return the template wrapper if possible
+    el = el.childNodes[0] if el.childNodes.length is 1 # do not return the template wrapper if possible
     kb.releaseOnNodeRemove(view_model, el)
     observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
 
