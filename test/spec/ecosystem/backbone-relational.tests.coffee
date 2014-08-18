@@ -965,6 +965,10 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
   #   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   #   done()
+  
+  
+  
+
 
   # https://github.com/kmalakoff/knockback/issues/122
   it '14. Issue 122', (done) ->
@@ -990,5 +994,32 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/121
+  it '15. Issue 121', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+ 
+    Model1 = Backbone.RelationalModel.extend({})
+    
+    view_model =  new kb.ViewModel( model1 = new Model1() )
+    
+    model1.set({propB: 'val2'})
+    assert.equal view_model.propB(), 'val2'
+
+    model1.listenTo( model1, "change:propA", (model)->  model1.set( 'propC', 'val3' ) )
+
+    model1.set({propA: 'val1', propB: 'val2.2'})
+    assert.equal view_model.propA(), 'val1'
+    assert.equal view_model.propB(), 'val2.2'
+    assert.equal view_model.propC(), 'val3'
+
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  
+  
+
 
   it 'CLEANUP', -> kb.configure({orm: 'default'})
