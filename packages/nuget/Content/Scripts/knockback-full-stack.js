@@ -1236,8 +1236,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    el = document.createElement('div');
 	    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-	    if (el.children.length === 1) {
-	      el = el.children[0];
+	    if (el.childNodes.length === 1) {
+	      el = el.childNodes[0];
 	    }
 	    kb.releaseOnNodeRemove(view_model, el);
 	    observable.dispose();
