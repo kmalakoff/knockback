@@ -1,5 +1,5 @@
 /*
-  knockback-core.js 0.19.1
+  knockback-core.js 0.19.2
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -84,7 +84,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -597,7 +597,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -808,7 +808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -891,7 +891,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1042,7 +1042,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1119,7 +1119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function kb() {}
 
-	  kb.VERSION = '0.19.1';
+	  kb.VERSION = '0.19.2';
 
 	  kb.TYPE_UNKNOWN = 0;
 
@@ -1231,8 +1231,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    el = document.createElement('div');
 	    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-	    if (el.children.length === 1) {
-	      el = el.children[0];
+	    if (el.childNodes.length === 1) {
+	      el = el.childNodes[0];
 	    }
 	    kb.releaseOnNodeRemove(view_model, el);
 	    observable.dispose();
@@ -1348,7 +1348,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1386,7 +1386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1558,7 +1558,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1696,7 +1696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2032,7 +2032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2316,7 +2316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2520,7 +2520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2581,7 +2581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2638,7 +2638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2722,7 +2722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.19.1
+	  knockback.js 0.19.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback

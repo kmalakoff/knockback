@@ -1,6 +1,6 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
-## 0.19.1
+## 0.19.2
 * BREAKING API CHANGE: kb.observable now splits share options out to the second parameter to give a new signature: kb.observable(model, key, share_options, view_model)
 * BREAKING API CHANGE: kb.ViewModel::mapObservables is now aliased to kb.ViewModel::createObservables. Also, kb.ViewModel::createObservables now respected the excludes option. Use kb.observable(model, key_or_options, share_options, vm) to manually add observables to a view model.
 * Removed support for Knockout version < 2.1.0.
