@@ -1,6 +1,6 @@
 {
   "name": "knockback",
-  "version": "0.19.2",
+  "version": "0.19.3",
   "main": "knockback.js",
   "ignore": [
     "**/.*",

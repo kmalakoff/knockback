@@ -97,7 +97,7 @@ And now when you type in the input boxes, the values are properly transferred to
 Of course, this is just a simple example, but hopefully you get the picture.
 
 
-#Download Latest (0.19.2):
+#Download Latest (0.19.3):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
@@ -105,15 +105,15 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/blob/maste
 
 Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback.min.js)
-* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback-full-stack.min.js)
+* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback.min.js)
+* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback-full-stack.min.js)
 
 ###Core
 
 Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
-* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback-core.min.js)
-* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.19.2/knockback-core-stack.min.js)
+* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback-core.min.js)
+* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.19.3/knockback-core-stack.min.js)
 
 ###Distributions
 
