@@ -27,6 +27,11 @@
     "knockout",
     "knockoutjs"
   ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
   "dependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
