@@ -81,7 +81,7 @@ gulp.task 'publish', ['minify'], (callback) ->
       .on('end', callback)
 
   queue = new Queue(1)
-  queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
+  # queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
   queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
   # queue.defer (callback) ->

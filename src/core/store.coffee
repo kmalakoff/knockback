@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.3
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -85,10 +85,10 @@ module.exports = class kb.Store
     @observable_records.push({obj: obj, observable: observable, creator: creator})
     return observable
 
-  # @private
+  # @nodoc
   findIndex: (obj, creator) ->
     removals = []
-    if not obj or (obj instanceof kb.Model)
+    if not obj or kb.isModel(obj)
       for index, record of @observable_records
         continue unless record.observable
 
@@ -110,10 +110,10 @@ module.exports = class kb.Store
     @observable_records = _.difference(@observable_records, removals) if removals.length
     return -1
 
-  # @private
+  # @nodoc
   find: (obj, creator) -> return if (index = @findIndex(obj, creator)) < 0 then null else @observable_records[index].observable
 
-  # @private
+  # @nodoc
   isRegistered: (observable) ->
     return true for record in @observable_records when record.observable is observable
     return false
@@ -132,7 +132,7 @@ module.exports = class kb.Store
   findOrCreate: (obj, options) ->
     options.store = this
     options.creator or (options.creator = kb.utils.inferCreator(obj, options.factory, options.path))
-    options.creator = kb.ViewModel if not options.creator and (obj instanceof kb.Model)
+    options.creator = kb.ViewModel if not options.creator and kb.isModel(obj)
     creator = options.creator
 
     # no creator, create default and don't store
@@ -158,7 +158,7 @@ module.exports = class kb.Store
 
     return observable
 
-  # @private
+  # @nodoc
   findOrReplace: (obj, creator, observable) ->
     obj or kb._throwUnexpected(@, 'obj missing')
     if (index = @findIndex(obj, creator)) < 0

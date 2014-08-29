@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.3
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -120,7 +120,7 @@ class kb.EventWatcher
   # Internal
   ####################################################
 
-  # @private
+  # @nodoc
   # NOTE: this is called by registerCallbacks so the model could already be bound and we just want to bind the new info
   # NOTE: this is called by emitter so it may be used to clear a previous emitter without triggering an intermediate change
   _onModelLoaded: (model) =>
@@ -134,13 +134,14 @@ class kb.EventWatcher
         (info.emitter(model) if info.emitter)
     return
 
-  # @private
+  # @nodoc
   _onModelUnloaded: (model) =>
     return if @ee isnt model
     @ee = null
     @_unbindCallbacks(event_name, callbacks) for event_name, callbacks of @__kb.callbacks # unbind all events
     return
 
+  # @nodoc
   _unbindCallbacks: (event_name, callbacks, skip_emitter) =>
     (callbacks.model.unbind(event_name, callbacks.fn); callbacks.model = null) if callbacks.model
     for info in callbacks.list

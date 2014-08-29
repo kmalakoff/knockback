@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.3
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -73,7 +73,7 @@ module.exports = class kb.TriggeredObservable
   ####################################################
   # Internal
   ####################################################
-  # @private
+  # @nodoc
   update: ->
     return unless @ee # do not trigger if there is no emitter
     if @vo() isnt @ee then @vo(@ee) else @vo.valueHasMutated() # manually trigger the dependable

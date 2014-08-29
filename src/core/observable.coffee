@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.3
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -142,7 +142,7 @@ class kb.Observable
   ####################################################
   # Internal
   ####################################################
-  # @private
+  # @nodoc
   update: (new_value) ->
     return if @__kb_released # destroyed, nothing to do
     new_value = kb.getValue(kb.peek(@_model), kb.peek(@key)) unless arguments.length
