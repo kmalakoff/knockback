@@ -75,11 +75,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(11);
 	__webpack_require__(12);
 	__webpack_require__(13);
+	__webpack_require__(18);
+	__webpack_require__(19);
 	__webpack_require__(15);
 	__webpack_require__(16);
 	__webpack_require__(17);
-	__webpack_require__(18);
-	__webpack_require__(19);
 	module.exports = __webpack_require__(14);
 
 
@@ -2586,202 +2586,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	__webpack_require__(21);
-
-	KEYS_PUBLISH = ['destroy', 'setToDefault'];
-
-	module.exports = kb.DefaultObservable = (function() {
-	  function DefaultObservable(target_observable, dv) {
-	    var observable;
-	    this.dv = dv;
-	    observable = kb.utils.wrappedObservable(this, ko.computed({
-	      read: (function(_this) {
-	        return function() {
-	          var current_target;
-	          current_target = ko.utils.unwrapObservable(target_observable());
-	          if (_.isNull(current_target) || _.isUndefined(current_target)) {
-	            return ko.utils.unwrapObservable(_this.dv);
-	          } else {
-	            return current_target;
-	          }
-	        };
-	      })(this),
-	      write: function(value) {
-	        return target_observable(value);
-	      }
-	    }));
-	    kb.publishMethods(observable, this, KEYS_PUBLISH);
-	    return observable;
-	  }
-
-	  DefaultObservable.prototype.destroy = function() {
-	    return kb.utils.wrappedDestroy(this);
-	  };
-
-	  DefaultObservable.prototype.setToDefault = function() {
-	    return kb.utils.wrappedObservable(this)(this.dv);
-	  };
-
-	  return DefaultObservable;
-
-	})();
-
-	kb.defaultObservable = function(target, default_value) {
-	  return new kb.DefaultObservable(target, default_value);
-	};
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  knockback.js 0.19.4
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
-	var arraySlice, kb, ko, _, _ref;
-
-	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
-
-	arraySlice = Array.prototype.slice;
-
-	kb.toFormattedString = function(format) {
-	  var arg, args, index, parameter_index, result, value;
-	  result = format.slice();
-	  args = arraySlice.call(arguments, 1);
-	  for (index in args) {
-	    arg = args[index];
-	    value = ko.utils.unwrapObservable(arg);
-	    if (_.isUndefined(value) || _.isNull(value)) {
-	      value = '';
-	    }
-	    parameter_index = format.indexOf("\{" + index + "\}");
-	    while (parameter_index >= 0) {
-	      result = result.replace("{" + index + "}", value);
-	      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
-	    }
-	  }
-	  return result;
-	};
-
-	kb.parseFormattedString = function(string, format) {
-	  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, result, results, sorted_positions;
-	  regex_string = format.slice();
-	  index = 0;
-	  parameter_count = 0;
-	  positions = {};
-	  while (regex_string.search("\\{" + index + "\\}") >= 0) {
-	    parameter_index = format.indexOf("\{" + index + "\}");
-	    while (parameter_index >= 0) {
-	      regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
-	      positions[parameter_index] = index;
-	      parameter_count++;
-	      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
-	    }
-	    index++;
-	  }
-	  count = index;
-	  regex = new RegExp(regex_string);
-	  matches = regex.exec(string);
-	  if (matches) {
-	    matches.shift();
-	  }
-	  if (!matches || (matches.length !== parameter_count)) {
-	    result = [];
-	    while (count-- > 0) {
-	      result.push('');
-	    }
-	    return result;
-	  }
-	  sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
-	    return parseInt(parameter_index, 10);
-	  });
-	  format_indices_to_matched_indices = {};
-	  for (match_index in sorted_positions) {
-	    parameter_index = sorted_positions[match_index];
-	    index = positions[parameter_index];
-	    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
-	      continue;
-	    }
-	    format_indices_to_matched_indices[index] = match_index;
-	  }
-	  results = [];
-	  index = 0;
-	  while (index < count) {
-	    results.push(matches[format_indices_to_matched_indices[index]]);
-	    index++;
-	  }
-	  return results;
-	};
-
-	module.exports = kb.FormattedObservable = (function() {
-	  function FormattedObservable(format, args) {
-	    var observable, observable_args;
-	    if (_.isArray(args)) {
-	      format = format;
-	      observable_args = args;
-	    } else {
-	      observable_args = arraySlice.call(arguments, 1);
-	    }
-	    observable = kb.utils.wrappedObservable(this, ko.computed({
-	      read: function() {
-	        var arg, _i, _len;
-	        args = [ko.utils.unwrapObservable(format)];
-	        for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
-	          arg = observable_args[_i];
-	          args.push(ko.utils.unwrapObservable(arg));
-	        }
-	        return kb.toFormattedString.apply(null, args);
-	      },
-	      write: function(value) {
-	        var index, matches, max_count;
-	        matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
-	        max_count = Math.min(observable_args.length, matches.length);
-	        index = 0;
-	        while (index < max_count) {
-	          observable_args[index](matches[index]);
-	          index++;
-	        }
-	      }
-	    }));
-	    return observable;
-	  }
-
-	  FormattedObservable.prototype.destroy = function() {
-	    return kb.utils.wrappedDestroy(this);
-	  };
-
-	  return FormattedObservable;
-
-	})();
-
-	kb.formattedObservable = function(format, args) {
-	  return new kb.FormattedObservable(format, arraySlice.call(arguments, 1));
-	};
-
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  knockback.js 0.19.4
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
-	var KEYS_PUBLISH, kb, ko, _, _ref;
-
-	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
-
 	KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
 	kb.locale_manager || (kb.locale_manager = void 0);
@@ -2877,7 +2681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2950,7 +2754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2966,7 +2770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
-	__webpack_require__(22);
+	__webpack_require__(21);
 
 	callOrGet = function(value) {
 	  value = ko.utils.unwrapObservable(value);
@@ -3110,13 +2914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
-
-/***/ },
-/* 21 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3128,53 +2926,197 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var KEYS_PUBLISH, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	kb.Observable.prototype.setToDefault = function() {
-	  var _ref1;
-	  if ((_ref1 = this.__kb_value) != null) {
-	    if (typeof _ref1.setToDefault === "function") {
-	      _ref1.setToDefault();
-	    }
-	  }
-	};
+	__webpack_require__(22);
 
-	kb.ViewModel.prototype.setToDefault = function() {
-	  var vm_key, _ref1;
-	  for (vm_key in this.__kb.vm_keys) {
-	    if ((_ref1 = this[vm_key]) != null) {
-	      if (typeof _ref1.setToDefault === "function") {
-	        _ref1.setToDefault();
-	      }
-	    }
-	  }
-	};
+	KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
-	kb.utils.setToDefault = function(obj) {
-	  var key, value;
-	  if (!obj) {
-	    return;
-	  }
-	  if (ko.isObservable(obj)) {
-	    if (typeof obj.setToDefault === "function") {
-	      obj.setToDefault();
-	    }
-	  } else if (_.isObject(obj)) {
-	    for (key in obj) {
-	      value = obj[key];
-	      if (value && (ko.isObservable(value) || (typeof value !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) {
-	        this.setToDefault(value);
+	module.exports = kb.DefaultObservable = (function() {
+	  function DefaultObservable(target_observable, dv) {
+	    var observable;
+	    this.dv = dv;
+	    observable = kb.utils.wrappedObservable(this, ko.computed({
+	      read: (function(_this) {
+	        return function() {
+	          var current_target;
+	          current_target = ko.utils.unwrapObservable(target_observable());
+	          if (_.isNull(current_target) || _.isUndefined(current_target)) {
+	            return ko.utils.unwrapObservable(_this.dv);
+	          } else {
+	            return current_target;
+	          }
+	        };
+	      })(this),
+	      write: function(value) {
+	        return target_observable(value);
 	      }
-	    }
+	    }));
+	    kb.publishMethods(observable, this, KEYS_PUBLISH);
+	    return observable;
 	  }
-	  return obj;
+
+	  DefaultObservable.prototype.destroy = function() {
+	    return kb.utils.wrappedDestroy(this);
+	  };
+
+	  DefaultObservable.prototype.setToDefault = function() {
+	    return kb.utils.wrappedObservable(this)(this.dv);
+	  };
+
+	  return DefaultObservable;
+
+	})();
+
+	kb.defaultObservable = function(target, default_value) {
+	  return new kb.DefaultObservable(target, default_value);
 	};
 
 
 /***/ },
-/* 22 */
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.19.4
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var arraySlice, kb, ko, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	arraySlice = Array.prototype.slice;
+
+	kb.toFormattedString = function(format) {
+	  var arg, args, index, parameter_index, result, value;
+	  result = format.slice();
+	  args = arraySlice.call(arguments, 1);
+	  for (index in args) {
+	    arg = args[index];
+	    value = ko.utils.unwrapObservable(arg);
+	    if (_.isUndefined(value) || _.isNull(value)) {
+	      value = '';
+	    }
+	    parameter_index = format.indexOf("\{" + index + "\}");
+	    while (parameter_index >= 0) {
+	      result = result.replace("{" + index + "}", value);
+	      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+	    }
+	  }
+	  return result;
+	};
+
+	kb.parseFormattedString = function(string, format) {
+	  var count, format_indices_to_matched_indices, index, match_index, matches, parameter_count, parameter_index, positions, regex, regex_string, result, results, sorted_positions;
+	  regex_string = format.slice();
+	  index = 0;
+	  parameter_count = 0;
+	  positions = {};
+	  while (regex_string.search("\\{" + index + "\\}") >= 0) {
+	    parameter_index = format.indexOf("\{" + index + "\}");
+	    while (parameter_index >= 0) {
+	      regex_string = regex_string.replace("\{" + index + "\}", '(.*)');
+	      positions[parameter_index] = index;
+	      parameter_count++;
+	      parameter_index = format.indexOf("\{" + index + "\}", parameter_index + 1);
+	    }
+	    index++;
+	  }
+	  count = index;
+	  regex = new RegExp(regex_string);
+	  matches = regex.exec(string);
+	  if (matches) {
+	    matches.shift();
+	  }
+	  if (!matches || (matches.length !== parameter_count)) {
+	    result = [];
+	    while (count-- > 0) {
+	      result.push('');
+	    }
+	    return result;
+	  }
+	  sorted_positions = _.sortBy(_.keys(positions), function(parameter_index, format_index) {
+	    return parseInt(parameter_index, 10);
+	  });
+	  format_indices_to_matched_indices = {};
+	  for (match_index in sorted_positions) {
+	    parameter_index = sorted_positions[match_index];
+	    index = positions[parameter_index];
+	    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
+	      continue;
+	    }
+	    format_indices_to_matched_indices[index] = match_index;
+	  }
+	  results = [];
+	  index = 0;
+	  while (index < count) {
+	    results.push(matches[format_indices_to_matched_indices[index]]);
+	    index++;
+	  }
+	  return results;
+	};
+
+	module.exports = kb.FormattedObservable = (function() {
+	  function FormattedObservable(format, args) {
+	    var observable, observable_args;
+	    if (_.isArray(args)) {
+	      format = format;
+	      observable_args = args;
+	    } else {
+	      observable_args = arraySlice.call(arguments, 1);
+	    }
+	    observable = kb.utils.wrappedObservable(this, ko.computed({
+	      read: function() {
+	        var arg, _i, _len;
+	        args = [ko.utils.unwrapObservable(format)];
+	        for (_i = 0, _len = observable_args.length; _i < _len; _i++) {
+	          arg = observable_args[_i];
+	          args.push(ko.utils.unwrapObservable(arg));
+	        }
+	        return kb.toFormattedString.apply(null, args);
+	      },
+	      write: function(value) {
+	        var index, matches, max_count;
+	        matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+	        max_count = Math.min(observable_args.length, matches.length);
+	        index = 0;
+	        while (index < max_count) {
+	          observable_args[index](matches[index]);
+	          index++;
+	        }
+	      }
+	    }));
+	    return observable;
+	  }
+
+	  FormattedObservable.prototype.destroy = function() {
+	    return kb.utils.wrappedDestroy(this);
+	  };
+
+	  return FormattedObservable;
+
+	})();
+
+	kb.formattedObservable = function(format, args) {
+	  return new kb.FormattedObservable(format, arraySlice.call(arguments, 1));
+	};
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
+
+/***/ },
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3286,6 +3228,64 @@ return /******/ (function(modules) { // webpackBootstrap
 	    was_false |= !(result = f(ko.utils.unwrapObservable(value)));
 	    return (was_false ? result : ko.utils.unwrapObservable(stand_in));
 	  };
+	};
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.19.4
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var kb, ko, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	kb.Observable.prototype.setToDefault = function() {
+	  var _ref1;
+	  if ((_ref1 = this.__kb_value) != null) {
+	    if (typeof _ref1.setToDefault === "function") {
+	      _ref1.setToDefault();
+	    }
+	  }
+	};
+
+	kb.ViewModel.prototype.setToDefault = function() {
+	  var vm_key, _ref1;
+	  for (vm_key in this.__kb.vm_keys) {
+	    if ((_ref1 = this[vm_key]) != null) {
+	      if (typeof _ref1.setToDefault === "function") {
+	        _ref1.setToDefault();
+	      }
+	    }
+	  }
+	};
+
+	kb.utils.setToDefault = function(obj) {
+	  var key, value;
+	  if (!obj) {
+	    return;
+	  }
+	  if (ko.isObservable(obj)) {
+	    if (typeof obj.setToDefault === "function") {
+	      obj.setToDefault();
+	    }
+	  } else if (_.isObject(obj)) {
+	    for (key in obj) {
+	      value = obj[key];
+	      if (value && (ko.isObservable(value) || (typeof value !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) {
+	        this.setToDefault(value);
+	      }
+	    }
+	  }
+	  return obj;
 	};
 
 

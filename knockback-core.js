@@ -10,7 +10,9 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["knockout", "backbone", "underscore"], (function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__) { return factory(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__, root["jQuery"]); }));
+		define(["knockout", "backbone", "underscore"], function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__) {
+			return factory(__WEBPACK_EXTERNAL_MODULE_15__, __WEBPACK_EXTERNAL_MODULE_16__, __WEBPACK_EXTERNAL_MODULE_17__, root["jQuery"]);
+		});
 	else if(typeof exports === 'object')
 		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else
