@@ -69,7 +69,7 @@
     "node-jquery-xhr": "*",
     "nuget": "*",
     "queue-async": "*",
-    "webpack": "git+https://github.com/forivall/webpack#master",
+    "webpack": "*",
     "wrench": "*"
   },
   "optionalDependencies": {
