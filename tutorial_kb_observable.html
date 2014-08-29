@@ -108,7 +108,7 @@ ViewModel = (model) -&gt;
     key:&#39;number&#39;
     read: -&gt; return &quot;#: #{@number()}&quot;
     write: (value) -&gt; @number(value.substring(3))
-  }, @)
+  }, {}, @)
   return
 
 view_model = new ViewModel(model)
@@ -122,7 +122,7 @@ var ViewModel = function(model) {
     key: &#39;number&#39;,
     read: function() { return &quot;#: &quot; + (this.number()); },
     write: function(value) { return this.number(value.substring(3)); }
-  }, this);
+  }, {}, this);
 };
 
 var view_model = new ViewModel(model);
