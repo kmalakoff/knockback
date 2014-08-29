@@ -34,12 +34,19 @@ module.exports = class TypedValue
       when kb.TYPE_COLLECTION
         return value(new_value) if @value_type is kb.TYPE_COLLECTION and new_type is kb.TYPE_ARRAY
         if new_type is kb.TYPE_COLLECTION or _.isNull(new_value)
+          # extract the collection
+          new_value = kb.peek(new_value.collection) if new_value and not kb.isCollection(new_value) and _.isFunction(new_value.collection)
+
           if _.isFunction(value.collection)
             value.collection(new_value) if kb.peek(value.collection) isnt new_value
             return
 
       when kb.TYPE_MODEL
         if new_type is kb.TYPE_MODEL or _.isNull(new_value)
+          # extract the model
+          if new_value and not kb.isModel(new_value)
+            new_value = if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)
+
           if _.isFunction(value.model)
             value.model(new_value) if kb.peek(value.model) isnt new_value
           else

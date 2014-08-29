@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.2
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -81,6 +81,7 @@ module.exports = class kb.Store
     (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
     return observable
 
+  # @nodoc
   find: (obj, creator) ->
     if (observable = (@observable_records[@creatorId(creator)] or= {})[@cid(obj)])?.__kb_released
       delete @observable_records[@creatorId(creator)][@cid(obj)]

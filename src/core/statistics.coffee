@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.2
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -74,7 +74,7 @@ module.exports = class kb.Statistics
       written = true
     return if stats_string then stats_string else success_message
 
-  # @private
+  # @nodoc
   registeredTracker: (key) ->
     return @registered_tracker[key] if @registered_tracker.hasOwnProperty(key)
     type_tracker = []; @registered_tracker[key] = type_tracker

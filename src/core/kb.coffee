@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.2
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -103,7 +103,7 @@ var extend = function (protoProps, classProps) {
 module.exports = class kb
 
   # Knockback library semantic version
-  @VERSION: '0.19.2'
+  @VERSION: '0.19.4'
 
   ####################################
   # OBSERVABLE STORAGE TYPES
@@ -136,7 +136,7 @@ module.exports = class kb
       return true
 
     # a known type that is not releaseable
-    else if (typeof(obj) is 'function') or (obj instanceof kb.Model) or (obj instanceof kb.Collection)
+    else if (typeof(obj) is 'function') or kb.isModel(obj) or kb.isCollection(obj)
       return false
 
     # a releaseable signature
@@ -258,11 +258,23 @@ module.exports = class kb
   ####################################
   # INTERNAL HELPERS
   ####################################
+  # @nodoc
   @_throwMissing: (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
+
+  # @nodoc
   @_throwUnexpected: (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is unexpected"
 
+  # @nodoc
   @publishMethods: (observable, instance, methods) -> observable[fn] = kb._.bind(instance[fn], instance) for fn in methods; return
+
+  # @nodoc
   @peek: (obs) -> return obs unless ko.isObservable(obs); return obs.peek() if obs.peek; return kb.ignore -> obs()
+
+  # @nodoc
+  @isModel: (obj) -> obj and ((obj instanceof kb.Model) or ((typeof(obj.get) is 'function') and (typeof(obj.bind) is 'function')))
+
+  # @nodoc
+  @isCollection: (obj) -> obj and (obj instanceof kb.Collection)
 
 if window.Parse
   Backbone = kb.Parse = window.Parse

@@ -1,5 +1,11 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.19.4
+* Bug fix for extracting a Model when setting by kb.ViewModel and to extract a Collection when setting by kb.CollectionObservable.
+
+## 0.19.3
+* Tested Knckout 3.2 and updated component.io reference to kmalakoff/knockout for latest.
+
 ## 0.19.2
 * Fixed childNodes skipping comments in kb.renderTemplate.
 * Fixed comments: https://github.com/kmalakoff/knockback/issues/128

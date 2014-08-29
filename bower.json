@@ -1,6 +1,6 @@
 {
   "name": "knockback",
-  "version": "0.19.2",
+  "version": "0.19.4",
   "main": "knockback.js",
   "ignore": [
     "**/.*",
@@ -27,10 +27,15 @@
     "knockout",
     "knockoutjs"
   ],
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
   "dependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
-    "knockout": "knockout.js#>=2.2.1"
+    "knockout": ">=2.2.1"
   },
 
   "license": "MIT"

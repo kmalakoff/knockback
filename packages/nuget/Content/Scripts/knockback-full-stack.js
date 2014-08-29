@@ -1,5 +1,5 @@
 /*
-  knockback-full-stack.js 0.19.2
+  knockback-full-stack.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -89,7 +89,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -600,7 +600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -811,7 +811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -894,7 +894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1045,7 +1045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1122,7 +1122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function kb() {}
 
-	  kb.VERSION = '0.19.2';
+	  kb.VERSION = '0.19.4';
 
 	  kb.TYPE_UNKNOWN = 0;
 
@@ -1147,7 +1147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return false;
 	    } else if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) {
 	      return true;
-	    } else if ((typeof obj === 'function') || (obj instanceof kb.Model) || (obj instanceof kb.Collection)) {
+	    } else if ((typeof obj === 'function') || kb.isModel(obj) || kb.isCollection(obj)) {
 	      return false;
 	    } else if ((typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
 	      return true;
@@ -1317,6 +1317,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  };
 
+	  kb.isModel = function(obj) {
+	    return obj && ((obj instanceof kb.Model) || ((typeof obj.get === 'function') && (typeof obj.bind === 'function')));
+	  };
+
+	  kb.isCollection = function(obj) {
+	    return obj && (obj instanceof kb.Collection);
+	  };
+
 	  return kb;
 
 	})();
@@ -1351,7 +1359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1389,7 +1397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1561,7 +1569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1699,7 +1707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1773,8 +1781,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	    creator || (creator = observable.constructor);
 	    kb.utils.wrappedObject(observable, obj);
 	    obj || (observable.__kb_null = true);
+<<<<<<< HEAD
 	    if (current_observable = this.find(obj, creator)) {
 	      this.replaced_observables.push(current_observable);
+=======
+	    creator = options.creator ? options.creator : (options.path && options.factory ? options.factory.creatorForPath(obj, options.path) : null);
+	    if (!creator) {
+	      creator = observable.constructor;
+	    }
+	    this.observable_records.push({
+	      obj: obj,
+	      observable: observable,
+	      creator: creator
+	    });
+	    return observable;
+	  };
+
+	  Store.prototype.findIndex = function(obj, creator) {
+	    var index, record, removals, _ref1;
+	    removals = [];
+	    if (!obj || kb.isModel(obj)) {
+	      _ref1 = this.observable_records;
+	      for (index in _ref1) {
+	        record = _ref1[index];
+	        if (!record.observable) {
+	          continue;
+	        }
+	        if (record.observable.__kb_released) {
+	          removals.push(record);
+	          continue;
+	        }
+	        if ((!obj && !record.observable.__kb_null) || (obj && (record.observable.__kb_null || (record.obj !== obj)))) {
+	          continue;
+	        } else if ((record.creator === creator) || (record.creator.create && (record.creator.create === creator.create))) {
+	          if (removals.length) {
+	            this.observable_records = _.difference(this.observable_records, removals);
+	            return _.indexOf(this.observable_records, record);
+	          } else {
+	            return index;
+	          }
+	        }
+	      }
+>>>>>>> f2382353d5b3a318bd78461f1c7d24415ea2ebd7
 	    }
 	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
 	    return observable;
@@ -1791,7 +1839,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Store.prototype.findOrCreate = function(obj, options) {
 	    var creator, observable;
+<<<<<<< HEAD
 	    if (!(creator = this.creator(obj, options))) {
+=======
+	    options.store = this;
+	    options.creator || (options.creator = kb.utils.inferCreator(obj, options.factory, options.path));
+	    if (!options.creator && kb.isModel(obj)) {
+	      options.creator = kb.ViewModel;
+	    }
+	    creator = options.creator;
+	    if (!creator) {
+>>>>>>> f2382353d5b3a318bd78461f1c7d24415ea2ebd7
 	      return kb.utils.createFromDefaultCreator(obj, options);
 	    }
 	    if (creator.models_only) {
@@ -1925,6 +1983,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return value(new_value);
 	        }
 	        if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
+	          if (new_value && !kb.isCollection(new_value) && _.isFunction(new_value.collection)) {
+	            new_value = kb.peek(new_value.collection);
+	          }
 	          if (_.isFunction(value.collection)) {
 	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
@@ -1935,6 +1996,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        break;
 	      case kb.TYPE_MODEL:
 	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
+	          if (new_value && !kb.isModel(new_value)) {
+	            new_value = _.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value);
+	          }
 	          if (_.isFunction(value.model)) {
 	            if (kb.peek(value.model) !== new_value) {
 	              value.model(new_value);
@@ -2017,7 +2081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2190,10 +2254,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  utils.createFromDefaultCreator = function(obj, options) {
-	    if (obj instanceof kb.Model) {
+	    if (kb.isModel(obj)) {
 	      return kb.viewModel(obj, options);
 	    }
-	    if (obj instanceof kb.Collection) {
+	    if (kb.isCollection(obj)) {
 	      return kb.collectionObservable(obj, options);
 	    }
 	    if (_.isArray(obj)) {
@@ -2301,7 +2365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2505,7 +2569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2541,7 +2605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2603,7 +2667,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2737,7 +2801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2848,7 +2912,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2921,7 +2985,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -3087,7 +3151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -3145,7 +3209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -3261,7 +3325,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -3318,7 +3382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -3402,7 +3466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.19.2
+	  knockback.js 0.19.4
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -3498,11 +3562,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(27), __webpack_require__(20), exports], __WEBPACK_AMD_DEFINE_RESULT__ = (function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(27), __webpack_require__(20), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
-	    }.apply(null, __WEBPACK_AMD_DEFINE_ARRAY__)), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 	  // Next for Node.js or CommonJS. jQuery may not be needed as a module.
 	  } else if (typeof exports !== 'undefined') {
@@ -5101,7 +5165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.6.0
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.7.0
 	//     http://underscorejs.org
 	//     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 	//     Underscore may be freely distributed under the MIT license.
@@ -5117,9 +5181,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Save the previous value of the `_` variable.
 	  var previousUnderscore = root._;
 
-	  // Establish the object that gets returned to break out of a loop iteration.
-	  var breaker = {};
-
 	  // Save bytes in the minified (but not gzipped) version:
 	  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
 
@@ -5134,15 +5195,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // All **ECMAScript 5** native function implementations that we hope to use
 	  // are declared here.
 	  var
-	    nativeForEach      = ArrayProto.forEach,
-	    nativeMap          = ArrayProto.map,
-	    nativeReduce       = ArrayProto.reduce,
-	    nativeReduceRight  = ArrayProto.reduceRight,
-	    nativeFilter       = ArrayProto.filter,
-	    nativeEvery        = ArrayProto.every,
-	    nativeSome         = ArrayProto.some,
-	    nativeIndexOf      = ArrayProto.indexOf,
-	    nativeLastIndexOf  = ArrayProto.lastIndexOf,
 	    nativeIsArray      = Array.isArray,
 	    nativeKeys         = Object.keys,
 	    nativeBind         = FuncProto.bind;
@@ -5156,8 +5208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Export the Underscore object for **Node.js**, with
 	  // backwards-compatibility for the old `require()` API. If we're in
-	  // the browser, add `_` as a global object via a string identifier,
-	  // for Closure Compiler "advanced" mode.
+	  // the browser, add `_` as a global object.
 	  if (true) {
 	    if (typeof module !== 'undefined' && module.exports) {
 	      exports = module.exports = _;
@@ -5168,98 +5219,125 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // Current version.
-	  _.VERSION = '1.6.0';
+	  _.VERSION = '1.7.0';
+
+	  // Internal function that returns an efficient (for current engines) version
+	  // of the passed-in callback, to be repeatedly applied in other Underscore
+	  // functions.
+	  var createCallback = function(func, context, argCount) {
+	    if (context === void 0) return func;
+	    switch (argCount == null ? 3 : argCount) {
+	      case 1: return function(value) {
+	        return func.call(context, value);
+	      };
+	      case 2: return function(value, other) {
+	        return func.call(context, value, other);
+	      };
+	      case 3: return function(value, index, collection) {
+	        return func.call(context, value, index, collection);
+	      };
+	      case 4: return function(accumulator, value, index, collection) {
+	        return func.call(context, accumulator, value, index, collection);
+	      };
+	    }
+	    return function() {
+	      return func.apply(context, arguments);
+	    };
+	  };
+
+	  // A mostly-internal function to generate callbacks that can be applied
+	  // to each element in a collection, returning the desired result — either
+	  // identity, an arbitrary callback, a property matcher, or a property accessor.
+	  _.iteratee = function(value, context, argCount) {
+	    if (value == null) return _.identity;
+	    if (_.isFunction(value)) return createCallback(value, context, argCount);
+	    if (_.isObject(value)) return _.matches(value);
+	    return _.property(value);
+	  };
 
 	  // Collection Functions
 	  // --------------------
 
 	  // The cornerstone, an `each` implementation, aka `forEach`.
-	  // Handles objects with the built-in `forEach`, arrays, and raw objects.
-	  // Delegates to **ECMAScript 5**'s native `forEach` if available.
-	  var each = _.each = _.forEach = function(obj, iterator, context) {
+	  // Handles raw objects in addition to array-likes. Treats all
+	  // sparse array-likes as if they were dense.
+	  _.each = _.forEach = function(obj, iteratee, context) {
 	    if (obj == null) return obj;
-	    if (nativeForEach && obj.forEach === nativeForEach) {
-	      obj.forEach(iterator, context);
-	    } else if (obj.length === +obj.length) {
-	      for (var i = 0, length = obj.length; i < length; i++) {
-	        if (iterator.call(context, obj[i], i, obj) === breaker) return;
+	    iteratee = createCallback(iteratee, context);
+	    var i, length = obj.length;
+	    if (length === +length) {
+	      for (i = 0; i < length; i++) {
+	        iteratee(obj[i], i, obj);
 	      }
 	    } else {
 	      var keys = _.keys(obj);
-	      for (var i = 0, length = keys.length; i < length; i++) {
-	        if (iterator.call(context, obj[keys[i]], keys[i], obj) === breaker) return;
+	      for (i = 0, length = keys.length; i < length; i++) {
+	        iteratee(obj[keys[i]], keys[i], obj);
 	      }
 	    }
 	    return obj;
 	  };
 
-	  // Return the results of applying the iterator to each element.
-	  // Delegates to **ECMAScript 5**'s native `map` if available.
-	  _.map = _.collect = function(obj, iterator, context) {
-	    var results = [];
-	    if (obj == null) return results;
-	    if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
-	    each(obj, function(value, index, list) {
-	      results.push(iterator.call(context, value, index, list));
-	    });
+	  // Return the results of applying the iteratee to each element.
+	  _.map = _.collect = function(obj, iteratee, context) {
+	    if (obj == null) return [];
+	    iteratee = _.iteratee(iteratee, context);
+	    var keys = obj.length !== +obj.length && _.keys(obj),
+	        length = (keys || obj).length,
+	        results = Array(length),
+	        currentKey;
+	    for (var index = 0; index < length; index++) {
+	      currentKey = keys ? keys[index] : index;
+	      results[index] = iteratee(obj[currentKey], currentKey, obj);
+	    }
 	    return results;
 	  };
 
 	  var reduceError = 'Reduce of empty array with no initial value';
 
 	  // **Reduce** builds up a single result from a list of values, aka `inject`,
-	  // or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
-	  _.reduce = _.foldl = _.inject = function(obj, iterator, memo, context) {
-	    var initial = arguments.length > 2;
+	  // or `foldl`.
+	  _.reduce = _.foldl = _.inject = function(obj, iteratee, memo, context) {
 	    if (obj == null) obj = [];
-	    if (nativeReduce && obj.reduce === nativeReduce) {
-	      if (context) iterator = _.bind(iterator, context);
-	      return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
+	    iteratee = createCallback(iteratee, context, 4);
+	    var keys = obj.length !== +obj.length && _.keys(obj),
+	        length = (keys || obj).length,
+	        index = 0, currentKey;
+	    if (arguments.length < 3) {
+	      if (!length) throw new TypeError(reduceError);
+	      memo = obj[keys ? keys[index++] : index++];
 	    }
-	    each(obj, function(value, index, list) {
-	      if (!initial) {
-	        memo = value;
-	        initial = true;
-	      } else {
-	        memo = iterator.call(context, memo, value, index, list);
-	      }
-	    });
-	    if (!initial) throw new TypeError(reduceError);
+	    for (; index < length; index++) {
+	      currentKey = keys ? keys[index] : index;
+	      memo = iteratee(memo, obj[currentKey], currentKey, obj);
+	    }
 	    return memo;
 	  };
 
 	  // The right-associative version of reduce, also known as `foldr`.
-	  // Delegates to **ECMAScript 5**'s native `reduceRight` if available.
-	  _.reduceRight = _.foldr = function(obj, iterator, memo, context) {
-	    var initial = arguments.length > 2;
+	  _.reduceRight = _.foldr = function(obj, iteratee, memo, context) {
 	    if (obj == null) obj = [];
-	    if (nativeReduceRight && obj.reduceRight === nativeReduceRight) {
-	      if (context) iterator = _.bind(iterator, context);
-	      return initial ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
+	    iteratee = createCallback(iteratee, context, 4);
+	    var keys = obj.length !== + obj.length && _.keys(obj),
+	        index = (keys || obj).length,
+	        currentKey;
+	    if (arguments.length < 3) {
+	      if (!index) throw new TypeError(reduceError);
+	      memo = obj[keys ? keys[--index] : --index];
 	    }
-	    var length = obj.length;
-	    if (length !== +length) {
-	      var keys = _.keys(obj);
-	      length = keys.length;
+	    while (index--) {
+	      currentKey = keys ? keys[index] : index;
+	      memo = iteratee(memo, obj[currentKey], currentKey, obj);
 	    }
-	    each(obj, function(value, index, list) {
-	      index = keys ? keys[--length] : --length;
-	      if (!initial) {
-	        memo = obj[index];
-	        initial = true;
-	      } else {
-	        memo = iterator.call(context, memo, obj[index], index, list);
-	      }
-	    });
-	    if (!initial) throw new TypeError(reduceError);
 	    return memo;
 	  };
 
 	  // Return the first value which passes a truth test. Aliased as `detect`.
 	  _.find = _.detect = function(obj, predicate, context) {
 	    var result;
-	    any(obj, function(value, index, list) {
-	      if (predicate.call(context, value, index, list)) {
+	    predicate = _.iteratee(predicate, context);
+	    _.some(obj, function(value, index, list) {
+	      if (predicate(value, index, list)) {
 	        result = value;
 	        return true;
 	      }
@@ -5268,61 +5346,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  // Return all the elements that pass a truth test.
-	  // Delegates to **ECMAScript 5**'s native `filter` if available.
 	  // Aliased as `select`.
 	  _.filter = _.select = function(obj, predicate, context) {
 	    var results = [];
 	    if (obj == null) return results;
-	    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(predicate, context);
-	    each(obj, function(value, index, list) {
-	      if (predicate.call(context, value, index, list)) results.push(value);
+	    predicate = _.iteratee(predicate, context);
+	    _.each(obj, function(value, index, list) {
+	      if (predicate(value, index, list)) results.push(value);
 	    });
 	    return results;
 	  };
 
 	  // Return all the elements for which a truth test fails.
 	  _.reject = function(obj, predicate, context) {
-	    return _.filter(obj, function(value, index, list) {
-	      return !predicate.call(context, value, index, list);
-	    }, context);
+	    return _.filter(obj, _.negate(_.iteratee(predicate)), context);
 	  };
 
 	  // Determine whether all of the elements match a truth test.
-	  // Delegates to **ECMAScript 5**'s native `every` if available.
 	  // Aliased as `all`.
 	  _.every = _.all = function(obj, predicate, context) {
-	    predicate || (predicate = _.identity);
-	    var result = true;
-	    if (obj == null) return result;
-	    if (nativeEvery && obj.every === nativeEvery) return obj.every(predicate, context);
-	    each(obj, function(value, index, list) {
-	      if (!(result = result && predicate.call(context, value, index, list))) return breaker;
-	    });
-	    return !!result;
+	    if (obj == null) return true;
+	    predicate = _.iteratee(predicate, context);
+	    var keys = obj.length !== +obj.length && _.keys(obj),
+	        length = (keys || obj).length,
+	        index, currentKey;
+	    for (index = 0; index < length; index++) {
+	      currentKey = keys ? keys[index] : index;
+	      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+	    }
+	    return true;
 	  };
 
 	  // Determine if at least one element in the object matches a truth test.
-	  // Delegates to **ECMAScript 5**'s native `some` if available.
 	  // Aliased as `any`.
-	  var any = _.some = _.any = function(obj, predicate, context) {
-	    predicate || (predicate = _.identity);
-	    var result = false;
-	    if (obj == null) return result;
-	    if (nativeSome && obj.some === nativeSome) return obj.some(predicate, context);
-	    each(obj, function(value, index, list) {
-	      if (result || (result = predicate.call(context, value, index, list))) return breaker;
-	    });
-	    return !!result;
+	  _.some = _.any = function(obj, predicate, context) {
+	    if (obj == null) return false;
+	    predicate = _.iteratee(predicate, context);
+	    var keys = obj.length !== +obj.length && _.keys(obj),
+	        length = (keys || obj).length,
+	        index, currentKey;
+	    for (index = 0; index < length; index++) {
+	      currentKey = keys ? keys[index] : index;
+	      if (predicate(obj[currentKey], currentKey, obj)) return true;
+	    }
+	    return false;
 	  };
 
 	  // Determine if the array or object contains a given value (using `===`).
 	  // Aliased as `include`.
 	  _.contains = _.include = function(obj, target) {
 	    if (obj == null) return false;
-	    if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
-	    return any(obj, function(value) {
-	      return value === target;
-	    });
+	    if (obj.length !== +obj.length) obj = _.values(obj);
+	    return _.indexOf(obj, target) >= 0;
 	  };
 
 	  // Invoke a method (with arguments) on every item in a collection.
@@ -5351,51 +5426,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _.find(obj, _.matches(attrs));
 	  };
 
-	  // Return the maximum element or (element-based computation).
-	  // Can't optimize arrays of integers longer than 65,535 elements.
-	  // See [WebKit Bug 80797](https://bugs.webkit.org/show_bug.cgi?id=80797)
-	  _.max = function(obj, iterator, context) {
-	    if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
-	      return Math.max.apply(Math, obj);
-	    }
-	    var result = -Infinity, lastComputed = -Infinity;
-	    each(obj, function(value, index, list) {
-	      var computed = iterator ? iterator.call(context, value, index, list) : value;
-	      if (computed > lastComputed) {
-	        result = value;
-	        lastComputed = computed;
+	  // Return the maximum element (or element-based computation).
+	  _.max = function(obj, iteratee, context) {
+	    var result = -Infinity, lastComputed = -Infinity,
+	        value, computed;
+	    if (iteratee == null && obj != null) {
+	      obj = obj.length === +obj.length ? obj : _.values(obj);
+	      for (var i = 0, length = obj.length; i < length; i++) {
+	        value = obj[i];
+	        if (value > result) {
+	          result = value;
+	        }
 	      }
-	    });
+	    } else {
+	      iteratee = _.iteratee(iteratee, context);
+	      _.each(obj, function(value, index, list) {
+	        computed = iteratee(value, index, list);
+	        if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
+	          result = value;
+	          lastComputed = computed;
+	        }
+	      });
+	    }
 	    return result;
 	  };
 
 	  // Return the minimum element (or element-based computation).
-	  _.min = function(obj, iterator, context) {
-	    if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
-	      return Math.min.apply(Math, obj);
-	    }
-	    var result = Infinity, lastComputed = Infinity;
-	    each(obj, function(value, index, list) {
-	      var computed = iterator ? iterator.call(context, value, index, list) : value;
-	      if (computed < lastComputed) {
-	        result = value;
-	        lastComputed = computed;
+	  _.min = function(obj, iteratee, context) {
+	    var result = Infinity, lastComputed = Infinity,
+	        value, computed;
+	    if (iteratee == null && obj != null) {
+	      obj = obj.length === +obj.length ? obj : _.values(obj);
+	      for (var i = 0, length = obj.length; i < length; i++) {
+	        value = obj[i];
+	        if (value < result) {
+	          result = value;
+	        }
 	      }
-	    });
+	    } else {
+	      iteratee = _.iteratee(iteratee, context);
+	      _.each(obj, function(value, index, list) {
+	        computed = iteratee(value, index, list);
+	        if (computed < lastComputed || computed === Infinity && result === Infinity) {
+	          result = value;
+	          lastComputed = computed;
+	        }
+	      });
+	    }
 	    return result;
 	  };
 
-	  // Shuffle an array, using the modern version of the
+	  // Shuffle a collection, using the modern version of the
 	  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
 	  _.shuffle = function(obj) {
-	    var rand;
-	    var index = 0;
-	    var shuffled = [];
-	    each(obj, function(value) {
-	      rand = _.random(index++);
-	      shuffled[index - 1] = shuffled[rand];
-	      shuffled[rand] = value;
-	    });
+	    var set = obj && obj.length === +obj.length ? obj : _.values(obj);
+	    var length = set.length;
+	    var shuffled = Array(length);
+	    for (var index = 0, rand; index < length; index++) {
+	      rand = _.random(0, index);
+	      if (rand !== index) shuffled[index] = shuffled[rand];
+	      shuffled[rand] = set[index];
+	    }
 	    return shuffled;
 	  };
 
@@ -5410,21 +5501,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _.shuffle(obj).slice(0, Math.max(0, n));
 	  };
 
-	  // An internal function to generate lookup iterators.
-	  var lookupIterator = function(value) {
-	    if (value == null) return _.identity;
-	    if (_.isFunction(value)) return value;
-	    return _.property(value);
-	  };
-
-	  // Sort the object's values by a criterion produced by an iterator.
-	  _.sortBy = function(obj, iterator, context) {
-	    iterator = lookupIterator(iterator);
+	  // Sort the object's values by a criterion produced by an iteratee.
+	  _.sortBy = function(obj, iteratee, context) {
+	    iteratee = _.iteratee(iteratee, context);
 	    return _.pluck(_.map(obj, function(value, index, list) {
 	      return {
 	        value: value,
 	        index: index,
-	        criteria: iterator.call(context, value, index, list)
+	        criteria: iteratee(value, index, list)
 	      };
 	    }).sort(function(left, right) {
 	      var a = left.criteria;
@@ -5439,12 +5523,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // An internal function used for aggregate "group by" operations.
 	  var group = function(behavior) {
-	    return function(obj, iterator, context) {
+	    return function(obj, iteratee, context) {
 	      var result = {};
-	      iterator = lookupIterator(iterator);
-	      each(obj, function(value, index) {
-	        var key = iterator.call(context, value, index, obj);
-	        behavior(result, key, value);
+	      iteratee = _.iteratee(iteratee, context);
+	      _.each(obj, function(value, index) {
+	        var key = iteratee(value, index, obj);
+	        behavior(result, value, key);
 	      });
 	      return result;
 	    };
@@ -5452,32 +5536,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Groups the object's values by a criterion. Pass either a string attribute
 	  // to group by, or a function that returns the criterion.
-	  _.groupBy = group(function(result, key, value) {
-	    _.has(result, key) ? result[key].push(value) : result[key] = [value];
+	  _.groupBy = group(function(result, value, key) {
+	    if (_.has(result, key)) result[key].push(value); else result[key] = [value];
 	  });
 
 	  // Indexes the object's values by a criterion, similar to `groupBy`, but for
 	  // when you know that your index values will be unique.
-	  _.indexBy = group(function(result, key, value) {
+	  _.indexBy = group(function(result, value, key) {
 	    result[key] = value;
 	  });
 
 	  // Counts instances of an object that group by a certain criterion. Pass
 	  // either a string attribute to count by, or a function that returns the
 	  // criterion.
-	  _.countBy = group(function(result, key) {
-	    _.has(result, key) ? result[key]++ : result[key] = 1;
+	  _.countBy = group(function(result, value, key) {
+	    if (_.has(result, key)) result[key]++; else result[key] = 1;
 	  });
 
 	  // Use a comparator function to figure out the smallest index at which
 	  // an object should be inserted so as to maintain order. Uses binary search.
-	  _.sortedIndex = function(array, obj, iterator, context) {
-	    iterator = lookupIterator(iterator);
-	    var value = iterator.call(context, obj);
+	  _.sortedIndex = function(array, obj, iteratee, context) {
+	    iteratee = _.iteratee(iteratee, context, 1);
+	    var value = iteratee(obj);
 	    var low = 0, high = array.length;
 	    while (low < high) {
-	      var mid = (low + high) >>> 1;
-	      iterator.call(context, array[mid]) < value ? low = mid + 1 : high = mid;
+	      var mid = low + high >>> 1;
+	      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
 	    }
 	    return low;
 	  };
@@ -5493,7 +5577,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Return the number of elements in an object.
 	  _.size = function(obj) {
 	    if (obj == null) return 0;
-	    return (obj.length === +obj.length) ? obj.length : _.keys(obj).length;
+	    return obj.length === +obj.length ? obj.length : _.keys(obj).length;
+	  };
+
+	  // Split a collection into two arrays: one whose elements all satisfy the given
+	  // predicate, and one whose elements all do not satisfy the predicate.
+	  _.partition = function(obj, predicate, context) {
+	    predicate = _.iteratee(predicate, context);
+	    var pass = [], fail = [];
+	    _.each(obj, function(value, key, obj) {
+	      (predicate(value, key, obj) ? pass : fail).push(value);
+	    });
+	    return [pass, fail];
 	  };
 
 	  // Array Functions
@@ -5504,7 +5599,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // allows it to work with `_.map`.
 	  _.first = _.head = _.take = function(array, n, guard) {
 	    if (array == null) return void 0;
-	    if ((n == null) || guard) return array[0];
+	    if (n == null || guard) return array[0];
 	    if (n < 0) return [];
 	    return slice.call(array, 0, n);
 	  };
@@ -5514,14 +5609,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // the array, excluding the last N. The **guard** check allows it to work with
 	  // `_.map`.
 	  _.initial = function(array, n, guard) {
-	    return slice.call(array, 0, array.length - ((n == null) || guard ? 1 : n));
+	    return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
 	  };
 
 	  // Get the last element of an array. Passing **n** will return the last N
 	  // values in the array. The **guard** check allows it to work with `_.map`.
 	  _.last = function(array, n, guard) {
 	    if (array == null) return void 0;
-	    if ((n == null) || guard) return array[array.length - 1];
+	    if (n == null || guard) return array[array.length - 1];
 	    return slice.call(array, Math.max(array.length - n, 0));
 	  };
 
@@ -5530,7 +5625,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // the rest N values in the array. The **guard**
 	  // check allows it to work with `_.map`.
 	  _.rest = _.tail = _.drop = function(array, n, guard) {
-	    return slice.call(array, (n == null) || guard ? 1 : n);
+	    return slice.call(array, n == null || guard ? 1 : n);
 	  };
 
 	  // Trim out all falsy values from an array.
@@ -5539,23 +5634,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  // Internal implementation of a recursive `flatten` function.
-	  var flatten = function(input, shallow, output) {
+	  var flatten = function(input, shallow, strict, output) {
 	    if (shallow && _.every(input, _.isArray)) {
 	      return concat.apply(output, input);
 	    }
-	    each(input, function(value) {
-	      if (_.isArray(value) || _.isArguments(value)) {
-	        shallow ? push.apply(output, value) : flatten(value, shallow, output);
+	    for (var i = 0, length = input.length; i < length; i++) {
+	      var value = input[i];
+	      if (!_.isArray(value) && !_.isArguments(value)) {
+	        if (!strict) output.push(value);
+	      } else if (shallow) {
+	        push.apply(output, value);
 	      } else {
-	        output.push(value);
+	        flatten(value, shallow, strict, output);
 	      }
-	    });
+	    }
 	    return output;
 	  };
 
 	  // Flatten out an array, either recursively (by default), or just one level.
 	  _.flatten = function(array, shallow) {
-	    return flatten(array, shallow, []);
+	    return flatten(array, shallow, false, []);
 	  };
 
 	  // Return a version of the array that does not contain the specified value(s).
@@ -5563,68 +5661,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _.difference(array, slice.call(arguments, 1));
 	  };
 
-	  // Split an array into two arrays: one whose elements all satisfy the given
-	  // predicate, and one whose elements all do not satisfy the predicate.
-	  _.partition = function(array, predicate) {
-	    var pass = [], fail = [];
-	    each(array, function(elem) {
-	      (predicate(elem) ? pass : fail).push(elem);
-	    });
-	    return [pass, fail];
-	  };
-
 	  // Produce a duplicate-free version of the array. If the array has already
 	  // been sorted, you have the option of using a faster algorithm.
 	  // Aliased as `unique`.
-	  _.uniq = _.unique = function(array, isSorted, iterator, context) {
-	    if (_.isFunction(isSorted)) {
-	      context = iterator;
-	      iterator = isSorted;
+	  _.uniq = _.unique = function(array, isSorted, iteratee, context) {
+	    if (array == null) return [];
+	    if (!_.isBoolean(isSorted)) {
+	      context = iteratee;
+	      iteratee = isSorted;
 	      isSorted = false;
 	    }
-	    var initial = iterator ? _.map(array, iterator, context) : array;
-	    var results = [];
+	    if (iteratee != null) iteratee = _.iteratee(iteratee, context);
+	    var result = [];
 	    var seen = [];
-	    each(initial, function(value, index) {
-	      if (isSorted ? (!index || seen[seen.length - 1] !== value) : !_.contains(seen, value)) {
-	        seen.push(value);
-	        results.push(array[index]);
+	    for (var i = 0, length = array.length; i < length; i++) {
+	      var value = array[i];
+	      if (isSorted) {
+	        if (!i || seen !== value) result.push(value);
+	        seen = value;
+	      } else if (iteratee) {
+	        var computed = iteratee(value, i, array);
+	        if (_.indexOf(seen, computed) < 0) {
+	          seen.push(computed);
+	          result.push(value);
+	        }
+	      } else if (_.indexOf(result, value) < 0) {
+	        result.push(value);
 	      }
-	    });
-	    return results;
+	    }
+	    return result;
 	  };
 
 	  // Produce an array that contains the union: each distinct element from all of
 	  // the passed-in arrays.
 	  _.union = function() {
-	    return _.uniq(_.flatten(arguments, true));
+	    return _.uniq(flatten(arguments, true, true, []));
 	  };
 
 	  // Produce an array that contains every item shared between all the
 	  // passed-in arrays.
 	  _.intersection = function(array) {
-	    var rest = slice.call(arguments, 1);
-	    return _.filter(_.uniq(array), function(item) {
-	      return _.every(rest, function(other) {
-	        return _.contains(other, item);
-	      });
-	    });
+	    if (array == null) return [];
+	    var result = [];
+	    var argsLength = arguments.length;
+	    for (var i = 0, length = array.length; i < length; i++) {
+	      var item = array[i];
+	      if (_.contains(result, item)) continue;
+	      for (var j = 1; j < argsLength; j++) {
+	        if (!_.contains(arguments[j], item)) break;
+	      }
+	      if (j === argsLength) result.push(item);
+	    }
+	    return result;
 	  };
 
 	  // Take the difference between one array and a number of other arrays.
 	  // Only the elements present in just the first array will remain.
 	  _.difference = function(array) {
-	    var rest = concat.apply(ArrayProto, slice.call(arguments, 1));
-	    return _.filter(array, function(value){ return !_.contains(rest, value); });
+	    var rest = flatten(slice.call(arguments, 1), true, true, []);
+	    return _.filter(array, function(value){
+	      return !_.contains(rest, value);
+	    });
 	  };
 
 	  // Zip together multiple lists into a single array -- elements that share
 	  // an index go together.
-	  _.zip = function() {
-	    var length = _.max(_.pluck(arguments, 'length').concat(0));
-	    var results = new Array(length);
+	  _.zip = function(array) {
+	    if (array == null) return [];
+	    var length = _.max(arguments, 'length').length;
+	    var results = Array(length);
 	    for (var i = 0; i < length; i++) {
-	      results[i] = _.pluck(arguments, '' + i);
+	      results[i] = _.pluck(arguments, i);
 	    }
 	    return results;
 	  };
@@ -5645,10 +5752,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return result;
 	  };
 
-	  // If the browser doesn't supply us with indexOf (I'm looking at you, **MSIE**),
-	  // we need this function. Return the position of the first occurrence of an
-	  // item in an array, or -1 if the item is not included in the array.
-	  // Delegates to **ECMAScript 5**'s native `indexOf` if available.
+	  // Return the position of the first occurrence of an item in an array,
+	  // or -1 if the item is not included in the array.
 	  // If the array is large and already in sort order, pass `true`
 	  // for **isSorted** to use binary search.
 	  _.indexOf = function(array, item, isSorted) {
@@ -5656,26 +5761,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var i = 0, length = array.length;
 	    if (isSorted) {
 	      if (typeof isSorted == 'number') {
-	        i = (isSorted < 0 ? Math.max(0, length + isSorted) : isSorted);
+	        i = isSorted < 0 ? Math.max(0, length + isSorted) : isSorted;
 	      } else {
 	        i = _.sortedIndex(array, item);
 	        return array[i] === item ? i : -1;
 	      }
 	    }
-	    if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item, isSorted);
 	    for (; i < length; i++) if (array[i] === item) return i;
 	    return -1;
 	  };
 
-	  // Delegates to **ECMAScript 5**'s native `lastIndexOf` if available.
 	  _.lastIndexOf = function(array, item, from) {
 	    if (array == null) return -1;
-	    var hasIndex = from != null;
-	    if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf) {
-	      return hasIndex ? array.lastIndexOf(item, from) : array.lastIndexOf(item);
+	    var idx = array.length;
+	    if (typeof from == 'number') {
+	      idx = from < 0 ? idx + from + 1 : Math.min(idx, from + 1);
 	    }
-	    var i = (hasIndex ? from : array.length);
-	    while (i--) if (array[i] === item) return i;
+	    while (--idx >= 0) if (array[idx] === item) return idx;
 	    return -1;
 	  };
 
@@ -5687,15 +5789,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      stop = start || 0;
 	      start = 0;
 	    }
-	    step = arguments[2] || 1;
+	    step = step || 1;
 
 	    var length = Math.max(Math.ceil((stop - start) / step), 0);
-	    var idx = 0;
-	    var range = new Array(length);
+	    var range = Array(length);
 
-	    while(idx < length) {
-	      range[idx++] = start;
-	      start += step;
+	    for (var idx = 0; idx < length; idx++, start += step) {
+	      range[idx] = start;
 	    }
 
 	    return range;
@@ -5705,7 +5805,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // ------------------
 
 	  // Reusable constructor function for prototype setting.
-	  var ctor = function(){};
+	  var Ctor = function(){};
 
 	  // Create a function bound to a given object (assigning `this`, and arguments,
 	  // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
@@ -5713,17 +5813,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _.bind = function(func, context) {
 	    var args, bound;
 	    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-	    if (!_.isFunction(func)) throw new TypeError;
+	    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
 	    args = slice.call(arguments, 2);
-	    return bound = function() {
+	    bound = function() {
 	      if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
-	      ctor.prototype = func.prototype;
-	      var self = new ctor;
-	      ctor.prototype = null;
+	      Ctor.prototype = func.prototype;
+	      var self = new Ctor;
+	      Ctor.prototype = null;
 	      var result = func.apply(self, args.concat(slice.call(arguments)));
-	      if (Object(result) === result) return result;
+	      if (_.isObject(result)) return result;
 	      return self;
 	    };
+	    return bound;
 	  };
 
 	  // Partially apply a function by creating a version that has had some of its
@@ -5746,27 +5847,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // are the method names to be bound. Useful for ensuring that all callbacks
 	  // defined on an object belong to it.
 	  _.bindAll = function(obj) {
-	    var funcs = slice.call(arguments, 1);
-	    if (funcs.length === 0) throw new Error('bindAll must be passed function names');
-	    each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
+	    var i, length = arguments.length, key;
+	    if (length <= 1) throw new Error('bindAll must be passed function names');
+	    for (i = 1; i < length; i++) {
+	      key = arguments[i];
+	      obj[key] = _.bind(obj[key], obj);
+	    }
 	    return obj;
 	  };
 
 	  // Memoize an expensive function by storing its results.
 	  _.memoize = function(func, hasher) {
-	    var memo = {};
-	    hasher || (hasher = _.identity);
-	    return function() {
-	      var key = hasher.apply(this, arguments);
-	      return _.has(memo, key) ? memo[key] : (memo[key] = func.apply(this, arguments));
+	    var memoize = function(key) {
+	      var cache = memoize.cache;
+	      var address = hasher ? hasher.apply(this, arguments) : key;
+	      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
+	      return cache[address];
 	    };
+	    memoize.cache = {};
+	    return memoize;
 	  };
 
 	  // Delays a function for the given number of milliseconds, and then calls
 	  // it with the arguments supplied.
 	  _.delay = function(func, wait) {
 	    var args = slice.call(arguments, 2);
-	    return setTimeout(function(){ return func.apply(null, args); }, wait);
+	    return setTimeout(function(){
+	      return func.apply(null, args);
+	    }, wait);
 	  };
 
 	  // Defers a function, scheduling it to run after the current call stack has
@@ -5784,12 +5892,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var context, args, result;
 	    var timeout = null;
 	    var previous = 0;
-	    options || (options = {});
+	    if (!options) options = {};
 	    var later = function() {
 	      previous = options.leading === false ? 0 : _.now();
 	      timeout = null;
 	      result = func.apply(context, args);
-	      context = args = null;
+	      if (!timeout) context = args = null;
 	    };
 	    return function() {
 	      var now = _.now();
@@ -5797,12 +5905,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var remaining = wait - (now - previous);
 	      context = this;
 	      args = arguments;
-	      if (remaining <= 0) {
+	      if (remaining <= 0 || remaining > wait) {
 	        clearTimeout(timeout);
 	        timeout = null;
 	        previous = now;
 	        result = func.apply(context, args);
-	        context = args = null;
+	        if (!timeout) context = args = null;
 	      } else if (!timeout && options.trailing !== false) {
 	        timeout = setTimeout(later, remaining);
 	      }
@@ -5819,13 +5927,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var later = function() {
 	      var last = _.now() - timestamp;
-	      if (last < wait) {
+
+	      if (last < wait && last > 0) {
 	        timeout = setTimeout(later, wait - last);
 	      } else {
 	        timeout = null;
 	        if (!immediate) {
 	          result = func.apply(context, args);
-	          context = args = null;
+	          if (!timeout) context = args = null;
 	        }
 	      }
 	    };
@@ -5835,28 +5944,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      args = arguments;
 	      timestamp = _.now();
 	      var callNow = immediate && !timeout;
-	      if (!timeout) {
-	        timeout = setTimeout(later, wait);
-	      }
+	      if (!timeout) timeout = setTimeout(later, wait);
 	      if (callNow) {
 	        result = func.apply(context, args);
 	        context = args = null;
 	      }
 
 	      return result;
-	    };
-	  };
-
-	  // Returns a function that will be executed at most one time, no matter how
-	  // often you call it. Useful for lazy initialization.
-	  _.once = function(func) {
-	    var ran = false, memo;
-	    return function() {
-	      if (ran) return memo;
-	      ran = true;
-	      memo = func.apply(this, arguments);
-	      func = null;
-	      return memo;
 	    };
 	  };
 
@@ -5867,16 +5961,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return _.partial(wrapper, func);
 	  };
 
+	  // Returns a negated version of the passed-in predicate.
+	  _.negate = function(predicate) {
+	    return function() {
+	      return !predicate.apply(this, arguments);
+	    };
+	  };
+
 	  // Returns a function that is the composition of a list of functions, each
 	  // consuming the return value of the function that follows.
 	  _.compose = function() {
-	    var funcs = arguments;
+	    var args = arguments;
+	    var start = args.length - 1;
 	    return function() {
-	      var args = arguments;
-	      for (var i = funcs.length - 1; i >= 0; i--) {
-	        args = [funcs[i].apply(this, args)];
-	      }
-	      return args[0];
+	      var i = start;
+	      var result = args[start].apply(this, arguments);
+	      while (i--) result = args[i].call(this, result);
+	      return result;
 	    };
 	  };
 
@@ -5888,6 +5989,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    };
 	  };
+
+	  // Returns a function that will only be executed before being called N times.
+	  _.before = function(times, func) {
+	    var memo;
+	    return function() {
+	      if (--times > 0) {
+	        memo = func.apply(this, arguments);
+	      } else {
+	        func = null;
+	      }
+	      return memo;
+	    };
+	  };
+
+	  // Returns a function that will be executed at most one time, no matter how
+	  // often you call it. Useful for lazy initialization.
+	  _.once = _.partial(_.before, 2);
 
 	  // Object Functions
 	  // ----------------
@@ -5906,7 +6024,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _.values = function(obj) {
 	    var keys = _.keys(obj);
 	    var length = keys.length;
-	    var values = new Array(length);
+	    var values = Array(length);
 	    for (var i = 0; i < length; i++) {
 	      values[i] = obj[keys[i]];
 	    }
@@ -5917,7 +6035,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _.pairs = function(obj) {
 	    var keys = _.keys(obj);
 	    var length = keys.length;
-	    var pairs = new Array(length);
+	    var pairs = Array(length);
 	    for (var i = 0; i < length; i++) {
 	      pairs[i] = [keys[i], obj[keys[i]]];
 	    }
@@ -5946,45 +6064,62 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Extend a given object with all the properties in passed-in object(s).
 	  _.extend = function(obj) {
-	    each(slice.call(arguments, 1), function(source) {
-	      if (source) {
-	        for (var prop in source) {
-	          obj[prop] = source[prop];
+	    if (!_.isObject(obj)) return obj;
+	    var source, prop;
+	    for (var i = 1, length = arguments.length; i < length; i++) {
+	      source = arguments[i];
+	      for (prop in source) {
+	        if (hasOwnProperty.call(source, prop)) {
+	            obj[prop] = source[prop];
 	        }
 	      }
-	    });
+	    }
 	    return obj;
 	  };
 
 	  // Return a copy of the object only containing the whitelisted properties.
-	  _.pick = function(obj) {
-	    var copy = {};
-	    var keys = concat.apply(ArrayProto, slice.call(arguments, 1));
-	    each(keys, function(key) {
-	      if (key in obj) copy[key] = obj[key];
-	    });
-	    return copy;
+	  _.pick = function(obj, iteratee, context) {
+	    var result = {}, key;
+	    if (obj == null) return result;
+	    if (_.isFunction(iteratee)) {
+	      iteratee = createCallback(iteratee, context);
+	      for (key in obj) {
+	        var value = obj[key];
+	        if (iteratee(value, key, obj)) result[key] = value;
+	      }
+	    } else {
+	      var keys = concat.apply([], slice.call(arguments, 1));
+	      obj = new Object(obj);
+	      for (var i = 0, length = keys.length; i < length; i++) {
+	        key = keys[i];
+	        if (key in obj) result[key] = obj[key];
+	      }
+	    }
+	    return result;
 	  };
 
 	   // Return a copy of the object without the blacklisted properties.
-	  _.omit = function(obj) {
-	    var copy = {};
-	    var keys = concat.apply(ArrayProto, slice.call(arguments, 1));
-	    for (var key in obj) {
-	      if (!_.contains(keys, key)) copy[key] = obj[key];
+	  _.omit = function(obj, iteratee, context) {
+	    if (_.isFunction(iteratee)) {
+	      iteratee = _.negate(iteratee);
+	    } else {
+	      var keys = _.map(concat.apply([], slice.call(arguments, 1)), String);
+	      iteratee = function(value, key) {
+	        return !_.contains(keys, key);
+	      };
 	    }
-	    return copy;
+	    return _.pick(obj, iteratee, context);
 	  };
 
 	  // Fill in a given object with default properties.
 	  _.defaults = function(obj) {
-	    each(slice.call(arguments, 1), function(source) {
-	      if (source) {
-	        for (var prop in source) {
-	          if (obj[prop] === void 0) obj[prop] = source[prop];
-	        }
+	    if (!_.isObject(obj)) return obj;
+	    for (var i = 1, length = arguments.length; i < length; i++) {
+	      var source = arguments[i];
+	      for (var prop in source) {
+	        if (obj[prop] === void 0) obj[prop] = source[prop];
 	      }
-	    });
+	    }
 	    return obj;
 	  };
 
@@ -6006,7 +6141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var eq = function(a, b, aStack, bStack) {
 	    // Identical objects are equal. `0 === -0`, but they aren't identical.
 	    // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
-	    if (a === b) return a !== 0 || 1 / a == 1 / b;
+	    if (a === b) return a !== 0 || 1 / a === 1 / b;
 	    // A strict comparison is necessary because `null == undefined`.
 	    if (a == null || b == null) return a === b;
 	    // Unwrap any wrapped objects.
@@ -6014,29 +6149,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (b instanceof _) b = b._wrapped;
 	    // Compare `[[Class]]` names.
 	    var className = toString.call(a);
-	    if (className != toString.call(b)) return false;
+	    if (className !== toString.call(b)) return false;
 	    switch (className) {
-	      // Strings, numbers, dates, and booleans are compared by value.
+	      // Strings, numbers, regular expressions, dates, and booleans are compared by value.
+	      case '[object RegExp]':
+	      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
 	      case '[object String]':
 	        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
 	        // equivalent to `new String("5")`.
-	        return a == String(b);
+	        return '' + a === '' + b;
 	      case '[object Number]':
-	        // `NaN`s are equivalent, but non-reflexive. An `egal` comparison is performed for
-	        // other numeric values.
-	        return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+	        // `NaN`s are equivalent, but non-reflexive.
+	        // Object(NaN) is equivalent to NaN
+	        if (+a !== +a) return +b !== +b;
+	        // An `egal` comparison is performed for other numeric values.
+	        return +a === 0 ? 1 / +a === 1 / b : +a === +b;
 	      case '[object Date]':
 	      case '[object Boolean]':
 	        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
 	        // millisecond representations. Note that invalid dates with millisecond representations
 	        // of `NaN` are not equivalent.
-	        return +a == +b;
-	      // RegExps are compared by their source patterns and flags.
-	      case '[object RegExp]':
-	        return a.source == b.source &&
-	               a.global == b.global &&
-	               a.multiline == b.multiline &&
-	               a.ignoreCase == b.ignoreCase;
+	        return +a === +b;
 	    }
 	    if (typeof a != 'object' || typeof b != 'object') return false;
 	    // Assume equality for cyclic structures. The algorithm for detecting cyclic
@@ -6045,25 +6178,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    while (length--) {
 	      // Linear search. Performance is inversely proportional to the number of
 	      // unique nested structures.
-	      if (aStack[length] == a) return bStack[length] == b;
+	      if (aStack[length] === a) return bStack[length] === b;
 	    }
 	    // Objects with different constructors are not equivalent, but `Object`s
 	    // from different frames are.
 	    var aCtor = a.constructor, bCtor = b.constructor;
-	    if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
-	                             _.isFunction(bCtor) && (bCtor instanceof bCtor))
-	                        && ('constructor' in a && 'constructor' in b)) {
+	    if (
+	      aCtor !== bCtor &&
+	      // Handle Object.create(x) cases
+	      'constructor' in a && 'constructor' in b &&
+	      !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
+	        _.isFunction(bCtor) && bCtor instanceof bCtor)
+	    ) {
 	      return false;
 	    }
 	    // Add the first object to the stack of traversed objects.
 	    aStack.push(a);
 	    bStack.push(b);
-	    var size = 0, result = true;
+	    var size, result;
 	    // Recursively compare objects and arrays.
-	    if (className == '[object Array]') {
+	    if (className === '[object Array]') {
 	      // Compare array lengths to determine if a deep comparison is necessary.
 	      size = a.length;
-	      result = size == b.length;
+	      result = size === b.length;
 	      if (result) {
 	        // Deep compare the contents, ignoring non-numeric properties.
 	        while (size--) {
@@ -6072,20 +6209,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    } else {
 	      // Deep compare objects.
-	      for (var key in a) {
-	        if (_.has(a, key)) {
-	          // Count the expected number of properties.
-	          size++;
-	          // Deep compare each member.
+	      var keys = _.keys(a), key;
+	      size = keys.length;
+	      // Ensure that both objects contain the same number of properties before comparing deep equality.
+	      result = _.keys(b).length === size;
+	      if (result) {
+	        while (size--) {
+	          // Deep compare each member
+	          key = keys[size];
 	          if (!(result = _.has(b, key) && eq(a[key], b[key], aStack, bStack))) break;
 	        }
-	      }
-	      // Ensure that both objects contain the same number of properties.
-	      if (result) {
-	        for (key in b) {
-	          if (_.has(b, key) && !(size--)) break;
-	        }
-	        result = !size;
 	      }
 	    }
 	    // Remove the first object from the stack of traversed objects.
@@ -6103,7 +6236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // An "empty" object has no enumerable own-properties.
 	  _.isEmpty = function(obj) {
 	    if (obj == null) return true;
-	    if (_.isArray(obj) || _.isString(obj)) return obj.length === 0;
+	    if (_.isArray(obj) || _.isString(obj) || _.isArguments(obj)) return obj.length === 0;
 	    for (var key in obj) if (_.has(obj, key)) return false;
 	    return true;
 	  };
@@ -6116,18 +6249,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Is a given value an array?
 	  // Delegates to ECMA5's native Array.isArray
 	  _.isArray = nativeIsArray || function(obj) {
-	    return toString.call(obj) == '[object Array]';
+	    return toString.call(obj) === '[object Array]';
 	  };
 
 	  // Is a given variable an object?
 	  _.isObject = function(obj) {
-	    return obj === Object(obj);
+	    var type = typeof obj;
+	    return type === 'function' || type === 'object' && !!obj;
 	  };
 
 	  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp.
-	  each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
+	  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'], function(name) {
 	    _['is' + name] = function(obj) {
-	      return toString.call(obj) == '[object ' + name + ']';
+	      return toString.call(obj) === '[object ' + name + ']';
 	    };
 	  });
 
@@ -6135,14 +6269,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // there isn't any inspectable "Arguments" type.
 	  if (!_.isArguments(arguments)) {
 	    _.isArguments = function(obj) {
-	      return !!(obj && _.has(obj, 'callee'));
+	      return _.has(obj, 'callee');
 	    };
 	  }
 
-	  // Optimize `isFunction` if appropriate.
+	  // Optimize `isFunction` if appropriate. Work around an IE 11 bug.
 	  if (true) {
 	    _.isFunction = function(obj) {
-	      return typeof obj === 'function';
+	      return typeof obj == 'function' || false;
 	    };
 	  }
 
@@ -6153,12 +6287,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Is the given value `NaN`? (NaN is the only number which does not equal itself).
 	  _.isNaN = function(obj) {
-	    return _.isNumber(obj) && obj != +obj;
+	    return _.isNumber(obj) && obj !== +obj;
 	  };
 
 	  // Is a given value a boolean?
 	  _.isBoolean = function(obj) {
-	    return obj === true || obj === false || toString.call(obj) == '[object Boolean]';
+	    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
 	  };
 
 	  // Is a given value equal to null?
@@ -6174,7 +6308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // Shortcut function for checking if an object has a given property directly
 	  // on itself (in other words, not on a prototype).
 	  _.has = function(obj, key) {
-	    return hasOwnProperty.call(obj, key);
+	    return obj != null && hasOwnProperty.call(obj, key);
 	  };
 
 	  // Utility Functions
@@ -6187,16 +6321,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this;
 	  };
 
-	  // Keep the identity function around for default iterators.
+	  // Keep the identity function around for default iteratees.
 	  _.identity = function(value) {
 	    return value;
 	  };
 
 	  _.constant = function(value) {
-	    return function () {
+	    return function() {
 	      return value;
 	    };
 	  };
+
+	  _.noop = function(){};
 
 	  _.property = function(key) {
 	    return function(obj) {
@@ -6206,20 +6342,23 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
 	  _.matches = function(attrs) {
+	    var pairs = _.pairs(attrs), length = pairs.length;
 	    return function(obj) {
-	      if (obj === attrs) return true; //avoid comparing an object to itself.
-	      for (var key in attrs) {
-	        if (attrs[key] !== obj[key])
-	          return false;
+	      if (obj == null) return !length;
+	      obj = new Object(obj);
+	      for (var i = 0; i < length; i++) {
+	        var pair = pairs[i], key = pair[0];
+	        if (pair[1] !== obj[key] || !(key in obj)) return false;
 	      }
 	      return true;
-	    }
+	    };
 	  };
 
 	  // Run a function **n** times.
-	  _.times = function(n, iterator, context) {
+	  _.times = function(n, iteratee, context) {
 	    var accum = Array(Math.max(0, n));
-	    for (var i = 0; i < n; i++) accum[i] = iterator.call(context, i);
+	    iteratee = createCallback(iteratee, context, 1);
+	    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
 	    return accum;
 	  };
 
@@ -6233,54 +6372,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  // A (possibly faster) way to get the current timestamp as an integer.
-	  _.now = Date.now || function() { return new Date().getTime(); };
-
-	  // List of HTML entities for escaping.
-	  var entityMap = {
-	    escape: {
-	      '&': '&amp;',
-	      '<': '&lt;',
-	      '>': '&gt;',
-	      '"': '&quot;',
-	      "'": '&#x27;'
-	    }
+	  _.now = Date.now || function() {
+	    return new Date().getTime();
 	  };
-	  entityMap.unescape = _.invert(entityMap.escape);
 
-	  // Regexes containing the keys and values listed immediately above.
-	  var entityRegexes = {
-	    escape:   new RegExp('[' + _.keys(entityMap.escape).join('') + ']', 'g'),
-	    unescape: new RegExp('(' + _.keys(entityMap.unescape).join('|') + ')', 'g')
+	   // List of HTML entities for escaping.
+	  var escapeMap = {
+	    '&': '&amp;',
+	    '<': '&lt;',
+	    '>': '&gt;',
+	    '"': '&quot;',
+	    "'": '&#x27;',
+	    '`': '&#x60;'
 	  };
+	  var unescapeMap = _.invert(escapeMap);
 
 	  // Functions for escaping and unescaping strings to/from HTML interpolation.
-	  _.each(['escape', 'unescape'], function(method) {
-	    _[method] = function(string) {
-	      if (string == null) return '';
-	      return ('' + string).replace(entityRegexes[method], function(match) {
-	        return entityMap[method][match];
-	      });
+	  var createEscaper = function(map) {
+	    var escaper = function(match) {
+	      return map[match];
 	    };
-	  });
+	    // Regexes for identifying a key that needs to be escaped
+	    var source = '(?:' + _.keys(map).join('|') + ')';
+	    var testRegexp = RegExp(source);
+	    var replaceRegexp = RegExp(source, 'g');
+	    return function(string) {
+	      string = string == null ? '' : '' + string;
+	      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
+	    };
+	  };
+	  _.escape = createEscaper(escapeMap);
+	  _.unescape = createEscaper(unescapeMap);
 
 	  // If the value of the named `property` is a function then invoke it with the
 	  // `object` as context; otherwise, return it.
 	  _.result = function(object, property) {
 	    if (object == null) return void 0;
 	    var value = object[property];
-	    return _.isFunction(value) ? value.call(object) : value;
-	  };
-
-	  // Add your own custom functions to the Underscore object.
-	  _.mixin = function(obj) {
-	    each(_.functions(obj), function(name) {
-	      var func = _[name] = obj[name];
-	      _.prototype[name] = function() {
-	        var args = [this._wrapped];
-	        push.apply(args, arguments);
-	        return result.call(this, func.apply(_, args));
-	      };
-	    });
+	    return _.isFunction(value) ? object[property]() : value;
 	  };
 
 	  // Generate a unique integer id (unique within the entire client session).
@@ -6311,22 +6440,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	    '\\':     '\\',
 	    '\r':     'r',
 	    '\n':     'n',
-	    '\t':     't',
 	    '\u2028': 'u2028',
 	    '\u2029': 'u2029'
 	  };
 
-	  var escaper = /\\|'|\r|\n|\t|\u2028|\u2029/g;
+	  var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
+
+	  var escapeChar = function(match) {
+	    return '\\' + escapes[match];
+	  };
 
 	  // JavaScript micro-templating, similar to John Resig's implementation.
 	  // Underscore templating handles arbitrary delimiters, preserves whitespace,
 	  // and correctly escapes quotes within interpolated code.
-	  _.template = function(text, data, settings) {
-	    var render;
+	  // NB: `oldSettings` only exists for backwards compatibility.
+	  _.template = function(text, settings, oldSettings) {
+	    if (!settings && oldSettings) settings = oldSettings;
 	    settings = _.defaults({}, settings, _.templateSettings);
 
 	    // Combine delimiters into one regular expression via alternation.
-	    var matcher = new RegExp([
+	    var matcher = RegExp([
 	      (settings.escape || noMatch).source,
 	      (settings.interpolate || noMatch).source,
 	      (settings.evaluate || noMatch).source
@@ -6336,19 +6469,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var index = 0;
 	    var source = "__p+='";
 	    text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
-	      source += text.slice(index, offset)
-	        .replace(escaper, function(match) { return '\\' + escapes[match]; });
+	      source += text.slice(index, offset).replace(escaper, escapeChar);
+	      index = offset + match.length;
 
 	      if (escape) {
 	        source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
-	      }
-	      if (interpolate) {
+	      } else if (interpolate) {
 	        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-	      }
-	      if (evaluate) {
+	      } else if (evaluate) {
 	        source += "';\n" + evaluate + "\n__p+='";
 	      }
-	      index = offset + match.length;
+
+	      // Adobe VMs need the match returned to produce the correct offest.
 	      return match;
 	    });
 	    source += "';\n";
@@ -6358,29 +6490,31 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    source = "var __t,__p='',__j=Array.prototype.join," +
 	      "print=function(){__p+=__j.call(arguments,'');};\n" +
-	      source + "return __p;\n";
+	      source + 'return __p;\n';
 
 	    try {
-	      render = new Function(settings.variable || 'obj', '_', source);
+	      var render = new Function(settings.variable || 'obj', '_', source);
 	    } catch (e) {
 	      e.source = source;
 	      throw e;
 	    }
 
-	    if (data) return render(data, _);
 	    var template = function(data) {
 	      return render.call(this, data, _);
 	    };
 
-	    // Provide the compiled function source as a convenience for precompilation.
-	    template.source = 'function(' + (settings.variable || 'obj') + '){\n' + source + '}';
+	    // Provide the compiled source as a convenience for precompilation.
+	    var argument = settings.variable || 'obj';
+	    template.source = 'function(' + argument + '){\n' + source + '}';
 
 	    return template;
 	  };
 
-	  // Add a "chain" function, which will delegate to the wrapper.
+	  // Add a "chain" function. Start chaining a wrapped Underscore object.
 	  _.chain = function(obj) {
-	    return _(obj).chain();
+	    var instance = _(obj);
+	    instance._chain = true;
+	    return instance;
 	  };
 
 	  // OOP
@@ -6394,42 +6528,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this._chain ? _(obj).chain() : obj;
 	  };
 
+	  // Add your own custom functions to the Underscore object.
+	  _.mixin = function(obj) {
+	    _.each(_.functions(obj), function(name) {
+	      var func = _[name] = obj[name];
+	      _.prototype[name] = function() {
+	        var args = [this._wrapped];
+	        push.apply(args, arguments);
+	        return result.call(this, func.apply(_, args));
+	      };
+	    });
+	  };
+
 	  // Add all of the Underscore functions to the wrapper object.
 	  _.mixin(_);
 
 	  // Add all mutator Array functions to the wrapper.
-	  each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+	  _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
 	    var method = ArrayProto[name];
 	    _.prototype[name] = function() {
 	      var obj = this._wrapped;
 	      method.apply(obj, arguments);
-	      if ((name == 'shift' || name == 'splice') && obj.length === 0) delete obj[0];
+	      if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
 	      return result.call(this, obj);
 	    };
 	  });
 
 	  // Add all accessor Array functions to the wrapper.
-	  each(['concat', 'join', 'slice'], function(name) {
+	  _.each(['concat', 'join', 'slice'], function(name) {
 	    var method = ArrayProto[name];
 	    _.prototype[name] = function() {
 	      return result.call(this, method.apply(this._wrapped, arguments));
 	    };
 	  });
 
-	  _.extend(_.prototype, {
-
-	    // Start chaining a wrapped Underscore object.
-	    chain: function() {
-	      this._chain = true;
-	      return this;
-	    },
-
-	    // Extracts the result from a wrapped and chained object.
-	    value: function() {
-	      return this._wrapped;
-	    }
-
-	  });
+	  // Extracts the result from a wrapped and chained object.
+	  _.prototype.value = function() {
+	    return this._wrapped;
+	  };
 
 	  // AMD registration happens at the end for compatibility with AMD loaders
 	  // that may not enforce next-turn semantics on modules. Even though general
@@ -6439,20 +6575,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // an AMD load request. Those cases could generate an error when an
 	  // anonymous define() is called outside of a loader request.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() {
 	      return _;
-	    }.apply(null, __WEBPACK_AMD_DEFINE_ARRAY__)), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  }
-	}).call(this);
+	}.call(this));
 
 
 /***/ },
 /* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(module) {// Knockout JavaScript library v3.1.0
-	// (c) Steven Sanderson - http://knockoutjs.com/
-	// License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	/* WEBPACK VAR INJECTION */(function(module) {/*!
+	 * Knockout JavaScript library v3.2.0
+	 * (c) Steven Sanderson - http://knockoutjs.com/
+	 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	 */
 
 	(function(){
 	var DEBUG=true;
@@ -6462,41 +6600,41 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var window = this || (0, eval)('this'),
 	        document = window['document'],
 	        navigator = window['navigator'],
-	        jQuery = window["jQuery"],
+	        jQueryInstance = window["jQuery"],
 	        JSON = window["JSON"];
 	(function(factory) {
 	    // Support three module loading scenarios
 	    if (true) {
 	        // [1] CommonJS/Node.js
 	        var target = module['exports'] || exports; // module.exports is for Node.js
-	        factory(target);
+	        factory(target, __webpack_require__(29));
 	    } else if (typeof define === 'function' && define['amd']) {
 	        // [2] AMD anonymous module
-	        define(['exports'], factory);
+	        define(['exports', 'require'], factory);
 	    } else {
 	        // [3] No module loader (plain <script> tag) - put directly in global namespace
 	        factory(window['ko'] = {});
 	    }
-	}(function(koExports){
+	}(function(koExports, require){
 	// Internally, all KO objects are attached to koExports (even the non-exported ones whose names will be minified by the closure compiler).
 	// In the future, the following "ko" variable may be made distinct from "koExports" so that private objects are not externally reachable.
 	var ko = typeof koExports !== 'undefined' ? koExports : {};
 	// Google Closure Compiler helpers (used only to make the minified file smaller)
 	ko.exportSymbol = function(koPath, object) {
-		var tokens = koPath.split(".");
+	    var tokens = koPath.split(".");
 
-		// In the future, "ko" may become distinct from "koExports" (so that non-exported objects are not reachable)
-		// At that point, "target" would be set to: (typeof koExports !== "undefined" ? koExports : ko)
-		var target = ko;
+	    // In the future, "ko" may become distinct from "koExports" (so that non-exported objects are not reachable)
+	    // At that point, "target" would be set to: (typeof koExports !== "undefined" ? koExports : ko)
+	    var target = ko;
 
-		for (var i = 0; i < tokens.length - 1; i++)
-			target = target[tokens[i]];
-		target[tokens[tokens.length - 1]] = object;
+	    for (var i = 0; i < tokens.length - 1; i++)
+	        target = target[tokens[i]];
+	    target[tokens[tokens.length - 1]] = object;
 	};
 	ko.exportProperty = function(owner, publicName, object) {
-	  owner[publicName] = object;
+	    owner[publicName] = object;
 	};
-	ko.version = "3.1.0";
+	ko.version = "3.2.0";
 
 	ko.exportSymbol('version', ko.version);
 	ko.utils = (function () {
@@ -6767,17 +6905,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    string.toString().replace(/^[\s\xa0]+|[\s\xa0]+$/g, '');
 	        },
 
-	        stringTokenize: function (string, delimiter) {
-	            var result = [];
-	            var tokens = (string || "").split(delimiter);
-	            for (var i = 0, j = tokens.length; i < j; i++) {
-	                var trimmed = ko.utils.stringTrim(tokens[i]);
-	                if (trimmed !== "")
-	                    result.push(trimmed);
-	            }
-	            return result;
-	        },
-
 	        stringStartsWith: function (string, startsWith) {
 	            string = string || "";
 	            if (startsWith.length > string.length)
@@ -6817,8 +6944,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        registerEventHandler: function (element, eventType, handler) {
 	            var mustUseAttachEvent = ieVersion && eventsThatMustBeRegisteredUsingAttachEvent[eventType];
-	            if (!mustUseAttachEvent && jQuery) {
-	                jQuery(element)['bind'](eventType, handler);
+	            if (!mustUseAttachEvent && jQueryInstance) {
+	                jQueryInstance(element)['bind'](eventType, handler);
 	            } else if (!mustUseAttachEvent && typeof element.addEventListener == "function")
 	                element.addEventListener(eventType, handler, false);
 	            else if (typeof element.attachEvent != "undefined") {
@@ -6845,8 +6972,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // In both cases, we'll use the click method instead.
 	            var useClickWorkaround = isClickOnCheckableElement(element, eventType);
 
-	            if (jQuery && !useClickWorkaround) {
-	                jQuery(element)['trigger'](eventType);
+	            if (jQueryInstance && !useClickWorkaround) {
+	                jQueryInstance(element)['trigger'](eventType);
 	            } else if (typeof document.createEvent == "function") {
 	                if (typeof element.dispatchEvent == "function") {
 	                    var eventCategory = knownEventTypesByEventName[eventType] || "HTMLEvents";
@@ -7014,12 +7141,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var key in data) {
 	                // Since 'data' this is a model object, we include all properties including those inherited from its prototype
 	                var input = document.createElement("input");
+	                input.type = "hidden";
 	                input.name = key;
 	                input.value = ko.utils.stringifyJson(ko.utils.unwrapObservable(data[key]));
 	                form.appendChild(input);
 	            }
 	            objectForEach(params, function(key, value) {
 	                var input = document.createElement("input");
+	                input.type = "hidden";
 	                input.name = key;
 	                input.value = value;
 	                form.appendChild(input);
@@ -7207,8 +7336,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // Special support for jQuery here because it's so commonly used.
 	            // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
 	            // so notify it to tear down any resources associated with the node & descendants here.
-	            if (jQuery && (typeof jQuery['cleanData'] == "function"))
-	                jQuery['cleanData']([node]);
+	            if (jQueryInstance && (typeof jQueryInstance['cleanData'] == "function"))
+	                jQueryInstance['cleanData']([node]);
 	        }
 	    }
 	})();
@@ -7258,11 +7387,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    function jQueryHtmlParse(html) {
 	        // jQuery's "parseHTML" function was introduced in jQuery 1.8.0 and is a documented public API.
-	        if (jQuery['parseHTML']) {
-	            return jQuery['parseHTML'](html) || []; // Ensure we always return an array and never null
+	        if (jQueryInstance['parseHTML']) {
+	            return jQueryInstance['parseHTML'](html) || []; // Ensure we always return an array and never null
 	        } else {
 	            // For jQuery < 1.8.0, we fall back on the undocumented internal "clean" function.
-	            var elems = jQuery['clean']([html]);
+	            var elems = jQueryInstance['clean']([html]);
 
 	            // As of jQuery 1.7.1, jQuery parses the HTML by appending it to some dummy parent nodes held in an in-memory document fragment.
 	            // Unfortunately, it never clears the dummy parent nodes from the document fragment, so it leaks memory over time.
@@ -7282,8 +7411,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    ko.utils.parseHtmlFragment = function(html) {
-	        return jQuery ? jQueryHtmlParse(html)   // As below, benefit from jQuery's optimisations where possible
-	                      : simpleHtmlParse(html);  // ... otherwise, this simple logic will do in most common cases.
+	        return jQueryInstance ? jQueryHtmlParse(html)   // As below, benefit from jQuery's optimisations where possible
+	                              : simpleHtmlParse(html);  // ... otherwise, this simple logic will do in most common cases.
 	    };
 
 	    ko.utils.setHtml = function(node, html) {
@@ -7299,8 +7428,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // jQuery contains a lot of sophisticated code to parse arbitrary HTML fragments,
 	            // for example <tr> elements which are not normally allowed to exist on their own.
 	            // If you've referenced jQuery we'll use that rather than duplicating its code.
-	            if (jQuery) {
-	                jQuery(node)['html'](html);
+	            if (jQueryInstance) {
+	                jQueryInstance(node)['html'](html);
 	            } else {
 	                // ... otherwise, use KO's own parsing logic.
 	                var parsedNodes = ko.utils.parseHtmlFragment(html);
@@ -7497,17 +7626,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var subscription = new ko.subscription(self, boundCallback, function () {
 	            ko.utils.arrayRemoveItem(self._subscriptions[event], subscription);
+	            if (self.afterSubscriptionRemove)
+	                self.afterSubscriptionRemove(event);
 	        });
 
-	        // This will force a computed with deferEvaluation to evaluate before any subscriptions
-	        // are registered.
-	        if (self.peek) {
-	            self.peek();
-	        }
+	        if (self.beforeSubscriptionAdd)
+	            self.beforeSubscriptionAdd(event);
 
 	        if (!self._subscriptions[event])
 	            self._subscriptions[event] = [];
 	        self._subscriptions[event].push(subscription);
+
 	        return subscription;
 	    },
 
@@ -7671,6 +7800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	ko.exportSymbol('computedContext', ko.computedContext);
 	ko.exportSymbol('computedContext.getDependenciesCount', ko.computedContext.getDependenciesCount);
 	ko.exportSymbol('computedContext.isInitial', ko.computedContext.isInitial);
+	ko.exportSymbol('computedContext.isSleeping', ko.computedContext.isSleeping);
 	ko.observable = function (initialValue) {
 	    var _latestValue = initialValue;
 
@@ -7745,6 +7875,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	ko.exportSymbol('observable', ko.observable);
 	ko.exportSymbol('isObservable', ko.isObservable);
 	ko.exportSymbol('isWriteableObservable', ko.isWriteableObservable);
+	ko.exportSymbol('isWritableObservable', ko.isWriteableObservable);
 	ko.observableArray = function (initialValues) {
 	    initialValues = initialValues || [];
 
@@ -7998,7 +8129,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _isBeingEvaluated = false,
 	        _suppressDisposalUntilDisposeWhenReturnsFalse = false,
 	        _isDisposed = false,
-	        readFunction = evaluatorFunctionOrOptions;
+	        readFunction = evaluatorFunctionOrOptions,
+	        pure = false,
+	        isSleeping = false;
 
 	    if (readFunction && typeof readFunction == "object") {
 	        // Single-parameter syntax - everything is on this "options" param
@@ -8021,12 +8154,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function disposeAllSubscriptionsToDependencies() {
-	        _isDisposed = true;
 	        ko.utils.objectForEach(_subscriptionsToDependencies, function (id, subscription) {
 	            subscription.dispose();
 	        });
 	        _subscriptionsToDependencies = {};
+	    }
+
+	    function disposeComputed() {
+	        disposeAllSubscriptionsToDependencies();
 	        _dependenciesCount = 0;
+	        _isDisposed = true;
 	        _needsEvaluation = false;
 	    }
 
@@ -8042,8 +8179,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 
-	    function evaluateImmediate() {
+	    function evaluateImmediate(suppressChangeNotification) {
 	        if (_isBeingEvaluated) {
+	            if (pure) {
+	                throw Error("A 'pure' computed must not be called recursively");
+	            }
 	            // If the evaluation of a ko.computed causes side effects, it's possible that it will trigger its own re-evaluation.
 	            // This is not desirable (it's hard for a developer to realise a chain of dependencies might cause this, and they almost
 	            // certainly didn't intend infinite re-evaluations). So, for predictability, we simply prevent ko.computeds from causing
@@ -8068,63 +8208,83 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        _isBeingEvaluated = true;
-	        try {
-	            // Initially, we assume that none of the subscriptions are still being used (i.e., all are candidates for disposal).
-	            // Then, during evaluation, we cross off any that are in fact still being used.
-	            var disposalCandidates = _subscriptionsToDependencies, disposalCount = _dependenciesCount;
-	            ko.dependencyDetection.begin({
-	                callback: function(subscribable, id) {
-	                    if (!_isDisposed) {
-	                        if (disposalCount && disposalCandidates[id]) {
-	                            // Don't want to dispose this subscription, as it's still being used
-	                            _subscriptionsToDependencies[id] = disposalCandidates[id];
-	                            ++_dependenciesCount;
-	                            delete disposalCandidates[id];
-	                            --disposalCount;
-	                        } else {
-	                            // Brand new subscription - add it
-	                            addSubscriptionToDependency(subscribable, id);
-	                        }
-	                    }
-	                },
-	                computed: dependentObservable,
-	                isInitial: !_dependenciesCount        // If we're evaluating when there are no previous dependencies, it must be the first time
-	            });
 
-	            _subscriptionsToDependencies = {};
-	            _dependenciesCount = 0;
-
+	        // When sleeping, recalculate the value and return.
+	        if (isSleeping) {
 	            try {
-	                var newValue = evaluatorFunctionTarget ? readFunction.call(evaluatorFunctionTarget) : readFunction();
-
+	                var dependencyTracking = {};
+	                ko.dependencyDetection.begin({
+	                    callback: function (subscribable, id) {
+	                        if (!dependencyTracking[id]) {
+	                            dependencyTracking[id] = 1;
+	                            ++_dependenciesCount;
+	                        }
+	                    },
+	                    computed: dependentObservable,
+	                    isInitial: undefined
+	                });
+	                _dependenciesCount = 0;
+	                _latestValue = readFunction.call(evaluatorFunctionTarget);
 	            } finally {
 	                ko.dependencyDetection.end();
+	                _isBeingEvaluated = false;
+	            }
+	        } else {
+	            try {
+	                // Initially, we assume that none of the subscriptions are still being used (i.e., all are candidates for disposal).
+	                // Then, during evaluation, we cross off any that are in fact still being used.
+	                var disposalCandidates = _subscriptionsToDependencies, disposalCount = _dependenciesCount;
+	                ko.dependencyDetection.begin({
+	                    callback: function(subscribable, id) {
+	                        if (!_isDisposed) {
+	                            if (disposalCount && disposalCandidates[id]) {
+	                                // Don't want to dispose this subscription, as it's still being used
+	                                _subscriptionsToDependencies[id] = disposalCandidates[id];
+	                                ++_dependenciesCount;
+	                                delete disposalCandidates[id];
+	                                --disposalCount;
+	                            } else {
+	                                // Brand new subscription - add it
+	                                addSubscriptionToDependency(subscribable, id);
+	                            }
+	                        }
+	                    },
+	                    computed: dependentObservable,
+	                    isInitial: pure ? undefined : !_dependenciesCount        // If we're evaluating when there are no previous dependencies, it must be the first time
+	                });
 
-	                // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
-	                if (disposalCount) {
-	                    ko.utils.objectForEach(disposalCandidates, function(id, toDispose) {
-	                        toDispose.dispose();
-	                    });
+	                _subscriptionsToDependencies = {};
+	                _dependenciesCount = 0;
+
+	                try {
+	                    var newValue = evaluatorFunctionTarget ? readFunction.call(evaluatorFunctionTarget) : readFunction();
+
+	                } finally {
+	                    ko.dependencyDetection.end();
+
+	                    // For each subscription no longer being used, remove it from the active subscriptions list and dispose it
+	                    if (disposalCount) {
+	                        ko.utils.objectForEach(disposalCandidates, function(id, toDispose) {
+	                            toDispose.dispose();
+	                        });
+	                    }
+
+	                    _needsEvaluation = false;
 	                }
 
-	                _needsEvaluation = false;
-	            }
+	                if (dependentObservable.isDifferent(_latestValue, newValue)) {
+	                    dependentObservable["notifySubscribers"](_latestValue, "beforeChange");
 
-	            if (dependentObservable.isDifferent(_latestValue, newValue)) {
-	                dependentObservable["notifySubscribers"](_latestValue, "beforeChange");
+	                    _latestValue = newValue;
+	                    if (DEBUG) dependentObservable._latestValue = _latestValue;
 
-	                _latestValue = newValue;
-	                if (DEBUG) dependentObservable._latestValue = _latestValue;
-
-	                // If rate-limited, the notification will happen within the limit function. Otherwise,
-	                // notify as soon as the value changes. Check specifically for the throttle setting since
-	                // it overrides rateLimit.
-	                if (!dependentObservable._evalRateLimited || dependentObservable['throttleEvaluation']) {
-	                    dependentObservable["notifySubscribers"](_latestValue);
+	                    if (suppressChangeNotification !== true) {  // Check for strict true value since setTimeout in Firefox passes a numeric value to the function
+	                        dependentObservable["notifySubscribers"](_latestValue);
+	                    }
 	                }
+	            } finally {
+	                _isBeingEvaluated = false;
 	            }
-	        } finally {
-	            _isBeingEvaluated = false;
 	        }
 
 	        if (!_dependenciesCount)
@@ -8142,18 +8302,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this; // Permits chained assignments
 	        } else {
 	            // Reading the value
-	            if (_needsEvaluation)
-	                evaluateImmediate();
 	            ko.dependencyDetection.registerDependency(dependentObservable);
+	            if (_needsEvaluation)
+	                evaluateImmediate(true /* suppressChangeNotification */);
 	            return _latestValue;
 	        }
 	    }
 
 	    function peek() {
-	        // Peek won't re-evaluate, except to get the initial value when "deferEvaluation" is set.
-	        // That's the only time that both of these conditions will be satisfied.
+	        // Peek won't re-evaluate, except to get the initial value when "deferEvaluation" is set, or while the computed is sleeping.
+	        // Those are the only times that both of these conditions will be satisfied.
 	        if (_needsEvaluation && !_dependenciesCount)
-	            evaluateImmediate();
+	            evaluateImmediate(true /* suppressChangeNotification */);
 	        return _latestValue;
 	    }
 
@@ -8166,7 +8326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        disposeWhenNodeIsRemoved = options["disposeWhenNodeIsRemoved"] || options.disposeWhenNodeIsRemoved || null,
 	        disposeWhenOption = options["disposeWhen"] || options.disposeWhen,
 	        disposeWhen = disposeWhenOption,
-	        dispose = disposeAllSubscriptionsToDependencies,
+	        dispose = disposeComputed,
 	        _subscriptionsToDependencies = {},
 	        _dependenciesCount = 0,
 	        evaluationTimeoutInstance = null;
@@ -8198,6 +8358,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 
+	    if (options['pure']) {
+	        pure = true;
+	        isSleeping = true;     // Starts off sleeping; will awake on the first subscription
+	        dependentObservable.beforeSubscriptionAdd = function () {
+	            // If asleep, wake up the computed and evaluate to register any dependencies.
+	            if (isSleeping) {
+	                isSleeping = false;
+	                evaluateImmediate(true /* suppressChangeNotification */);
+	            }
+	        }
+	        dependentObservable.afterSubscriptionRemove = function () {
+	            if (!dependentObservable.getSubscriptionsCount()) {
+	                disposeAllSubscriptionsToDependencies();
+	                isSleeping = _needsEvaluation = true;
+	            }
+	        }
+	    } else if (options['deferEvaluation']) {
+	        // This will force a computed with deferEvaluation to evaluate when the first subscriptions is registered.
+	        dependentObservable.beforeSubscriptionAdd = function () {
+	            peek();
+	            delete dependentObservable.beforeSubscriptionAdd;
+	        }
+	    }
+
 	    ko.exportProperty(dependentObservable, 'peek', dependentObservable.peek);
 	    ko.exportProperty(dependentObservable, 'dispose', dependentObservable.dispose);
 	    ko.exportProperty(dependentObservable, 'isActive', dependentObservable.isActive);
@@ -8222,8 +8406,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    }
 
-	    // Evaluate, unless deferEvaluation is true
-	    if (options['deferEvaluation'] !== true)
+	    // Evaluate, unless sleeping or deferEvaluation is true
+	    if (!isSleeping && !options['deferEvaluation'])
 	        evaluateImmediate();
 
 	    // Attach a DOM node disposal callback so that the computed will be proactively disposed as soon as the node is
@@ -8231,7 +8415,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (disposeWhenNodeIsRemoved && isActive() && disposeWhenNodeIsRemoved.nodeType) {
 	        dispose = function() {
 	            ko.utils.domNodeDisposal.removeDisposeCallback(disposeWhenNodeIsRemoved, dispose);
-	            disposeAllSubscriptionsToDependencies();
+	            disposeComputed();
 	        };
 	        ko.utils.domNodeDisposal.addDisposeCallback(disposeWhenNodeIsRemoved, dispose);
 	    }
@@ -8260,6 +8444,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	ko.exportSymbol('dependentObservable', ko.dependentObservable);
 	ko.exportSymbol('computed', ko.dependentObservable); // Make "ko.computed" an alias for "ko.dependentObservable"
 	ko.exportSymbol('isComputed', ko.isComputed);
+
+	ko.pureComputed = function (evaluatorFunctionOrOptions, evaluatorFunctionTarget) {
+	    if (typeof evaluatorFunctionOrOptions === 'function') {
+	        return ko.computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget, {'pure':true});
+	    } else {
+	        evaluatorFunctionOrOptions = ko.utils.extend({}, evaluatorFunctionOrOptions);   // make a copy of the parameter object
+	        evaluatorFunctionOrOptions['pure'] = true;
+	        return ko.computed(evaluatorFunctionOrOptions, evaluatorFunctionTarget);
+	    }
+	}
+	ko.exportSymbol('pureComputed', ko.pureComputed);
 
 	(function() {
 	    var maxNestedObservableDepth = 10; // Escape the (unlikely) pathalogical case where an observable's current value is itself (or similar reference cycle)
@@ -8541,15 +8736,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            function callPreprocessHook(obj) {
 	                return (obj && obj['preprocess']) ? (val = obj['preprocess'](val, key, processKeyValue)) : true;
 	            }
-	            if (!callPreprocessHook(ko['getBindingHandler'](key)))
-	                return;
+	            if (!bindingParams) {
+	                if (!callPreprocessHook(ko['getBindingHandler'](key)))
+	                    return;
 
-	            if (twoWayBindings[key] && (writableVal = getWriteableValue(val))) {
-	                // For two-way bindings, provide a write method in case the value
-	                // isn't a writable observable.
-	                propertyAccessorResultStrings.push("'" + key + "':function(_z){" + writableVal + "=_z}");
+	                if (twoWayBindings[key] && (writableVal = getWriteableValue(val))) {
+	                    // For two-way bindings, provide a write method in case the value
+	                    // isn't a writable observable.
+	                    propertyAccessorResultStrings.push("'" + key + "':function(_z){" + writableVal + "=_z}");
+	                }
 	            }
-
 	            // Values are wrapped in a function so that each value can be accessed independently
 	            if (makeValueAccessors) {
 	                val = 'function(){return ' + val + ' }';
@@ -8560,6 +8756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var resultStrings = [],
 	            propertyAccessorResultStrings = [],
 	            makeValueAccessors = bindingOptions['valueAccessors'],
+	            bindingParams = bindingOptions['bindingParams'],
 	            keyValueArray = typeof bindingsStringOrKeyValueArray === "string" ?
 	                parseObjectLiteral(bindingsStringOrKeyValueArray) : bindingsStringOrKeyValueArray;
 
@@ -8833,20 +9030,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ko.utils.extend(ko.bindingProvider.prototype, {
 	        'nodeHasBindings': function(node) {
 	            switch (node.nodeType) {
-	                case 1: return node.getAttribute(defaultBindingAttributeName) != null;   // Element
-	                case 8: return ko.virtualElements.hasBindingValue(node); // Comment node
+	                case 1: // Element
+	                    return node.getAttribute(defaultBindingAttributeName) != null
+	                        || ko.components['getComponentNameForNode'](node);
+	                case 8: // Comment node
+	                    return ko.virtualElements.hasBindingValue(node);
 	                default: return false;
 	            }
 	        },
 
 	        'getBindings': function(node, bindingContext) {
-	            var bindingsString = this['getBindingsString'](node, bindingContext);
-	            return bindingsString ? this['parseBindingsString'](bindingsString, bindingContext, node) : null;
+	            var bindingsString = this['getBindingsString'](node, bindingContext),
+	                parsedBindings = bindingsString ? this['parseBindingsString'](bindingsString, bindingContext, node) : null;
+	            return ko.components.addBindingsForCustomElement(parsedBindings, node, bindingContext, /* valueAccessors */ false);
 	        },
 
 	        'getBindingAccessors': function(node, bindingContext) {
-	            var bindingsString = this['getBindingsString'](node, bindingContext);
-	            return bindingsString ? this['parseBindingsString'](bindingsString, bindingContext, node, {'valueAccessors':true}) : null;
+	            var bindingsString = this['getBindingsString'](node, bindingContext),
+	                parsedBindings = bindingsString ? this['parseBindingsString'](bindingsString, bindingContext, node, { 'valueAccessors': true }) : null;
+	            return ko.components.addBindingsForCustomElement(parsedBindings, node, bindingContext, /* valueAccessors */ true);
 	        },
 
 	        // The following function is only used internally by this default provider.
@@ -9318,8 +9520,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    ko.applyBindings = function (viewModelOrBindingContext, rootNode) {
 	        // If jQuery is loaded after Knockout, we won't initially have access to it. So save it here.
-	        if (!jQuery && window['jQuery']) {
-	            jQuery = window['jQuery'];
+	        if (!jQueryInstance && window['jQuery']) {
+	            jQueryInstance = window['jQuery'];
 	        }
 
 	        if (rootNode && (rootNode.nodeType !== 1) && (rootNode.nodeType !== 8))
@@ -9354,6 +9556,540 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ko.exportSymbol('applyBindingsToNode', ko.applyBindingsToNode);
 	    ko.exportSymbol('contextFor', ko.contextFor);
 	    ko.exportSymbol('dataFor', ko.dataFor);
+	})();
+	(function(undefined) {
+	    var loadingSubscribablesCache = {}, // Tracks component loads that are currently in flight
+	        loadedDefinitionsCache = {};    // Tracks component loads that have already completed
+
+	    ko.components = {
+	        get: function(componentName, callback) {
+	            var cachedDefinition = getObjectOwnProperty(loadedDefinitionsCache, componentName);
+	            if (cachedDefinition) {
+	                // It's already loaded and cached. Reuse the same definition object.
+	                // Note that for API consistency, even cache hits complete asynchronously.
+	                setTimeout(function() { callback(cachedDefinition) }, 0);
+	            } else {
+	                // Join the loading process that is already underway, or start a new one.
+	                loadComponentAndNotify(componentName, callback);
+	            }
+	        },
+
+	        clearCachedDefinition: function(componentName) {
+	            delete loadedDefinitionsCache[componentName];
+	        },
+
+	        _getFirstResultFromLoaders: getFirstResultFromLoaders
+	    };
+
+	    function getObjectOwnProperty(obj, propName) {
+	        return obj.hasOwnProperty(propName) ? obj[propName] : undefined;
+	    }
+
+	    function loadComponentAndNotify(componentName, callback) {
+	        var subscribable = getObjectOwnProperty(loadingSubscribablesCache, componentName),
+	            completedAsync;
+	        if (!subscribable) {
+	            // It's not started loading yet. Start loading, and when it's done, move it to loadedDefinitionsCache.
+	            subscribable = loadingSubscribablesCache[componentName] = new ko.subscribable();
+	            beginLoadingComponent(componentName, function(definition) {
+	                loadedDefinitionsCache[componentName] = definition;
+	                delete loadingSubscribablesCache[componentName];
+
+	                // For API consistency, all loads complete asynchronously. However we want to avoid
+	                // adding an extra setTimeout if it's unnecessary (i.e., the completion is already
+	                // async) since setTimeout(..., 0) still takes about 16ms or more on most browsers.
+	                if (completedAsync) {
+	                    subscribable['notifySubscribers'](definition);
+	                } else {
+	                    setTimeout(function() {
+	                        subscribable['notifySubscribers'](definition);
+	                    }, 0);
+	                }
+	            });
+	            completedAsync = true;
+	        }
+	        subscribable.subscribe(callback);
+	    }
+
+	    function beginLoadingComponent(componentName, callback) {
+	        getFirstResultFromLoaders('getConfig', [componentName], function(config) {
+	            if (config) {
+	                // We have a config, so now load its definition
+	                getFirstResultFromLoaders('loadComponent', [componentName, config], function(definition) {
+	                    callback(definition);
+	                });
+	            } else {
+	                // The component has no config - it's unknown to all the loaders.
+	                // Note that this is not an error (e.g., a module loading error) - that would abort the
+	                // process and this callback would not run. For this callback to run, all loaders must
+	                // have confirmed they don't know about this component.
+	                callback(null);
+	            }
+	        });
+	    }
+
+	    function getFirstResultFromLoaders(methodName, argsExceptCallback, callback, candidateLoaders) {
+	        // On the first call in the stack, start with the full set of loaders
+	        if (!candidateLoaders) {
+	            candidateLoaders = ko.components['loaders'].slice(0); // Use a copy, because we'll be mutating this array
+	        }
+
+	        // Try the next candidate
+	        var currentCandidateLoader = candidateLoaders.shift();
+	        if (currentCandidateLoader) {
+	            var methodInstance = currentCandidateLoader[methodName];
+	            if (methodInstance) {
+	                var wasAborted = false,
+	                    synchronousReturnValue = methodInstance.apply(currentCandidateLoader, argsExceptCallback.concat(function(result) {
+	                        if (wasAborted) {
+	                            callback(null);
+	                        } else if (result !== null) {
+	                            // This candidate returned a value. Use it.
+	                            callback(result);
+	                        } else {
+	                            // Try the next candidate
+	                            getFirstResultFromLoaders(methodName, argsExceptCallback, callback, candidateLoaders);
+	                        }
+	                    }));
+
+	                // Currently, loaders may not return anything synchronously. This leaves open the possibility
+	                // that we'll extend the API to support synchronous return values in the future. It won't be
+	                // a breaking change, because currently no loader is allowed to return anything except undefined.
+	                if (synchronousReturnValue !== undefined) {
+	                    wasAborted = true;
+
+	                    // Method to suppress exceptions will remain undocumented. This is only to keep
+	                    // KO's specs running tidily, since we can observe the loading got aborted without
+	                    // having exceptions cluttering up the console too.
+	                    if (!currentCandidateLoader['suppressLoaderExceptions']) {
+	                        throw new Error('Component loaders must supply values by invoking the callback, not by returning values synchronously.');
+	                    }
+	                }
+	            } else {
+	                // This candidate doesn't have the relevant handler. Synchronously move on to the next one.
+	                getFirstResultFromLoaders(methodName, argsExceptCallback, callback, candidateLoaders);
+	            }
+	        } else {
+	            // No candidates returned a value
+	            callback(null);
+	        }
+	    }
+
+	    // Reference the loaders via string name so it's possible for developers
+	    // to replace the whole array by assigning to ko.components.loaders
+	    ko.components['loaders'] = [];
+
+	    ko.exportSymbol('components', ko.components);
+	    ko.exportSymbol('components.get', ko.components.get);
+	    ko.exportSymbol('components.clearCachedDefinition', ko.components.clearCachedDefinition);
+	})();
+	(function(undefined) {
+
+	    // The default loader is responsible for two things:
+	    // 1. Maintaining the default in-memory registry of component configuration objects
+	    //    (i.e., the thing you're writing to when you call ko.components.register(someName, ...))
+	    // 2. Answering requests for components by fetching configuration objects
+	    //    from that default in-memory registry and resolving them into standard
+	    //    component definition objects (of the form { createViewModel: ..., template: ... })
+	    // Custom loaders may override either of these facilities, i.e.,
+	    // 1. To supply configuration objects from some other source (e.g., conventions)
+	    // 2. Or, to resolve configuration objects by loading viewmodels/templates via arbitrary logic.
+
+	    var defaultConfigRegistry = {};
+
+	    ko.components.register = function(componentName, config) {
+	        if (!config) {
+	            throw new Error('Invalid configuration for ' + componentName);
+	        }
+
+	        if (ko.components.isRegistered(componentName)) {
+	            throw new Error('Component ' + componentName + ' is already registered');
+	        }
+
+	        defaultConfigRegistry[componentName] = config;
+	    }
+
+	    ko.components.isRegistered = function(componentName) {
+	        return componentName in defaultConfigRegistry;
+	    }
+
+	    ko.components.unregister = function(componentName) {
+	        delete defaultConfigRegistry[componentName];
+	        ko.components.clearCachedDefinition(componentName);
+	    }
+
+	    ko.components.defaultLoader = {
+	        'getConfig': function(componentName, callback) {
+	            var result = defaultConfigRegistry.hasOwnProperty(componentName)
+	                ? defaultConfigRegistry[componentName]
+	                : null;
+	            callback(result);
+	        },
+
+	        'loadComponent': function(componentName, config, callback) {
+	            var errorCallback = makeErrorCallback(componentName);
+	            possiblyGetConfigFromAmd(errorCallback, config, function(loadedConfig) {
+	                resolveConfig(componentName, errorCallback, loadedConfig, callback);
+	            });
+	        },
+
+	        'loadTemplate': function(componentName, templateConfig, callback) {
+	            resolveTemplate(makeErrorCallback(componentName), templateConfig, callback);
+	        },
+
+	        'loadViewModel': function(componentName, viewModelConfig, callback) {
+	            resolveViewModel(makeErrorCallback(componentName), viewModelConfig, callback);
+	        }
+	    };
+
+	    var createViewModelKey = 'createViewModel';
+
+	    // Takes a config object of the form { template: ..., viewModel: ... }, and asynchronously convert it
+	    // into the standard component definition format:
+	    //    { template: <ArrayOfDomNodes>, createViewModel: function(params, componentInfo) { ... } }.
+	    // Since both template and viewModel may need to be resolved asynchronously, both tasks are performed
+	    // in parallel, and the results joined when both are ready. We don't depend on any promises infrastructure,
+	    // so this is implemented manually below.
+	    function resolveConfig(componentName, errorCallback, config, callback) {
+	        var result = {},
+	            makeCallBackWhenZero = 2,
+	            tryIssueCallback = function() {
+	                if (--makeCallBackWhenZero === 0) {
+	                    callback(result);
+	                }
+	            },
+	            templateConfig = config['template'],
+	            viewModelConfig = config['viewModel'];
+
+	        if (templateConfig) {
+	            possiblyGetConfigFromAmd(errorCallback, templateConfig, function(loadedConfig) {
+	                ko.components._getFirstResultFromLoaders('loadTemplate', [componentName, loadedConfig], function(resolvedTemplate) {
+	                    result['template'] = resolvedTemplate;
+	                    tryIssueCallback();
+	                });
+	            });
+	        } else {
+	            tryIssueCallback();
+	        }
+
+	        if (viewModelConfig) {
+	            possiblyGetConfigFromAmd(errorCallback, viewModelConfig, function(loadedConfig) {
+	                ko.components._getFirstResultFromLoaders('loadViewModel', [componentName, loadedConfig], function(resolvedViewModel) {
+	                    result[createViewModelKey] = resolvedViewModel;
+	                    tryIssueCallback();
+	                });
+	            });
+	        } else {
+	            tryIssueCallback();
+	        }
+	    }
+
+	    function resolveTemplate(errorCallback, templateConfig, callback) {
+	        if (typeof templateConfig === 'string') {
+	            // Markup - parse it
+	            callback(ko.utils.parseHtmlFragment(templateConfig));
+	        } else if (templateConfig instanceof Array) {
+	            // Assume already an array of DOM nodes - pass through unchanged
+	            callback(templateConfig);
+	        } else if (isDocumentFragment(templateConfig)) {
+	            // Document fragment - use its child nodes
+	            callback(ko.utils.makeArray(templateConfig.childNodes));
+	        } else if (templateConfig['element']) {
+	            var element = templateConfig['element'];
+	            if (isDomElement(element)) {
+	                // Element instance - copy its child nodes
+	                callback(cloneNodesFromTemplateSourceElement(element));
+	            } else if (typeof element === 'string') {
+	                // Element ID - find it, then copy its child nodes
+	                var elemInstance = document.getElementById(element);
+	                if (elemInstance) {
+	                    callback(cloneNodesFromTemplateSourceElement(elemInstance));
+	                } else {
+	                    errorCallback('Cannot find element with ID ' + element);
+	                }
+	            } else {
+	                errorCallback('Unknown element type: ' + element);
+	            }
+	        } else {
+	            errorCallback('Unknown template value: ' + templateConfig);
+	        }
+	    }
+
+	    function resolveViewModel(errorCallback, viewModelConfig, callback) {
+	        if (typeof viewModelConfig === 'function') {
+	            // Constructor - convert to standard factory function format
+	            // By design, this does *not* supply componentInfo to the constructor, as the intent is that
+	            // componentInfo contains non-viewmodel data (e.g., the component's element) that should only
+	            // be used in factory functions, not viewmodel constructors.
+	            callback(function (params /*, componentInfo */) {
+	                return new viewModelConfig(params);
+	            });
+	        } else if (typeof viewModelConfig[createViewModelKey] === 'function') {
+	            // Already a factory function - use it as-is
+	            callback(viewModelConfig[createViewModelKey]);
+	        } else if ('instance' in viewModelConfig) {
+	            // Fixed object instance - promote to createViewModel format for API consistency
+	            var fixedInstance = viewModelConfig['instance'];
+	            callback(function (params, componentInfo) {
+	                return fixedInstance;
+	            });
+	        } else if ('viewModel' in viewModelConfig) {
+	            // Resolved AMD module whose value is of the form { viewModel: ... }
+	            resolveViewModel(errorCallback, viewModelConfig['viewModel'], callback);
+	        } else {
+	            errorCallback('Unknown viewModel value: ' + viewModelConfig);
+	        }
+	    }
+
+	    function cloneNodesFromTemplateSourceElement(elemInstance) {
+	        switch (ko.utils.tagNameLower(elemInstance)) {
+	            case 'script':
+	                return ko.utils.parseHtmlFragment(elemInstance.text);
+	            case 'textarea':
+	                return ko.utils.parseHtmlFragment(elemInstance.value);
+	            case 'template':
+	                // For browsers with proper <template> element support (i.e., where the .content property
+	                // gives a document fragment), use that document fragment.
+	                if (isDocumentFragment(elemInstance.content)) {
+	                    return ko.utils.cloneNodes(elemInstance.content.childNodes);
+	                }
+	        }
+
+	        // Regular elements such as <div>, and <template> elements on old browsers that don't really
+	        // understand <template> and just treat it as a regular container
+	        return ko.utils.cloneNodes(elemInstance.childNodes);
+	    }
+
+	    function isDomElement(obj) {
+	        if (window['HTMLElement']) {
+	            return obj instanceof HTMLElement;
+	        } else {
+	            return obj && obj.tagName && obj.nodeType === 1;
+	        }
+	    }
+
+	    function isDocumentFragment(obj) {
+	        if (window['DocumentFragment']) {
+	            return obj instanceof DocumentFragment;
+	        } else {
+	            return obj && obj.nodeType === 11;
+	        }
+	    }
+
+	    function possiblyGetConfigFromAmd(errorCallback, config, callback) {
+	        if (typeof config['require'] === 'string') {
+	            // The config is the value of an AMD module
+	            if (require || window['require']) {
+	                (require || window['require'])([config['require']], callback);
+	            } else {
+	                errorCallback('Uses require, but no AMD loader is present');
+	            }
+	        } else {
+	            callback(config);
+	        }
+	    }
+
+	    function makeErrorCallback(componentName) {
+	        return function (message) {
+	            throw new Error('Component \'' + componentName + '\': ' + message);
+	        };
+	    }
+
+	    ko.exportSymbol('components.register', ko.components.register);
+	    ko.exportSymbol('components.isRegistered', ko.components.isRegistered);
+	    ko.exportSymbol('components.unregister', ko.components.unregister);
+
+	    // Expose the default loader so that developers can directly ask it for configuration
+	    // or to resolve configuration
+	    ko.exportSymbol('components.defaultLoader', ko.components.defaultLoader);
+
+	    // By default, the default loader is the only registered component loader
+	    ko.components['loaders'].push(ko.components.defaultLoader);
+
+	    // Privately expose the underlying config registry for use in old-IE shim
+	    ko.components._allRegisteredComponents = defaultConfigRegistry;
+	})();
+	(function (undefined) {
+	    // Overridable API for determining which component name applies to a given node. By overriding this,
+	    // you can for example map specific tagNames to components that are not preregistered.
+	    ko.components['getComponentNameForNode'] = function(node) {
+	        var tagNameLower = ko.utils.tagNameLower(node);
+	        return ko.components.isRegistered(tagNameLower) && tagNameLower;
+	    };
+
+	    ko.components.addBindingsForCustomElement = function(allBindings, node, bindingContext, valueAccessors) {
+	        // Determine if it's really a custom element matching a component
+	        if (node.nodeType === 1) {
+	            var componentName = ko.components['getComponentNameForNode'](node);
+	            if (componentName) {
+	                // It does represent a component, so add a component binding for it
+	                allBindings = allBindings || {};
+
+	                if (allBindings['component']) {
+	                    // Avoid silently overwriting some other 'component' binding that may already be on the element
+	                    throw new Error('Cannot use the "component" binding on a custom element matching a component');
+	                }
+
+	                var componentBindingValue = { 'name': componentName, 'params': getComponentParamsFromCustomElement(node, bindingContext) };
+
+	                allBindings['component'] = valueAccessors
+	                    ? function() { return componentBindingValue; }
+	                    : componentBindingValue;
+	            }
+	        }
+
+	        return allBindings;
+	    }
+
+	    var nativeBindingProviderInstance = new ko.bindingProvider();
+
+	    function getComponentParamsFromCustomElement(elem, bindingContext) {
+	        var paramsAttribute = elem.getAttribute('params');
+
+	        if (paramsAttribute) {
+	            var params = nativeBindingProviderInstance['parseBindingsString'](paramsAttribute, bindingContext, elem, { 'valueAccessors': true, 'bindingParams': true }),
+	                rawParamComputedValues = ko.utils.objectMap(params, function(paramValue, paramName) {
+	                    return ko.computed(paramValue, null, { disposeWhenNodeIsRemoved: elem });
+	                }),
+	                result = ko.utils.objectMap(rawParamComputedValues, function(paramValueComputed, paramName) {
+	                    // Does the evaluation of the parameter value unwrap any observables?
+	                    if (!paramValueComputed.isActive()) {
+	                        // No it doesn't, so there's no need for any computed wrapper. Just pass through the supplied value directly.
+	                        // Example: "someVal: firstName, age: 123" (whether or not firstName is an observable/computed)
+	                        return paramValueComputed.peek();
+	                    } else {
+	                        // Yes it does. Supply a computed property that unwraps both the outer (binding expression)
+	                        // level of observability, and any inner (resulting model value) level of observability.
+	                        // This means the component doesn't have to worry about multiple unwrapping.
+	                        return ko.computed(function() {
+	                            return ko.utils.unwrapObservable(paramValueComputed());
+	                        }, null, { disposeWhenNodeIsRemoved: elem });
+	                    }
+	                });
+
+	            // Give access to the raw computeds, as long as that wouldn't overwrite any custom param also called '$raw'
+	            // This is in case the developer wants to react to outer (binding) observability separately from inner
+	            // (model value) observability, or in case the model value observable has subobservables.
+	            if (!result.hasOwnProperty('$raw')) {
+	                result['$raw'] = rawParamComputedValues;
+	            }
+
+	            return result;
+	        } else {
+	            // For consistency, absence of a "params" attribute is treated the same as the presence of
+	            // any empty one. Otherwise component viewmodels need special code to check whether or not
+	            // 'params' or 'params.$raw' is null/undefined before reading subproperties, which is annoying.
+	            return { '$raw': {} };
+	        }
+	    }
+
+	    // --------------------------------------------------------------------------------
+	    // Compatibility code for older (pre-HTML5) IE browsers
+
+	    if (ko.utils.ieVersion < 9) {
+	        // Whenever you preregister a component, enable it as a custom element in the current document
+	        ko.components['register'] = (function(originalFunction) {
+	            return function(componentName) {
+	                document.createElement(componentName); // Allows IE<9 to parse markup containing the custom element
+	                return originalFunction.apply(this, arguments);
+	            }
+	        })(ko.components['register']);
+
+	        // Whenever you create a document fragment, enable all preregistered component names as custom elements
+	        // This is needed to make innerShiv/jQuery HTML parsing correctly handle the custom elements
+	        document.createDocumentFragment = (function(originalFunction) {
+	            return function() {
+	                var newDocFrag = originalFunction(),
+	                    allComponents = ko.components._allRegisteredComponents;
+	                for (var componentName in allComponents) {
+	                    if (allComponents.hasOwnProperty(componentName)) {
+	                        newDocFrag.createElement(componentName);
+	                    }
+	                }
+	                return newDocFrag;
+	            };
+	        })(document.createDocumentFragment);
+	    }
+	})();(function(undefined) {
+
+	    var componentLoadingOperationUniqueId = 0;
+
+	    ko.bindingHandlers['component'] = {
+	        'init': function(element, valueAccessor, ignored1, ignored2, bindingContext) {
+	            var currentViewModel,
+	                currentLoadingOperationId,
+	                disposeAssociatedComponentViewModel = function () {
+	                    var currentViewModelDispose = currentViewModel && currentViewModel['dispose'];
+	                    if (typeof currentViewModelDispose === 'function') {
+	                        currentViewModelDispose.call(currentViewModel);
+	                    }
+
+	                    // Any in-flight loading operation is no longer relevant, so make sure we ignore its completion
+	                    currentLoadingOperationId = null;
+	                };
+
+	            ko.utils.domNodeDisposal.addDisposeCallback(element, disposeAssociatedComponentViewModel);
+
+	            ko.computed(function () {
+	                var value = ko.utils.unwrapObservable(valueAccessor()),
+	                    componentName, componentParams;
+
+	                if (typeof value === 'string') {
+	                    componentName = value;
+	                } else {
+	                    componentName = ko.utils.unwrapObservable(value['name']);
+	                    componentParams = ko.utils.unwrapObservable(value['params']);
+	                }
+
+	                if (!componentName) {
+	                    throw new Error('No component name specified');
+	                }
+
+	                var loadingOperationId = currentLoadingOperationId = ++componentLoadingOperationUniqueId;
+	                ko.components.get(componentName, function(componentDefinition) {
+	                    // If this is not the current load operation for this element, ignore it.
+	                    if (currentLoadingOperationId !== loadingOperationId) {
+	                        return;
+	                    }
+
+	                    // Clean up previous state
+	                    disposeAssociatedComponentViewModel();
+
+	                    // Instantiate and bind new component. Implicitly this cleans any old DOM nodes.
+	                    if (!componentDefinition) {
+	                        throw new Error('Unknown component \'' + componentName + '\'');
+	                    }
+	                    cloneTemplateIntoElement(componentName, componentDefinition, element);
+	                    var componentViewModel = createViewModel(componentDefinition, element, componentParams),
+	                        childBindingContext = bindingContext['createChildContext'](componentViewModel);
+	                    currentViewModel = componentViewModel;
+	                    ko.applyBindingsToDescendants(childBindingContext, element);
+	                });
+	            }, null, { disposeWhenNodeIsRemoved: element });
+
+	            return { 'controlsDescendantBindings': true };
+	        }
+	    };
+
+	    ko.virtualElements.allowedBindings['component'] = true;
+
+	    function cloneTemplateIntoElement(componentName, componentDefinition, element) {
+	        var template = componentDefinition['template'];
+	        if (!template) {
+	            throw new Error('Component \'' + componentName + '\' has no template');
+	        }
+
+	        var clonedNodesArray = ko.utils.cloneNodes(template);
+	        ko.virtualElements.setDomNodeChildren(element, clonedNodesArray);
+	    }
+
+	    function createViewModel(componentDefinition, element, componentParams) {
+	        var componentViewModelFactory = componentDefinition['createViewModel'];
+	        return componentViewModelFactory
+	            ? componentViewModelFactory.call(componentDefinition, componentParams, { element: element })
+	            : componentParams; // Template-only component
+	    }
+
 	})();
 	var attrHtmlToJavascriptMap = { 'class': 'className', 'for': 'htmlFor' };
 	ko.bindingHandlers['attr'] = {
@@ -9398,11 +10134,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	ko.bindingHandlers['checked'] = {
 	    'after': ['value', 'attr'],
 	    'init': function (element, valueAccessor, allBindings) {
-	        function checkedValue() {
-	            return allBindings['has']('checkedValue')
-	                ? ko.utils.unwrapObservable(allBindings.get('checkedValue'))
-	                : element.value;
-	        }
+	        var checkedValue = ko.pureComputed(function() {
+	            // Treat "value" like "checkedValue" when it is included with "checked" binding
+	            if (allBindings['has']('checkedValue')) {
+	                return ko.utils.unwrapObservable(allBindings.get('checkedValue'));
+	            } else if (allBindings['has']('value')) {
+	                return ko.utils.unwrapObservable(allBindings.get('value'));
+	            }
+
+	            return element.value;
+	        });
 
 	        function updateModel() {
 	            // This updates the model value from the view value.
@@ -9909,7 +10650,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var value = ko.utils.unwrapObservable(valueAccessor() || {});
 	        ko.utils.objectForEach(value, function(styleName, styleValue) {
 	            styleValue = ko.utils.unwrapObservable(styleValue);
-	            element.style[styleName] = styleValue || ""; // Empty string removes the value, whereas null/undefined have no effect
+
+	            if (styleValue === null || styleValue === undefined || styleValue === false) {
+	                // Empty string removes the value, whereas null/undefined have no effect
+	                styleValue = "";
+	            }
+
+	            element.style[styleName] = styleValue;
 	        });
 	    }
 	};
@@ -9933,17 +10680,194 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	};
 	ko.bindingHandlers['text'] = {
-		'init': function() {
-			// Prevent binding on the dynamically-injected text node (as developers are unlikely to expect that, and it has security implications).
-			// It should also make things faster, as we no longer have to consider whether the text node might be bindable.
+	    'init': function() {
+	        // Prevent binding on the dynamically-injected text node (as developers are unlikely to expect that, and it has security implications).
+	        // It should also make things faster, as we no longer have to consider whether the text node might be bindable.
 	        return { 'controlsDescendantBindings': true };
-		},
+	    },
 	    'update': function (element, valueAccessor) {
 	        ko.utils.setTextContent(element, valueAccessor());
 	    }
 	};
 	ko.virtualElements.allowedBindings['text'] = true;
-	ko.bindingHandlers['uniqueName'] = {
+	(function () {
+
+	if (window && window.navigator) {
+	    var parseVersion = function (matches) {
+	        if (matches) {
+	            return parseFloat(matches[1]);
+	        }
+	    };
+
+	    // Detect various browser versions because some old versions don't fully support the 'input' event
+	    var operaVersion = window.opera && window.opera.version && parseInt(window.opera.version()),
+	        userAgent = window.navigator.userAgent,
+	        safariVersion = parseVersion(userAgent.match(/^(?:(?!chrome).)*version\/([^ ]*) safari/i)),
+	        firefoxVersion = parseVersion(userAgent.match(/Firefox\/([^ ]*)/));
+	}
+
+	// IE 8 and 9 have bugs that prevent the normal events from firing when the value changes.
+	// But it does fire the 'selectionchange' event on many of those, presumably because the
+	// cursor is moving and that counts as the selection changing. The 'selectionchange' event is
+	// fired at the document level only and doesn't directly indicate which element changed. We
+	// set up just one event handler for the document and use 'activeElement' to determine which
+	// element was changed.
+	if (ko.utils.ieVersion < 10) {
+	    var selectionChangeRegisteredName = ko.utils.domData.nextKey(),
+	        selectionChangeHandlerName = ko.utils.domData.nextKey();
+	    var selectionChangeHandler = function(event) {
+	        var target = this.activeElement,
+	            handler = target && ko.utils.domData.get(target, selectionChangeHandlerName);
+	        if (handler) {
+	            handler(event);
+	        }
+	    };
+	    var registerForSelectionChangeEvent = function (element, handler) {
+	        var ownerDoc = element.ownerDocument;
+	        if (!ko.utils.domData.get(ownerDoc, selectionChangeRegisteredName)) {
+	            ko.utils.domData.set(ownerDoc, selectionChangeRegisteredName, true);
+	            ko.utils.registerEventHandler(ownerDoc, 'selectionchange', selectionChangeHandler);
+	        }
+	        ko.utils.domData.set(element, selectionChangeHandlerName, handler);
+	    };
+	}
+
+	ko.bindingHandlers['textInput'] = {
+	    'init': function (element, valueAccessor, allBindings) {
+
+	        var previousElementValue = element.value,
+	            timeoutHandle,
+	            elementValueBeforeEvent;
+
+	        var updateModel = function (event) {
+	            clearTimeout(timeoutHandle);
+	            elementValueBeforeEvent = timeoutHandle = undefined;
+
+	            var elementValue = element.value;
+	            if (previousElementValue !== elementValue) {
+	                // Provide a way for tests to know exactly which event was processed
+	                if (DEBUG && event) element['_ko_textInputProcessedEvent'] = event.type;
+	                previousElementValue = elementValue;
+	                ko.expressionRewriting.writeValueToProperty(valueAccessor(), allBindings, 'textInput', elementValue);
+	            }
+	        };
+
+	        var deferUpdateModel = function (event) {
+	            if (!timeoutHandle) {
+	                // The elementValueBeforeEvent variable is set *only* during the brief gap between an
+	                // event firing and the updateModel function running. This allows us to ignore model
+	                // updates that are from the previous state of the element, usually due to techniques
+	                // such as rateLimit. Such updates, if not ignored, can cause keystrokes to be lost.
+	                elementValueBeforeEvent = element.value;
+	                var handler = DEBUG ? updateModel.bind(element, {type: event.type}) : updateModel;
+	                timeoutHandle = setTimeout(handler, 4);
+	            }
+	        };
+
+	        var updateView = function () {
+	            var modelValue = ko.utils.unwrapObservable(valueAccessor());
+
+	            if (modelValue === null || modelValue === undefined) {
+	                modelValue = '';
+	            }
+
+	            if (elementValueBeforeEvent !== undefined && modelValue === elementValueBeforeEvent) {
+	                setTimeout(updateView, 4);
+	                return;
+	            }
+
+	            // Update the element only if the element and model are different. On some browsers, updating the value
+	            // will move the cursor to the end of the input, which would be bad while the user is typing.
+	            if (element.value !== modelValue) {
+	                previousElementValue = modelValue;  // Make sure we ignore events (propertychange) that result from updating the value
+	                element.value = modelValue;
+	            }
+	        };
+
+	        var onEvent = function (event, handler) {
+	            ko.utils.registerEventHandler(element, event, handler);
+	        };
+
+	        if (DEBUG && ko.bindingHandlers['textInput']['_forceUpdateOn']) {
+	            // Provide a way for tests to specify exactly which events are bound
+	            ko.utils.arrayForEach(ko.bindingHandlers['textInput']['_forceUpdateOn'], function(eventName) {
+	                if (eventName.slice(0,5) == 'after') {
+	                    onEvent(eventName.slice(5), deferUpdateModel);
+	                } else {
+	                    onEvent(eventName, updateModel);
+	                }
+	            });
+	        } else {
+	            if (ko.utils.ieVersion < 10) {
+	                // Internet Explorer <= 8 doesn't support the 'input' event, but does include 'propertychange' that fires whenever
+	                // any property of an element changes. Unlike 'input', it also fires if a property is changed from JavaScript code,
+	                // but that's an acceptable compromise for this binding. IE 9 does support 'input', but since it doesn't fire it
+	                // when using autocomplete, we'll use 'propertychange' for it also.
+	                onEvent('propertychange', function(event) {
+	                    if (event.propertyName === 'value') {
+	                        updateModel(event);
+	                    }
+	                });
+
+	                if (ko.utils.ieVersion == 8) {
+	                    // IE 8 has a bug where it fails to fire 'propertychange' on the first update following a value change from
+	                    // JavaScript code. It also doesn't fire if you clear the entire value. To fix this, we bind to the following
+	                    // events too.
+	                    onEvent('keyup', updateModel);      // A single keystoke
+	                    onEvent('keydown', updateModel);    // The first character when a key is held down
+	                }
+	                if (ko.utils.ieVersion >= 8) {
+	                    // Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
+	                    // the backspace, delete, or ctrl-x keys, clicking the 'x' to clear the input, dragging text
+	                    // out of the field, and cutting or deleting text using the context menu. 'selectionchange'
+	                    // can detect all of those except dragging text out of the field, for which we use 'dragend'.
+	                    // These are also needed in IE8 because of the bug described above.
+	                    registerForSelectionChangeEvent(element, updateModel);  // 'selectionchange' covers cut, paste, drop, delete, etc.
+	                    onEvent('dragend', deferUpdateModel);
+	                }
+	            } else {
+	                // All other supported browsers support the 'input' event, which fires whenever the content of the element is changed
+	                // through the user interface.
+	                onEvent('input', updateModel);
+
+	                if (safariVersion < 5 && ko.utils.tagNameLower(element) === "textarea") {
+	                    // Safari <5 doesn't fire the 'input' event for <textarea> elements (it does fire 'textInput'
+	                    // but only when typing). So we'll just catch as much as we can with keydown, cut, and paste.
+	                    onEvent('keydown', deferUpdateModel);
+	                    onEvent('paste', deferUpdateModel);
+	                    onEvent('cut', deferUpdateModel);
+	                } else if (operaVersion < 11) {
+	                    // Opera 10 doesn't always fire the 'input' event for cut, paste, undo & drop operations.
+	                    // We can try to catch some of those using 'keydown'.
+	                    onEvent('keydown', deferUpdateModel);
+	                } else if (firefoxVersion < 4.0) {
+	                    // Firefox <= 3.6 doesn't fire the 'input' event when text is filled in through autocomplete
+	                    onEvent('DOMAutoComplete', updateModel);
+
+	                    // Firefox <=3.5 doesn't fire the 'input' event when text is dropped into the input.
+	                    onEvent('dragdrop', updateModel);       // <3.5
+	                    onEvent('drop', updateModel);           // 3.5
+	                }
+	            }
+	        }
+
+	        // Bind to the change event so that we can catch programmatic updates of the value that fire this event.
+	        onEvent('change', updateModel);
+
+	        ko.computed(updateView, null, { disposeWhenNodeIsRemoved: element });
+	    }
+	};
+	ko.expressionRewriting.twoWayBindings['textInput'] = true;
+
+	// textinput is an alias for textInput
+	ko.bindingHandlers['textinput'] = {
+	    // preprocess is the only way to set up a full alias
+	    'preprocess': function (value, name, addBinding) {
+	        addBinding('textInput', value);
+	    }
+	};
+
+	})();ko.bindingHandlers['uniqueName'] = {
 	    'init': function (element, valueAccessor) {
 	        if (valueAccessor()) {
 	            var name = "ko_unique_" + (++ko.bindingHandlers['uniqueName'].currentIndex);
@@ -9955,10 +10879,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	ko.bindingHandlers['value'] = {
 	    'after': ['options', 'foreach'],
 	    'init': function (element, valueAccessor, allBindings) {
+	        // If the value binding is placed on a radio/checkbox, then just pass through to checkedValue and quit
+	        if (element.tagName.toLowerCase() == "input" && (element.type == "checkbox" || element.type == "radio")) {
+	            ko.applyBindingAccessorsToNode(element, { 'checkedValue': valueAccessor });
+	            return;
+	        }
+
 	        // Always catch "change" event; possibly other events too if asked
 	        var eventsToCatch = ["change"];
 	        var requestedEventsToCatch = allBindings.get("valueUpdate");
 	        var propertyChangedFired = false;
+	        var elementValueBeforeEvent = null;
+
 	        if (requestedEventsToCatch) {
 	            if (typeof requestedEventsToCatch == "string") // Allow both individual event names, and arrays of event names
 	                requestedEventsToCatch = [requestedEventsToCatch];
@@ -9967,6 +10899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        var valueUpdateHandler = function() {
+	            elementValueBeforeEvent = null;
 	            propertyChangedFired = false;
 	            var modelValue = valueAccessor();
 	            var elementValue = ko.selectExtensions.readValue(element);
@@ -9993,40 +10926,60 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // (otherwise, ko.selectExtensions.readValue(this) will receive the control's value *before* the key event)
 	            var handler = valueUpdateHandler;
 	            if (ko.utils.stringStartsWith(eventName, "after")) {
-	                handler = function() { setTimeout(valueUpdateHandler, 0) };
+	                handler = function() {
+	                    // The elementValueBeforeEvent variable is non-null *only* during the brief gap between
+	                    // a keyX event firing and the valueUpdateHandler running, which is scheduled to happen
+	                    // at the earliest asynchronous opportunity. We store this temporary information so that
+	                    // if, between keyX and valueUpdateHandler, the underlying model value changes separately,
+	                    // we can overwrite that model value change with the value the user just typed. Otherwise,
+	                    // techniques like rateLimit can trigger model changes at critical moments that will
+	                    // override the user's inputs, causing keystrokes to be lost.
+	                    elementValueBeforeEvent = ko.selectExtensions.readValue(element);
+	                    setTimeout(valueUpdateHandler, 0);
+	                };
 	                eventName = eventName.substring("after".length);
 	            }
 	            ko.utils.registerEventHandler(element, eventName, handler);
 	        });
-	    },
-	    'update': function (element, valueAccessor, allBindings) {
-	        var newValue = ko.utils.unwrapObservable(valueAccessor());
-	        var elementValue = ko.selectExtensions.readValue(element);
-	        var valueHasChanged = (newValue !== elementValue);
 
-	        if (valueHasChanged) {
-	            if (ko.utils.tagNameLower(element) === "select") {
-	                var allowUnset = allBindings.get('valueAllowUnset');
-	                var applyValueAction = function () {
-	                    ko.selectExtensions.writeValue(element, newValue, allowUnset);
-	                };
-	                applyValueAction();
+	        var updateFromModel = function () {
+	            var newValue = ko.utils.unwrapObservable(valueAccessor());
+	            var elementValue = ko.selectExtensions.readValue(element);
 
-	                if (!allowUnset && newValue !== ko.selectExtensions.readValue(element)) {
-	                    // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
-	                    // because you're not allowed to have a model value that disagrees with a visible UI selection.
-	                    ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
-	                } else {
-	                    // Workaround for IE6 bug: It won't reliably apply values to SELECT nodes during the same execution thread
-	                    // right after you've changed the set of OPTION nodes on it. So for that node type, we'll schedule a second thread
-	                    // to apply the value as well.
-	                    setTimeout(applyValueAction, 0);
-	                }
-	            } else {
-	                ko.selectExtensions.writeValue(element, newValue);
+	            if (elementValueBeforeEvent !== null && newValue === elementValueBeforeEvent) {
+	                setTimeout(updateFromModel, 0);
+	                return;
 	            }
-	        }
-	    }
+
+	            var valueHasChanged = (newValue !== elementValue);
+
+	            if (valueHasChanged) {
+	                if (ko.utils.tagNameLower(element) === "select") {
+	                    var allowUnset = allBindings.get('valueAllowUnset');
+	                    var applyValueAction = function () {
+	                        ko.selectExtensions.writeValue(element, newValue, allowUnset);
+	                    };
+	                    applyValueAction();
+
+	                    if (!allowUnset && newValue !== ko.selectExtensions.readValue(element)) {
+	                        // If you try to set a model value that can't be represented in an already-populated dropdown, reject that change,
+	                        // because you're not allowed to have a model value that disagrees with a visible UI selection.
+	                        ko.dependencyDetection.ignore(ko.utils.triggerEvent, null, [element, "change"]);
+	                    } else {
+	                        // Workaround for IE6 bug: It won't reliably apply values to SELECT nodes during the same execution thread
+	                        // right after you've changed the set of OPTION nodes on it. So for that node type, we'll schedule a second thread
+	                        // to apply the value as well.
+	                        setTimeout(applyValueAction, 0);
+	                    }
+	                } else {
+	                    ko.selectExtensions.writeValue(element, newValue);
+	                }
+	            }
+	        };
+
+	        ko.computed(updateFromModel, null, { disposeWhenNodeIsRemoved: element });
+	    },
+	    'update': function() {} // Keep for backwards compatibility with code that may have wrapped value binding
 	};
 	ko.expressionRewriting.twoWayBindings['value'] = true;
 	ko.bindingHandlers['visible'] = {
@@ -10388,6 +11341,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return renderedNodesArray;
 	    }
 
+	    function resolveTemplateName(template, data, context) {
+	        // The template can be specified as:
+	        if (ko.isObservable(template)) {
+	            // 1. An observable, with string value
+	            return template();
+	        } else if (typeof template === 'function') {
+	            // 2. A function of (data, context) returning a string
+	            return template(data, context);
+	        } else {
+	            // 3. A string
+	            return template;
+	        }
+	    }
+
 	    ko.renderTemplate = function (template, dataOrBindingContext, options, targetNodeOrNodeArray, renderMode) {
 	        options = options || {};
 	        if ((options['templateEngine'] || _templateEngine) == undefined)
@@ -10407,11 +11374,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        ? dataOrBindingContext
 	                        : new ko.bindingContext(ko.utils.unwrapObservable(dataOrBindingContext));
 
-	                    // Support selecting template as a function of the data being rendered
-	                    var templateName = ko.isObservable(template) ? template()
-	                        : typeof(template) == 'function' ? template(bindingContext['$data'], bindingContext) : template;
+	                    var templateName = resolveTemplateName(template, bindingContext['$data'], bindingContext),
+	                        renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options);
 
-	                    var renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options);
 	                    if (renderMode == "replaceNode") {
 	                        targetNodeOrNodeArray = renderedNodesArray;
 	                        firstTargetNode = getFirstNodeFromPossibleArray(targetNodeOrNodeArray);
@@ -10439,7 +11404,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            arrayItemContext = parentBindingContext['createChildContext'](arrayValue, options['as'], function(context) {
 	                context['$index'] = index;
 	            });
-	            var templateName = typeof(template) == 'function' ? template(arrayValue, arrayItemContext) : template;
+
+	            var templateName = resolveTemplateName(template, arrayValue, arrayItemContext);
 	            return executeTemplate(null, "ignoreTargetNode", templateName, arrayItemContext, options);
 	        }
 
@@ -10840,11 +11806,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Note that as of Knockout 1.3, we only support jQuery.tmpl 1.0.0pre and later,
 	        // which KO internally refers to as version "2", so older versions are no longer detected.
 	        var jQueryTmplVersion = this.jQueryTmplVersion = (function() {
-	            if (!jQuery || !(jQuery['tmpl']))
+	            if (!jQueryInstance || !(jQueryInstance['tmpl']))
 	                return 0;
 	            // Since it exposes no official version number, we use our own numbering system. To be updated as jquery-tmpl evolves.
 	            try {
-	                if (jQuery['tmpl']['tag']['tmpl']['open'].toString().indexOf('__') >= 0) {
+	                if (jQueryInstance['tmpl']['tag']['tmpl']['open'].toString().indexOf('__') >= 0) {
 	                    // Since 1.0.0pre, custom tags should append markup to an array called "__"
 	                    return 2; // Final version of jquery.tmpl
 	                }
@@ -10859,7 +11825,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        function executeTemplate(compiledTemplate, data, jQueryTemplateOptions) {
-	            return jQuery['tmpl'](compiledTemplate, data, jQueryTemplateOptions);
+	            return jQueryInstance['tmpl'](compiledTemplate, data, jQueryTemplateOptions);
 	        }
 
 	        this['renderTemplateSource'] = function(templateSource, bindingContext, options) {
@@ -10873,17 +11839,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // Wrap in "with($whatever.koBindingContext) { ... }"
 	                templateText = "{{ko_with $item.koBindingContext}}" + templateText + "{{/ko_with}}";
 
-	                precompiled = jQuery['template'](null, templateText);
+	                precompiled = jQueryInstance['template'](null, templateText);
 	                templateSource['data']('precompiled', precompiled);
 	            }
 
 	            var data = [bindingContext['$data']]; // Prewrap the data in an array to stop jquery.tmpl from trying to unwrap any arrays
-	            var jQueryTemplateOptions = jQuery['extend']({ 'koBindingContext': bindingContext }, options['templateOptions']);
+	            var jQueryTemplateOptions = jQueryInstance['extend']({ 'koBindingContext': bindingContext }, options['templateOptions']);
 
 	            var resultNodes = executeTemplate(precompiled, data, jQueryTemplateOptions);
 	            resultNodes['appendTo'](document.createElement("div")); // Using "appendTo" forces jQuery/jQuery.tmpl to perform necessary cleanup work
 
-	            jQuery['fragments'] = {}; // Clear jQuery's fragment cache to avoid a memory leak after a large number of template renders
+	            jQueryInstance['fragments'] = {}; // Clear jQuery's fragment cache to avoid a memory leak after a large number of template renders
 	            return resultNodes;
 	        };
 
@@ -10896,10 +11862,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        if (jQueryTmplVersion > 0) {
-	            jQuery['tmpl']['tag']['ko_code'] = {
+	            jQueryInstance['tmpl']['tag']['ko_code'] = {
 	                open: "__.push($1 || '');"
 	            };
-	            jQuery['tmpl']['tag']['ko_with'] = {
+	            jQueryInstance['tmpl']['tag']['ko_with'] = {
 	                open: "with($1) {",
 	                close: "} "
 	            };
@@ -10920,10 +11886,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	}());
 	})();
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(29)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(30)(module)))
 
 /***/ },
 /* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var map = {
+		"./knockout-latest": 31,
+		"./knockout-latest.debug": 28,
+		"./knockout-latest.debug.js": 28,
+		"./knockout-latest.js": 31
+	};
+	function webpackContext(req) {
+		return __webpack_require__(webpackContextResolve(req));
+	};
+	function webpackContextResolve(req) {
+		return map[req] || (function() { throw new Error("Cannot find module '" + req + "'.") }());
+	};
+	webpackContext.keys = function webpackContextKeys() {
+		return Object.keys(map);
+	};
+	webpackContext.resolve = webpackContextResolve;
+	module.exports = webpackContext;
+
+
+/***/ },
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module) {
@@ -10938,6 +11927,127 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/*** IMPORTS FROM imports-loader ***/
+	var require = false;
+
+	/*!
+	 * Knockout JavaScript library v3.2.0
+	 * (c) Steven Sanderson - http://knockoutjs.com/
+	 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	 */
+
+	(function() {(function(n){var v=this||(0,eval)("this"),y=v.document,L=v.navigator,r=v.jQuery,D=v.JSON;(function(n){true?n(module.exports||exports,require):"function"===typeof define&&define.amd?define(["exports","require"],n):n(v.ko={})})(function(M,N){function H(a,d){return null===a||typeof a in Q?a===d:!1}function R(a,d){var c;return function(){c||(c=setTimeout(function(){c=n;a()},d))}}function S(a,d){var c;return function(){clearTimeout(c);
+	c=setTimeout(a,d)}}function I(b,d,c,e){a.d[b]={init:function(b,h,k,g,m){var l,s;a.s(function(){var g=a.a.c(h()),k=!c!==!g,z=!s;if(z||d||k!==l)z&&a.Y.la()&&(s=a.a.ia(a.f.childNodes(b),!0)),k?(z||a.f.T(b,a.a.ia(s)),a.Ca(e?e(m,g):m,b)):a.f.ja(b),l=k},null,{o:b});return{controlsDescendantBindings:!0}}};a.h.ha[b]=!1;a.f.Q[b]=!0}var a="undefined"!==typeof M?M:{};a.b=function(b,d){for(var c=b.split("."),e=a,f=0;f<c.length-1;f++)e=e[c[f]];e[c[c.length-1]]=d};a.A=function(a,d,c){a[d]=c};a.version="3.2.0";
+	a.b("version",a.version);a.a=function(){function b(a,b){for(var c in a)a.hasOwnProperty(c)&&b(c,a[c])}function d(a,b){if(b)for(var c in b)b.hasOwnProperty(c)&&(a[c]=b[c]);return a}function c(a,b){a.__proto__=b;return a}var e={__proto__:[]}instanceof Array,f={},h={};f[L&&/Firefox\/2/i.test(L.userAgent)?"KeyboardEvent":"UIEvents"]=["keyup","keydown","keypress"];f.MouseEvents="click dblclick mousedown mouseup mousemove mouseover mouseout mouseenter mouseleave".split(" ");b(f,function(a,b){if(b.length)for(var c=
+	0,d=b.length;c<d;c++)h[b[c]]=a});var k={propertychange:!0},g=y&&function(){for(var a=3,b=y.createElement("div"),c=b.getElementsByTagName("i");b.innerHTML="\x3c!--[if gt IE "+ ++a+"]><i></i><![endif]--\x3e",c[0];);return 4<a?a:n}();return{vb:["authenticity_token",/^__RequestVerificationToken(_.*)?$/],u:function(a,b){for(var c=0,d=a.length;c<d;c++)b(a[c],c)},m:function(a,b){if("function"==typeof Array.prototype.indexOf)return Array.prototype.indexOf.call(a,b);for(var c=0,d=a.length;c<d;c++)if(a[c]===
+	b)return c;return-1},qb:function(a,b,c){for(var d=0,g=a.length;d<g;d++)if(b.call(c,a[d],d))return a[d];return null},ua:function(m,b){var c=a.a.m(m,b);0<c?m.splice(c,1):0===c&&m.shift()},rb:function(m){m=m||[];for(var b=[],c=0,d=m.length;c<d;c++)0>a.a.m(b,m[c])&&b.push(m[c]);return b},Da:function(a,b){a=a||[];for(var c=[],d=0,g=a.length;d<g;d++)c.push(b(a[d],d));return c},ta:function(a,b){a=a||[];for(var c=[],d=0,g=a.length;d<g;d++)b(a[d],d)&&c.push(a[d]);return c},ga:function(a,b){if(b instanceof
+	Array)a.push.apply(a,b);else for(var c=0,d=b.length;c<d;c++)a.push(b[c]);return a},ea:function(b,c,d){var g=a.a.m(a.a.Xa(b),c);0>g?d&&b.push(c):d||b.splice(g,1)},xa:e,extend:d,za:c,Aa:e?c:d,G:b,na:function(a,b){if(!a)return a;var c={},d;for(d in a)a.hasOwnProperty(d)&&(c[d]=b(a[d],d,a));return c},Ka:function(b){for(;b.firstChild;)a.removeNode(b.firstChild)},oc:function(b){b=a.a.S(b);for(var c=y.createElement("div"),d=0,g=b.length;d<g;d++)c.appendChild(a.R(b[d]));return c},ia:function(b,c){for(var d=
+	0,g=b.length,e=[];d<g;d++){var f=b[d].cloneNode(!0);e.push(c?a.R(f):f)}return e},T:function(b,c){a.a.Ka(b);if(c)for(var d=0,g=c.length;d<g;d++)b.appendChild(c[d])},Lb:function(b,c){var d=b.nodeType?[b]:b;if(0<d.length){for(var g=d[0],e=g.parentNode,f=0,h=c.length;f<h;f++)e.insertBefore(c[f],g);f=0;for(h=d.length;f<h;f++)a.removeNode(d[f])}},ka:function(a,b){if(a.length){for(b=8===b.nodeType&&b.parentNode||b;a.length&&a[0].parentNode!==b;)a.shift();if(1<a.length){var c=a[0],d=a[a.length-1];for(a.length=
+	0;c!==d;)if(a.push(c),c=c.nextSibling,!c)return;a.push(d)}}return a},Nb:function(a,b){7>g?a.setAttribute("selected",b):a.selected=b},cb:function(a){return null===a||a===n?"":a.trim?a.trim():a.toString().replace(/^[\s\xa0]+|[\s\xa0]+$/g,"")},uc:function(a,b){a=a||"";return b.length>a.length?!1:a.substring(0,b.length)===b},cc:function(a,b){if(a===b)return!0;if(11===a.nodeType)return!1;if(b.contains)return b.contains(3===a.nodeType?a.parentNode:a);if(b.compareDocumentPosition)return 16==(b.compareDocumentPosition(a)&
+	16);for(;a&&a!=b;)a=a.parentNode;return!!a},Ja:function(b){return a.a.cc(b,b.ownerDocument.documentElement)},ob:function(b){return!!a.a.qb(b,a.a.Ja)},t:function(a){return a&&a.tagName&&a.tagName.toLowerCase()},n:function(b,c,d){var e=g&&k[c];if(!e&&r)r(b).bind(c,d);else if(e||"function"!=typeof b.addEventListener)if("undefined"!=typeof b.attachEvent){var f=function(a){d.call(b,a)},h="on"+c;b.attachEvent(h,f);a.a.w.da(b,function(){b.detachEvent(h,f)})}else throw Error("Browser doesn't support addEventListener or attachEvent");
+	else b.addEventListener(c,d,!1)},oa:function(b,c){if(!b||!b.nodeType)throw Error("element must be a DOM node when calling triggerEvent");var d;"input"===a.a.t(b)&&b.type&&"click"==c.toLowerCase()?(d=b.type,d="checkbox"==d||"radio"==d):d=!1;if(r&&!d)r(b).trigger(c);else if("function"==typeof y.createEvent)if("function"==typeof b.dispatchEvent)d=y.createEvent(h[c]||"HTMLEvents"),d.initEvent(c,!0,!0,v,0,0,0,0,0,!1,!1,!1,!1,0,b),b.dispatchEvent(d);else throw Error("The supplied element doesn't support dispatchEvent");
+	else if(d&&b.click)b.click();else if("undefined"!=typeof b.fireEvent)b.fireEvent("on"+c);else throw Error("Browser doesn't support triggering events");},c:function(b){return a.C(b)?b():b},Xa:function(b){return a.C(b)?b.v():b},Ba:function(b,c,d){if(c){var g=/\S+/g,e=b.className.match(g)||[];a.a.u(c.match(g),function(b){a.a.ea(e,b,d)});b.className=e.join(" ")}},bb:function(b,c){var d=a.a.c(c);if(null===d||d===n)d="";var g=a.f.firstChild(b);!g||3!=g.nodeType||a.f.nextSibling(g)?a.f.T(b,[b.ownerDocument.createTextNode(d)]):
+	g.data=d;a.a.fc(b)},Mb:function(a,b){a.name=b;if(7>=g)try{a.mergeAttributes(y.createElement("<input name='"+a.name+"'/>"),!1)}catch(c){}},fc:function(a){9<=g&&(a=1==a.nodeType?a:a.parentNode,a.style&&(a.style.zoom=a.style.zoom))},dc:function(a){if(g){var b=a.style.width;a.style.width=0;a.style.width=b}},sc:function(b,c){b=a.a.c(b);c=a.a.c(c);for(var d=[],g=b;g<=c;g++)d.push(g);return d},S:function(a){for(var b=[],c=0,d=a.length;c<d;c++)b.push(a[c]);return b},xc:6===g,yc:7===g,L:g,xb:function(b,c){for(var d=
+	a.a.S(b.getElementsByTagName("input")).concat(a.a.S(b.getElementsByTagName("textarea"))),g="string"==typeof c?function(a){return a.name===c}:function(a){return c.test(a.name)},e=[],f=d.length-1;0<=f;f--)g(d[f])&&e.push(d[f]);return e},pc:function(b){return"string"==typeof b&&(b=a.a.cb(b))?D&&D.parse?D.parse(b):(new Function("return "+b))():null},eb:function(b,c,d){if(!D||!D.stringify)throw Error("Cannot find JSON.stringify(). Some browsers (e.g., IE < 8) don't support it natively, but you can overcome this by adding a script reference to json2.js, downloadable from http://www.json.org/json2.js");
+	return D.stringify(a.a.c(b),c,d)},qc:function(c,d,g){g=g||{};var e=g.params||{},f=g.includeFields||this.vb,h=c;if("object"==typeof c&&"form"===a.a.t(c))for(var h=c.action,k=f.length-1;0<=k;k--)for(var t=a.a.xb(c,f[k]),E=t.length-1;0<=E;E--)e[t[E].name]=t[E].value;d=a.a.c(d);var x=y.createElement("form");x.style.display="none";x.action=h;x.method="post";for(var n in d)c=y.createElement("input"),c.type="hidden",c.name=n,c.value=a.a.eb(a.a.c(d[n])),x.appendChild(c);b(e,function(a,b){var c=y.createElement("input");
+	c.type="hidden";c.name=a;c.value=b;x.appendChild(c)});y.body.appendChild(x);g.submitter?g.submitter(x):x.submit();setTimeout(function(){x.parentNode.removeChild(x)},0)}}}();a.b("utils",a.a);a.b("utils.arrayForEach",a.a.u);a.b("utils.arrayFirst",a.a.qb);a.b("utils.arrayFilter",a.a.ta);a.b("utils.arrayGetDistinctValues",a.a.rb);a.b("utils.arrayIndexOf",a.a.m);a.b("utils.arrayMap",a.a.Da);a.b("utils.arrayPushAll",a.a.ga);a.b("utils.arrayRemoveItem",a.a.ua);a.b("utils.extend",a.a.extend);a.b("utils.fieldsIncludedWithJsonPost",
+	a.a.vb);a.b("utils.getFormFields",a.a.xb);a.b("utils.peekObservable",a.a.Xa);a.b("utils.postJson",a.a.qc);a.b("utils.parseJson",a.a.pc);a.b("utils.registerEventHandler",a.a.n);a.b("utils.stringifyJson",a.a.eb);a.b("utils.range",a.a.sc);a.b("utils.toggleDomNodeCssClass",a.a.Ba);a.b("utils.triggerEvent",a.a.oa);a.b("utils.unwrapObservable",a.a.c);a.b("utils.objectForEach",a.a.G);a.b("utils.addOrRemoveItem",a.a.ea);a.b("unwrap",a.a.c);Function.prototype.bind||(Function.prototype.bind=function(a){var d=
+	this,c=Array.prototype.slice.call(arguments);a=c.shift();return function(){return d.apply(a,c.concat(Array.prototype.slice.call(arguments)))}});a.a.e=new function(){function a(b,h){var k=b[c];if(!k||"null"===k||!e[k]){if(!h)return n;k=b[c]="ko"+d++;e[k]={}}return e[k]}var d=0,c="__ko__"+(new Date).getTime(),e={};return{get:function(c,d){var e=a(c,!1);return e===n?n:e[d]},set:function(c,d,e){if(e!==n||a(c,!1)!==n)a(c,!0)[d]=e},clear:function(a){var b=a[c];return b?(delete e[b],a[c]=null,!0):!1},F:function(){return d++ +
+	c}}};a.b("utils.domData",a.a.e);a.b("utils.domData.clear",a.a.e.clear);a.a.w=new function(){function b(b,d){var g=a.a.e.get(b,c);g===n&&d&&(g=[],a.a.e.set(b,c,g));return g}function d(c){var e=b(c,!1);if(e)for(var e=e.slice(0),g=0;g<e.length;g++)e[g](c);a.a.e.clear(c);a.a.w.cleanExternalData(c);if(f[c.nodeType])for(e=c.firstChild;c=e;)e=c.nextSibling,8===c.nodeType&&d(c)}var c=a.a.e.F(),e={1:!0,8:!0,9:!0},f={1:!0,9:!0};return{da:function(a,c){if("function"!=typeof c)throw Error("Callback must be a function");
+	b(a,!0).push(c)},Kb:function(d,e){var g=b(d,!1);g&&(a.a.ua(g,e),0==g.length&&a.a.e.set(d,c,n))},R:function(b){if(e[b.nodeType]&&(d(b),f[b.nodeType])){var c=[];a.a.ga(c,b.getElementsByTagName("*"));for(var g=0,m=c.length;g<m;g++)d(c[g])}return b},removeNode:function(b){a.R(b);b.parentNode&&b.parentNode.removeChild(b)},cleanExternalData:function(a){r&&"function"==typeof r.cleanData&&r.cleanData([a])}}};a.R=a.a.w.R;a.removeNode=a.a.w.removeNode;a.b("cleanNode",a.R);a.b("removeNode",a.removeNode);a.b("utils.domNodeDisposal",
+	a.a.w);a.b("utils.domNodeDisposal.addDisposeCallback",a.a.w.da);a.b("utils.domNodeDisposal.removeDisposeCallback",a.a.w.Kb);(function(){a.a.ba=function(b){var d;if(r)if(r.parseHTML)d=r.parseHTML(b)||[];else{if((d=r.clean([b]))&&d[0]){for(b=d[0];b.parentNode&&11!==b.parentNode.nodeType;)b=b.parentNode;b.parentNode&&b.parentNode.removeChild(b)}}else{var c=a.a.cb(b).toLowerCase();d=y.createElement("div");c=c.match(/^<(thead|tbody|tfoot)/)&&[1,"<table>","</table>"]||!c.indexOf("<tr")&&[2,"<table><tbody>",
+	"</tbody></table>"]||(!c.indexOf("<td")||!c.indexOf("<th"))&&[3,"<table><tbody><tr>","</tr></tbody></table>"]||[0,"",""];b="ignored<div>"+c[1]+b+c[2]+"</div>";for("function"==typeof v.innerShiv?d.appendChild(v.innerShiv(b)):d.innerHTML=b;c[0]--;)d=d.lastChild;d=a.a.S(d.lastChild.childNodes)}return d};a.a.$a=function(b,d){a.a.Ka(b);d=a.a.c(d);if(null!==d&&d!==n)if("string"!=typeof d&&(d=d.toString()),r)r(b).html(d);else for(var c=a.a.ba(d),e=0;e<c.length;e++)b.appendChild(c[e])}})();a.b("utils.parseHtmlFragment",
+	a.a.ba);a.b("utils.setHtml",a.a.$a);a.D=function(){function b(c,d){if(c)if(8==c.nodeType){var f=a.D.Gb(c.nodeValue);null!=f&&d.push({bc:c,mc:f})}else if(1==c.nodeType)for(var f=0,h=c.childNodes,k=h.length;f<k;f++)b(h[f],d)}var d={};return{Ua:function(a){if("function"!=typeof a)throw Error("You can only pass a function to ko.memoization.memoize()");var b=(4294967296*(1+Math.random())|0).toString(16).substring(1)+(4294967296*(1+Math.random())|0).toString(16).substring(1);d[b]=a;return"\x3c!--[ko_memo:"+
+	b+"]--\x3e"},Rb:function(a,b){var f=d[a];if(f===n)throw Error("Couldn't find any memo with ID "+a+". Perhaps it's already been unmemoized.");try{return f.apply(null,b||[]),!0}finally{delete d[a]}},Sb:function(c,d){var f=[];b(c,f);for(var h=0,k=f.length;h<k;h++){var g=f[h].bc,m=[g];d&&a.a.ga(m,d);a.D.Rb(f[h].mc,m);g.nodeValue="";g.parentNode&&g.parentNode.removeChild(g)}},Gb:function(a){return(a=a.match(/^\[ko_memo\:(.*?)\]$/))?a[1]:null}}}();a.b("memoization",a.D);a.b("memoization.memoize",a.D.Ua);
+	a.b("memoization.unmemoize",a.D.Rb);a.b("memoization.parseMemoText",a.D.Gb);a.b("memoization.unmemoizeDomNodeAndDescendants",a.D.Sb);a.La={throttle:function(b,d){b.throttleEvaluation=d;var c=null;return a.j({read:b,write:function(a){clearTimeout(c);c=setTimeout(function(){b(a)},d)}})},rateLimit:function(a,d){var c,e,f;"number"==typeof d?c=d:(c=d.timeout,e=d.method);f="notifyWhenChangesStop"==e?S:R;a.Ta(function(a){return f(a,c)})},notify:function(a,d){a.equalityComparer="always"==d?null:H}};var Q=
+	{undefined:1,"boolean":1,number:1,string:1};a.b("extenders",a.La);a.Pb=function(b,d,c){this.target=b;this.wa=d;this.ac=c;this.Cb=!1;a.A(this,"dispose",this.K)};a.Pb.prototype.K=function(){this.Cb=!0;this.ac()};a.P=function(){a.a.Aa(this,a.P.fn);this.M={}};var B={U:function(b,d,c){var e=this;c=c||"change";var f=new a.Pb(e,d?b.bind(d):b,function(){a.a.ua(e.M[c],f);e.nb&&e.nb()});e.va&&e.va(c);e.M[c]||(e.M[c]=[]);e.M[c].push(f);return f},notifySubscribers:function(b,d){d=d||"change";if(this.Ab(d))try{a.k.Ea();
+	for(var c=this.M[d].slice(0),e=0,f;f=c[e];++e)f.Cb||f.wa(b)}finally{a.k.end()}},Ta:function(b){var d=this,c=a.C(d),e,f,h;d.qa||(d.qa=d.notifySubscribers,d.notifySubscribers=function(a,b){b&&"change"!==b?"beforeChange"===b?d.kb(a):d.qa(a,b):d.lb(a)});var k=b(function(){c&&h===d&&(h=d());e=!1;d.Pa(f,h)&&d.qa(f=h)});d.lb=function(a){e=!0;h=a;k()};d.kb=function(a){e||(f=a,d.qa(a,"beforeChange"))}},Ab:function(a){return this.M[a]&&this.M[a].length},yb:function(){var b=0;a.a.G(this.M,function(a,c){b+=c.length});
+	return b},Pa:function(a,d){return!this.equalityComparer||!this.equalityComparer(a,d)},extend:function(b){var d=this;b&&a.a.G(b,function(b,e){var f=a.La[b];"function"==typeof f&&(d=f(d,e)||d)});return d}};a.A(B,"subscribe",B.U);a.A(B,"extend",B.extend);a.A(B,"getSubscriptionsCount",B.yb);a.a.xa&&a.a.za(B,Function.prototype);a.P.fn=B;a.Db=function(a){return null!=a&&"function"==typeof a.U&&"function"==typeof a.notifySubscribers};a.b("subscribable",a.P);a.b("isSubscribable",a.Db);a.Y=a.k=function(){function b(a){c.push(e);
+	e=a}function d(){e=c.pop()}var c=[],e,f=0;return{Ea:b,end:d,Jb:function(b){if(e){if(!a.Db(b))throw Error("Only subscribable things can act as dependencies");e.wa(b,b.Vb||(b.Vb=++f))}},B:function(a,c,g){try{return b(),a.apply(c,g||[])}finally{d()}},la:function(){if(e)return e.s.la()},ma:function(){if(e)return e.ma}}}();a.b("computedContext",a.Y);a.b("computedContext.getDependenciesCount",a.Y.la);a.b("computedContext.isInitial",a.Y.ma);a.b("computedContext.isSleeping",a.Y.zc);a.p=function(b){function d(){if(0<
+	arguments.length)return d.Pa(c,arguments[0])&&(d.X(),c=arguments[0],d.W()),this;a.k.Jb(d);return c}var c=b;a.P.call(d);a.a.Aa(d,a.p.fn);d.v=function(){return c};d.W=function(){d.notifySubscribers(c)};d.X=function(){d.notifySubscribers(c,"beforeChange")};a.A(d,"peek",d.v);a.A(d,"valueHasMutated",d.W);a.A(d,"valueWillMutate",d.X);return d};a.p.fn={equalityComparer:H};var F=a.p.rc="__ko_proto__";a.p.fn[F]=a.p;a.a.xa&&a.a.za(a.p.fn,a.P.fn);a.Ma=function(b,d){return null===b||b===n||b[F]===n?!1:b[F]===
+	d?!0:a.Ma(b[F],d)};a.C=function(b){return a.Ma(b,a.p)};a.Ra=function(b){return"function"==typeof b&&b[F]===a.p||"function"==typeof b&&b[F]===a.j&&b.hc?!0:!1};a.b("observable",a.p);a.b("isObservable",a.C);a.b("isWriteableObservable",a.Ra);a.b("isWritableObservable",a.Ra);a.aa=function(b){b=b||[];if("object"!=typeof b||!("length"in b))throw Error("The argument passed when initializing an observable array must be an array, or null, or undefined.");b=a.p(b);a.a.Aa(b,a.aa.fn);return b.extend({trackArrayChanges:!0})};
+	a.aa.fn={remove:function(b){for(var d=this.v(),c=[],e="function"!=typeof b||a.C(b)?function(a){return a===b}:b,f=0;f<d.length;f++){var h=d[f];e(h)&&(0===c.length&&this.X(),c.push(h),d.splice(f,1),f--)}c.length&&this.W();return c},removeAll:function(b){if(b===n){var d=this.v(),c=d.slice(0);this.X();d.splice(0,d.length);this.W();return c}return b?this.remove(function(c){return 0<=a.a.m(b,c)}):[]},destroy:function(b){var d=this.v(),c="function"!=typeof b||a.C(b)?function(a){return a===b}:b;this.X();
+	for(var e=d.length-1;0<=e;e--)c(d[e])&&(d[e]._destroy=!0);this.W()},destroyAll:function(b){return b===n?this.destroy(function(){return!0}):b?this.destroy(function(d){return 0<=a.a.m(b,d)}):[]},indexOf:function(b){var d=this();return a.a.m(d,b)},replace:function(a,d){var c=this.indexOf(a);0<=c&&(this.X(),this.v()[c]=d,this.W())}};a.a.u("pop push reverse shift sort splice unshift".split(" "),function(b){a.aa.fn[b]=function(){var a=this.v();this.X();this.sb(a,b,arguments);a=a[b].apply(a,arguments);this.W();
+	return a}});a.a.u(["slice"],function(b){a.aa.fn[b]=function(){var a=this();return a[b].apply(a,arguments)}});a.a.xa&&a.a.za(a.aa.fn,a.p.fn);a.b("observableArray",a.aa);a.La.trackArrayChanges=function(b){function d(){if(!c){c=!0;var d=b.notifySubscribers;b.notifySubscribers=function(a,b){b&&"change"!==b||++f;return d.apply(this,arguments)};var g=[].concat(b.v()||[]);e=null;b.U(function(c){c=[].concat(c||[]);if(b.Ab("arrayChange")){var d;if(!e||1<f)e=a.a.Fa(g,c,{sparse:!0});d=e;d.length&&b.notifySubscribers(d,
+	"arrayChange")}g=c;e=null;f=0})}}if(!b.sb){var c=!1,e=null,f=0,h=b.U;b.U=b.subscribe=function(a,b,c){"arrayChange"===c&&d();return h.apply(this,arguments)};b.sb=function(b,d,m){function l(a,b,c){return s[s.length]={status:a,value:b,index:c}}if(c&&!f){var s=[],h=b.length,p=m.length,z=0;switch(d){case "push":z=h;case "unshift":for(d=0;d<p;d++)l("added",m[d],z+d);break;case "pop":z=h-1;case "shift":h&&l("deleted",b[z],z);break;case "splice":d=Math.min(Math.max(0,0>m[0]?h+m[0]:m[0]),h);for(var h=1===
+	p?h:Math.min(d+(m[1]||0),h),p=d+p-2,z=Math.max(h,p),u=[],t=[],E=2;d<z;++d,++E)d<h&&t.push(l("deleted",b[d],d)),d<p&&u.push(l("added",m[E],d));a.a.wb(t,u);break;default:return}e=s}}}};a.s=a.j=function(b,d,c){function e(){a.a.G(v,function(a,b){b.K()});v={}}function f(){e();A=0;u=!0;q=!1}function h(){var a=g.throttleEvaluation;a&&0<=a?(clearTimeout(O),O=setTimeout(k,a)):g.ib?g.ib():k()}function k(b){if(p){if(E)throw Error("A 'pure' computed must not be called recursively");}else if(!u){if(J&&J()){if(!z){r();
+	return}}else z=!1;p=!0;if(x)try{var c={};a.k.Ea({wa:function(a,b){c[b]||(c[b]=1,++A)},s:g,ma:n});A=0;s=t.call(d)}finally{a.k.end(),p=!1}else try{var e=v,l=A;a.k.Ea({wa:function(a,b){u||(l&&e[b]?(v[b]=e[b],++A,delete e[b],--l):v[b]||(v[b]=a.U(h),++A))},s:g,ma:E?n:!A});v={};A=0;try{var m=d?t.call(d):t()}finally{a.k.end(),l&&a.a.G(e,function(a,b){b.K()}),q=!1}g.Pa(s,m)&&(g.notifySubscribers(s,"beforeChange"),s=m,!0!==b&&g.notifySubscribers(s))}finally{p=!1}A||r()}}function g(){if(0<arguments.length){if("function"===
+	typeof G)G.apply(d,arguments);else throw Error("Cannot write a value to a ko.computed unless you specify a 'write' option. If you wish to read the current value, don't pass any parameters.");return this}a.k.Jb(g);q&&k(!0);return s}function m(){q&&!A&&k(!0);return s}function l(){return q||0<A}var s,q=!0,p=!1,z=!1,u=!1,t=b,E=!1,x=!1;t&&"object"==typeof t?(c=t,t=c.read):(c=c||{},t||(t=c.read));if("function"!=typeof t)throw Error("Pass a function that returns the value of the ko.computed");var G=c.write,
+	w=c.disposeWhenNodeIsRemoved||c.o||null,C=c.disposeWhen||c.Ia,J=C,r=f,v={},A=0,O=null;d||(d=c.owner);a.P.call(g);a.a.Aa(g,a.j.fn);g.v=m;g.la=function(){return A};g.hc="function"===typeof c.write;g.K=function(){r()};g.Z=l;var y=g.Ta;g.Ta=function(a){y.call(g,a);g.ib=function(){g.kb(s);q=!0;g.lb(g)}};c.pure?(x=E=!0,g.va=function(){x&&(x=!1,k(!0))},g.nb=function(){g.yb()||(e(),x=q=!0)}):c.deferEvaluation&&(g.va=function(){m();delete g.va});a.A(g,"peek",g.v);a.A(g,"dispose",g.K);a.A(g,"isActive",g.Z);
+	a.A(g,"getDependenciesCount",g.la);w&&(z=!0,w.nodeType&&(J=function(){return!a.a.Ja(w)||C&&C()}));x||c.deferEvaluation||k();w&&l()&&w.nodeType&&(r=function(){a.a.w.Kb(w,r);f()},a.a.w.da(w,r));return g};a.jc=function(b){return a.Ma(b,a.j)};B=a.p.rc;a.j[B]=a.p;a.j.fn={equalityComparer:H};a.j.fn[B]=a.j;a.a.xa&&a.a.za(a.j.fn,a.P.fn);a.b("dependentObservable",a.j);a.b("computed",a.j);a.b("isComputed",a.jc);a.Ib=function(b,d){if("function"===typeof b)return a.s(b,d,{pure:!0});b=a.a.extend({},b);b.pure=
+	!0;return a.s(b,d)};a.b("pureComputed",a.Ib);(function(){function b(a,f,h){h=h||new c;a=f(a);if("object"!=typeof a||null===a||a===n||a instanceof Date||a instanceof String||a instanceof Number||a instanceof Boolean)return a;var k=a instanceof Array?[]:{};h.save(a,k);d(a,function(c){var d=f(a[c]);switch(typeof d){case "boolean":case "number":case "string":case "function":k[c]=d;break;case "object":case "undefined":var l=h.get(d);k[c]=l!==n?l:b(d,f,h)}});return k}function d(a,b){if(a instanceof Array){for(var c=
+	0;c<a.length;c++)b(c);"function"==typeof a.toJSON&&b("toJSON")}else for(c in a)b(c)}function c(){this.keys=[];this.hb=[]}a.Qb=function(c){if(0==arguments.length)throw Error("When calling ko.toJS, pass the object you want to convert.");return b(c,function(b){for(var c=0;a.C(b)&&10>c;c++)b=b();return b})};a.toJSON=function(b,c,d){b=a.Qb(b);return a.a.eb(b,c,d)};c.prototype={save:function(b,c){var d=a.a.m(this.keys,b);0<=d?this.hb[d]=c:(this.keys.push(b),this.hb.push(c))},get:function(b){b=a.a.m(this.keys,
+	b);return 0<=b?this.hb[b]:n}}})();a.b("toJS",a.Qb);a.b("toJSON",a.toJSON);(function(){a.i={q:function(b){switch(a.a.t(b)){case "option":return!0===b.__ko__hasDomDataOptionValue__?a.a.e.get(b,a.d.options.Va):7>=a.a.L?b.getAttributeNode("value")&&b.getAttributeNode("value").specified?b.value:b.text:b.value;case "select":return 0<=b.selectedIndex?a.i.q(b.options[b.selectedIndex]):n;default:return b.value}},ca:function(b,d,c){switch(a.a.t(b)){case "option":switch(typeof d){case "string":a.a.e.set(b,a.d.options.Va,
+	n);"__ko__hasDomDataOptionValue__"in b&&delete b.__ko__hasDomDataOptionValue__;b.value=d;break;default:a.a.e.set(b,a.d.options.Va,d),b.__ko__hasDomDataOptionValue__=!0,b.value="number"===typeof d?d:""}break;case "select":if(""===d||null===d)d=n;for(var e=-1,f=0,h=b.options.length,k;f<h;++f)if(k=a.i.q(b.options[f]),k==d||""==k&&d===n){e=f;break}if(c||0<=e||d===n&&1<b.size)b.selectedIndex=e;break;default:if(null===d||d===n)d="";b.value=d}}}})();a.b("selectExtensions",a.i);a.b("selectExtensions.readValue",
+	a.i.q);a.b("selectExtensions.writeValue",a.i.ca);a.h=function(){function b(b){b=a.a.cb(b);123===b.charCodeAt(0)&&(b=b.slice(1,-1));var c=[],d=b.match(e),s,k,p=0;if(d){d.push(",");for(var z=0,u;u=d[z];++z){var t=u.charCodeAt(0);if(44===t){if(0>=p){s&&c.push(k?{key:s,value:k.join("")}:{unknown:s});s=k=p=0;continue}}else if(58===t){if(!k)continue}else if(47===t&&z&&1<u.length)(t=d[z-1].match(f))&&!h[t[0]]&&(b=b.substr(b.indexOf(u)+1),d=b.match(e),d.push(","),z=-1,u="/");else if(40===t||123===t||91===
+	t)++p;else if(41===t||125===t||93===t)--p;else if(!s&&!k){s=34===t||39===t?u.slice(1,-1):u;continue}k?k.push(u):k=[u]}}return c}var d=["true","false","null","undefined"],c=/^(?:[$_a-z][$\w]*|(.+)(\.\s*[$_a-z][$\w]*|\[.+\]))$/i,e=RegExp("\"(?:[^\"\\\\]|\\\\.)*\"|'(?:[^'\\\\]|\\\\.)*'|/(?:[^/\\\\]|\\\\.)*/w*|[^\\s:,/][^,\"'{}()/:[\\]]*[^\\s,\"'{}()/:[\\]]|[^\\s]","g"),f=/[\])"'A-Za-z0-9_$]+$/,h={"in":1,"return":1,"typeof":1},k={};return{ha:[],V:k,Wa:b,ya:function(g,m){function l(b,g){var m;if(!z){var u=
+	a.getBindingHandler(b);if(u&&u.preprocess&&!(g=u.preprocess(g,b,l)))return;if(u=k[b])m=g,0<=a.a.m(d,m)?m=!1:(u=m.match(c),m=null===u?!1:u[1]?"Object("+u[1]+")"+u[2]:m),u=m;u&&f.push("'"+b+"':function(_z){"+m+"=_z}")}h&&(g="function(){return "+g+" }");e.push("'"+b+"':"+g)}m=m||{};var e=[],f=[],h=m.valueAccessors,z=m.bindingParams,u="string"===typeof g?b(g):g;a.a.u(u,function(a){l(a.key||a.unknown,a.value)});f.length&&l("_ko_property_writers","{"+f.join(",")+" }");return e.join(",")},lc:function(a,
+	b){for(var c=0;c<a.length;c++)if(a[c].key==b)return!0;return!1},pa:function(b,c,d,e,f){if(b&&a.C(b))!a.Ra(b)||f&&b.v()===e||b(e);else if((b=c.get("_ko_property_writers"))&&b[d])b[d](e)}}}();a.b("expressionRewriting",a.h);a.b("expressionRewriting.bindingRewriteValidators",a.h.ha);a.b("expressionRewriting.parseObjectLiteral",a.h.Wa);a.b("expressionRewriting.preProcessBindings",a.h.ya);a.b("expressionRewriting._twoWayBindings",a.h.V);a.b("jsonExpressionRewriting",a.h);a.b("jsonExpressionRewriting.insertPropertyAccessorsIntoJson",
+	a.h.ya);(function(){function b(a){return 8==a.nodeType&&h.test(f?a.text:a.nodeValue)}function d(a){return 8==a.nodeType&&k.test(f?a.text:a.nodeValue)}function c(a,c){for(var g=a,e=1,f=[];g=g.nextSibling;){if(d(g)&&(e--,0===e))return f;f.push(g);b(g)&&e++}if(!c)throw Error("Cannot find closing comment tag to match: "+a.nodeValue);return null}function e(a,b){var d=c(a,b);return d?0<d.length?d[d.length-1].nextSibling:a.nextSibling:null}var f=y&&"\x3c!--test--\x3e"===y.createComment("test").text,h=f?
+	/^\x3c!--\s*ko(?:\s+([\s\S]+))?\s*--\x3e$/:/^\s*ko(?:\s+([\s\S]+))?\s*$/,k=f?/^\x3c!--\s*\/ko\s*--\x3e$/:/^\s*\/ko\s*$/,g={ul:!0,ol:!0};a.f={Q:{},childNodes:function(a){return b(a)?c(a):a.childNodes},ja:function(c){if(b(c)){c=a.f.childNodes(c);for(var d=0,g=c.length;d<g;d++)a.removeNode(c[d])}else a.a.Ka(c)},T:function(c,d){if(b(c)){a.f.ja(c);for(var g=c.nextSibling,e=0,f=d.length;e<f;e++)g.parentNode.insertBefore(d[e],g)}else a.a.T(c,d)},Hb:function(a,c){b(a)?a.parentNode.insertBefore(c,a.nextSibling):
+	a.firstChild?a.insertBefore(c,a.firstChild):a.appendChild(c)},Bb:function(c,d,g){g?b(c)?c.parentNode.insertBefore(d,g.nextSibling):g.nextSibling?c.insertBefore(d,g.nextSibling):c.appendChild(d):a.f.Hb(c,d)},firstChild:function(a){return b(a)?!a.nextSibling||d(a.nextSibling)?null:a.nextSibling:a.firstChild},nextSibling:function(a){b(a)&&(a=e(a));return a.nextSibling&&d(a.nextSibling)?null:a.nextSibling},gc:b,wc:function(a){return(a=(f?a.text:a.nodeValue).match(h))?a[1]:null},Fb:function(c){if(g[a.a.t(c)]){var l=
+	c.firstChild;if(l){do if(1===l.nodeType){var f;f=l.firstChild;var h=null;if(f){do if(h)h.push(f);else if(b(f)){var k=e(f,!0);k?f=k:h=[f]}else d(f)&&(h=[f]);while(f=f.nextSibling)}if(f=h)for(h=l.nextSibling,k=0;k<f.length;k++)h?c.insertBefore(f[k],h):c.appendChild(f[k])}while(l=l.nextSibling)}}}}})();a.b("virtualElements",a.f);a.b("virtualElements.allowedBindings",a.f.Q);a.b("virtualElements.emptyNode",a.f.ja);a.b("virtualElements.insertAfter",a.f.Bb);a.b("virtualElements.prepend",a.f.Hb);a.b("virtualElements.setDomNodeChildren",
+	a.f.T);(function(){a.J=function(){this.Yb={}};a.a.extend(a.J.prototype,{nodeHasBindings:function(b){switch(b.nodeType){case 1:return null!=b.getAttribute("data-bind")||a.g.getComponentNameForNode(b);case 8:return a.f.gc(b);default:return!1}},getBindings:function(b,d){var c=this.getBindingsString(b,d),c=c?this.parseBindingsString(c,d,b):null;return a.g.mb(c,b,d,!1)},getBindingAccessors:function(b,d){var c=this.getBindingsString(b,d),c=c?this.parseBindingsString(c,d,b,{valueAccessors:!0}):null;return a.g.mb(c,
+	b,d,!0)},getBindingsString:function(b){switch(b.nodeType){case 1:return b.getAttribute("data-bind");case 8:return a.f.wc(b);default:return null}},parseBindingsString:function(b,d,c,e){try{var f=this.Yb,h=b+(e&&e.valueAccessors||""),k;if(!(k=f[h])){var g,m="with($context){with($data||{}){return{"+a.h.ya(b,e)+"}}}";g=new Function("$context","$element",m);k=f[h]=g}return k(d,c)}catch(l){throw l.message="Unable to parse bindings.\nBindings value: "+b+"\nMessage: "+l.message,l;}}});a.J.instance=new a.J})();
+	a.b("bindingProvider",a.J);(function(){function b(a){return function(){return a}}function d(a){return a()}function c(b){return a.a.na(a.k.B(b),function(a,c){return function(){return b()[c]}})}function e(d,g,e){return"function"===typeof d?c(d.bind(null,g,e)):a.a.na(d,b)}function f(a,b){return c(this.getBindings.bind(this,a,b))}function h(b,c,d){var g,e=a.f.firstChild(c),l=a.J.instance,f=l.preprocessNode;if(f){for(;g=e;)e=a.f.nextSibling(g),f.call(l,g);e=a.f.firstChild(c)}for(;g=e;)e=a.f.nextSibling(g),
+	k(b,g,d)}function k(b,c,d){var g=!0,e=1===c.nodeType;e&&a.f.Fb(c);if(e&&d||a.J.instance.nodeHasBindings(c))g=m(c,null,b,d).shouldBindDescendants;g&&!s[a.a.t(c)]&&h(b,c,!e)}function g(b){var c=[],d={},g=[];a.a.G(b,function G(e){if(!d[e]){var l=a.getBindingHandler(e);l&&(l.after&&(g.push(e),a.a.u(l.after,function(c){if(b[c]){if(-1!==a.a.m(g,c))throw Error("Cannot combine the following bindings, because they have a cyclic dependency: "+g.join(", "));G(c)}}),g.length--),c.push({key:e,zb:l}));d[e]=!0}});
+	return c}function m(b,c,e,l){var m=a.a.e.get(b,q);if(!c){if(m)throw Error("You cannot apply bindings multiple times to the same element.");a.a.e.set(b,q,!0)}!m&&l&&a.Ob(b,e);var h;if(c&&"function"!==typeof c)h=c;else{var k=a.J.instance,s=k.getBindingAccessors||f,p=a.j(function(){(h=c?c(e,b):s.call(k,b,e))&&e.I&&e.I();return h},null,{o:b});h&&p.Z()||(p=null)}var r;if(h){var v=p?function(a){return function(){return d(p()[a])}}:function(a){return h[a]},A=function(){return a.a.na(p?p():h,d)};A.get=function(a){return h[a]&&
+	d(v(a))};A.has=function(a){return a in h};l=g(h);a.a.u(l,function(c){var d=c.zb.init,g=c.zb.update,l=c.key;if(8===b.nodeType&&!a.f.Q[l])throw Error("The binding '"+l+"' cannot be used with virtual elements");try{"function"==typeof d&&a.k.B(function(){var a=d(b,v(l),A,e.$data,e);if(a&&a.controlsDescendantBindings){if(r!==n)throw Error("Multiple bindings ("+r+" and "+l+") are trying to control descendant bindings of the same element. You cannot use these bindings together on the same element.");r=l}}),
+	"function"==typeof g&&a.j(function(){g(b,v(l),A,e.$data,e)},null,{o:b})}catch(f){throw f.message='Unable to process binding "'+l+": "+h[l]+'"\nMessage: '+f.message,f;}})}return{shouldBindDescendants:r===n}}function l(b){return b&&b instanceof a.N?b:new a.N(b)}a.d={};var s={script:!0};a.getBindingHandler=function(b){return a.d[b]};a.N=function(b,c,d,g){var e=this,l="function"==typeof b&&!a.C(b),f,m=a.j(function(){var f=l?b():b,h=a.a.c(f);c?(c.I&&c.I(),a.a.extend(e,c),m&&(e.I=m)):(e.$parents=[],e.$root=
+	h,e.ko=a);e.$rawData=f;e.$data=h;d&&(e[d]=h);g&&g(e,c,h);return e.$data},null,{Ia:function(){return f&&!a.a.ob(f)},o:!0});m.Z()&&(e.I=m,m.equalityComparer=null,f=[],m.Tb=function(b){f.push(b);a.a.w.da(b,function(b){a.a.ua(f,b);f.length||(m.K(),e.I=m=n)})})};a.N.prototype.createChildContext=function(b,c,d){return new a.N(b,this,c,function(a,b){a.$parentContext=b;a.$parent=b.$data;a.$parents=(b.$parents||[]).slice(0);a.$parents.unshift(a.$parent);d&&d(a)})};a.N.prototype.extend=function(b){return new a.N(this.I||
+	this.$data,this,null,function(c,d){c.$rawData=d.$rawData;a.a.extend(c,"function"==typeof b?b():b)})};var q=a.a.e.F(),p=a.a.e.F();a.Ob=function(b,c){if(2==arguments.length)a.a.e.set(b,p,c),c.I&&c.I.Tb(b);else return a.a.e.get(b,p)};a.ra=function(b,c,d){1===b.nodeType&&a.f.Fb(b);return m(b,c,l(d),!0)};a.Wb=function(b,c,d){d=l(d);return a.ra(b,e(c,d,b),d)};a.Ca=function(a,b){1!==b.nodeType&&8!==b.nodeType||h(l(a),b,!0)};a.pb=function(a,b){!r&&v.jQuery&&(r=v.jQuery);if(b&&1!==b.nodeType&&8!==b.nodeType)throw Error("ko.applyBindings: first parameter should be your view model; second parameter should be a DOM node");
+	b=b||v.document.body;k(l(a),b,!0)};a.Ha=function(b){switch(b.nodeType){case 1:case 8:var c=a.Ob(b);if(c)return c;if(b.parentNode)return a.Ha(b.parentNode)}return n};a.$b=function(b){return(b=a.Ha(b))?b.$data:n};a.b("bindingHandlers",a.d);a.b("applyBindings",a.pb);a.b("applyBindingsToDescendants",a.Ca);a.b("applyBindingAccessorsToNode",a.ra);a.b("applyBindingsToNode",a.Wb);a.b("contextFor",a.Ha);a.b("dataFor",a.$b)})();(function(b){function d(d,g){var e=f.hasOwnProperty(d)?f[d]:b,l;e||(e=f[d]=new a.P,
+	c(d,function(a){h[d]=a;delete f[d];l?e.notifySubscribers(a):setTimeout(function(){e.notifySubscribers(a)},0)}),l=!0);e.U(g)}function c(a,b){e("getConfig",[a],function(c){c?e("loadComponent",[a,c],function(a){b(a)}):b(null)})}function e(c,d,f,l){l||(l=a.g.loaders.slice(0));var h=l.shift();if(h){var q=h[c];if(q){var p=!1;if(q.apply(h,d.concat(function(a){p?f(null):null!==a?f(a):e(c,d,f,l)}))!==b&&(p=!0,!h.suppressLoaderExceptions))throw Error("Component loaders must supply values by invoking the callback, not by returning values synchronously.");
+	}else e(c,d,f,l)}else f(null)}var f={},h={};a.g={get:function(a,c){var e=h.hasOwnProperty(a)?h[a]:b;e?setTimeout(function(){c(e)},0):d(a,c)},tb:function(a){delete h[a]},jb:e};a.g.loaders=[];a.b("components",a.g);a.b("components.get",a.g.get);a.b("components.clearCachedDefinition",a.g.tb)})();(function(){function b(b,c,d,e){function h(){0===--u&&e(k)}var k={},u=2,t=d.template;d=d.viewModel;t?f(c,t,function(c){a.g.jb("loadTemplate",[b,c],function(a){k.template=a;h()})}):h();d?f(c,d,function(c){a.g.jb("loadViewModel",
+	[b,c],function(a){k[g]=a;h()})}):h()}function d(a,b,c){if("function"===typeof b)c(function(a){return new b(a)});else if("function"===typeof b[g])c(b[g]);else if("instance"in b){var e=b.instance;c(function(){return e})}else"viewModel"in b?d(a,b.viewModel,c):a("Unknown viewModel value: "+b)}function c(b){switch(a.a.t(b)){case "script":return a.a.ba(b.text);case "textarea":return a.a.ba(b.value);case "template":if(e(b.content))return a.a.ia(b.content.childNodes)}return a.a.ia(b.childNodes)}function e(a){return v.DocumentFragment?
+	a instanceof DocumentFragment:a&&11===a.nodeType}function f(a,b,c){"string"===typeof b.require?N||v.require?(N||v.require)([b.require],c):a("Uses require, but no AMD loader is present"):c(b)}function h(a){return function(b){throw Error("Component '"+a+"': "+b);}}var k={};a.g.register=function(b,c){if(!c)throw Error("Invalid configuration for "+b);if(a.g.Qa(b))throw Error("Component "+b+" is already registered");k[b]=c};a.g.Qa=function(a){return a in k};a.g.vc=function(b){delete k[b];a.g.tb(b)};a.g.ub=
+	{getConfig:function(a,b){b(k.hasOwnProperty(a)?k[a]:null)},loadComponent:function(a,c,d){var e=h(a);f(e,c,function(c){b(a,e,c,d)})},loadTemplate:function(b,d,g){b=h(b);if("string"===typeof d)g(a.a.ba(d));else if(d instanceof Array)g(d);else if(e(d))g(a.a.S(d.childNodes));else if(d.element)if(d=d.element,v.HTMLElement?d instanceof HTMLElement:d&&d.tagName&&1===d.nodeType)g(c(d));else if("string"===typeof d){var f=y.getElementById(d);f?g(c(f)):b("Cannot find element with ID "+d)}else b("Unknown element type: "+
+	d);else b("Unknown template value: "+d)},loadViewModel:function(a,b,c){d(h(a),b,c)}};var g="createViewModel";a.b("components.register",a.g.register);a.b("components.isRegistered",a.g.Qa);a.b("components.unregister",a.g.vc);a.b("components.defaultLoader",a.g.ub);a.g.loaders.push(a.g.ub);a.g.Ub=k})();(function(){function b(b,e){var f=b.getAttribute("params");if(f){var f=d.parseBindingsString(f,e,b,{valueAccessors:!0,bindingParams:!0}),f=a.a.na(f,function(d){return a.s(d,null,{o:b})}),h=a.a.na(f,function(d){return d.Z()?
+	a.s(function(){return a.a.c(d())},null,{o:b}):d.v()});h.hasOwnProperty("$raw")||(h.$raw=f);return h}return{$raw:{}}}a.g.getComponentNameForNode=function(b){b=a.a.t(b);return a.g.Qa(b)&&b};a.g.mb=function(c,d,f,h){if(1===d.nodeType){var k=a.g.getComponentNameForNode(d);if(k){c=c||{};if(c.component)throw Error('Cannot use the "component" binding on a custom element matching a component');var g={name:k,params:b(d,f)};c.component=h?function(){return g}:g}}return c};var d=new a.J;9>a.a.L&&(a.g.register=
+	function(a){return function(b){y.createElement(b);return a.apply(this,arguments)}}(a.g.register),y.createDocumentFragment=function(b){return function(){var d=b(),f=a.g.Ub,h;for(h in f)f.hasOwnProperty(h)&&d.createElement(h);return d}}(y.createDocumentFragment))})();(function(){var b=0;a.d.component={init:function(d,c,e,f,h){function k(){var a=g&&g.dispose;"function"===typeof a&&a.call(g);m=null}var g,m;a.a.w.da(d,k);a.s(function(){var e=a.a.c(c()),f,q;"string"===typeof e?f=e:(f=a.a.c(e.name),q=a.a.c(e.params));
+	if(!f)throw Error("No component name specified");var p=m=++b;a.g.get(f,function(b){if(m===p){k();if(!b)throw Error("Unknown component '"+f+"'");var c=b.template;if(!c)throw Error("Component '"+f+"' has no template");c=a.a.ia(c);a.f.T(d,c);var c=q,e=b.createViewModel;b=e?e.call(b,c,{element:d}):c;c=h.createChildContext(b);g=b;a.Ca(c,d)}})},null,{o:d});return{controlsDescendantBindings:!0}}};a.f.Q.component=!0})();var P={"class":"className","for":"htmlFor"};a.d.attr={update:function(b,d){var c=a.a.c(d())||
+	{};a.a.G(c,function(c,d){d=a.a.c(d);var h=!1===d||null===d||d===n;h&&b.removeAttribute(c);8>=a.a.L&&c in P?(c=P[c],h?b.removeAttribute(c):b[c]=d):h||b.setAttribute(c,d.toString());"name"===c&&a.a.Mb(b,h?"":d.toString())})}};(function(){a.d.checked={after:["value","attr"],init:function(b,d,c){function e(){var e=b.checked,f=s?h():e;if(!a.Y.ma()&&(!g||e)){var k=a.k.B(d);m?l!==f?(e&&(a.a.ea(k,f,!0),a.a.ea(k,l,!1)),l=f):a.a.ea(k,f,e):a.h.pa(k,c,"checked",f,!0)}}function f(){var c=a.a.c(d());b.checked=
+	m?0<=a.a.m(c,h()):k?c:h()===c}var h=a.Ib(function(){return c.has("checkedValue")?a.a.c(c.get("checkedValue")):c.has("value")?a.a.c(c.get("value")):b.value}),k="checkbox"==b.type,g="radio"==b.type;if(k||g){var m=k&&a.a.c(d())instanceof Array,l=m?h():n,s=g||m;g&&!b.name&&a.d.uniqueName.init(b,function(){return!0});a.s(e,null,{o:b});a.a.n(b,"click",e);a.s(f,null,{o:b})}}};a.h.V.checked=!0;a.d.checkedValue={update:function(b,d){b.value=a.a.c(d())}}})();a.d.css={update:function(b,d){var c=a.a.c(d());"object"==
+	typeof c?a.a.G(c,function(c,d){d=a.a.c(d);a.a.Ba(b,c,d)}):(c=String(c||""),a.a.Ba(b,b.__ko__cssValue,!1),b.__ko__cssValue=c,a.a.Ba(b,c,!0))}};a.d.enable={update:function(b,d){var c=a.a.c(d());c&&b.disabled?b.removeAttribute("disabled"):c||b.disabled||(b.disabled=!0)}};a.d.disable={update:function(b,d){a.d.enable.update(b,function(){return!a.a.c(d())})}};a.d.event={init:function(b,d,c,e,f){var h=d()||{};a.a.G(h,function(h){"string"==typeof h&&a.a.n(b,h,function(b){var m,l=d()[h];if(l){try{var s=a.a.S(arguments);
+	e=f.$data;s.unshift(e);m=l.apply(e,s)}finally{!0!==m&&(b.preventDefault?b.preventDefault():b.returnValue=!1)}!1===c.get(h+"Bubble")&&(b.cancelBubble=!0,b.stopPropagation&&b.stopPropagation())}})})}};a.d.foreach={Eb:function(b){return function(){var d=b(),c=a.a.Xa(d);if(!c||"number"==typeof c.length)return{foreach:d,templateEngine:a.O.Oa};a.a.c(d);return{foreach:c.data,as:c.as,includeDestroyed:c.includeDestroyed,afterAdd:c.afterAdd,beforeRemove:c.beforeRemove,afterRender:c.afterRender,beforeMove:c.beforeMove,
+	afterMove:c.afterMove,templateEngine:a.O.Oa}}},init:function(b,d){return a.d.template.init(b,a.d.foreach.Eb(d))},update:function(b,d,c,e,f){return a.d.template.update(b,a.d.foreach.Eb(d),c,e,f)}};a.h.ha.foreach=!1;a.f.Q.foreach=!0;a.d.hasfocus={init:function(b,d,c){function e(e){b.__ko_hasfocusUpdating=!0;var g=b.ownerDocument;if("activeElement"in g){var f;try{f=g.activeElement}catch(h){f=g.body}e=f===b}g=d();a.h.pa(g,c,"hasfocus",e,!0);b.__ko_hasfocusLastValue=e;b.__ko_hasfocusUpdating=!1}var f=
+	e.bind(null,!0),h=e.bind(null,!1);a.a.n(b,"focus",f);a.a.n(b,"focusin",f);a.a.n(b,"blur",h);a.a.n(b,"focusout",h)},update:function(b,d){var c=!!a.a.c(d());b.__ko_hasfocusUpdating||b.__ko_hasfocusLastValue===c||(c?b.focus():b.blur(),a.k.B(a.a.oa,null,[b,c?"focusin":"focusout"]))}};a.h.V.hasfocus=!0;a.d.hasFocus=a.d.hasfocus;a.h.V.hasFocus=!0;a.d.html={init:function(){return{controlsDescendantBindings:!0}},update:function(b,d){a.a.$a(b,d())}};I("if");I("ifnot",!1,!0);I("with",!0,!1,function(a,d){return a.createChildContext(d)});
+	var K={};a.d.options={init:function(b){if("select"!==a.a.t(b))throw Error("options binding applies only to SELECT elements");for(;0<b.length;)b.remove(0);return{controlsDescendantBindings:!0}},update:function(b,d,c){function e(){return a.a.ta(b.options,function(a){return a.selected})}function f(a,b,c){var d=typeof b;return"function"==d?b(a):"string"==d?a[b]:c}function h(c,d){if(s.length){var e=0<=a.a.m(s,a.i.q(d[0]));a.a.Nb(d[0],e);q&&!e&&a.k.B(a.a.oa,null,[b,"change"])}}var k=0!=b.length&&b.multiple?
+	b.scrollTop:null,g=a.a.c(d()),m=c.get("optionsIncludeDestroyed");d={};var l,s;s=b.multiple?a.a.Da(e(),a.i.q):0<=b.selectedIndex?[a.i.q(b.options[b.selectedIndex])]:[];g&&("undefined"==typeof g.length&&(g=[g]),l=a.a.ta(g,function(b){return m||b===n||null===b||!a.a.c(b._destroy)}),c.has("optionsCaption")&&(g=a.a.c(c.get("optionsCaption")),null!==g&&g!==n&&l.unshift(K)));var q=!1;d.beforeRemove=function(a){b.removeChild(a)};g=h;c.has("optionsAfterRender")&&(g=function(b,d){h(0,d);a.k.B(c.get("optionsAfterRender"),
+	null,[d[0],b!==K?b:n])});a.a.Za(b,l,function(d,e,g){g.length&&(s=g[0].selected?[a.i.q(g[0])]:[],q=!0);e=b.ownerDocument.createElement("option");d===K?(a.a.bb(e,c.get("optionsCaption")),a.i.ca(e,n)):(g=f(d,c.get("optionsValue"),d),a.i.ca(e,a.a.c(g)),d=f(d,c.get("optionsText"),g),a.a.bb(e,d));return[e]},d,g);a.k.B(function(){c.get("valueAllowUnset")&&c.has("value")?a.i.ca(b,a.a.c(c.get("value")),!0):(b.multiple?s.length&&e().length<s.length:s.length&&0<=b.selectedIndex?a.i.q(b.options[b.selectedIndex])!==
+	s[0]:s.length||0<=b.selectedIndex)&&a.a.oa(b,"change")});a.a.dc(b);k&&20<Math.abs(k-b.scrollTop)&&(b.scrollTop=k)}};a.d.options.Va=a.a.e.F();a.d.selectedOptions={after:["options","foreach"],init:function(b,d,c){a.a.n(b,"change",function(){var e=d(),f=[];a.a.u(b.getElementsByTagName("option"),function(b){b.selected&&f.push(a.i.q(b))});a.h.pa(e,c,"selectedOptions",f)})},update:function(b,d){if("select"!=a.a.t(b))throw Error("values binding applies only to SELECT elements");var c=a.a.c(d());c&&"number"==
+	typeof c.length&&a.a.u(b.getElementsByTagName("option"),function(b){var d=0<=a.a.m(c,a.i.q(b));a.a.Nb(b,d)})}};a.h.V.selectedOptions=!0;a.d.style={update:function(b,d){var c=a.a.c(d()||{});a.a.G(c,function(c,d){d=a.a.c(d);if(null===d||d===n||!1===d)d="";b.style[c]=d})}};a.d.submit={init:function(b,d,c,e,f){if("function"!=typeof d())throw Error("The value for a submit binding must be a function");a.a.n(b,"submit",function(a){var c,e=d();try{c=e.call(f.$data,b)}finally{!0!==c&&(a.preventDefault?a.preventDefault():
+	a.returnValue=!1)}})}};a.d.text={init:function(){return{controlsDescendantBindings:!0}},update:function(b,d){a.a.bb(b,d())}};a.f.Q.text=!0;(function(){if(v&&v.navigator)var b=function(a){if(a)return parseFloat(a[1])},d=v.opera&&v.opera.version&&parseInt(v.opera.version()),c=v.navigator.userAgent,e=b(c.match(/^(?:(?!chrome).)*version\/([^ ]*) safari/i)),f=b(c.match(/Firefox\/([^ ]*)/));if(10>a.a.L)var h=a.a.e.F(),k=a.a.e.F(),g=function(b){var c=this.activeElement;(c=c&&a.a.e.get(c,k))&&c(b)},m=function(b,
+	c){var d=b.ownerDocument;a.a.e.get(d,h)||(a.a.e.set(d,h,!0),a.a.n(d,"selectionchange",g));a.a.e.set(b,k,c)};a.d.textInput={init:function(b,c,g){function h(c,d){a.a.n(b,c,d)}function k(){var d=a.a.c(c());if(null===d||d===n)d="";v!==n&&d===v?setTimeout(k,4):b.value!==d&&(r=d,b.value=d)}function u(){x||(v=b.value,x=setTimeout(t,4))}function t(){clearTimeout(x);v=x=n;var d=b.value;r!==d&&(r=d,a.h.pa(c(),g,"textInput",d))}var r=b.value,x,v;10>a.a.L?(h("propertychange",function(a){"value"===a.propertyName&&
+	t()}),8==a.a.L&&(h("keyup",t),h("keydown",t)),8<=a.a.L&&(m(b,t),h("dragend",u))):(h("input",t),5>e&&"textarea"===a.a.t(b)?(h("keydown",u),h("paste",u),h("cut",u)):11>d?h("keydown",u):4>f&&(h("DOMAutoComplete",t),h("dragdrop",t),h("drop",t)));h("change",t);a.s(k,null,{o:b})}};a.h.V.textInput=!0;a.d.textinput={preprocess:function(a,b,c){c("textInput",a)}}})();a.d.uniqueName={init:function(b,d){if(d()){var c="ko_unique_"+ ++a.d.uniqueName.Zb;a.a.Mb(b,c)}}};a.d.uniqueName.Zb=0;a.d.value={after:["options",
+	"foreach"],init:function(b,d,c){if("input"!=b.tagName.toLowerCase()||"checkbox"!=b.type&&"radio"!=b.type){var e=["change"],f=c.get("valueUpdate"),h=!1,k=null;f&&("string"==typeof f&&(f=[f]),a.a.ga(e,f),e=a.a.rb(e));var g=function(){k=null;h=!1;var e=d(),g=a.i.q(b);a.h.pa(e,c,"value",g)};!a.a.L||"input"!=b.tagName.toLowerCase()||"text"!=b.type||"off"==b.autocomplete||b.form&&"off"==b.form.autocomplete||-1!=a.a.m(e,"propertychange")||(a.a.n(b,"propertychange",function(){h=!0}),a.a.n(b,"focus",function(){h=
+	!1}),a.a.n(b,"blur",function(){h&&g()}));a.a.u(e,function(c){var d=g;a.a.uc(c,"after")&&(d=function(){k=a.i.q(b);setTimeout(g,0)},c=c.substring(5));a.a.n(b,c,d)});var m=function(){var e=a.a.c(d()),g=a.i.q(b);if(null!==k&&e===k)setTimeout(m,0);else if(e!==g)if("select"===a.a.t(b)){var f=c.get("valueAllowUnset"),g=function(){a.i.ca(b,e,f)};g();f||e===a.i.q(b)?setTimeout(g,0):a.k.B(a.a.oa,null,[b,"change"])}else a.i.ca(b,e)};a.s(m,null,{o:b})}else a.ra(b,{checkedValue:d})},update:function(){}};a.h.V.value=
+	!0;a.d.visible={update:function(b,d){var c=a.a.c(d()),e="none"!=b.style.display;c&&!e?b.style.display="":!c&&e&&(b.style.display="none")}};(function(b){a.d[b]={init:function(d,c,e,f,h){return a.d.event.init.call(this,d,function(){var a={};a[b]=c();return a},e,f,h)}}})("click");a.H=function(){};a.H.prototype.renderTemplateSource=function(){throw Error("Override renderTemplateSource");};a.H.prototype.createJavaScriptEvaluatorBlock=function(){throw Error("Override createJavaScriptEvaluatorBlock");};
+	a.H.prototype.makeTemplateSource=function(b,d){if("string"==typeof b){d=d||y;var c=d.getElementById(b);if(!c)throw Error("Cannot find template with ID "+b);return new a.r.l(c)}if(1==b.nodeType||8==b.nodeType)return new a.r.fa(b);throw Error("Unknown template type: "+b);};a.H.prototype.renderTemplate=function(a,d,c,e){a=this.makeTemplateSource(a,e);return this.renderTemplateSource(a,d,c)};a.H.prototype.isTemplateRewritten=function(a,d){return!1===this.allowTemplateRewriting?!0:this.makeTemplateSource(a,
+	d).data("isRewritten")};a.H.prototype.rewriteTemplate=function(a,d,c){a=this.makeTemplateSource(a,c);d=d(a.text());a.text(d);a.data("isRewritten",!0)};a.b("templateEngine",a.H);a.fb=function(){function b(b,c,d,k){b=a.h.Wa(b);for(var g=a.h.ha,m=0;m<b.length;m++){var l=b[m].key;if(g.hasOwnProperty(l)){var s=g[l];if("function"===typeof s){if(l=s(b[m].value))throw Error(l);}else if(!s)throw Error("This template engine does not support the '"+l+"' binding within its templates");}}d="ko.__tr_ambtns(function($context,$element){return(function(){return{ "+
+	a.h.ya(b,{valueAccessors:!0})+" } })()},'"+d.toLowerCase()+"')";return k.createJavaScriptEvaluatorBlock(d)+c}var d=/(<([a-z]+\d*)(?:\s+(?!data-bind\s*=\s*)[a-z0-9\-]+(?:=(?:\"[^\"]*\"|\'[^\']*\'))?)*\s+)data-bind\s*=\s*(["'])([\s\S]*?)\3/gi,c=/\x3c!--\s*ko\b\s*([\s\S]*?)\s*--\x3e/g;return{ec:function(b,c,d){c.isTemplateRewritten(b,d)||c.rewriteTemplate(b,function(b){return a.fb.nc(b,c)},d)},nc:function(a,f){return a.replace(d,function(a,c,d,e,l){return b(l,c,d,f)}).replace(c,function(a,c){return b(c,
+	"\x3c!-- ko --\x3e","#comment",f)})},Xb:function(b,c){return a.D.Ua(function(d,k){var g=d.nextSibling;g&&g.nodeName.toLowerCase()===c&&a.ra(g,b,k)})}}}();a.b("__tr_ambtns",a.fb.Xb);(function(){a.r={};a.r.l=function(a){this.l=a};a.r.l.prototype.text=function(){var b=a.a.t(this.l),b="script"===b?"text":"textarea"===b?"value":"innerHTML";if(0==arguments.length)return this.l[b];var d=arguments[0];"innerHTML"===b?a.a.$a(this.l,d):this.l[b]=d};var b=a.a.e.F()+"_";a.r.l.prototype.data=function(c){if(1===
+	arguments.length)return a.a.e.get(this.l,b+c);a.a.e.set(this.l,b+c,arguments[1])};var d=a.a.e.F();a.r.fa=function(a){this.l=a};a.r.fa.prototype=new a.r.l;a.r.fa.prototype.text=function(){if(0==arguments.length){var b=a.a.e.get(this.l,d)||{};b.gb===n&&b.Ga&&(b.gb=b.Ga.innerHTML);return b.gb}a.a.e.set(this.l,d,{gb:arguments[0]})};a.r.l.prototype.nodes=function(){if(0==arguments.length)return(a.a.e.get(this.l,d)||{}).Ga;a.a.e.set(this.l,d,{Ga:arguments[0]})};a.b("templateSources",a.r);a.b("templateSources.domElement",
+	a.r.l);a.b("templateSources.anonymousTemplate",a.r.fa)})();(function(){function b(b,c,d){var e;for(c=a.f.nextSibling(c);b&&(e=b)!==c;)b=a.f.nextSibling(e),d(e,b)}function d(c,d){if(c.length){var e=c[0],f=c[c.length-1],h=e.parentNode,k=a.J.instance,n=k.preprocessNode;if(n){b(e,f,function(a,b){var c=a.previousSibling,d=n.call(k,a);d&&(a===e&&(e=d[0]||b),a===f&&(f=d[d.length-1]||c))});c.length=0;if(!e)return;e===f?c.push(e):(c.push(e,f),a.a.ka(c,h))}b(e,f,function(b){1!==b.nodeType&&8!==b.nodeType||
+	a.pb(d,b)});b(e,f,function(b){1!==b.nodeType&&8!==b.nodeType||a.D.Sb(b,[d])});a.a.ka(c,h)}}function c(a){return a.nodeType?a:0<a.length?a[0]:null}function e(b,e,f,k,q){q=q||{};var p=b&&c(b),p=p&&p.ownerDocument,n=q.templateEngine||h;a.fb.ec(f,n,p);f=n.renderTemplate(f,k,q,p);if("number"!=typeof f.length||0<f.length&&"number"!=typeof f[0].nodeType)throw Error("Template engine must return an array of DOM nodes");p=!1;switch(e){case "replaceChildren":a.f.T(b,f);p=!0;break;case "replaceNode":a.a.Lb(b,
+	f);p=!0;break;case "ignoreTargetNode":break;default:throw Error("Unknown renderMode: "+e);}p&&(d(f,k),q.afterRender&&a.k.B(q.afterRender,null,[f,k.$data]));return f}function f(b,c,d){return a.C(b)?b():"function"===typeof b?b(c,d):b}var h;a.ab=function(b){if(b!=n&&!(b instanceof a.H))throw Error("templateEngine must inherit from ko.templateEngine");h=b};a.Ya=function(b,d,k,s,q){k=k||{};if((k.templateEngine||h)==n)throw Error("Set a template engine before calling renderTemplate");q=q||"replaceChildren";
+	if(s){var p=c(s);return a.j(function(){var h=d&&d instanceof a.N?d:new a.N(a.a.c(d)),n=f(b,h.$data,h),h=e(s,q,n,h,k);"replaceNode"==q&&(s=h,p=c(s))},null,{Ia:function(){return!p||!a.a.Ja(p)},o:p&&"replaceNode"==q?p.parentNode:p})}return a.D.Ua(function(c){a.Ya(b,d,k,c,"replaceNode")})};a.tc=function(b,c,h,k,q){function p(a,b){d(b,u);h.afterRender&&h.afterRender(b,a)}function r(a,c){u=q.createChildContext(a,h.as,function(a){a.$index=c});var d=f(b,a,u);return e(null,"ignoreTargetNode",d,u,h)}var u;
+	return a.j(function(){var b=a.a.c(c)||[];"undefined"==typeof b.length&&(b=[b]);b=a.a.ta(b,function(b){return h.includeDestroyed||b===n||null===b||!a.a.c(b._destroy)});a.k.B(a.a.Za,null,[k,b,r,h,p])},null,{o:k})};var k=a.a.e.F();a.d.template={init:function(b,c){var d=a.a.c(c());"string"==typeof d||d.name?a.f.ja(b):(d=a.f.childNodes(b),d=a.a.oc(d),(new a.r.fa(b)).nodes(d));return{controlsDescendantBindings:!0}},update:function(b,c,d,e,f){var h=c(),r;c=a.a.c(h);d=!0;e=null;"string"==typeof c?c={}:(h=
+	c.name,"if"in c&&(d=a.a.c(c["if"])),d&&"ifnot"in c&&(d=!a.a.c(c.ifnot)),r=a.a.c(c.data));"foreach"in c?e=a.tc(h||b,d&&c.foreach||[],c,b,f):d?(f="data"in c?f.createChildContext(r,c.as):f,e=a.Ya(h||b,f,c,b)):a.f.ja(b);f=e;(r=a.a.e.get(b,k))&&"function"==typeof r.K&&r.K();a.a.e.set(b,k,f&&f.Z()?f:n)}};a.h.ha.template=function(b){b=a.h.Wa(b);return 1==b.length&&b[0].unknown||a.h.lc(b,"name")?null:"This template engine does not support anonymous templates nested within its templates"};a.f.Q.template=!0})();
+	a.b("setTemplateEngine",a.ab);a.b("renderTemplate",a.Ya);a.a.wb=function(a,d,c){if(a.length&&d.length){var e,f,h,k,g;for(e=f=0;(!c||e<c)&&(k=a[f]);++f){for(h=0;g=d[h];++h)if(k.value===g.value){k.moved=g.index;g.moved=k.index;d.splice(h,1);e=h=0;break}e+=h}}};a.a.Fa=function(){function b(b,c,e,f,h){var k=Math.min,g=Math.max,m=[],l,n=b.length,q,p=c.length,r=p-n||1,u=n+p+1,t,v,x;for(l=0;l<=n;l++)for(v=t,m.push(t=[]),x=k(p,l+r),q=g(0,l-1);q<=x;q++)t[q]=q?l?b[l-1]===c[q-1]?v[q-1]:k(v[q]||u,t[q-1]||u)+
+	1:q+1:l+1;k=[];g=[];r=[];l=n;for(q=p;l||q;)p=m[l][q]-1,q&&p===m[l][q-1]?g.push(k[k.length]={status:e,value:c[--q],index:q}):l&&p===m[l-1][q]?r.push(k[k.length]={status:f,value:b[--l],index:l}):(--q,--l,h.sparse||k.push({status:"retained",value:c[q]}));a.a.wb(g,r,10*n);return k.reverse()}return function(a,c,e){e="boolean"===typeof e?{dontLimitMoves:e}:e||{};a=a||[];c=c||[];return a.length<=c.length?b(a,c,"added","deleted",e):b(c,a,"deleted","added",e)}}();a.b("utils.compareArrays",a.a.Fa);(function(){function b(b,
+	d,f,h,k){var g=[],m=a.j(function(){var l=d(f,k,a.a.ka(g,b))||[];0<g.length&&(a.a.Lb(g,l),h&&a.k.B(h,null,[f,l,k]));g.length=0;a.a.ga(g,l)},null,{o:b,Ia:function(){return!a.a.ob(g)}});return{$:g,j:m.Z()?m:n}}var d=a.a.e.F();a.a.Za=function(c,e,f,h,k){function g(b,d){w=s[d];t!==d&&(y[b]=w);w.Na(t++);a.a.ka(w.$,c);r.push(w);x.push(w)}function m(b,c){if(b)for(var d=0,e=c.length;d<e;d++)c[d]&&a.a.u(c[d].$,function(a){b(a,d,c[d].sa)})}e=e||[];h=h||{};var l=a.a.e.get(c,d)===n,s=a.a.e.get(c,d)||[],q=a.a.Da(s,
+	function(a){return a.sa}),p=a.a.Fa(q,e,h.dontLimitMoves),r=[],u=0,t=0,v=[],x=[];e=[];for(var y=[],q=[],w,C=0,B,D;B=p[C];C++)switch(D=B.moved,B.status){case "deleted":D===n&&(w=s[u],w.j&&w.j.K(),v.push.apply(v,a.a.ka(w.$,c)),h.beforeRemove&&(e[C]=w,x.push(w)));u++;break;case "retained":g(C,u++);break;case "added":D!==n?g(C,D):(w={sa:B.value,Na:a.p(t++)},r.push(w),x.push(w),l||(q[C]=w))}m(h.beforeMove,y);a.a.u(v,h.beforeRemove?a.R:a.removeNode);for(var C=0,l=a.f.firstChild(c),F;w=x[C];C++){w.$||a.a.extend(w,
+	b(c,f,w.sa,k,w.Na));for(u=0;p=w.$[u];l=p.nextSibling,F=p,u++)p!==l&&a.f.Bb(c,p,F);!w.ic&&k&&(k(w.sa,w.$,w.Na),w.ic=!0)}m(h.beforeRemove,e);m(h.afterMove,y);m(h.afterAdd,q);a.a.e.set(c,d,r)}})();a.b("utils.setDomNodeChildrenFromArrayMapping",a.a.Za);a.O=function(){this.allowTemplateRewriting=!1};a.O.prototype=new a.H;a.O.prototype.renderTemplateSource=function(b){var d=(9>a.a.L?0:b.nodes)?b.nodes():null;if(d)return a.a.S(d.cloneNode(!0).childNodes);b=b.text();return a.a.ba(b)};a.O.Oa=new a.O;a.ab(a.O.Oa);
+	a.b("nativeTemplateEngine",a.O);(function(){a.Sa=function(){var a=this.kc=function(){if(!r||!r.tmpl)return 0;try{if(0<=r.tmpl.tag.tmpl.open.toString().indexOf("__"))return 2}catch(a){}return 1}();this.renderTemplateSource=function(b,e,f){f=f||{};if(2>a)throw Error("Your version of jQuery.tmpl is too old. Please upgrade to jQuery.tmpl 1.0.0pre or later.");var h=b.data("precompiled");h||(h=b.text()||"",h=r.template(null,"{{ko_with $item.koBindingContext}}"+h+"{{/ko_with}}"),b.data("precompiled",h));
+	b=[e.$data];e=r.extend({koBindingContext:e},f.templateOptions);e=r.tmpl(h,b,e);e.appendTo(y.createElement("div"));r.fragments={};return e};this.createJavaScriptEvaluatorBlock=function(a){return"{{ko_code ((function() { return "+a+" })()) }}"};this.addTemplate=function(a,b){y.write("<script type='text/html' id='"+a+"'>"+b+"\x3c/script>")};0<a&&(r.tmpl.tag.ko_code={open:"__.push($1 || '');"},r.tmpl.tag.ko_with={open:"with($1) {",close:"} "})};a.Sa.prototype=new a.H;var b=new a.Sa;0<b.kc&&a.ab(b);a.b("jqueryTmplTemplateEngine",
+	a.Sa)})()})})();})();
+
+
 /***/ }
 /******/ ])
-})
+});

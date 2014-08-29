@@ -378,7 +378,7 @@ describe 'view-model @quick @view-model', ->
 
     # add custom mapping
     view_model = kb.viewModel(model, {factories:
-      reused: (obj, options) -> return if obj instanceof kb.Collection then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
+      reused: (obj, options) -> return if kb.isCollection(obj) then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
     })
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 

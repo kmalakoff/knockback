@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.2
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -275,7 +275,7 @@ class kb.CollectionObservable
   # Internal
   ####################################################
 
-  # @private
+  # @nodoc
   _shareOrCreateFactory: (options) ->
     absolute_models_path = kb.utils.pathJoin(options.path, 'models')
     factories = options.factories
@@ -308,7 +308,7 @@ class kb.CollectionObservable
         factory.addPathMapping(absolute_models_path, kb.ViewModel)
     return factory
 
-  # @private
+  # @nodoc
   _onCollectionChange: (event, arg) => return kb.ignore =>
     return if @in_edit # we are doing the editing
 
@@ -348,7 +348,7 @@ class kb.CollectionObservable
 
     return
 
-  # @private
+  # @nodoc
   _onModelRemove: (model) ->
     view_model = if @models_only then model else @viewModelByModel(model) # either remove a view model or a model
     return unless view_model  # it may have already been removed
@@ -357,7 +357,7 @@ class kb.CollectionObservable
     observable.remove(view_model)
     @in_edit--
 
-  # @private
+  # @nodoc
   _onObservableArrayChange: (models_or_view_models) -> return kb.ignore =>
     return if @in_edit # we are doing the editing
 
@@ -396,19 +396,19 @@ class kb.CollectionObservable
     @in_edit--
     return
 
-  # @private
+  # @nodoc
   _attributeComparator: (sort_attribute) ->
     modelAttributeCompare = (model_a, model_b) ->
       attribute_name = ko.utils.unwrapObservable(sort_attribute)
       kb.compare(model_a.get(attribute_name), model_b.get(attribute_name))
     return (if @models_only then modelAttributeCompare else (model_a, model_b) -> modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b)))
 
-  # @private
+  # @nodoc
   _createViewModel: (model) ->
     return model if @models_only
     return @create_options.store.findOrCreate(model, @create_options)
 
-  # @private
+  # @nodoc
   _selectModel: (model) ->
     filters = kb.peek(@_filters)
     for filter in filters

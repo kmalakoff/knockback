@@ -1,5 +1,5 @@
 ###
-  knockback.js 0.19.2
+  knockback.js 0.19.4
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -217,8 +217,8 @@ class kb.utils
 
   # Creates an observable based on a value's type.
   @createFromDefaultCreator: (obj, options) ->
-    return kb.viewModel(obj, options)                   if obj instanceof kb.Model
-    return kb.collectionObservable(obj, options)        if obj instanceof kb.Collection
+    return kb.viewModel(obj, options)                   if kb.isModel(obj)
+    return kb.collectionObservable(obj, options)        if kb.isCollection(obj)
     return ko.observableArray(obj)                      if _.isArray(obj)
     return ko.observable(obj)
 
