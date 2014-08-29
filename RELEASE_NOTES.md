@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.19.4
+* Bug fix for extracting the model from a ViewModel when setting by ViewModel.
+
 ## 0.19.3
 * Tested Knckout 3.2 and updated component.io reference to kmalakoff/knockout for latest.
 
