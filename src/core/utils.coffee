@@ -86,6 +86,15 @@ class kb.utils
   #   var collection = kb.utils.wrappedObject(collection_observable);
   @wrappedObject: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
 
+  # @nodoc
+  @wrappedCreator: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'creator'))
+
+  # @nodoc
+  @orSet: (obj, key, value) ->
+    obj.__kb or= {}
+    obj.__kb[key] = value unless obj.__kb.hasOwnProperty(key)
+    return obj.__kb[key]
+
   # Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
   # @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
   #

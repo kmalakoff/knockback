@@ -21,14 +21,14 @@ module.exports = class kb.Store
 
   # Used to either register yourself with the existing store or to create a new store.
   #
-  # @param [Object] options please pass the options from your constructor to the retain method. For example, constructor(model, options)
-  # @param [Instance] obj the instance that will own or retain with the store
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
+  # @param [Instance] obj the instance that will own or register with the store
   # @param [ko.observable] observable the observable that will own the store
   # @example
   #   kb.Store.useOptionsOrCreate(model, this, options);
   @useOptionsOrCreate: (options, obj, observable) ->
     if options.store
-      options.store.retain(obj, observable, options.creator)
+      options.store.register(obj, observable, options.creator)
       return kb.utils.wrappedStore(observable, options.store)
     else
       kb.utils.wrappedStoreIsOwned(observable, true)
@@ -50,8 +50,7 @@ module.exports = class kb.Store
   clear: ->
     [observable_records, @observable_records] = [@observable_records, {}]
     for creator_id, records of observable_records
-      for cid, record of records
-        kb.release(record.observable) while record.ref_count-- > 0
+      kb.release(observable) for cid, observable of records when not observable.__kb_released
 
     [replaced_observables, @replaced_observables] = [@replaced_observables, []]
     kb.release(observable) for observable in replaced_observables when not observable.__kb_released
@@ -60,75 +59,70 @@ module.exports = class kb.Store
   # Manually compact the store by searching for released view models
   compact: ->
     for creator_id, records of @observable_records
-      delete records[cid] for cid, record of records when record.observable.__kb_released
+      delete records[cid] for cid, observable of records when observable.__kb_released
     return
 
-  # Used to retain a new view model with the store.
+  # Used to register a new view model with the store.
   #
   # @param [Model] obj the Model
   # @param [ko.observable] observable the observable to share for the Model
-  # @param [Object] options please pass the options from your constructor to the retain method. For example, constructor(model, options)
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
   # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
   #
   # @example register an observable with the store
-  #   store.retain(obj, observable, creator);
-  retain: (obj, observable, creator) ->
+  #   store.registerObservable(obj, observable, creator);
+  register: (obj, observable, creator) ->
     return unless @canRegister(observable)
     creator or= observable.constructor # default is to use the constructor
 
     # prepare the observable
     kb.utils.wrappedObject(observable, obj)
-    obj or (observable.__kb_null = true) # retain as shared null
+    obj or (observable.__kb_null = true) # register as shared null
 
-    kb.retain(observable)
-    if record = (@observable_records[creator_id = @creatorId(creator)] or= {})[cid = @cid(obj)]
-      if record.observable isnt observable
-        kb.release(record.observable) while record.ref_count-- > 0
-        record.observable = observable
-    else
-      record = (@observable_records[creator_id] or= {})[cid] = {observable: observable, ref_count: 0}
-    record.ref_count++
-    return
+    @replaced_observables.push(current_observable) if current_observable = @find(obj, creator)
+
+    # TODO: look for changing
+    kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
+    (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
+    stores_references = kb.utils.orSet(observable, 'stores_references', [])
+    unless store_references = _.find(stores_references, (store_references) => store_references.store is @)
+      stores_references.push(store_references = {store: @, ref_count: 0, release: => @release(observable)})
+    store_references.ref_count++
+    return observable
 
   # @nodoc
   find: (obj, creator) ->
-    return null unless record = (@observable_records[creator_id = @creatorId(creator)] or= {})[cid = @cid(obj)]
-    (delete @observable_records[creator_id][cid]; return null) if record.observable?.__kb_released
-    return record.observable
-
-  # @nodoc
-  release: (obj, observable, creator) ->
-    return console?.log "Could not find object for release", obj unless record = (@observable_records[creator_id = @creatorId(creator)] or= {})[cid = @cid(obj)]
-    return console?.log "Observable does not match for release", obj, observable unless observable is record.observable
-    return console?.log "Could not release object. Reference count corrupt: #{record.ref_count}", obj if record.ref_count < 1
-    delete @observable_records[creator_id][cid] if record.ref_count-- < 1
-    kb.release(record.observable)
+    if (observable = (@observable_records[@creatorId(creator)] or= {})[@cid(obj)])?.__kb_released
+      delete @observable_records[@creatorId(creator)][@cid(obj)]
+      return null
+    return observable
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
   #
   # @param [Model|Collection|Data] obj the object to create the observable for. Only Models are cached in the store.
-  # @param [Object] options please pass the options from your constructor to the retain method. For example, constructor(model, options)
+  # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
   # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
   # @option options [kb.Factory] factory a factory used to create view models.
   #
-  # @example retain an observable with the store
-  #   observable = store.retainOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
-  retainOrCreate: (obj, options) ->
+  # @example register an observable with the store
+  #   observable = store.findOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
+  findOrCreate: (obj, options) ->
     return kb.utils.createFromDefaultCreator(obj, options) unless creator = @creator(obj, options)
     return obj if creator.models_only
-    unless observable = @find(obj, creator)
-      observable = kb.ignore =>
-        options = _.defaults({store: @, creator: creator}, options) # set our own creator so we can retain ourselves above
-        observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
-        return observable or ko.observable(null) # default to null
-    @retain(obj, observable, creator)
+    return observable if observable = @find(obj, creator)
 
-    return {observable: observable, release: => @release(obj, observable, creator)}
+    observable = kb.ignore =>
+      options = _.defaults({store: @, creator: creator}, options) # set our own creator so we can register ourselves above
+      observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
+      return observable or ko.observable(null) # default to null
+
+    @register(obj, observable, creator)
+    return observable
 
   # @nodoc
   findOrReplace: (obj, creator, observable) ->
@@ -138,12 +132,23 @@ module.exports = class kb.Store
       return if current_observable is observable # no change
       (current_observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
 
-    @retain(obj, observable, creator)
+    @register(obj, observable, creator)
     return observable
 
   # @nodoc
+  release: (observable) ->
+    return console?.log "Object missing for release" unless obj = kb.utils.wrappedObject(observable)
+    return console?.log "Creator missing for release" unless creator = kb.utils.wrappedCreator(observable)
+    return console?.log "Current observable mismatch for release" unless (current_observable = @find(obj, creator)) is observable
+    return console?.log "Store references missing for release" unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)
+    return console?.log "Could not release observable. Reference count corrupt: #{store_references.ref_count}" if store_references.ref_count < 1
+    return if --store_references.ref_count > 0 # do not release yet
+    delete @observable_records[@creatorId(creator)][@cid(obj)]
+    kb.release(observable)
+
+  # @nodoc
   canRegister: (observable) ->
-    # only retain view models not basic ko.observables nor kb.CollectionObservables
+    # only register view models not basic ko.observables nor kb.CollectionObservables
     return observable and not ko.isObservable(observable) and not observable.__kb_is_co
 
   # @nodoc
