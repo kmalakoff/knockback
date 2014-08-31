@@ -7,7 +7,9 @@ module.exports = class TypedValue
 
   destroy: ->
     @__kb_released = true
-    kb.release(@__kb_value); @__kb_value = null
+    if previous_value = @__kb_value # release previous
+      @__kb_value = null
+      if @__kb_store_reference then (@__kb_store_reference.release(); @__kb_store_reference = null) else kb.release(previous_value)
 
   value: -> ko.utils.unwrapObservable(@_vo())
   rawValue: -> return @__kb_value
@@ -65,13 +67,13 @@ module.exports = class TypedValue
 
     # release the previous value
     previous_value = @__kb_value; @__kb_value = undefined
-    kb.release(previous_value) if previous_value # release previous
 
     # found a creator
     if creator
       # have the store, use it to create
       if create_options.store
-        value = create_options.store.findOrCreate(new_value, create_options)
+        @__kb_store_reference = create_options.store.retainOrCreate(new_value, create_options)
+        value = @__kb_store_reference.observable
 
       # create manually
       else
@@ -102,6 +104,9 @@ module.exports = class TypedValue
         @value_type = kb.TYPE_COLLECTION
       else
         @value_type = kb.TYPE_SIMPLE
+
+    if previous_value # release previous
+      if @__kb_store_reference then (@__kb_store_reference.release(); @__kb_store_reference = null) else kb.release(previous_value)
 
     # store the value
     @__kb_value = value

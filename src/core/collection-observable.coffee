@@ -406,7 +406,7 @@ class kb.CollectionObservable
   # @nodoc
   _createViewModel: (model) ->
     return model if @models_only
-    return @create_options.store.findOrCreate(model, @create_options)
+    return @create_options.store.retainOrCreate(model, @create_options)
 
   # @nodoc
   _selectModel: (model) ->
