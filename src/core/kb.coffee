@@ -63,6 +63,8 @@ var extend = function (protoProps, classProps) {
 };
 `
 
+LIFECYCLE_METHODS = ['release', 'destroy', 'dispose']
+
 # The 'kb' namespace for classes, factory functions, constants, etc. Aliased to 'Knockback'
 #
 # @method .collectionObservable(collection, options)
@@ -130,7 +132,7 @@ module.exports = class kb
     return false if (not obj or (obj isnt Object(obj))) or obj.__kb_released # must be an object and not already released
     return true if ko.isObservable(obj) or (obj instanceof kb.ViewModel) # a known type that is releasable
     return false if (typeof(obj) is 'function') or kb.isModel(obj) or kb.isCollection(obj) # a known type that is not releaseable
-    return true if (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function') # a releaseable signature
+    return true for method in LIFECYCLE_METHODS when typeof(obj[method]) is 'function' # a releaseable signature
     return false if depth > 0 # max depth check for ViewModel inside of ViewModel
     return true for key, value of obj when (key isnt '__kb') and kb.isReleaseable(value, depth+1)
     return false
@@ -161,9 +163,7 @@ module.exports = class kb
       return
 
     # releaseable signature
-    return obj.release() if (typeof(obj.release) is 'function')
-    return obj.destroy() if (typeof(obj.destroy) is 'function')
-    return obj.dispose() if (typeof(obj.dispose) is 'function')
+    return obj[method].call(obj) for method in LIFECYCLE_METHODS when typeof(obj[method]) is 'function' # a releaseable signature
     return @releaseKeys(obj) unless ko.isObservable(obj) # view model
     return
 

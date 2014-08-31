@@ -1054,7 +1054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var Backbone, copyProps, kb, ko, window, _;
+	var Backbone, LIFECYCLE_METHODS, copyProps, kb, ko, window, _;
 
 	window = window != null ? window : global;
 
@@ -1119,6 +1119,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	;
 
+	LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
+
 	module.exports = kb = (function() {
 	  var _ref;
 
@@ -1141,7 +1143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.isReleaseable = function(obj, depth) {
-	    var key, value;
+	    var key, method, value, _i, _len;
 	    if (depth == null) {
 	      depth = 0;
 	    }
@@ -1154,8 +1156,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if ((typeof obj === 'function') || kb.isModel(obj) || kb.isCollection(obj)) {
 	      return false;
 	    }
-	    if ((typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
-	      return true;
+	    for (_i = 0, _len = LIFECYCLE_METHODS.length; _i < _len; _i++) {
+	      method = LIFECYCLE_METHODS[_i];
+	      if (typeof obj[method] === 'function') {
+	        return true;
+	      }
 	    }
 	    if (depth > 0) {
 	      return false;
@@ -1170,7 +1175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.release = function(obj) {
-	    var array, index, value;
+	    var array, index, method, value, _i, _len;
 	    if (!kb.isReleaseable(obj)) {
 	      return;
 	    }
@@ -1201,14 +1206,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      return;
 	    }
-	    if (typeof obj.release === 'function') {
-	      return obj.release();
-	    }
-	    if (typeof obj.destroy === 'function') {
-	      return obj.destroy();
-	    }
-	    if (typeof obj.dispose === 'function') {
-	      return obj.dispose();
+	    for (_i = 0, _len = LIFECYCLE_METHODS.length; _i < _len; _i++) {
+	      method = LIFECYCLE_METHODS[_i];
+	      if (typeof obj[method] === 'function') {
+	        return obj[method].call(obj);
+	      }
 	    }
 	    if (!ko.isObservable(obj)) {
 	      return this.releaseKeys(obj);
