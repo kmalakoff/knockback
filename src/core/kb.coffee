@@ -89,10 +89,10 @@ module.exports = class kb
   #
   # @example
   #   var view_model = kb.viewModel(model);
-  #   kb.utils.release(view_model); view_model = null;
+  #   kb.release(view_model); view_model = null;
   # @example
   #   var todos = kb.collectionObservable(collection);
-  #   kb.utils.release(todos); todos = null;
+  #   kb.release(todos); todos = null;
   @release: (obj) ->
     return unless kb.isReleaseable(obj)
 
