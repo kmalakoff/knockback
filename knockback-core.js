@@ -1142,18 +1142,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if ((!obj || (obj !== Object(obj))) || obj.__kb_released) {
 	      return false;
-	    } else if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) {
+	    }
+	    if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) {
 	      return true;
-	    } else if ((typeof obj === 'function') || kb.isModel(obj) || kb.isCollection(obj)) {
+	    }
+	    if ((typeof obj === 'function') || kb.isModel(obj) || kb.isCollection(obj)) {
 	      return false;
-	    } else if ((typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
+	    }
+	    if ((typeof obj.dispose === 'function') || (typeof obj.destroy === 'function') || (typeof obj.release === 'function')) {
 	      return true;
-	    } else if (depth < 1) {
-	      for (key in obj) {
-	        value = obj[key];
-	        if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) {
-	          return true;
-	        }
+	    }
+	    if (depth > 0) {
+	      return false;
+	    }
+	    for (key in obj) {
+	      value = obj[key];
+	      if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) {
+	        return true;
 	      }
 	    }
 	    return false;
@@ -1192,13 +1197,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    if (typeof obj.release === 'function') {
-	      obj.release();
-	    } else if (typeof obj.destroy === 'function') {
-	      obj.destroy();
-	    } else if (typeof obj.dispose === 'function') {
-	      obj.dispose();
-	    } else if (!ko.isObservable(obj)) {
-	      this.releaseKeys(obj);
+	      return obj.release();
+	    }
+	    if (typeof obj.destroy === 'function') {
+	      return obj.destroy();
+	    }
+	    if (typeof obj.dispose === 'function') {
+	      return obj.dispose();
+	    }
+	    if (!ko.isObservable(obj)) {
+	      return this.releaseKeys(obj);
 	    }
 	  };
 

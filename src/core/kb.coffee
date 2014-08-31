@@ -127,27 +127,12 @@ module.exports = class kb
   # Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.
   # @param [Any] obj the object to release and also release its keys
   @isReleaseable: (obj, depth=0) ->
-    # must be an object and not already released
-    if (not obj or (obj isnt Object(obj))) or obj.__kb_released
-      return false
-
-    # a known type that is releasable
-    else if ko.isObservable(obj) or (obj instanceof kb.ViewModel)
-      return true
-
-    # a known type that is not releaseable
-    else if (typeof(obj) is 'function') or kb.isModel(obj) or kb.isCollection(obj)
-      return false
-
-    # a releaseable signature
-    else if (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function')
-      return true
-
-    # max depth check for ViewModel inside of ViewModel
-    else if depth < 1
-      for key, value of obj
-        return true if (key isnt '__kb') and kb.isReleaseable(value, depth+1)
-
+    return false if (not obj or (obj isnt Object(obj))) or obj.__kb_released # must be an object and not already released
+    return true if ko.isObservable(obj) or (obj instanceof kb.ViewModel) # a known type that is releasable
+    return false if (typeof(obj) is 'function') or kb.isModel(obj) or kb.isCollection(obj) # a known type that is not releaseable
+    return true if (typeof(obj.dispose) is 'function') or (typeof(obj.destroy) is 'function') or (typeof(obj.release) is 'function') # a releaseable signature
+    return false if depth > 0 # max depth check for ViewModel inside of ViewModel
+    return true for key, value of obj when (key isnt '__kb') and kb.isReleaseable(value, depth+1)
     return false
 
   # Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
@@ -176,10 +161,10 @@ module.exports = class kb
       return
 
     # releaseable signature
-    if (typeof(obj.release) is 'function') then obj.release()
-    else if (typeof(obj.destroy) is 'function') then obj.destroy()
-    else if (typeof(obj.dispose) is 'function') then obj.dispose()
-    else if not ko.isObservable(obj) then @releaseKeys(obj) # view model
+    return obj.release() if (typeof(obj.release) is 'function')
+    return obj.destroy() if (typeof(obj.destroy) is 'function')
+    return obj.dispose() if (typeof(obj.dispose) is 'function')
+    return @releaseKeys(obj) unless ko.isObservable(obj) # view model
     return
 
   # Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
