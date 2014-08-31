@@ -146,6 +146,8 @@ module.exports = class kb
     obj.__kb_ref_count++
     return obj
 
+  @refCount: (obj) -> if typeof(obj.refCount) is 'function' then obj.refCount() else (obj.__kb_ref_count or 0)
+
   # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   #
   # NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options, afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
