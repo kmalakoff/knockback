@@ -7,14 +7,12 @@ Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 Why Knockback?
 ----------
 
-* make amazingly dynamic applications by applying a small number of simple principles
-* leverage the wonderful work from both the Backbone and Knockout communities
-* easily view and edit relationships between Models using an ORM of your choice:
+* Make amazingly dynamic applications by applying a small number of simple principles
+* Leverage the wonderful work from both the Backbone and Knockout communities
+* Easily view and edit relationships between Models using an ORM of your choice:
   * [BackboneORM](http://vidigami.github.io/backbone-orm/)
   * [Backbone-Relational.js](http://backbonerelational.org/)
-  * [Backbone Associations](http://dhruvaray.github.io/backbone-associations/)
-  * [Supermodel.js](http://pathable.github.io/supermodel/)
-* simplify program control flow by configuring your application from your HTML Views: think of it like Angular.js without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!
+* Simplify program control flow by configuring your application from your HTML Views. It's like Angular.js but without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!
 
 An Example
 ----------
@@ -27,6 +25,7 @@ Javascript
 var ContactViewModel = kb.ViewModel.extend({
   constructor: function(model) {
     kb.ViewModel.prototype.constructor.call(this, model);
+
     this.full_name = ko.computed(function() {
       return this.first_name() + " " + this.last_name();
     }, this);
@@ -40,6 +39,7 @@ or Coffeescript
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
     super model
+    
     @full_name = ko.computed => "#{@first_name()} #{@last_name()}"
 ```
 
@@ -76,6 +76,7 @@ Getting Started
 ----------
 
 * [Knockback.js Website](http://kmalakoff.github.com/knockback/)
+* [Knockback.js Tutorials](http://kmalakoff.github.io/knockback/tutorials_introduction.html)
 * [API Docs](http://kmalakoff.github.com/knockback/doc/index.html)
 * [Tutorials](http://kmalakoff.github.com/knockback/tutorials_introduction.html)
 * [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/)
@@ -87,40 +88,33 @@ Download Latest (0.19.4):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
-###Full
-
-Bundles advanced features including: localization, formatting, triggering, and defaults. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
-
 * Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback.min.js)
 * Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-full-stack.min.js)
 
-###Core
-
-Removes advanced features that can be included separately: localization, formatting, triggering, defaults, validation, and statistics. Stack provides Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
-
 * Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core.min.js)
 * Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core-stack.min.js)
+
+The **full versions** bundle advanced features
+The **core versions** removes advanced features that can be included separately: localization, formatting, triggering, defaults, and validation.
+The **stack versions** provide Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
 ###Distributions
 
 You can also find Knockback on your favorite distributions:
 
-* npm: npm install knockback
-* Bower: bower install knockback
-* Component.io: component install kmalakoff/knockback
+* **npm**: npm install knockback
+* **Bower**: bower install knockback
+* **Component**: component install kmalakoff/knockback
 * [NuGet]: (http://nuget.org/packages/Knockback.js)
-* Jam: jam install knockback
+* **Jam**: jam install knockback
 
 ###Dependencies
 
 * [Backbone.js](http://backbonejs.org/)
 * [Underscore.js](http://underscorejs.org/)
 * [Knockout.js](http://knockoutjs.com/)
-
-###Replaceable Dependencies
-
-* [LoDash](http://lodash.com/) - it you prefer LoDash to Underscore.js, we've got support for it!
-* [Parse](https://www.parse.com/) - instead of Backbone.js, you can use Parse. Please note: there is no support for module loading and if you include Parse, it overrides Backbone.js and Underscore.js
+* [LoDash](http://lodash.com/) - optionally replaces Underscore.js
+* [Parse](https://www.parse.com/) - optionally replaces Backbone.js and Underscore.js
 
 ###Compatible Components
 
