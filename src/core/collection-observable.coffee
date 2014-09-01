@@ -132,7 +132,7 @@ class kb.CollectionObservable
       read: => return @_collection()
       write: (new_collection) => kb.ignore =>
         return if ((previous_collection = @_collection()) is new_collection) # no change
-        # @create_options.store.reuse(@, new_collection)
+        @create_options.store.reuse(@, new_collection)
 
         # clean up
         previous_collection.unbind('all', @_onCollectionChange) if previous_collection

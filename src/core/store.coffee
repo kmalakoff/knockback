@@ -143,8 +143,8 @@ module.exports = class kb.Store
     throw new Error "Trying to change a shared view model. Reference count: #{@refCount(observable)}" unless @refCount(observable) is 1
     kb.utils.wrappedObject(observable, obj)
     creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
-    delete @observable_records[@creatorId(creator)][@cid(current_obj)]
-    @observable_records[@creatorId(creator)][@cid(obj)] = observable
+    delete @observable_records[@creatorId(creator)][@cid(current_obj)] unless _.isUndefined(current_obj)
+    (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
 
     stores_references = kb.utils.orSet(observable, 'stores_references', [])
     unless store_references = _.find(stores_references, (store_references) => store_references.store is @)

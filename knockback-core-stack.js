@@ -185,6 +185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((previous_collection = _this._collection()) === new_collection) {
 	                return;
 	              }
+	              _this.create_options.store.reuse(_this, new_collection);
 	              if (previous_collection) {
 	                previous_collection.unbind('all', _this._onCollectionChange);
 	              }
@@ -1211,7 +1212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (ko.isObservable(obj) && _.isArray(array = kb.peek(obj))) {
 	      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
-	        return obj.destroy();
+	        return typeof obj.destroy === "function" ? obj.destroy() : void 0;
 	      }
 	      for (index in array) {
 	        value = array[index];
@@ -1906,7 +1907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
-	    var creator, current_obj, store_references, stores_references;
+	    var creator, current_obj, store_references, stores_references, _base, _name;
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
@@ -1915,8 +1916,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    kb.utils.wrappedObject(observable, obj);
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
-	    this.observable_records[this.creatorId(creator)][this.cid(obj)] = observable;
+	    if (!_.isUndefined(current_obj)) {
+	      delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
+	    }
+	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
 	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
 	    if (!(store_references = _.find(stores_references, (function(_this) {
 	      return function(store_references) {
