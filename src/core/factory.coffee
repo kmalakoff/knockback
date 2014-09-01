@@ -42,8 +42,7 @@ class kb.Factory
     @paths[path] = create_info
 
   addPathMappings: (factories, owner_path) ->
-    for path, create_info of factories
-      @paths[kb.utils.pathJoin(owner_path, path)] = create_info
+    @paths[kb.utils.pathJoin(owner_path, path)] = create_info for path, create_info of factories
     return
 
   hasPathMappings: (factories, owner_path) ->
@@ -59,8 +58,6 @@ class kb.Factory
   #   factory.addPathMapping('bob.the.builder', kb.ViewModel);
   #   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
   creatorForPath: (obj, path) ->
-    if (creator = @paths[path])
-      return if creator.view_model then creator.view_model else creator
-    if @parent_factory
-      return creator if (creator = @parent_factory.creatorForPath(obj, path))
+    return (if creator.view_model then creator.view_model else creator) if creator = @paths[path]
+    return creator if creator = @parent_factory?.creatorForPath(obj, path)
     return null
