@@ -34,8 +34,10 @@ module.exports = class TypedValue
       when kb.TYPE_COLLECTION
         return value(new_value) if @value_type is kb.TYPE_COLLECTION and new_type is kb.TYPE_ARRAY
         if new_type is kb.TYPE_COLLECTION or _.isNull(new_value)
-          # extract the collection
-          new_value = kb.peek(new_value.collection) if new_value and not kb.isCollection(new_value) and _.isFunction(new_value.collection)
+          # use the provided CollectionObservable
+          if new_value and new_value instanceof kb.CollectionObservable
+            @_updateValueObservable(kb.peek(new_value.collection), new_value)
+            return
 
           if _.isFunction(value.collection) # and (not @create_options.store or @create_options.store.canReuse(value))
             value.collection(new_value) if kb.peek(value.collection) isnt new_value
@@ -45,11 +47,9 @@ module.exports = class TypedValue
 
       when kb.TYPE_MODEL
         if new_type is kb.TYPE_MODEL or _.isNull(new_value)
-          # extract the model
+          # use the provided ViewModel
           if new_value and not kb.isModel(new_value)
-            new_observable = new_value
-            new_value = if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)
-            @_updateValueObservable(new_value, new_observable)
+            @_updateValueObservable((if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)), new_value)
             return
 
           if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value))
