@@ -11,5 +11,5 @@ module.exports =
   port: 9876
   colors: true
   logLevel: 'INFO'
-  browsers: ['Chrome'] # ['Firefox', 'Chrome', 'Safari']
-  singleRun: false
+  browsers: ['PhantomJS'] # ['Firefox', 'Chrome', 'Safari']
+  singleRun: true
