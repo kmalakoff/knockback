@@ -948,18 +948,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Factory.prototype.creatorForPath = function(obj, path) {
-	    var creator;
-	    if ((creator = this.paths[path])) {
-	      if (creator.view_model) {
-	        return creator.view_model;
-	      } else {
-	        return creator;
-	      }
+	    var creator, _ref;
+	    if (creator = this.paths[path]) {
+	      return (creator.view_model ? creator.view_model : creator);
 	    }
-	    if (this.parent_factory) {
-	      if ((creator = this.parent_factory.creatorForPath(obj, path))) {
-	        return creator;
-	      }
+	    if (creator = (_ref = this.parent_factory) != null ? _ref.creatorForPath(obj, path) : void 0) {
+	      return creator;
 	    }
 	    return null;
 	  };
@@ -1903,7 +1897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.canReuse = function(observable) {
-	    return kb.utils.wrappedCreator(observable) && this.refCount(observable) === 1;
+	    return this.refCount(observable) === 1;
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
@@ -2090,7 +2084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this._updateValueObservable(kb.peek(new_value.collection), new_value);
 	            return;
 	          }
-	          if (_.isFunction(value.collection)) {
+	          if (_.isFunction(value.collection) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
 	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
 	            }
@@ -2109,11 +2103,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	          }
 	          if (_.isFunction(value.model) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
-	            if (kb.peek(value.model) !== new_value) {
+	            if (kb.peek(value.model) !== kb.utils.resolveModel(new_value)) {
 	              value.model(new_value);
 	            }
 	          } else {
-	            if (kb.utils.wrappedObject(value) !== new_value) {
+	            if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) {
 	              this._updateValueObservable(new_value);
 	            }
 	          }
@@ -2167,11 +2161,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this.value_type === kb.TYPE_UNKNOWN) {
 	      if (!ko.isObservable(value)) {
 	        this.value_type = kb.TYPE_MODEL;
-	        if (typeof value.model !== 'function') {
-	          kb.utils.wrappedObject(value, new_value);
-	        }
+	        kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
 	      } else if (value.__kb_is_co) {
 	        this.value_type = kb.TYPE_COLLECTION;
+	        kb.utils.wrappedObject(value, new_value);
 	      } else {
 	        this.value_type = kb.TYPE_SIMPLE;
 	      }
@@ -2483,6 +2476,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return obj;
 	  };
 
+	  utils.resolveModel = function(model) {
+	    if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) {
+	      return model.model();
+	    } else {
+	      return model;
+	    }
+	  };
+
 	  return utils;
 
 	})();
@@ -2594,7 +2595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
-	              _this.__kb.store.reuse(_this, (new_model && kb.Backbone && kb.Backbone.ModelRef && new_model instanceof kb.Backbone.ModelRef ? new_model.model() : new_model));
+	              _this.__kb.store.reuse(_this, kb.utils.resolveModel(new_model));
 	              event_watcher.emitter(new_model);
 	              _model(event_watcher.ee);
 	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);

@@ -134,7 +134,7 @@ class kb.ViewModel
       write: (new_model) => kb.ignore =>
         return if (kb.utils.wrappedObject(@) is new_model) or kb.wasReleased(@) or not event_watcher
 
-        @__kb.store.reuse(@, (if new_model and kb.Backbone and kb.Backbone.ModelRef and new_model instanceof kb.Backbone.ModelRef then new_model.model() else new_model))
+        @__kb.store.reuse(@, kb.utils.resolveModel(new_model))
         event_watcher.emitter(new_model); _model(event_watcher.ee)
         not event_watcher.ee or @createObservables(event_watcher.ee)
     }

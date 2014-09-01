@@ -135,7 +135,7 @@ module.exports = class kb.Store
     return observable
 
   # @nodoc
-  canReuse: (observable) -> kb.utils.wrappedCreator(observable) and @refCount(observable) is 1
+  canReuse: (observable) -> @refCount(observable) is 1
 
   # @nodoc
   reuse: (observable, obj) ->

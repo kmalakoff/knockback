@@ -299,3 +299,5 @@ class kb.utils
       return result
 
     return obj
+
+  @resolveModel: (model) -> if model and kb.Backbone and kb.Backbone.ModelRef and model instanceof kb.Backbone.ModelRef then model.model() else model

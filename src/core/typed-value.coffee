@@ -39,7 +39,7 @@ module.exports = class TypedValue
             @_updateValueObservable(kb.peek(new_value.collection), new_value)
             return
 
-          if _.isFunction(value.collection) # and (not @create_options.store or @create_options.store.canReuse(value))
+          if _.isFunction(value.collection) and (not @create_options.store or @create_options.store.canReuse(value))
             value.collection(new_value) if kb.peek(value.collection) isnt new_value
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
@@ -53,9 +53,9 @@ module.exports = class TypedValue
             return
 
           if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value))
-            value.model(new_value) if kb.peek(value.model) isnt new_value
+            value.model(new_value) if kb.peek(value.model) isnt kb.utils.resolveModel(new_value)
           else
-            @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
+            @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt kb.utils.resolveModel(new_value)
           return
 
     if @value_type is new_type and not _.isUndefined(@value_type)
@@ -102,9 +102,10 @@ module.exports = class TypedValue
     if @value_type is kb.TYPE_UNKNOWN
       if not ko.isObservable(value) # a view model, recognize view_models as non-observable
         @value_type = kb.TYPE_MODEL
-        kb.utils.wrappedObject(value, new_value) if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
+        kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value))
       else if value.__kb_is_co
         @value_type = kb.TYPE_COLLECTION
+        kb.utils.wrappedObject(value, new_value)
       else
         @value_type = kb.TYPE_SIMPLE
 
