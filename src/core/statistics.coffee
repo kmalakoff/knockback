@@ -9,6 +9,8 @@
 
 {_} = kb = require './kb'
 
+COUNTER = 0
+
 # kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
 #
 # kb.Statistics is not included in `knockback.js` nor `knockback-core.js` so you need to manually include it from the `lib` directory.
@@ -45,13 +47,15 @@ module.exports = class kb.Statistics
 
   # Register an object by key
   register: (key, obj) ->
+    obj._index = COUNTER++
+
+    debugger if obj._index in [68]
     @registeredTracker(key).push(obj)
 
   # Unregister an object by key
   unregister: (key, obj) ->
     type_tracker = @registeredTracker(key)
-    index = _.indexOf(type_tracker, obj)
-    console?.log("kb.Statistics: failed to unregister type: #{key}") if index < 0
+    return console?.log("kb.Statistics: failed to unregister type: #{key}") if (index = _.indexOf(type_tracker, obj)) < 0
     type_tracker.splice(index, 1)
 
   # @return [Integer] the number of registered objects by type

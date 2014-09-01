@@ -1612,9 +1612,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, _;
+	var COUNTER, kb, _;
 
 	_ = (kb = __webpack_require__(7))._;
+
+	COUNTER = 0;
 
 	module.exports = kb.Statistics = (function() {
 	  function Statistics() {
@@ -1645,17 +1647,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Statistics.prototype.register = function(key, obj) {
+	    var _ref;
+	    obj._index = COUNTER++;
+	    if ((_ref = obj._index) === 68) {
+	      debugger;
+	    }
 	    return this.registeredTracker(key).push(obj);
 	  };
 
 	  Statistics.prototype.unregister = function(key, obj) {
 	    var index, type_tracker;
 	    type_tracker = this.registeredTracker(key);
-	    index = _.indexOf(type_tracker, obj);
-	    if (index < 0) {
-	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("kb.Statistics: failed to unregister type: " + key);
-	      }
+	    if ((index = _.indexOf(type_tracker, obj)) < 0) {
+	      return typeof console !== "undefined" && console !== null ? console.log("kb.Statistics: failed to unregister type: " + key) : void 0;
 	    }
 	    return type_tracker.splice(index, 1);
 	  };
@@ -1750,9 +1754,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _ref;
+	var COUNTER, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+
+	COUNTER = 0;
 
 	module.exports = kb.Store = (function() {
 	  Store.instances = [];
@@ -1771,10 +1777,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.observable_records = {};
 	    this.replaced_observables = [];
 	    kb.Store.instances.push(this);
+	    this._index = COUNTER++;
 	  }
 
 	  Store.prototype.destroy = function() {
-	    var index;
+	    var index, _ref1;
+	    if ((_ref1 = this._index) === 2) {
+	      debugger;
+	    }
 	    this.__kb_released = true;
 	    this.clear();
 	    if ((index = _.indexOf(kb.Store.instances, this)) >= 0) {
@@ -1822,6 +1832,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    creator || (creator = observable.constructor);
 	    if (current_observable = this.find(obj, creator)) {
+	      if (current_observable === observable) {
+	        this.getOrCreateStoreReferences(observable).ref_count++;
+	        return observable;
+	      }
 	      this.replaced_observables.push(current_observable);
 	    }
 	    kb.utils.wrappedObject(observable, obj);
@@ -1873,40 +1887,40 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
-	    var creator, current_obj, _base, _name;
+	    var creator, current_obj, current_observable, _ref1;
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
 	    if (this.refCount(observable) !== 1) {
 	      throw new Error("Trying to change a shared view model. Reference count: " + (this.refCount(observable)));
 	    }
-	    kb.utils.wrappedObject(observable, obj);
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    if (!_.isUndefined(current_obj)) {
+	    if (!_.isUndefined(current_obj) && (current_observable = this.find(current_obj, creator))) {
 	      delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
+	      this.replaced_observables.push(current_observable);
+	      if ((_ref1 = this.storeReferences(current_observable)) != null) {
+	        _ref1.ref_count--;
+	      }
 	    }
-	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
-	    if (!this.storeReferences(observable)) {
-	      this.getOrCreateStoreReferences(observable).ref_count++;
-	    }
+	    this.retain(obj, observable, creator);
 	  };
 
 	  Store.prototype.release = function(observable, force) {
 	    var creator, current_observable, obj, store_references;
-	    if (observable.__kb_released) {
-	      return;
-	    }
-	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (store_references = this.storeReferences(observable)) {
 	      if (!force && --store_references.ref_count > 0) {
 	        return;
 	      }
 	      this.clearStoreReferences(observable);
 	    }
+	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator)) {
 	      if (current_observable === observable) {
 	        delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
 	      }
+	    }
+	    if (observable.__kb_released) {
+	      return;
 	    }
 	    kb.utils.wrappedObject(observable, null);
 	    kb.utils.wrappedCreator(observable, null);
