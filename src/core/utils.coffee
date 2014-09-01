@@ -134,23 +134,7 @@ class kb.utils
   @wrappedEventWatcherIsOwned: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'event_watcher_is_owned') else kb.utils.set(obj, 'event_watcher_is_owned', value)
 
   # Clean up function that releases all of the wrapped values on an owner.
-  @wrappedDestroy: (obj) ->
-    return unless obj.__kb
-    obj.__kb.event_watcher.releaseCallbacks(obj) if obj.__kb.event_watcher
-    __kb = obj.__kb; obj.__kb = null # clear now to break cycles
-    if __kb.observable
-      __kb.observable.destroy = __kb.observable.release = null
-      @wrappedDestroy(__kb.observable)
-      __kb.observable = null
-    __kb.factory = null
-    __kb.event_watcher.destroy() if __kb.event_watcher_is_owned # release the event_watcher
-    __kb.event_watcher = null
-    __kb.store.destroy() if __kb.store_is_owned # release the store
-    __kb.store = null
-    if __kb.stores_references
-      while store_references = __kb.stores_references.pop()
-        store_references.store.release(obj) unless store_references.store.__kb_released
-    return
+  @wrappedDestroy: require('./functions/wrapped_destroy')
 
   # Retrieves the value stored in a ko.observable.
   #
@@ -227,19 +211,10 @@ class kb.utils
   #
   # @example
   #   kb.utils.collapseOptions(options);
-  @collapseOptions: require('./collapse_options')
+  @collapseOptions: require('./functions/collapse_options')
 
   # used for attribute setting to ensure all model attributes have their underlying models
-  @unwrapModels: (obj) ->
-    return obj if not obj
+  @unwrapModels: require('./functions/unwrap_models')
 
-    return (if obj.__kb.hasOwnProperty('object') then obj.__kb.object else obj) if obj.__kb
-    return _.map(obj, (test) -> return kb.utils.unwrapModels(test)) if _.isArray(obj)
-    if _.isObject(obj) and (obj.constructor is {}.constructor) # a simple object
-      result = {}
-      result[key] = kb.utils.unwrapModels(value) for key, value of obj
-      return result
-
-    return obj
-
+  # @nodoc
   @resolveModel: (model) -> if model and kb.Backbone and kb.Backbone.ModelRef and model instanceof kb.Backbone.ModelRef then model.model() else model

@@ -164,15 +164,11 @@ kb.injectViewModels = kb.Inject.injectViewModels
 #############################
 if document?
   # use DOM library ready function
-  if $
-    $(->kb.injectViewModels())
+  if $ then $(->kb.injectViewModels())
 
   # use simple ready check
   else
     (onReady = ->
-      # keep waiting for the document to load
-      return setTimeout(onReady, 0) unless document.readyState is "complete"
-
-      # the document is loaded
-      kb.injectViewModels()
+      return setTimeout(onReady, 0) unless document.readyState is 'complete' # keep waiting for the document to load
+      kb.injectViewModels() # the document is loaded
     )()

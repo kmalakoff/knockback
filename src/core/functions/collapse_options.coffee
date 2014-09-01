@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-{_} = require './kb'
+{_} = require '../kb'
 
 # @nodoc
 _mergeArray = (result, key, value) ->

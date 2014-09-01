@@ -15,7 +15,7 @@
 		exports["kb"] = factory(require("jquery"));
 	else
 		root["kb"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_17__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_15__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -75,9 +75,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(11);
 	__webpack_require__(12);
 	__webpack_require__(13);
-	__webpack_require__(14);
-	__webpack_require__(15);
-	module.exports = __webpack_require__(16);
+	module.exports = __webpack_require__(14);
 
 
 /***/ },
@@ -93,109 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var _, _keyArrayToObject, _mergeArray, _mergeObject;
-
-	_ = __webpack_require__(8)._;
-
-	_mergeArray = function(result, key, value) {
-	  result[key] || (result[key] = []);
-	  if (!_.isArray(value)) {
-	    value = [value];
-	  }
-	  result[key] = result[key].length ? _.union(result[key], value) : value;
-	  return result;
-	};
-
-	_mergeObject = function(result, key, value) {
-	  result[key] || (result[key] = {});
-	  return _.extend(result[key], value);
-	};
-
-	_keyArrayToObject = function(value) {
-	  var item, result, _i, _len;
-	  result = {};
-	  for (_i = 0, _len = value.length; _i < _len; _i++) {
-	    item = value[_i];
-	    result[item] = {
-	      key: item
-	    };
-	  }
-	  return result;
-	};
-
-	module.exports = function(options) {
-	  var key, result, value, _ref;
-	  result = {};
-	  options = {
-	    options: options
-	  };
-	  while (options.options) {
-	    _ref = options.options;
-	    for (key in _ref) {
-	      value = _ref[key];
-	      switch (key) {
-	        case 'internals':
-	        case 'requires':
-	        case 'excludes':
-	        case 'statics':
-	          _mergeArray(result, key, value);
-	          break;
-	        case 'keys':
-	          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
-	            if (!_.isObject(value)) {
-	              value = [value];
-	            }
-	            if (_.isArray(value)) {
-	              value = _keyArrayToObject(value);
-	            }
-	            if (_.isArray(result[key])) {
-	              result[key] = _keyArrayToObject(result[key]);
-	            }
-	            _mergeObject(result, key, value);
-	          } else {
-	            _mergeArray(result, key, value);
-	          }
-	          break;
-	        case 'factories':
-	          if (_.isFunction(value)) {
-	            result[key] = value;
-	          } else {
-	            _mergeObject(result, key, value);
-	          }
-	          break;
-	        case 'static_defaults':
-	          _mergeObject(result, key, value);
-	          break;
-	        case 'options':
-	          break;
-	        default:
-	          result[key] = value;
-	      }
-	    }
-	    options = options.options;
-	  }
-	  return result;
-	};
-
-
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  knockback.js 0.20.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
 	var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KEYS_PUBLISH, kb, ko, _, _ref,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	COMPARE_EQUAL = 0;
 
@@ -644,19 +544,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var ALL_ORMS, kb, key, ko, value, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	ALL_ORMS = {
 	  "default": null,
 	  'backbone-orm': null,
-	  'backbone-associations': __webpack_require__(18),
-	  'backbone-relational': __webpack_require__(19),
-	  supermodel: __webpack_require__(20)
+	  'backbone-associations': __webpack_require__(16),
+	  'backbone-relational': __webpack_require__(17),
+	  supermodel: __webpack_require__(18)
 	};
 
 	kb.orm = ALL_ORMS["default"];
@@ -701,7 +601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -716,7 +616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var kb, ko, _, _ref,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.EventWatcher = (function() {
 	  EventWatcher.useOptionsOrCreate = function(options, emitter, obj, callback_options) {
@@ -912,84 +812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  knockback.js 0.20.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
-	var copyProps;
-
-	copyProps = function(dest, source) {
-	  var key, value;
-	  for (key in source) {
-	    value = source[key];
-	    dest[key] = value;
-	  }
-	  return dest;
-	};
-
-	// Shared empty constructor function to aid in prototype-chain creation.
-	var ctor = function(){};
-
-	// Helper function to correctly set up the prototype chain, for subclasses.
-	// Similar to 'goog.inherits', but uses a hash of prototype properties and
-	// class properties to be extended.
-	var inherits = function(parent, protoProps, staticProps) {
-	  var child;
-
-	  // The constructor function for the new subclass is either defined by you
-	  // (the "constructor" property in your extend definition), or defaulted
-	  // by us to simply call the parent's constructor.
-	  if (protoProps && protoProps.hasOwnProperty('constructor')) {
-	    child = protoProps.constructor;
-	  } else {
-	    child = function(){ parent.apply(this, arguments); };
-	  }
-
-	  // Inherit class (static) properties from parent.
-	  copyProps(child, parent);
-
-	  // Set the prototype chain to inherit from parent, without calling
-	  // parent's constructor function.
-	  ctor.prototype = parent.prototype;
-	  child.prototype = new ctor();
-
-	  // Add prototype properties (instance properties) to the subclass,
-	  // if supplied.
-	  if (protoProps) copyProps(child.prototype, protoProps);
-
-	  // Add static properties to the constructor function, if supplied.
-	  if (staticProps) copyProps(child, staticProps);
-
-	  // Correctly set child's 'prototype.constructor'.
-	  child.prototype.constructor = child;
-
-	  // Set a convenience property in case the parent's prototype is needed later.
-	  child.__super__ = parent.prototype;
-
-	  return child;
-	};
-
-	// The self-propagating extend function that BacLCone classes use.
-	var extend = function (protoProps, classProps) {
-	  var child = inherits(this, protoProps, classProps);
-	  child.extend = this.extend;
-	  return child;
-	};
-	;
-
-	module.exports = extend;
-
-
-/***/ },
-/* 6 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1003,7 +826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, _;
 
-	_ = (kb = __webpack_require__(8))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	kb.Factory = (function() {
 	  Factory.useOptionsOrCreate = function(options, obj, owner_path) {
@@ -1066,7 +889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -1082,7 +905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
 	kb.RECUSIVE_AUTO_INJECT = true;
 
@@ -1206,7 +1029,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  } else {
 	    (onReady = function() {
-	      if (document.readyState !== "complete") {
+	      if (document.readyState !== 'complete') {
 	        return setTimeout(onReady, 0);
 	      }
 	      return kb.injectViewModels();
@@ -1217,7 +1040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 8 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -1233,7 +1056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	ko = __webpack_require__(23);
+	ko = __webpack_require__(25);
 
 	LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -1415,7 +1238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return value;
 	  };
 
-	  kb.extend = __webpack_require__(5);
+	  kb.extend = __webpack_require__(19);
 
 	  kb._throwMissing = function(instance, message) {
 	    throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
@@ -1461,8 +1284,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Backbone = kb.Parse = window.Parse;
 	  _ = kb._ = window.Parse._;
 	} else {
-	  Backbone = kb.Backbone = __webpack_require__(21);
-	  _ = kb._ = __webpack_require__(22);
+	  Backbone = kb.Backbone = __webpack_require__(23);
+	  _ = kb._ = __webpack_require__(24);
 	}
 
 	kb.ko = ko;
@@ -1476,13 +1299,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.$ = window.jQuery || window.$;
 
 	try {
-	  kb.$ || (kb.$ = __webpack_require__(17));
+	  kb.$ || (kb.$ = __webpack_require__(15));
 	} catch (_error) {}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 9 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1496,7 +1319,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _extend, _ref, _ref1;
 
-	ko = (kb = __webpack_require__(8)).ko;
+	ko = (kb = __webpack_require__(6)).ko;
 
 	if ((_ref = ko.subscribable) != null ? (_ref1 = _ref.fn) != null ? _ref1.extend : void 0 : void 0) {
 	  _extend = ko.subscribable.fn.extend;
@@ -1520,7 +1343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1534,9 +1357,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_INFO, KEYS_PUBLISH, TypedValue, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	TypedValue = __webpack_require__(13);
+	TypedValue = __webpack_require__(11);
 
 	KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 
@@ -1692,7 +1515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1706,7 +1529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, _;
 
-	_ = (kb = __webpack_require__(8))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	module.exports = kb.Statistics = (function() {
 	  function Statistics() {
@@ -1827,7 +1650,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1841,7 +1664,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var COUNTER, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	COUNTER = 0;
 
@@ -2128,12 +1951,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var TypedValue, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	module.exports = TypedValue = (function() {
 	  function TypedValue(create_options) {
@@ -2293,7 +2116,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2307,7 +2130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.utils = (function() {
 	  function utils() {}
@@ -2407,38 +2230,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  utils.wrappedDestroy = function(obj) {
-	    var store_references, __kb;
-	    if (!obj.__kb) {
-	      return;
-	    }
-	    if (obj.__kb.event_watcher) {
-	      obj.__kb.event_watcher.releaseCallbacks(obj);
-	    }
-	    __kb = obj.__kb;
-	    obj.__kb = null;
-	    if (__kb.observable) {
-	      __kb.observable.destroy = __kb.observable.release = null;
-	      this.wrappedDestroy(__kb.observable);
-	      __kb.observable = null;
-	    }
-	    __kb.factory = null;
-	    if (__kb.event_watcher_is_owned) {
-	      __kb.event_watcher.destroy();
-	    }
-	    __kb.event_watcher = null;
-	    if (__kb.store_is_owned) {
-	      __kb.store.destroy();
-	    }
-	    __kb.store = null;
-	    if (__kb.stores_references) {
-	      while (store_references = __kb.stores_references.pop()) {
-	        if (!store_references.store.__kb_released) {
-	          store_references.store.release(obj);
-	        }
-	      }
-	    }
-	  };
+	  utils.wrappedDestroy = __webpack_require__(20);
 
 	  utils.valueType = function(observable) {
 	    if (!observable) {
@@ -2507,31 +2299,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
 	  };
 
-	  utils.collapseOptions = __webpack_require__(1);
+	  utils.collapseOptions = __webpack_require__(21);
 
-	  utils.unwrapModels = function(obj) {
-	    var key, result, value;
-	    if (!obj) {
-	      return obj;
-	    }
-	    if (obj.__kb) {
-	      return (obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj);
-	    }
-	    if (_.isArray(obj)) {
-	      return _.map(obj, function(test) {
-	        return kb.utils.unwrapModels(test);
-	      });
-	    }
-	    if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
-	      result = {};
-	      for (key in obj) {
-	        value = obj[key];
-	        result[key] = kb.utils.unwrapModels(value);
-	      }
-	      return result;
-	    }
-	    return obj;
-	  };
+	  utils.unwrapModels = __webpack_require__(22);
 
 	  utils.resolveModel = function(model) {
 	    if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) {
@@ -2547,7 +2317,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2561,7 +2331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	createOptions = (function(_this) {
 	  return function(vm) {
@@ -2747,7 +2517,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2761,9 +2531,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, key, _i, _len, _ref;
 
-	module.exports = kb = __webpack_require__(8);
+	module.exports = kb = __webpack_require__(6);
 
-	kb.configure = __webpack_require__(3);
+	kb.configure = __webpack_require__(2);
 
 	kb.modules = {
 	  underscore: kb._,
@@ -2783,13 +2553,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_17__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_15__;
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2803,7 +2573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var AssociatedModel, Backbone, BackboneAssociations, kb, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, Backbone = _ref.Backbone;
+	_ref = kb = __webpack_require__(6), _ = _ref._, Backbone = _ref.Backbone;
 
 	AssociatedModel = null;
 
@@ -2846,7 +2616,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2860,7 +2630,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var Backbone, BackboneRelational, RelationalModel, kb, _, _ref;
 
-	_ref = kb = __webpack_require__(8), _ = _ref._, Backbone = _ref.Backbone;
+	_ref = kb = __webpack_require__(6), _ = _ref._, Backbone = _ref.Backbone;
 
 	RelationalModel = null;
 
@@ -2930,7 +2700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -2946,7 +2716,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	root = typeof window !== "undefined" && window !== null ? window : global;
 
-	_ = (kb = __webpack_require__(8))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	Supermodel = null;
 
@@ -3017,7 +2787,275 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var copyProps;
+
+	copyProps = function(dest, source) {
+	  var key, value;
+	  for (key in source) {
+	    value = source[key];
+	    dest[key] = value;
+	  }
+	  return dest;
+	};
+
+	// Shared empty constructor function to aid in prototype-chain creation.
+	var ctor = function(){};
+
+	// Helper function to correctly set up the prototype chain, for subclasses.
+	// Similar to 'goog.inherits', but uses a hash of prototype properties and
+	// class properties to be extended.
+	var inherits = function(parent, protoProps, staticProps) {
+	  var child;
+
+	  // The constructor function for the new subclass is either defined by you
+	  // (the "constructor" property in your extend definition), or defaulted
+	  // by us to simply call the parent's constructor.
+	  if (protoProps && protoProps.hasOwnProperty('constructor')) {
+	    child = protoProps.constructor;
+	  } else {
+	    child = function(){ parent.apply(this, arguments); };
+	  }
+
+	  // Inherit class (static) properties from parent.
+	  copyProps(child, parent);
+
+	  // Set the prototype chain to inherit from parent, without calling
+	  // parent's constructor function.
+	  ctor.prototype = parent.prototype;
+	  child.prototype = new ctor();
+
+	  // Add prototype properties (instance properties) to the subclass,
+	  // if supplied.
+	  if (protoProps) copyProps(child.prototype, protoProps);
+
+	  // Add static properties to the constructor function, if supplied.
+	  if (staticProps) copyProps(child, staticProps);
+
+	  // Correctly set child's 'prototype.constructor'.
+	  child.prototype.constructor = child;
+
+	  // Set a convenience property in case the parent's prototype is needed later.
+	  child.__super__ = parent.prototype;
+
+	  return child;
+	};
+
+	// The self-propagating extend function that BacLCone classes use.
+	var extend = function (protoProps, classProps) {
+	  var child = inherits(this, protoProps, classProps);
+	  child.extend = this.extend;
+	  return child;
+	};
+	;
+
+	module.exports = extend;
+
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var wrappedDestroy, _;
+
+	_ = __webpack_require__(6)._;
+
+	module.exports = wrappedDestroy = function(obj) {
+	  var store_references, __kb;
+	  if (!obj.__kb) {
+	    return;
+	  }
+	  if (obj.__kb.event_watcher) {
+	    obj.__kb.event_watcher.releaseCallbacks(obj);
+	  }
+	  __kb = obj.__kb;
+	  obj.__kb = null;
+	  if (__kb.observable) {
+	    __kb.observable.destroy = __kb.observable.release = null;
+	    wrappedDestroy(__kb.observable);
+	    __kb.observable = null;
+	  }
+	  __kb.factory = null;
+	  if (__kb.event_watcher_is_owned) {
+	    __kb.event_watcher.destroy();
+	  }
+	  __kb.event_watcher = null;
+	  if (__kb.store_is_owned) {
+	    __kb.store.destroy();
+	  }
+	  __kb.store = null;
+	  if (__kb.stores_references) {
+	    while (store_references = __kb.stores_references.pop()) {
+	      if (!store_references.store.__kb_released) {
+	        store_references.store.release(obj);
+	      }
+	    }
+	  }
+	};
+
+
+/***/ },
 /* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var _, _keyArrayToObject, _mergeArray, _mergeObject;
+
+	_ = __webpack_require__(6)._;
+
+	_mergeArray = function(result, key, value) {
+	  result[key] || (result[key] = []);
+	  if (!_.isArray(value)) {
+	    value = [value];
+	  }
+	  result[key] = result[key].length ? _.union(result[key], value) : value;
+	  return result;
+	};
+
+	_mergeObject = function(result, key, value) {
+	  result[key] || (result[key] = {});
+	  return _.extend(result[key], value);
+	};
+
+	_keyArrayToObject = function(value) {
+	  var item, result, _i, _len;
+	  result = {};
+	  for (_i = 0, _len = value.length; _i < _len; _i++) {
+	    item = value[_i];
+	    result[item] = {
+	      key: item
+	    };
+	  }
+	  return result;
+	};
+
+	module.exports = function(options) {
+	  var key, result, value, _ref;
+	  result = {};
+	  options = {
+	    options: options
+	  };
+	  while (options.options) {
+	    _ref = options.options;
+	    for (key in _ref) {
+	      value = _ref[key];
+	      switch (key) {
+	        case 'internals':
+	        case 'requires':
+	        case 'excludes':
+	        case 'statics':
+	          _mergeArray(result, key, value);
+	          break;
+	        case 'keys':
+	          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
+	            if (!_.isObject(value)) {
+	              value = [value];
+	            }
+	            if (_.isArray(value)) {
+	              value = _keyArrayToObject(value);
+	            }
+	            if (_.isArray(result[key])) {
+	              result[key] = _keyArrayToObject(result[key]);
+	            }
+	            _mergeObject(result, key, value);
+	          } else {
+	            _mergeArray(result, key, value);
+	          }
+	          break;
+	        case 'factories':
+	          if (_.isFunction(value)) {
+	            result[key] = value;
+	          } else {
+	            _mergeObject(result, key, value);
+	          }
+	          break;
+	        case 'static_defaults':
+	          _mergeObject(result, key, value);
+	          break;
+	        case 'options':
+	          break;
+	        default:
+	          result[key] = value;
+	      }
+	    }
+	    options = options.options;
+	  }
+	  return result;
+	};
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var unwrapModels, _;
+
+	_ = __webpack_require__(6)._;
+
+	module.exports = unwrapModels = function(obj) {
+	  var key, result, value;
+	  if (!obj) {
+	    return obj;
+	  }
+	  if (obj.__kb) {
+	    return (obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj);
+	  }
+	  if (_.isArray(obj)) {
+	    return _.map(obj, function(test) {
+	      return unwrapModels(test);
+	    });
+	  }
+	  if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
+	    result = {};
+	    for (key in obj) {
+	      value = obj[key];
+	      result[key] = unwrapModels(value);
+	    }
+	    return result;
+	  }
+	  return obj;
+	};
+
+
+/***/ },
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.1.2
@@ -3031,7 +3069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(22), __webpack_require__(17), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(24), __webpack_require__(15), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -4631,7 +4669,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.7.0
@@ -6052,7 +6090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(module) {/*!
@@ -6076,7 +6114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (true) {
 	        // [1] CommonJS/Node.js
 	        var target = module['exports'] || exports; // module.exports is for Node.js
-	        factory(target, __webpack_require__(24));
+	        factory(target, __webpack_require__(26));
 	    } else if (typeof define === 'function' && define['amd']) {
 	        // [2] AMD anonymous module
 	        define(['exports', 'require'], factory);
@@ -11355,17 +11393,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	}());
 	})();
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(25)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(27)(module)))
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./knockout-latest": 26,
-		"./knockout-latest.debug": 23,
-		"./knockout-latest.debug.js": 23,
-		"./knockout-latest.js": 26
+		"./knockout-latest": 28,
+		"./knockout-latest.debug": 25,
+		"./knockout-latest.debug.js": 25,
+		"./knockout-latest.js": 28
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -11381,7 +11419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = function(module) {
@@ -11397,7 +11435,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/

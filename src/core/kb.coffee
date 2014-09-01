@@ -190,7 +190,7 @@ module.exports = class kb
   # INTERNAL HELPERS
   ####################################
   # @nodoc
-  @extend = require './extend'
+  @extend = require './functions/extend'
 
   # @nodoc
   @_throwMissing: (instance, message) -> throw "#{if _.isString(instance) then instance else instance.constructor.name}: #{message} is missing"
