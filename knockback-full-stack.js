@@ -2559,8 +2559,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
+	              if (new_model && kb.Backbone && kb.Backbone.ModelRef && new_model instanceof kb.Backbone.ModelRef) {
+	                _this.__kb.store.reuse(_this, new_model.model());
+	              } else {
+	                _this.__kb.store.reuse(_this, new_model);
+	              }
 	              event_watcher.emitter(new_model);
-	              _this.__kb.store.reuse(_this, event_watcher.ee);
 	              _model(event_watcher.ee);
 	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);
 	            });
