@@ -31,7 +31,7 @@ module.exports = class kb.Store
   @useOptionsOrCreate: (options, obj, observable) ->
     kb.utils.wrappedStoreIsOwned(observable, true) unless options.store
     store = kb.utils.wrappedStore(observable, options.store or new kb.Store())
-    store.retain(obj, observable, options.creator)
+    store.retain(observable, obj, options.creator)
     return store
 
   # Used to create a new kb.Store.
@@ -40,13 +40,9 @@ module.exports = class kb.Store
     @replaced_observables = []
     kb.Store.instances.push(@)
 
-    @_index = COUNTER++
-
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
-    debugger if @_index in [2]
-
     @__kb_released = true
     @clear()
     kb.Store.instances.splice(index, 1) if (index = _.indexOf(kb.Store.instances, @)) >= 0
@@ -78,19 +74,16 @@ module.exports = class kb.Store
   # @option options [kb.Factory] factory a factory used to create view models.
   #
   # @example retain an observable with the store
-  #   store.retain(obj, observable, creator);
-  retain: (obj, observable, creator) ->
+  #   store.retain(observable, obj, creator);
+  retain: (observable, obj, creator) ->
     return unless @canRegister(observable)
     creator or= observable.constructor # default is to use the constructor
 
     if current_observable = @find(obj, creator)
-      if current_observable is observable # already in this store
-        @getOrCreateStoreReferences(observable).ref_count++
-        return observable
-      @replaced_observables.push(current_observable)
+      (@getOrCreateStoreReferences(observable).ref_count++; return observable) if current_observable is observable # already in this store
+      @retire(current_observable)
 
-    kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
-    (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
+    @add(observable, obj, creator)
     @getOrCreateStoreReferences(observable).ref_count++
     return observable
 
@@ -121,7 +114,7 @@ module.exports = class kb.Store
       observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
       return observable or ko.observable(null) # default to null
 
-    @retain(obj, observable, creator)
+    @retain(observable, obj, creator)
     return observable
 
   # @nodoc
@@ -133,12 +126,9 @@ module.exports = class kb.Store
     throw new Error "Trying to change a shared view model. Reference count: #{@refCount(observable)}" unless @refCount(observable) is 1
 
     creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
-    if not _.isUndefined(current_obj) and current_observable = @find(current_obj, creator)
-      delete @observable_records[@creatorId(creator)][@cid(current_obj)]
-      @replaced_observables.push(current_observable)
-      @storeReferences(current_observable)?.ref_count--
+    @retire(current_observable) if not _.isUndefined(current_obj) and current_observable = @find(current_obj, creator)
 
-    @retain(obj, observable, creator)
+    @retain(observable, obj, creator)
     return
 
   # @nodoc
@@ -148,12 +138,9 @@ module.exports = class kb.Store
       return if not force and --store_references.ref_count > 0 # do not release yet
       @clearStoreReferences(observable)
 
-    creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
-    if current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released
-      delete @observable_records[@creatorId(creator)][@cid(obj)] if current_observable is observable # not already replaced
+    @remove(observable)
 
     return if observable.__kb_released
-    kb.utils.wrappedObject(observable, null); kb.utils.wrappedCreator(observable, null)
     kb.release(observable)
 
   refCount: (observable) ->
@@ -191,6 +178,22 @@ module.exports = class kb.Store
     if stores_references = kb.utils.get(observable, 'stores_references')
       (observable.__kb.stores_references.splice(index, 1); break) for index, store_references of observable.__kb.stores_references when store_references.store is @
     return
+
+  # @nodoc
+  retire: (observable) -> @clearStoreReferences(observable); @replaced_observables.push(observable); @remove(observable)
+
+  # @nodoc
+  add: (observable, obj, creator) ->
+    creator or= observable.constructor # default is to use the constructor
+    kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
+    (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
+
+  # @nodoc
+  remove: (observable) ->
+    creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
+    if current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released
+      delete @observable_records[@creatorId(creator)][@cid(obj)] if current_observable is observable # not already replaced
+    kb.utils.wrappedObject(observable, null); kb.utils.wrappedCreator(observable, null)
 
   # @nodoc
   creator: (obj, options) ->

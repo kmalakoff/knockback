@@ -394,7 +394,7 @@ class kb.CollectionObservable
         # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
         if current_view_model = @create_options.store.find(model, @create_options.creator)
           (current_view_model.constructor is view_model.constructor) or kb._throwUnexpected(@, 'replacing different type of view model')
-        @create_options.store.retain(model, view_model, @create_options.creator)
+        @create_options.store.retain(view_model, model, @create_options.creator)
         models.push(model)
 
     # a change, update models

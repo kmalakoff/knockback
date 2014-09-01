@@ -71,7 +71,7 @@ module.exports = class TypedValue
 
     if new_observable
       value = new_observable
-      create_options.store.retain(new_value, new_observable, creator) if create_options.store
+      create_options.store.retain(new_observable, new_value, creator) if create_options.store
 
     # found a creator
     else if creator

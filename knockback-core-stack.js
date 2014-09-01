@@ -481,7 +481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (current_view_model = _this.create_options.store.find(model, _this.create_options.creator)) {
 	              (current_view_model.constructor === view_model.constructor) || kb._throwUnexpected(_this, 'replacing different type of view model');
 	            }
-	            _this.create_options.store.retain(model, view_model, _this.create_options.creator);
+	            _this.create_options.store.retain(view_model, model, _this.create_options.creator);
 	            models.push(model);
 	          }
 	        }
@@ -1605,11 +1605,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var COUNTER, kb, _;
+	var kb, _;
 
 	_ = (kb = __webpack_require__(7))._;
-
-	COUNTER = 0;
 
 	module.exports = kb.Statistics = (function() {
 	  function Statistics() {
@@ -1640,11 +1638,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Statistics.prototype.register = function(key, obj) {
-	    var _ref;
-	    obj._index = COUNTER++;
-	    if ((_ref = obj._index) === 68) {
-	      debugger;
-	    }
 	    return this.registeredTracker(key).push(obj);
 	  };
 
@@ -1762,7 +1755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      kb.utils.wrappedStoreIsOwned(observable, true);
 	    }
 	    store = kb.utils.wrappedStore(observable, options.store || new kb.Store());
-	    store.retain(obj, observable, options.creator);
+	    store.retain(observable, obj, options.creator);
 	    return store;
 	  };
 
@@ -1770,14 +1763,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.observable_records = {};
 	    this.replaced_observables = [];
 	    kb.Store.instances.push(this);
-	    this._index = COUNTER++;
 	  }
 
 	  Store.prototype.destroy = function() {
-	    var index, _ref1;
-	    if ((_ref1 = this._index) === 2) {
-	      debugger;
-	    }
+	    var index;
 	    this.__kb_released = true;
 	    this.clear();
 	    if ((index = _.indexOf(kb.Store.instances, this)) >= 0) {
@@ -1818,8 +1807,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Store.prototype.retain = function(obj, observable, creator) {
-	    var current_observable, _base, _name;
+	  Store.prototype.retain = function(observable, obj, creator) {
+	    var current_observable;
 	    if (!this.canRegister(observable)) {
 	      return;
 	    }
@@ -1829,11 +1818,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.getOrCreateStoreReferences(observable).ref_count++;
 	        return observable;
 	      }
-	      this.replaced_observables.push(current_observable);
+	      this.retire(current_observable);
 	    }
-	    kb.utils.wrappedObject(observable, obj);
-	    kb.utils.wrappedCreator(observable, creator);
-	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
+	    this.add(observable, obj, creator);
 	    this.getOrCreateStoreReferences(observable).ref_count++;
 	    return observable;
 	  };
@@ -1871,7 +1858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return observable || ko.observable(null);
 	      };
 	    })(this));
-	    this.retain(obj, observable, creator);
+	    this.retain(observable, obj, creator);
 	    return observable;
 	  };
 
@@ -1880,7 +1867,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
-	    var creator, current_obj, current_observable, _ref1;
+	    var creator, current_obj, current_observable;
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
@@ -1889,34 +1876,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (!_.isUndefined(current_obj) && (current_observable = this.find(current_obj, creator))) {
-	      delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
-	      this.replaced_observables.push(current_observable);
-	      if ((_ref1 = this.storeReferences(current_observable)) != null) {
-	        _ref1.ref_count--;
-	      }
+	      this.retire(current_observable);
 	    }
-	    this.retain(obj, observable, creator);
+	    this.retain(observable, obj, creator);
 	  };
 
 	  Store.prototype.release = function(observable, force) {
-	    var creator, current_observable, obj, store_references;
+	    var store_references;
 	    if (store_references = this.storeReferences(observable)) {
 	      if (!force && --store_references.ref_count > 0) {
 	        return;
 	      }
 	      this.clearStoreReferences(observable);
 	    }
-	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    if (current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator)) {
-	      if (current_observable === observable) {
-	        delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
-	      }
-	    }
+	    this.remove(observable);
 	    if (observable.__kb_released) {
 	      return;
 	    }
-	    kb.utils.wrappedObject(observable, null);
-	    kb.utils.wrappedCreator(observable, null);
 	    return kb.release(observable);
 	  };
 
@@ -2006,6 +1982,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	    }
+	  };
+
+	  Store.prototype.retire = function(observable) {
+	    this.clearStoreReferences(observable);
+	    this.replaced_observables.push(observable);
+	    return this.remove(observable);
+	  };
+
+	  Store.prototype.add = function(observable, obj, creator) {
+	    var _base, _name;
+	    creator || (creator = observable.constructor);
+	    kb.utils.wrappedObject(observable, obj);
+	    kb.utils.wrappedCreator(observable, creator);
+	    return ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
+	  };
+
+	  Store.prototype.remove = function(observable) {
+	    var creator, current_observable, obj;
+	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
+	    if (current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator)) {
+	      if (current_observable === observable) {
+	        delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
+	      }
+	    }
+	    kb.utils.wrappedObject(observable, null);
+	    return kb.utils.wrappedCreator(observable, null);
 	  };
 
 	  Store.prototype.creator = function(obj, options) {
@@ -2140,7 +2142,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (new_observable) {
 	      value = new_observable;
 	      if (create_options.store) {
-	        create_options.store.retain(new_value, new_observable, creator);
+	        create_options.store.retain(new_observable, new_value, creator);
 	      }
 	    } else if (creator) {
 	      if (create_options.store) {
