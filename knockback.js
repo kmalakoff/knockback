@@ -2338,7 +2338,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  utils.wrappedDestroy = function(obj) {
-	    var store_references, __kb, _results;
+	    var store_references, __kb;
 	    if (!obj.__kb) {
 	      return;
 	    }
@@ -2362,15 +2362,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    __kb.store = null;
 	    if (__kb.stores_references) {
-	      _results = [];
 	      while (store_references = __kb.stores_references.pop()) {
 	        if (!store_references.store.__kb_released) {
-	          _results.push(store_references.store.release(obj));
-	        } else {
-	          _results.push(void 0);
+	          store_references.store.release(obj);
 	        }
 	      }
-	      return _results;
 	    }
 	  };
 

@@ -189,6 +189,7 @@ class kb.utils
     if __kb.stores_references
       while store_references = __kb.stores_references.pop()
         store_references.store.release(obj) unless store_references.store.__kb_released
+    return
 
   # Retrieves the value stored in a ko.observable.
   #
