@@ -1849,7 +1849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (current_observable = this.find(obj, creator)) {
 	      this.replaced_observables.push(current_observable);
 	    }
-	    kb.utils.wrappedObject(observable, obj);
+	    kb.utils.wrappedObj(observable, obj);
 	    kb.utils.wrappedCreator(observable, creator);
 	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
 	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
@@ -1921,14 +1921,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Store.prototype.release = function(observable) {
 	    var creator, current_observable, obj, store_references, _ref1;
-	    if (!(obj = kb.utils.wrappedObject(observable))) {
+	    if (observable.__kb_released) {
+	      return;
+	    }
+	    if (!(obj = kb.utils.wrappedObj(observable))) {
 	      return typeof console !== "undefined" && console !== null ? console.log("Object missing for release") : void 0;
 	    }
 	    if (!(creator = kb.utils.wrappedCreator(observable))) {
 	      return typeof console !== "undefined" && console !== null ? console.log("Creator missing for release") : void 0;
-	    }
-	    if ((current_observable = this.find(obj, creator)) !== observable) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Current observable mismatch for release") : void 0;
 	    }
 	    if (!(store_references = _.find(((_ref1 = observable.__kb) != null ? _ref1.stores_references : void 0) || [], (function(_this) {
 	      return function(store_references) {
@@ -1943,8 +1943,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (--store_references.ref_count > 0) {
 	      return;
 	    }
+	    if ((current_observable = this.find(obj, creator)) !== observable) {
+	      return typeof console !== "undefined" && console !== null ? console.log("Current observable mismatch for release") : void 0;
+	    }
 	    delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
 	    return kb.release(observable);
+	  };
+
+	  Store.prototype.refCount = function(observable) {
+	    var creator, obj, store_references, _ref1;
+	    if (observable.__kb_released) {
+	      if (typeof console !== "undefined" && console !== null) {
+	        console.log("Observable already released");
+	      }
+	      return 0;
+	    }
+	    if (!(obj = kb.utils.wrappedObj(observable))) {
+	      if (typeof console !== "undefined" && console !== null) {
+	        console.log("Object missing for release");
+	      }
+	      return 0;
+	    }
+	    if (!(creator = kb.utils.wrappedCreator(observable))) {
+	      if (typeof console !== "undefined" && console !== null) {
+	        console.log("Creator missing for release");
+	      }
+	      return 0;
+	    }
+	    if (!(store_references = _.find(((_ref1 = observable.__kb) != null ? _ref1.stores_references : void 0) || [], (function(_this) {
+	      return function(store_references) {
+	        return store_references.store === _this;
+	      };
+	    })(this)))) {
+	      if (typeof console !== "undefined" && console !== null) {
+	        console.log("Store references missing for release");
+	      }
+	      return 0;
+	    }
+	    return store_references.ref_count;
 	  };
 
 	  Store.prototype.canRegister = function(observable) {
@@ -2007,9 +2043,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  TypedValue.prototype.destroy = function() {
+	    var previous_value;
 	    this.__kb_released = true;
-	    kb.release(this.__kb_value);
-	    return this.__kb_value = null;
+	    if (previous_value = this.__kb_value) {
+	      this.__kb_value = null;
+	      kb.release(previous_value);
+	    }
+	    return this.create_options = null;
 	  };
 
 	  TypedValue.prototype.value = function() {
@@ -2052,8 +2092,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
 	            }
-	            return;
 	          }
+	          return;
 	        }
 	        break;
 	      case kb.TYPE_MODEL:
@@ -2061,7 +2101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (new_value && !kb.isModel(new_value)) {
 	            new_value = _.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value);
 	          }
-	          if (_.isFunction(value.model)) {
+	          if (_.isFunction(value.model) && (!this.create_options.store || (kb.utils.wrappedObj(value) && this.create_options.store.refCount(value) === 1))) {
 	            if (kb.peek(value.model) !== new_value) {
 	              value.model(new_value);
 	            }
@@ -2091,9 +2131,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.value_type = kb.TYPE_UNKNOWN;
 	    previous_value = this.__kb_value;
 	    this.__kb_value = void 0;
-	    if (previous_value) {
-	      kb.release(previous_value);
-	    }
 	    if (creator) {
 	      if (create_options.store) {
 	        value = create_options.store.findOrCreate(new_value, create_options);
@@ -2126,6 +2163,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.value_type = kb.TYPE_COLLECTION;
 	      } else {
 	        this.value_type = kb.TYPE_SIMPLE;
+	      }
+	    }
+	    if (previous_value) {
+	      if (this.create_options.store && kb.utils.wrappedObj(previous_value)) {
+	        this.create_options.store.release(previous_value);
+	      } else {
+	        kb.release(previous_value);
 	      }
 	    }
 	    this.__kb_value = value;
@@ -2208,6 +2252,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  utils.wrappedObject = function(obj, value) {
 	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'object'));
+	  };
+
+	  utils.wrappedObj = function(obj, value) {
+	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'obj'));
 	  };
 
 	  utils.wrappedCreator = function(obj, value) {

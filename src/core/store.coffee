@@ -85,7 +85,7 @@ module.exports = class kb.Store
     @replaced_observables.push(current_observable) if current_observable = @find(obj, creator)
 
     # TODO: look for changing
-    kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
+    kb.utils.wrappedObj(observable, obj); kb.utils.wrappedCreator(observable, creator)
     (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
     stores_references = kb.utils.orSet(observable, 'stores_references', [])
     unless store_references = _.find(stores_references, (store_references) => store_references.store is @)
@@ -137,14 +137,22 @@ module.exports = class kb.Store
 
   # @nodoc
   release: (observable) ->
-    return console?.log "Object missing for release" unless obj = kb.utils.wrappedObject(observable)
+    return if observable.__kb_released
+    return console?.log "Object missing for release" unless obj = kb.utils.wrappedObj(observable)
     return console?.log "Creator missing for release" unless creator = kb.utils.wrappedCreator(observable)
-    return console?.log "Current observable mismatch for release" unless (current_observable = @find(obj, creator)) is observable
     return console?.log "Store references missing for release" unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)
     return console?.log "Could not release observable. Reference count corrupt: #{store_references.ref_count}" if store_references.ref_count < 1
     return if --store_references.ref_count > 0 # do not release yet
+    return console?.log "Current observable mismatch for release" unless (current_observable = @find(obj, creator)) is observable
     delete @observable_records[@creatorId(creator)][@cid(obj)]
     kb.release(observable)
+
+  refCount: (observable) ->
+    (console?.log "Observable already released"; return 0) if observable.__kb_released
+    (console?.log "Object missing for release"; return 0) unless obj = kb.utils.wrappedObj(observable)
+    (console?.log "Creator missing for release"; return 0) unless creator = kb.utils.wrappedCreator(observable)
+    (console?.log "Store references missing for release"; return 0) unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)
+    return store_references.ref_count
 
   # @nodoc
   canRegister: (observable) ->

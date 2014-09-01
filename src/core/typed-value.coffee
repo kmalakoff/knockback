@@ -7,7 +7,11 @@ module.exports = class TypedValue
 
   destroy: ->
     @__kb_released = true
-    kb.release(@__kb_value); @__kb_value = null
+    if previous_value = @__kb_value
+      @__kb_value = null
+      # if @create_options.store and kb.utils.wrappedObj(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
+      kb.release(previous_value)
+    @create_options = null
 
   value: -> ko.utils.unwrapObservable(@_vo())
   rawValue: -> return @__kb_value
@@ -37,9 +41,11 @@ module.exports = class TypedValue
           # extract the collection
           new_value = kb.peek(new_value.collection) if new_value and not kb.isCollection(new_value) and _.isFunction(new_value.collection)
 
-          if _.isFunction(value.collection)
+          if _.isFunction(value.collection) # and (not @create_options.store or (kb.utils.wrappedObj(value) and @create_options.store.refCount(value) is 1))
             value.collection(new_value) if kb.peek(value.collection) isnt new_value
-            return
+          # else
+          #   @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
+          return
 
       when kb.TYPE_MODEL
         if new_type is kb.TYPE_MODEL or _.isNull(new_value)
@@ -47,7 +53,7 @@ module.exports = class TypedValue
           if new_value and not kb.isModel(new_value)
             new_value = if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)
 
-          if _.isFunction(value.model)
+          if _.isFunction(value.model) and (not @create_options.store or (kb.utils.wrappedObj(value) and @create_options.store.refCount(value) is 1))
             value.model(new_value) if kb.peek(value.model) isnt new_value
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
@@ -65,7 +71,6 @@ module.exports = class TypedValue
 
     # release the previous value
     previous_value = @__kb_value; @__kb_value = undefined
-    kb.release(previous_value) if previous_value # release previous
 
     # found a creator
     if creator
@@ -102,6 +107,10 @@ module.exports = class TypedValue
         @value_type = kb.TYPE_COLLECTION
       else
         @value_type = kb.TYPE_SIMPLE
+
+    # release previous
+    if previous_value
+      if @create_options.store and kb.utils.wrappedObj(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
 
     # store the value
     @__kb_value = value

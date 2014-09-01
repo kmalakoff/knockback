@@ -87,6 +87,9 @@ class kb.utils
   @wrappedObject: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
 
   # @nodoc
+  @wrappedObj: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'obj'))
+
+  # @nodoc
   @wrappedCreator: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'creator'))
 
   # @nodoc
