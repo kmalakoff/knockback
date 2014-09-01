@@ -134,15 +134,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.CollectionObservable = (function() {
 	  CollectionObservable.extend = kb.extend;
 
-	  function CollectionObservable(collection, options) {
+	  function CollectionObservable(collection, view_model, options) {
 	    this._onCollectionChange = __bind(this._onCollectionChange, this);
 	    return kb.ignore((function(_this) {
 	      return function() {
 	        var create_options, observable, _ref1;
-	        if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
-	          _ref1 = [new kb.Collection(), collection], collection = _ref1[0], options = _ref1[1];
-	        } else if (_.isArray(collection)) {
+	        if (_.isArray(collection)) {
 	          collection = new kb.Collection(collection);
+	        } else if (!(collection instanceof kb.Collection)) {
+	          _ref1 = [new kb.Collection(), collection, view_model], collection = _ref1[0], view_model = _ref1[1], options = _ref1[2];
+	        }
+	        if (_.isFunction(view_model)) {
+	          options = _.extend({
+	            view_model: view_model
+	          }, options || {});
+	        } else if (_.isObject(view_model)) {
+	          options = view_model;
 	        }
 	        options || (options = {});
 	        observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
@@ -535,8 +542,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	kb.collectionObservable = function(collection, options) {
-	  return new kb.CollectionObservable(collection, options);
+	kb.collectionObservable = function(collection, view_model, options) {
+	  return new kb.CollectionObservable(collection, view_model, options);
 	};
 
 

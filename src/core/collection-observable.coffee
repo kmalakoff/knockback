@@ -82,11 +82,16 @@ class kb.CollectionObservable
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   # @note the constructor does not return 'this' but a ko.observableArray
-  constructor: (collection, options) -> return kb.ignore =>
-    if _.isUndefined(options) and not (collection instanceof kb.Collection) # default create collection
-      [collection, options] = [new kb.Collection(), collection]
-    else if _.isArray(collection)
+  constructor: (collection, view_model, options) -> return kb.ignore =>
+    if _.isArray(collection)
       collection = new kb.Collection(collection)
+    else if not (collection instanceof kb.Collection)
+      [collection, view_model, options] = [new kb.Collection(), collection, view_model]
+
+    if _.isFunction(view_model)
+      options = _.extend({view_model: view_model}, options or {})
+    else if _.isObject(view_model)
+      options = view_model
 
     options or= {}
     observable = kb.utils.wrappedObservable(@, ko.observableArray([]))
@@ -423,4 +428,4 @@ class kb.CollectionObservable
     return true
 
 # factory function
-kb.collectionObservable = (collection, options) -> return new kb.CollectionObservable(collection, options)
+kb.collectionObservable = (collection, view_model, options) -> return new kb.CollectionObservable(collection, view_model, options)

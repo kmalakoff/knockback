@@ -722,9 +722,9 @@ describe 'collection-observable @quick @collection-observable', ->
     collection_observable = kb.collectionObservable(models, {view_model: PersonViewModel})
     assert.equal(collection_observable.collection().length, 4)
 
-    for view_models in collection_observable()
-      assert.ok(!!view_models.date())
-      assert.ok(view_models.model() instanceof Contact)
+    for view_model in collection_observable()
+      assert.ok(!!view_model.date())
+      assert.ok(view_model.model() instanceof Contact)
 
     kb.release(collection_observable)
 
@@ -810,5 +810,64 @@ describe 'collection-observable @quick @collection-observable', ->
     for model in models
       collection.remove(model)
       assert.ok(kb.Statistics.eventsStats(model).count is 0, "All model events cleared. Expected: 0. Actual: #{JSON.stringify(kb.Statistics.eventsStats(model))}")
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  it '22. reduced form for view models', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class PersonViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(PersonViewModel)
+    assert.equal collection_observable.collection().length, 0, 'no view models'
+    collection_observable.collection().reset((new Contact({id: id}) for id in [1..4]))
+    assert.equal collection_observable.collection().length, 4, '4 view models'
+
+    for view_model in collection_observable()
+      assert.ok view_model instanceof PersonViewModel, 'view model correct type'
+      assert.ok !!view_model.date()
+      assert.ok view_model.model() instanceof Contact, 'model correct type'
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  it '23. reduced form for view models with options', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class PersonViewModel extends kb.ViewModel
+    class OtherViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(PersonViewModel, {factories: {other: OtherViewModel}})
+    assert.equal collection_observable.collection().length, 0, 'no view models'
+    collection_observable.collection().reset((new Contact({id: id}) for id in [1..4]))
+    assert.equal collection_observable.collection().length, 4, '4 view models'
+
+    for view_model in collection_observable()
+      assert.ok view_model instanceof PersonViewModel, 'view model correct type'
+      assert.ok !!view_model.date()
+      assert.ok view_model.model() instanceof Contact, 'model correct type'
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  it '24. expanded form for colletion, view models with options', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class PersonViewModel extends kb.ViewModel
+    class OtherViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(new kb.Collection(), PersonViewModel, {factories: {other: OtherViewModel}})
+    assert.equal collection_observable.collection().length, 0, 'no view models'
+    collection_observable.collection().reset((new Contact({id: id}) for id in [1..4]))
+    assert.equal collection_observable.collection().length, 4, '4 view models'
+
+    for view_model in collection_observable()
+      assert.ok view_model instanceof PersonViewModel, 'view model correct type'
+      assert.ok !!view_model.date()
+      assert.ok view_model.model() instanceof Contact, 'model correct type'
+
+    kb.release(collection_observable)
+
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
