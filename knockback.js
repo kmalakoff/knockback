@@ -1736,8 +1736,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Store.prototype.retain = function(observable, obj, creator) {
-	    var current_observable;
+	  Store.prototype.retain = function(observable, obj, creator, reuse) {
+	    var current_observable, _ref1;
 	    if (!this.canRegister(observable)) {
 	      return;
 	    }
@@ -1750,6 +1750,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.retire(current_observable);
 	    }
 	    this.add(observable, obj, creator);
+	    if (reuse && ((_ref1 = this.getOrCreateStoreReferences(observable)) != null ? _ref1.ref_count : void 0) > 0) {
+	      return;
+	    }
 	    this.getOrCreateStoreReferences(observable).ref_count++;
 	    return observable;
 	  };
@@ -1807,7 +1810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!_.isUndefined(current_obj) && (current_observable = this.find(current_obj, creator))) {
 	      this.retire(current_observable);
 	    }
-	    this.retain(observable, obj, creator);
+	    this.retain(observable, obj, creator, true);
 	  };
 
 	  Store.prototype.release = function(observable, force) {
