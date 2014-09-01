@@ -142,7 +142,7 @@ module.exports = class kb.Store
     return if (current_obj = kb.utils.wrappedObject(observable)) is obj
     throw new Error "Trying to change a shared view model. Reference count: #{@refCount(observable)}" unless @refCount(observable) is 1
     kb.utils.wrappedObject(observable, obj)
-    return console?.log "Creator missing for reuse" unless creator = kb.utils.wrappedCreator(observable)
+    creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
     delete @observable_records[@creatorId(creator)][@cid(current_obj)]
     @observable_records[@creatorId(creator)][@cid(obj)] = observable
 
@@ -154,7 +154,7 @@ module.exports = class kb.Store
   # @nodoc
   release: (observable) ->
     return if observable.__kb_released
-    return console?.log "Creator missing for release" unless creator = kb.utils.wrappedCreator(observable)
+    creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
     return unless current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released
     return console?.log "Current observable mismatch for release", current_observable, observable if current_observable isnt observable
     return console?.log "Store references missing for release" unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)

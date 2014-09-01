@@ -1909,9 +1909,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new Error("Trying to change a shared view model. Reference count: " + (this.refCount(observable)));
 	    }
 	    kb.utils.wrappedObject(observable, obj);
-	    if (!(creator = kb.utils.wrappedCreator(observable))) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Creator missing for reuse") : void 0;
-	    }
+	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
 	    this.observable_records[this.creatorId(creator)][this.cid(obj)] = observable;
 	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
@@ -1937,9 +1935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (observable.__kb_released) {
 	      return;
 	    }
-	    if (!(creator = kb.utils.wrappedCreator(observable))) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Creator missing for release") : void 0;
-	    }
+	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (!(current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator))) {
 	      return;
 	    }
@@ -2580,11 +2576,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
-	              if (new_model && kb.Backbone && kb.Backbone.ModelRef && new_model instanceof kb.Backbone.ModelRef) {
-	                _this.__kb.store.reuse(_this, new_model.model());
-	              } else {
-	                _this.__kb.store.reuse(_this, new_model);
-	              }
+	              _this.__kb.store.reuse(_this, (new_model && kb.Backbone && kb.Backbone.ModelRef && new_model instanceof kb.Backbone.ModelRef ? new_model.model() : new_model));
 	              event_watcher.emitter(new_model);
 	              _model(event_watcher.ee);
 	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);
