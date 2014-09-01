@@ -981,10 +981,13 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
         @hasNested = ko.computed => !!@nested()
 
     view_model = new ViewModel(model = new Model1())
+    assert.ok !view_model.hasNested(), 'not have a nested'
     view_model.addNested()
     assert.ok !!model.get('nested'), 'added a nested'
+    assert.ok view_model.hasNested(), 'added a nested'
     view_model.removeNested()
     assert.ok !model.get('nested'), 'removed a nested'
+    assert.ok !view_model.hasNested(), 'removed a nested'
 
     kb.release(view_model)
 
