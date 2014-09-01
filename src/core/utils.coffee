@@ -10,19 +10,6 @@
 {_, ko} = kb = require './kb'
 
 ####################################################
-# Internal
-####################################################
-_mergeArray = (result, key, value) ->
-  result[key] or= []
-  value = [value] unless _.isArray(value)
-  result[key] = if result[key].length then _.union(result[key], value) else value
-  return result
-
-_mergeObject = (result, key, value) -> result[key] or= {}; return _.extend(result[key], value)
-
-_keyArrayToObject = (value) -> result = {}; result[item] = {key: item} for item in value; return result
-
-####################################################
 # Public API
 ####################################################
 
@@ -240,34 +227,7 @@ class kb.utils
   #
   # @example
   #   kb.utils.collapseOptions(options);
-  @collapseOptions: (options) ->
-    result = {}
-    options = {options: options}
-    while options.options
-      for key, value of options.options
-        switch key
-          when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
-          when 'keys'
-            # an object
-            if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
-              value = [value] unless _.isObject(value)
-              value = _keyArrayToObject(value) if _.isArray(value)
-              result[key] = _keyArrayToObject(result[key]) if _.isArray(result[key])
-              _mergeObject(result, key, value)
-
-            # an array
-            else
-              _mergeArray(result, key, value)
-
-          when 'factories'
-            if _.isFunction(value) then result[key] = value else _mergeObject(result, key, value)
-          when 'static_defaults' then _mergeObject(result, key, value)
-          when 'options' then
-          else
-            result[key] = value
-
-      options = options.options
-    return result
+  @collapseOptions: require('./collapse_options')
 
   # used for attribute setting to ensure all model attributes have their underlying models
   @unwrapModels: (obj) ->
