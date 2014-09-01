@@ -450,7 +450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CollectionObservable.prototype._onObservableArrayChange = function(models_or_view_models) {
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var collection, has_filters, model, models, observable, view_model, view_models, _i, _len;
+	        var collection, current_view_model, has_filters, model, models, observable, view_model, view_models, _i, _len;
 	        if (_this.in_edit) {
 	          return;
 	        }
@@ -478,7 +478,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	              }
 	              view_models.push(view_model);
 	            }
-	            _this.create_options.store.retainWithReplace(model, _this.create_options.creator, view_model);
+	            if (current_view_model = _this.create_options.store.find(model, _this.create_options.creator)) {
+	              (current_view_model.constructor === view_model.constructor) || kb._throwUnexpected(_this, 'replacing different type of view model');
+	            }
+	            _this.create_options.store.retain(model, view_model, _this.create_options.creator);
 	            models.push(model);
 	          }
 	        }
@@ -1854,20 +1857,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return observable || ko.observable(null);
 	      };
 	    })(this));
-	    this.retain(obj, observable, creator);
-	    return observable;
-	  };
-
-	  Store.prototype.retainWithReplace = function(obj, creator, observable) {
-	    var current_observable;
-	    obj || kb._throwUnexpected(this, 'obj missing');
-	    observable || kb._throwUnexpected(this, 'observable missing');
-	    if ((current_observable = this.find(obj, creator)) === observable) {
-	      return observable;
-	    }
-	    if (current_observable && current_observable !== observable) {
-	      (current_observable.constructor === observable.constructor) || kb._throwUnexpected(this, 'replacing different type');
-	    }
 	    this.retain(obj, observable, creator);
 	    return observable;
 	  };

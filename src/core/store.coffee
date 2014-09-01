@@ -118,18 +118,6 @@ module.exports = class kb.Store
     return observable
 
   # @nodoc
-  retainWithReplace: (obj, creator, observable) ->
-    obj or kb._throwUnexpected(@, 'obj missing')
-    observable or kb._throwUnexpected(@, 'observable missing')
-
-    return observable if (current_observable = @find(obj, creator)) is observable # already retained
-    if current_observable and current_observable isnt observable
-      (current_observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
-
-    @retain(obj, observable, creator)
-    return observable
-
-  # @nodoc
   canReuse: (observable) -> @refCount(observable) is 1
 
   # @nodoc
