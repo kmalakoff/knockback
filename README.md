@@ -75,12 +75,11 @@ Of course, this is just a simple example, but hopefully you get the picture.
 Getting Started
 ----------
 
-* [Knockback.js Website](http://kmalakoff.github.com/knockback/)
-* [Knockback.js Tutorials](http://kmalakoff.github.io/knockback/tutorials_introduction.html)
-* [API Docs](http://kmalakoff.github.com/knockback/doc/index.html)
-* [Tutorials](http://kmalakoff.github.com/knockback/tutorials_introduction.html)
-* [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/)
-* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/): demonstrates best practices when using Knockback.js including page routing and lifecycle management.
+* [Website](http://kmalakoff.github.com/knockback/) - explore everything Knockback and connect to the community
+* [Tutorials](http://kmalakoff.github.io/knockback/tutorials_introduction.html) - try some live examples
+* [API Docs](http://kmalakoff.github.com/knockback/doc/index.html) - dig into the API
+* [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/) - compare client-side framworks
+* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) - demonstrates best practices when using Knockback.js including page routing and lifecycle management
 * [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 Download Latest (0.19.4):
@@ -94,8 +93,10 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/blob/maste
 * Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core.min.js)
 * Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core-stack.min.js)
 
-The **full versions** bundle advanced features
-The **core versions** removes advanced features that can be included separately: localization, formatting, triggering, defaults, and validation.
+The **full versions** bundle advanced features.
+
+The **core versions** remove advanced features that can be included separately: localization, formatting, triggering, defaults, and validation.
+
 The **stack versions** provide Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 
 ###Distributions
@@ -105,15 +106,15 @@ You can also find Knockback on your favorite distributions:
 * **npm**: npm install knockback
 * **Bower**: bower install knockback
 * **Component**: component install kmalakoff/knockback
-* [NuGet]: (http://nuget.org/packages/Knockback.js)
+* [NuGet](http://nuget.org/packages/Knockback.js) - install right in Visual Studio
 * **Jam**: jam install knockback
 
 ###Dependencies
 
-* [Backbone.js](http://backbonejs.org/)
-* [Underscore.js](http://underscorejs.org/)
-* [Knockout.js](http://knockoutjs.com/)
-* [LoDash](http://lodash.com/) - optionally replaces Underscore.js
+* [Backbone.js](http://backbonejs.org/) - provides the Model layer
+* [Knockout.js](http://knockoutjs.com/) - provides the ViewModel layer foundations for Knockback
+* [Underscore.js](http://underscorejs.org/) - provides an awesome JavaScript utility belt
+* [LoDash](http://lodash.com/) - optionally replaces Underscore.js with a library optimized for consistent performance
 * [Parse](https://www.parse.com/) - optionally replaces Backbone.js and Underscore.js
 
 ###Compatible Components
