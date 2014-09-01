@@ -28,10 +28,7 @@ module.exports = class TypedValue
     (new_value isnt undefined) or (new_value = null) # ensure null instead of undefined
     new_type = kb.utils.valueType(new_value)
 
-    # SHARED NULL MODEL - update reference
-    if not @__kb_value or (@__kb_value.__kb_released or (@__kb_value.__kb_null and new_value))
-      @__kb_value = undefined
-      @value_type = undefined
+    (@__kb_value = @value_type = undefined) if @__kb_value?.__kb_released
     value = @__kb_value
 
     switch @value_type

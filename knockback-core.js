@@ -1814,7 +1814,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    creator || (creator = observable.constructor);
 	    kb.utils.wrappedObject(observable, obj);
 	    kb.utils.wrappedCreator(observable, creator);
-	    obj || (observable.__kb_null = true);
 	    if (current_observable = this.find(obj, creator)) {
 	      this.replaced_observables.push(current_observable);
 	    }
@@ -2043,15 +2042,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  TypedValue.prototype.update = function(new_value) {
-	    var new_type, value;
+	    var new_type, value, _ref1;
 	    if (this.__kb_released) {
 	      return;
 	    }
 	    (new_value !== void 0) || (new_value = null);
 	    new_type = kb.utils.valueType(new_value);
-	    if (!this.__kb_value || (this.__kb_value.__kb_released || (this.__kb_value.__kb_null && new_value))) {
-	      this.__kb_value = void 0;
-	      this.value_type = void 0;
+	    if ((_ref1 = this.__kb_value) != null ? _ref1.__kb_released : void 0) {
+	      this.__kb_value = this.value_type = void 0;
 	    }
 	    value = this.__kb_value;
 	    switch (this.value_type) {

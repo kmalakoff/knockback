@@ -78,7 +78,6 @@ module.exports = class kb.Store
 
     # prepare the observable
     kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
-    obj or (observable.__kb_null = true) # register as shared null
 
     @replaced_observables.push(current_observable) if current_observable = @find(obj, creator)
 
