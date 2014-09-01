@@ -186,6 +186,9 @@ class kb.utils
     __kb.event_watcher = null
     __kb.store.destroy() if __kb.store_is_owned # release the store
     __kb.store = null
+    if __kb.stores_references
+      while store_references = __kb.stores_references.pop()
+        store_references.store.release(obj) unless store_references.store.__kb_released
 
   # Retrieves the value stored in a ko.observable.
   #

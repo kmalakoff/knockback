@@ -41,6 +41,7 @@ module.exports = class kb.Store
   # Required clean up function to break cycles, release view models, etc.
   # Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy: ->
+    @__kb_released = true
     @clear()
     kb.Store.instances.splice(index, 1) if (index = _.indexOf(kb.Store.instances, @)) >= 0
 
@@ -76,19 +77,13 @@ module.exports = class kb.Store
     return unless @canRegister(observable)
     creator or= observable.constructor # default is to use the constructor
     if current_observable = @find(obj, creator)
+      # if current_observable is observable # already in this store
+      #   @getOrCreateStoreReferences(observable).ref_count++
+      #   return observable
       @replaced_observables.push(current_observable)
-      console.log @replaced_observables.length, current_observable is observable
-      # if current_observable isnt observable
-      #   @clearStoreReferences(current_observable)
-      # else
-      #   return
 
-    # prepare the observable
     kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
-
-    # TODO: handle changing
     (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
-
     @getOrCreateStoreReferences(observable).ref_count++
     return observable
 
@@ -119,16 +114,17 @@ module.exports = class kb.Store
       observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
       return observable or ko.observable(null) # default to null
 
-    @retain(obj, observable, creator) # if @find(obj, creator) isnt observable # already added
+    @retain(obj, observable, creator)
     return observable
 
   # @nodoc
   retainWithReplace: (obj, creator, observable) ->
     obj or kb._throwUnexpected(@, 'obj missing')
+    observable or kb._throwUnexpected(@, 'observable missing')
 
-    if current_observable = @find(obj, creator)
-      if current_observable isnt observable
-        (current_observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
+    return observable if (current_observable = @find(obj, creator)) is observable # already retained
+    if current_observable and current_observable isnt observable
+      (current_observable.constructor is observable.constructor) or kb._throwUnexpected(@, 'replacing different type')
 
     @retain(obj, observable, creator)
     return observable
@@ -155,7 +151,7 @@ module.exports = class kb.Store
 
     # maybe be externally added
     if store_references = @storeReferences(observable)
-      return if not force or --store_references.ref_count > 0 # do not release yet
+      return if not force and --store_references.ref_count > 0 # do not release yet
       @clearStoreReferences(observable)
 
     if current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released

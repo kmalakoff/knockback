@@ -1765,6 +1765,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Store.prototype.destroy = function() {
 	    var index;
+	    this.__kb_released = true;
 	    this.clear();
 	    if ((index = _.indexOf(kb.Store.instances, this)) >= 0) {
 	      return kb.Store.instances.splice(index, 1);
@@ -1812,7 +1813,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    creator || (creator = observable.constructor);
 	    if (current_observable = this.find(obj, creator)) {
 	      this.replaced_observables.push(current_observable);
-	      console.log(this.replaced_observables.length, current_observable === observable);
 	    }
 	    kb.utils.wrappedObject(observable, obj);
 	    kb.utils.wrappedCreator(observable, creator);
@@ -1861,10 +1861,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Store.prototype.retainWithReplace = function(obj, creator, observable) {
 	    var current_observable;
 	    obj || kb._throwUnexpected(this, 'obj missing');
-	    if (current_observable = this.find(obj, creator)) {
-	      if (current_observable !== observable) {
-	        (current_observable.constructor === observable.constructor) || kb._throwUnexpected(this, 'replacing different type');
-	      }
+	    observable || kb._throwUnexpected(this, 'observable missing');
+	    if ((current_observable = this.find(obj, creator)) === observable) {
+	      return observable;
+	    }
+	    if (current_observable && current_observable !== observable) {
+	      (current_observable.constructor === observable.constructor) || kb._throwUnexpected(this, 'replacing different type');
 	    }
 	    this.retain(obj, observable, creator);
 	    return observable;
@@ -1900,7 +1902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (store_references = this.storeReferences(observable)) {
-	      if (!force || --store_references.ref_count > 0) {
+	      if (!force && --store_references.ref_count > 0) {
 	        return;
 	      }
 	      this.clearStoreReferences(observable);
@@ -2324,7 +2326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  utils.wrappedDestroy = function(obj) {
-	    var __kb;
+	    var store_references, __kb, _results;
 	    if (!obj.__kb) {
 	      return;
 	    }
@@ -2346,7 +2348,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (__kb.store_is_owned) {
 	      __kb.store.destroy();
 	    }
-	    return __kb.store = null;
+	    __kb.store = null;
+	    if (__kb.stores_references) {
+	      _results = [];
+	      while (store_references = __kb.stores_references.pop()) {
+	        if (!store_references.store.__kb_released) {
+	          _results.push(store_references.store.release(obj));
+	        } else {
+	          _results.push(void 0);
+	        }
+	      }
+	      return _results;
+	    }
 	  };
 
 	  utils.valueType = function(observable) {
