@@ -1001,3 +1001,32 @@ describe 'view-model @quick @view-model', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'cannot update a shared view model', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class CustomViewModel extends kb.ViewModel
+
+    model = new kb.Model({name: 'Fred'})
+    view_model = kb.viewModel(new kb.Model({model1: model, model2: model}), {factories: {model1: CustomViewModel, model2: CustomViewModel}})
+    assert.ok view_model.model1
+    assert.equal view_model.model1().model(), model, 'model1 is model'
+    assert.equal view_model.model1().name(), 'Fred', 'name is Fred'
+    assert.ok view_model.model2
+    assert.equal view_model.model2().model(), model, 'model2 is model'
+    assert.equal view_model.model2().name(), 'Fred', 'name is Fred'
+
+    # cannot change a shared model
+    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Reference count: 2'
+    assert.equal view_model.model1().model(), model, 'model1 is still model'
+    assert.equal view_model.model1().name(), 'Fred', 'name has not been changed'
+
+    # can set the view model
+    view_model.model1(new CustomViewModel(new kb.Model({name: 'Bob'})))
+    assert !!view_model.model1().model
+    assert.equal view_model.model1().name(), 'Bob', 'name has been changed on the new view model'
+
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
