@@ -31,7 +31,7 @@ model = new Backbone.Model({first_name: 'Bob', last_name: 'Smith'})
 ko.applyBindings(kb.viewModel(model))
 ```
 
-When you type in the input boxes, the values are properly transferred to the model and all other bound view models!
+When you type in the input boxes, the values are properly transferred bi-directionally to the model and all other bound view models!
 
 
 ### Advanced
