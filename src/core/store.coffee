@@ -48,7 +48,10 @@ module.exports = class kb.Store
   clear: ->
     [observable_records, @observable_records] = [@observable_records, {}]
     for creator_id, records of observable_records
-      kb.release(observable) for cid, observable of records when not observable.__kb_released
+      for cid, observable of records when not observable.__kb_released
+        kb.release(observable)
+        if observable.__kb and observable.__kb.stores_references
+          (delete observable.__kb.stores_references[index]; break) for index, store_references of observable.__kb.stores_references when store_references.store is @
 
     [replaced_observables, @replaced_observables] = [@replaced_observables, []]
     kb.release(observable) for observable in replaced_observables when not observable.__kb_released
@@ -143,6 +146,11 @@ module.exports = class kb.Store
     delete @observable_records[@creatorId(creator)][@cid(current_obj)]
     @observable_records[@creatorId(creator)][@cid(obj)] = observable
 
+    stores_references = kb.utils.orSet(observable, 'stores_references', [])
+    unless store_references = _.find(stores_references, (store_references) => store_references.store is @)
+      stores_references.push(store_references = {store: @, ref_count: 1, release: => @release(observable)})
+    return
+
   # @nodoc
   release: (observable) ->
     return if observable.__kb_released
@@ -157,7 +165,7 @@ module.exports = class kb.Store
 
   refCount: (observable) ->
     (console?.log "Observable already released"; return 0) if observable.__kb_released
-    (console?.log "Store references missing for refCount", observable.__kb?.stores_references; return 1) unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)
+    return 1 unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)
     return store_references.ref_count
 
   # @nodoc

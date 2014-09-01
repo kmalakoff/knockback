@@ -1775,18 +1775,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.clear = function() {
-	    var cid, creator_id, observable, observable_records, records, replaced_observables, _i, _len, _ref1, _ref2;
+	    var cid, creator_id, index, observable, observable_records, records, replaced_observables, store_references, _i, _len, _ref1, _ref2, _ref3;
 	    _ref1 = [this.observable_records, {}], observable_records = _ref1[0], this.observable_records = _ref1[1];
 	    for (creator_id in observable_records) {
 	      records = observable_records[creator_id];
 	      for (cid in records) {
 	        observable = records[cid];
-	        if (!observable.__kb_released) {
-	          kb.release(observable);
+	        if (!(!observable.__kb_released)) {
+	          continue;
+	        }
+	        kb.release(observable);
+	        if (observable.__kb && observable.__kb.stores_references) {
+	          _ref2 = observable.__kb.stores_references;
+	          for (index in _ref2) {
+	            store_references = _ref2[index];
+	            if (store_references.store === this) {
+	              delete observable.__kb.stores_references[index];
+	              break;
+	            }
+	          }
 	        }
 	      }
 	    }
-	    _ref2 = [this.replaced_observables, []], replaced_observables = _ref2[0], this.replaced_observables = _ref2[1];
+	    _ref3 = [this.replaced_observables, []], replaced_observables = _ref3[0], this.replaced_observables = _ref3[1];
 	    for (_i = 0, _len = replaced_observables.length; _i < _len; _i++) {
 	      observable = replaced_observables[_i];
 	      if (!observable.__kb_released) {
@@ -1893,7 +1904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
-	    var creator, current_obj;
+	    var creator, current_obj, store_references, stores_references;
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
@@ -1905,7 +1916,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return typeof console !== "undefined" && console !== null ? console.log("Creator missing for reuse") : void 0;
 	    }
 	    delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
-	    return this.observable_records[this.creatorId(creator)][this.cid(obj)] = observable;
+	    this.observable_records[this.creatorId(creator)][this.cid(obj)] = observable;
+	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
+	    if (!(store_references = _.find(stores_references, (function(_this) {
+	      return function(store_references) {
+	        return store_references.store === _this;
+	      };
+	    })(this)))) {
+	      stores_references.push(store_references = {
+	        store: this,
+	        ref_count: 1,
+	        release: (function(_this) {
+	          return function() {
+	            return _this.release(observable);
+	          };
+	        })(this)
+	      });
+	    }
 	  };
 
 	  Store.prototype.release = function(observable) {
@@ -1940,7 +1967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.refCount = function(observable) {
-	    var store_references, _ref1, _ref2;
+	    var store_references, _ref1;
 	    if (observable.__kb_released) {
 	      if (typeof console !== "undefined" && console !== null) {
 	        console.log("Observable already released");
@@ -1952,9 +1979,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return store_references.store === _this;
 	      };
 	    })(this)))) {
-	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("Store references missing for refCount", (_ref2 = observable.__kb) != null ? _ref2.stores_references : void 0);
-	      }
 	      return 1;
 	    }
 	    return store_references.ref_count;
