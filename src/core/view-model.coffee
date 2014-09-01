@@ -128,7 +128,7 @@ class kb.ViewModel
     @__kb.path = options.path
     kb.Factory.useOptionsOrCreate(options, @, options.path)
 
-    _model = kb._wrappedKey(@, '_model', ko.observable())
+    _model = kb.utils.set(@, '_model', ko.observable())
     @model = ko.computed {
       read: => ko.utils.unwrapObservable(_model)
       write: (new_model) => kb.ignore =>

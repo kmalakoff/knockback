@@ -2208,28 +2208,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _argumentsAddKey, _keyArrayToObject, _mergeArray, _mergeObject, _ref, _wrappedKey;
+	var kb, ko, _, _keyArrayToObject, _mergeArray, _mergeObject, _ref;
 
 	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
-
-	_wrappedKey = kb._wrappedKey = function(obj, key, value) {
-	  if (arguments.length === 2) {
-	    if (obj && obj.__kb && obj.__kb.hasOwnProperty(key)) {
-	      return obj.__kb[key];
-	    } else {
-	      return void 0;
-	    }
-	  }
-	  obj || kb._throwUnexpected(this, "no obj for wrapping " + key);
-	  obj.__kb || (obj.__kb = {});
-	  obj.__kb[key] = value;
-	  return value;
-	};
-
-	_argumentsAddKey = function(args, key) {
-	  Array.prototype.splice.call(args, 1, 0, key);
-	  return args;
-	};
 
 	_mergeArray = function(result, key, value) {
 	  result[key] || (result[key] = []);
@@ -2260,76 +2241,99 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.utils = (function() {
 	  function utils() {}
 
+	  utils.get = function(obj, key, default_value) {
+	    if (!obj.__kb || !obj.__kb.hasOwnProperty(key)) {
+	      return default_value;
+	    } else {
+	      return obj.__kb[key];
+	    }
+	  };
+
+	  utils.set = function(obj, key, value) {
+	    return (obj.__kb || (obj.__kb = {}))[key] = value;
+	  };
+
+	  utils.orSet = function(obj, key, value) {
+	    if (!(obj.__kb || (obj.__kb = {})).hasOwnProperty(key)) {
+	      obj.__kb[key] = value;
+	    }
+	    return obj.__kb[key];
+	  };
+
 	  utils.wrappedObservable = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'observable'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'observable');
+	    } else {
+	      return kb.utils.set(obj, 'observable', value);
+	    }
 	  };
 
 	  utils.wrappedObject = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'object'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'object');
+	    } else {
+	      return kb.utils.set(obj, 'object', value);
+	    }
 	  };
 
 	  utils.wrappedCreator = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'creator'));
-	  };
-
-	  utils.get = function(obj, key, default_value) {
-	    if (!obj.__kb) {
-	      return default_value;
-	    }
-	    if (obj.__kb.hasOwnProperty(key)) {
-	      return obj.__kb[key];
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'creator');
 	    } else {
-	      return default_value;
+	      return kb.utils.set(obj, 'creator', value);
 	    }
-	  };
-
-	  utils.orSet = function(obj, key, value) {
-	    obj.__kb || (obj.__kb = {});
-	    if (!obj.__kb.hasOwnProperty(key)) {
-	      obj.__kb[key] = value;
-	    }
-	    return obj.__kb[key];
-	  };
-
-	  utils.orSet = function(obj, key, value) {
-	    obj.__kb || (obj.__kb = {});
-	    if (!obj.__kb.hasOwnProperty(key)) {
-	      obj.__kb[key] = value;
-	    }
-	    return obj.__kb[key];
 	  };
 
 	  utils.wrappedModel = function(obj, value) {
 	    if (arguments.length === 1) {
-	      value = _wrappedKey(obj, 'object');
-	      if (_.isUndefined(value)) {
+	      if (_.isUndefined(value = kb.utils.get(obj, 'object'))) {
 	        return obj;
 	      } else {
 	        return value;
 	      }
 	    } else {
-	      return _wrappedKey(obj, 'object', value);
+	      return kb.utils.set(obj, 'object', value);
 	    }
 	  };
 
 	  utils.wrappedStore = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'store'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'store');
+	    } else {
+	      return kb.utils.set(obj, 'store', value);
+	    }
 	  };
 
 	  utils.wrappedStoreIsOwned = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'store_is_owned'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'store_is_owned');
+	    } else {
+	      return kb.utils.set(obj, 'store_is_owned', value);
+	    }
 	  };
 
 	  utils.wrappedFactory = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'factory'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'factory');
+	    } else {
+	      return kb.utils.set(obj, 'factory', value);
+	    }
 	  };
 
 	  utils.wrappedEventWatcher = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'event_watcher'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'event_watcher');
+	    } else {
+	      return kb.utils.set(obj, 'event_watcher', value);
+	    }
 	  };
 
 	  utils.wrappedEventWatcherIsOwned = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'event_watcher_is_owned'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'event_watcher_is_owned');
+	    } else {
+	      return kb.utils.set(obj, 'event_watcher_is_owned', value);
+	    }
 	  };
 
 	  utils.wrappedDestroy = function(obj) {
@@ -2492,16 +2496,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return obj;
 	    }
 	    if (obj.__kb) {
-	      if ('object' in obj.__kb) {
-	        return obj.__kb.object;
-	      } else {
-	        return obj;
-	      }
-	    } else if (_.isArray(obj)) {
+	      return (obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj);
+	    }
+	    if (_.isArray(obj)) {
 	      return _.map(obj, function(test) {
 	        return kb.utils.unwrapModels(test);
 	      });
-	    } else if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
+	    }
+	    if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
 	      result = {};
 	      for (key in obj) {
 	        value = obj[key];
@@ -2621,7 +2623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        kb.Store.useOptionsOrCreate(options, model, _this);
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
-	        _model = kb._wrappedKey(_this, '_model', ko.observable());
+	        _model = kb.utils.set(_this, '_model', ko.observable());
 	        _this.model = ko.computed({
 	          read: function() {
 	            return ko.utils.unwrapObservable(_model);

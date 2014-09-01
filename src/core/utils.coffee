@@ -12,19 +12,6 @@
 ####################################################
 # Internal
 ####################################################
-_wrappedKey = kb._wrappedKey = (obj, key, value) ->
-  # get
-  if arguments.length is 2
-    return if (obj and obj.__kb and obj.__kb.hasOwnProperty(key)) then obj.__kb[key] else undefined
-
-  # set
-  obj or kb._throwUnexpected(@, "no obj for wrapping #{key}")
-  obj.__kb or= {}
-  obj.__kb[key] = value
-  return value
-
-_argumentsAddKey = (args, key) -> Array.prototype.splice.call(args, 1, 0, key); return args
-
 _mergeArray = (result, key, value) ->
   result[key] or= []
   value = [value] unless _.isArray(value)
@@ -41,6 +28,15 @@ _keyArrayToObject = (value) -> result = {}; result[item] = {key: item} for item 
 
 # Library of general-purpose utilities
 class kb.utils
+
+  # @nodoc
+  @get: (obj, key, default_value) -> return if not obj.__kb or not obj.__kb.hasOwnProperty(key) then default_value else obj.__kb[key]
+
+  # @nodoc
+  @set: (obj, key, value) -> return ((obj.__kb or= {}))[key] = value
+
+  # @nodoc
+  @orSet: (obj, key, value) -> obj.__kb[key] = value unless ((obj.__kb or= {})).hasOwnProperty(key); return obj.__kb[key]
 
   # Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'. Relevant for:
   #
@@ -67,7 +63,7 @@ class kb.utils
   #       return kb.utils.wrappedObservable(this);
   #     }
   #   });
-  @wrappedObservable: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'observable'))
+  @wrappedObservable: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'observable') else kb.utils.set(obj, 'observable', value)
 
   # Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.
   # @note this is almost the same as {kb.utils.wrappedModel} except that if the Model doesn't exist, it returns null.
@@ -84,26 +80,10 @@ class kb.utils
   # @example
   #   var model = kb.utils.wrappedObject(view_model);
   #   var collection = kb.utils.wrappedObject(collection_observable);
-  @wrappedObject: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'object'))
+  @wrappedObject: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'object') else kb.utils.set(obj, 'object', value)
 
   # @nodoc
-  @wrappedCreator: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'creator'))
-
-  # @nodoc
-  @get: (obj, key, default_value) ->
-    return default_value unless obj.__kb
-    return if obj.__kb.hasOwnProperty(key) then obj.__kb[key] else default_value
-
-  @orSet: (obj, key, value) ->
-    obj.__kb or= {}
-    obj.__kb[key] = value unless obj.__kb.hasOwnProperty(key)
-    return obj.__kb[key]
-
- # @nodoc
-  @orSet: (obj, key, value) ->
-    obj.__kb or= {}
-    obj.__kb[key] = value unless obj.__kb.hasOwnProperty(key)
-    return obj.__kb[key]
+  @wrappedCreator: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'creator') else kb.utils.set(obj, 'creator', value)
 
   # Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
   # @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
@@ -116,13 +96,7 @@ class kb.utils
   #   Sets the observable on an object
   #   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Model.
   #   @param [Model] model the Model
-  @wrappedModel: (obj, value) ->
-    # get
-    if (arguments.length is 1)
-      value = _wrappedKey(obj, 'object')
-      return if _.isUndefined(value) then obj else value
-    else
-      return _wrappedKey(obj, 'object', value)
+  @wrappedModel: (obj, value) -> if arguments.length is 1 then (if _.isUndefined(value = kb.utils.get(obj, 'object')) then obj else value) else kb.utils.set(obj, 'object', value)
 
   # Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
   #
@@ -140,10 +114,10 @@ class kb.utils
   #   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   #     store: kb.utils.wrappedStore(co)
   #   });
-  @wrappedStore: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store'))
+  @wrappedStore: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'store') else kb.utils.set(obj, 'store', value)
 
   # @private
-  @wrappedStoreIsOwned: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'store_is_owned'))
+  @wrappedStoreIsOwned: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'store_is_owned') else kb.utils.set(obj, 'store_is_owned', value)
 
   # Dual-purpose getter/setter for retrieving and storing a kb.Factory on an owner.
   #
@@ -155,7 +129,7 @@ class kb.utils
   #   Sets the factory on an object
   #   @param [Any] obj the owner
   #   @param [kb.Factory] factory the factory
-  @wrappedFactory: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'factory'))
+  @wrappedFactory: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'factory') else kb.utils.set(obj, 'factory', value)
 
   # Dual-purpose getter/setter for retrieving and storing a kb.EventWatcher on an owner.
   #
@@ -167,10 +141,10 @@ class kb.utils
   #   Sets the event_watcher on an object
   #   @param [Any] obj the owner
   #   @param [kb.EventWatcher] event_watcher the event_watcher
-  @wrappedEventWatcher: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher'))
+  @wrappedEventWatcher: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'event_watcher') else kb.utils.set(obj, 'event_watcher', value)
 
   # @private
-  @wrappedEventWatcherIsOwned: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'event_watcher_is_owned'))
+  @wrappedEventWatcherIsOwned: (obj, value) -> if arguments.length is 1 then kb.utils.get(obj, 'event_watcher_is_owned') else kb.utils.set(obj, 'event_watcher_is_owned', value)
 
   # Clean up function that releases all of the wrapped values on an owner.
   @wrappedDestroy: (obj) ->
@@ -284,15 +258,14 @@ class kb.utils
             # an array
             else
               _mergeArray(result, key, value)
+
           when 'factories'
-            if _.isFunction(value) # special case for ko.observable
-              result[key] = value
-            else
-              _mergeObject(result, key, value)
+            if _.isFunction(value) then result[key] = value else _mergeObject(result, key, value)
           when 'static_defaults' then _mergeObject(result, key, value)
           when 'options' then
           else
             result[key] = value
+
       options = options.options
     return result
 
@@ -300,16 +273,11 @@ class kb.utils
   @unwrapModels: (obj) ->
     return obj if not obj
 
-    if obj.__kb
-      return if ('object' of obj.__kb) then obj.__kb.object else obj
-
-    else if _.isArray(obj)
-      return _.map(obj, (test) -> return kb.utils.unwrapModels(test))
-
-    else if _.isObject(obj) and (obj.constructor is {}.constructor) # a simple object
+    return (if obj.__kb.hasOwnProperty('object') then obj.__kb.object else obj) if obj.__kb
+    return _.map(obj, (test) -> return kb.utils.unwrapModels(test)) if _.isArray(obj)
+    if _.isObject(obj) and (obj.constructor is {}.constructor) # a simple object
       result = {}
-      for key, value of obj
-        result[key] = kb.utils.unwrapModels(value)
+      result[key] = kb.utils.unwrapModels(value) for key, value of obj
       return result
 
     return obj
