@@ -97,11 +97,6 @@ module.exports = class kb
     return unless kb.isReleaseable(obj)
     obj.__kb_released = true # mark as released
 
-    # check reference count
-    if obj.hasOwnProperty('__kb_ref_count')
-      return console?.log "Error: failed to release object. Reference count corrupt: #{obj.__kb_ref_count}", obj if obj.__kb_ref_count < 1
-      return if --obj.__kb_ref_count > 0 # not yet released
-
     # release array's items
     if _.isArray(obj)
       (obj[index] = null; kb.release(value)) for index, value of obj when kb.isReleaseable(value)
@@ -139,14 +134,6 @@ module.exports = class kb
     view_model or kb._throwUnexpected(@, 'missing view model')
     node or kb._throwUnexpected(@, 'missing node')
     ko.utils.domNodeDisposal.addDisposeCallback(node, -> kb.release(view_model))
-
-  @retain: (obj) ->
-    return obj.retain() if typeof(obj.retain) is 'function'
-    obj.__kb_ref_count = 0 unless obj.hasOwnProperty('__kb_ref_count')
-    obj.__kb_ref_count++
-    return obj
-
-  @refCount: (obj) -> if typeof(obj.refCount) is 'function' then obj.refCount() else (obj.__kb_ref_count or 0)
 
   # Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   #

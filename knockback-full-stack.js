@@ -1197,14 +1197,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    obj.__kb_released = true;
-	    if (obj.hasOwnProperty('__kb_ref_count')) {
-	      if (obj.__kb_ref_count < 1) {
-	        return typeof console !== "undefined" && console !== null ? console.log("Error: failed to release object. Reference count corrupt: " + obj.__kb_ref_count, obj) : void 0;
-	      }
-	      if (--obj.__kb_ref_count > 0) {
-	        return;
-	      }
-	    }
 	    if (_.isArray(obj)) {
 	      for (index in obj) {
 	        value = obj[index];
@@ -1259,25 +1251,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ko.utils.domNodeDisposal.addDisposeCallback(node, function() {
 	      return kb.release(view_model);
 	    });
-	  };
-
-	  kb.retain = function(obj) {
-	    if (typeof obj.retain === 'function') {
-	      return obj.retain();
-	    }
-	    if (!obj.hasOwnProperty('__kb_ref_count')) {
-	      obj.__kb_ref_count = 0;
-	    }
-	    obj.__kb_ref_count++;
-	    return obj;
-	  };
-
-	  kb.refCount = function(obj) {
-	    if (typeof obj.refCount === 'function') {
-	      return obj.refCount();
-	    } else {
-	      return obj.__kb_ref_count || 0;
-	    }
 	  };
 
 	  kb.renderTemplate = function(template, view_model, options) {
