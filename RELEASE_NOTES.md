@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.20.0
+* Bug fix for shared view models: https://github.com/kmalakoff/knockback/issues/113. You will now get warnings if you try to change a model on a shared ViewModel.
+
 ## 0.19.4
 * Bug fix for extracting a Model when setting by kb.ViewModel and to extract a Collection when setting by kb.CollectionObservable.
 
