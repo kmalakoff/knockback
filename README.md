@@ -31,6 +31,9 @@ model = new Backbone.Model({first_name: 'Bob', last_name: 'Smith'})
 ko.applyBindings(kb.viewModel(model))
 ```
 
+When you type in the input boxes, the values are properly transferred to the model and all other bound view models!
+
+
 ### Advanced
 
 ###### The View Model:
@@ -78,9 +81,8 @@ ko.applyBindings(view_model)
 kb.release(view_model)
 ```
 
-And now when you type in the input boxes, the values are properly transferred to the model and the greeting updates as you type!
+Now, the greeting updates as you type!
 
-Of course, this is just a simple example, but hopefully you get the picture.
 
 # Getting Started
 
