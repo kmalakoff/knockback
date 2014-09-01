@@ -9,8 +9,7 @@ module.exports = class TypedValue
     @__kb_released = true
     if previous_value = @__kb_value
       @__kb_value = null
-      # if @create_options.store and kb.utils.wrappedCreator(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
-      kb.release(previous_value)
+      if @create_options.store and kb.utils.wrappedCreator(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
     @create_options = null
 
   value: -> ko.utils.unwrapObservable(@_vo())
@@ -38,17 +37,20 @@ module.exports = class TypedValue
           # extract the collection
           new_value = kb.peek(new_value.collection) if new_value and not kb.isCollection(new_value) and _.isFunction(new_value.collection)
 
-          if _.isFunction(value.collection) # and (not @create_options.store or (kb.utils.wrappedObject(value) and @create_options.store.refCount(value) is 1))
+          if _.isFunction(value.collection) # and (not @create_options.store or @create_options.store.canReuse(value))
             value.collection(new_value) if kb.peek(value.collection) isnt new_value
-          # else
-          #   @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
+          else
+            @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
           return
 
       when kb.TYPE_MODEL
         if new_type is kb.TYPE_MODEL or _.isNull(new_value)
           # extract the model
           if new_value and not kb.isModel(new_value)
+            new_observable = new_value
             new_value = if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)
+            @_updateValueObservable(new_value, new_observable)
+            return
 
           if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value))
             value.model(new_value) if kb.peek(value.model) isnt new_value
@@ -61,16 +63,18 @@ module.exports = class TypedValue
     else
       @_updateValueObservable(new_value) if kb.peek(value) isnt new_value
 
-  _updateValueObservable: (new_value) ->
+  _updateValueObservable: (new_value, new_observable) ->
     create_options = @create_options
     creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path)
     @value_type = kb.TYPE_UNKNOWN
+    [previous_value, @__kb_value] = [@__kb_value, undefined]
 
-    # release the previous value
-    previous_value = @__kb_value; @__kb_value = undefined
+    if new_observable
+      value = new_observable
+      create_options.store.register(new_value, new_observable, creator) if create_options.store
 
     # found a creator
-    if creator
+    else if creator
       # have the store, use it to create
       if create_options.store
         value = create_options.store.findOrCreate(new_value, create_options)
@@ -98,8 +102,7 @@ module.exports = class TypedValue
     if @value_type is kb.TYPE_UNKNOWN
       if not ko.isObservable(value) # a view model, recognize view_models as non-observable
         @value_type = kb.TYPE_MODEL
-        if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
-          kb.utils.wrappedObject(value, new_value)
+        kb.utils.wrappedObject(value, new_value) if typeof(value.model) isnt 'function' # manually cache the model to check for changes later
       else if value.__kb_is_co
         @value_type = kb.TYPE_COLLECTION
       else

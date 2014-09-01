@@ -1936,12 +1936,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    if (!(current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator))) {
-	      return;
-	    }
-	    if (current_observable !== observable) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Current observable mismatch for release", current_observable, observable) : void 0;
-	    }
 	    if (!(store_references = _.find(((_ref1 = observable.__kb) != null ? _ref1.stores_references : void 0) || [], (function(_this) {
 	      return function(store_references) {
 	        return store_references.store === _this;
@@ -1949,13 +1943,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })(this)))) {
 	      return typeof console !== "undefined" && console !== null ? console.log("Store references missing for release") : void 0;
 	    }
-	    if (store_references.ref_count < 1) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Could not release observable. Reference count corrupt: " + store_references.ref_count) : void 0;
-	    }
 	    if (--store_references.ref_count > 0) {
 	      return;
 	    }
-	    delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
+	    if (!(current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator))) {
+	      return;
+	    }
+	    if (current_observable === observable) {
+	      delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
+	    }
 	    return kb.release(observable);
 	  };
 
@@ -2041,7 +2037,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.__kb_released = true;
 	    if (previous_value = this.__kb_value) {
 	      this.__kb_value = null;
-	      kb.release(previous_value);
+	      if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
+	        this.create_options.store.release(previous_value);
+	      } else {
+	        kb.release(previous_value);
+	      }
 	    }
 	    return this.create_options = null;
 	  };
@@ -2062,7 +2062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  TypedValue.prototype.update = function(new_value) {
-	    var new_type, value, _ref1;
+	    var new_observable, new_type, value, _ref1;
 	    if (this.__kb_released) {
 	      return;
 	    }
@@ -2085,6 +2085,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
 	            }
+	          } else {
+	            if (kb.utils.wrappedObject(value) !== new_value) {
+	              this._updateValueObservable(new_value);
+	            }
 	          }
 	          return;
 	        }
@@ -2092,7 +2096,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case kb.TYPE_MODEL:
 	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
 	          if (new_value && !kb.isModel(new_value)) {
+	            new_observable = new_value;
 	            new_value = _.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value);
+	            this._updateValueObservable(new_value, new_observable);
+	            return;
 	          }
 	          if (_.isFunction(value.model) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
 	            if (kb.peek(value.model) !== new_value) {
@@ -2117,14 +2124,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  TypedValue.prototype._updateValueObservable = function(new_value) {
-	    var create_options, creator, previous_value, value;
+	  TypedValue.prototype._updateValueObservable = function(new_value, new_observable) {
+	    var create_options, creator, previous_value, value, _ref1;
 	    create_options = this.create_options;
 	    creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
 	    this.value_type = kb.TYPE_UNKNOWN;
-	    previous_value = this.__kb_value;
-	    this.__kb_value = void 0;
-	    if (creator) {
+	    _ref1 = [this.__kb_value, void 0], previous_value = _ref1[0], this.__kb_value = _ref1[1];
+	    if (new_observable) {
+	      value = new_observable;
+	      if (create_options.store) {
+	        create_options.store.register(new_value, new_observable, creator);
+	      }
+	    } else if (creator) {
 	      if (create_options.store) {
 	        value = create_options.store.findOrCreate(new_value, create_options);
 	      } else {

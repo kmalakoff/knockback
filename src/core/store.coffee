@@ -155,12 +155,11 @@ module.exports = class kb.Store
   release: (observable) ->
     return if observable.__kb_released
     creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
-    return unless current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released
-    return console?.log "Current observable mismatch for release", current_observable, observable if current_observable isnt observable
     return console?.log "Store references missing for release" unless store_references = _.find((observable.__kb?.stores_references or []), (store_references) => store_references.store is @)
-    return console?.log "Could not release observable. Reference count corrupt: #{store_references.ref_count}" if store_references.ref_count < 1
+    # return console?.log "Could not release observable. Reference count corrupt: #{store_references.ref_count}" if store_references.ref_count < 1
     return if --store_references.ref_count > 0 # do not release yet
-    delete @observable_records[@creatorId(creator)][@cid(obj)]
+    return unless current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released
+    delete @observable_records[@creatorId(creator)][@cid(obj)] if current_observable is observable # not already replaced
     kb.release(observable)
 
   refCount: (observable) ->
