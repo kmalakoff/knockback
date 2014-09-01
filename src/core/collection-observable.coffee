@@ -392,7 +392,7 @@ class kb.CollectionObservable
           view_models.push(view_model)
 
         # check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
-        @create_options.store.findOrReplace(model, @create_options.creator, view_model)
+        @create_options.store.retainWithReplace(model, @create_options.creator, view_model)
         models.push(model)
 
     # a change, update models
@@ -412,7 +412,7 @@ class kb.CollectionObservable
   # @nodoc
   _createViewModel: (model) ->
     return model if @models_only
-    return @create_options.store.findOrCreate(model, @create_options)
+    return @create_options.store.retainOrCreate(model, @create_options)
 
   # @nodoc
   _selectModel: (model) ->

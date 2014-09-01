@@ -71,13 +71,13 @@ module.exports = class TypedValue
 
     if new_observable
       value = new_observable
-      create_options.store.register(new_value, new_observable, creator) if create_options.store
+      create_options.store.retain(new_value, new_observable, creator) if create_options.store
 
     # found a creator
     else if creator
       # have the store, use it to create
       if create_options.store
-        value = create_options.store.findOrCreate(new_value, create_options)
+        value = create_options.store.retainOrCreate(new_value, create_options)
 
       # create manually
       else
@@ -111,7 +111,7 @@ module.exports = class TypedValue
 
     # release previous
     if previous_value
-      if @create_options.store and kb.utils.wrappedCreator(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
+      if @create_options.store then @create_options.store.release(previous_value) else kb.release(previous_value)
 
     # store the value
     @__kb_value = value

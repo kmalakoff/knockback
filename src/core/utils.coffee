@@ -90,6 +90,16 @@ class kb.utils
   @wrappedCreator: (obj, value) -> return _wrappedKey.apply(@, _argumentsAddKey(arguments, 'creator'))
 
   # @nodoc
+  @get: (obj, key, default_value) ->
+    return default_value unless obj.__kb
+    return if obj.__kb.hasOwnProperty(key) then obj.__kb[key] else default_value
+
+  @orSet: (obj, key, value) ->
+    obj.__kb or= {}
+    obj.__kb[key] = value unless obj.__kb.hasOwnProperty(key)
+    return obj.__kb[key]
+
+ # @nodoc
   @orSet: (obj, key, value) ->
     obj.__kb or= {}
     obj.__kb[key] = value unless obj.__kb.hasOwnProperty(key)
