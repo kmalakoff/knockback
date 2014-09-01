@@ -2065,7 +2065,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  TypedValue.prototype.update = function(new_value) {
-	    var new_observable, new_type, value, _ref1;
+	    var new_type, value, _ref1;
 	    if (this.__kb_released) {
 	      return;
 	    }
@@ -2081,8 +2081,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return value(new_value);
 	        }
 	        if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
-	          if (new_value && !kb.isCollection(new_value) && _.isFunction(new_value.collection)) {
-	            new_value = kb.peek(new_value.collection);
+	          if (new_value && new_value instanceof kb.CollectionObservable) {
+	            this._updateValueObservable(kb.peek(new_value.collection), new_value);
+	            return;
 	          }
 	          if (_.isFunction(value.collection)) {
 	            if (kb.peek(value.collection) !== new_value) {
@@ -2099,9 +2100,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case kb.TYPE_MODEL:
 	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
 	          if (new_value && !kb.isModel(new_value)) {
-	            new_observable = new_value;
-	            new_value = _.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value);
-	            this._updateValueObservable(new_value, new_observable);
+	            this._updateValueObservable((_.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value)), new_value);
 	            return;
 	          }
 	          if (_.isFunction(value.model) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
