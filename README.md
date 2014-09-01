@@ -4,8 +4,7 @@
 
 Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 
-Why Knockback?
-----------
+# Why Knockback?
 
 * Make amazingly dynamic applications by applying a small number of simple principles
 * Leverage the wonderful work from both the Backbone and Knockout communities
@@ -14,12 +13,29 @@ Why Knockback?
   * [Backbone-Relational.js](http://backbonerelational.org/)
 * Simplify program control flow by configuring your application from your HTML Views. It's like Angular.js but without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!
 
-An Example
-----------
+# Examples
 
-### The view model:
+### Simple
 
-Javascript
+###### The HTML:
+
+```html
+<label>First Name: </label><input data-bind="value: first_name, valueUpdate: 'keyup'" />
+<label>Last Name: </label><input data-bind="value: last_name, valueUpdate: 'keyup'" />
+```
+
+###### And...engage:
+
+```coffeescript
+model = new Backbone.Model({first_name: 'Bob', last_name: 'Smith'})
+ko.applyBindings(kb.viewModel(model))
+```
+
+### Advanced
+
+###### The View Model:
+
+**Javascript**
 
 ```javascript
 var ContactViewModel = kb.ViewModel.extend({
@@ -33,7 +49,7 @@ var ContactViewModel = kb.ViewModel.extend({
 
 ```
 
-or Coffeescript
+**or Coffeescript**
 
 ```coffeescript
 class ContactViewModel extends kb.ViewModel
@@ -43,28 +59,22 @@ class ContactViewModel extends kb.ViewModel
     @full_name = ko.computed => "#{@first_name()} #{@last_name()}"
 ```
 
-### The HTML:
+###### The HTML:
 
 ```html
 <h1 data-bind="text: 'Hello ' + full_name()"></h1>
 <label>First Name: </label><input data-bind="value: first_name, valueUpdate: 'keyup'" />
 <label>Last Name: </label><input data-bind="value: last_name, valueUpdate: 'keyup'" />
-<label>Email: </label><input data-bind="value: email" />
-<label>Birthdate: </label><input data-bind="value: date" />
 ```
 
-### And...engage:
+###### And...engage:
 
 ```coffeescript
-view_model = new ContactViewModel(new Backbone.Model({
-  first_name: 'Bob', last_name: 'Bob',
-  email: 'bob@bob.com',
-  date: new Date()
-}))
+model = new Backbone.Model({first_name: 'Bob', last_name: 'Smith'})
+view_model = new ContactViewModel(model)
 ko.applyBindings(view_model)
 
-# ...
-
+# ... do stuff then clean up
 kb.release(view_model)
 ```
 
@@ -72,8 +82,7 @@ And now when you type in the input boxes, the values are properly transferred to
 
 Of course, this is just a simple example, but hopefully you get the picture.
 
-Getting Started
-----------
+# Getting Started
 
 * [Website](http://kmalakoff.github.com/knockback/) - explore everything Knockback and connect to the community
 * [Tutorials](http://kmalakoff.github.io/knockback/tutorials_introduction.html) - try some live examples
@@ -82,8 +91,7 @@ Getting Started
 * [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) - demonstrates best practices when using Knockback.js including page routing and lifecycle management
 * [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
-Download Latest (0.19.4):
-----------
+# Download Latest (0.19.4):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
@@ -128,8 +136,7 @@ You can also find Knockback on your favorite distributions:
 * [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
 
 
-Contributing
-----------
+# Contributing
 
 To build the library for Node.js and browsers:
 
