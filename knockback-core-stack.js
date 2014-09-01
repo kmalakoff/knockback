@@ -1746,13 +1746,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Store.instances = [];
 
 	  Store.useOptionsOrCreate = function(options, obj, observable) {
-	    if (options.store) {
-	      options.store.register(obj, observable, options.creator);
-	      return kb.utils.wrappedStore(observable, options.store);
-	    } else {
+	    var store;
+	    if (!options.store) {
 	      kb.utils.wrappedStoreIsOwned(observable, true);
-	      return kb.utils.wrappedStore(observable, new kb.Store());
 	    }
+	    store = kb.utils.wrappedStore(observable, options.store || new kb.Store());
+	    store.register(obj, observable, options.creator);
+	    return store;
 	  };
 
 	  function Store() {
@@ -1811,12 +1811,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    creator || (creator = observable.constructor);
 	    kb.utils.wrappedObject(observable, obj);
+	    kb.utils.wrappedCreator(observable, creator);
 	    obj || (observable.__kb_null = true);
 	    if (current_observable = this.find(obj, creator)) {
 	      this.replaced_observables.push(current_observable);
 	    }
-	    kb.utils.wrappedObj(observable, obj);
-	    kb.utils.wrappedCreator(observable, creator);
 	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
 	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
 	    if (!(store_references = _.find(stores_references, (function(_this) {
@@ -1885,16 +1884,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observable;
 	  };
 
+	  Store.prototype.canReuse = function(observable) {
+	    return kb.utils.wrappedCreator(observable) && this.refCount(observable) === 1;
+	  };
+
+	  Store.prototype.reuse = function(observable, obj) {
+	    var creator, current_obj;
+	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
+	      return;
+	    }
+	    if (this.refCount(observable) !== 1) {
+	      throw new Error("Trying to change a shared view model. Reference count: " + (this.refCount(observable)));
+	    }
+	    kb.utils.wrappedObject(observable, obj);
+	    if (!(creator = kb.utils.wrappedCreator(observable))) {
+	      return typeof console !== "undefined" && console !== null ? console.log("Creator missing for reuse") : void 0;
+	    }
+	    delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
+	    return this.observable_records[this.creatorId(creator)][this.cid(obj)] = observable;
+	  };
+
 	  Store.prototype.release = function(observable) {
 	    var creator, current_observable, obj, store_references, _ref1;
 	    if (observable.__kb_released) {
 	      return;
 	    }
-	    if (!(obj = kb.utils.wrappedObj(observable))) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Object missing for release") : void 0;
-	    }
 	    if (!(creator = kb.utils.wrappedCreator(observable))) {
 	      return typeof console !== "undefined" && console !== null ? console.log("Creator missing for release") : void 0;
+	    }
+	    if (!(current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator))) {
+	      return;
+	    }
+	    if (current_observable !== observable) {
+	      return typeof console !== "undefined" && console !== null ? console.log("Current observable mismatch for release", current_observable, observable) : void 0;
 	    }
 	    if (!(store_references = _.find(((_ref1 = observable.__kb) != null ? _ref1.stores_references : void 0) || [], (function(_this) {
 	      return function(store_references) {
@@ -1909,30 +1931,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (--store_references.ref_count > 0) {
 	      return;
 	    }
-	    if ((current_observable = this.find(obj, creator)) !== observable) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Current observable mismatch for release") : void 0;
-	    }
 	    delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
 	    return kb.release(observable);
 	  };
 
 	  Store.prototype.refCount = function(observable) {
-	    var creator, obj, store_references, _ref1;
+	    var store_references, _ref1, _ref2;
 	    if (observable.__kb_released) {
 	      if (typeof console !== "undefined" && console !== null) {
 	        console.log("Observable already released");
-	      }
-	      return 0;
-	    }
-	    if (!(obj = kb.utils.wrappedObj(observable))) {
-	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("Object missing for release");
-	      }
-	      return 0;
-	    }
-	    if (!(creator = kb.utils.wrappedCreator(observable))) {
-	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("Creator missing for release");
 	      }
 	      return 0;
 	    }
@@ -1942,9 +1949,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    })(this)))) {
 	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("Store references missing for release");
+	        console.log("Store references missing for refCount", (_ref2 = observable.__kb) != null ? _ref2.stores_references : void 0);
 	      }
-	      return 0;
+	      return 1;
 	    }
 	    return store_references.ref_count;
 	  };
@@ -2067,7 +2074,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (new_value && !kb.isModel(new_value)) {
 	            new_value = _.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value);
 	          }
-	          if (_.isFunction(value.model) && (!this.create_options.store || (kb.utils.wrappedObj(value) && this.create_options.store.refCount(value) === 1))) {
+	          if (_.isFunction(value.model) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
 	            if (kb.peek(value.model) !== new_value) {
 	              value.model(new_value);
 	            }
@@ -2132,7 +2139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	    if (previous_value) {
-	      if (this.create_options.store && kb.utils.wrappedObj(previous_value)) {
+	      if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
 	        this.create_options.store.release(previous_value);
 	      } else {
 	        kb.release(previous_value);
@@ -2218,10 +2225,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  utils.wrappedObject = function(obj, value) {
 	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'object'));
-	  };
-
-	  utils.wrappedObj = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'obj'));
 	  };
 
 	  utils.wrappedCreator = function(obj, value) {
@@ -2553,12 +2556,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
-	              if (_this.__kb_null) {
-	                !new_model || kb._throwUnexpected(_this, 'model set on shared null');
-	                return;
-	              }
 	              event_watcher.emitter(new_model);
-	              kb.utils.wrappedObject(_this, event_watcher.ee);
+	              _this.__kb.store.reuse(_this, event_watcher.ee);
 	              _model(event_watcher.ee);
 	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);
 	            });

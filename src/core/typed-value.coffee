@@ -9,7 +9,7 @@ module.exports = class TypedValue
     @__kb_released = true
     if previous_value = @__kb_value
       @__kb_value = null
-      # if @create_options.store and kb.utils.wrappedObject(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
+      # if @create_options.store and kb.utils.wrappedCreator(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
       kb.release(previous_value)
     @create_options = null
 
@@ -110,7 +110,7 @@ module.exports = class TypedValue
 
     # release previous
     if previous_value
-      if @create_options.store and kb.utils.wrappedObject(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
+      if @create_options.store and kb.utils.wrappedCreator(previous_value) then @create_options.store.release(previous_value) else kb.release(previous_value)
 
     # store the value
     @__kb_value = value

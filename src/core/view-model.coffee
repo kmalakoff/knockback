@@ -133,10 +133,9 @@ class kb.ViewModel
       read: => ko.utils.unwrapObservable(_model)
       write: (new_model) => kb.ignore =>
         return if (kb.utils.wrappedObject(@) is new_model) or kb.wasReleased(@) or not event_watcher
-        (not new_model or kb._throwUnexpected(@, 'model set on shared null'); return) if this.__kb_null # SHARED NULL MODEL - keep it that way
 
         event_watcher.emitter(new_model)
-        kb.utils.wrappedObject(@, event_watcher.ee); _model(event_watcher.ee)
+        @__kb.store.reuse(@, event_watcher.ee); _model(event_watcher.ee)
         not event_watcher.ee or @createObservables(event_watcher.ee)
     }
     event_watcher = kb.utils.wrappedEventWatcher(@, new kb.EventWatcher(model, @, {emitter: @_model, update: (=> kb.ignore => not event_watcher?.ee or @createObservables(event_watcher?.ee))}))
