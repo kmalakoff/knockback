@@ -53,7 +53,7 @@ module.exports = class TypedValue
           if new_value and not kb.isModel(new_value)
             new_value = if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)
 
-          if _.isFunction(value.model) and (not @create_options.store or (kb.utils.wrappedObject(value) and @create_options.store.refCount(value) is 1))
+          if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value))
             value.model(new_value) if kb.peek(value.model) isnt new_value
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
