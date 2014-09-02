@@ -76,22 +76,16 @@ module.exports = class kb.Store
   # @example retain an observable with the store
   #   store.retain(observable, obj, creator);
   retain: (observable, obj, creator, reuse) ->
-    return unless @canRegister(observable)
+    return unless @_canRegister(observable)
     creator or= observable.constructor # default is to use the constructor
 
     if current_observable = @find(obj, creator)
-      (@getOrCreateStoreReferences(observable).ref_count++; return observable) if current_observable is observable # already in this store
-      @retire(current_observable)
+      (@_getOrCreateStoreReferences(observable).ref_count++; return observable) if current_observable is observable # already in this store
+      @_retire(current_observable)
 
-    @add(observable, obj, creator)
-    return if reuse and @getOrCreateStoreReferences(observable)?.ref_count > 0
-    @getOrCreateStoreReferences(observable).ref_count++
-    return observable
-
-  # @nodoc
-  find: (obj, creator) ->
-    return null unless records = @observable_records[@creatorId(creator)]
-    (delete records[@cid(obj)]; return null) if (observable = records[@cid(obj)])?.__kb_released
+    @_add(observable, obj, creator)
+    return if reuse and @_getOrCreateStoreReferences(observable)?.ref_count > 0
+    @_getOrCreateStoreReferences(observable).ref_count++
     return observable
 
   # Used to find an existing observable in the store or create a new one if it doesn't exist.
@@ -106,7 +100,7 @@ module.exports = class kb.Store
   # @example register an observable with the store
   #   observable = store.retainOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
   retainOrCreate: (obj, options) ->
-    return kb.utils.createFromDefaultCreator(obj, options) unless creator = @creator(obj, options)
+    return kb.utils.createFromDefaultCreator(obj, options) unless creator = @_creator(obj, options)
     return obj if creator.models_only
     return observable if observable = @find(obj, creator)
 
@@ -119,15 +113,15 @@ module.exports = class kb.Store
     return observable
 
   # @nodoc
-  canReuse: (observable) -> @refCount(observable) is 1
+  canReuse: (observable) -> @_refCount(observable) is 1
 
   # @nodoc
   reuse: (observable, obj) ->
     return if (current_obj = kb.utils.wrappedObject(observable)) is obj
-    throw new Error "Trying to change a shared view model. Reference count: #{@refCount(observable)}" unless @refCount(observable) is 1
+    throw new Error "Trying to change a shared view model. Reference count: #{@_refCount(observable)}" unless @_refCount(observable) is 1
 
     creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
-    @retire(current_observable) if not _.isUndefined(current_obj) and current_observable = @find(current_obj, creator)
+    @_retire(current_observable) if not _.isUndefined(current_obj) and current_observable = @find(current_obj, creator)
 
     @retain(observable, obj, creator, true)
     return
@@ -135,69 +129,75 @@ module.exports = class kb.Store
   # @nodoc
   release: (observable, force) ->
     # maybe be externally added
-    if store_references = @storeReferences(observable)
+    if store_references = @_storeReferences(observable)
       return if not force and --store_references.ref_count > 0 # do not release yet
-      @clearStoreReferences(observable)
+      @_clearStoreReferences(observable)
 
-    @remove(observable)
+    @_remove(observable)
 
     return if observable.__kb_released
     kb.release(observable)
 
-  refCount: (observable) ->
+  # @nodoc
+  find: (obj, creator) ->
+    return null unless records = @observable_records[@_creatorId(creator)]
+    (delete records[@_cid(obj)]; return null) if (observable = records[@_cid(obj)])?.__kb_released
+    return observable
+
+  _refCount: (observable) ->
     (console?.log "Observable already released"; return 0) if observable.__kb_released
-    return 1 unless store_references = @storeReferences(observable)
+    return 1 unless store_references = @_storeReferences(observable)
     return store_references.ref_count
 
   # @nodoc
-  canRegister: (observable) -> return observable and not ko.isObservable(observable) and not observable.__kb_is_co # only register view models not basic ko.observables nor kb.CollectionObservables
+  _canRegister: (observable) -> return observable and not ko.isObservable(observable) and not observable.__kb_is_co # only register view models not basic ko.observables nor kb.CollectionObservables
 
   # @nodoc
-  cid: (obj) -> cid = if obj then obj.cid or= _.uniqueId('c') else 'null'
+  _cid: (obj) -> cid = if obj then obj.cid or= _.uniqueId('c') else 'null'
 
   # @nodoc
-  creatorId: (creator) ->
+  _creatorId: (creator) ->
     create = creator.create or creator
     create.__kb_cids or= []
     return item.cid for item in create.__kb_cids when item.create is create
     create.__kb_cids.push(item = {create: create, cid: _.uniqueId('kb')}); return item.cid
 
   # @nodoc
-  storeReferences: (observable) ->
+  _storeReferences: (observable) ->
     return unless stores_references = kb.utils.get(observable, 'stores_references')
     return _.find(stores_references, (store_references) => store_references.store is @)
 
   # @nodoc
-  getOrCreateStoreReferences: (observable) ->
+  _getOrCreateStoreReferences: (observable) ->
     stores_references = kb.utils.orSet(observable, 'stores_references', [])
     unless store_references = _.find(stores_references, (store_references) => store_references.store is @)
       stores_references.push(store_references = {store: @, ref_count: 0, release: => @release(observable)})
     return store_references
 
   # @nodoc
-  clearStoreReferences: (observable) ->
+  _clearStoreReferences: (observable) ->
     if stores_references = kb.utils.get(observable, 'stores_references')
       (observable.__kb.stores_references.splice(index, 1); break) for index, store_references of observable.__kb.stores_references when store_references.store is @
     return
 
   # @nodoc
-  retire: (observable) -> @clearStoreReferences(observable); @replaced_observables.push(observable); @remove(observable)
+  _retire: (observable) -> @_clearStoreReferences(observable); @replaced_observables.push(observable); @_remove(observable)
 
   # @nodoc
-  add: (observable, obj, creator) ->
+  _add: (observable, obj, creator) ->
     creator or= observable.constructor # default is to use the constructor
     kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator)
-    (@observable_records[@creatorId(creator)] or= {})[@cid(obj)] = observable
+    (@observable_records[@_creatorId(creator)] or= {})[@_cid(obj)] = observable
 
   # @nodoc
-  remove: (observable) ->
+  _remove: (observable) ->
     creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
     if current_observable = @find(obj = kb.utils.wrappedObject(observable), creator) # already released
-      delete @observable_records[@creatorId(creator)][@cid(obj)] if current_observable is observable # not already replaced
+      delete @observable_records[@_creatorId(creator)][@_cid(obj)] if current_observable is observable # not already replaced
     kb.utils.wrappedObject(observable, null); kb.utils.wrappedCreator(observable, null)
 
   # @nodoc
-  creator: (obj, options) ->
+  _creator: (obj, options) ->
     return options.creator if options.creator
     return creator if creator = kb.utils.inferCreator(obj, options.factory, options.path)
     return kb.ViewModel if (obj instanceof kb.Model)

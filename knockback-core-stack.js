@@ -1731,40 +1731,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Store.prototype.retain = function(observable, obj, creator, reuse) {
 	    var current_observable, _ref1;
-	    if (!this.canRegister(observable)) {
+	    if (!this._canRegister(observable)) {
 	      return;
 	    }
 	    creator || (creator = observable.constructor);
 	    if (current_observable = this.find(obj, creator)) {
 	      if (current_observable === observable) {
-	        this.getOrCreateStoreReferences(observable).ref_count++;
+	        this._getOrCreateStoreReferences(observable).ref_count++;
 	        return observable;
 	      }
-	      this.retire(current_observable);
+	      this._retire(current_observable);
 	    }
-	    this.add(observable, obj, creator);
-	    if (reuse && ((_ref1 = this.getOrCreateStoreReferences(observable)) != null ? _ref1.ref_count : void 0) > 0) {
+	    this._add(observable, obj, creator);
+	    if (reuse && ((_ref1 = this._getOrCreateStoreReferences(observable)) != null ? _ref1.ref_count : void 0) > 0) {
 	      return;
 	    }
-	    this.getOrCreateStoreReferences(observable).ref_count++;
-	    return observable;
-	  };
-
-	  Store.prototype.find = function(obj, creator) {
-	    var observable, records, _ref1;
-	    if (!(records = this.observable_records[this.creatorId(creator)])) {
-	      return null;
-	    }
-	    if ((_ref1 = (observable = records[this.cid(obj)])) != null ? _ref1.__kb_released : void 0) {
-	      delete records[this.cid(obj)];
-	      return null;
-	    }
+	    this._getOrCreateStoreReferences(observable).ref_count++;
 	    return observable;
 	  };
 
 	  Store.prototype.retainOrCreate = function(obj, options) {
 	    var creator, observable;
-	    if (!(creator = this.creator(obj, options))) {
+	    if (!(creator = this._creator(obj, options))) {
 	      return kb.utils.createFromDefaultCreator(obj, options);
 	    }
 	    if (creator.models_only) {
@@ -1788,7 +1776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.canReuse = function(observable) {
-	    return this.refCount(observable) === 1;
+	    return this._refCount(observable) === 1;
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
@@ -1796,32 +1784,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
-	    if (this.refCount(observable) !== 1) {
-	      throw new Error("Trying to change a shared view model. Reference count: " + (this.refCount(observable)));
+	    if (this._refCount(observable) !== 1) {
+	      throw new Error("Trying to change a shared view model. Reference count: " + (this._refCount(observable)));
 	    }
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (!_.isUndefined(current_obj) && (current_observable = this.find(current_obj, creator))) {
-	      this.retire(current_observable);
+	      this._retire(current_observable);
 	    }
 	    this.retain(observable, obj, creator, true);
 	  };
 
 	  Store.prototype.release = function(observable, force) {
 	    var store_references;
-	    if (store_references = this.storeReferences(observable)) {
+	    if (store_references = this._storeReferences(observable)) {
 	      if (!force && --store_references.ref_count > 0) {
 	        return;
 	      }
-	      this.clearStoreReferences(observable);
+	      this._clearStoreReferences(observable);
 	    }
-	    this.remove(observable);
+	    this._remove(observable);
 	    if (observable.__kb_released) {
 	      return;
 	    }
 	    return kb.release(observable);
 	  };
 
-	  Store.prototype.refCount = function(observable) {
+	  Store.prototype.find = function(obj, creator) {
+	    var observable, records, _ref1;
+	    if (!(records = this.observable_records[this._creatorId(creator)])) {
+	      return null;
+	    }
+	    if ((_ref1 = (observable = records[this._cid(obj)])) != null ? _ref1.__kb_released : void 0) {
+	      delete records[this._cid(obj)];
+	      return null;
+	    }
+	    return observable;
+	  };
+
+	  Store.prototype._refCount = function(observable) {
 	    var store_references;
 	    if (observable.__kb_released) {
 	      if (typeof console !== "undefined" && console !== null) {
@@ -1829,22 +1829,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      return 0;
 	    }
-	    if (!(store_references = this.storeReferences(observable))) {
+	    if (!(store_references = this._storeReferences(observable))) {
 	      return 1;
 	    }
 	    return store_references.ref_count;
 	  };
 
-	  Store.prototype.canRegister = function(observable) {
+	  Store.prototype._canRegister = function(observable) {
 	    return observable && !ko.isObservable(observable) && !observable.__kb_is_co;
 	  };
 
-	  Store.prototype.cid = function(obj) {
+	  Store.prototype._cid = function(obj) {
 	    var cid;
 	    return cid = obj ? obj.cid || (obj.cid = _.uniqueId('c')) : 'null';
 	  };
 
-	  Store.prototype.creatorId = function(creator) {
+	  Store.prototype._creatorId = function(creator) {
 	    var create, item, _i, _len, _ref1;
 	    create = creator.create || creator;
 	    create.__kb_cids || (create.__kb_cids = []);
@@ -1862,7 +1862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return item.cid;
 	  };
 
-	  Store.prototype.storeReferences = function(observable) {
+	  Store.prototype._storeReferences = function(observable) {
 	    var stores_references;
 	    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
 	      return;
@@ -1874,7 +1874,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    })(this));
 	  };
 
-	  Store.prototype.getOrCreateStoreReferences = function(observable) {
+	  Store.prototype._getOrCreateStoreReferences = function(observable) {
 	    var store_references, stores_references;
 	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
 	    if (!(store_references = _.find(stores_references, (function(_this) {
@@ -1895,7 +1895,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return store_references;
 	  };
 
-	  Store.prototype.clearStoreReferences = function(observable) {
+	  Store.prototype._clearStoreReferences = function(observable) {
 	    var index, store_references, stores_references, _ref1;
 	    if (stores_references = kb.utils.get(observable, 'stores_references')) {
 	      _ref1 = observable.__kb.stores_references;
@@ -1909,33 +1909,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Store.prototype.retire = function(observable) {
-	    this.clearStoreReferences(observable);
+	  Store.prototype._retire = function(observable) {
+	    this._clearStoreReferences(observable);
 	    this.replaced_observables.push(observable);
-	    return this.remove(observable);
+	    return this._remove(observable);
 	  };
 
-	  Store.prototype.add = function(observable, obj, creator) {
+	  Store.prototype._add = function(observable, obj, creator) {
 	    var _base, _name;
 	    creator || (creator = observable.constructor);
 	    kb.utils.wrappedObject(observable, obj);
 	    kb.utils.wrappedCreator(observable, creator);
-	    return ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
+	    return ((_base = this.observable_records)[_name = this._creatorId(creator)] || (_base[_name] = {}))[this._cid(obj)] = observable;
 	  };
 
-	  Store.prototype.remove = function(observable) {
+	  Store.prototype._remove = function(observable) {
 	    var creator, current_observable, obj;
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
 	    if (current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator)) {
 	      if (current_observable === observable) {
-	        delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
+	        delete this.observable_records[this._creatorId(creator)][this._cid(obj)];
 	      }
 	    }
 	    kb.utils.wrappedObject(observable, null);
 	    return kb.utils.wrappedCreator(observable, null);
 	  };
 
-	  Store.prototype.creator = function(obj, options) {
+	  Store.prototype._creator = function(obj, options) {
 	    var creator;
 	    if (options.creator) {
 	      return options.creator;
