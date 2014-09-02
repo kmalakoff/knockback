@@ -1806,7 +1806,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (observable.__kb_released) {
 	      return;
 	    }
-	    return kb.release(observable);
+	    if (force || this._globalRefCount(observable) <= 1) {
+	      return kb.release(observable);
+	    }
 	  };
 
 	  Store.prototype.find = function(obj, creator) {
@@ -1825,7 +1827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var store_references;
 	    if (observable.__kb_released) {
 	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("Observable already released");
+	        console.log('Observable already released');
 	      }
 	      return 0;
 	    }
@@ -1833,6 +1835,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return 1;
 	    }
 	    return store_references.ref_count;
+	  };
+
+	  Store.prototype._globalRefCount = function(observable) {
+	    var stores_references;
+	    if (observable.__kb_released) {
+	      if (typeof console !== "undefined" && console !== null) {
+	        console.log('Observable already released');
+	      }
+	      return 0;
+	    }
+	    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
+	      return 0;
+	    }
+	    return _.reduce(stores_references, (function(memo, store_references) {
+	      return memo + store_references.ref_count;
+	    }), 0);
 	  };
 
 	  Store.prototype._canRegister = function(observable) {

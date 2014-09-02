@@ -136,7 +136,7 @@ module.exports = class kb.Store
     @_remove(observable)
 
     return if observable.__kb_released
-    kb.release(observable)
+    kb.release(observable) if force or @_globalRefCount(observable) <= 1 # allow for a single initial reference in another store
 
   # @nodoc
   find: (obj, creator) ->
@@ -145,9 +145,14 @@ module.exports = class kb.Store
     return observable
 
   _refCount: (observable) ->
-    (console?.log "Observable already released"; return 0) if observable.__kb_released
+    (console?.log 'Observable already released'; return 0) if observable.__kb_released
     return 1 unless store_references = @_storeReferences(observable)
     return store_references.ref_count
+
+  _globalRefCount: (observable) ->
+    (console?.log 'Observable already released'; return 0) if observable.__kb_released
+    return 0 unless stores_references = kb.utils.get(observable, 'stores_references')
+    return _.reduce(stores_references, ((memo, store_references) -> memo + store_references.ref_count), 0)
 
   # @nodoc
   _canRegister: (observable) -> return observable and not ko.isObservable(observable) and not observable.__kb_is_co # only register view models not basic ko.observables nor kb.CollectionObservables
