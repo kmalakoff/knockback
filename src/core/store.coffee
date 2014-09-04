@@ -113,7 +113,14 @@ module.exports = class kb.Store
     return observable
 
   # @nodoc
-  canReuse: (observable) -> @_refCount(observable) is 1
+  canReuse: (observable) ->
+    return false if observable.__kb_released
+    return true unless store_references = @_storeReferences(observable)
+    return true if (global_ref_count = @_globalRefCount(observable)) is 1 # only one reference
+
+    # we don't own and there is only one other reference
+    store = kb.utils.wrappedStore(observable)
+    return (not store or store isnt @) and ((global_ref_count - @_refCount(observable)) <= 1)
 
   # @nodoc
   reuse: (observable, obj) ->

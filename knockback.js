@@ -1783,7 +1783,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.canReuse = function(observable) {
-	    return this._refCount(observable) === 1;
+	    var global_ref_count, store, store_references;
+	    if (observable.__kb_released) {
+	      return false;
+	    }
+	    if (!(store_references = this._storeReferences(observable))) {
+	      return true;
+	    }
+	    if ((global_ref_count = this._globalRefCount(observable)) === 1) {
+	      return true;
+	    }
+	    store = kb.utils.wrappedStore(observable);
+	    return (!store || store !== this) && ((global_ref_count - this._refCount(observable)) <= 1);
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
