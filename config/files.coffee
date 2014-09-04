@@ -8,7 +8,6 @@ PLUGIN_ENTRIES =
   formatting: './src/formatting/formatted-observable.coffee'
   localization: './src/localization/localized-observable.coffee'
   triggering: './src/triggering/triggered-observable.coffee'
-  validation: './src/validation/validation.coffee'
 
 module.exports =
   libraries: _.flatten(_.map(_.filter(fs.readdirSync('./config/builds/library'), (file) -> path.extname(file) is '.coffee' and file.indexOf('webpack.config.coffee') >= 0), (file) -> [file.replace('webpack.config.coffee', 'js'), file.replace('webpack.config.coffee', 'min.js')]))

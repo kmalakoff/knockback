@@ -3,6 +3,7 @@ Please refer to the following release notes when upgrading your version of Knock
 ## 0.20.0
 * Bug fix for shared view models: https://github.com/kmalakoff/knockback/issues/113. You will now get warnings if you try to change a model on a shared ViewModel.
 * Added variants for creating a Collection Observable: kb.collectionObservable(YourViewModel), kb.collectionObservable(YourViewModel, options), kb.collectionObservable(new YourCollection(), YourViewModel, options)
+* Removed support for validations.
 
 ## 0.19.4
 * Bug fix for extracting a Model when setting by kb.ViewModel and to extract a Collection when setting by kb.CollectionObservable.
