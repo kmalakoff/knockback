@@ -575,7 +575,8 @@ describe 'localized-observable @quick @localization', ->
       assert.equal(view_model.name(), name, "#{name}: Name matches")
       assert.equal(view_model.date().valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
 
-    validateModel = (model, name, birthdate) ->
+    validateModel = (view_model, name, birthdate) ->
+      model = view_model.model()
       assert.equal(model.get('name'), name, "#{name}: Name matches")
       assert.equal(model.get('date').valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
 

@@ -36,11 +36,7 @@ module.exports = class TypedValue
         if new_type is kb.TYPE_COLLECTION or _.isNull(new_value)
           # use the provided CollectionObservable
           if new_value and new_value instanceof kb.CollectionObservable
-            @_updateValueObservable(kb.peek(new_value.collection), new_value)
-            return
-
-          if _.isFunction(value.collection) and (not @create_options.store or @create_options.store.canReuse(value, new_value))
-            value.collection(new_value) if kb.peek(value.collection) isnt new_value
+            @_updateValueObservable(kb.utils.wrappedObject(new_value), new_value)
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
           return
@@ -49,11 +45,7 @@ module.exports = class TypedValue
         if new_type is kb.TYPE_MODEL or _.isNull(new_value)
           # use the provided ViewModel
           if new_value and not kb.isModel(new_value)
-            @_updateValueObservable((if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)), new_value)
-            return
-
-          if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value, new_value))
-            value.model(new_value) if kb.peek(value.model) isnt kb.utils.resolveModel(new_value)
+            @_updateValueObservable(kb.utils.wrappedObject(new_value), new_value)
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt kb.utils.resolveModel(new_value)
           return
@@ -65,8 +57,17 @@ module.exports = class TypedValue
 
   _updateValueObservable: (new_value, new_observable) ->
     create_options = @create_options
-    creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path)
-    @value_type = kb.TYPE_UNKNOWN
+    creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path)
+
+    # retain previous type
+    if (new_value is null) and not creator
+      if @value_type is kb.TYPE_MODEL
+        creator = kb.ViewModel
+      else if @value_type is kb.TYPE_COLLECTION
+        creator = kb.CollectionObservable
+    create_options.creator = creator
+
+    value_type = kb.TYPE_UNKNOWN
     [previous_value, @__kb_value] = [@__kb_value, undefined]
 
     if new_observable
@@ -83,7 +84,7 @@ module.exports = class TypedValue
       else
         if creator.models_only
           value = new_value
-          @value_type = kb.TYPE_SIMPLE
+          value_type = kb.TYPE_SIMPLE
         else if creator.create
           value = creator.create(new_value, create_options)
         else
@@ -92,21 +93,21 @@ module.exports = class TypedValue
     # create and cache the type
     else
       if _.isArray(new_value)
-        @value_type = kb.TYPE_ARRAY
+        value_type = kb.TYPE_ARRAY
         value = ko.observableArray(new_value)
       else
-        @value_type = kb.TYPE_SIMPLE
+        value_type = kb.TYPE_SIMPLE
         value = ko.observable(new_value)
 
     # determine the type
-    if @value_type is kb.TYPE_UNKNOWN
+    if (@value_type = value_type) is kb.TYPE_UNKNOWN
       if not ko.isObservable(value) # a view model, recognize view_models as non-observable
         @value_type = kb.TYPE_MODEL
         kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value))
       else if value.__kb_is_co
         @value_type = kb.TYPE_COLLECTION
         kb.utils.wrappedObject(value, new_value)
-      else
+      else if not @value_type
         @value_type = kb.TYPE_SIMPLE
 
     # release previous
@@ -116,3 +117,5 @@ module.exports = class TypedValue
     # store the value
     @__kb_value = value
     @_vo(value)
+
+  _inferType: (value) ->

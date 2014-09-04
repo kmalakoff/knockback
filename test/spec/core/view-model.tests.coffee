@@ -327,7 +327,8 @@ describe 'view-model @quick @view-model', ->
       assert.equal(view_model.name(), name, "#{name}: Name matches")
       assert.equal(view_model.date().valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
 
-    validateModel = (model, name, birthdate) ->
+    validateModel = (view_model, name, birthdate) ->
+      model = view_model.model()
       assert.equal(model.get('name'), name, "#{name}: Name matches")
       assert.equal(model.get('date').valueOf(), birthdate.valueOf(), "#{name}: Birthdate matches")
 
@@ -357,7 +358,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '8. Changing attribute types', (done) ->
+  it '8a. Changing attribute types', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     model = new kb.Model({reused: null})
@@ -366,6 +367,9 @@ describe 'view-model @quick @view-model', ->
 
     model.set({reused: new kb.Model()})
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
+
+    model.set({reused: null})
+    assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is retains type of kb.TYPE_MODEL')
 
     model.set({reused: new kb.Collection()})
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
@@ -376,14 +380,26 @@ describe 'view-model @quick @view-model', ->
     # clean up
     kb.release(view_model)
 
-    # add custom mapping
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  it '8b. Changing attribute types', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model = new kb.Model({reused: null})
     view_model = kb.viewModel(model, {factories:
-      reused: (obj, options) -> return if kb.isCollection(obj) then kb.collectionObservable(obj, options) else kb.viewModel(obj, options)
+      reused: {create: (obj, options) ->
+        return kb.collectionObservable(obj, options) if kb.isCollection(obj) or ((obj is null) and (kb.utils.valueType(view_model?.reused) is kb.TYPE_COLLECTION))
+        return kb.viewModel(obj, options)
+      }
     })
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 
     model.set({reused: new kb.Model()})
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
+
+    model.set({reused: null})
+    assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused retains type of kb.TYPE_MODEL')
 
     model.set({reused: new kb.Collection()})
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION')
@@ -988,7 +1004,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal view_model.model2().model(), null, 'model2 is null'
 
     # cannot change a shared model
-    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Reference count: 2'
+    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Store ref count: 2. Global ref count: 2'
     assert.equal view_model.model1().model(), null, 'model1 is still null'
     assert.ok !view_model.model1().name, 'name has not been added to the shared view model'
 
@@ -1017,7 +1033,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal view_model.model2().name(), 'Fred', 'name is Fred'
 
     # cannot change a shared model
-    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Reference count: 2'
+    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Store ref count: 2. Global ref count: 2'
     assert.equal view_model.model1().model(), model, 'model1 is still model'
     assert.equal view_model.model1().name(), 'Fred', 'name has not been changed'
 
