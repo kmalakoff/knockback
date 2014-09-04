@@ -978,7 +978,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
         super model, {requires: ['nested'], options: options}
         @removeNested = => model.get('nested').destroy()
         @addNested = => model.set({nested: new Model2()})
-        @hasNested = ko.computed => !!@nested()
+        @hasNested = ko.computed => !!@nested()?.model()
 
     view_model = new ViewModel(model = new Model1())
     assert.ok !view_model.hasNested(), 'not have a nested'

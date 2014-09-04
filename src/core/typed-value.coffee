@@ -38,7 +38,7 @@ module.exports = class TypedValue
           if new_value and new_value instanceof kb.CollectionObservable
             @_updateValueObservable(kb.utils.wrappedObject(new_value), new_value)
           else
-            @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
+            value.collection(new_value) if value.collection() isnt new_value # collection observables are allocated once
           return
 
       when kb.TYPE_MODEL
