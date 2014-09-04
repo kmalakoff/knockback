@@ -105,7 +105,7 @@ Please see the [release notes](https://github.com/kmalakoff/knockback/blob/maste
 
 The **full versions** bundle advanced features.
 
-The **core versions** remove advanced features that can be included separately: localization, formatting, triggering, and defaults.
+The **core versions** remove advanced features that can be included separately: localization, formatting, triggering, defaults, and validation.
 
 The **stack versions** provide Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.
 

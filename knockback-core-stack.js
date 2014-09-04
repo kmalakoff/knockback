@@ -6104,7 +6104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/*** IMPORTS FROM imports-loader ***/
-	var require = false;
+	var require = __webpack_require__;
 
 	/*!
 	 * Knockout JavaScript library v3.2.0

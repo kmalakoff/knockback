@@ -10,14 +10,14 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["knockout", "backbone", "underscore"], function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__) {
-			return factory(__WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, root["jQuery"]);
+		define(["knockout", "backbone", "underscore"], function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__) {
+			return factory(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, root["jQuery"]);
 		});
 	else if(typeof exports === 'object')
 		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else
 		root["kb"] = factory(root["ko"], root["Backbone"], root["_"], root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_19__, __WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_23__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -81,6 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(16);
 	__webpack_require__(17);
 	__webpack_require__(18);
+	__webpack_require__(19);
 	module.exports = __webpack_require__(14);
 
 
@@ -561,9 +562,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	ALL_ORMS = {
 	  "default": null,
 	  'backbone-orm': null,
-	  'backbone-associations': __webpack_require__(24),
-	  'backbone-relational': __webpack_require__(25),
-	  supermodel: __webpack_require__(26)
+	  'backbone-associations': __webpack_require__(26),
+	  'backbone-relational': __webpack_require__(27),
+	  supermodel: __webpack_require__(28)
 	};
 
 	kb.orm = ALL_ORMS["default"];
@@ -1063,7 +1064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	ko = __webpack_require__(19);
+	ko = __webpack_require__(20);
 
 	LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -1245,7 +1246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return value;
 	  };
 
-	  kb.extend = __webpack_require__(27);
+	  kb.extend = __webpack_require__(29);
 
 	  kb._throwMissing = function(instance, message) {
 	    throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
@@ -1291,8 +1292,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Backbone = kb.Parse = window.Parse;
 	  _ = kb._ = window.Parse._;
 	} else {
-	  Backbone = kb.Backbone = __webpack_require__(20);
-	  _ = kb._ = __webpack_require__(21);
+	  Backbone = kb.Backbone = __webpack_require__(21);
+	  _ = kb._ = __webpack_require__(22);
 	}
 
 	kb.ko = ko;
@@ -1306,7 +1307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.$ = window.jQuery || window.$;
 
 	try {
-	  kb.$ || (kb.$ = __webpack_require__(22));
+	  kb.$ || (kb.$ = __webpack_require__(23));
 	} catch (_error) {}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
@@ -2246,7 +2247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  utils.wrappedDestroy = __webpack_require__(28);
+	  utils.wrappedDestroy = __webpack_require__(30);
 
 	  utils.valueType = function(observable) {
 	    if (!observable) {
@@ -2315,9 +2316,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
 	  };
 
-	  utils.collapseOptions = __webpack_require__(29);
+	  utils.collapseOptions = __webpack_require__(31);
 
-	  utils.unwrapModels = __webpack_require__(30);
+	  utils.unwrapModels = __webpack_require__(32);
 
 	  utils.resolveModel = function(model) {
 	    if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) {
@@ -2585,7 +2586,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	__webpack_require__(23);
+	__webpack_require__(24);
 
 	KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
@@ -2952,7 +2953,161 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_19__;
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var $, callOrGet, kb, ko, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+
+	__webpack_require__(25);
+
+	callOrGet = function(value) {
+	  value = ko.utils.unwrapObservable(value);
+	  if (typeof value === 'function') {
+	    return value.apply(null, Array.prototype.slice.call(arguments, 1));
+	  } else {
+	    return value;
+	  }
+	};
+
+	module.exports = kb.Validation = (function() {
+	  function Validation() {}
+
+	  return Validation;
+
+	})();
+
+	kb.valueValidator = function(value, bindings, validation_options) {
+	  if (validation_options == null) {
+	    validation_options = {};
+	  }
+	  (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
+	  return ko.computed(function() {
+	    var active_index, current_value, disabled, identifier, identifier_index, priorities, results, validator;
+	    results = {
+	      $error_count: 0
+	    };
+	    current_value = ko.utils.unwrapObservable(value);
+	    !('disable' in validation_options) || (disabled = callOrGet(validation_options.disable));
+	    !('enable' in validation_options) || (disabled = !callOrGet(validation_options.enable));
+	    priorities = validation_options.priorities || [];
+	    _.isArray(priorities) || (priorities = [priorities]);
+	    active_index = priorities.length + 1;
+	    for (identifier in bindings) {
+	      validator = bindings[identifier];
+	      results[identifier] = !disabled && callOrGet(validator, current_value);
+	      if (results[identifier]) {
+	        results.$error_count++;
+	        (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
+	        if (results.$active_error && identifier_index < active_index) {
+	          results.$active_error = identifier;
+	          active_index = identifier_index;
+	        } else {
+	          results.$active_error || (results.$active_error = identifier, active_index = identifier_index);
+	        }
+	      }
+	    }
+	    results.$enabled = !disabled;
+	    results.$disable = !!disabled;
+	    results.$valid = results.$error_count === 0;
+	    return results;
+	  });
+	};
+
+	kb.inputValidator = function(view_model, el, validation_options) {
+	  var $input_el, bindings, identifier, input_name, options, result, type, validator, validators, _ref1;
+	  if (validation_options == null) {
+	    validation_options = {};
+	  }
+	  (validation_options && !(typeof validation_options === 'function')) || (validation_options = {});
+	  validators = kb.valid;
+	  $input_el = $(el);
+	  if ((input_name = $input_el.attr('name')) && !_.isString(input_name)) {
+	    input_name = null;
+	  }
+	  if (!(bindings = $input_el.attr('data-bind'))) {
+	    return null;
+	  }
+	  options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
+	  if (!(options && options.value)) {
+	    return null;
+	  }
+	  (!options.validation_options) || (_.defaults(options.validation_options, validation_options), validation_options = options.validation_options);
+	  bindings = {};
+	  (!validators[type = $input_el.attr('type')]) || (bindings[type] = validators[type]);
+	  (!$input_el.attr('required')) || (bindings.required = validators.required);
+	  if (options.validations) {
+	    _ref1 = options.validations;
+	    for (identifier in _ref1) {
+	      validator = _ref1[identifier];
+	      bindings[identifier] = validator;
+	    }
+	  }
+	  result = kb.valueValidator(options.value, bindings, validation_options);
+	  (!input_name && !validation_options.no_attach) || (view_model["$" + input_name] = result);
+	  return result;
+	};
+
+	kb.formValidator = function(view_model, el) {
+	  var $root_el, bindings, form_name, input_el, name, options, results, validation_options, validator, validators, _i, _len, _ref1;
+	  results = {};
+	  validators = [];
+	  $root_el = $(el);
+	  if ((form_name = $root_el.attr('name')) && !_.isString(form_name)) {
+	    form_name = null;
+	  }
+	  if ((bindings = $root_el.attr('data-bind'))) {
+	    options = (new Function("sc", "with(sc[0]) { return { " + bindings + " } }"))([view_model]);
+	    validation_options = options.validation_options;
+	  }
+	  validation_options || (validation_options = {});
+	  validation_options.no_attach = !!form_name;
+	  _ref1 = $root_el.find('input');
+	  for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+	    input_el = _ref1[_i];
+	    if (!(name = $(input_el).attr('name'))) {
+	      continue;
+	    }
+	    validator = kb.inputValidator(view_model, input_el, validation_options);
+	    !validator || validators.push(results[name] = validator);
+	  }
+	  results.$error_count = ko.computed(function() {
+	    var error_count, _j, _len1;
+	    error_count = 0;
+	    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
+	      validator = validators[_j];
+	      error_count += validator().$error_count;
+	    }
+	    return error_count;
+	  });
+	  results.$valid = ko.computed(function() {
+	    return results.$error_count() === 0;
+	  });
+	  results.$enabled = ko.computed(function() {
+	    var enabled, _j, _len1;
+	    enabled = true;
+	    for (_j = 0, _len1 = validators.length; _j < _len1; _j++) {
+	      validator = validators[_j];
+	      enabled &= validator().$enabled;
+	    }
+	    return enabled;
+	  });
+	  results.$disabled = ko.computed(function() {
+	    return !results.$enabled();
+	  });
+	  if (form_name) {
+	    view_model["$" + form_name] = results;
+	  }
+	  return results;
+	};
+
 
 /***/ },
 /* 20 */
@@ -2970,11 +3125,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	if(typeof __WEBPACK_EXTERNAL_MODULE_22__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
 	module.exports = __WEBPACK_EXTERNAL_MODULE_22__;
 
 /***/ },
 /* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	if(typeof __WEBPACK_EXTERNAL_MODULE_23__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
+	module.exports = __WEBPACK_EXTERNAL_MODULE_23__;
+
+/***/ },
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3032,7 +3193,123 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 24 */
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var $, EMAIL_REGEXP, NUMBER_REGEXP, URL_REGEXP, kb, ko, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+
+	URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+
+	EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
+
+	NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
+
+	kb.valid = {
+	  required: function(value) {
+	    return !value;
+	  },
+	  url: function(value) {
+	    return !URL_REGEXP.test(value);
+	  },
+	  email: function(value) {
+	    return !EMAIL_REGEXP.test(value);
+	  },
+	  number: function(value) {
+	    return !NUMBER_REGEXP.test(value);
+	  }
+	};
+
+	kb.hasChangedFn = function(model) {
+	  var attributes, m;
+	  m = null;
+	  attributes = null;
+	  return function() {
+	    var current_model;
+	    if (m !== (current_model = ko.utils.unwrapObservable(model))) {
+	      m = current_model;
+	      attributes = (m ? m.toJSON() : null);
+	      return false;
+	    }
+	    if (!(m && attributes)) {
+	      return false;
+	    }
+	    return !_.isEqual(m.toJSON(), attributes);
+	  };
+	};
+
+	kb.minLengthFn = function(length) {
+	  return function(value) {
+	    return !value || value.length < length;
+	  };
+	};
+
+	kb.uniqueValueFn = function(model, key, collection) {
+	  return function(value) {
+	    var c, k, m;
+	    m = ko.utils.unwrapObservable(model);
+	    k = ko.utils.unwrapObservable(key);
+	    c = ko.utils.unwrapObservable(collection);
+	    if (!(m && k && c)) {
+	      return false;
+	    }
+	    return !!_.find(c.models, (function(_this) {
+	      return function(test) {
+	        return (test !== m) && test.get(k) === value;
+	      };
+	    })(this));
+	  };
+	};
+
+	kb.untilTrueFn = function(stand_in, fn, model) {
+	  var was_true;
+	  was_true = false;
+	  if (model && ko.isObservable(model)) {
+	    model.subscribe(function() {
+	      return was_true = false;
+	    });
+	  }
+	  return function(value) {
+	    var f, result;
+	    if (!(f = ko.utils.unwrapObservable(fn))) {
+	      return ko.utils.unwrapObservable(stand_in);
+	    }
+	    was_true |= !!(result = f(ko.utils.unwrapObservable(value)));
+	    return (was_true ? result : ko.utils.unwrapObservable(stand_in));
+	  };
+	};
+
+	kb.untilFalseFn = function(stand_in, fn, model) {
+	  var was_false;
+	  was_false = false;
+	  if (model && ko.isObservable(model)) {
+	    model.subscribe(function() {
+	      return was_false = false;
+	    });
+	  }
+	  return function(value) {
+	    var f, result;
+	    if (!(f = ko.utils.unwrapObservable(fn))) {
+	      return ko.utils.unwrapObservable(stand_in);
+	    }
+	    was_false |= !(result = f(ko.utils.unwrapObservable(value)));
+	    return (was_false ? result : ko.utils.unwrapObservable(stand_in));
+	  };
+	};
+
+
+/***/ },
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3089,7 +3366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3173,7 +3450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -3260,7 +3537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3337,7 +3614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3388,7 +3665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3486,7 +3763,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
