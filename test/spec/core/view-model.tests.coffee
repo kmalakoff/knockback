@@ -1004,7 +1004,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal view_model.model2().model(), null, 'model2 is null'
 
     # cannot change a shared model
-    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Store ref count: 2. Global ref count: 2'
+    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Ref count: 2'
     assert.equal view_model.model1().model(), null, 'model1 is still null'
     assert.ok !view_model.model1().name, 'name has not been added to the shared view model'
 
@@ -1033,7 +1033,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal view_model.model2().name(), 'Fred', 'name is Fred'
 
     # cannot change a shared model
-    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Store ref count: 2. Global ref count: 2'
+    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Ref count: 2'
     assert.equal view_model.model1().model(), model, 'model1 is still model'
     assert.equal view_model.model1().name(), 'Fred', 'name has not been changed'
 

@@ -116,7 +116,7 @@ module.exports = class kb.Store
   reuse: (observable, obj) ->
     return if (current_obj = kb.utils.wrappedObject(observable)) is obj
     throw new Error 'Cannot reuse a simple observable' unless @_canRegister(observable)
-    throw new Error "Trying to change a shared view model. Store ref count: #{@_refCount(observable)}. Global ref count: #{@_globalRefCount(observable)}" unless @_globalRefCount(observable) is 1
+    throw new Error "Trying to change a shared view model. Ref count: #{@_refCount(observable)}" unless @_refCount(observable) is 1
 
     creator = kb.utils.wrappedCreator(observable) or observable.constructor # default is to use the constructor
     current_observable = @find(current_obj, creator) if not _.isUndefined(current_obj)
@@ -126,7 +126,7 @@ module.exports = class kb.Store
 
   # @nodoc
   release: (observable, force) ->
-    return unless @_canRegister(observable)
+    return kb.release(observable) unless @_canRegister(observable) # just release
 
     # maybe be externally added
     if store_references = @_storeReferences(observable)
@@ -135,7 +135,7 @@ module.exports = class kb.Store
 
     @_remove(observable)
     return if observable.__kb_released
-    kb.release(observable) if force or @_globalRefCount(observable) <= 1 # allow for a single initial reference in another store
+    kb.release(observable) if force or @_refCount(observable) <= 1 # allow for a single initial reference in another store
 
   # @nodoc
   find: (obj, creator) ->
@@ -145,16 +145,11 @@ module.exports = class kb.Store
 
   _refCount: (observable) ->
     (console?.log 'Observable already released'; return 0) if observable.__kb_released
-    return 1 unless store_references = @_storeReferences(observable)
-    return store_references.ref_count
-
-  _globalRefCount: (observable) ->
-    (console?.log 'Observable already released'; return 0) if observable.__kb_released
     return 1 unless stores_references = kb.utils.get(observable, 'stores_references')
     return _.reduce(stores_references, ((memo, store_references) -> memo + store_references.ref_count), 0)
 
   # @nodoc
-  _canRegister: (observable) -> return observable and (not ko.isObservable(observable) or observable.__kb_is_co)
+  _canRegister: (observable) -> return observable and not ko.isObservable(observable) and not observable.__kb_is_co # only register view models not basic ko.observables nor kb.CollectionObservables
 
   # @nodoc
   _cid: (obj) -> cid = if obj then obj.cid or= _.uniqueId('c') else 'null'
