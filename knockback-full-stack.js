@@ -204,7 +204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          collection.bind('all', _this._onCollectionChange);
 	        }
 	        _this._mapper = ko.computed(function() {
-	          var comparator, current_collection, filter, filters, models, view_models, _i, _len;
+	          var comparator, current_collection, filter, filters, models, previous_view_models, view_models, _i, _len;
 	          comparator = _this._comparator();
 	          filters = _this._filters();
 	          if (filters) {
@@ -218,6 +218,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	          }
 	          observable = kb.utils.wrappedObservable(_this);
+	          previous_view_models = kb.peek(observable);
 	          if (current_collection) {
 	            models = current_collection.models;
 	          }
@@ -243,7 +244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          _this.in_edit++;
 	          observable(view_models);
-	          return _this.in_edit--;
+	          _this.in_edit--;
 	        });
 	        observable.subscribe(_.bind(_this._onObservableArrayChange, _this));
 	        !kb.statistics || kb.statistics.register('CollectionObservable', _this);
@@ -1667,11 +1668,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var COUNTER, kb, ko, _, _ref;
+	var kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
-
-	COUNTER = 0;
 
 	module.exports = kb.Store = (function() {
 	  Store.instances = [];

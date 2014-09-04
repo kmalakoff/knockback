@@ -155,6 +155,7 @@ class kb.CollectionObservable
 
       # no models
       observable = kb.utils.wrappedObservable(@)
+      previous_view_models = kb.peek(observable)
       models = current_collection.models if current_collection
       if not models or (current_collection.models.length is 0) then view_models = []
 
@@ -178,6 +179,11 @@ class kb.CollectionObservable
       @in_edit++
       observable(view_models)
       @in_edit--
+
+      # TODO: release previous
+      # unless @models_only
+      #   create_options.store.release(view_model) for view_model in previous_view_models
+      return
 
     # start subscribing
     observable.subscribe(_.bind(@_onObservableArrayChange, @))
