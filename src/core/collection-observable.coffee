@@ -156,8 +156,7 @@ class kb.CollectionObservable
       # no models
       observable = kb.utils.wrappedObservable(@)
       models = current_collection.models if current_collection
-      if not models or (current_collection.models.length is 0)
-        view_models = []
+      if not models or (current_collection.models.length is 0) then view_models = []
 
       # process filters, sorting, etc
       else

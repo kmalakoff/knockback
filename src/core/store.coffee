@@ -75,7 +75,7 @@ module.exports = class kb.Store
   #
   # @example retain an observable with the store
   #   store.retain(observable, obj, creator);
-  retain: (observable, obj, creator, reuse) ->
+  retain: (observable, obj, creator) ->
     return unless @_canRegister(observable)
     creator or= observable.constructor # default is to use the constructor
 
@@ -84,7 +84,6 @@ module.exports = class kb.Store
       @_retire(current_observable)
 
     @_add(observable, obj, creator)
-    return if reuse and @_getOrCreateStoreReferences(observable)?.ref_count > 0
     @_getOrCreateStoreReferences(observable).ref_count++
     return observable
 

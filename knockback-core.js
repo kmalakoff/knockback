@@ -1731,8 +1731,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Store.prototype.retain = function(observable, obj, creator, reuse) {
-	    var current_observable, _ref1;
+	  Store.prototype.retain = function(observable, obj, creator) {
+	    var current_observable;
 	    if (!this._canRegister(observable)) {
 	      return;
 	    }
@@ -1745,9 +1745,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._retire(current_observable);
 	    }
 	    this._add(observable, obj, creator);
-	    if (reuse && ((_ref1 = this._getOrCreateStoreReferences(observable)) != null ? _ref1.ref_count : void 0) > 0) {
-	      return;
-	    }
 	    this._getOrCreateStoreReferences(observable).ref_count++;
 	    return observable;
 	  };
@@ -1777,38 +1774,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observable;
 	  };
 
-	  Store.prototype.canReuse = function(observable) {
-	    var global_ref_count, store, store_references;
-	    if (observable.__kb_released) {
-	      return false;
-	    }
-	    if (!(store_references = this._storeReferences(observable))) {
-	      return true;
-	    }
-	    if ((global_ref_count = this._globalRefCount(observable)) === 1) {
-	      return true;
-	    }
-	    store = kb.utils.wrappedStore(observable);
-	    return (!store || store !== this) && ((global_ref_count - this._refCount(observable)) <= 1);
-	  };
-
 	  Store.prototype.reuse = function(observable, obj) {
 	    var creator, current_obj, current_observable;
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
+	    if (!this._canRegister(observable)) {
+	      throw new Error('Cannot reuse a simple observable');
+	    }
 	    if (this._refCount(observable) !== 1) {
-	      throw new Error("Trying to change a shared view model. Reference count: " + (this._refCount(observable)));
+	      throw new Error("Trying to change a shared view model. Ref count: " + (this._refCount(observable)));
 	    }
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    if (!_.isUndefined(current_obj) && (current_observable = this.find(current_obj, creator))) {
-	      this._retire(current_observable);
+	    if (!_.isUndefined(current_obj)) {
+	      current_observable = this.find(current_obj, creator);
 	    }
-	    this.retain(observable, obj, creator, true);
+	    this.retain(observable, obj, creator);
+	    if (current_observable) {
+	      this.release(current_observable);
+	    }
 	  };
 
 	  Store.prototype.release = function(observable, force) {
 	    var store_references;
+	    if (!this._canRegister(observable)) {
+	      return kb.release(observable);
+	    }
 	    if (store_references = this._storeReferences(observable)) {
 	      if (!force && --store_references.ref_count > 0) {
 	        return;
@@ -1819,7 +1810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (observable.__kb_released) {
 	      return;
 	    }
-	    if (force || this._globalRefCount(observable) <= 1) {
+	    if (force || this._refCount(observable) <= 1) {
 	      return kb.release(observable);
 	    }
 	  };
@@ -1837,20 +1828,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype._refCount = function(observable) {
-	    var store_references;
-	    if (observable.__kb_released) {
-	      if (typeof console !== "undefined" && console !== null) {
-	        console.log('Observable already released');
-	      }
-	      return 0;
-	    }
-	    if (!(store_references = this._storeReferences(observable))) {
-	      return 1;
-	    }
-	    return store_references.ref_count;
-	  };
-
-	  Store.prototype._globalRefCount = function(observable) {
 	    var stores_references;
 	    if (observable.__kb_released) {
 	      if (typeof console !== "undefined" && console !== null) {
@@ -1859,7 +1836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return 0;
 	    }
 	    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
-	      return 0;
+	      return 1;
 	    }
 	    return _.reduce(stores_references, (function(memo, store_references) {
 	      return memo + store_references.ref_count;
@@ -1974,7 +1951,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) {
 	      return creator;
 	    }
-	    if (obj instanceof kb.Model) {
+	    if (kb.isModel(obj)) {
 	      return kb.ViewModel;
 	    }
 	  };
@@ -2045,16 +2022,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
 	          if (new_value && new_value instanceof kb.CollectionObservable) {
-	            this._updateValueObservable(kb.peek(new_value.collection), new_value);
-	            return;
-	          }
-	          if (_.isFunction(value.collection) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
-	            if (kb.peek(value.collection) !== new_value) {
-	              value.collection(new_value);
-	            }
+	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
-	            if (kb.utils.wrappedObject(value) !== new_value) {
-	              this._updateValueObservable(new_value);
+	            if (value.collection() !== new_value) {
+	              value.collection(new_value);
 	            }
 	          }
 	          return;
@@ -2063,13 +2034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case kb.TYPE_MODEL:
 	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
 	          if (new_value && !kb.isModel(new_value)) {
-	            this._updateValueObservable((_.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value)), new_value);
-	            return;
-	          }
-	          if (_.isFunction(value.model) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
-	            if (kb.peek(value.model) !== kb.utils.resolveModel(new_value)) {
-	              value.model(new_value);
-	            }
+	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
 	            if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) {
 	              this._updateValueObservable(new_value);
@@ -2090,10 +2055,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  TypedValue.prototype._updateValueObservable = function(new_value, new_observable) {
-	    var create_options, creator, previous_value, value, _ref1;
+	    var create_options, creator, previous_value, value, value_type, _ref1;
 	    create_options = this.create_options;
-	    creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
-	    this.value_type = kb.TYPE_UNKNOWN;
+	    creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
+	    if ((new_value === null) && !creator) {
+	      if (this.value_type === kb.TYPE_MODEL) {
+	        creator = kb.ViewModel;
+	      } else if (this.value_type === kb.TYPE_COLLECTION) {
+	        creator = kb.CollectionObservable;
+	      }
+	    }
+	    create_options.creator = creator;
+	    value_type = kb.TYPE_UNKNOWN;
 	    _ref1 = [this.__kb_value, void 0], previous_value = _ref1[0], this.__kb_value = _ref1[1];
 	    if (new_observable) {
 	      value = new_observable;
@@ -2106,7 +2079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        if (creator.models_only) {
 	          value = new_value;
-	          this.value_type = kb.TYPE_SIMPLE;
+	          value_type = kb.TYPE_SIMPLE;
 	        } else if (creator.create) {
 	          value = creator.create(new_value, create_options);
 	        } else {
@@ -2115,21 +2088,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    } else {
 	      if (_.isArray(new_value)) {
-	        this.value_type = kb.TYPE_ARRAY;
+	        value_type = kb.TYPE_ARRAY;
 	        value = ko.observableArray(new_value);
 	      } else {
-	        this.value_type = kb.TYPE_SIMPLE;
+	        value_type = kb.TYPE_SIMPLE;
 	        value = ko.observable(new_value);
 	      }
 	    }
-	    if (this.value_type === kb.TYPE_UNKNOWN) {
+	    if ((this.value_type = value_type) === kb.TYPE_UNKNOWN) {
 	      if (!ko.isObservable(value)) {
 	        this.value_type = kb.TYPE_MODEL;
 	        kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
 	      } else if (value.__kb_is_co) {
 	        this.value_type = kb.TYPE_COLLECTION;
 	        kb.utils.wrappedObject(value, new_value);
-	      } else {
+	      } else if (!this.value_type) {
 	        this.value_type = kb.TYPE_SIMPLE;
 	      }
 	    }
@@ -2143,6 +2116,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.__kb_value = value;
 	    return this._vo(value);
 	  };
+
+	  TypedValue.prototype._inferType = function(value) {};
 
 	  return TypedValue;
 
@@ -2186,6 +2161,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      obj.__kb[key] = value;
 	    }
 	    return obj.__kb[key];
+	  };
+
+	  utils.has = function(obj, key) {
+	    return obj.__kb && obj.__kb.hasOwnProperty(key);
 	  };
 
 	  utils.wrappedObservable = function(obj, value) {
