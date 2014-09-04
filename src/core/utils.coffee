@@ -25,6 +25,9 @@ class kb.utils
   # @nodoc
   @orSet: (obj, key, value) -> obj.__kb[key] = value unless ((obj.__kb or= {})).hasOwnProperty(key); return obj.__kb[key]
 
+  # @nodoc
+  @has: (obj, key) -> obj.__kb and obj.__kb.hasOwnProperty(key)
+
   # Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'. Relevant for:
   #
   #   * [kb.CollectionObservable]('classes/kb/CollectionObservable.html')

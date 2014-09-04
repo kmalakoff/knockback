@@ -39,7 +39,7 @@ module.exports = class TypedValue
             @_updateValueObservable(kb.peek(new_value.collection), new_value)
             return
 
-          if _.isFunction(value.collection) and (not @create_options.store or @create_options.store.canReuse(value))
+          if _.isFunction(value.collection) and (not @create_options.store or @create_options.store.canReuse(value, new_value))
             value.collection(new_value) if kb.peek(value.collection) isnt new_value
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt new_value
@@ -52,7 +52,7 @@ module.exports = class TypedValue
             @_updateValueObservable((if _.isFunction(new_value.model) then kb.peek(new_value.model) else kb.utils.wrappedObject(new_value)), new_value)
             return
 
-          if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value))
+          if _.isFunction(value.model) and (not @create_options.store or @create_options.store.canReuse(value, new_value))
             value.model(new_value) if kb.peek(value.model) isnt kb.utils.resolveModel(new_value)
           else
             @_updateValueObservable(new_value) if kb.utils.wrappedObject(value) isnt kb.utils.resolveModel(new_value)
