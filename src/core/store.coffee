@@ -17,6 +17,7 @@
 #     store: kb.utils.wrappedStore(co)
 #   });
 module.exports = class kb.Store
+  # @nodoc
   @instances = []
 
   # Used to either register yourself with the existing store or to create a new store.
@@ -121,7 +122,7 @@ module.exports = class kb.Store
     @release(current_observable) if current_observable
     return
 
-  # @nodoc
+  # Release a reference to a a ViewModel in this store.
   release: (observable, force) ->
     return kb.release(observable) unless @_canRegister(observable) # just release
 
@@ -140,6 +141,7 @@ module.exports = class kb.Store
     (delete records[@_cid(obj)]; return null) if (observable = records[@_cid(obj)])?.__kb_released
     return observable
 
+  # @nodoc
   _refCount: (observable) ->
     (console?.log 'Observable already released'; return 0) if observable.__kb_released
     return 1 unless stores_references = kb.utils.get(observable, 'stores_references')

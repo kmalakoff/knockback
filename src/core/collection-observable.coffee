@@ -56,6 +56,7 @@ kb.compare = (value_a, value_b) ->
 #   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 #
 class kb.CollectionObservable
+  # @nodoc
   @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.CollectionObservable.
@@ -373,7 +374,7 @@ class kb.CollectionObservable
     return if @in_edit # we are doing the editing
 
     # validate input
-    (@models_only and (not models_or_view_models.length or kb.utils.hasModelSignature(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.utils.hasModelSignature(models_or_view_models[0])))) or kb._throwUnexpected(@, 'incorrect type passed')
+    (@models_only and (not models_or_view_models.length or kb.isModel(models_or_view_models[0]))) or (not @models_only and (not models_or_view_models.length or (_.isObject(models_or_view_models[0]) and not kb.isModel(models_or_view_models[0])))) or kb._throwUnexpected(@, 'incorrect type passed')
 
     observable = kb.utils.wrappedObservable(@)
     collection = kb.peek(@_collection)

@@ -192,22 +192,6 @@ class kb.utils
     return ko.observableArray(obj)                      if _.isArray(obj)
     return ko.observable(obj)
 
-  # Helper to check an object for having a Model signature. For example, locale managers and ModelRef don't need to derive from Model
-  #
-  # @param [Object] obj the object to test
-  #
-  # @example
-  #   kb.utils.hasModelSignature(new Model());
-  @hasModelSignature: (obj) -> return obj and (obj.attributes and not obj.models) and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
-
-  # Helper to check an object for having a Model signature. For example, locale managers and ModelRef don't need to derive from Model
-  #
-  # @param [Object] obj the object to test
-  #
-  # @example
-  #   kb.utils.hasModelSignature(new Model());
-  @hasCollectionSignature: (obj) -> return obj and obj.models and (typeof(obj.get) is 'function') and (typeof(obj.trigger) is 'function')
-
   # Helper to merge options including ViewmModel options like `keys` and `factories`
   #
   # @param [Object] obj the object to test

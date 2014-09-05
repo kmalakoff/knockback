@@ -12,10 +12,7 @@
   },
   "main": "knockback.js",
   "scripts": [
-    "knockback.js",
-    "knockback.min.js",
-    "knockback-core.js",
-    "knockback-core.min.js"
+    "knockback.js"
   ],
   "license": "MIT"
 }

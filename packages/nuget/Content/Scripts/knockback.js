@@ -10,14 +10,14 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else if(typeof define === 'function' && define.amd)
-		define(["knockout", "backbone", "underscore"], function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_23__) {
-			return factory(__WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_23__, root["jQuery"]);
+		define(["knockout", "backbone", "underscore"], function webpackLoadOptionalExternalModuleAmd(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__) {
+			return factory(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, root["jQuery"]);
 		});
 	else if(typeof exports === 'object')
 		exports["kb"] = factory(require("knockout"), require("backbone"), require("underscore"), (function webpackLoadOptionalExternalModule() { try { return require("jquery"); } catch(e) {} }()));
 	else
 		root["kb"] = factory(root["ko"], root["Backbone"], root["_"], root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_23__, __WEBPACK_EXTERNAL_MODULE_24__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_20__, __WEBPACK_EXTERNAL_MODULE_21__, __WEBPACK_EXTERNAL_MODULE_22__, __WEBPACK_EXTERNAL_MODULE_23__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -77,13 +77,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(11);
 	__webpack_require__(12);
 	__webpack_require__(13);
-	__webpack_require__(14);
+	__webpack_require__(15);
 	__webpack_require__(16);
 	__webpack_require__(17);
 	__webpack_require__(18);
 	__webpack_require__(19);
-	__webpack_require__(20);
-	module.exports = __webpack_require__(15);
+	module.exports = __webpack_require__(14);
 
 
 /***/ },
@@ -103,7 +102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
 	  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	COMPARE_EQUAL = 0;
 
@@ -134,15 +133,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.CollectionObservable = (function() {
 	  CollectionObservable.extend = kb.extend;
 
-	  function CollectionObservable(collection, options) {
+	  function CollectionObservable(collection, view_model, options) {
 	    this._onCollectionChange = __bind(this._onCollectionChange, this);
 	    return kb.ignore((function(_this) {
 	      return function() {
 	        var create_options, observable, _ref1;
-	        if (_.isUndefined(options) && !(collection instanceof kb.Collection)) {
-	          _ref1 = [new kb.Collection(), collection], collection = _ref1[0], options = _ref1[1];
-	        } else if (_.isArray(collection)) {
+	        if (_.isArray(collection)) {
 	          collection = new kb.Collection(collection);
+	        } else if (!(collection instanceof kb.Collection)) {
+	          _ref1 = [new kb.Collection(), collection, view_model], collection = _ref1[0], view_model = _ref1[1], options = _ref1[2];
+	        }
+	        if (_.isFunction(view_model)) {
+	          options = _.extend({
+	            view_model: view_model
+	          }, options || {});
+	        } else if (_.isObject(view_model)) {
+	          options = view_model;
 	        }
 	        options || (options = {});
 	        observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
@@ -185,6 +191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((previous_collection = _this._collection()) === new_collection) {
 	                return;
 	              }
+	              _this.create_options.store.reuse(_this, new_collection);
 	              if (previous_collection) {
 	                previous_collection.unbind('all', _this._onCollectionChange);
 	              }
@@ -199,7 +206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          collection.bind('all', _this._onCollectionChange);
 	        }
 	        _this._mapper = ko.computed(function() {
-	          var comparator, current_collection, filter, filters, models, view_models, _i, _len;
+	          var comparator, current_collection, filter, filters, models, previous_view_models, view_models, _i, _len;
 	          comparator = _this._comparator();
 	          filters = _this._filters();
 	          if (filters) {
@@ -213,6 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	          }
 	          observable = kb.utils.wrappedObservable(_this);
+	          previous_view_models = kb.peek(observable);
 	          if (current_collection) {
 	            models = current_collection.models;
 	          }
@@ -238,7 +246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          _this.in_edit++;
 	          observable(view_models);
-	          return _this.in_edit--;
+	          _this.in_edit--;
 	        });
 	        observable.subscribe(_.bind(_this._onObservableArrayChange, _this));
 	        !kb.statistics || kb.statistics.register('CollectionObservable', _this);
@@ -449,11 +457,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  CollectionObservable.prototype._onObservableArrayChange = function(models_or_view_models) {
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var collection, has_filters, model, models, observable, view_model, view_models, _i, _len;
+	        var collection, current_view_model, has_filters, model, models, observable, view_model, view_models, _i, _len;
 	        if (_this.in_edit) {
 	          return;
 	        }
-	        (_this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!_this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || kb._throwUnexpected(_this, 'incorrect type passed');
+	        (_this.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0]))) || (!_this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])))) || kb._throwUnexpected(_this, 'incorrect type passed');
 	        observable = kb.utils.wrappedObservable(_this);
 	        collection = kb.peek(_this._collection);
 	        has_filters = kb.peek(_this._filters).length;
@@ -477,7 +485,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	              }
 	              view_models.push(view_model);
 	            }
-	            _this.create_options.store.findOrReplace(model, _this.create_options.creator, view_model);
+	            if (current_view_model = _this.create_options.store.find(model, _this.create_options.creator)) {
+	              (current_view_model.constructor === view_model.constructor) || kb._throwUnexpected(_this, 'replacing different type of view model');
+	            }
+	            _this.create_options.store.retain(view_model, model, _this.create_options.creator);
 	            models.push(model);
 	          }
 	        }
@@ -505,7 +516,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (this.models_only) {
 	      return model;
 	    }
-	    return this.create_options.store.findOrCreate(model, this.create_options);
+	    return this.create_options.store.retainOrCreate(model, this.create_options);
 	  };
 
 	  CollectionObservable.prototype._selectModel = function(model) {
@@ -535,8 +546,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	})();
 
-	kb.collectionObservable = function(collection, options) {
-	  return new kb.CollectionObservable(collection, options);
+	kb.collectionObservable = function(collection, view_model, options) {
+	  return new kb.CollectionObservable(collection, view_model, options);
 	};
 
 
@@ -546,14 +557,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var ALL_ORMS, kb, key, ko, value, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	ALL_ORMS = {
 	  "default": null,
 	  'backbone-orm': null,
-	  'backbone-associations': __webpack_require__(27),
-	  'backbone-relational': __webpack_require__(28),
-	  supermodel: __webpack_require__(29)
+	  'backbone-associations': __webpack_require__(26),
+	  'backbone-relational': __webpack_require__(27),
+	  supermodel: __webpack_require__(28)
 	};
 
 	kb.orm = ALL_ORMS["default"];
@@ -613,7 +624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var kb, ko, _, _ref,
 	  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.EventWatcher = (function() {
 	  EventWatcher.useOptionsOrCreate = function(options, emitter, obj, callback_options) {
@@ -821,86 +832,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var copyProps;
-
-	copyProps = function(dest, source) {
-	  var key, value;
-	  for (key in source) {
-	    value = source[key];
-	    dest[key] = value;
-	  }
-	  return dest;
-	};
-
-	// Shared empty constructor function to aid in prototype-chain creation.
-	var ctor = function(){};
-
-	// Helper function to correctly set up the prototype chain, for subclasses.
-	// Similar to 'goog.inherits', but uses a hash of prototype properties and
-	// class properties to be extended.
-	var inherits = function(parent, protoProps, staticProps) {
-	  var child;
-
-	  // The constructor function for the new subclass is either defined by you
-	  // (the "constructor" property in your extend definition), or defaulted
-	  // by us to simply call the parent's constructor.
-	  if (protoProps && protoProps.hasOwnProperty('constructor')) {
-	    child = protoProps.constructor;
-	  } else {
-	    child = function(){ parent.apply(this, arguments); };
-	  }
-
-	  // Inherit class (static) properties from parent.
-	  copyProps(child, parent);
-
-	  // Set the prototype chain to inherit from parent, without calling
-	  // parent's constructor function.
-	  ctor.prototype = parent.prototype;
-	  child.prototype = new ctor();
-
-	  // Add prototype properties (instance properties) to the subclass,
-	  // if supplied.
-	  if (protoProps) copyProps(child.prototype, protoProps);
-
-	  // Add static properties to the constructor function, if supplied.
-	  if (staticProps) copyProps(child, staticProps);
-
-	  // Correctly set child's 'prototype.constructor'.
-	  child.prototype.constructor = child;
-
-	  // Set a convenience property in case the parent's prototype is needed later.
-	  child.__super__ = parent.prototype;
-
-	  return child;
-	};
-
-	// The self-propagating extend function that BacLCone classes use.
-	var extend = function (protoProps, classProps) {
-	  var child = inherits(this, protoProps, classProps);
-	  child.extend = this.extend;
-	  return child;
-	};
-	;
-
-	module.exports = extend;
-
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  knockback.js 0.20.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
 	var kb, _;
 
-	_ = (kb = __webpack_require__(7))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	kb.Factory = (function() {
 	  Factory.useOptionsOrCreate = function(options, obj, owner_path) {
@@ -947,18 +881,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Factory.prototype.creatorForPath = function(obj, path) {
-	    var creator;
-	    if ((creator = this.paths[path])) {
-	      if (creator.view_model) {
-	        return creator.view_model;
-	      } else {
-	        return creator;
-	      }
+	    var creator, _ref;
+	    if (creator = this.paths[path]) {
+	      return (creator.view_model ? creator.view_model : creator);
 	    }
-	    if (this.parent_factory) {
-	      if ((creator = this.parent_factory.creatorForPath(obj, path))) {
-	        return creator;
-	      }
+	    if (creator = (_ref = this.parent_factory) != null ? _ref.creatorForPath(obj, path) : void 0) {
+	      return creator;
 	    }
 	    return null;
 	  };
@@ -969,7 +897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -985,7 +913,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
 	kb.RECUSIVE_AUTO_INJECT = true;
 
@@ -1109,7 +1037,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  } else {
 	    (onReady = function() {
-	      if (document.readyState !== "complete") {
+	      if (document.readyState !== 'complete') {
 	        return setTimeout(onReady, 0);
 	      }
 	      return kb.injectViewModels();
@@ -1120,7 +1048,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -1136,7 +1064,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	window = window != null ? window : global;
 
-	ko = __webpack_require__(21);
+	ko = __webpack_require__(20);
 
 	LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -1211,7 +1139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (ko.isObservable(obj) && _.isArray(array = kb.peek(obj))) {
 	      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
-	        return obj.destroy();
+	        return typeof obj.destroy === "function" ? obj.destroy() : void 0;
 	      }
 	      for (index in array) {
 	        value = array[index];
@@ -1318,7 +1246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return value;
 	  };
 
-	  kb.extend = __webpack_require__(4);
+	  kb.extend = __webpack_require__(29);
 
 	  kb._throwMissing = function(instance, message) {
 	    throw "" + (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
@@ -1364,8 +1292,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Backbone = kb.Parse = window.Parse;
 	  _ = kb._ = window.Parse._;
 	} else {
-	  Backbone = kb.Backbone = __webpack_require__(22);
-	  _ = kb._ = __webpack_require__(23);
+	  Backbone = kb.Backbone = __webpack_require__(21);
+	  _ = kb._ = __webpack_require__(22);
 	}
 
 	kb.ko = ko;
@@ -1379,13 +1307,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.$ = window.jQuery || window.$;
 
 	try {
-	  kb.$ || (kb.$ = __webpack_require__(24));
+	  kb.$ || (kb.$ = __webpack_require__(23));
 	} catch (_error) {}
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1399,7 +1327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _extend, _ref, _ref1;
 
-	ko = (kb = __webpack_require__(7)).ko;
+	ko = (kb = __webpack_require__(6)).ko;
 
 	if ((_ref = ko.subscribable) != null ? (_ref1 = _ref.fn) != null ? _ref1.extend : void 0 : void 0) {
 	  _extend = ko.subscribable.fn.extend;
@@ -1423,7 +1351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1437,9 +1365,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_INFO, KEYS_PUBLISH, TypedValue, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	TypedValue = __webpack_require__(12);
+	TypedValue = __webpack_require__(11);
 
 	KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 
@@ -1595,7 +1523,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1609,7 +1537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, _;
 
-	_ = (kb = __webpack_require__(7))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	module.exports = kb.Statistics = (function() {
 	  function Statistics() {
@@ -1646,11 +1574,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Statistics.prototype.unregister = function(key, obj) {
 	    var index, type_tracker;
 	    type_tracker = this.registeredTracker(key);
-	    index = _.indexOf(type_tracker, obj);
-	    if (index < 0) {
-	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("kb.Statistics: failed to unregister type: " + key);
-	      }
+	    if ((index = _.indexOf(type_tracker, obj)) < 0) {
+	      return typeof console !== "undefined" && console !== null ? console.log("kb.Statistics: failed to unregister type: " + key) : void 0;
 	    }
 	    return type_tracker.splice(index, 1);
 	  };
@@ -1733,7 +1658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -1747,7 +1672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	module.exports = kb.Store = (function() {
 	  Store.instances = [];
@@ -1758,7 +1683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      kb.utils.wrappedStoreIsOwned(observable, true);
 	    }
 	    store = kb.utils.wrappedStore(observable, options.store || new kb.Store());
-	    store.register(obj, observable, options.creator);
+	    store.retain(observable, obj, options.creator);
 	    return store;
 	  };
 
@@ -1770,6 +1695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Store.prototype.destroy = function() {
 	    var index;
+	    this.__kb_released = true;
 	    this.clear();
 	    if ((index = _.indexOf(kb.Store.instances, this)) >= 0) {
 	      return kb.Store.instances.splice(index, 1);
@@ -1777,33 +1703,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  Store.prototype.clear = function() {
-	    var cid, creator_id, index, observable, observable_records, records, replaced_observables, store_references, _i, _len, _ref1, _ref2, _ref3;
+	    var cid, creator_id, observable, observable_records, records, replaced_observables, _i, _len, _ref1, _ref2;
 	    _ref1 = [this.observable_records, {}], observable_records = _ref1[0], this.observable_records = _ref1[1];
 	    for (creator_id in observable_records) {
 	      records = observable_records[creator_id];
 	      for (cid in records) {
 	        observable = records[cid];
-	        if (!(!observable.__kb_released)) {
-	          continue;
-	        }
-	        kb.release(observable);
-	        if (observable.__kb && observable.__kb.stores_references) {
-	          _ref2 = observable.__kb.stores_references;
-	          for (index in _ref2) {
-	            store_references = _ref2[index];
-	            if (store_references.store === this) {
-	              delete observable.__kb.stores_references[index];
-	              break;
-	            }
-	          }
-	        }
+	        this.release(observable, true);
 	      }
 	    }
-	    _ref3 = [this.replaced_observables, []], replaced_observables = _ref3[0], this.replaced_observables = _ref3[1];
+	    _ref2 = [this.replaced_observables, []], replaced_observables = _ref2[0], this.replaced_observables = _ref2[1];
 	    for (_i = 0, _len = replaced_observables.length; _i < _len; _i++) {
 	      observable = replaced_observables[_i];
 	      if (!observable.__kb_released) {
-	        kb.release(observable);
+	        this.release(observable, true);
 	      }
 	    }
 	  };
@@ -1822,50 +1735,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  Store.prototype.register = function(obj, observable, creator) {
-	    var current_observable, store_references, stores_references, _base, _name;
-	    if (!this.canRegister(observable)) {
+	  Store.prototype.retain = function(observable, obj, creator) {
+	    var current_observable;
+	    if (!this._canRegister(observable)) {
 	      return;
 	    }
 	    creator || (creator = observable.constructor);
-	    kb.utils.wrappedObject(observable, obj);
-	    kb.utils.wrappedCreator(observable, creator);
 	    if (current_observable = this.find(obj, creator)) {
-	      this.replaced_observables.push(current_observable);
+	      if (current_observable === observable) {
+	        this._getOrCreateStoreReferences(observable).ref_count++;
+	        return observable;
+	      }
+	      this._retire(current_observable);
 	    }
-	    ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)] = observable;
-	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
-	    if (!(store_references = _.find(stores_references, (function(_this) {
-	      return function(store_references) {
-	        return store_references.store === _this;
-	      };
-	    })(this)))) {
-	      stores_references.push(store_references = {
-	        store: this,
-	        ref_count: 0,
-	        release: (function(_this) {
-	          return function() {
-	            return _this.release(observable);
-	          };
-	        })(this)
-	      });
-	    }
-	    store_references.ref_count++;
+	    this._add(observable, obj, creator);
+	    this._getOrCreateStoreReferences(observable).ref_count++;
 	    return observable;
 	  };
 
-	  Store.prototype.find = function(obj, creator) {
-	    var observable, _base, _name, _ref1;
-	    if ((_ref1 = (observable = ((_base = this.observable_records)[_name = this.creatorId(creator)] || (_base[_name] = {}))[this.cid(obj)])) != null ? _ref1.__kb_released : void 0) {
-	      delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
-	      return null;
-	    }
-	    return observable;
-	  };
-
-	  Store.prototype.findOrCreate = function(obj, options) {
+	  Store.prototype.retainOrCreate = function(obj, options) {
 	    var creator, observable;
-	    if (!(creator = this.creator(obj, options))) {
+	    if (!(creator = this._creator(obj, options))) {
 	      return kb.utils.createFromDefaultCreator(obj, options);
 	    }
 	    if (creator.models_only) {
@@ -1884,110 +1774,89 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return observable || ko.observable(null);
 	      };
 	    })(this));
-	    this.register(obj, observable, creator);
+	    this.retain(observable, obj, creator);
 	    return observable;
-	  };
-
-	  Store.prototype.findOrReplace = function(obj, creator, observable) {
-	    var current_observable;
-	    obj || kb._throwUnexpected(this, 'obj missing');
-	    if (current_observable = this.find(obj, creator)) {
-	      if (current_observable === observable) {
-	        return;
-	      }
-	      (current_observable.constructor === observable.constructor) || kb._throwUnexpected(this, 'replacing different type');
-	    }
-	    this.register(obj, observable, creator);
-	    return observable;
-	  };
-
-	  Store.prototype.canReuse = function(observable) {
-	    return kb.utils.wrappedCreator(observable) && this.refCount(observable) === 1;
 	  };
 
 	  Store.prototype.reuse = function(observable, obj) {
-	    var creator, current_obj, store_references, stores_references;
+	    var creator, current_obj, current_observable;
 	    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
 	      return;
 	    }
-	    if (this.refCount(observable) !== 1) {
-	      throw new Error("Trying to change a shared view model. Reference count: " + (this.refCount(observable)));
+	    if (!this._canRegister(observable)) {
+	      throw new Error('Cannot reuse a simple observable');
 	    }
-	    kb.utils.wrappedObject(observable, obj);
+	    if (this._refCount(observable) !== 1) {
+	      throw new Error("Trying to change a shared view model. Ref count: " + (this._refCount(observable)));
+	    }
 	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    delete this.observable_records[this.creatorId(creator)][this.cid(current_obj)];
-	    this.observable_records[this.creatorId(creator)][this.cid(obj)] = observable;
-	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
-	    if (!(store_references = _.find(stores_references, (function(_this) {
-	      return function(store_references) {
-	        return store_references.store === _this;
-	      };
-	    })(this)))) {
-	      stores_references.push(store_references = {
-	        store: this,
-	        ref_count: 1,
-	        release: (function(_this) {
-	          return function() {
-	            return _this.release(observable);
-	          };
-	        })(this)
-	      });
+	    if (!_.isUndefined(current_obj)) {
+	      current_observable = this.find(current_obj, creator);
+	    }
+	    this.retain(observable, obj, creator);
+	    if (current_observable) {
+	      this.release(current_observable);
 	    }
 	  };
 
-	  Store.prototype.release = function(observable) {
-	    var creator, current_observable, obj, store_references, _ref1;
+	  Store.prototype.release = function(observable, force) {
+	    var store_references;
+	    if (!this._canRegister(observable)) {
+	      return kb.release(observable);
+	    }
+	    if (store_references = this._storeReferences(observable)) {
+	      if (!force && --store_references.ref_count > 0) {
+	        return;
+	      }
+	      this._clearStoreReferences(observable);
+	    }
+	    this._remove(observable);
 	    if (observable.__kb_released) {
 	      return;
 	    }
-	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
-	    if (!(store_references = _.find(((_ref1 = observable.__kb) != null ? _ref1.stores_references : void 0) || [], (function(_this) {
-	      return function(store_references) {
-	        return store_references.store === _this;
-	      };
-	    })(this)))) {
-	      return typeof console !== "undefined" && console !== null ? console.log("Store references missing for release") : void 0;
+	    if (force || this._refCount(observable) <= 1) {
+	      return kb.release(observable);
 	    }
-	    if (--store_references.ref_count > 0) {
-	      return;
-	    }
-	    if (!(current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator))) {
-	      return;
-	    }
-	    if (current_observable === observable) {
-	      delete this.observable_records[this.creatorId(creator)][this.cid(obj)];
-	    }
-	    return kb.release(observable);
 	  };
 
-	  Store.prototype.refCount = function(observable) {
-	    var store_references, _ref1;
+	  Store.prototype.find = function(obj, creator) {
+	    var observable, records, _ref1;
+	    if (!(records = this.observable_records[this._creatorId(creator)])) {
+	      return null;
+	    }
+	    if ((_ref1 = (observable = records[this._cid(obj)])) != null ? _ref1.__kb_released : void 0) {
+	      delete records[this._cid(obj)];
+	      return null;
+	    }
+	    return observable;
+	  };
+
+	  Store.prototype._refCount = function(observable) {
+	    var stores_references;
 	    if (observable.__kb_released) {
 	      if (typeof console !== "undefined" && console !== null) {
-	        console.log("Observable already released");
+	        console.log('Observable already released');
 	      }
 	      return 0;
 	    }
-	    if (!(store_references = _.find(((_ref1 = observable.__kb) != null ? _ref1.stores_references : void 0) || [], (function(_this) {
-	      return function(store_references) {
-	        return store_references.store === _this;
-	      };
-	    })(this)))) {
+	    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
 	      return 1;
 	    }
-	    return store_references.ref_count;
+	    return _.reduce(stores_references, (function(memo, store_references) {
+	      return memo + store_references.ref_count;
+	    }), 0);
 	  };
 
-	  Store.prototype.canRegister = function(observable) {
+	  Store.prototype._canRegister = function(observable) {
 	    return observable && !ko.isObservable(observable) && !observable.__kb_is_co;
 	  };
 
-	  Store.prototype.cid = function(obj) {
+	  Store.prototype._cid = function(obj) {
 	    var cid;
 	    return cid = obj ? obj.cid || (obj.cid = _.uniqueId('c')) : 'null';
 	  };
 
-	  Store.prototype.creatorId = function(creator) {
+	  Store.prototype._creatorId = function(creator) {
 	    var create, item, _i, _len, _ref1;
 	    create = creator.create || creator;
 	    create.__kb_cids || (create.__kb_cids = []);
@@ -2005,7 +1874,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return item.cid;
 	  };
 
-	  Store.prototype.creator = function(obj, options) {
+	  Store.prototype._storeReferences = function(observable) {
+	    var stores_references;
+	    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
+	      return;
+	    }
+	    return _.find(stores_references, (function(_this) {
+	      return function(store_references) {
+	        return store_references.store === _this;
+	      };
+	    })(this));
+	  };
+
+	  Store.prototype._getOrCreateStoreReferences = function(observable) {
+	    var store_references, stores_references;
+	    stores_references = kb.utils.orSet(observable, 'stores_references', []);
+	    if (!(store_references = _.find(stores_references, (function(_this) {
+	      return function(store_references) {
+	        return store_references.store === _this;
+	      };
+	    })(this)))) {
+	      stores_references.push(store_references = {
+	        store: this,
+	        ref_count: 0,
+	        release: (function(_this) {
+	          return function() {
+	            return _this.release(observable);
+	          };
+	        })(this)
+	      });
+	    }
+	    return store_references;
+	  };
+
+	  Store.prototype._clearStoreReferences = function(observable) {
+	    var index, store_references, stores_references, _ref1;
+	    if (stores_references = kb.utils.get(observable, 'stores_references')) {
+	      _ref1 = observable.__kb.stores_references;
+	      for (index in _ref1) {
+	        store_references = _ref1[index];
+	        if (store_references.store === this) {
+	          observable.__kb.stores_references.splice(index, 1);
+	          break;
+	        }
+	      }
+	    }
+	  };
+
+	  Store.prototype._retire = function(observable) {
+	    this._clearStoreReferences(observable);
+	    this.replaced_observables.push(observable);
+	    return this._remove(observable);
+	  };
+
+	  Store.prototype._add = function(observable, obj, creator) {
+	    var _base, _name;
+	    creator || (creator = observable.constructor);
+	    kb.utils.wrappedObject(observable, obj);
+	    kb.utils.wrappedCreator(observable, creator);
+	    return ((_base = this.observable_records)[_name = this._creatorId(creator)] || (_base[_name] = {}))[this._cid(obj)] = observable;
+	  };
+
+	  Store.prototype._remove = function(observable) {
+	    var creator, current_observable, obj;
+	    creator = kb.utils.wrappedCreator(observable) || observable.constructor;
+	    if (current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator)) {
+	      if (current_observable === observable) {
+	        delete this.observable_records[this._creatorId(creator)][this._cid(obj)];
+	      }
+	    }
+	    kb.utils.wrappedObject(observable, null);
+	    return kb.utils.wrappedCreator(observable, null);
+	  };
+
+	  Store.prototype._creator = function(obj, options) {
 	    var creator;
 	    if (options.creator) {
 	      return options.creator;
@@ -2013,7 +1955,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) {
 	      return creator;
 	    }
-	    if (obj instanceof kb.Model) {
+	    if (kb.isModel(obj)) {
 	      return kb.ViewModel;
 	    }
 	  };
@@ -2024,12 +1966,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var TypedValue, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	module.exports = TypedValue = (function() {
 	  function TypedValue(create_options) {
@@ -2084,16 +2026,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
 	          if (new_value && new_value instanceof kb.CollectionObservable) {
-	            this._updateValueObservable(kb.peek(new_value.collection), new_value);
-	            return;
-	          }
-	          if (_.isFunction(value.collection)) {
-	            if (kb.peek(value.collection) !== new_value) {
-	              value.collection(new_value);
-	            }
+	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
-	            if (kb.utils.wrappedObject(value) !== new_value) {
-	              this._updateValueObservable(new_value);
+	            if (value.collection() !== new_value) {
+	              value.collection(new_value);
 	            }
 	          }
 	          return;
@@ -2102,15 +2038,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case kb.TYPE_MODEL:
 	        if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
 	          if (new_value && !kb.isModel(new_value)) {
-	            this._updateValueObservable((_.isFunction(new_value.model) ? kb.peek(new_value.model) : kb.utils.wrappedObject(new_value)), new_value);
-	            return;
-	          }
-	          if (_.isFunction(value.model) && (!this.create_options.store || this.create_options.store.canReuse(value))) {
-	            if (kb.peek(value.model) !== new_value) {
-	              value.model(new_value);
-	            }
+	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
-	            if (kb.utils.wrappedObject(value) !== new_value) {
+	            if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) {
 	              this._updateValueObservable(new_value);
 	            }
 	          }
@@ -2129,23 +2059,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  TypedValue.prototype._updateValueObservable = function(new_value, new_observable) {
-	    var create_options, creator, previous_value, value, _ref1;
+	    var create_options, creator, previous_value, value, value_type, _ref1;
 	    create_options = this.create_options;
-	    creator = create_options.creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
-	    this.value_type = kb.TYPE_UNKNOWN;
+	    creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
+	    if ((new_value === null) && !creator) {
+	      if (this.value_type === kb.TYPE_MODEL) {
+	        creator = kb.ViewModel;
+	      } else if (this.value_type === kb.TYPE_COLLECTION) {
+	        creator = kb.CollectionObservable;
+	      }
+	    }
+	    create_options.creator = creator;
+	    value_type = kb.TYPE_UNKNOWN;
 	    _ref1 = [this.__kb_value, void 0], previous_value = _ref1[0], this.__kb_value = _ref1[1];
 	    if (new_observable) {
 	      value = new_observable;
 	      if (create_options.store) {
-	        create_options.store.register(new_value, new_observable, creator);
+	        create_options.store.retain(new_observable, new_value, creator);
 	      }
 	    } else if (creator) {
 	      if (create_options.store) {
-	        value = create_options.store.findOrCreate(new_value, create_options);
+	        value = create_options.store.retainOrCreate(new_value, create_options);
 	      } else {
 	        if (creator.models_only) {
 	          value = new_value;
-	          this.value_type = kb.TYPE_SIMPLE;
+	          value_type = kb.TYPE_SIMPLE;
 	        } else if (creator.create) {
 	          value = creator.create(new_value, create_options);
 	        } else {
@@ -2154,27 +2092,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    } else {
 	      if (_.isArray(new_value)) {
-	        this.value_type = kb.TYPE_ARRAY;
+	        value_type = kb.TYPE_ARRAY;
 	        value = ko.observableArray(new_value);
 	      } else {
-	        this.value_type = kb.TYPE_SIMPLE;
+	        value_type = kb.TYPE_SIMPLE;
 	        value = ko.observable(new_value);
 	      }
 	    }
-	    if (this.value_type === kb.TYPE_UNKNOWN) {
+	    if ((this.value_type = value_type) === kb.TYPE_UNKNOWN) {
 	      if (!ko.isObservable(value)) {
 	        this.value_type = kb.TYPE_MODEL;
-	        if (typeof value.model !== 'function') {
-	          kb.utils.wrappedObject(value, new_value);
-	        }
+	        kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
 	      } else if (value.__kb_is_co) {
 	        this.value_type = kb.TYPE_COLLECTION;
-	      } else {
+	        kb.utils.wrappedObject(value, new_value);
+	      } else if (!this.value_type) {
 	        this.value_type = kb.TYPE_SIMPLE;
 	      }
 	    }
 	    if (previous_value) {
-	      if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
+	      if (this.create_options.store) {
 	        this.create_options.store.release(previous_value);
 	      } else {
 	        kb.release(previous_value);
@@ -2184,13 +2121,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return this._vo(value);
 	  };
 
+	  TypedValue.prototype._inferType = function(value) {};
+
 	  return TypedValue;
 
 	})();
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2202,136 +2141,113 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var kb, ko, _, _argumentsAddKey, _keyArrayToObject, _mergeArray, _mergeObject, _ref, _wrappedKey;
+	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
-
-	_wrappedKey = kb._wrappedKey = function(obj, key, value) {
-	  if (arguments.length === 2) {
-	    if (obj && obj.__kb && obj.__kb.hasOwnProperty(key)) {
-	      return obj.__kb[key];
-	    } else {
-	      return void 0;
-	    }
-	  }
-	  obj || kb._throwUnexpected(this, "no obj for wrapping " + key);
-	  obj.__kb || (obj.__kb = {});
-	  obj.__kb[key] = value;
-	  return value;
-	};
-
-	_argumentsAddKey = function(args, key) {
-	  Array.prototype.splice.call(args, 1, 0, key);
-	  return args;
-	};
-
-	_mergeArray = function(result, key, value) {
-	  result[key] || (result[key] = []);
-	  if (!_.isArray(value)) {
-	    value = [value];
-	  }
-	  result[key] = result[key].length ? _.union(result[key], value) : value;
-	  return result;
-	};
-
-	_mergeObject = function(result, key, value) {
-	  result[key] || (result[key] = {});
-	  return _.extend(result[key], value);
-	};
-
-	_keyArrayToObject = function(value) {
-	  var item, result, _i, _len;
-	  result = {};
-	  for (_i = 0, _len = value.length; _i < _len; _i++) {
-	    item = value[_i];
-	    result[item] = {
-	      key: item
-	    };
-	  }
-	  return result;
-	};
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.utils = (function() {
 	  function utils() {}
 
-	  utils.wrappedObservable = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'observable'));
+	  utils.get = function(obj, key, default_value) {
+	    if (!obj.__kb || !obj.__kb.hasOwnProperty(key)) {
+	      return default_value;
+	    } else {
+	      return obj.__kb[key];
+	    }
 	  };
 
-	  utils.wrappedObject = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'object'));
-	  };
-
-	  utils.wrappedCreator = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'creator'));
+	  utils.set = function(obj, key, value) {
+	    return (obj.__kb || (obj.__kb = {}))[key] = value;
 	  };
 
 	  utils.orSet = function(obj, key, value) {
-	    obj.__kb || (obj.__kb = {});
-	    if (!obj.__kb.hasOwnProperty(key)) {
+	    if (!(obj.__kb || (obj.__kb = {})).hasOwnProperty(key)) {
 	      obj.__kb[key] = value;
 	    }
 	    return obj.__kb[key];
 	  };
 
+	  utils.has = function(obj, key) {
+	    return obj.__kb && obj.__kb.hasOwnProperty(key);
+	  };
+
+	  utils.wrappedObservable = function(obj, value) {
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'observable');
+	    } else {
+	      return kb.utils.set(obj, 'observable', value);
+	    }
+	  };
+
+	  utils.wrappedObject = function(obj, value) {
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'object');
+	    } else {
+	      return kb.utils.set(obj, 'object', value);
+	    }
+	  };
+
+	  utils.wrappedCreator = function(obj, value) {
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'creator');
+	    } else {
+	      return kb.utils.set(obj, 'creator', value);
+	    }
+	  };
+
 	  utils.wrappedModel = function(obj, value) {
 	    if (arguments.length === 1) {
-	      value = _wrappedKey(obj, 'object');
-	      if (_.isUndefined(value)) {
+	      if (_.isUndefined(value = kb.utils.get(obj, 'object'))) {
 	        return obj;
 	      } else {
 	        return value;
 	      }
 	    } else {
-	      return _wrappedKey(obj, 'object', value);
+	      return kb.utils.set(obj, 'object', value);
 	    }
 	  };
 
 	  utils.wrappedStore = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'store'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'store');
+	    } else {
+	      return kb.utils.set(obj, 'store', value);
+	    }
 	  };
 
 	  utils.wrappedStoreIsOwned = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'store_is_owned'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'store_is_owned');
+	    } else {
+	      return kb.utils.set(obj, 'store_is_owned', value);
+	    }
 	  };
 
 	  utils.wrappedFactory = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'factory'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'factory');
+	    } else {
+	      return kb.utils.set(obj, 'factory', value);
+	    }
 	  };
 
 	  utils.wrappedEventWatcher = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'event_watcher'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'event_watcher');
+	    } else {
+	      return kb.utils.set(obj, 'event_watcher', value);
+	    }
 	  };
 
 	  utils.wrappedEventWatcherIsOwned = function(obj, value) {
-	    return _wrappedKey.apply(this, _argumentsAddKey(arguments, 'event_watcher_is_owned'));
+	    if (arguments.length === 1) {
+	      return kb.utils.get(obj, 'event_watcher_is_owned');
+	    } else {
+	      return kb.utils.set(obj, 'event_watcher_is_owned', value);
+	    }
 	  };
 
-	  utils.wrappedDestroy = function(obj) {
-	    var __kb;
-	    if (!obj.__kb) {
-	      return;
-	    }
-	    if (obj.__kb.event_watcher) {
-	      obj.__kb.event_watcher.releaseCallbacks(obj);
-	    }
-	    __kb = obj.__kb;
-	    obj.__kb = null;
-	    if (__kb.observable) {
-	      __kb.observable.destroy = __kb.observable.release = null;
-	      this.wrappedDestroy(__kb.observable);
-	      __kb.observable = null;
-	    }
-	    __kb.factory = null;
-	    if (__kb.event_watcher_is_owned) {
-	      __kb.event_watcher.destroy();
-	    }
-	    __kb.event_watcher = null;
-	    if (__kb.store_is_owned) {
-	      __kb.store.destroy();
-	    }
-	    return __kb.store = null;
-	  };
+	  utils.wrappedDestroy = __webpack_require__(30);
 
 	  utils.valueType = function(observable) {
 	    if (!observable) {
@@ -2392,92 +2308,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ko.observable(obj);
 	  };
 
-	  utils.hasModelSignature = function(obj) {
-	    return obj && (obj.attributes && !obj.models) && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
-	  };
+	  utils.collapseOptions = __webpack_require__(31);
 
-	  utils.hasCollectionSignature = function(obj) {
-	    return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
-	  };
+	  utils.unwrapModels = __webpack_require__(32);
 
-	  utils.collapseOptions = function(options) {
-	    var key, result, value, _ref1;
-	    result = {};
-	    options = {
-	      options: options
-	    };
-	    while (options.options) {
-	      _ref1 = options.options;
-	      for (key in _ref1) {
-	        value = _ref1[key];
-	        switch (key) {
-	          case 'internals':
-	          case 'requires':
-	          case 'excludes':
-	          case 'statics':
-	            _mergeArray(result, key, value);
-	            break;
-	          case 'keys':
-	            if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
-	              if (!_.isObject(value)) {
-	                value = [value];
-	              }
-	              if (_.isArray(value)) {
-	                value = _keyArrayToObject(value);
-	              }
-	              if (_.isArray(result[key])) {
-	                result[key] = _keyArrayToObject(result[key]);
-	              }
-	              _mergeObject(result, key, value);
-	            } else {
-	              _mergeArray(result, key, value);
-	            }
-	            break;
-	          case 'factories':
-	            if (_.isFunction(value)) {
-	              result[key] = value;
-	            } else {
-	              _mergeObject(result, key, value);
-	            }
-	            break;
-	          case 'static_defaults':
-	            _mergeObject(result, key, value);
-	            break;
-	          case 'options':
-	            break;
-	          default:
-	            result[key] = value;
-	        }
-	      }
-	      options = options.options;
+	  utils.resolveModel = function(model) {
+	    if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) {
+	      return model.model();
+	    } else {
+	      return model;
 	    }
-	    return result;
-	  };
-
-	  utils.unwrapModels = function(obj) {
-	    var key, result, value;
-	    if (!obj) {
-	      return obj;
-	    }
-	    if (obj.__kb) {
-	      if ('object' in obj.__kb) {
-	        return obj.__kb.object;
-	      } else {
-	        return obj;
-	      }
-	    } else if (_.isArray(obj)) {
-	      return _.map(obj, function(test) {
-	        return kb.utils.unwrapModels(test);
-	      });
-	    } else if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
-	      result = {};
-	      for (key in obj) {
-	        value = obj[key];
-	        result[key] = kb.utils.unwrapModels(value);
-	      }
-	      return result;
-	    }
-	    return obj;
 	  };
 
 	  return utils;
@@ -2486,7 +2326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2500,7 +2340,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	createOptions = (function(_this) {
 	  return function(vm) {
@@ -2581,7 +2421,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        kb.Store.useOptionsOrCreate(options, model, _this);
 	        _this.__kb.path = options.path;
 	        kb.Factory.useOptionsOrCreate(options, _this, options.path);
-	        _model = kb._wrappedKey(_this, '_model', ko.observable());
+	        _model = kb.utils.set(_this, '_model', ko.observable());
 	        _this.model = ko.computed({
 	          read: function() {
 	            return ko.utils.unwrapObservable(_model);
@@ -2591,7 +2431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
 	                return;
 	              }
-	              _this.__kb.store.reuse(_this, (new_model && kb.Backbone && kb.Backbone.ModelRef && new_model instanceof kb.Backbone.ModelRef ? new_model.model() : new_model));
+	              _this.__kb.store.reuse(_this, kb.utils.resolveModel(new_model));
 	              event_watcher.emitter(new_model);
 	              _model(event_watcher.ee);
 	              return !event_watcher.ee || _this.createObservables(event_watcher.ee);
@@ -2686,7 +2526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2700,7 +2540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, key, _i, _len, _ref;
 
-	module.exports = kb = __webpack_require__(7);
+	module.exports = kb = __webpack_require__(6);
 
 	kb.configure = __webpack_require__(2);
 
@@ -2722,7 +2562,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2736,9 +2576,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_PUBLISH, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
-	__webpack_require__(25);
+	__webpack_require__(24);
 
 	KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
@@ -2784,7 +2624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2798,7 +2638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var arraySlice, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	arraySlice = Array.prototype.slice;
 
@@ -2918,7 +2758,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -2932,7 +2772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_PUBLISH, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
@@ -3029,7 +2869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3043,7 +2883,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var KEYS_PUBLISH, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	KEYS_PUBLISH = ['destroy'];
 
@@ -3102,7 +2942,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3116,9 +2956,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var $, callOrGet, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
-	__webpack_require__(26);
+	__webpack_require__(25);
 
 	callOrGet = function(value) {
 	  value = ko.utils.unwrapObservable(value);
@@ -3262,6 +3102,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_20__;
+
+/***/ },
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3277,17 +3123,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
+	if(typeof __WEBPACK_EXTERNAL_MODULE_23__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
 	module.exports = __WEBPACK_EXTERNAL_MODULE_23__;
 
 /***/ },
 /* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	if(typeof __WEBPACK_EXTERNAL_MODULE_24__ === 'undefined') {var e = new Error("Cannot find module \"undefined\""); e.code = 'MODULE_NOT_FOUND'; throw e;}
-	module.exports = __WEBPACK_EXTERNAL_MODULE_24__;
-
-/***/ },
-/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3301,7 +3141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
 	kb.Observable.prototype.setToDefault = function() {
 	  var _ref1;
@@ -3345,7 +3185,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3359,7 +3199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var $, EMAIL_REGEXP, NUMBER_REGEXP, URL_REGEXP, kb, ko, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, ko = _ref.ko, $ = _ref.$;
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko, $ = _ref.$;
 
 	URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
 
@@ -3461,7 +3301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3475,7 +3315,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var AssociatedModel, Backbone, BackboneAssociations, kb, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, Backbone = _ref.Backbone;
+	_ref = kb = __webpack_require__(6), _ = _ref._, Backbone = _ref.Backbone;
 
 	AssociatedModel = null;
 
@@ -3518,7 +3358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 28 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -3532,7 +3372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	var Backbone, BackboneRelational, RelationalModel, kb, _, _ref;
 
-	_ref = kb = __webpack_require__(7), _ = _ref._, Backbone = _ref.Backbone;
+	_ref = kb = __webpack_require__(6), _ = _ref._, Backbone = _ref.Backbone;
 
 	RelationalModel = null;
 
@@ -3602,7 +3442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -3618,7 +3458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	root = typeof window !== "undefined" && window !== null ? window : global;
 
-	_ = (kb = __webpack_require__(7))._;
+	_ = (kb = __webpack_require__(6))._;
 
 	Supermodel = null;
 
@@ -3687,6 +3527,274 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var copyProps;
+
+	copyProps = function(dest, source) {
+	  var key, value;
+	  for (key in source) {
+	    value = source[key];
+	    dest[key] = value;
+	  }
+	  return dest;
+	};
+
+	// Shared empty constructor function to aid in prototype-chain creation.
+	var ctor = function(){};
+
+	// Helper function to correctly set up the prototype chain, for subclasses.
+	// Similar to 'goog.inherits', but uses a hash of prototype properties and
+	// class properties to be extended.
+	var inherits = function(parent, protoProps, staticProps) {
+	  var child;
+
+	  // The constructor function for the new subclass is either defined by you
+	  // (the "constructor" property in your extend definition), or defaulted
+	  // by us to simply call the parent's constructor.
+	  if (protoProps && protoProps.hasOwnProperty('constructor')) {
+	    child = protoProps.constructor;
+	  } else {
+	    child = function(){ parent.apply(this, arguments); };
+	  }
+
+	  // Inherit class (static) properties from parent.
+	  copyProps(child, parent);
+
+	  // Set the prototype chain to inherit from parent, without calling
+	  // parent's constructor function.
+	  ctor.prototype = parent.prototype;
+	  child.prototype = new ctor();
+
+	  // Add prototype properties (instance properties) to the subclass,
+	  // if supplied.
+	  if (protoProps) copyProps(child.prototype, protoProps);
+
+	  // Add static properties to the constructor function, if supplied.
+	  if (staticProps) copyProps(child, staticProps);
+
+	  // Correctly set child's 'prototype.constructor'.
+	  child.prototype.constructor = child;
+
+	  // Set a convenience property in case the parent's prototype is needed later.
+	  child.__super__ = parent.prototype;
+
+	  return child;
+	};
+
+	// The self-propagating extend function that BacLCone classes use.
+	var extend = function (protoProps, classProps) {
+	  var child = inherits(this, protoProps, classProps);
+	  child.extend = this.extend;
+	  return child;
+	};
+	;
+
+	module.exports = extend;
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var wrappedDestroy, _;
+
+	_ = __webpack_require__(6)._;
+
+	module.exports = wrappedDestroy = function(obj) {
+	  var store_references, __kb;
+	  if (!obj.__kb) {
+	    return;
+	  }
+	  if (obj.__kb.event_watcher) {
+	    obj.__kb.event_watcher.releaseCallbacks(obj);
+	  }
+	  __kb = obj.__kb;
+	  obj.__kb = null;
+	  if (__kb.observable) {
+	    __kb.observable.destroy = __kb.observable.release = null;
+	    wrappedDestroy(__kb.observable);
+	    __kb.observable = null;
+	  }
+	  __kb.factory = null;
+	  if (__kb.event_watcher_is_owned) {
+	    __kb.event_watcher.destroy();
+	  }
+	  __kb.event_watcher = null;
+	  if (__kb.store_is_owned) {
+	    __kb.store.destroy();
+	  }
+	  __kb.store = null;
+	  if (__kb.stores_references) {
+	    while (store_references = __kb.stores_references.pop()) {
+	      if (!store_references.store.__kb_released) {
+	        store_references.store.release(obj);
+	      }
+	    }
+	  }
+	};
+
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var _, _keyArrayToObject, _mergeArray, _mergeObject;
+
+	_ = __webpack_require__(6)._;
+
+	_mergeArray = function(result, key, value) {
+	  result[key] || (result[key] = []);
+	  if (!_.isArray(value)) {
+	    value = [value];
+	  }
+	  result[key] = result[key].length ? _.union(result[key], value) : value;
+	  return result;
+	};
+
+	_mergeObject = function(result, key, value) {
+	  result[key] || (result[key] = {});
+	  return _.extend(result[key], value);
+	};
+
+	_keyArrayToObject = function(value) {
+	  var item, result, _i, _len;
+	  result = {};
+	  for (_i = 0, _len = value.length; _i < _len; _i++) {
+	    item = value[_i];
+	    result[item] = {
+	      key: item
+	    };
+	  }
+	  return result;
+	};
+
+	module.exports = function(options) {
+	  var key, result, value, _ref;
+	  result = {};
+	  options = {
+	    options: options
+	  };
+	  while (options.options) {
+	    _ref = options.options;
+	    for (key in _ref) {
+	      value = _ref[key];
+	      switch (key) {
+	        case 'internals':
+	        case 'requires':
+	        case 'excludes':
+	        case 'statics':
+	          _mergeArray(result, key, value);
+	          break;
+	        case 'keys':
+	          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
+	            if (!_.isObject(value)) {
+	              value = [value];
+	            }
+	            if (_.isArray(value)) {
+	              value = _keyArrayToObject(value);
+	            }
+	            if (_.isArray(result[key])) {
+	              result[key] = _keyArrayToObject(result[key]);
+	            }
+	            _mergeObject(result, key, value);
+	          } else {
+	            _mergeArray(result, key, value);
+	          }
+	          break;
+	        case 'factories':
+	          if (_.isFunction(value)) {
+	            result[key] = value;
+	          } else {
+	            _mergeObject(result, key, value);
+	          }
+	          break;
+	        case 'static_defaults':
+	          _mergeObject(result, key, value);
+	          break;
+	        case 'options':
+	          break;
+	        default:
+	          result[key] = value;
+	      }
+	    }
+	    options = options.options;
+	  }
+	  return result;
+	};
+
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var unwrapModels, _;
+
+	_ = __webpack_require__(6)._;
+
+	module.exports = unwrapModels = function(obj) {
+	  var key, result, value;
+	  if (!obj) {
+	    return obj;
+	  }
+	  if (obj.__kb) {
+	    return (obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj);
+	  }
+	  if (_.isArray(obj)) {
+	    return _.map(obj, function(test) {
+	      return unwrapModels(test);
+	    });
+	  }
+	  if (_.isObject(obj) && (obj.constructor === {}.constructor)) {
+	    result = {};
+	    for (key in obj) {
+	      value = obj[key];
+	      result[key] = unwrapModels(value);
+	    }
+	    return result;
+	  }
+	  return obj;
+	};
+
 
 /***/ }
 /******/ ])

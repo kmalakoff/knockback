@@ -58,7 +58,7 @@ var ContactViewModel = kb.ViewModel.extend({
 class ContactViewModel extends kb.ViewModel
   constructor: (model) ->
     super model
-    
+
     @full_name = ko.computed => "#{@first_name()} #{@last_name()}"
 ```
 
@@ -93,15 +93,15 @@ Now, the greeting updates as you type!
 * [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) - demonstrates best practices when using Knockback.js including page routing and lifecycle management
 * [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
-# Download Latest (0.19.4):
+# Download Latest (0.20.0):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
-* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback.min.js)
-* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-full-stack.min.js)
+* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback.min.js)
+* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback-full-stack.min.js)
 
-* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core.min.js)
-* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.19.4/knockback-core-stack.min.js)
+* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback-core.min.js)
+* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.20.0/knockback-core-stack.min.js)
 
 The **full versions** bundle advanced features.
 

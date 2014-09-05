@@ -459,7 +459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (_this.in_edit) {
 	          return;
 	        }
-	        (_this.models_only && (!models_or_view_models.length || kb.utils.hasModelSignature(models_or_view_models[0]))) || (!_this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.utils.hasModelSignature(models_or_view_models[0])))) || kb._throwUnexpected(_this, 'incorrect type passed');
+	        (_this.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0]))) || (!_this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])))) || kb._throwUnexpected(_this, 'incorrect type passed');
 	        observable = kb.utils.wrappedObservable(_this);
 	        collection = kb.peek(_this._collection);
 	        has_filters = kb.peek(_this._filters).length;
@@ -2304,14 +2304,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return ko.observableArray(obj);
 	    }
 	    return ko.observable(obj);
-	  };
-
-	  utils.hasModelSignature = function(obj) {
-	    return obj && (obj.attributes && !obj.models) && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
-	  };
-
-	  utils.hasCollectionSignature = function(obj) {
-	    return obj && obj.models && (typeof obj.get === 'function') && (typeof obj.trigger === 'function');
 	  };
 
 	  utils.collapseOptions = __webpack_require__(28);

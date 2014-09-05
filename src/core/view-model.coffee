@@ -93,6 +93,7 @@ KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults']
 #     view_model.model(new Backbone.Model({name: 'fred'})); // set
 #
 class kb.ViewModel
+  # @nodoc
   @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.ViewModel.
