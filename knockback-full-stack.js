@@ -2026,7 +2026,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (new_value && new_value instanceof kb.CollectionObservable) {
 	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
-	            if (value.collection() !== new_value) {
+	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
 	            }
 	          }

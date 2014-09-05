@@ -64,8 +64,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(2);
 	__webpack_require__(1);
+	__webpack_require__(2);
 	__webpack_require__(3);
 	__webpack_require__(4);
 	__webpack_require__(5);
@@ -87,63 +87,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ALL_ORMS, kb, key, ko, value, _, _ref;
-
-	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
-
-	ALL_ORMS = {
-	  "default": null,
-	  'backbone-orm': null,
-	  'backbone-associations': __webpack_require__(26),
-	  'backbone-relational': __webpack_require__(27),
-	  supermodel: __webpack_require__(28)
-	};
-
-	kb.orm = ALL_ORMS["default"];
-
-	for (key in ALL_ORMS) {
-	  value = ALL_ORMS[key];
-	  if (value && value.isAvailable()) {
-	    kb.orm = value;
-	    break;
-	  }
-	}
-
-	module.exports = function(options) {
-	  var orm;
-	  if (options == null) {
-	    options = {};
-	  }
-	  for (key in options) {
-	    value = options[key];
-	    switch (key) {
-	      case 'orm':
-	        if (_.isString(value)) {
-	          if (!ALL_ORMS.hasOwnProperty(value)) {
-	            console.log("Knockback configure: could not find orm: " + value + ". Available: " + (_.keys(ALL_ORMS).join(', ')));
-	            continue;
-	          }
-	          if ((orm = ALL_ORMS[value]) && !orm.isAvailable()) {
-	            console.log("Knockback configure: could not enable orm " + value + ". Make sure it is included before Knockback");
-	            continue;
-	          }
-	          kb.orm = orm;
-	          continue;
-	        } else {
-	          kb.orm = value;
-	        }
-	        break;
-	      default:
-	        kb[key] = value;
-	    }
-	  }
-	};
-
-
-/***/ },
-/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -605,6 +548,63 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.collectionObservable = function(collection, view_model, options) {
 	  return new kb.CollectionObservable(collection, view_model, options);
+	};
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ALL_ORMS, kb, key, ko, value, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
+	ALL_ORMS = {
+	  "default": null,
+	  'backbone-orm': null,
+	  'backbone-associations': __webpack_require__(26),
+	  'backbone-relational': __webpack_require__(27),
+	  supermodel: __webpack_require__(28)
+	};
+
+	kb.orm = ALL_ORMS["default"];
+
+	for (key in ALL_ORMS) {
+	  value = ALL_ORMS[key];
+	  if (value && value.isAvailable()) {
+	    kb.orm = value;
+	    break;
+	  }
+	}
+
+	module.exports = function(options) {
+	  var orm;
+	  if (options == null) {
+	    options = {};
+	  }
+	  for (key in options) {
+	    value = options[key];
+	    switch (key) {
+	      case 'orm':
+	        if (_.isString(value)) {
+	          if (!ALL_ORMS.hasOwnProperty(value)) {
+	            console.log("Knockback configure: could not find orm: " + value + ". Available: " + (_.keys(ALL_ORMS).join(', ')));
+	            continue;
+	          }
+	          if ((orm = ALL_ORMS[value]) && !orm.isAvailable()) {
+	            console.log("Knockback configure: could not enable orm " + value + ". Make sure it is included before Knockback");
+	            continue;
+	          }
+	          kb.orm = orm;
+	          continue;
+	        } else {
+	          kb.orm = value;
+	        }
+	        break;
+	      default:
+	        kb[key] = value;
+	    }
+	  }
 	};
 
 
@@ -2028,7 +2028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (new_value && new_value instanceof kb.CollectionObservable) {
 	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
-	            if (value.collection() !== new_value) {
+	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
 	            }
 	          }
@@ -2542,7 +2542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = kb = __webpack_require__(6);
 
-	kb.configure = __webpack_require__(1);
+	kb.configure = __webpack_require__(2);
 
 	kb.modules = {
 	  underscore: kb._,
