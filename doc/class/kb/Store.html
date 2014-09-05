@@ -51,6 +51,17 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 </div>
 <div class='tags'>
 </div>
+      <h2>Variables Summary</h2>
+      <dl class='constants'>
+  <dt id='instances-variable'>
+    instances
+    =
+  </dt>
+  <dd>
+    <pre><code class='coffeescript'>[]</code></pre>
+    
+  </dd>
+</dl>
       <h2>Class Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -89,7 +100,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       </a>
     </span>
     <span class='desc'>
-      Manually clear the store. 
+      Manually clear the store 
     </span>
   </li>
   <li>
@@ -101,15 +112,15 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       </a>
     </span>
     <span class='desc'>
-      Manually compact the store by searching for released view models. 
+      Manually compact the store by searching for released view models 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#register-dynamic'>
+      <a href='#retain-dynamic'>
         #
 (void)
-<b>register</b><span>(obj, observable, options)</span>
+<b>retain</b><span>(observable, obj, creator)</span>
       </a>
     </span>
     <span class='desc'>
@@ -118,14 +129,26 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
   </li>
   <li>
     <span class='signature'>
-      <a href='#findOrCreate-dynamic'>
+      <a href='#retainOrCreate-dynamic'>
         #
 (void)
-<b>findOrCreate</b><span>(obj, options)</span>
+<b>retainOrCreate</b><span>(obj, options)</span>
       </a>
     </span>
     <span class='desc'>
       Used to find an existing observable in the store or create a new one if it doesn&#39;t exist. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#release-dynamic'>
+        #
+(void)
+<b>release</b><span>(observable, force)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Release a reference to a a ViewModel in this store. 
     </span>
   </li>
 </ul>
@@ -225,7 +248,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
       <br>
     </p>
     <div class='docstring'>
-  <p>Manually clear the store.</p>
+  <p>Manually clear the store</p>
 </div>
 <div class='tags'>
 </div>
@@ -238,16 +261,16 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
       <br>
     </p>
     <div class='docstring'>
-  <p>Manually compact the store by searching for released view models.</p>
+  <p>Manually compact the store by searching for released view models</p>
 </div>
 <div class='tags'>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='register-dynamic'>
+    <p class='signature' id='retain-dynamic'>
       #
 (void)
-<b>register</b><span>(obj, observable, options)</span>
+<b>retain</b><span>(observable, obj, creator)</span>
       <br>
     </p>
     <div class='docstring'>
@@ -255,9 +278,9 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
-      register an observable with the store
+      retain an observable with the store
     </h4>
-    <pre><code class='coffeescript'>store.registerObservable(obj, observable, {creator: creator});</code></pre>
+    <pre><code class='coffeescript'>store.retain(observable, obj, creator);</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -343,10 +366,10 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='findOrCreate-dynamic'>
+    <p class='signature' id='retainOrCreate-dynamic'>
       #
 (void)
-<b>findOrCreate</b><span>(obj, options)</span>
+<b>retainOrCreate</b><span>(obj, options)</span>
       <br>
     </p>
     <div class='docstring'>
@@ -354,9 +377,9 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
   <div class='examples'>
     <h3>Examples:</h3>
     <h4>
-      register an observable with th store
+      register an observable with the store
     </h4>
-    <pre><code class='coffeescript'>observable = store.findOrCreateObservable(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})</code></pre>
+    <pre><code class='coffeescript'>observable = store.retainOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -431,10 +454,23 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
   </ul>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='release-dynamic'>
+      #
+(void)
+<b>release</b><span>(observable, force)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Release a reference to a a ViewModel in this store.</p>
+</div>
+<div class='tags'>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
-  August 29, 14 06:51:46 by
+  September 04, 14 18:10:25 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

@@ -46,7 +46,7 @@
     =
   </dt>
   <dd>
-    <pre><code class='coffeescript'>&#39;0.19.4&#39;</code></pre>
+    <pre><code class='coffeescript'>&#39;0.20.0&#39;</code></pre>
     <div class='docstring'>
   <p>Knockback library semantic version</p>
 </div>
@@ -112,14 +112,6 @@
 </div>
 <div class='tags'>
 </div>
-  </dd>
-  <dt id='extend-variable'>
-    extend
-    =
-  </dt>
-  <dd>
-    <pre><code class='coffeescript'>extend</code></pre>
-    
   </dd>
 </dl>
       <h2>Class Method Summary</h2>
@@ -372,12 +364,12 @@
       
     </h4>
     <pre><code class='coffeescript'>var view_model = kb.viewModel(model);
-kb.utils.release(view_model); view_model = null;</code></pre>
+kb.release(view_model); view_model = null;</code></pre>
     <h4>
       
     </h4>
     <pre><code class='coffeescript'>var todos = kb.collectionObservable(collection);
-kb.utils.release(todos); todos = null;</code></pre>
+kb.release(todos); todos = null;</code></pre>
   </div>
 </div>
 <div class='tags'>
@@ -783,7 +775,7 @@ ko.removeNode(el); &#47;&#47; removes el from the DOM and calls kb.release(view_
 </div>
     </div>
     <div id='footer'>
-  August 29, 14 06:51:46 by
+  September 04, 14 18:10:25 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

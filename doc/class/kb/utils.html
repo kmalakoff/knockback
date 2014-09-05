@@ -141,18 +141,6 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#wrappedDestroy-static'>
-        .
-(void)
-<b>wrappedDestroy</b><span>(obj)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Clean up function that releases all of the wrapped values on an owner. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
       <a href='#valueType-static'>
         .
 (void)
@@ -209,54 +197,6 @@
     </span>
     <span class='desc'>
       Creates an observable based on a value&#39;s type. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#hasModelSignature-static'>
-        .
-(void)
-<b>hasModelSignature</b><span>(obj)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Helper to check an object for having a Model signature. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#hasCollectionSignature-static'>
-        .
-(void)
-<b>hasCollectionSignature</b><span>(obj)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Helper to check an object for having a Model signature. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#collapseOptions-static'>
-        .
-(void)
-<b>collapseOptions</b><span>(options)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Helper to merge options including ViewmModel options like <code>keys</code> and <code>factories</code> 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#unwrapModels-static'>
-        .
-(void)
-<b>unwrapModels</b><span>(obj)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      used for attribute setting to ensure all model attributes have their underlying models 
     </span>
   </li>
 </ul>
@@ -872,19 +812,6 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='wrappedDestroy-static'>
-      .
-(void)
-<b>wrappedDestroy</b><span>(obj)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Clean up function that releases all of the wrapped values on an owner.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-  <div class='method_details'>
     <p class='signature' id='valueType-static'>
       .
 (void)
@@ -1046,122 +973,10 @@ kb.utils.valueType(view_model.model_attr);  &#47;&#47; kb.TYPE_MODEL</code></pre
 <div class='tags'>
 </div>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='hasModelSignature-static'>
-      .
-(void)
-<b>hasModelSignature</b><span>(obj)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Helper to check an object for having a Model signature. For example, locale managers and ModelRef don&#39;t need to derive from Model</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>kb.utils.hasModelSignature(new Model());</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>obj</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the object to test </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='hasCollectionSignature-static'>
-      .
-(void)
-<b>hasCollectionSignature</b><span>(obj)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Helper to check an object for having a Model signature. For example, locale managers and ModelRef don&#39;t need to derive from Model</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>kb.utils.hasModelSignature(new Model());</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>obj</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the object to test </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='collapseOptions-static'>
-      .
-(void)
-<b>collapseOptions</b><span>(options)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Helper to merge options including ViewmModel options like <code>keys</code> and <code>factories</code></p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>kb.utils.collapseOptions(options);</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>obj</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the object to test </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='unwrapModels-static'>
-      .
-(void)
-<b>unwrapModels</b><span>(obj)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>used for attribute setting to ensure all model attributes have their underlying models</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
 </div>
     </div>
     <div id='footer'>
-  August 29, 14 06:51:46 by
+  September 04, 14 18:10:25 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
