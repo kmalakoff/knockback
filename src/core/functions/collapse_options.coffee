@@ -23,6 +23,7 @@ _mergeObject = (result, key, value) -> result[key] or= {}; return _.extend(resul
 _keyArrayToObject = (value) -> result = {}; result[item] = {key: item} for item in value; return result
 
 _mergeOptions = (result, options) ->
+  return result unless options
   for key, value of options
     switch key
       when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
@@ -45,10 +46,7 @@ _mergeOptions = (result, options) ->
       else
         result[key] = value
 
+  return _mergeOptions(result, options.options)
+
 # @nodoc
-module.exports = (options) ->
-  result = {}
-  if options
-    _mergeOptions(result, options)
-    (_mergeOptions(result, options.options); options = options.options) while options.options
-  return result
+module.exports = (options) -> _mergeOptions({}, options)

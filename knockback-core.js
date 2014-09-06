@@ -2987,8 +2987,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	_mergeOptions = function(result, options) {
-	  var key, value, _results;
-	  _results = [];
+	  var key, value;
+	  if (!options) {
+	    return result;
+	  }
 	  for (key in options) {
 	    value = options[key];
 	    switch (key) {
@@ -2996,7 +2998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case 'requires':
 	      case 'excludes':
 	      case 'statics':
-	        _results.push(_mergeArray(result, key, value));
+	        _mergeArray(result, key, value);
 	        break;
 	      case 'keys':
 	        if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
@@ -3009,41 +3011,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (_.isArray(result[key])) {
 	            result[key] = _keyArrayToObject(result[key]);
 	          }
-	          _results.push(_mergeObject(result, key, value));
+	          _mergeObject(result, key, value);
 	        } else {
-	          _results.push(_mergeArray(result, key, value));
+	          _mergeArray(result, key, value);
 	        }
 	        break;
 	      case 'factories':
 	        if (_.isFunction(value)) {
-	          _results.push(result[key] = value);
+	          result[key] = value;
 	        } else {
-	          _results.push(_mergeObject(result, key, value));
+	          _mergeObject(result, key, value);
 	        }
 	        break;
 	      case 'static_defaults':
-	        _results.push(_mergeObject(result, key, value));
+	        _mergeObject(result, key, value);
 	        break;
 	      case 'options':
 	        break;
 	      default:
-	        _results.push(result[key] = value);
+	        result[key] = value;
 	    }
 	  }
-	  return _results;
+	  return _mergeOptions(result, options.options);
 	};
 
 	module.exports = function(options) {
-	  var result;
-	  result = {};
-	  if (options) {
-	    _mergeOptions(result, options);
-	    while (options.options) {
-	      _mergeOptions(result, options.options);
-	      options = options.options;
-	    }
-	  }
-	  return result;
+	  return _mergeOptions({}, options);
 	};
 
 

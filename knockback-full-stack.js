@@ -77,8 +77,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	__webpack_require__(13);
 	__webpack_require__(15);
 	__webpack_require__(16);
-	__webpack_require__(17);
 	__webpack_require__(18);
+	__webpack_require__(17);
 	__webpack_require__(19);
 	module.exports = __webpack_require__(14);
 
@@ -2778,6 +2778,79 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
 
+	KEYS_PUBLISH = ['destroy'];
+
+	module.exports = kb.TriggeredObservable = (function() {
+	  function TriggeredObservable(emitter, event_selector) {
+	    var observable;
+	    this.event_selector = event_selector;
+	    emitter || kb._throwMissing(this, 'emitter');
+	    this.event_selector || kb._throwMissing(this, 'event_selector');
+	    this.vo = ko.observable();
+	    observable = kb.utils.wrappedObservable(this, ko.computed((function(_this) {
+	      return function() {
+	        return _this.vo();
+	      };
+	    })(this)));
+	    kb.publishMethods(observable, this, KEYS_PUBLISH);
+	    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, {
+	      emitter: _.bind(this.emitter, this),
+	      update: _.bind(this.update, this),
+	      event_selector: this.event_selector
+	    }));
+	    return observable;
+	  }
+
+	  TriggeredObservable.prototype.destroy = function() {
+	    return kb.utils.wrappedDestroy(this);
+	  };
+
+	  TriggeredObservable.prototype.emitter = function(new_emitter) {
+	    if ((arguments.length === 0) || (this.ee === new_emitter)) {
+	      return this.ee;
+	    }
+	    if ((this.ee = new_emitter)) {
+	      return this.update();
+	    }
+	  };
+
+	  TriggeredObservable.prototype.update = function() {
+	    if (!this.ee) {
+	      return;
+	    }
+	    if (this.vo() !== this.ee) {
+	      return this.vo(this.ee);
+	    } else {
+	      return this.vo.valueHasMutated();
+	    }
+	  };
+
+	  return TriggeredObservable;
+
+	})();
+
+	kb.triggeredObservable = function(emitter, event_selector) {
+	  return new kb.TriggeredObservable(emitter, event_selector);
+	};
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	
+	/*
+	  knockback.js 0.20.0
+	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+	  Source: https://github.com/kmalakoff/knockback
+	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+	 */
+	var KEYS_PUBLISH, kb, ko, _, _ref;
+
+	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
+
 	KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
 	kb.locale_manager || (kb.locale_manager = void 0);
@@ -2869,79 +2942,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.localizedObservable = function(value, options, view_model) {
 	  return new kb.LocalizedObservable(value, options, view_model);
-	};
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	
-	/*
-	  knockback.js 0.20.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
-	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-	  Source: https://github.com/kmalakoff/knockback
-	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-	 */
-	var KEYS_PUBLISH, kb, ko, _, _ref;
-
-	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
-
-	KEYS_PUBLISH = ['destroy'];
-
-	module.exports = kb.TriggeredObservable = (function() {
-	  function TriggeredObservable(emitter, event_selector) {
-	    var observable;
-	    this.event_selector = event_selector;
-	    emitter || kb._throwMissing(this, 'emitter');
-	    this.event_selector || kb._throwMissing(this, 'event_selector');
-	    this.vo = ko.observable();
-	    observable = kb.utils.wrappedObservable(this, ko.computed((function(_this) {
-	      return function() {
-	        return _this.vo();
-	      };
-	    })(this)));
-	    kb.publishMethods(observable, this, KEYS_PUBLISH);
-	    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, {
-	      emitter: _.bind(this.emitter, this),
-	      update: _.bind(this.update, this),
-	      event_selector: this.event_selector
-	    }));
-	    return observable;
-	  }
-
-	  TriggeredObservable.prototype.destroy = function() {
-	    return kb.utils.wrappedDestroy(this);
-	  };
-
-	  TriggeredObservable.prototype.emitter = function(new_emitter) {
-	    if ((arguments.length === 0) || (this.ee === new_emitter)) {
-	      return this.ee;
-	    }
-	    if ((this.ee = new_emitter)) {
-	      return this.update();
-	    }
-	  };
-
-	  TriggeredObservable.prototype.update = function() {
-	    if (!this.ee) {
-	      return;
-	    }
-	    if (this.vo() !== this.ee) {
-	      return this.vo(this.ee);
-	    } else {
-	      return this.vo.valueHasMutated();
-	    }
-	  };
-
-	  return TriggeredObservable;
-
-	})();
-
-	kb.triggeredObservable = function(emitter, event_selector) {
-	  return new kb.TriggeredObservable(emitter, event_selector);
 	};
 
 
@@ -3685,8 +3685,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	_mergeOptions = function(result, options) {
-	  var key, value, _results;
-	  _results = [];
+	  var key, value;
+	  if (!options) {
+	    return result;
+	  }
 	  for (key in options) {
 	    value = options[key];
 	    switch (key) {
@@ -3694,7 +3696,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      case 'requires':
 	      case 'excludes':
 	      case 'statics':
-	        _results.push(_mergeArray(result, key, value));
+	        _mergeArray(result, key, value);
 	        break;
 	      case 'keys':
 	        if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
@@ -3707,41 +3709,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (_.isArray(result[key])) {
 	            result[key] = _keyArrayToObject(result[key]);
 	          }
-	          _results.push(_mergeObject(result, key, value));
+	          _mergeObject(result, key, value);
 	        } else {
-	          _results.push(_mergeArray(result, key, value));
+	          _mergeArray(result, key, value);
 	        }
 	        break;
 	      case 'factories':
 	        if (_.isFunction(value)) {
-	          _results.push(result[key] = value);
+	          result[key] = value;
 	        } else {
-	          _results.push(_mergeObject(result, key, value));
+	          _mergeObject(result, key, value);
 	        }
 	        break;
 	      case 'static_defaults':
-	        _results.push(_mergeObject(result, key, value));
+	        _mergeObject(result, key, value);
 	        break;
 	      case 'options':
 	        break;
 	      default:
-	        _results.push(result[key] = value);
+	        result[key] = value;
 	    }
 	  }
-	  return _results;
+	  return _mergeOptions(result, options.options);
 	};
 
 	module.exports = function(options) {
-	  var result;
-	  result = {};
-	  if (options) {
-	    _mergeOptions(result, options);
-	    while (options.options) {
-	      _mergeOptions(result, options.options);
-	      options = options.options;
-	    }
-	  }
-	  return result;
+	  return _mergeOptions({}, options);
 	};
 
 
