@@ -837,35 +837,58 @@ describe 'collection-observable @quick @collection-observable', ->
 
     class PersonViewModel extends kb.ViewModel
     class OtherViewModel extends kb.ViewModel
-    collection_observable = kb.collectionObservable(PersonViewModel, {factories: {other: OtherViewModel}})
+    collection_observable = kb.collectionObservable(PersonViewModel, {factories: {'models.other': OtherViewModel}})
     assert.equal collection_observable.collection().length, 0, 'no view models'
-    collection_observable.collection().reset((new Contact({id: id}) for id in [1..4]))
+    collection_observable.collection().reset((new Contact({id: id, other: null}) for id in [1..4]))
     assert.equal collection_observable.collection().length, 4, '4 view models'
 
     for view_model in collection_observable()
       assert.ok view_model instanceof PersonViewModel, 'view model correct type'
       assert.ok !!view_model.date()
       assert.ok view_model.model() instanceof Contact, 'model correct type'
+      assert.ok view_model.other() instanceof OtherViewModel, 'view_model correct type'
 
     kb.release(collection_observable)
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '24. expanded form for colletion, view models with options', (done) ->
+  it '24. expanded form for collection, view models with options', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     class PersonViewModel extends kb.ViewModel
     class OtherViewModel extends kb.ViewModel
-    collection_observable = kb.collectionObservable(new kb.Collection(), PersonViewModel, {factories: {other: OtherViewModel}})
+    collection_observable = kb.collectionObservable(new kb.Collection(), PersonViewModel, {factories: {'models.other': OtherViewModel}})
     assert.equal collection_observable.collection().length, 0, 'no view models'
-    collection_observable.collection().reset((new Contact({id: id}) for id in [1..4]))
+    collection_observable.collection().reset((new Contact({id: id, other: null}) for id in [1..4]))
     assert.equal collection_observable.collection().length, 4, '4 view models'
 
     for view_model in collection_observable()
       assert.ok view_model instanceof PersonViewModel, 'view model correct type'
       assert.ok !!view_model.date()
       assert.ok view_model.model() instanceof Contact, 'model correct type'
+      assert.ok view_model.other() instanceof OtherViewModel, 'view_model correct type'
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
+
+  it '24. expanded form for collection, view models with many options', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class PersonViewModel extends kb.ViewModel
+    class OtherViewModel extends kb.ViewModel
+    collection_observable = kb.collectionObservable(new kb.Collection(), PersonViewModel, {}, {}, {}, {factories: {'models.other': OtherViewModel}})
+    assert.equal collection_observable.collection().length, 0, 'no view models'
+    collection_observable.collection().reset((new Contact({id: id, other: null}) for id in [1..4]))
+    assert.equal collection_observable.collection().length, 4, '4 view models'
+
+    for view_model in collection_observable()
+      assert.ok view_model instanceof PersonViewModel, 'view model correct type'
+      assert.ok !!view_model.date()
+      assert.ok view_model.model() instanceof Contact, 'model correct type'
+      assert.ok view_model.other() instanceof OtherViewModel, 'view_model correct type'
 
     kb.release(collection_observable)
 

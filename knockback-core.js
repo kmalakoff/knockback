@@ -130,22 +130,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function CollectionObservable(collection, view_model, options) {
 	    this._onCollectionChange = __bind(this._onCollectionChange, this);
+	    var args;
+	    args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var create_options, observable, _ref1;
-	        if (_.isArray(collection)) {
-	          collection = new kb.Collection(collection);
-	        } else if (!(collection instanceof kb.Collection)) {
-	          _ref1 = [new kb.Collection(), collection, view_model], collection = _ref1[0], view_model = _ref1[1], options = _ref1[2];
+	        var arg, create_options, observable, _i, _len;
+	        collection = args[0] instanceof kb.Collection ? args.shift() : (_.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection());
+	        if (_.isFunction(args[0])) {
+	          args[0] = {
+	            view_model: args[0]
+	          };
 	        }
-	        if (_.isFunction(view_model)) {
-	          options = _.extend({
-	            view_model: view_model
-	          }, options || {});
-	        } else if (_.isObject(view_model)) {
-	          options = view_model;
+	        options = {};
+	        for (_i = 0, _len = args.length; _i < _len; _i++) {
+	          arg = args[_i];
+	          _.extend(options, arg);
 	        }
-	        options || (options = {});
 	        observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
 	        observable.__kb_is_co = true;
 	        _this.in_edit = 0;
@@ -201,12 +201,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	          collection.bind('all', _this._onCollectionChange);
 	        }
 	        _this._mapper = ko.computed(function() {
-	          var comparator, current_collection, filter, filters, models, previous_view_models, view_models, _i, _len;
+	          var comparator, current_collection, filter, filters, models, previous_view_models, view_models, _j, _len1;
 	          comparator = _this._comparator();
 	          filters = _this._filters();
 	          if (filters) {
-	            for (_i = 0, _len = filters.length; _i < _len; _i++) {
-	              filter = filters[_i];
+	            for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+	              filter = filters[_j];
 	              ko.utils.unwrapObservable(filter);
 	            }
 	          }
@@ -542,7 +542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	kb.collectionObservable = function(collection, view_model, options) {
-	  return new kb.CollectionObservable(collection, view_model, options);
+	  return new kb.CollectionObservable(arguments);
 	};
 
 
@@ -2401,12 +2401,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return kb.ignore((function(_this) {
 	      return function() {
 	        var create_options, event_watcher, key, _i, _len, _model;
-	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
+	        !model || kb.isModel(model) || kb._throwUnexpected(_this, 'not a model');
 	        options = _.isArray(options) ? {
 	          keys: options
 	        } : kb.utils.collapseOptions(options);
-	        _this.__kb || (_this.__kb = {});
-	        _this.__kb.view_model = view_model || _this;
+	        (_this.__kb || (_this.__kb = {})).view_model = view_model || _this;
 	        for (_i = 0, _len = KEYS_OPTIONS.length; _i < _len; _i++) {
 	          key = KEYS_OPTIONS[_i];
 	          if (options.hasOwnProperty(key)) {

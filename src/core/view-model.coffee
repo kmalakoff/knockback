@@ -114,12 +114,11 @@ class kb.ViewModel
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   constructor: (model, options={}, view_model) -> return kb.ignore =>
-    not model or (model instanceof kb.Model) or ((typeof(model.get) is 'function') and (typeof(model.bind) is 'function')) or kb._throwUnexpected(@, 'not a model')
+    not model or kb.isModel(model) or kb._throwUnexpected(@, 'not a model')
 
     # bind and extract options
     options = if _.isArray(options) then {keys: options} else kb.utils.collapseOptions(options)
-    @__kb or= {}
-    @__kb.view_model = view_model or @
+    (@__kb or= {}).view_model = view_model or @
     @__kb[key] = options[key] for key in KEYS_OPTIONS when options.hasOwnProperty(key)
 
     # always use a store to ensure recursive view models are handled correctly

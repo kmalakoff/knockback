@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.20.1
+* Generalized kb.CollectionObservable to take a variable number of options.
+
 ## 0.20.0
 * Bug fix for shared view models: https://github.com/kmalakoff/knockback/issues/113. You will now get warnings if you try to change a model on a shared ViewModel.
 * Added variants for creating a Collection Observable: kb.collectionObservable(YourViewModel), kb.collectionObservable(YourViewModel, options), kb.collectionObservable(new YourCollection(), YourViewModel, options)
