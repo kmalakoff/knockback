@@ -33,13 +33,11 @@ class kb.Factory
     factory.addPathMappings(options.factories, owner_path) if options.factories
     return factory
 
-  constructor: (@parent_factory) ->
-    @paths = {}
+  constructor: (parent_factory) -> @paths = {}; @parent_factory = parent_factory if parent_factory
 
-  hasPath: (path) -> return @paths.hasOwnProperty(path) or (@parent_factory and @parent_factory.hasPath(path))
+  hasPath: (path) -> return @paths.hasOwnProperty(path) or @parent_factory?.hasPath(path)
 
-  addPathMapping: (path, create_info) ->
-    @paths[path] = create_info
+  addPathMapping: (path, create_info) -> @paths[path] = create_info
 
   addPathMappings: (factories, owner_path) ->
     @paths[kb.utils.pathJoin(owner_path, path)] = create_info for path, create_info of factories

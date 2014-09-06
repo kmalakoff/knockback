@@ -10,9 +10,6 @@
 {_, ko} = kb = require './kb'
 
 # @nodoc
-createOptions = (vm) => {store: kb.utils.wrappedStore(vm), factory: kb.utils.wrappedFactory(vm), path: vm.__kb.path, event_watcher: kb.utils.wrappedEventWatcher(vm)}
-
-# @nodoc
 assignViewModelKey = (vm, key) ->
   vm_key = if vm.__kb.internals and _.contains(vm.__kb.internals, key) then "_#{key}" else key
   return if vm.__kb.view_model.hasOwnProperty(vm_key) # already exists, skip
@@ -113,12 +110,11 @@ class kb.ViewModel
   # @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   # @return [ko.observable] the constructor returns 'this'
   # @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  constructor: (model, options={}, view_model) -> return kb.ignore =>
-    not model or kb.isModel(model) or kb._throwUnexpected(@, 'not a model')
-
-    # bind and extract options
-    options = if _.isArray(options) then {keys: options} else kb.utils.collapseOptions(options)
-    (@__kb or= {}).view_model = view_model or @
+  constructor: (model, options={}, view_model) -> args = Array.prototype.slice.call(if _.isArguments(model) then model else arguments); return kb.ignore =>
+    not (model = args.shift()) or kb.isModel(model) or kb._throwUnexpected(@, 'not a model')
+    args[0] = {keys: args[0]} if _.isArray(args[0])
+    @__kb or= {}; @__kb.view_model = (if args.length > 1 then args.pop() else @)
+    options = {}; _.extend(options, arg) for arg in args; options = kb.utils.collapseOptions(options)
     @__kb[key] = options[key] for key in KEYS_OPTIONS when options.hasOwnProperty(key)
 
     # always use a store to ensure recursive view models are handled correctly
@@ -142,12 +138,12 @@ class kb.ViewModel
     kb.utils.wrappedObject(@, model = event_watcher.ee); _model(event_watcher.ee)
 
     # update the observables
-    create_options = createOptions(@)
-    not options.requires or @createObservables(model, options.requires, create_options)
-    not @__kb.internals or @createObservables(model, @__kb.internals, create_options)
-    not options.mappings or @createObservables(model, options.mappings, create_options)
+    @__kb.create_options = {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@), path: @__kb.path, event_watcher: kb.utils.wrappedEventWatcher(@)}
+    not options.requires or @createObservables(model, options.requires)
+    not @__kb.internals or @createObservables(model, @__kb.internals)
+    not options.mappings or @createObservables(model, options.mappings)
     not @__kb.statics or createStaticObservables(@, model)
-    @createObservables(model, @__kb.keys, create_options)
+    @createObservables(model, @__kb.keys)
 
     not kb.statistics or kb.statistics.register('ViewModel', @)     # collect memory management statistics
     return @
@@ -157,7 +153,7 @@ class kb.ViewModel
   destroy: ->
     @__kb_released = true
     (@__kb.view_model[vm_key] = null for vm_key of @__kb.vm_keys) if @__kb.view_model isnt @ # clear the external references
-    @__kb.view_model = null
+    @__kb.view_model = @__kb.create_options = null
     kb.releaseKeys(@)
     kb.utils.wrappedDestroy(@)
 
@@ -167,19 +163,18 @@ class kb.ViewModel
   shareOptions: -> {store: kb.utils.wrappedStore(@), factory: kb.utils.wrappedFactory(@)}
 
   # create observables manually
-  createObservables: (model, keys, create_options) ->
-    create_options or= createOptions(@)
+  createObservables: (model, keys) ->
     if not keys
       return if @__kb.keys or not model # only use the keys provided
-      createObservable(@, model, key, create_options) for key of model.attributes
-      (createObservable(@, model, key, create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
+      createObservable(@, model, key, @__kb.create_options) for key of model.attributes
+      (createObservable(@, model, key, @__kb.create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
     else if _.isArray(keys)
-      createObservable(@, model, key, create_options) for key in keys
+      createObservable(@, model, key, @__kb.create_options) for key in keys
     else
       for key, mapping_info of keys when vm_key = assignViewModelKey(@, key)
         mapping_info.key or= vm_key unless _.isString(mapping_info)
-        @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, @)
+        @[vm_key] = @__kb.view_model[vm_key] = kb.observable(model, mapping_info, @__kb.create_options, @)
     return
 
 # Factory function to create a kb.ViewModel.
-kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(model, options, view_model)
+kb.viewModel = (model, options, view_model) -> return new kb.ViewModel(arguments)
