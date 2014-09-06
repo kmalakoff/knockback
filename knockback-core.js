@@ -2956,7 +2956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var _, _keyArrayToObject, _mergeArray, _mergeObject;
+	var _, _keyArrayToObject, _mergeArray, _mergeObject, _mergeOptions;
 
 	_ = __webpack_require__(6)._;
 
@@ -2986,56 +2986,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return result;
 	};
 
-	module.exports = function(options) {
-	  var key, result, value, _ref;
-	  result = {};
-	  options = {
-	    options: options
-	  };
-	  while (options.options) {
-	    _ref = options.options;
-	    for (key in _ref) {
-	      value = _ref[key];
-	      switch (key) {
-	        case 'internals':
-	        case 'requires':
-	        case 'excludes':
-	        case 'statics':
-	          _mergeArray(result, key, value);
-	          break;
-	        case 'keys':
-	          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
-	            if (!_.isObject(value)) {
-	              value = [value];
-	            }
-	            if (_.isArray(value)) {
-	              value = _keyArrayToObject(value);
-	            }
-	            if (_.isArray(result[key])) {
-	              result[key] = _keyArrayToObject(result[key]);
-	            }
-	            _mergeObject(result, key, value);
-	          } else {
-	            _mergeArray(result, key, value);
+	_mergeOptions = function(result, options) {
+	  var key, value, _results;
+	  _results = [];
+	  for (key in options) {
+	    value = options[key];
+	    switch (key) {
+	      case 'internals':
+	      case 'requires':
+	      case 'excludes':
+	      case 'statics':
+	        _results.push(_mergeArray(result, key, value));
+	        break;
+	      case 'keys':
+	        if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
+	          if (!_.isObject(value)) {
+	            value = [value];
 	          }
-	          break;
-	        case 'factories':
-	          if (_.isFunction(value)) {
-	            result[key] = value;
-	          } else {
-	            _mergeObject(result, key, value);
+	          if (_.isArray(value)) {
+	            value = _keyArrayToObject(value);
 	          }
-	          break;
-	        case 'static_defaults':
-	          _mergeObject(result, key, value);
-	          break;
-	        case 'options':
-	          break;
-	        default:
-	          result[key] = value;
-	      }
+	          if (_.isArray(result[key])) {
+	            result[key] = _keyArrayToObject(result[key]);
+	          }
+	          _results.push(_mergeObject(result, key, value));
+	        } else {
+	          _results.push(_mergeArray(result, key, value));
+	        }
+	        break;
+	      case 'factories':
+	        if (_.isFunction(value)) {
+	          _results.push(result[key] = value);
+	        } else {
+	          _results.push(_mergeObject(result, key, value));
+	        }
+	        break;
+	      case 'static_defaults':
+	        _results.push(_mergeObject(result, key, value));
+	        break;
+	      case 'options':
+	        break;
+	      default:
+	        _results.push(result[key] = value);
 	    }
-	    options = options.options;
+	  }
+	  return _results;
+	};
+
+	module.exports = function(options) {
+	  var result;
+	  result = {};
+	  if (options) {
+	    _mergeOptions(result, options);
+	    while (options.options) {
+	      _mergeOptions(result, options.options);
+	      options = options.options;
+	    }
 	  }
 	  return result;
 	};

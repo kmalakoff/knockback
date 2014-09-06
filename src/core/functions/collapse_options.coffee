@@ -22,32 +22,33 @@ _mergeObject = (result, key, value) -> result[key] or= {}; return _.extend(resul
 # @nodoc
 _keyArrayToObject = (value) -> result = {}; result[item] = {key: item} for item in value; return result
 
+_mergeOptions = (result, options) ->
+  for key, value of options
+    switch key
+      when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
+      when 'keys'
+        # an object
+        if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
+          value = [value] unless _.isObject(value)
+          value = _keyArrayToObject(value) if _.isArray(value)
+          result[key] = _keyArrayToObject(result[key]) if _.isArray(result[key])
+          _mergeObject(result, key, value)
+
+        # an array
+        else
+          _mergeArray(result, key, value)
+
+      when 'factories'
+        if _.isFunction(value) then result[key] = value else _mergeObject(result, key, value)
+      when 'static_defaults' then _mergeObject(result, key, value)
+      when 'options' then
+      else
+        result[key] = value
+
 # @nodoc
 module.exports = (options) ->
   result = {}
-  options = {options: options}
-  while options.options
-    for key, value of options.options
-      switch key
-        when 'internals', 'requires', 'excludes', 'statics' then _mergeArray(result, key, value)
-        when 'keys'
-          # an object
-          if (_.isObject(value) and not _.isArray(value)) or (_.isObject(result[key]) and not _.isArray(result[key]))
-            value = [value] unless _.isObject(value)
-            value = _keyArrayToObject(value) if _.isArray(value)
-            result[key] = _keyArrayToObject(result[key]) if _.isArray(result[key])
-            _mergeObject(result, key, value)
-
-          # an array
-          else
-            _mergeArray(result, key, value)
-
-        when 'factories'
-          if _.isFunction(value) then result[key] = value else _mergeObject(result, key, value)
-        when 'static_defaults' then _mergeObject(result, key, value)
-        when 'options' then
-        else
-          result[key] = value
-
-    options = options.options
+  if options
+    _mergeOptions(result, options)
+    (_mergeOptions(result, options.options); options = options.options) while options.options
   return result
