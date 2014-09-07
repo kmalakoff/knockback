@@ -143,9 +143,9 @@ class kb.Inject
         beforeBinding = app.view_model.beforeBinding or options.beforeBinding
 
       # auto-bind
-      beforeBinding(app.view_model, app.el, options) if beforeBinding
+      beforeBinding.call(app.view_model, app.view_model, app.el, options) if beforeBinding
       kb.applyBindings(app.view_model, app.el, options)
-      afterBinding(app.view_model, app.el, options) if afterBinding
+      afterBinding.call(app.view_model, app.view_model, app.el, options) if afterBinding
     return results
 
 # auto-inject recursively

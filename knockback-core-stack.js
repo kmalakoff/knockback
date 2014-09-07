@@ -1000,11 +1000,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
 	      }
 	      if (beforeBinding) {
-	        beforeBinding(app.view_model, app.el, options);
+	        beforeBinding.call(app.view_model, app.view_model, app.el, options);
 	      }
 	      kb.applyBindings(app.view_model, app.el, options);
 	      if (afterBinding) {
-	        afterBinding(app.view_model, app.el, options);
+	        afterBinding.call(app.view_model, app.view_model, app.el, options);
 	      }
 	    }
 	    return results;
