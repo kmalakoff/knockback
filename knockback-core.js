@@ -1206,7 +1206,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  kb.applyBindings = function(view_model, node) {
 	    var child, children, _i, _len, _ref;
-	    if (_.isArray(node)) {
+	    if (node.length) {
 	      _ref = [document.createElement('div'), node], node = _ref[0], children = _ref[1];
 	      for (_i = 0, _len = children.length; _i < _len; _i++) {
 	        child = children[_i];
