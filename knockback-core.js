@@ -1193,6 +1193,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
 	    if (el.childNodes.length === 1) {
 	      el = el.childNodes[0];
+	    } else if (el.childNodes.length) {
+	      ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[0]));
 	    }
 	    kb.releaseOnNodeRemove(view_model, el);
 	    observable.dispose();
@@ -1761,6 +1763,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (observable = this.find(obj, creator)) {
 	      return observable;
+	    }
+	    if (!_.isFunction(creator.create || creator)) {
+	      throw new Error("Invalid factory for \"" + options.path + "\"");
 	    }
 	    observable = kb.ignore((function(_this) {
 	      return function() {
