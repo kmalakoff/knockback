@@ -1205,8 +1205,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.applyBindings = function(view_model, node) {
+	    var child, children, _i, _len, _ref;
+	    if (_.isArray(node)) {
+	      _ref = [document.createElement('div'), node], node = _ref[0], children = _ref[1];
+	      for (_i = 0, _len = children.length; _i < _len; _i++) {
+	        child = children[_i];
+	        node.appendChild(child);
+	      }
+	    }
 	    ko.applyBindings(view_model, node);
-	    return kb.releaseOnNodeRemove(view_model, node);
+	    kb.releaseOnNodeRemove(view_model, node);
+	    return node;
 	  };
 
 	  kb.getValue = function(model, key, args) {

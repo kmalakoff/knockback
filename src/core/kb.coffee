@@ -166,8 +166,12 @@ module.exports = class kb
   #   ...
   #   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   @applyBindings: (view_model, node) ->
+    if _.isArray(node) # convert to a root element
+      [node, children] = [document.createElement('div'), node]
+      node.appendChild(child) for child in children
     ko.applyBindings(view_model, node)
     kb.releaseOnNodeRemove(view_model, node)
+    return node
 
   @getValue: (model, key, args) ->
     return unless model

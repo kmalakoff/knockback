@@ -2,6 +2,7 @@ Please refer to the following release notes when upgrading your version of Knock
 
 ## 0.20.2
 * Passed the context from the rendered nodes to the wrapper in kb.renderTemplate.
+* Attached an array of elements to a new node in kb.applyBindings and returned a single node.
 
 ## 0.20.1
 * Generalized kb.CollectionObservable to take a variable number of options.
