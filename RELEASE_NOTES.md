@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.20.2
+* Passed the context from the rendered nodes to the wrapper in kb.renderTemplate.
+
 ## 0.20.1
 * Generalized kb.CollectionObservable to take a variable number of options.
 

@@ -102,8 +102,7 @@ module.exports = class kb.Store
     return obj if creator.models_only
     return observable if observable = @find(obj, creator)
 
-    unless _.isFunction(creator.create or creator)
-      throw new Error "Invalid factory for \"#{options.path}\""
+    throw new Error "Invalid factory for \"#{options.path}\"" unless _.isFunction(creator.create or creator)
 
     observable = kb.ignore =>
       options = _.defaults({store: @, creator: creator}, options) # set our own creator so we can register ourselves above
