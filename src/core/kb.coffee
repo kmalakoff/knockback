@@ -148,7 +148,10 @@ module.exports = class kb
 
     el = document.createElement('div')
     observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-    el = el.childNodes[0] if el.childNodes.length is 1 # do not return the template wrapper if possible
+    if el.childNodes.length is 1 # do not return the template wrapper if possible
+      el = el.childNodes[0]
+    else if el.childNodes.length
+      ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[0])) # ensure the context is passed up to wrapper
     kb.releaseOnNodeRemove(view_model, el)
     observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
 
