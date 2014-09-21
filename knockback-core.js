@@ -2653,6 +2653,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
+	  BackboneAssociations.useFunction = function() {
+	    return false;
+	  };
+
 	  return BackboneAssociations;
 
 	})();
@@ -2735,6 +2739,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        model.unbind("" + events[0] + ":" + key, rel_fn);
 	      }
 	    };
+	  };
+
+	  BackboneRelational.useFunction = function() {
+	    return false;
 	  };
 
 	  return BackboneRelational;

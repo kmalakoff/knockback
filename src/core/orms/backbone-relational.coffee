@@ -39,3 +39,5 @@ module.exports = class BackboneRelational
       else
         model.unbind("#{events[0]}:#{key}", rel_fn)
       return
+
+  @useFunction: -> false

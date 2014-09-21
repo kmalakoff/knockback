@@ -23,3 +23,5 @@ module.exports = class BackboneAssociations
     return null unless model instanceof AssociatedModel
     return null unless relation = _.find(model.relations, (test) -> return test.key is key)
     return if (relation.type is 'Many') then kb.TYPE_COLLECTION else kb.TYPE_MODEL
+
+  @useFunction: -> false

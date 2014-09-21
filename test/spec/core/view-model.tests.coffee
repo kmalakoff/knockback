@@ -1045,3 +1045,15 @@ describe 'view-model @quick @view-model', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/134
+  it 'handles url attributes', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    view_model = kb.viewModel(new kb.Model({url: '/some_url'}))
+    assert.equal view_model.url(), '/some_url'
+
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
