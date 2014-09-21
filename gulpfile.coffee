@@ -31,8 +31,8 @@ LIBRARY_FILES = require('./config/files').libraries
 
 gulp.task 'build', buildLibraries = (callback) ->
   errors = []
-  gulp.src('config/builds/library/**/*.webpack.config.coffee', {read: false, buffer: false})
-    .pipe(webpack({no_delete: true}))
+  gulp.src('config/builds/library/**/*.webpack.config.coffee')
+    .pipe(webpack())
     .pipe(header(HEADER, {pkg: require('./package.json')}))
     .pipe(gulp.dest('.'))
     .on('end', callback)

@@ -1,6 +1,6 @@
 {
   "name": "knockback",
-  "version": "0.20.0",
+  "version": "0.20.2",
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "main": "knockback.js",
   "author": {
@@ -49,7 +49,7 @@
     "gulp-shell": "*",
     "gulp-uglify": "*",
     "gulp-util": "*",
-    "gulp-webpack-config": "0.1.1",
+    "gulp-webpack-config": "*",
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
     "imports-loader": "*",

@@ -7,6 +7,7 @@ module.exports = _.extend  _.clone(require '../../webpack/base-config.coffee'), 
   output:
     library: 'kb'
     libraryTarget: 'umd2'
+    filename: 'knockback-core.js'
 
   externals: [
     {underscore: {root: '_', amd: 'underscore', commonjs: 'underscore', commonjs2: 'underscore'}}

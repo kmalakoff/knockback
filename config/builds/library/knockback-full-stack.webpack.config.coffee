@@ -7,6 +7,7 @@ module.exports = _.extend  _.clone(require '../../webpack/base-config.coffee'), 
   output:
     library: 'kb'
     libraryTarget: 'umd2'
+    filename: 'knockback-full-stack.js'
 
   externals: [
     {jquery: {optional: true, root: 'jQuery', amd: 'jquery', commonjs: 'jquery', commonjs2: 'jquery'}}

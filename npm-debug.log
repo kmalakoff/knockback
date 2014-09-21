@@ -1,0 +1,155 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/Users/kevin/.nvm/v0.10.32/bin/node',
+1 verbose cli   '/Users/kevin/.nvm/v0.10.32/bin/npm',
+1 verbose cli   'publish' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.32
+4 verbose publish [ '.' ]
+5 verbose cache add [ '.', null ]
+6 verbose cache add name=undefined spec="." args=[".",null]
+7 verbose parsed url { protocol: null,
+7 verbose parsed url   slashes: null,
+7 verbose parsed url   auth: null,
+7 verbose parsed url   host: null,
+7 verbose parsed url   port: null,
+7 verbose parsed url   hostname: null,
+7 verbose parsed url   hash: null,
+7 verbose parsed url   search: null,
+7 verbose parsed url   query: null,
+7 verbose parsed url   pathname: '.',
+7 verbose parsed url   path: '.',
+7 verbose parsed url   href: '.' }
+8 silly lockFile 3a52ce78- .
+9 verbose lock . /Users/kevin/.npm/3a52ce78-.lock
+10 verbose tar pack [ '/Users/kevin/.npm/knockback/0.20.2/package.tgz', '.' ]
+11 verbose tarball /Users/kevin/.npm/knockback/0.20.2/package.tgz
+12 verbose folder .
+13 info prepublish knockback@0.20.2
+14 silly lockFile 1f1177db-tar tar://.
+15 verbose lock tar://. /Users/kevin/.npm/1f1177db-tar.lock
+16 silly lockFile e8c5d732-npm-knockback-0-20-2-package-tgz tar:///Users/kevin/.npm/knockback/0.20.2/package.tgz
+17 verbose lock tar:///Users/kevin/.npm/knockback/0.20.2/package.tgz /Users/kevin/.npm/e8c5d732-npm-knockback-0-20-2-package-tgz.lock
+18 silly lockFile 1f1177db-tar tar://.
+19 silly lockFile 1f1177db-tar tar://.
+20 silly lockFile e8c5d732-npm-knockback-0-20-2-package-tgz tar:///Users/kevin/.npm/knockback/0.20.2/package.tgz
+21 silly lockFile e8c5d732-npm-knockback-0-20-2-package-tgz tar:///Users/kevin/.npm/knockback/0.20.2/package.tgz
+22 silly lockFile b7bbaa10-vin-npm-knockback-0-20-2-package /Users/kevin/.npm/knockback/0.20.2/package
+23 verbose lock /Users/kevin/.npm/knockback/0.20.2/package /Users/kevin/.npm/b7bbaa10-vin-npm-knockback-0-20-2-package.lock
+24 silly lockFile b7bbaa10-vin-npm-knockback-0-20-2-package /Users/kevin/.npm/knockback/0.20.2/package
+25 silly lockFile b7bbaa10-vin-npm-knockback-0-20-2-package /Users/kevin/.npm/knockback/0.20.2/package
+26 silly lockFile 3a52ce78- .
+27 silly lockFile 3a52ce78- .
+28 silly publish { name: 'knockback',
+28 silly publish   version: '0.20.2',
+28 silly publish   description: 'Knockback.js provides Knockout.js magic for Backbone.js Models and Collections',
+28 silly publish   main: 'knockback.js',
+28 silly publish   author: { name: 'Kevin Malakoff', url: 'https://github.com/kmalakoff' },
+28 silly publish   keywords:
+28 silly publish    [ 'knockback',
+28 silly publish      'knockbackjs',
+28 silly publish      'backbone',
+28 silly publish      'backbonejs',
+28 silly publish      'knockout',
+28 silly publish      'knockoutjs' ],
+28 silly publish   private: true,
+28 silly publish   url: 'http://kmalakoff.github.com/knockback/',
+28 silly publish   homepage: 'http://kmalakoff.github.com/knockback/',
+28 silly publish   repository:
+28 silly publish    { type: 'git',
+28 silly publish      url: 'http://github.com/kmalakoff/knockback.git' },
+28 silly publish   scripts: { test: 'gulp test', docs: 'codo -n Knockback.js -o doc src/.' },
+28 silly publish   dependencies:
+28 silly publish    { underscore: '>=1.1.7',
+28 silly publish      backbone: '>=0.5.1',
+28 silly publish      knockout: '>=2.1.0',
+28 silly publish      jquery: '*',
+28 silly publish      'backbone-relational': '*',
+28 silly publish      'backbone-modelref': '*',
+28 silly publish      lodash: '*',
+28 silly publish      'backbone-orm': '*',
+28 silly publish      moment: '2.x',
+28 silly publish      'backbone-associations': '*',
+28 silly publish      supermodel: 'git+https://github.com/pathable/supermodel',
+28 silly publish      parse: '*' },
+28 silly publish   devDependencies:
+28 silly publish    { async: '*',
+28 silly publish      chai: '*',
+28 silly publish      codo: '2.x',
+28 silly publish      'coffee-loader': '*',
+28 silly publish      'coffee-script': '*',
+28 silly publish      'event-stream': '*',
+28 silly publish      gulp: '*',
+28 silly publish      'gulp-browserify': '*',
+28 silly publish      'gulp-compile-js': '*',
+28 silly publish      'gulp-concat': '*',
+28 silly publish      'gulp-header': '*',
+28 silly publish      'gulp-mocha': '*',
+28 silly publish      'gulp-mocha-phantomjs': '*',
+28 silly publish      'gulp-rename': '*',
+28 silly publish      'gulp-shell': '*',
+28 silly publish      'gulp-uglify': '*',
+28 silly publish      'gulp-util': '*',
+28 silly publish      'gulp-webpack-config': '*',
+28 silly publish      'gulp-wrap-amd-infer': '*',
+28 silly publish      'gulp-zip': '*',
+28 silly publish      'imports-loader': '*',
+28 silly publish      jquery: '*',
+28 silly publish      karma: '*',
+28 silly publish      'karma-chai': '*',
+28 silly publish      'karma-chrome-launcher': '*',
+28 silly publish      'karma-cli': '*',
+28 silly publish      'karma-coffee-preprocessor': '*',
+28 silly publish      'karma-firefox-launcher': '*',
+28 silly publish      'karma-mocha': '*',
+28 silly publish      'karma-phantomjs-launcher': '*',
+28 silly publish      'karma-safari-launcher': '*',
+28 silly publish      'karma-spec-reporter': '*',
+28 silly publish      mocha: '*',
+28 silly publish      'node-jquery-xhr': '*',
+28 silly publish      nuget: '*',
+28 silly publish      'queue-async': '*',
+28 silly publish      webpack: '*',
+28 silly publish      wrench: '*' },
+28 silly publish   optionalDependencies:
+28 silly publish    { jquery: '*',
+28 silly publish      'backbone-relational': '*',
+28 silly publish      'backbone-modelref': '*',
+28 silly publish      lodash: '*',
+28 silly publish      'backbone-orm': '*',
+28 silly publish      moment: '2.x',
+28 silly publish      'backbone-associations': '*',
+28 silly publish      supermodel: 'git+https://github.com/pathable/supermodel',
+28 silly publish      parse: '*' },
+28 silly publish   jam:
+28 silly publish    { dependencies:
+28 silly publish       { underscore: '>=1.1.7',
+28 silly publish         backbone: '>=0.5.1',
+28 silly publish         knockout: '>=2.2.1' } },
+28 silly publish   readme: '[![Build Status](https://secure.travis-ci.org/kmalakoff/knockback.png)](http://travis-ci.org/kmalakoff/knockback#master)\n\n![logo](https://github.com/kmalakoff/knockback/raw/master/media/logo.png)\n\nKnockback.js provides Knockout.js magic for Backbone.js Models and Collections.\n\n# Why Knockback?\n\n* Make amazingly dynamic applications by applying a small number of simple principles\n* Leverage the wonderful work from both the Backbone and Knockout communities\n* Easily view and edit relationships between Models using an ORM of your choice:\n  * [BackboneORM](http://vidigami.github.io/backbone-orm/)\n  * [Backbone-Relational.js](http://backbonerelational.org/)\n* Simplify program control flow by configuring your application from your HTML Views. It\'s like Angular.js but without memorizing all of the special purpose ng-{something} attributes. See the [Inject Tutorial](http://kmalakoff.github.com/knockback/tutorial_inject.html) for live examples!\n\n# Examples\n\n### Simple\n\n###### The HTML:\n\n```html\n<label>First Name: </label><input data-bind="value: first_name, valueUpdate: \'keyup\'" />\n<label>Last Name: </label><input data-bind="value: last_name, valueUpdate: \'keyup\'" />\n```\n\n###### And...engage:\n\n```coffeescript\nmodel = new Backbone.Model({first_name: \'Bob\', last_name: \'Smith\'})\nko.applyBindings(kb.viewModel(model))\n```\n\nWhen you type in the input boxes, the values are properly transferred bi-directionally to the model and all other bound view models!\n\n\n### Advanced\n\n###### The View Model:\n\n**Javascript**\n\n```javascript\nvar ContactViewModel = kb.ViewModel.extend({\n  constructor: function(model) {\n    kb.ViewModel.prototype.constructor.call(this, model);\n\n    this.full_name = ko.computed(function() {\n      return this.first_name() + " " + this.last_name();\n    }, this);\n});\n\n```\n\n**or Coffeescript**\n\n```coffeescript\nclass ContactViewModel extends kb.ViewModel\n  constructor: (model) ->\n    super model\n\n    @full_name = ko.computed => "#{@first_name()} #{@last_name()}"\n```\n\n###### The HTML:\n\n```html\n<h1 data-bind="text: \'Hello \' + full_name()"></h1>\n<label>First Name: </label><input data-bind="value: first_name, valueUpdate: \'keyup\'" />\n<label>Last Name: </label><input data-bind="value: last_name, valueUpdate: \'keyup\'" />\n```\n\n###### And...engage:\n\n```coffeescript\nmodel = new Backbone.Model({first_name: \'Bob\', last_name: \'Smith\'})\nview_model = new ContactViewModel(model)\nko.applyBindings(view_model)\n\n# ... do stuff then clean up\nkb.release(view_model)\n```\n\nNow, the greeting updates as you type!\n\n\n# Getting Started\n\n* [Website](http://kmalakoff.github.com/knockback/) - explore everything Knockback and connect to the community\n* [Tutorials](http://kmalakoff.github.io/knockback/tutorials_introduction.html) - try some live examples\n* [API Docs](http://kmalakoff.github.com/knockback/doc/index.html) - dig into the API\n* [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/) - compare client-side framworks\n* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) - demonstrates best practices when using Knockback.js including page routing and lifecycle management\n* [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!\n\n# Download Latest (0.20.2):\n\nPlease see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.\n\n* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback.min.js)\n* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback-full-stack.min.js)\n\n* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback-core.min.js)\n* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/0.20.2/knockback-core-stack.min.js)\n\nThe **full versions** bundle advanced features.\n\nThe **core versions** remove advanced features that can be included separately: localization, formatting, triggering, defaults, and validation.\n\nThe **stack versions** provide Underscore.js + Backbone.js + Knockout.js + Knockback.js in a single file.\n\n###Distributions\n\nYou can also find Knockback on your favorite distributions:\n\n* **npm**: npm install knockback\n* **Bower**: bower install knockback\n* **Component**: component install kmalakoff/knockback\n* [NuGet](http://nuget.org/packages/Knockback.js) - install right in Visual Studio\n* **Jam**: jam install knockback\n\n###Dependencies\n\n* [Backbone.js](http://backbonejs.org/) - provides the Model layer\n* [Knockout.js](http://knockoutjs.com/) - provides the ViewModel layer foundations for Knockback\n* [Underscore.js](http://underscorejs.org/) - provides an awesome JavaScript utility belt\n* [LoDash](http://lodash.com/) - optionally replaces Underscore.js with a library optimized for consistent performance\n* [Parse](https://www.parse.com/) - optionally replaces Backbone.js and Underscore.js\n\n###Compatible Components\n\n* [BackboneORM](http://vidigami.github.io/backbone-orm/) - A polystore ORM for Node.js and the browser\n* [Backbone-Relational.js](http://backbonerelational.org/) - Get and set relations (one-to-one, one-to-many, many-to-one) for Backbone models\n* [Backbone Associations](http://dhruvaray.github.io/backbone-associations/) - Create object hierarchies with Backbone models. Respond to hierarchy changes using regular Backbone events\n* [Supermodel.js](http://pathable.github.io/supermodel/) - Minimal Model Tracking for Backbonejs\n* [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).\n* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.\n* [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).\n\n\n# Contributing\n\nTo build the library for Node.js and browsers:\n\n```\n$ gulp build\n```\n\nPlease run tests before submitting a pull request:\n\n```\n$ gulp test --quick\n```\n\nand eventually all tests:\n\n```\n$ npm test\n```\n',
+28 silly publish   readmeFilename: 'README.md',
+28 silly publish   gitHead: 'b36b15235972d77cbf9b9ae1932f1aa21cbc69c6',
+28 silly publish   bugs: { url: 'https://github.com/kmalakoff/knockback/issues' },
+28 silly publish   _id: 'knockback@0.20.2',
+28 silly publish   _shasum: '7aed3863a7f77a13232e7cb86f0183855ae061df',
+28 silly publish   _from: '.' }
+29 error Error: This package has been marked as private
+29 error Remove the 'private' field from the package.json to publish it.
+29 error     at publish_ (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/lib/publish.js:91:31)
+29 error     at Array.1 (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/slide/lib/bind-actor.js:15:8)
+29 error     at LOOP (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/slide/lib/chain.js:15:14)
+29 error     at LOOP (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/slide/lib/chain.js:14:28)
+29 error     at chain (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/slide/lib/chain.js:20:5)
+29 error     at /Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/lib/publish.js:57:5
+29 error     at /Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/inflight/inflight.js:22:7
+29 error     at Array.forEach (native)
+29 error     at res (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/inflight/inflight.js:21:9)
+29 error     at f (/Users/kevin/.nvm/v0.10.32/lib/node_modules/npm/node_modules/once/once.js:16:25)
+30 error If you need help, you may report this *entire* log,
+30 error including the npm and node versions, at:
+30 error     <http://github.com/npm/npm/issues>
+31 error System Darwin 13.3.0
+32 error command "/Users/kevin/.nvm/v0.10.32/bin/node" "/Users/kevin/.nvm/v0.10.32/bin/npm" "publish"
+33 error cwd /Users/kevin/Dev/OpenSource/Mine/knockback
+34 error node -v v0.10.32
+35 error npm -v 1.4.28
+36 verbose exit [ 1, true ]

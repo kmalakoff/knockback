@@ -1,5 +1,5 @@
 /*
-  knockback-core.js 0.20.0
+  knockback-core.js 0.20.2
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -86,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -130,22 +130,22 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function CollectionObservable(collection, view_model, options) {
 	    this._onCollectionChange = __bind(this._onCollectionChange, this);
+	    var args;
+	    args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var create_options, observable, _ref1;
-	        if (_.isArray(collection)) {
-	          collection = new kb.Collection(collection);
-	        } else if (!(collection instanceof kb.Collection)) {
-	          _ref1 = [new kb.Collection(), collection, view_model], collection = _ref1[0], view_model = _ref1[1], options = _ref1[2];
+	        var arg, create_options, observable, _i, _len;
+	        collection = args[0] instanceof kb.Collection ? args.shift() : (_.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection());
+	        if (_.isFunction(args[0])) {
+	          args[0] = {
+	            view_model: args[0]
+	          };
 	        }
-	        if (_.isFunction(view_model)) {
-	          options = _.extend({
-	            view_model: view_model
-	          }, options || {});
-	        } else if (_.isObject(view_model)) {
-	          options = view_model;
+	        options = {};
+	        for (_i = 0, _len = args.length; _i < _len; _i++) {
+	          arg = args[_i];
+	          _.extend(options, arg);
 	        }
-	        options || (options = {});
 	        observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
 	        observable.__kb_is_co = true;
 	        _this.in_edit = 0;
@@ -201,12 +201,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	          collection.bind('all', _this._onCollectionChange);
 	        }
 	        _this._mapper = ko.computed(function() {
-	          var comparator, current_collection, filter, filters, models, previous_view_models, view_models, _i, _len;
+	          var comparator, current_collection, filter, filters, models, previous_view_models, view_models, _j, _len1;
 	          comparator = _this._comparator();
 	          filters = _this._filters();
 	          if (filters) {
-	            for (_i = 0, _len = filters.length; _i < _len; _i++) {
-	              filter = filters[_i];
+	            for (_j = 0, _len1 = filters.length; _j < _len1; _j++) {
+	              filter = filters[_j];
 	              ko.utils.unwrapObservable(filter);
 	            }
 	          }
@@ -542,7 +542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	kb.collectionObservable = function(collection, view_model, options) {
-	  return new kb.CollectionObservable(collection, view_model, options);
+	  return new kb.CollectionObservable(arguments);
 	};
 
 
@@ -609,7 +609,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -820,7 +820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -845,12 +845,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  function Factory(parent_factory) {
-	    this.parent_factory = parent_factory;
 	    this.paths = {};
+	    if (parent_factory) {
+	      this.parent_factory = parent_factory;
+	    }
 	  }
 
 	  Factory.prototype.hasPath = function(path) {
-	    return this.paths.hasOwnProperty(path) || (this.parent_factory && this.parent_factory.hasPath(path));
+	    var _ref;
+	    return this.paths.hasOwnProperty(path) || ((_ref = this.parent_factory) != null ? _ref.hasPath(path) : void 0);
 	  };
 
 	  Factory.prototype.addPathMapping = function(path, create_info) {
@@ -897,7 +900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -999,11 +1002,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
 	      }
 	      if (beforeBinding) {
-	        beforeBinding(app.view_model, app.el, options);
+	        beforeBinding.call(app.view_model, app.view_model, app.el, options);
 	      }
 	      kb.applyBindings(app.view_model, app.el, options);
 	      if (afterBinding) {
-	        afterBinding(app.view_model, app.el, options);
+	        afterBinding.call(app.view_model, app.view_model, app.el, options);
 	      }
 	    }
 	    return results;
@@ -1048,7 +1051,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1068,7 +1071,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  function kb() {}
 
-	  kb.VERSION = '0.20.0';
+	  kb.VERSION = '0.20.2';
 
 	  kb.TYPE_UNKNOWN = 0;
 
@@ -1190,6 +1193,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
 	    if (el.childNodes.length === 1) {
 	      el = el.childNodes[0];
+	    } else if (el.childNodes.length) {
+	      ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[0]));
 	    }
 	    kb.releaseOnNodeRemove(view_model, el);
 	    observable.dispose();
@@ -1200,8 +1205,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  kb.applyBindings = function(view_model, node) {
+	    var child, children, _i, _len, _ref;
+	    if (node.length) {
+	      _ref = [document.createElement('div'), node], node = _ref[0], children = _ref[1];
+	      for (_i = 0, _len = children.length; _i < _len; _i++) {
+	        child = children[_i];
+	        node.appendChild(child);
+	      }
+	    }
 	    ko.applyBindings(view_model, node);
-	    return kb.releaseOnNodeRemove(view_model, node);
+	    kb.releaseOnNodeRemove(view_model, node);
+	    return node;
 	  };
 
 	  kb.getValue = function(model, key, args) {
@@ -1313,7 +1327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1351,7 +1365,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1523,7 +1537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1658,7 +1672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -1758,6 +1772,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (observable = this.find(obj, creator)) {
 	      return observable;
+	    }
+	    if (!_.isFunction(creator.create || creator)) {
+	      throw new Error("Invalid factory for \"" + options.path + "\"");
 	    }
 	    observable = kb.ignore((function(_this) {
 	      return function() {
@@ -2023,7 +2040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (new_value && new_value instanceof kb.CollectionObservable) {
 	            this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
 	          } else {
-	            if (value.collection() !== new_value) {
+	            if (kb.peek(value.collection) !== new_value) {
 	              value.collection(new_value);
 	            }
 	          }
@@ -2129,7 +2146,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2326,27 +2343,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var KEYS_OPTIONS, assignViewModelKey, createObservable, createOptions, createStaticObservables, kb, ko, _, _ref;
+	var KEYS_OPTIONS, assignViewModelKey, createObservable, createStaticObservables, kb, ko, _, _ref;
 
 	_ref = kb = __webpack_require__(6), _ = _ref._, ko = _ref.ko;
-
-	createOptions = (function(_this) {
-	  return function(vm) {
-	    return {
-	      store: kb.utils.wrappedStore(vm),
-	      factory: kb.utils.wrappedFactory(vm),
-	      path: vm.__kb.path,
-	      event_watcher: kb.utils.wrappedEventWatcher(vm)
-	    };
-	  };
-	})(this);
 
 	assignViewModelKey = function(vm, key) {
 	  var vm_key;
@@ -2395,20 +2401,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ViewModel.extend = kb.extend;
 
 	  function ViewModel(model, options, view_model) {
+	    var args;
 	    if (options == null) {
 	      options = {};
 	    }
+	    args = Array.prototype.slice.call(_.isArguments(model) ? model : arguments);
 	    return kb.ignore((function(_this) {
 	      return function() {
-	        var create_options, event_watcher, key, _i, _len, _model;
-	        !model || (model instanceof kb.Model) || ((typeof model.get === 'function') && (typeof model.bind === 'function')) || kb._throwUnexpected(_this, 'not a model');
-	        options = _.isArray(options) ? {
-	          keys: options
-	        } : kb.utils.collapseOptions(options);
+	        var arg, event_watcher, key, _i, _j, _len, _len1, _model;
+	        !(model = args.shift()) || kb.isModel(model) || kb._throwUnexpected(_this, 'not a model');
+	        if (_.isArray(args[0])) {
+	          args[0] = {
+	            keys: args[0]
+	          };
+	        }
 	        _this.__kb || (_this.__kb = {});
-	        _this.__kb.view_model = view_model || _this;
-	        for (_i = 0, _len = KEYS_OPTIONS.length; _i < _len; _i++) {
-	          key = KEYS_OPTIONS[_i];
+	        _this.__kb.view_model = (args.length > 1 ? args.pop() : _this);
+	        options = {};
+	        for (_i = 0, _len = args.length; _i < _len; _i++) {
+	          arg = args[_i];
+	          _.extend(options, arg);
+	        }
+	        options = kb.utils.collapseOptions(options);
+	        for (_j = 0, _len1 = KEYS_OPTIONS.length; _j < _len1; _j++) {
+	          key = KEYS_OPTIONS[_j];
 	          if (options.hasOwnProperty(key)) {
 	            _this.__kb[key] = options[key];
 	          }
@@ -2443,12 +2459,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }));
 	        kb.utils.wrappedObject(_this, model = event_watcher.ee);
 	        _model(event_watcher.ee);
-	        create_options = createOptions(_this);
-	        !options.requires || _this.createObservables(model, options.requires, create_options);
-	        !_this.__kb.internals || _this.createObservables(model, _this.__kb.internals, create_options);
-	        !options.mappings || _this.createObservables(model, options.mappings, create_options);
+	        _this.__kb.create_options = {
+	          store: kb.utils.wrappedStore(_this),
+	          factory: kb.utils.wrappedFactory(_this),
+	          path: _this.__kb.path,
+	          event_watcher: kb.utils.wrappedEventWatcher(_this)
+	        };
+	        !options.requires || _this.createObservables(model, options.requires);
+	        !_this.__kb.internals || _this.createObservables(model, _this.__kb.internals);
+	        !options.mappings || _this.createObservables(model, options.mappings);
 	        !_this.__kb.statics || createStaticObservables(_this, model);
-	        _this.createObservables(model, _this.__kb.keys, create_options);
+	        _this.createObservables(model, _this.__kb.keys);
 	        !kb.statistics || kb.statistics.register('ViewModel', _this);
 	        return _this;
 	      };
@@ -2463,7 +2484,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.__kb.view_model[vm_key] = null;
 	      }
 	    }
-	    this.__kb.view_model = null;
+	    this.__kb.view_model = this.__kb.create_options = null;
 	    kb.releaseKeys(this);
 	    kb.utils.wrappedDestroy(this);
 	    return !kb.statistics || kb.statistics.unregister('ViewModel', this);
@@ -2476,26 +2497,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 
-	  ViewModel.prototype.createObservables = function(model, keys, create_options) {
+	  ViewModel.prototype.createObservables = function(model, keys) {
 	    var key, mapping_info, rel_keys, vm_key, _i, _j, _len, _len1, _ref1;
-	    create_options || (create_options = createOptions(this));
 	    if (!keys) {
 	      if (this.__kb.keys || !model) {
 	        return;
 	      }
 	      for (key in model.attributes) {
-	        createObservable(this, model, key, create_options);
+	        createObservable(this, model, key, this.__kb.create_options);
 	      }
 	      if (rel_keys = (_ref1 = kb.orm) != null ? typeof _ref1.keys === "function" ? _ref1.keys(model) : void 0 : void 0) {
 	        for (_i = 0, _len = rel_keys.length; _i < _len; _i++) {
 	          key = rel_keys[_i];
-	          createObservable(this, model, key, create_options);
+	          createObservable(this, model, key, this.__kb.create_options);
 	        }
 	      }
 	    } else if (_.isArray(keys)) {
 	      for (_j = 0, _len1 = keys.length; _j < _len1; _j++) {
 	        key = keys[_j];
-	        createObservable(this, model, key, create_options);
+	        createObservable(this, model, key, this.__kb.create_options);
 	      }
 	    } else {
 	      for (key in keys) {
@@ -2506,7 +2526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!_.isString(mapping_info)) {
 	          mapping_info.key || (mapping_info.key = vm_key);
 	        }
-	        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, create_options, this);
+	        this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this);
 	      }
 	    }
 	  };
@@ -2516,7 +2536,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	kb.viewModel = function(model, options, view_model) {
-	  return new kb.ViewModel(model, options, view_model);
+	  return new kb.ViewModel(arguments);
 	};
 
 
@@ -2526,7 +2546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2587,7 +2607,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2633,6 +2653,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
+	  BackboneAssociations.useFunction = function() {
+	    return false;
+	  };
+
 	  return BackboneAssociations;
 
 	})();
@@ -2644,7 +2668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2717,6 +2741,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  };
 
+	  BackboneRelational.useFunction = function() {
+	    return false;
+	  };
+
 	  return BackboneRelational;
 
 	})();
@@ -2728,7 +2756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2815,7 +2843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2892,7 +2920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
@@ -2943,14 +2971,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var _, _keyArrayToObject, _mergeArray, _mergeObject;
+	var _, _keyArrayToObject, _mergeArray, _mergeObject, _mergeOptions;
 
 	_ = __webpack_require__(6)._;
 
@@ -2980,58 +3008,57 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return result;
 	};
 
-	module.exports = function(options) {
-	  var key, result, value, _ref;
-	  result = {};
-	  options = {
-	    options: options
-	  };
-	  while (options.options) {
-	    _ref = options.options;
-	    for (key in _ref) {
-	      value = _ref[key];
-	      switch (key) {
-	        case 'internals':
-	        case 'requires':
-	        case 'excludes':
-	        case 'statics':
-	          _mergeArray(result, key, value);
-	          break;
-	        case 'keys':
-	          if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
-	            if (!_.isObject(value)) {
-	              value = [value];
-	            }
-	            if (_.isArray(value)) {
-	              value = _keyArrayToObject(value);
-	            }
-	            if (_.isArray(result[key])) {
-	              result[key] = _keyArrayToObject(result[key]);
-	            }
-	            _mergeObject(result, key, value);
-	          } else {
-	            _mergeArray(result, key, value);
-	          }
-	          break;
-	        case 'factories':
-	          if (_.isFunction(value)) {
-	            result[key] = value;
-	          } else {
-	            _mergeObject(result, key, value);
-	          }
-	          break;
-	        case 'static_defaults':
-	          _mergeObject(result, key, value);
-	          break;
-	        case 'options':
-	          break;
-	        default:
-	          result[key] = value;
-	      }
-	    }
-	    options = options.options;
+	_mergeOptions = function(result, options) {
+	  var key, value;
+	  if (!options) {
+	    return result;
 	  }
-	  return result;
+	  for (key in options) {
+	    value = options[key];
+	    switch (key) {
+	      case 'internals':
+	      case 'requires':
+	      case 'excludes':
+	      case 'statics':
+	        _mergeArray(result, key, value);
+	        break;
+	      case 'keys':
+	        if ((_.isObject(value) && !_.isArray(value)) || (_.isObject(result[key]) && !_.isArray(result[key]))) {
+	          if (!_.isObject(value)) {
+	            value = [value];
+	          }
+	          if (_.isArray(value)) {
+	            value = _keyArrayToObject(value);
+	          }
+	          if (_.isArray(result[key])) {
+	            result[key] = _keyArrayToObject(result[key]);
+	          }
+	          _mergeObject(result, key, value);
+	        } else {
+	          _mergeArray(result, key, value);
+	        }
+	        break;
+	      case 'factories':
+	        if (_.isFunction(value)) {
+	          result[key] = value;
+	        } else {
+	          _mergeObject(result, key, value);
+	        }
+	        break;
+	      case 'static_defaults':
+	        _mergeObject(result, key, value);
+	        break;
+	      case 'options':
+	        break;
+	      default:
+	        result[key] = value;
+	    }
+	  }
+	  return _mergeOptions(result, options.options);
+	};
+
+	module.exports = function(options) {
+	  return _mergeOptions({}, options);
 	};
 
 
@@ -3041,7 +3068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	
 	/*
-	  knockback.js 0.20.0
+	  knockback.js 0.20.2
 	  Copyright (c)  2011-2014 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
