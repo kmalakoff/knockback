@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.20.3
+* Bug fix for kb.CollectionObservable storage.
+
 ## 0.20.2
 * Passed the context from the rendered nodes to the wrapper in kb.renderTemplate.
 * Attached an array of elements to a new node in kb.applyBindings and returned a single node.
