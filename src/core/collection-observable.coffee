@@ -106,6 +106,7 @@ class kb.CollectionObservable
     else
       @_filters = ko.observableArray([])
     create_options = @create_options = {store:  kb.Store.useOptionsOrCreate(options, collection, observable)} # create options
+    kb.utils.wrappedObject(observable, collection)
 
     # view model factory create factories
     @path = options.path
@@ -125,7 +126,8 @@ class kb.CollectionObservable
       read: => return @_collection()
       write: (new_collection) => kb.ignore =>
         return if ((previous_collection = @_collection()) is new_collection) # no change
-        @create_options.store.reuse(@, new_collection)
+        # @create_options.store.reuse(@, new_collection) # not meant to be shared
+        kb.utils.wrappedObject(observable, new_collection)
 
         # clean up
         previous_collection.unbind('all', @_onCollectionChange) if previous_collection
@@ -190,7 +192,7 @@ class kb.CollectionObservable
   destroy: ->
     @__kb_released = true
     observable = kb.utils.wrappedObservable(@)
-    collection = kb.peek(@_collection)
+    collection = kb.peek(@_collection); kb.utils.wrappedObject(observable, null)
     if collection
       collection.unbind('all', @_onCollectionChange)
       array = kb.peek(observable); array.splice(0, array.length) # clear the view models or models

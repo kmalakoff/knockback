@@ -1,4 +1,7 @@
 .DS_Store
+npm-debug.log
+*.map
+
 node_modules/
 doc/
 _temp/
