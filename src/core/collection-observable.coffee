@@ -316,7 +316,7 @@ class kb.CollectionObservable
 
   # @nodoc
   _onCollectionChange: (event, arg) => return kb.ignore =>
-    return if @in_edit # we are doing the editing
+    return if @in_edit or kb.wasReleased(@) # we are doing the editing or have been released
 
     switch event
       when 'reset'

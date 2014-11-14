@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 0.20.5
+* Additional check for a collection updating during release.
+
 ## 0.20.4
 * Compatibility fix for IE9.
 

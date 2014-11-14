@@ -382,7 +382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return kb.ignore((function(_this) {
 	      return function() {
 	        var collection, comparator, observable, view_model;
-	        if (_this.in_edit) {
+	        if (_this.in_edit || kb.wasReleased(_this)) {
 	          return;
 	        }
 	        switch (event) {
