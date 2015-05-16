@@ -53,7 +53,6 @@
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
     "imports-loader": "*",
-    "jquery": "*",
     "karma": "*",
     "karma-chai": "*",
     "karma-chrome-launcher": "*",
@@ -68,7 +67,7 @@
     "node-jquery-xhr": "*",
     "nuget": "*",
     "queue-async": "*",
-    "webpack": "*",
+    "webpack": "1.8.x",
     "wrench": "*"
   },
   "optionalDependencies": {
