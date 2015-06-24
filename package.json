@@ -54,7 +54,7 @@
     "gulp-zip": "*",
     "imports-loader": "*",
     "jquery": "*",
-    "jquery-xhr": "^2.1.3",
+    "jquery-xhr": "*",
     "karma": "*",
     "karma-chai": "*",
     "karma-chrome-launcher": "*",
