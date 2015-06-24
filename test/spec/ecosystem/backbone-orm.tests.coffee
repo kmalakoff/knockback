@@ -276,6 +276,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship')
     done()
 
+  # TODO: add tests and support for idAttribute
   it '5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) ->
     class Book extends Backbone.Model
       model_name: 'Book'
@@ -286,7 +287,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
 
       defaults:
         name: 'untitled'
-      idAttribute: '_id'
+      # idAttribute: '_id'
 
     class Author extends Backbone.Model
       model_name: 'Author'
@@ -297,7 +298,7 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
 
       defaults:
         name: 'untitled'
-      idAttribute: '_id'
+      # idAttribute: '_id'
 
     class BookStore extends Backbone.Model
       model_name: 'BookStore'
@@ -307,8 +308,10 @@ describe 'Knockback.js with BackboneORM @backbone-orm', ->
       sync: BackboneORM.sync(BookStore)
 
     bs = new BookStore({
-      books:[{_id: "b1", name: "Book One", author: "a1"}, {_id: "b2", name: "Book Two", author: "a1"}],
-      authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
+      # books:[{_id: "b1", name: "Book One", author: "a1"}, {_id: "b2", name: "Book Two", author: "a1"}],
+      # authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
+      books:[{id: "b1", name: "Book One", author: "a1"}, {id: "b2", name: "Book Two", author: "a1"}],
+      authors:[{name: 'fred', id: "a1"}, {name: 'ted', id: "a2"}]
     })
 
     queue = new Queue(1)
