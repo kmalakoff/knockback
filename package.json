@@ -75,6 +75,7 @@
     "jquery": "*",
     "backbone-relational": "*",
     "backbone-modelref": "*",
+    "backbone.localstorage": "*",
     "lodash": "*",
     "backbone-orm": "*",
     "moment": "2.x",
