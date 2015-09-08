@@ -1057,3 +1057,17 @@ describe 'view-model @quick @view-model', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/73
+  it 'handles attribute named model', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model = new kb.Model({model: 'car'})
+    view_model = kb.viewModel(model, internals: ['model'])
+    assert.equal view_model._model(), 'car'
+    assert.equal view_model.model(), model
+
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()
