@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.20.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.0.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -93,14 +93,14 @@
     @current_locale = ko.observable(locale_identifier)
 
   get: (string_id) -&gt;
-    return &#39;(no translation)&#39; unless @translations_by_locale[@current_locale()]
-    return &#39;(no translation)&#39; unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
+    return '(no translation)' unless @translations_by_locale[@current_locale()]
+    return '(no translation)' unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
     return @translations_by_locale[@current_locale()][string_id]
 
   getLocale: -&gt; return @current_locale()
   setLocale: (locale_identifier) -&gt;
     @current_locale(locale_identifier)
-    @trigger(&#39;change&#39;, @)
+    @trigger('change', @)
 
 _.extend(LocaleManager.prototype, Backbone.Events)</pre>
           <pre data-for="js">var LocaleManager = function(locale_identifier, translations_by_locale) {
@@ -108,15 +108,15 @@ _.extend(LocaleManager.prototype, Backbone.Events)</pre>
   this.current_locale = ko.observable(locale_identifier);
 
   this.get = function(string_id) {
-    if (!this.translations_by_locale[this.current_locale()]) { return &#39;(no translation)&#39;; }
-    if (!this.translations_by_locale[this.current_locale()].hasOwnProperty(string_id)) { return &#39;(no translation)&#39;; }
+    if (!this.translations_by_locale[this.current_locale()]) { return '(no translation)'; }
+    if (!this.translations_by_locale[this.current_locale()].hasOwnProperty(string_id)) { return '(no translation)'; }
     return this.translations_by_locale[this.current_locale()][string_id];
   };
 
   this.getLocale = function() { return this.current_locale(); };
   this.setLocale = function(locale_identifier) {
     this.current_locale(locale_identifier);
-    return this.trigger(&#39;change&#39;, this);
+    return this.trigger('change', this);
   };
 };
 
@@ -150,7 +150,7 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
               </ul>
               <div class="tab-content">
                 <div id="lm_simple_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;lm_simple&#39;&gt;
+                  <pre>&lt;div id='lm_simple'&gt;
   &lt;p&gt;
     &lt;span data-bind=&quot;text: label_name&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: name&quot;&gt;&lt;/span&gt;
@@ -165,44 +165,44 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
                 </div>
                 <div id="lm_simple_view_model" class="tab-pane">
                   <pre data-for="cs"># create and initialize the locale manager with two languages
-simple_locale_manager = new LocaleManager(&#39;en&#39;, {
-  &#39;en&#39;:
-    name: &#39;Name: &#39;
-  &#39;fr&#39;:
-    name: &#39;Nom: &#39;
+simple_locale_manager = new LocaleManager('en', {
+  'en':
+    name: 'Name: '
+  'fr':
+    name: 'Nom: '
 })
 
-bob = new Backbone.Model({name: &#39;Bob&#39;})
+bob = new Backbone.Model({name: 'Bob'})
 
 view_model = kb.viewModel(bob)
 
-# add a localized label for &#39;name&#39; and a function for toggling the current locale
-view_model.label_name = kb.observable(simple_locale_manager, &#39;name&#39;)
+# add a localized label for 'name' and a function for toggling the current locale
+view_model.label_name = kb.observable(simple_locale_manager, 'name')
 view_model.toggleLocale = -&gt;
-  simple_locale_manager.setLocale(if (simple_locale_manager.getLocale() is &#39;en&#39;) then &#39;fr&#39; else &#39;en&#39;)
+  simple_locale_manager.setLocale(if (simple_locale_manager.getLocale() is 'en') then 'fr' else 'en')
 
-ko.applyBindings(view_model, $(&#39;#lm_simple&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#lm_simple')[0])</pre>
                   <pre data-for="js">// create and initialize the locale manager with two languages
-var simple_locale_manager = new LocaleManager(&#39;en&#39;, {
-  &#39;en&#39;: {
-    name: &#39;Name: &#39;
+var simple_locale_manager = new LocaleManager('en', {
+  'en': {
+    name: 'Name: '
   },
-  &#39;fr&#39;: {
-    name: &#39;Nom: &#39;
+  'fr': {
+    name: 'Nom: '
   }
 });
 
-var bob = new Backbone.Model({name: &#39;Bob&#39;});
+var bob = new Backbone.Model({name: 'Bob'});
 
 var view_model = kb.viewModel(bob);
 
-// add a localized label for &#39;name&#39; and a function for toggling the current locale
-view_model.label_name = kb.observable(simple_locale_manager, &#39;name&#39;);
+// add a localized label for 'name' and a function for toggling the current locale
+view_model.label_name = kb.observable(simple_locale_manager, 'name');
 view_model.toggleLocale = function() {
-  return simple_locale_manager.setLocale(simple_locale_manager.getLocale() === &#39;en&#39; ? &#39;fr&#39; : &#39;en&#39;);
+  return simple_locale_manager.setLocale(simple_locale_manager.getLocale() === 'en' ? 'fr' : 'en');
 };
 
-ko.applyBindings(view_model, $(&#39;#lm_simple&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#lm_simple')[0]);</pre>
                 </div>
               </div>
             </div>
@@ -235,8 +235,8 @@ ko.applyBindings(view_model, $(&#39;#lm_simple&#39;)[0]);</pre>
     @setLocale(locale_identifier)
 
   get: (string_id) -&gt;
-    return &#39;(no translation)&#39; unless @translations_by_locale[@current_locale()]
-    return &#39;(no translation)&#39; unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
+    return '(no translation)' unless @translations_by_locale[@current_locale()]
+    return '(no translation)' unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
 
     string = @translations_by_locale[@current_locale()][string_id]
     return string if arguments == 1     # no arguments
@@ -248,7 +248,7 @@ ko.applyBindings(view_model, $(&#39;#lm_simple&#39;)[0]);</pre>
   getLocale: -&gt; return @current_locale()
   setLocale: (locale_identifier) -&gt;
     @current_locale(locale_identifier)
-    @trigger(&#39;change&#39;, @)
+    @trigger('change', @)
     @trigger(&quot;change:#{key}&quot;, value) for key, value of @translations_by_locale[@current_locale()]
 
   getLocales: -&gt;
@@ -262,8 +262,8 @@ _.extend(LocaleManager.prototype, Backbone.Events)</pre>
   this.current_locale = ko.observable(locale_identifier);
 
   this.get = function(string_id) {
-    if (!this.translations_by_locale[this.current_locale()]) { return &#39;(no translation)&#39;; }
-    if (!this.translations_by_locale[this.current_locale()].hasOwnProperty(string_id)) { return &#39;(no translation)&#39;; }
+    if (!this.translations_by_locale[this.current_locale()]) { return '(no translation)'; }
+    if (!this.translations_by_locale[this.current_locale()].hasOwnProperty(string_id)) { return '(no translation)'; }
 
     var string = this.translations_by_locale[this.current_locale()][string_id];
     if (arguments === 1) { return string; }     // no arguments
@@ -277,7 +277,7 @@ _.extend(LocaleManager.prototype, Backbone.Events)</pre>
   this.getLocale = function() { return this.current_locale(); };
   this.setLocale = function(locale_identifier) {
     this.current_locale(locale_identifier);
-    this.trigger(&#39;change&#39;, this);
+    this.trigger('change', this);
     var map = this.translations_by_locale[this.current_locale()];
     for (key in map) { this.trigger(&quot;change:&quot; + key, map[key]); }
   };
@@ -305,8 +305,8 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
               </ul>
               <div class="tab-content">
                 <div id="lm_bulk_labels_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;lm_bulk_labels&#39;&gt;
-  &lt;!-- ko foreach:[&#39;name&#39;, &#39;start_date&#39;, &#39;end_date&#39;] --&gt;
+                  <pre>&lt;div id='lm_bulk_labels'&gt;
+  &lt;!-- ko foreach:['name', 'start_date', 'end_date'] --&gt;
   &lt;p&gt;
     &lt;span data-bind=&quot;text: $parent.labels[$data]&quot;&gt;&lt;/span&gt;
     &lt;span data-bind=&quot;text: $parent[$data]&quot;&gt;&lt;/span&gt;
@@ -321,47 +321,47 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
 &lt;/div&gt;</pre>
                 </div>
                 <div id="lm_bulk_labels_view_model" class="tab-pane">
-                  <pre data-for="cs">bulk_locale_manager = new LocaleManager(&#39;en&#39;, {
-  &#39;en&#39;:
-    name: &#39;Name: &#39;
-    start_date: &#39;Start Date: &#39;
-    end_date: &#39;End Date: &#39;
-  &#39;fr&#39;:
-    name: &#39;Nom: &#39;
-    start_date: &#39;Commencement: &#39;
-    end_date: &#39;Clôture: &#39;
+                  <pre data-for="cs">bulk_locale_manager = new LocaleManager('en', {
+  'en':
+    name: 'Name: '
+    start_date: 'Start Date: '
+    end_date: 'End Date: '
+  'fr':
+    name: 'Nom: '
+    start_date: 'Commencement: '
+    end_date: 'Clôture: '
 })
 
-view_model = kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;, start_date: &#39;1/1/2012&#39;, end_date: &#39;1/2/2012&#39;}))
+view_model = kb.viewModel(new Backbone.Model({name: 'Bob', start_date: '1/1/2012', end_date: '1/2/2012'}))
 
 # use ko.observable to create multiple labels quickly
-view_model.labels = kb.viewModel(bulk_locale_manager, [&#39;name&#39;, &#39;start_date&#39;, &#39;end_date&#39;])
+view_model.labels = kb.viewModel(bulk_locale_manager, ['name', 'start_date', 'end_date'])
 view_model.toggleLocale = -&gt;
-  bulk_locale_manager.setLocale(if (bulk_locale_manager.getLocale() is &#39;en&#39;) then &#39;fr&#39; else &#39;en&#39;)
+  bulk_locale_manager.setLocale(if (bulk_locale_manager.getLocale() is 'en') then 'fr' else 'en')
 
-ko.applyBindings(view_model, $(&#39;#lm_bulk_labels&#39;)[0])</pre>
-                  <pre data-for="js">var bulk_locale_manager = new LocaleManager(&#39;en&#39;, {
-  &#39;en&#39;: {
-    name: &#39;Name: &#39;,
-    start_date: &#39;Start Date: &#39;,
-    end_date: &#39;End Date: &#39;
+ko.applyBindings(view_model, $('#lm_bulk_labels')[0])</pre>
+                  <pre data-for="js">var bulk_locale_manager = new LocaleManager('en', {
+  'en': {
+    name: 'Name: ',
+    start_date: 'Start Date: ',
+    end_date: 'End Date: '
   },
-  &#39;fr&#39;: {
-    name: &#39;Nom: &#39;,
-    start_date: &#39;Commencement: &#39;,
-    end_date: &#39;Clôture: &#39;
+  'fr': {
+    name: 'Nom: ',
+    start_date: 'Commencement: ',
+    end_date: 'Clôture: '
   }
 });
 
-var view_model = kb.viewModel(new Backbone.Model({name: &#39;Bob&#39;, start_date: &#39;1/1/2012&#39;, end_date: &#39;1/2/2012&#39;}));
+var view_model = kb.viewModel(new Backbone.Model({name: 'Bob', start_date: '1/1/2012', end_date: '1/2/2012'}));
 
 // use ko.observable to create multiple labels quickly
-view_model.labels = kb.viewModel(bulk_locale_manager, [&#39;name&#39;, &#39;start_date&#39;, &#39;end_date&#39;]);
+view_model.labels = kb.viewModel(bulk_locale_manager, ['name', 'start_date', 'end_date']);
 view_model.toggleLocale = function() {
-  return bulk_locale_manager.setLocale(bulk_locale_manager.getLocale() === &#39;en&#39; ? &#39;fr&#39; : &#39;en&#39;);
+  return bulk_locale_manager.setLocale(bulk_locale_manager.getLocale() === 'en' ? 'fr' : 'en');
 };
 
-ko.applyBindings(view_model, $(&#39;#lm_bulk_labels&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#lm_bulk_labels')[0]);</pre>
                 </div>
               </div>
             </div>

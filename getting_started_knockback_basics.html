@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.20.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.0.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -96,9 +96,9 @@
               </ul>
               <div class="tab-content">
                 <div id="kb_observable_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kb_observable&#39;&gt;
-  &lt;p&gt;First name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: first_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Last name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: last_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
+                  <pre>&lt;div id='kb_observable'&gt;
+  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
   &lt;p&gt;Hello, &lt;span data-bind=&quot;text: full_name&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
 &lt;/div&gt;
 </pre>
@@ -107,25 +107,25 @@
                   <pre data-for="cs">model = new Backbone.Model({first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;})
 
 ViewModel = (model) -&gt;
-  @first_name = kb.observable(model, &#39;first_name&#39;)
-  @last_name = kb.observable(model, &#39;last_name&#39;)
+  @first_name = kb.observable(model, 'first_name')
+  @last_name = kb.observable(model, 'last_name')
   @full_name = ko.computed((-&gt;return &quot;#{this.first_name()} #{this.last_name()}&quot;), @)
   return
 
 view_model = new ViewModel(model)
 
-ko.applyBindings(view_model, $(&#39;#kb_observable&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#kb_observable')[0])</pre>
                   <pre data-for="js">var model = new Backbone.Model({first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;});
 
 var ViewModel = function(model) {
-  this.first_name = kb.observable(model, &#39;first_name&#39;);
-  this.last_name = kb.observable(model, &#39;last_name&#39;);
+  this.first_name = kb.observable(model, 'first_name');
+  this.last_name = kb.observable(model, 'last_name');
   this.full_name = ko.computed((function() {return &quot;&quot; + (this.first_name()) + &quot; &quot; + (this.last_name());}), this);
 };
 
 var view_model = new ViewModel(model);
 
-ko.applyBindings(view_model, $(&#39;#kb_observable&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kb_observable')[0]);</pre>
                 </div>
               </div>
             </div>
@@ -151,9 +151,9 @@ ko.applyBindings(view_model, $(&#39;#kb_observable&#39;)[0]);</pre>
               </ul>
               <div class="tab-content">
                 <div id="kb_view_model_computed_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kb_view_model_computed&#39;&gt;
-  &lt;p&gt;First name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: first_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Last name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: last_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
+                  <pre>&lt;div id='kb_view_model_computed'&gt;
+  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
   &lt;p&gt;Hello, &lt;span data-bind=&quot;text: full_name&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
 &lt;/div&gt;</pre>
                 </div>
@@ -163,13 +163,13 @@ ko.applyBindings(view_model, $(&#39;#kb_observable&#39;)[0]);</pre>
 view_model = kb.viewModel(model)
 view_model.full_name = ko.computed((-&gt;return &quot;#{@first_name()} #{@last_name()}&quot;), view_model)
 
-ko.applyBindings(view_model, $(&#39;#kb_view_model_computed&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#kb_view_model_computed')[0])</pre>
                   <pre data-for="js">var model = new Backbone.Model({first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;});
 
 var view_model = kb.viewModel(model);
 view_model.full_name = ko.computed((function() {return &quot;&quot; + (this.first_name()) + &quot; &quot; + (this.last_name());}), view_model);
 
-ko.applyBindings(view_model, $(&#39;#kb_view_model_computed&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kb_view_model_computed')[0]);</pre>
                 </div>
               </div>
             </div>
@@ -204,26 +204,26 @@ ko.applyBindings(view_model, $(&#39;#kb_view_model_computed&#39;)[0]);</pre>
               </ul>
               <div class="tab-content">
                 <div id="kb_collection_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kb_collection&#39; data-bind=&quot;foreach: planets&quot;&gt;
-  &lt;p&gt;First name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: first_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Last name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: last_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Hello, &lt;span data-bind=&quot;text: ko.computed(function(){ return $data.first_name() + &#39; &#39; + $data.last_name(); })&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
+                  <pre>&lt;div id='kb_collection' data-bind=&quot;foreach: planets&quot;&gt;
+  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Hello, &lt;span data-bind=&quot;text: ko.computed(function(){ return $data.first_name() + ' ' + $data.last_name(); })&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
 &lt;/div&gt;</pre>
                 </div>
                 <div id="kb_collection_view_model" class="tab-pane">
-                  <pre data-for="cs">earth = new Backbone.Model({first_name: &#39;Planet&#39;, last_name: &#39;Earth&#39;})
-mars = new Backbone.Model({first_name: &#39;Planet&#39;, last_name: &#39;Mars&#39;})
-the_moon = new Backbone.Model({first_name: &#39;The&#39;, last_name: &#39;Moon&#39;})
+                  <pre data-for="cs">earth = new Backbone.Model({first_name: 'Planet', last_name: 'Earth'})
+mars = new Backbone.Model({first_name: 'Planet', last_name: 'Mars'})
+the_moon = new Backbone.Model({first_name: 'The', last_name: 'Moon'})
 
 planets = new Backbone.Collection([earth, the_moon, mars])
 
 view_model =
   planets: kb.collectionObservable(planets, {view_model: kb.ViewModel})
 
-ko.applyBindings(view_model, $(&#39;#kb_collection&#39;)[0])</pre>
-                  <pre data-for="js">var earth = new Backbone.Model({first_name: &#39;Planet&#39;, last_name: &#39;Earth&#39;});
-var mars = new Backbone.Model({first_name: &#39;Planet&#39;, last_name: &#39;Mars&#39;});
-var the_moon = new Backbone.Model({first_name: &#39;The&#39;, last_name: &#39;Moon&#39;});
+ko.applyBindings(view_model, $('#kb_collection')[0])</pre>
+                  <pre data-for="js">var earth = new Backbone.Model({first_name: 'Planet', last_name: 'Earth'});
+var mars = new Backbone.Model({first_name: 'Planet', last_name: 'Mars'});
+var the_moon = new Backbone.Model({first_name: 'The', last_name: 'Moon'});
 
 var planets = new Backbone.Collection([earth, the_moon, mars]);
 
@@ -231,7 +231,7 @@ var view_model = {
   planets: kb.collectionObservable(planets, { view_model: kb.ViewModel })
 };
 
-ko.applyBindings(view_model, $(&#39;#kb_collection&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kb_collection')[0]);</pre>
                 </div>
               </div>
             </div>

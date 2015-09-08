@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.20.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.0.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -93,44 +93,44 @@
             </ul>
             <div class="tab-content">
               <div id="kbco_sorting_view" class="tab-pane active">
-                <pre>&lt;div id=&#39;kbco_sorting&#39; &gt;
+                <pre>&lt;div id='kbco_sorting' &gt;
   &lt;legend&gt;Sort Attribute
     &lt;select data-bind=&quot;options: sort_attributes, selectedOptions: sort_attribute&quot;&gt;&lt;/select&gt;
   &lt;/legend&gt;
   &lt;div data-bind=&quot;foreach: people&quot;&gt;
-    &lt;div class=&#39;row-fluid&#39;&gt;
-      &lt;div class=&#39;span5&#39;&gt;
+    &lt;div class='row-fluid'&gt;
+      &lt;div class='span5'&gt;
         &lt;span&gt;First: &lt;/span&gt;
-        &lt;input class=&#39;input-small&#39; data-bind=&quot;value: first, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+        &lt;input class='input-small' data-bind=&quot;value: first, valueUpdate: 'keyup'&quot;/&gt;
       &lt;/div&gt;
-      &lt;div class=&#39;offset1 span5&#39;&gt;
+      &lt;div class='offset1 span5'&gt;
         &lt;span&gt;Last: &lt;/span&gt;
-        &lt;input class=&#39;input-small&#39; data-bind=&quot;value: last, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+        &lt;input class='input-small' data-bind=&quot;value: last, valueUpdate: 'keyup'&quot;/&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre>
               </div>
               <div id="kbco_sorting_view_model" class="tab-pane">
-                <pre data-for="cs">people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Steven&#39;, last: &#39;Ashkenas&#39;}])
-sort_attribute = ko.observable(&#39;first&#39;)
+                <pre data-for="cs">people = new Backbone.Collection([{first: 'Jeremy', last: 'Sanderson'}, {first: 'Steven', last: 'Ashkenas'}])
+sort_attribute = ko.observable('first')
 
 view_model =
   sort_attribute: sort_attribute
-  sort_attributes: ko.observableArray([&#39;first&#39;, &#39;last&#39;])
+  sort_attributes: ko.observableArray(['first', 'last'])
   people: kb.collectionObservable(people, {sort_attribute: sort_attribute})
 
-ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0])</pre>
-                <pre data-for="js">var people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Steven&#39;, last: &#39;Ashkenas&#39;}]);
-var sort_attribute = ko.observable(&#39;first&#39;);
+ko.applyBindings(view_model, $('#kbco_sorting')[0])</pre>
+                <pre data-for="js">var people = new Backbone.Collection([{first: 'Jeremy', last: 'Sanderson'}, {first: 'Steven', last: 'Ashkenas'}]);
+var sort_attribute = ko.observable('first');
 
 var view_model = {
   sort_attribute: sort_attribute,
-  sort_attributes: ko.observableArray([&#39;first&#39;, &#39;last&#39;]),
+  sort_attributes: ko.observableArray(['first', 'last']),
   people: kb.collectionObservable(people, {sort_attribute: sort_attribute})
 };
 
-ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbco_sorting')[0]);</pre>
               </div>
             </div>
           </div>
@@ -167,44 +167,44 @@ ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0]);</pre>
             </ul>
             <div class="tab-content">
               <div id="kbco_filtering_view" class="tab-pane active">
-                <pre>&lt;div id=&#39;kbco_filtering&#39; &gt;
+                <pre>&lt;div id='kbco_filtering' &gt;
   &lt;legend&gt;Filter Name
    &lt;select data-bind=&quot;options: available_names, selectedOptions: filtered_names&quot;&gt;&lt;/select&gt;
   &lt;/legend&gt;
   &lt;div data-bind=&quot;foreach: people&quot;&gt;
-    &lt;div class=&#39;row-fluid&#39;&gt;
-      &lt;div class=&#39;span5&#39;&gt;
+    &lt;div class='row-fluid'&gt;
+      &lt;div class='span5'&gt;
         &lt;span&gt;First: &lt;/span&gt;
-        &lt;input class=&#39;input-small&#39; data-bind=&quot;value: first, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+        &lt;input class='input-small' data-bind=&quot;value: first, valueUpdate: 'keyup'&quot;/&gt;
       &lt;/div&gt;
-      &lt;div class=&#39;offset1 span5&#39;&gt;
+      &lt;div class='offset1 span5'&gt;
         &lt;span&gt;Last: &lt;/span&gt;
-        &lt;input class=&#39;input-small&#39; data-bind=&quot;value: last, valueUpdate: &#39;keyup&#39;&quot;/&gt;
+        &lt;input class='input-small' data-bind=&quot;value: last, valueUpdate: 'keyup'&quot;/&gt;
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre>
               </div>
               <div id="kbco_filtering_view_model" class="tab-pane">
-                <pre data-for="cs">people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Ashkenas&#39;}, {first: &#39;Steven&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Kevin&#39;, last: &#39;Malakoff&#39;}])
-filtered_names = ko.observableArray([&#39;Kevin&#39;])
+                <pre data-for="cs">people = new Backbone.Collection([{first: 'Jeremy', last: 'Ashkenas'}, {first: 'Steven', last: 'Sanderson'}, {first: 'Kevin', last: 'Malakoff'}])
+filtered_names = ko.observableArray(['Kevin'])
 
 view_model =
   filtered_names: filtered_names
-  available_names: ko.observableArray(people.map((model) -&gt; return model.get(&#39;first&#39;)))
-  people: kb.collectionObservable(people, {filters: (model) -&gt; return model.get(&#39;first&#39;) is filtered_names()[0]})
+  available_names: ko.observableArray(people.map((model) -&gt; return model.get('first')))
+  people: kb.collectionObservable(people, {filters: (model) -&gt; return model.get('first') is filtered_names()[0]})
 
-ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0])</pre>
-                <pre data-for="js">var people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Ashkenas&#39;}, {first: &#39;Steven&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Kevin&#39;, last: &#39;Malakoff&#39;}]);
-var filtered_names = ko.observableArray([&#39;Kevin&#39;]);
+ko.applyBindings(view_model, $('#kbco_filtering')[0])</pre>
+                <pre data-for="js">var people = new Backbone.Collection([{first: 'Jeremy', last: 'Ashkenas'}, {first: 'Steven', last: 'Sanderson'}, {first: 'Kevin', last: 'Malakoff'}]);
+var filtered_names = ko.observableArray(['Kevin']);
 
 var view_model = {
   filtered_names: filtered_names,
-  available_names: ko.observableArray(people.map(function(model) { return model.get(&#39;first&#39;); })),
-  people: kb.collectionObservable(people, {filters: function(model) { return model.get(&#39;first&#39;) === filtered_names()[0]; } })
+  available_names: ko.observableArray(people.map(function(model) { return model.get('first'); })),
+  people: kb.collectionObservable(people, {filters: function(model) { return model.get('first') === filtered_names()[0]; } })
 };
 
-ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbco_filtering')[0]);</pre>
               </div>
             </div>
           </div>
@@ -241,8 +241,8 @@ ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0]);</pre>
             </ul>
             <div class="tab-content">
               <div id="kbco_html_select_view" class="tab-pane active">
-                <pre>&lt;div id=&#39;kbco_html_select&#39;&gt;
-  &lt;select multiple=&quot;multiple&quot; data-bind=&quot;options: people, optionsText: &#39;name&#39;, selectedOptions: selected_people&quot;&gt;&lt;/select&gt;
+                <pre>&lt;div id='kbco_html_select'&gt;
+  &lt;select multiple=&quot;multiple&quot; data-bind=&quot;options: people, optionsText: 'name', selectedOptions: selected_people&quot;&gt;&lt;/select&gt;
   &lt;div&gt;
     &lt;span&gt;Selected people: &lt;/span&gt;
     &lt;!-- ko foreach: selected_people --&gt;
@@ -252,15 +252,15 @@ ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0]);</pre>
 &lt;/div&gt;</pre>
               </div>
               <div id="kbco_html_select_view_model" class="tab-pane">
-                <pre data-for="cs">people = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Sarah&#39;}, {name: &#39;George&#39;}])
+                <pre data-for="cs">people = new Backbone.Collection([{name: 'Bob'}, {name: 'Sarah'}, {name: 'George'}])
 selected_people = new Backbone.Collection()
 
 view_model =
   people: kb.collectionObservable(people)
   selected_people: kb.collectionObservable(selected_people)
 
-ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0])</pre>
-                <pre data-for="js">var people = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Sarah&#39;}, {name: &#39;George&#39;}]);
+ko.applyBindings(view_model, $('#kbco_html_select')[0])</pre>
+                <pre data-for="js">var people = new Backbone.Collection([{name: 'Bob'}, {name: 'Sarah'}, {name: 'George'}]);
 var selected_people = new Backbone.Collection();
 
 var view_model = {
@@ -268,7 +268,7 @@ var view_model = {
   selected_people: kb.collectionObservable(selected_people)
 };
 
-ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbco_html_select')[0]);</pre>
               </div>
             </div>
           </div>
@@ -297,9 +297,9 @@ ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0]);</pre>
             </ul>
             <div class="tab-content">
               <div id="kbco_share_options_view" class="tab-pane active">
-                <pre>&lt;div id=&#39;kbco_share_options&#39;&gt;
+                <pre>&lt;div id='kbco_share_options'&gt;
   &lt;div data-bind=&quot;text: name&quot;&gt;&lt;/div&gt;
-  &lt;select multiple=&quot;multiple&quot; data-bind=&quot;options: available_things, optionsText: &#39;name&#39;, selectedOptions: my_things&quot;&gt;&lt;/select&gt;
+  &lt;select multiple=&quot;multiple&quot; data-bind=&quot;options: available_things, optionsText: 'name', selectedOptions: my_things&quot;&gt;&lt;/select&gt;
 
   &lt;p&gt;
     &lt;span&gt;My Things:&lt;/span&gt;
@@ -310,27 +310,27 @@ ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0]);</pre>
 &lt;/div&gt;</pre>
               </div>
               <div id="kbco_share_options_view_model" class="tab-pane">
-                <pre data-for="cs">chair = new Backbone.Model({name: &#39;chair&#39;, my_things: new Backbone.Collection()})
-things = new Backbone.Collection([{name: &#39;leg1&#39;}, {name: &#39;leg2&#39;}, {name: &#39;leg3&#39;}])
+                <pre data-for="cs">chair = new Backbone.Model({name: 'chair', my_things: new Backbone.Collection()})
+things = new Backbone.Collection([{name: 'leg1'}, {name: 'leg2'}, {name: 'leg3'}])
 
 available_things = kb.collectionObservable(things)
 view_model =
   available_things: available_things
-  name: kb.observable(chair, &#39;name&#39;)
-  my_things: kb.collectionObservable(chair.get(&#39;my_things&#39;), available_things.shareOptions())
+  name: kb.observable(chair, 'name')
+  my_things: kb.collectionObservable(chair.get('my_things'), available_things.shareOptions())
 
-ko.applyBindings(view_model, $(&#39;#kbco_share_options&#39;)[0])</pre>
-                <pre data-for="js">var chair = new Backbone.Model({name: &#39;chair&#39;, my_things: new Backbone.Collection()});
-var things = new Backbone.Collection([{name: &#39;leg1&#39;}, {name: &#39;leg2&#39;}, {name: &#39;leg3&#39;}]);
+ko.applyBindings(view_model, $('#kbco_share_options')[0])</pre>
+                <pre data-for="js">var chair = new Backbone.Model({name: 'chair', my_things: new Backbone.Collection()});
+var things = new Backbone.Collection([{name: 'leg1'}, {name: 'leg2'}, {name: 'leg3'}]);
 
 var available_things = kb.collectionObservable(things);
 var view_model = {
   available_things: available_things,
-  name: kb.observable(chair, &#39;name&#39;),
-  my_things: kb.collectionObservable(chair.get(&#39;my_things&#39;), available_things.shareOptions())
+  name: kb.observable(chair, 'name'),
+  my_things: kb.collectionObservable(chair.get('my_things'), available_things.shareOptions())
 };
 
-ko.applyBindings(view_model, $(&#39;#kbco_share_options&#39;)[0]);</pre>
+ko.applyBindings(view_model, $('#kbco_share_options')[0]);</pre>
               </div>
             </div>
           </div>

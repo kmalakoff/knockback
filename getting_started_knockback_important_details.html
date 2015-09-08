@@ -17,7 +17,7 @@
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-0.20.4.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.0.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -106,9 +106,9 @@
               </ul>
               <div class="tab-content">
                 <div id="kb_view_model_inheritance_view" class="tab-pane active">
-                  <pre>&lt;div id=&#39;kb_view_model_inheritance&#39;&gt;
-  &lt;p&gt;First name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: first_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
-  &lt;p&gt;Last name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: last_name, valueUpdate: &#39;keyup&#39;&quot; /&gt;&lt;/p&gt;
+                  <pre>&lt;div id='kb_view_model_inheritance'&gt;
+  &lt;p&gt;First name: &lt;input class='input-small pull-right' data-bind=&quot;value: first_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
+  &lt;p&gt;Last name: &lt;input class='input-small pull-right' data-bind=&quot;value: last_name, valueUpdate: 'keyup'&quot; /&gt;&lt;/p&gt;
   &lt;p&gt;Hello, &lt;span data-bind=&quot;text: full_name&quot;&gt; &lt;/span&gt;!&lt;/p&gt;
 &lt;/div&gt;</pre>
                 </div>
@@ -121,7 +121,7 @@ class MyViewModel extends kb.ViewModel
     @full_name = ko.computed((-&gt;return &quot;#{@first_name()} #{@last_name()}&quot;), @)
 view_model = new MyViewModel(model)
 
-ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0])</pre>
+ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0])</pre>
                   <pre data-for="js">var model = new Backbone.Model({first_name: &quot;Planet&quot;, last_name: &quot;Earth&quot;});
 
 var MyViewModel = kb.ViewModel.extend({
@@ -135,7 +135,7 @@ var MyViewModel = kb.ViewModel.extend({
 
 var view_model = new MyViewModel(model);
 
-ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0]);
+ko.applyBindings(view_model, $('#kb_view_model_inheritance')[0]);
 </pre>
                 </div>
               </div>
@@ -156,15 +156,15 @@ ko.applyBindings(view_model, $(&#39;#kb_view_model_inheritance&#39;)[0]);
           <pre data-for="cs">view_model = {
   people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
     factories:
-      &#39;models&#39;: PersonViewModel
-      &#39;models.friends.models&#39;: FriendViewModel
+      'models': PersonViewModel
+      'models.friends.models': FriendViewModel
   })
 }</pre>
           <pre data-for="js">var view_model = {
   people: kb.collectionObservable(new Backbone.Collection([bob, fred]), {
     factories: {
-      &#39;models&#39;: PersonViewModel,
-      &#39;models.friends.models&#39;: FriendViewModel
+      'models': PersonViewModel,
+      'models.friends.models': FriendViewModel
     }
   })
 };</pre><p>Please take a look at the <a href="tutorial_nested_models.html">Nested Model Tutorial</a> for more details.</p>
