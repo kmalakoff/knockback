@@ -1,6 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 1.0.0
+* Added observableX formats to be more consistent with knockout's observableArray
+
+## 0.20.5
 * Additional check for a collection updating during release.
 
 ## 0.20.4
