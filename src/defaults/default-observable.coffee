@@ -46,3 +46,4 @@ module.exports = class kb.DefaultObservable
   setToDefault: -> kb.utils.wrappedObservable(@)(@dv)
 
 kb.defaultObservable = (target, default_value) -> return new kb.DefaultObservable(target, default_value)
+kb.observableDefault = kb.defaultObservable

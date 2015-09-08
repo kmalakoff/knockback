@@ -100,3 +100,4 @@ module.exports = class kb.FormattedObservable
   destroy: -> kb.utils.wrappedDestroy(@)
 
 kb.formattedObservable = (format, args) -> return new kb.FormattedObservable(format, arraySlice.call(arguments, 1))
+kb.observableFormatted = kb.formattedObservable

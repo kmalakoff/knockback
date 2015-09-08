@@ -894,3 +894,22 @@ describe 'collection-observable @quick @collection-observable', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it '25. Test auto-generate collections (kb.observableCollection)', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    models = (new Contact({id: id}) for id in [1..4])
+    class PersonViewModel extends kb.ViewModel
+    collection_observable = kb.observableCollection({view_model: PersonViewModel})
+
+    collection_observable.collection().reset(models)
+    assert.equal(collection_observable.collection().length, 4)
+
+    for view_models in collection_observable()
+      assert.ok(!!view_models.date())
+      assert.ok(view_models.model() instanceof Contact)
+
+    kb.release(collection_observable)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

@@ -142,3 +142,4 @@ module.exports = class kb.LocalizedObservable
 
 # factory function
 kb.localizedObservable = (value, options, view_model) -> return new kb.LocalizedObservable(value, options, view_model)
+kb.observableLocalized = kb.localizedObservable

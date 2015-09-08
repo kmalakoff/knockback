@@ -431,3 +431,4 @@ class kb.CollectionObservable
 
 # factory function
 kb.collectionObservable = (collection, view_model, options) -> return new kb.CollectionObservable(arguments)
+kb.observableCollection = kb.collectionObservable

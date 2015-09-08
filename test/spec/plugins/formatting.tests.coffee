@@ -216,3 +216,29 @@ describe 'formatted-observable @quick @formatting', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'kb.observableFormatted', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    class ContactViewModelFullName extends kb.ViewModel
+      constructor: (model) ->
+        super(model, {internals: ['first', 'last']})
+        @full_name = kb.observableFormatted('Last: {1}, First: {0}', @_first, @_last)
+
+    model = new kb.Model({first: 'Ringo', last: 'Starr'})
+    view_model = new ContactViewModelFullName(model)
+    assert.equal(view_model.full_name(), 'Last: Starr, First: Ringo', "full name is good")
+
+    model.set({first: 'Bongo'})
+    assert.equal(view_model.full_name(), 'Last: Starr, First: Bongo', "full name is good")
+
+    view_model.full_name('Last: The Starr, First: Ringo')
+    assert.equal(view_model.full_name(), 'Last: The Starr, First: Ringo', "full name is good")
+    assert.equal(model.get('first'), 'Ringo', "first name is good")
+    assert.equal(model.get('last'), 'The Starr', "last name is good")
+
+    # clean up
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

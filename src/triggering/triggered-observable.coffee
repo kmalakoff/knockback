@@ -80,3 +80,4 @@ module.exports = class kb.TriggeredObservable
 
 # factory function
 kb.triggeredObservable = (emitter, event_selector) -> return new kb.TriggeredObservable(emitter, event_selector)
+kb.observableTriggered = kb.triggeredObservable
