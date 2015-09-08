@@ -4,15 +4,16 @@
   "main": "knockback.js",
   "ignore": [
     "**/.*",
+    "config",
     "components",
     "doc",
     "media",
     "node_modules",
     "packages",
+    "src",
     "test",
     "vendor",
-    "bower_components",
-    "tests"
+    "bower_components"
   ],
   "homepage": "https://github.com/kmalakoff/knockback",
   "authors": [
