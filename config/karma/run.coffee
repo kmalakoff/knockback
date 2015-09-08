@@ -2,7 +2,7 @@ path = require 'path'
 _ = require 'underscore'
 Queue = require 'queue-async'
 Wrench = require 'wrench'
-karma = require('karma').server
+{Server} = require 'karma'
 gutil = require 'gulp-util'
 generate = require './generate'
 
@@ -22,7 +22,8 @@ module.exports = (options={}, callback) ->
       do (test) -> queue.defer (callback) ->
         gutil.log "RUNNING TESTS: #{test.name}"
         gutil.log "#{JSON.stringify test.files}"
-        karma.start _.defaults({files: test.files, client: {args: ['--grep', options.tags or '']}}, BASE_CONFIG), (return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value)
+        new Server(_.defaults({files: test.files, client: {args: ['--grep', options.tags or '']}}, BASE_CONFIG))
+          .start((return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value))
 
   queue.await (err) ->
     Wrench.rmdirSyncRecursive('./_temp', true) unless err
