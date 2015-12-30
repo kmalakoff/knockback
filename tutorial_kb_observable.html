@@ -80,10 +80,10 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><h1 id="tutorial-kb-observable">Tutorial: kb.Observable</h1>
+      <content class="page"><p>#Tutorial: kb.Observable</p>
 <p><a href="index.html">Knockback.js</a> provides ways to customize a kb.Observable when it is created. This tutorial provides working examples of using these options.</p>
-<h2 id="create-options-read-function-write-function-value-">Create Options: {read: function(), write: function(value)}</h2>
-<p>Instead of performing a simple Backbone.Model get or set to synchronize with a kb.Observable, you can provide a custom read or write method like for a ko.observable.</p>
+<p>##Create Options: {read: function(), write: function(value)}
+Instead of performing a simple Backbone.Model get or set to synchronize with a kb.Observable, you can provide a custom read or write method like for a ko.observable.</p>
 <p><strong>Note</strong>: just like in Knockout.js, if you require access to the owning view model, it provided as &#39;this&#39; in read and write methods if you provide it as a parameter to the kb.observable&#39;s create method: (model, options, owning_view_model)</p>
 
         <div class="row-fluid">
@@ -94,8 +94,8 @@
             </ul>
             <div class="tab-content">
               <div id="kboo_read_write_view" class="tab-pane active">
-                <pre>&lt;div id='kboo_read_write'&gt;
-  &lt;input class='input-small pull-right' data-bind=&quot;value: formatted_number, valueUpdate: 'keyup'&quot;/&gt;
+                <pre>&lt;div id=&#39;kboo_read_write&#39;&gt;
+  &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: formatted_number, valueUpdate: &#39;keyup&#39;&quot;/&gt;
   &lt;label data-bind=&quot;text: number&quot;&gt;&lt;/label&gt;
 &lt;/div&gt;</pre>
               </div>
@@ -103,31 +103,31 @@
                 <pre data-for="cs">model = new Backbone.Model({number: 33})
 
 ViewModel = (model) -&gt;
-  @number = kb.observable(model, 'number')
+  @number = kb.observable(model, &#39;number&#39;)
   @formatted_number = kb.observable(model, {
-    key:'number'
+    key:&#39;number&#39;
     read: -&gt; return &quot;#: #{@number()}&quot;
     write: (value) -&gt; @number(value.substring(3))
-  }, @)
+  }, {}, @)
   return
 
 view_model = new ViewModel(model)
 
-ko.applyBindings(view_model, $('#kboo_read_write')[0])</pre>
+ko.applyBindings(view_model, $(&#39;#kboo_read_write&#39;)[0])</pre>
                 <pre data-for="js">var model = new Backbone.Model({number: 33});
 
 var ViewModel = function(model) {
-  this.number = kb.observable(model, 'number');
+  this.number = kb.observable(model, &#39;number&#39;);
   this.formatted_number = kb.observable(model, {
-    key: 'number',
+    key: &#39;number&#39;,
     read: function() { return &quot;#: &quot; + (this.number()); },
     write: function(value) { return this.number(value.substring(3)); }
-  }, this);
+  }, {}, this);
 };
 
 var view_model = new ViewModel(model);
 
-ko.applyBindings(view_model, $('#kboo_read_write')[0]);</pre>
+ko.applyBindings(view_model, $(&#39;#kboo_read_write&#39;)[0]);</pre>
               </div>
             </div>
           </div>
@@ -140,19 +140,19 @@ ko.applyBindings(view_model, $('#kboo_read_write')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_observable/kboo_read_write_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2 id="create-options-localizer-constructor-value-">Create Options: {localizer: constructor(value)}</h2>
+        </div><p>##Create Options: {localizer: constructor(value)}</p>
 <p>Instead of a read and/or write option, you can provide a kb.LocalizedObservable derived class for custom localized of an attribute. Please see the <a href="tutorial_kb_localized_observable.html#localized_input">kb.LocalizedObservable tutorial</a> an explanation of the following:</p>
-<h3 id="viewmodel-and-bindings-">ViewModel and Bindings:</h3>
+<p>###ViewModel and Bindings:</p>
 
         <pre data-for="cs">model = new Backbone.Model({date: new Date()})
 
 view_model =
-  date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})</pre>
+  date: kb.observable(model, {key: &#39;date&#39;, localizer: LongDateLocalizer})</pre>
         <pre data-for="js">  var model = new Backbone.Model({date: new Date()});
 
   var view_model = {
-    date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})
-  };</pre><h2 id="create-options-default-value-or-observable-">Create Options: {default: value or observable}</h2>
+    date: kb.observable(model, {key: &#39;date&#39;, localizer: LongDateLocalizer})
+  };</pre><p>##Create Options: {default: value or observable}</p>
 <p>You can pass a default function or parameter to provide a value when there is no value available.</p>
 
         <div class="row-fluid">
@@ -163,8 +163,8 @@ view_model =
             </ul>
             <div class="tab-content">
               <div id="kboo_default_view" class="tab-pane active">
-                <pre>&lt;div id='kboo_default'&gt;
-  &lt;p&gt;Name: &lt;input class='input-small pull-right' data-bind=&quot;value: name, valueUpdate: 'keyup'&quot;/&gt;&lt;/p&gt;
+                <pre>&lt;div id=&#39;kboo_default&#39;&gt;
+  &lt;p&gt;Name: &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: name, valueUpdate: &#39;keyup&#39;&quot;/&gt;&lt;/p&gt;
   &lt;p&gt;Name with default: &lt;span data-bind=&quot;text: name_with_default&quot;&gt;&lt;/span&gt;&lt;/p&gt;
 &lt;/div&gt;</pre>
               </div>
@@ -172,23 +172,23 @@ view_model =
                 <pre data-for="cs">model = new Backbone.Model({})
 
 ViewModel = (model) -&gt;
-  @name = kb.observable(model, 'name')
-  @name_with_default = kb.observable(model, {key: 'name', default: '(no name)'})
+  @name = kb.observable(model, &#39;name&#39;)
+  @name_with_default = kb.observable(model, {key: &#39;name&#39;, default: &#39;(no name)&#39;})
   return
 
 view_model = new ViewModel(model)
 
-ko.applyBindings(view_model, $('#kboo_default_view_model')[0])</pre>
+ko.applyBindings(view_model, $(&#39;#kboo_default_view_model&#39;)[0])</pre>
                 <pre data-for="js">var model = new Backbone.Model({});
 
 var ViewModel = function(model) {
-  this.name = kb.observable(model, 'name');
-  this.name_with_default = kb.observable(model, {key: 'name', &quot;default&quot;: '(no name)'});
+  this.name = kb.observable(model, &#39;name&#39;);
+  this.name_with_default = kb.observable(model, {key: &#39;name&#39;, &quot;default&quot;: &#39;(no name)&#39;});
 };
 
 var view_model = new ViewModel(model);
 
-ko.applyBindings(view_model, $('#kboo_default')[0]);</pre>
+ko.applyBindings(view_model, $(&#39;#kboo_default&#39;)[0]);</pre>
               </div>
             </div>
           </div>
@@ -201,7 +201,7 @@ ko.applyBindings(view_model, $('#kboo_default')[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_observable/kboo_default_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><h2 id="dynamic-attribute-types">Dynamic Attribute Types</h2>
+        </div><p>##Dynamic Attribute Types</p>
 <p>Since Knockback.js version 0.16.0, a kb.Observable can be created using the correct type before the attribute is loaded using the <a href="doc/class/kb/ViewModel.html#constructor-dynamic">factories options</a> and change types when the attribute value changes.</p>
 
         <pre data-for="cs">model = new Backbone.Model({reused: null})

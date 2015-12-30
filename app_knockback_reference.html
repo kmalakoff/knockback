@@ -73,8 +73,8 @@
 <p>As you should see by now, Backbone.js provides great models and collections ORM functionality plus single-page app routing,  Knockout.js provides very dynamic bindings between data and views using ViewModels, and Knockback.js provides the layer between the Backbone ORM and Knockout.js ViewModels.</p>
 <p>Because Backbone.Views and Knockout.js ViewModels provide traditional MVC Controller functionality, it is your choice on how to structure your application and whether your continue to use Backbone.Views (personally, I no longer use Backbone.Views).</p>
 <p>That said, I have put together a reference application that demonstrates some good principles for routing, memory management, and architectural structure. Let&#39;s get started!</p>
-<h1 id="memory-management">Memory Management</h1>
-<p>Knockback.js requires you to release your view models using &#39;kb.release(view_model)&#39;. The reason for this is that kb.CollectionObservables and kb.ViewModels may have cicular references that need to be broken. Also, kb.release walks your ViewModel properties so it ensures all ko.observables, kb.observables, and the like to be properly released to avoid memory leaks.</p>
+<p>#Memory Management
+Knockback.js requires you to release your view models using &#39;kb.release(view_model)&#39;. The reason for this is that kb.CollectionObservables and kb.ViewModels may have cicular references that need to be broken. Also, kb.release walks your ViewModel properties so it ensures all ko.observables, kb.observables, and the like to be properly released to avoid memory leaks.</p>
 <p>That said, you can largely automate this using the approach from <a href="https://github.com/kmalakoff/knockback-navigators">Knockback-Navigators.js</a>!</p>
 <p>Knockback-Navigators.js uses an implicit memory management model based on Knockback.js conventions (based on Knockout.js functionality). When an element is created, Knockback binds Knockout&#39;s dispose node callback:</p>
 <pre><code>// binds a callback to the node that releases the view model when the node is removed using ko.removeNode
@@ -88,14 +88,14 @@ kb.applyBindings(view_model, el);
 
 // OR: Manually
 kb.releaseOnNodeRemove(view_model, el);
-</code></pre><h3 id="an-example-">An example:</h3>
+</code></pre><p>###An example:</p>
 <p>In the reference application, I manually create the statistics view model:</p>
 <pre><code>var statistics_el = kb.renderTemplate(&#39;statistics&#39;, new StatisticsViewModel());
 $(&#39;body&#39;).append(statistics_el);
 ...
 ko.releaseNode(statistics_el);
 </code></pre><p>Calling ko.releaseNode will not only clean up the element, but also call destroy() on the StatisticsViewModel.</p>
-<h1 id="routing">Routing</h1>
+<p>#Routing</p>
 <p>Backbone.Router is quite easy to use with a Knockback. Here is a simple example where there can only be one active page at a time:</p>
 <pre><code>window.RouterBackboneJS = Backbone.Router.extend({
   constructor: function(page_navigator) {
@@ -126,7 +126,7 @@ ko.releaseNode(statistics_el);
     $(el).addClass(&#39;active&#39;); // CSS {display: none} -&gt; {display: block}
   }
 });
-</code></pre><h1 id="advanced-routing">Advanced Routing</h1>
+</code></pre><p>#Advanced Routing</p>
 <p>You can use <a href="https://github.com/kmalakoff/knockback-navigators">Knockback-Navigators.js</a> to provide more exciting and interesting functionality. Here&#39;s an example with transitions and non-cached pages:</p>
 <pre><code>window.RouterBackboneJSExtendedNoCache = Backbone.Router.extend({
   constructor: function(page_navigator /* instance of kb.PageNavigatorPanes */) {
@@ -154,7 +154,7 @@ ko.releaseNode(statistics_el);
       });
     }));
   });
-</code></pre><h1 id="application-architecture">Application Architecture</h1>
+</code></pre><p>#Application Architecture</p>
 <p>I try to keep directories organized like in <a href="http://addyosmani.github.com/todomvc/">TodoMVC</a> and <a href="http://brunch.io/">Brunch</a>:</p>
 <pre><code>- app
   - lib - reusable libraries
@@ -171,9 +171,9 @@ ko.releaseNode(statistics_el);
   }
 });
 </code></pre><p>If you are making a large app, you could create a single namespace like &#39;window.MyApp = {};&#39; to hang all of your classes from or you could use an AMD loading solution like <a href="">Brunch</a>.</p>
-<h1 id="walkthrough">Walkthrough</h1>
+<p>#Walkthrough</p>
 <p>I will skip the extended application-specific code to keep things simple so you might see additional code in the actual application code.</p>
-<h2 id="application-specific">Application-Specific</h2>
+<p>##Application-Specific</p>
 <p>Like in Brunch, the appplication is managed using an Application class:</p>
 <pre><code>window.Application = (function() {
 
@@ -208,7 +208,7 @@ ko.releaseNode(statistics_el);
 
   return Application;
 })();
-</code></pre><h2 id="models">Models</h2>
+</code></pre><p>##Models</p>
 <p>Thing Models use Backbone-Relational to manage ownership:</p>
 <pre><code>window.Thing = Backbone.RelationalModel.extend({
   url: function() {
@@ -259,7 +259,7 @@ window.ThingCellCollectionObservable = kb.CollectionObservable.extend({
     return kb.CollectionObservable.prototype.constructor.call(this, collection, { view_model: ThingCellViewModel, options: options });
   }
 });
-</code></pre><h1 id="extended-features">Extended Features</h1>
+</code></pre><p>#Extended Features</p>
 <p>In addition to a the Tutorial reference application, you can find more advanced implementations that use <a href="https://github.com/kmalakoff/knockback-navigators">Knockback-Navigators.js</a> for page and embedded pane transitions (under DemoMode):</p>
 <ul>
 <li><strong>Panes</strong>: adds sliding panes with embedded cells for each relationship instead of simple buttons.</li>

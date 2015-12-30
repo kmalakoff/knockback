@@ -92,22 +92,22 @@
     @current_locale = ko.observable(locale_identifier)
 
   get: (string_id) -&gt;
-    return '(no translation)' unless @translations_by_locale[@current_locale()]
-    return '(no translation)' unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
+    return &#39;(no translation)&#39; unless @translations_by_locale[@current_locale()]
+    return &#39;(no translation)&#39; unless @translations_by_locale[@current_locale()].hasOwnProperty(string_id)
     return @translations_by_locale[@current_locale()][string_id]
 
   getLocale: -&gt; return @current_locale()
   setLocale: (locale_identifier) -&gt;
     @current_locale(locale_identifier)
-    @trigger('change', @)
+    @trigger(&#39;change&#39;, @)
 
 _.extend(LocaleManager.prototype, Backbone.Events)
 
-kb.locale_manager = new LocaleManager('en-GB', {
-  'en-GB':
-    body: 'I ought to localize this sentence.'
-  'fr-FR':
-    body: 'J\'ai besoin de localiser cette phrase.'
+kb.locale_manager = new LocaleManager(&#39;en-GB&#39;, {
+  &#39;en-GB&#39;:
+    body: &#39;I ought to localize this sentence.&#39;
+  &#39;fr-FR&#39;:
+    body: &#39;J\&#39;ai besoin de localiser cette phrase.&#39;
 })
 </pre>
             <pre data-for="js">var LocaleManager = function(locale_identifier, translations_by_locale) {
@@ -115,26 +115,26 @@ kb.locale_manager = new LocaleManager('en-GB', {
   this.current_locale = ko.observable(locale_identifier);
 
   this.get = function(string_id) {
-    if (!this.translations_by_locale[this.current_locale()]) {return '(no translation)';}
-    if (!this.translations_by_locale[this.current_locale()].hasOwnProperty(string_id)) {return '(no translation)';}
+    if (!this.translations_by_locale[this.current_locale()]) {return &#39;(no translation)&#39;;}
+    if (!this.translations_by_locale[this.current_locale()].hasOwnProperty(string_id)) {return &#39;(no translation)&#39;;}
     this.translations_by_locale[this.current_locale()][string_id];
   };
 
   this.getLocale = function() { return this.current_locale(); };
   this.setLocale = function(locale_identifier) {
     this.current_locale(locale_identifier);
-    this.trigger('change', this);
+    this.trigger(&#39;change&#39;, this);
   };
 };
 
 _.extend(LocaleManager.prototype, Backbone.Events);
 
-kb.locale_manager = new LocaleManager('en-GB', {
-  'en-GB': {
-    body: 'I ought to localize this sentence.'
+kb.locale_manager = new LocaleManager(&#39;en-GB&#39;, {
+  &#39;en-GB&#39;: {
+    body: &#39;I ought to localize this sentence.&#39;
   },
-  'fr-FR': {
-    body: 'J\'ai besoin de localiser cette phrase.'
+  &#39;fr-FR&#39;: {
+    body: &#39;J\&#39;ai besoin de localiser cette phrase.&#39;
   }
 });
 </pre>
@@ -159,7 +159,7 @@ kb.locale_manager = new LocaleManager('en-GB', {
     return kb.utils.wrappedObservable(@)
 
   read: (string_id) -&gt;
-    return if (string_id) then kb.locale_manager.get(string_id) else ''
+    return if (string_id) then kb.locale_manager.get(string_id) else &#39;&#39;
 })</pre>
                   <pre data-for="js">var LocalizedStringLocalizer = kb.LocalizedObservable.extend({
   constructor: function(value, options, view_model) {
@@ -167,12 +167,12 @@ kb.locale_manager = new LocaleManager('en-GB', {
     return kb.utils.wrappedObservable(this);
   },
   read: function(string_id) {
-    return string_id ? kb.locale_manager.get(string_id) : '';
+    return string_id ? kb.locale_manager.get(string_id) : &#39;&#39;;
   }
 });</pre>
                 </div>
                 <div id="kblo_string_id_view" class="tab-pane">
-                  <pre>&lt;div id='kblo_read_only'&gt;
+                  <pre>&lt;div id=&#39;kblo_read_only&#39;&gt;
   &lt;p data-bind=&quot;text: main_text&quot;&gt;&lt;/p&gt;
 
   &lt;p&gt;
@@ -183,24 +183,24 @@ kb.locale_manager = new LocaleManager('en-GB', {
 &lt;/div&gt;</pre>
                 </div>
                 <div id="kblo_string_id_view_model" class="tab-pane">
-                  <pre data-for="cs">texts = new Backbone.Model({main_text_id: 'body'})
+                  <pre data-for="cs">texts = new Backbone.Model({main_text_id: &#39;body&#39;})
 
 view_model =
-  main_text: kb.observable(texts, {key: 'main_text_id', localizer: LocalizedStringLocalizer})
+  main_text: kb.observable(texts, {key: &#39;main_text_id&#39;, localizer: LocalizedStringLocalizer})
   toggleLocale: -&gt;
-    kb.locale_manager.setLocale(if kb.locale_manager.getLocale() is 'en-GB' then 'fr-FR' else 'en-GB')
+    kb.locale_manager.setLocale(if kb.locale_manager.getLocale() is &#39;en-GB&#39; then &#39;fr-FR&#39; else &#39;en-GB&#39;)
 
-ko.applyBindings(view_model, $('#kblo_read_only')[0])</pre>
-                  <pre data-for="js">var texts = new Backbone.Model({main_text_id: 'body'});
+ko.applyBindings(view_model, $(&#39;#kblo_read_only&#39;)[0])</pre>
+                  <pre data-for="js">var texts = new Backbone.Model({main_text_id: &#39;body&#39;});
 
 view_model = {
-  main_text: kb.observable(texts, {key: 'main_text_id', localizer: LocalizedStringLocalizer}),
+  main_text: kb.observable(texts, {key: &#39;main_text_id&#39;, localizer: LocalizedStringLocalizer}),
   toggleLocale: function() {
-    return kb.locale_manager.setLocale(kb.locale_manager.getLocale() === 'en-GB' ? 'fr-FR' : 'en-GB');
+    return kb.locale_manager.setLocale(kb.locale_manager.getLocale() === &#39;en-GB&#39; ? &#39;fr-FR&#39; : &#39;en-GB&#39;);
   }
 };
 
-ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
+ko.applyBindings(view_model, $(&#39;#kblo_read_only&#39;)[0]);</pre>
                 </div>
               </div>
             </div>
@@ -239,11 +239,11 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
     return kb.utils.wrappedObservable(@)
 
   read: (value) -&gt;
-    return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())
+    return Globalize.format(value, &#39;dd MMMM yyyy&#39;, kb.locale_manager.getLocale())
 
   write: (localized_string, value) -&gt;
     # reset if invalid
-    new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale())
+    new_value = Globalize.parseDate(localized_string, &#39;dd MMMM yyyy&#39;, kb.locale_manager.getLocale())
     if not (new_value and _.isDate(new_value))
       return kb.utils.wrappedObservable(this).resetToCurrent()
 
@@ -255,11 +255,11 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
     return kb.utils.wrappedObservable(this);
   },
   read: function(value) {
-    return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale());
+    return Globalize.format(value, &#39;dd MMMM yyyy&#39;, kb.locale_manager.getLocale());
   },
   write: function(localized_string, value) {
     // reset if invalid
-    var new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale());
+    var new_value = Globalize.parseDate(localized_string, &#39;dd MMMM yyyy&#39;, kb.locale_manager.getLocale());
     if (!(new_value &amp;&amp; _.isDate(new_value))) {
       return kb.utils.wrappedObservable(this).resetToCurrent();
     }
@@ -268,8 +268,8 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
 });</pre>
                 </div>
                 <div id="kblo_localized_input_view" class="tab-pane">
-                  <pre>&lt;div id='kblo_read_write'&gt;
-  &lt;input class='input-small pull-right' data-bind=&quot;value: date, valueUpdate: 'keyup'&quot;/&gt;
+                  <pre>&lt;div id=&#39;kblo_read_write&#39;&gt;
+  &lt;input class=&#39;input-small pull-right&#39; data-bind=&quot;value: date, valueUpdate: &#39;keyup&#39;&quot;/&gt;
 
   &lt;p&gt;
     &lt;span&gt;Current Locale: &lt;span&gt;
@@ -282,21 +282,21 @@ ko.applyBindings(view_model, $('#kblo_read_only')[0]);</pre>
                   <pre data-for="cs">model = new Backbone.Model({date: new Date()})
 
 view_model =
-  date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer})
+  date: kb.observable(model, {key: &#39;date&#39;, localizer: LongDateLocalizer})
   toggleLocale: -&gt;
-    kb.locale_manager.setLocale(if kb.locale_manager.getLocale() is 'en-GB' then 'fr-FR' else 'en-GB')
+    kb.locale_manager.setLocale(if kb.locale_manager.getLocale() is &#39;en-GB&#39; then &#39;fr-FR&#39; else &#39;en-GB&#39;)
 
-ko.applyBindings(view_model, $('#kblo_read_write')[0])</pre>
+ko.applyBindings(view_model, $(&#39;#kblo_read_write&#39;)[0])</pre>
                   <pre data-for="js">var model = new Backbone.Model({date: new Date()});
 
 view_model = {
-  date: kb.observable(model, {key: 'date', localizer: LongDateLocalizer}),
+  date: kb.observable(model, {key: &#39;date&#39;, localizer: LongDateLocalizer}),
   toggleLocale: function() {
-    return kb.locale_manager.setLocale(kb.locale_manager.getLocale() === 'en-GB' ? 'fr-FR' : 'en-GB');
+    return kb.locale_manager.setLocale(kb.locale_manager.getLocale() === &#39;en-GB&#39; ? &#39;fr-FR&#39; : &#39;en-GB&#39;);
   }
 };
 
-ko.applyBindings(view_model, $('#kblo_read_write')[0]);</pre>
+ko.applyBindings(view_model, $(&#39;#kblo_read_write&#39;)[0]);</pre>
                 </div>
               </div>
             </div>

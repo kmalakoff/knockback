@@ -81,24 +81,24 @@
       <header class="page">
       </header>
       <content class="page">
-        <section><h1 id="getting-started-with-knockback-js">Getting Started with Knockback.js</h1>
+        <section><p>#Getting Started with Knockback.js</p>
 <p>In essence, <a href="index.html">Knockback.js</a> bridges the dynamic DOM bindings of <a href="http://knockoutjs.com/">Knockout.js</a> with the models, computeds, and routers of <a href="http://documentcloud.github.com/backbone/">Backbone.js</a>. It also brings some other cool features like localization, default values, and nested view models!</p>
 <p>If you are more of JavaScript developer than a CoffeeScript hipster, check out the JavaScript language toggle for the site (at the top right) on many pages with code and live examples.</p>
-<h1 id="tidbits">Tidbits</h1>
+<p>#Tidbits</p>
 <ul>
 <li><p>&#39;kb&#39; and &#39;Knockback&#39; can be used interchangeably</p>
 </li>
 <li><p>Knockback.js uses the following coding conventions: ClassName, functionName, property_name, &#39;constant string&#39;, &quot;dynamic string&quot;, CONSTANT_NAME</p>
 </li>
 </ul>
-<h1 id="classes-vs-factory-functions">Classes vs Factory Functions</h1>
-<p>You will soon notice that there are different capitalizations for things like kb.viewModel(model, options) and kb.ViewModel. The reason is that to reduce the need of using <code>new</code> and to be more familiar with Knockout, there are factory methods that create the underlying classes.</p>
+<p>#Classes vs Factory Functions
+You will soon notice that there are different capitalizations for things like kb.viewModel(model, options) and kb.ViewModel. The reason is that to reduce the need of using <code>new</code> and to be more familiar with Knockout, there are factory methods that create the underlying classes.</p>
 <p>A factory function uses new to create a new instance:</p>
 
           <pre data-for="cs">Knockback.viewModel = (model, options) -> return new Knockback.ViewModel(model, options)
 </pre>
           <pre data-for="js">Knockback.viewModel = function(model, options) { return new Knockback.ViewModel(model, options); };
-</pre><h1 id="useful-resources">Useful Resources</h1>
+</pre><p>#Useful Resources</p>
 <p>Before you start with Knockback.js, we recommend you first get acquainted with Backbone.js and Knockout.js by reviewing their websites (above) and you could also look at these resources:</p>
 <ul>
 <li><a href="http://documentcloud.github.com/backbone/docs/todos.html">Documentation of Backbone.js Todos app</a>: but skip the section on views</li>
@@ -107,7 +107,7 @@
 <li><a href="http://www.syncfusion.com/resources/techportal/ebooks/knockoutjs">Free eBook on Knockout.js</a>:</li>
 </ul>
 <p>For Knockback.js, also take a look at this <a href="index.html#comparison_table">comparison table</a> between the libraries or this <a href="http://www.geekdave.com/?p=79">blog entry</a> which provides a good introduction.</p>
-<h1 id="topics">Topics</h1>
+<p>#Topics</p>
 <p>You can find the various &#39;Getting Started&#39; topics in the navigation bar above:</p>
 <ul>
 <li><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a>: quick overview of Backbone.js and Knockout.js topics relevant to Knockback.js</li>

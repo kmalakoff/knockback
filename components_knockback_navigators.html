@@ -67,9 +67,9 @@
 <p><a href="http://kmalakoff.github.com/knockback-navigators/">Try the demo</a></p>
 <h2 id="kb-pagenavigatorpanes">kb.PageNavigatorPanes</h2>
 <p>This component provides a page navigator with history and optional transition animations. If you are using Knockout.js or Knockback.js, you can observe changes to the active page (for example, to update menu links).</p>
-<h1 id="usage">Usage</h1>
+<p>#Usage</p>
 <p>In order to filter loading of page URLs (eg. not reloading the active page if the URL hasn&#39;t changed) and to manage history (eg. going back if the previous page matches the URL), kb.PageNavigatorPanes provides a &#39;dispatcher(callback)&#39; that is only called when a cached page is not available.</p>
-<h3 id="basic-usage-static-pages-">Basic Usage (Static Pages)</h3>
+<p>###Basic Usage (Static Pages)</p>
 <p>If you want to bind  to a static page, you should provide the &#39;{no_remove: true}&#39; option so if only hides, but does not detach elements when a page is deactivated.</p>
 <p>BackboneJS:</p>
 <pre><code>var page_navigator = new kb.PageNavigatorPanes($(&#39;#app&#39;)[0], {no_remove: true});
@@ -85,7 +85,7 @@ Path.map(&#39;#page1&#39;).to(page_navigator.dispatcher(function(){ page_navigat
 Path.map(&#39;#page2&#39;).to(page_navigator.dispatcher(function(){ page_navigator.loadPage($(&#39;#page2&#39;)[0]); }));
 Path.listen();
 Path.dispatch(window.location.hash);
-</code></pre><h3 id="dynamic-pages-using-knockback-js">Dynamic Pages using Knockback.js</h3>
+</code></pre><p>###Dynamic Pages using Knockback.js</p>
 <p>You can dynamic pages either by hand or using Knockback.js&#39;s &#39;kb.renderTemplate(template_name, view_model, options)&#39; function.</p>
 <pre><code>...
 router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
@@ -98,7 +98,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
   create: function() { return kb.renderTemplate(&#39;page&#39;, new PageViewModel(pages.get(&#39;page1&#39;))) }
 }));
 ...
-</code></pre><h1 id="adding-transition-animations">Adding Transition Animations</h1>
+</code></pre><p>#Adding Transition Animations</p>
 <p>You can provide transition animations either during routing (assymetic reverse transitions will not work if the page can be reloaded) or during button clicks.</p>
 <p>Transitions during routing:</p>
 <pre><code>...
@@ -122,7 +122,7 @@ router.route(&#39;&#39;, null, page_navigator.dispatcher(function(){
 <pre><code>&lt;button class=&#39;btn btn-small&#39; onclick=&quot;kb.loadUrl(&#39;#page1&#39;, {name: &#39;NavigationSlide&#39;, inverse: true})&quot;&gt; Back&lt;/button&gt;
 </code></pre><p>With buttons (Knockout):</p>
 <pre><code>&lt;button class=&#39;btn btn-small&#39; data-bind=&quot;click: function(){ kb.loadUrl(&#39;#page1&#39;, {name: &#39;NavigationSlide&#39;, inverse: true}) }&quot;&gt;&lt;span&gt; Back&lt;/span&gt;&lt;/button&gt;
-</code></pre><h1 id="embedding-using-knockout-js-bindings-">Embedding using Knockout.js bindings:</h1>
+</code></pre><p>#Embedding using Knockout.js bindings:</p>
 <p>If you are using KnockoutJS or Knockback.js, you can actually bind a page navigator in the HTML using &#39;ko.bindings&#39; and receive a callback to set up routing.</p>
 <pre><code>&lt;div data-bind=&quot;PageNavigatorPanes: {loaded: loaded}&quot;&gt;&lt;/div&gt;
 
@@ -137,11 +137,11 @@ ko.applyBindings({
 Backbone.history.start({hashChange: true});
 </code></pre><h2 id="kb-pagenavigatorsimple">kb.PageNavigatorSimple</h2>
 <p>This component provides a page navigator with no history and no transitions. In addition to adding a little structure to your application, if you are using Knockout.js or Knockback.js, you can observe changes to the active page (for example, to update menu links).</p>
-<h1 id="usage">Usage</h1>
+<p>#Usage</p>
 <p>The usage is similar to kb.PageNavigatorSimple except you cannot supply transition animations and create functions (there is no history).</p>
 <h2 id="kb-panenavigator">kb.PaneNavigator</h2>
 <p>This component provides a way to embed moveable panes within you HTML (for example, sliding between items one at a time) with or without transition animations and provides the page transition functionality to kb.PageNavigatorPanes.</p>
-<h1 id="usage">Usage</h1>
+<p>#Usage</p>
 <p>You can manually bind a pane-navigator:</p>
 <pre><code>&lt;div class=&#39;pane-navigator&#39;&gt;
   &lt;div class=&#39;pane cell&#39;&gt;
@@ -159,7 +159,7 @@ var pane_navigator_el = $(&#39;.pane-navigator&#39;)[0];
 var pane_navigator = new kb.PaneNavigator(pane_navigator_el, {no_remove: true, transition: &#39;NavigationSlide&#39;});
 kb.utils.wrappedPaneNavigator(pane_navigator_el, pane_navigator);
 pane_navigator.push(new kb.Pane(pane_navigator_el.children[0]));
-</code></pre><h1 id="optional-knockout-js-bindings-">Optional Knockout.js bindings:</h1>
+</code></pre><p>#Optional Knockout.js bindings:</p>
 <pre><code>&lt;div class=&#39;pane-navigator&#39; data-bind=&quot;PaneNavigator: {transition: &#39;NavigationSlide&#39;}&quot;&gt;
   &lt;div class=&#39;pane cell&#39;&gt;
     &lt;p&gt;Pane1&lt;/p&gt;

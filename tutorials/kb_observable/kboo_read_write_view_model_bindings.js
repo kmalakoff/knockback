@@ -6,7 +6,7 @@ var ViewModel = function(model) {
     key: 'number',
     read: function() { return "#: " + (this.number()); },
     write: function(value) { return this.number(value.substring(3)); }
-  }, this);
+  }, {}, this);
 };
 
 var view_model = new ViewModel(model);
