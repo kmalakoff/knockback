@@ -1,6 +1,6 @@
 /*
   knockback.js 1.0.0
-  Copyright (c)  2011-2015 Kevin Malakoff.
+  Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1992,7 +1992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    } else if (creator) {
 	      if (create_options.store) {
-	        value = create_options.store.retainOrCreate(new_value, create_options);
+	        value = create_options.store.retainOrCreate(new_value, create_options, true);
 	      } else {
 	        if (creator.models_only) {
 	          value = new_value;
@@ -2272,7 +2272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return observable;
 	  };
 
-	  Store.prototype.retainOrCreate = function(obj, options) {
+	  Store.prototype.retainOrCreate = function(obj, options, retainExisting) {
 	    var creator, observable;
 	    if (!(creator = this._creator(obj, options))) {
 	      return kb.utils.createFromDefaultCreator(obj, options);
@@ -2281,7 +2281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return obj;
 	    }
 	    if (observable = this.find(obj, creator)) {
-	      return observable;
+	      return (retainExisting ? this.retain(observable, obj, creator) : observable);
 	    }
 	    if (!_.isFunction(creator.create || creator)) {
 	      throw new Error("Invalid factory for \"" + options.path + "\"");
@@ -2296,7 +2296,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return observable || ko.observable(null);
 	      };
 	    })(this));
-	    this.retain(observable, obj, creator);
 	    return observable;
 	  };
 
