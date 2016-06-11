@@ -1,9 +1,8 @@
-fs = require 'fs'
+fs = require 'fs-extra'
 path = require 'path'
 _ = require 'underscore'
 Queue = require 'queue-async'
 es = require 'event-stream'
-Wrench = require 'wrench'
 
 gulp = require 'gulp'
 gutil = require 'gulp-util'
@@ -55,5 +54,5 @@ module.exports = (options={}, callback) ->
 
   # uninstall knockback
   queue.await (err) ->
-    Wrench.rmdirSyncRecursive('node_modules/knockback', true)
+    fs.removeSync('node_modules/knockback', true)
     callback(err)
