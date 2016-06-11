@@ -38,6 +38,8 @@
     "coffee-loader": "*",
     "coffee-script": "*",
     "event-stream": "*",
+    "fs-extra": "*",
+    "fs-readdir-recursive": "^1.0.0",
     "gulp": "*",
     "gulp-browserify": "*",
     "gulp-compile-js": "*",
@@ -68,8 +70,7 @@
     "mocha": "*",
     "nuget": "*",
     "queue-async": "*",
-    "webpack": "*",
-    "wrench": "*"
+    "webpack": "*"
   },
   "optionalDependencies": {
     "jquery": "*",

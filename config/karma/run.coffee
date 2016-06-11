@@ -1,7 +1,7 @@
+fs = require 'fs-extra'
 path = require 'path'
 _ = require 'underscore'
 Queue = require 'queue-async'
-Wrench = require 'wrench'
 {Server} = require 'karma'
 gutil = require 'gulp-util'
 generate = require './generate'
@@ -9,8 +9,8 @@ generate = require './generate'
 BASE_CONFIG = require './base-config'
 
 module.exports = (options={}, callback) ->
-  Wrench.rmdirSyncRecursive('./_temp', true)
-  Wrench.rmdirSyncRecursive('node_modules/knockback', true)
+  fs.removeSync('./_temp', true)
+  fs.removeSync('node_modules/knockback', true)
   queue = new Queue(1)
   queue.defer (callback) -> generate(options, callback)
 
@@ -26,5 +26,5 @@ module.exports = (options={}, callback) ->
           .start((return_value) -> callback(new Error "Tests failed: #{return_value}" if return_value))
 
   queue.await (err) ->
-    Wrench.rmdirSyncRecursive('./_temp', true) unless err
+    fs.removeSync('./_temp', true) unless err
     callback(err)
