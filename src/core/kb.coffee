@@ -1,5 +1,5 @@
 ###
-  knockback.js 1.0.0
+  knockback.js 1.1.0
   Copyright (c)  2011-2014 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -52,7 +52,7 @@ LIFECYCLE_METHODS = ['release', 'destroy', 'dispose']
 module.exports = class kb
 
   # Knockback library semantic version
-  @VERSION: '1.0.0'
+  @VERSION: '1.1.0'
 
   ####################################
   # OBSERVABLE STORAGE TYPES

@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 1.1.0
+* Updated reference counting to fix over-eager releasing: https://github.com/kmalakoff/knockback/issues/155
+
 ## 1.0.0
 * Added observableX formats to be more consistent with knockout's observableArray
 
@@ -105,7 +108,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * bug fix for nested filter dependencies: https://github.com/addyosmani/todomvc/issues/381
 * bug fix for filtering notifications: https://github.com/kmalakoff/knockback/issues/53
 * bug fix for models_only on change event: https://github.com/kmalakoff/knockback/issues/59
-* added support for Backbone 1.0.0. Note: needed to patch Backbone-relational to 0.8.0plus and to add _.findWhere to lodash.
+* added support for Backbone 1.1.0. Note: needed to patch Backbone-relational to 0.8.0plus and to add _.findWhere to lodash.
 * added automatic call of afterRender on a view model in kb.renderTemplate unless afterRender is also provided in the options (to avoid multiple calls).
 
 ## 0.16.8
