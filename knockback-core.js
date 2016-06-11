@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -557,7 +557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -839,7 +839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -992,7 +992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1053,7 +1053,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1141,7 +1141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1228,7 +1228,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1439,7 +1439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1519,7 +1519,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */(function(global) {
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1670,7 +1670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -1708,7 +1708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2043,7 +2043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2178,7 +2178,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2489,7 +2489,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2686,7 +2686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2737,7 +2737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2834,7 +2834,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -2876,7 +2876,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
@@ -3079,7 +3079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/*
 	  knockback.js 1.1.0
-	  Copyright (c)  2011-2014 Kevin Malakoff.
+	  Copyright (c)  2011-2016 Kevin Malakoff.
 	  License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	  Source: https://github.com/kmalakoff/knockback
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
