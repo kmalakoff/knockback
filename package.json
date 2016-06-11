@@ -42,7 +42,7 @@
     "fs-readdir-recursive": "^1.0.0",
     "gulp": "*",
     "gulp-browserify": "*",
-    "gulp-compile-js": "*",
+    "gulp-coffee": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
     "gulp-mocha": "*",

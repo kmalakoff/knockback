@@ -7,7 +7,7 @@ es = require 'event-stream'
 gulp = require 'gulp'
 gutil = require 'gulp-util'
 shell = require 'gulp-shell'
-compile = require 'gulp-compile-js'
+coffee = require 'gulp-coffee'
 concat = require 'gulp-concat'
 wrapAMD = require 'gulp-wrap-amd-infer'
 webpack = require 'gulp-webpack-config'
@@ -37,7 +37,7 @@ module.exports = (options={}, callback) ->
   for test in TEST_GROUPS.browserify or []
     do (test) -> queue.defer (callback) ->
       gulp.src(test.build.files)
-        .pipe(compile({coffee: {bare: true}}))
+        .pipe(coffee({bare: true}))
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
@@ -47,7 +47,7 @@ module.exports = (options={}, callback) ->
   for test in TEST_GROUPS.amd or []
     do (test) -> queue.defer (callback) ->
       gulp.src(test.build.files)
-        .pipe(compile({coffee: {bare: true, header: false}}))
+        .pipe(coffee({bare: true, header: false}))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
         .on('end', callback)
