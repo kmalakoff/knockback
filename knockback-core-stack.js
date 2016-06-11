@@ -11652,6 +11652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return observable || ko.observable(null);
 	      };
 	    })(this));
+	    this.retain(observable, obj, creator);
 	    return observable;
 	  };
 

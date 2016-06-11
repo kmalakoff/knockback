@@ -110,10 +110,10 @@ module.exports = class kb.Store
       observable = if creator.create then creator.create(obj, options) else new creator(obj, options)
       return observable or ko.observable(null) # default to null
 
+    @retain(observable, obj, creator)
     return observable
 
-
-# @nodoc
+  # @nodoc
   reuse: (observable, obj) ->
     return if (current_obj = kb.utils.wrappedObject(observable)) is obj
     throw new Error 'Cannot reuse a simple observable' unless @_canRegister(observable)
