@@ -7,6 +7,7 @@
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"
   },
+  "license": "MIT",
   "keywords": [
     "knockback",
     "knockbackjs",
@@ -17,10 +18,13 @@
   ],
   "url": "http://kmalakoff.github.com/knockback/",
   "homepage": "http://kmalakoff.github.com/knockback/",
+  "contributors": [],
   "repository": {
     "type": "git",
     "url": "http://github.com/kmalakoff/knockback.git"
   },
+  "bugs": "https://github.com/kmalakoff/knockback/issues",
+  "dependencies": {},
   "optionalDependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
