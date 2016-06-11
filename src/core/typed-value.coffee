@@ -78,7 +78,7 @@ module.exports = class TypedValue
     else if creator
       # have the store, use it to create
       if create_options.store
-        value = create_options.store.retainOrCreate(new_value, create_options)
+        value = create_options.store.retainOrCreate(new_value, create_options, true)
 
       # create manually
       else
