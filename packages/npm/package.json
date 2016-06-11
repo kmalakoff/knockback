@@ -1,18 +1,29 @@
 {
-  "author"        : {"name": "Kevin Malakoff", "url": "https://github.com/kmalakoff"},
-  "name"          : "knockback",
-  "version"       : "1.0.0",
-  "main"          : "knockback.js",
-  "description"   : "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
-  "keywords"      : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
-
-  "url"           : "http://kmalakoff.github.com/knockback/",
-  "homepage"      : "http://kmalakoff.github.com/knockback/",
-  "repository"    : {"type": "git", "url": "http://github.com/kmalakoff/knockback.git"},
-
+  "name": "knockback",
+  "version": "1.1.0",
+  "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
+  "main": "knockback.js",
+  "author": {
+    "name": "Kevin Malakoff",
+    "url": "https://github.com/kmalakoff"
+  },
+  "keywords": [
+    "knockback",
+    "knockbackjs",
+    "backbone",
+    "backbonejs",
+    "knockout",
+    "knockoutjs"
+  ],
+  "url": "http://kmalakoff.github.com/knockback/",
+  "homepage": "http://kmalakoff.github.com/knockback/",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/kmalakoff/knockback.git"
+  },
   "optionalDependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
-    "knockout": ">=2.2.1"
+    "knockout": ">=2.1.0"
   }
 }
