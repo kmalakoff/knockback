@@ -14,12 +14,12 @@ KNOCKBACK =
   core_stack: ['./knockback-core-stack.js']
 
 REQUIRED_DEPENDENCIES =
-  backbone_underscore_latest: (resolveModule(module_name) for module_name in ['jquery', 'underscore', 'backbone', 'knockout'])
-  backbone_underscore_legacy: ['./vendor/jquery-1.8.3.js', './vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
+  backbone_underscore_latest: (resolveModule(module_name) for module_name in ['underscore', 'backbone', 'knockout'])
+  backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
   backbone_lodash_latest: (resolveModule(module_name) for module_name in ['lodash', 'backbone', 'knockout'])
-  backbone_lodash_legacy: ['./vendor/jquery-1.8.3.js', './vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
-  parse_latest: (resolveModule(module_name) for module_name in ['jquery', 'knockout', 'parse'])
-  parse_legacy: (resolveModule(module_name) for module_name in ['jquery', 'knockout']).concat(['./vendor/parse-1.2.0.js'])
+  backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
+  parse_latest: (resolveModule(module_name) for module_name in ['knockout', 'parse'])
+  parse_legacy: (resolveModule(module_name) for module_name in ['knockout']).concat(['./vendor/parse-1.2.0.js'])
 
 LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize.culture.en-GB.js', './test/lib/globalize.culture.fr-FR.js']
 
@@ -66,7 +66,6 @@ TEST_GROUPS.amd = []
 for test in TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
   test_files = ['./node_modules/chai/chai.js'].concat(test.files); files = []; test_patterns = []; path_files = []
   files.push({pattern: './test/lib/requirejs-2.1.14.js'})
-  test_files.unshift(resolveModule('jquery')) unless resolveModule('jquery') in test_files # jQuery is required for Backbone using AMD
   for file in test_files
     (test_patterns.push(file); continue) if file.indexOf('.tests.') >= 0
     files.push({pattern: file, included: false})
@@ -79,11 +78,11 @@ for test in TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core) when (test.name
 ###############################
 TEST_GROUPS.webpack = []
 for file in FILES.tests_webpack
-  TEST_GROUPS.webpack.push({name: "webpack_#{file.replace('.js', '')}", files: _.flatten([resolveModule('jquery'), (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), file])})
+  TEST_GROUPS.webpack.push({name: "webpack_#{file.replace('.js', '')}", files: _.flatten([(if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), file])})
 
 ###############################
 # Browserify
 ###############################
 TEST_GROUPS.browserify = []
 for test_name, test_info of require('./browserify/tests')
-  TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: _.flatten([resolveModule('jquery'), (if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), test_info.output]), build: {destination: test_info.output, options: test_info.options, files: test_info.files}})
+  TEST_GROUPS.browserify.push({name: "browserify_#{test_name}", files: _.flatten([(if file.indexOf('core') >= 0 then [] else LOCALIZATION_DEPENCIES), test_info.output]), build: {destination: test_info.output, options: test_info.options, files: test_info.files}})

@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-{_, ko, $} = kb = require '../core/kb'
+{_, ko} = kb = require '../core/kb'
 
 require './validators'
 
@@ -164,19 +164,18 @@ kb.valueValidator = (value, bindings, validation_options={}) ->
 kb.inputValidator = (view_model, el, validation_options={}) ->
   (validation_options and not (typeof(validation_options) is 'function')) or (validation_options = {})
   validators = kb.valid
-  $input_el = $(el)
-  input_name = null if (input_name = $input_el.attr('name')) and not _.isString(input_name)
+  input_name = null if (input_name = el.getAttribute('name')) and not _.isString(input_name)
 
   # only set up form elements with a value bindings
-  return null unless (bindings = $input_el.attr('data-bind'))
+  return null unless (bindings = el.getAttribute('data-bind'))
   options = (new Function("sc", "with(sc[0]) { return { #{bindings} } }"))([view_model])
   return null if not (options and options.value)
   (not options.validation_options) or (_.defaults(options.validation_options, validation_options); validation_options = options.validation_options)
 
   # collect the types to identifier
   bindings = {}
-  (not validators[type = $input_el.attr('type')]) or (bindings[type] = validators[type])
-  (not $input_el.attr('required')) or (bindings.required = validators.required)
+  (not validators[type = el.getAttribute('type')]) or (bindings[type] = validators[type])
+  (not el.getAttribute('required')) or (bindings.required = validators.required)
   if options.validations
     bindings[identifier] = validator for identifier, validator of options.validations
   result = kb.valueValidator(options.value, bindings, validation_options)
@@ -188,18 +187,17 @@ kb.inputValidator = (view_model, el, validation_options={}) ->
 kb.formValidator = (view_model, el) ->
   results = {}
   validators = []
-  $root_el = $(el)
-  form_name = null if (form_name = $root_el.attr('name')) and not _.isString(form_name)
+  form_name = null if (form_name = el.getAttribute('name')) and not _.isString(form_name)
 
-  if (bindings = $root_el.attr('data-bind'))
+  if (bindings = el.getAttribute('data-bind'))
     options = (new Function("sc", "with(sc[0]) { return { #{bindings} } }"))([view_model])
     validation_options = options.validation_options
   validation_options or= {}
   validation_options.no_attach = !!form_name
 
   # build up the results
-  for input_el in $root_el.find('input')
-    continue unless (name = $(input_el).attr('name')) # need named inputs to set up an object
+  for input_el in el.getElementsByTagName('input')
+    continue unless (name = input_el.getAttribute('name')) # need named inputs to set up an object
     validator = kb.inputValidator(view_model, input_el, validation_options)
     not validator or validators.push(results[name] = validator)
 

@@ -9,7 +9,7 @@
 
 window = if window? then window else global
 
-{_, ko, $} = kb = require './kb'
+{_, ko} = kb = require './kb'
 
 kb.RECUSIVE_AUTO_INJECT = true
 
@@ -163,12 +163,8 @@ kb.injectViewModels = kb.Inject.injectViewModels
 # Auto Inject results
 #############################
 if document?
-  # use DOM library ready function
-  if $ then $(->kb.injectViewModels())
-
   # use simple ready check
-  else
-    (onReady = ->
-      return setTimeout(onReady, 0) unless document.readyState is 'complete' # keep waiting for the document to load
-      kb.injectViewModels() # the document is loaded
-    )()
+  (onReady = ->
+    return setTimeout(onReady, 0) unless document.readyState is 'complete' # keep waiting for the document to load
+    kb.injectViewModels() # the document is loaded
+  )()

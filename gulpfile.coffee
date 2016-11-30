@@ -55,7 +55,6 @@ testNode = (callback) ->
   tags = ("@#{tag.replace(/^[-]+/, '')}" for tag in process.argv.slice(3)).join(' ')
 
   gutil.log "Running Node.js tests #{tags}"
-  require './test/lib/node_jquery_xhr' # ensure that globals for the target backend are loaded
   gulp.src('test/spec/**/*.tests.coffee')
     .pipe(mocha({reporter: 'dot', grep: tags}))
     .pipe es.writeArray callback

@@ -8,14 +8,14 @@
 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("jquery"));
+		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(["jquery"], factory);
+		define([], factory);
 	else if(typeof exports === 'object')
-		exports["kb"] = factory(require("jquery"));
+		exports["kb"] = factory();
 	else
-		root["kb"] = factory(root["jQuery"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_9__) {
+		root["kb"] = factory();
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -63,19 +63,19 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	__webpack_require__(1);
-	__webpack_require__(10);
+	__webpack_require__(9);
+	__webpack_require__(13);
 	__webpack_require__(14);
 	__webpack_require__(15);
-	__webpack_require__(16);
 	__webpack_require__(2);
+	__webpack_require__(16);
 	__webpack_require__(17);
-	__webpack_require__(18);
-	__webpack_require__(20);
-	__webpack_require__(21);
 	__webpack_require__(19);
-	__webpack_require__(22);
-	__webpack_require__(26);
-	module.exports = __webpack_require__(27);
+	__webpack_require__(20);
+	__webpack_require__(18);
+	__webpack_require__(21);
+	__webpack_require__(25);
+	module.exports = __webpack_require__(26);
 
 
 /***/ },
@@ -816,12 +816,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	kb.Events = Backbone.Events;
 
-	kb.$ = window.jQuery || window.$;
-
-	try {
-	  kb.$ || (kb.$ = __webpack_require__(9));
-	} catch (undefined) {}
-
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
@@ -829,8 +823,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module) {/*!
-	 * Knockout JavaScript library v3.4.0
-	 * (c) Steven Sanderson - http://knockoutjs.com/
+	 * Knockout JavaScript library v3.4.1
+	 * (c) The Knockout.js team - http://knockoutjs.com/
 	 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
 	 */
 
@@ -875,7 +869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	ko.exportProperty = function(owner, publicName, object) {
 	    owner[publicName] = object;
 	};
-	ko.version = "3.4.0";
+	ko.version = "3.4.1";
 
 	ko.exportSymbol('version', ko.version);
 	// For any options that may affect various areas of Knockout and aren't directly associated with data binding.
@@ -2537,6 +2531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        cachedDiff = null,
 	        arrayChangeSubscription,
 	        pendingNotifications = 0,
+	        underlyingNotifySubscribersFunction,
 	        underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd,
 	        underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove;
 
@@ -2553,6 +2548,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (underlyingAfterSubscriptionRemoveFunction)
 	            underlyingAfterSubscriptionRemoveFunction.call(target, event);
 	        if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
+	            if (underlyingNotifySubscribersFunction) {
+	                target['notifySubscribers'] = underlyingNotifySubscribersFunction;
+	                underlyingNotifySubscribersFunction = undefined;
+	            }
 	            arrayChangeSubscription.dispose();
 	            trackingChanges = false;
 	        }
@@ -2567,7 +2566,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        trackingChanges = true;
 
 	        // Intercept "notifySubscribers" to track how many times it was called.
-	        var underlyingNotifySubscribersFunction = target['notifySubscribers'];
+	        underlyingNotifySubscribersFunction = target['notifySubscribers'];
 	        target['notifySubscribers'] = function(valueToNotify, event) {
 	            if (!event || event === defaultEvent) {
 	                ++pendingNotifications;
@@ -2877,7 +2876,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    evaluateImmediate: function (notifyChange) {
 	        var computedObservable = this,
 	            state = computedObservable[computedState],
-	            disposeWhen = state.disposeWhen;
+	            disposeWhen = state.disposeWhen,
+	            changed = false;
 
 	        if (state.isBeingEvaluated) {
 	            // If the evaluation of a ko.computed causes side effects, it's possible that it will trigger its own re-evaluation.
@@ -2905,7 +2905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        state.isBeingEvaluated = true;
 	        try {
-	            this.evaluateImmediate_CallReadWithDependencyDetection(notifyChange);
+	            changed = this.evaluateImmediate_CallReadWithDependencyDetection(notifyChange);
 	        } finally {
 	            state.isBeingEvaluated = false;
 	        }
@@ -2913,6 +2913,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!state.dependenciesCount) {
 	            computedObservable.dispose();
 	        }
+
+	        return changed;
 	    },
 	    evaluateImmediate_CallReadWithDependencyDetection: function (notifyChange) {
 	        // This function is really just part of the evaluateImmediate logic. You would never call it from anywhere else.
@@ -2920,7 +2922,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
 
 	        var computedObservable = this,
-	            state = computedObservable[computedState];
+	            state = computedObservable[computedState],
+	            changed = false;
 
 	        // Initially, we assume that none of the subscriptions are still being used (i.e., all are candidates for disposal).
 	        // Then, during evaluation, we cross off any that are in fact still being used.
@@ -2949,17 +2952,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 
 	            state.latestValue = newValue;
+	            if (DEBUG) computedObservable._latestValue = newValue;
 
 	            if (state.isSleeping) {
 	                computedObservable.updateVersion();
 	            } else if (notifyChange) {
 	                computedObservable["notifySubscribers"](state.latestValue);
 	            }
+
+	            changed = true;
 	        }
 
 	        if (isInitial) {
 	            computedObservable["notifySubscribers"](state.latestValue, "awake");
 	        }
+
+	        return changed;
 	    },
 	    evaluateImmediate_CallReadThenEndDependencyDetection: function (state, dependencyDetectionContext) {
 	        // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
@@ -3033,7 +3041,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                state.dependencyTracking = null;
 	                state.dependenciesCount = 0;
 	                state.isStale = true;
-	                computedObservable.evaluateImmediate();
+	                if (computedObservable.evaluateImmediate()) {
+	                    computedObservable.updateVersion();
+	                }
 	            } else {
 	                // First put the dependencies in order
 	                var dependeciesOrder = [];
@@ -3790,7 +3800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // The ko.bindingContext constructor is only called directly to create the root context. For child
 	    // contexts, use bindingContext.createChildContext or bindingContext.extend.
-	    ko.bindingContext = function(dataItemOrAccessor, parentContext, dataItemAlias, extendCallback) {
+	    ko.bindingContext = function(dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, options) {
 
 	        // The binding context object includes static properties for the current, parent, and root view models.
 	        // If a view model is actually stored in an observable, the corresponding binding context object, and
@@ -3813,10 +3823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                ko.utils.extend(self, parentContext);
 
 	                // Because the above copy overwrites our own properties, we need to reset them.
-	                // During the first execution, "subscribable" isn't set, so don't bother doing the update then.
-	                if (subscribable) {
-	                    self._subscribable = subscribable;
-	                }
+	                self._subscribable = subscribable;
 	            } else {
 	                self['$parents'] = [];
 	                self['$root'] = dataItem;
@@ -3846,35 +3853,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var self = this,
 	            isFunc = typeof(dataItemOrAccessor) == "function" && !ko.isObservable(dataItemOrAccessor),
 	            nodes,
+	            subscribable;
+
+	        if (options && options['exportDependencies']) {
+	            // The "exportDependencies" option means that the calling code will track any dependencies and re-create
+	            // the binding context when they change.
+	            updateContext();
+	        } else {
 	            subscribable = ko.dependentObservable(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true });
 
-	        // At this point, the binding context has been initialized, and the "subscribable" computed observable is
-	        // subscribed to any observables that were accessed in the process. If there is nothing to track, the
-	        // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
-	        // the context object.
-	        if (subscribable.isActive()) {
-	            self._subscribable = subscribable;
+	            // At this point, the binding context has been initialized, and the "subscribable" computed observable is
+	            // subscribed to any observables that were accessed in the process. If there is nothing to track, the
+	            // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
+	            // the context object.
+	            if (subscribable.isActive()) {
+	                self._subscribable = subscribable;
 
-	            // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
-	            subscribable['equalityComparer'] = null;
+	                // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
+	                subscribable['equalityComparer'] = null;
 
-	            // We need to be able to dispose of this computed observable when it's no longer needed. This would be
-	            // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
-	            // we cannot assume that those nodes have any relation to each other. So instead we track any node that
-	            // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
+	                // We need to be able to dispose of this computed observable when it's no longer needed. This would be
+	                // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
+	                // we cannot assume that those nodes have any relation to each other. So instead we track any node that
+	                // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
 
-	            // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
-	            nodes = [];
-	            subscribable._addNode = function(node) {
-	                nodes.push(node);
-	                ko.utils.domNodeDisposal.addDisposeCallback(node, function(node) {
-	                    ko.utils.arrayRemoveItem(nodes, node);
-	                    if (!nodes.length) {
-	                        subscribable.dispose();
-	                        self._subscribable = subscribable = undefined;
-	                    }
-	                });
-	            };
+	                // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
+	                nodes = [];
+	                subscribable._addNode = function(node) {
+	                    nodes.push(node);
+	                    ko.utils.domNodeDisposal.addDisposeCallback(node, function(node) {
+	                        ko.utils.arrayRemoveItem(nodes, node);
+	                        if (!nodes.length) {
+	                            subscribable.dispose();
+	                            self._subscribable = subscribable = undefined;
+	                        }
+	                    });
+	                };
+	            }
 	        }
 	    }
 
@@ -3883,7 +3898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // But this does not mean that the $data value of the child context will also get updated. If the child
 	    // view model also depends on the parent view model, you must provide a function that returns the correct
 	    // view model on each update.
-	    ko.bindingContext.prototype['createChildContext'] = function (dataItemOrAccessor, dataItemAlias, extendCallback) {
+	    ko.bindingContext.prototype['createChildContext'] = function (dataItemOrAccessor, dataItemAlias, extendCallback, options) {
 	        return new ko.bindingContext(dataItemOrAccessor, this, dataItemAlias, function(self, parentContext) {
 	            // Extend the context hierarchy by setting the appropriate pointers
 	            self['$parentContext'] = parentContext;
@@ -3892,7 +3907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            self['$parents'].unshift(self['$parent']);
 	            if (extendCallback)
 	                extendCallback(self);
-	        });
+	        }, options);
 	    };
 
 	    // Extend the binding context with new custom properties. This doesn't change the context hierarchy.
@@ -3907,6 +3922,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            self['$rawData'] = parentContext['$rawData'];
 	            ko.utils.extend(self, typeof(properties) == "function" ? properties() : properties);
 	        });
+	    };
+
+	    ko.bindingContext.prototype.createStaticChildContext = function (dataItemOrAccessor, dataItemAlias) {
+	        return this['createChildContext'](dataItemOrAccessor, dataItemAlias, null, { "exportDependencies": true });
 	    };
 
 	    // Returns the valueAccesor function for a binding value
@@ -5153,7 +5172,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var didDisplayOnLastUpdate,
 	                savedNodes;
 	            ko.computed(function() {
-	                var dataValue = ko.utils.unwrapObservable(valueAccessor()),
+	                var rawValue = valueAccessor(),
+	                    dataValue = ko.utils.unwrapObservable(rawValue),
 	                    shouldDisplay = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
 	                    isFirstRender = !savedNodes,
 	                    needsRefresh = isFirstRender || isWith || (shouldDisplay !== didDisplayOnLastUpdate);
@@ -5168,7 +5188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        if (!isFirstRender) {
 	                            ko.virtualElements.setDomNodeChildren(element, ko.utils.cloneNodes(savedNodes));
 	                        }
-	                        ko.applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, dataValue) : bindingContext, element);
+	                        ko.applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, rawValue) : bindingContext, element);
 	                    } else {
 	                        ko.virtualElements.emptyNode(element);
 	                    }
@@ -5188,7 +5208,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	makeWithIfBinding('ifnot', false /* isWith */, true /* isNot */);
 	makeWithIfBinding('with', true /* isWith */, false /* isNot */,
 	    function(bindingContext, dataValue) {
-	        return bindingContext['createChildContext'](dataValue);
+	        return bindingContext.createStaticChildContext(dataValue);
 	    }
 	);
 	var captionPlaceholder = {};
@@ -6149,7 +6169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    // Ensure we've got a proper binding context to work with
 	                    var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof ko.bindingContext))
 	                        ? dataOrBindingContext
-	                        : new ko.bindingContext(ko.utils.unwrapObservable(dataOrBindingContext));
+	                        : new ko.bindingContext(dataOrBindingContext, null, null, null, { "exportDependencies": true });
 
 	                    var templateName = resolveTemplateName(template, bindingContext['$data'], bindingContext),
 	                        renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options);
@@ -6250,7 +6270,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        },
 	        'update': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
 	            var value = valueAccessor(),
-	                dataValue,
 	                options = ko.utils.unwrapObservable(value),
 	                shouldDisplay = true,
 	                templateComputed = null,
@@ -6267,8 +6286,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    shouldDisplay = ko.utils.unwrapObservable(options['if']);
 	                if (shouldDisplay && 'ifnot' in options)
 	                    shouldDisplay = !ko.utils.unwrapObservable(options['ifnot']);
-
-	                dataValue = ko.utils.unwrapObservable(options['data']);
 	            }
 
 	            if ('foreach' in options) {
@@ -6280,7 +6297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            } else {
 	                // Render once for this single data point (or use the viewModel if no data was provided)
 	                var innerBindingContext = ('data' in options) ?
-	                    bindingContext['createChildContext'](dataValue, options['as']) :  // Given an explitit 'data' value, we create a child binding context for it
+	                    bindingContext.createStaticChildContext(options['data'], options['as']) :  // Given an explitit 'data' value, we create a child binding context for it
 	                    bindingContext;                                                        // Given no explicit 'data' value, we retain the same binding context
 	                templateComputed = ko.renderTemplate(templateName || element, innerBindingContext, options, element);
 	            }
@@ -6822,7 +6839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  // Set up Backbone appropriately for the environment. Start with AMD.
 	  if (true) {
-	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(8), __webpack_require__(9), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+	    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(8), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, exports, $) {
 	      // Export global even in AMD case in case this script is loaded with
 	      // others that may still expect a global Backbone.
 	      root.Backbone = factory(root, exports, _, $);
@@ -10285,12 +10302,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_9__;
-
-/***/ },
-/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var ALL_ORMS, _, kb, key, ko, ref, value;
@@ -10300,9 +10311,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	ALL_ORMS = {
 	  "default": null,
 	  'backbone-orm': null,
-	  'backbone-associations': __webpack_require__(11),
-	  'backbone-relational': __webpack_require__(12),
-	  supermodel: __webpack_require__(13)
+	  'backbone-associations': __webpack_require__(10),
+	  'backbone-relational': __webpack_require__(11),
+	  supermodel: __webpack_require__(12)
 	};
 
 	kb.orm = ALL_ORMS["default"];
@@ -10347,7 +10358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -10408,7 +10419,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -10496,7 +10507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -10583,7 +10594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -10794,7 +10805,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -10874,7 +10885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {
@@ -10886,11 +10897,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var $, _, _ko_applyBindings, kb, ko, onReady, ref, window;
+	var _, _ko_applyBindings, kb, ko, onReady, ref, window;
 
 	window = window != null ? window : global;
 
-	ref = kb = __webpack_require__(2), _ = ref._, ko = ref.ko, $ = ref.$;
+	ref = kb = __webpack_require__(2), _ = ref._, ko = ref.ko;
 
 	kb.RECUSIVE_AUTO_INJECT = true;
 
@@ -11008,24 +11019,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	kb.injectViewModels = kb.Inject.injectViewModels;
 
 	if (typeof document !== "undefined" && document !== null) {
-	  if ($) {
-	    $(function() {
-	      return kb.injectViewModels();
-	    });
-	  } else {
-	    (onReady = function() {
-	      if (document.readyState !== 'complete') {
-	        return setTimeout(onReady, 0);
-	      }
-	      return kb.injectViewModels();
-	    })();
-	  }
+	  (onReady = function() {
+	    if (document.readyState !== 'complete') {
+	      return setTimeout(onReady, 0);
+	    }
+	    return kb.injectViewModels();
+	  })();
 	}
 
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -11063,7 +11068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -11079,7 +11084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	ref = kb = __webpack_require__(2), _ = ref._, ko = ref.ko;
 
-	TypedValue = __webpack_require__(19);
+	TypedValue = __webpack_require__(18);
 
 	KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 
@@ -11235,7 +11240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var TypedValue, _, kb, ko, ref;
@@ -11398,7 +11403,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -11533,7 +11538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -11844,7 +11849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -11962,7 +11967,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  };
 
-	  utils.wrappedDestroy = __webpack_require__(23);
+	  utils.wrappedDestroy = __webpack_require__(22);
 
 	  utils.valueType = function(observable) {
 	    if (!observable) {
@@ -12023,9 +12028,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ko.observable(obj);
 	  };
 
-	  utils.collapseOptions = __webpack_require__(24);
+	  utils.collapseOptions = __webpack_require__(23);
 
-	  utils.unwrapModels = __webpack_require__(25);
+	  utils.unwrapModels = __webpack_require__(24);
 
 	  utils.resolveModel = function(model) {
 	    if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) {
@@ -12041,7 +12046,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 23 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -12092,7 +12097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 24 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -12189,7 +12194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 25 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -12231,7 +12236,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 26 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -12434,7 +12439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 27 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -12446,27 +12451,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
 	  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 	 */
-	var i, kb, key, len, ref;
+	var kb;
 
 	module.exports = kb = __webpack_require__(2);
 
-	kb.configure = __webpack_require__(10);
+	kb.configure = __webpack_require__(9);
 
 	kb.modules = {
 	  underscore: kb._,
 	  backbone: kb.Parse || kb.Backbone,
 	  knockout: kb.ko
 	};
-
-	if (typeof window !== "undefined" && window !== null) {
-	  ref = ['_', 'Backbone', 'Parse', 'ko', '$'];
-	  for (i = 0, len = ref.length; i < len; i++) {
-	    key = ref[i];
-	    if (kb[key] && !Object.prototype.hasOwnProperty.call(window, key)) {
-	      window[key] = kb[key];
-	    }
-	  }
-	}
 
 
 /***/ }

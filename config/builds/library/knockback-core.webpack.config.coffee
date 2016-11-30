@@ -14,7 +14,6 @@ module.exports = _.extend  _.clone(require '../../webpack/base-config.coffee'), 
     {backbone: {root: 'Backbone', amd: 'backbone', commonjs: 'backbone', commonjs2: 'backbone'}}
     {knockout: {root: 'ko', amd: 'knockout', commonjs: 'knockout', commonjs2: 'knockout'}}
 
-    {jquery: {optional: true, root: 'jQuery', amd: 'jquery', commonjs: 'jquery', commonjs2: 'jquery'}}
     {'backbone-relational': {optional: true, root: 'Backbone', amd: 'backbone-relational', commonjs: 'backbone-relational', commonjs2: 'backbone-relational'}}
     {'backbone-associations': {optional: true, root: 'Backbone', amd: 'backbone-associations', commonjs: 'backbone-associations', commonjs2: 'backbone-associations'}}
     {'supermodel': {optional: true, root: 'Supermodel', amd: 'supermodel', commonjs: 'supermodel', commonjs2: 'supermodel'}}

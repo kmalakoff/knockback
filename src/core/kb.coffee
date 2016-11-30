@@ -229,6 +229,3 @@ kb.ko = ko
 kb.Collection = Backbone.Collection
 kb.Model = Backbone.Object or Backbone.Model
 kb.Events = Backbone.Events
-
-kb.$ = window.jQuery or window.$
-try kb.$ or= require 'jquery' # webpack optionals

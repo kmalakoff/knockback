@@ -40,7 +40,7 @@
     "coffee-script": "*",
     "event-stream": "*",
     "fs-extra": "*",
-    "fs-readdir-recursive": "^1.0.0",
+    "fs-readdir-recursive": "*",
     "gulp": "*",
     "gulp-browserify": "*",
     "gulp-coffee": "*",
@@ -56,8 +56,6 @@
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
     "imports-loader": "*",
-    "jquery": "*",
-    "jquery-xhr": "*",
     "karma": "*",
     "karma-chai": "*",
     "karma-chrome-launcher": "*",
@@ -74,13 +72,13 @@
     "webpack": "*"
   },
   "optionalDependencies": {
-    "jquery": "*",
     "backbone-relational": "*",
     "backbone-modelref": "*",
     "backbone.localstorage": "*",
     "lodash": "*",
     "backbone-orm": "*",
-    "moment": "2.x",
+    "jquery": "*",
+    "moment": "*",
     "backbone-associations": "*",
     "supermodel": "git+https://github.com/pathable/supermodel",
     "parse": "*"

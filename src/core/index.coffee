@@ -13,5 +13,3 @@ kb.configure = require './configure'
 
 # re-expose modules
 kb.modules = {underscore: kb._, backbone: kb.Parse or kb.Backbone, knockout: kb.ko}
-if window?
-  window[key] = kb[key] for key in ['_', 'Backbone', 'Parse', 'ko', '$'] when kb[key] and not Object.prototype.hasOwnProperty.call(window, key)

@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ###
 
-{_, ko, $} = kb = require '../core/kb'
+{_, ko} = kb = require '../core/kb'
 
 # Regular expressions from Angular.js: https://github.com/angular/angular.js
 URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/
