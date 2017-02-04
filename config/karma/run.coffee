@@ -6,7 +6,8 @@ Queue = require 'queue-async'
 gutil = require 'gulp-util'
 generate = require './generate'
 
-BASE_CONFIG = require './base-config'
+KARMA_CONFIG_BASE = require './config-base'
+KARMA_CONFIG_AMD = require './config-amd'
 
 module.exports = (options={}, callback) ->
   fs.removeSync('./_temp', true)
@@ -19,13 +20,14 @@ module.exports = (options={}, callback) ->
 
   for name, tests of TEST_GROUPS then do (name, tests) -> 
     for test in tests then do (test) -> 
-      # return unless (name == 'browser_globals') and (test.name == 'backbone_underscore_latest_browser_globals')
+      # return unless test.name is 'amd_backbone_lodash_latest_browser_globals'
 
       queue.defer (callback) ->
         gutil.log "RUNNING TESTS: #{name} #{test.name}"
         gutil.log "#{JSON.stringify test.files}"
+        karma_config = if (name == 'amd') then KARMA_CONFIG_AMD else KARMA_CONFIG_BASE
         new Server(
-          _.defaults({files: test.files, client: {args: ['--grep', options.tags or '']}}, BASE_CONFIG),
+          _.defaults({files: test.files, client: {args: ['--grep', options.tags or '']}}, karma_config),
           (return_value) ->
             console.log("DONE TESTS: #{name} #{test.name}. Return value: #{return_value}")
             callback(new Error "Tests failed: #{return_value}" if return_value)
