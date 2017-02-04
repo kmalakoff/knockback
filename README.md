@@ -90,8 +90,6 @@ Now, the greeting updates as you type!
 * [Tutorials](http://kmalakoff.github.io/knockback/tutorials_introduction.html) - try some live examples
 * [API Docs](http://kmalakoff.github.com/knockback/doc/index.html) - dig into the API
 * [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/) - compare client-side framworks
-* [Knockback.js Reference App (Live!)](http://kmalakoff.github.com/knockback-reference-app/) - demonstrates best practices when using Knockback.js including page routing and lifecycle management
-* [Knockback-Navigators.js (Live!)](http://kmalakoff.github.com/knockback-navigators): demonstrates page and embedded pane transitions. They are platform-agnostic so you can even use them without using Knockback.js or Knockout.js!
 
 # Download Latest (1.2.0):
 
@@ -131,8 +129,6 @@ You can also find Knockback on your favorite distributions:
 * [Backbone-Relational.js](http://backbonerelational.org/) - Get and set relations (one-to-one, one-to-many, many-to-one) for Backbone models
 * [Backbone Associations](http://dhruvaray.github.io/backbone-associations/) - Create object hierarchies with Backbone models. Respond to hierarchy changes using regular Backbone events
 * [BackboneModelRef.js](https://github.com/kmalakoff/backbone-modelref/) - provides a reference to a Backbone.Model that can be bound to your view before the model is loaded from the server (along with relevant load state notifications).
-* [KnockbackNavigators.js](https://github.com/kmalakoff/knockback-navigators/) - provides page and pane navigation including history and state (useful for single-page and mobile apps). Can be used independently from Knockback.js.
-* [KnockbackInspector.js](https://github.com/kmalakoff/knockback-inspector/) - provides customizable tree view of models and collections for viewing and editing your data (useful for debugging and visualizaing JSON).
 
 
 # Contributing
