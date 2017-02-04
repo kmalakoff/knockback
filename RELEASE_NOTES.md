@@ -5,8 +5,9 @@ Please refer to the following release notes when upgrading your version of Knock
 * Removed dependency on jquery
 * Simplified API usage for compatibility with lodash 4.x
 * Updated tests for last Parse compatible with Backbone (1.5.x)
+* Removed support for supermodel due to project inactivity
 
-## 1.2.0
+## 1.1.0
 * Updated reference counting to fix over-eager releasing: https://github.com/kmalakoff/knockback/issues/155
 
 ## 1.0.0

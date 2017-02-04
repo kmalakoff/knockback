@@ -52,7 +52,6 @@ ORM_TESTS =
   backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/spec/ecosystem/**/backbone-orm*.tests.coffee']
   backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/spec/ecosystem/**/backbone-relational*.tests.coffee']
   backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/spec/ecosystem/**/backbone-associations*.tests.coffee']
-  supermodel: [KNOCKBACK.browser_globals, resolveModule('supermodel'), './test/spec/ecosystem/**/supermodel*.tests.coffee']
 
 TEST_GROUPS.orm = []
 for dep_name, dep_files of _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest')

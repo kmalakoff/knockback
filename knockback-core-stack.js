@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 25);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -101,7 +101,7 @@ var Backbone, LIFECYCLE_METHODS, _, kb, ko, window;
 
 window = window != null ? window : global;
 
-ko = __webpack_require__(25);
+ko = __webpack_require__(24);
 
 LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -393,8 +393,7 @@ ALL_ORMS = {
   "default": null,
   'backbone-orm': null,
   'backbone-associations': __webpack_require__(21),
-  'backbone-relational': __webpack_require__(22),
-  supermodel: __webpack_require__(23)
+  'backbone-relational': __webpack_require__(22)
 };
 
 kb.orm = ALL_ORMS["default"];
@@ -3538,7 +3537,7 @@ module.exports = kb.Store = (function() {
       return obj;
     }
     if (observable = this.find(obj, creator)) {
-      return observable;
+      return (retainExisting ? this.retain(observable, obj, creator) : observable);
     }
     if (!_.isFunction(creator.create || creator)) {
       throw new Error("Invalid factory for \"" + options.path + "\"");
@@ -3960,7 +3959,7 @@ ref = kb = __webpack_require__(0), _ = ref._, ko = ref.ko;
 
 assignViewModelKey = function(vm, key) {
   var vm_key;
-  vm_key = vm.__kb.internals && _.contains(vm.__kb.internals, key) ? "_" + key : key;
+  vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? "_" + key : key;
   if (vm.__kb.view_model.hasOwnProperty(vm_key)) {
     return;
   }
@@ -3970,10 +3969,10 @@ assignViewModelKey = function(vm, key) {
 
 createObservable = function(vm, model, key, create_options) {
   var vm_key;
-  if (vm.__kb.excludes && _.contains(vm.__kb.excludes, key)) {
+  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) {
     return;
   }
-  if (vm.__kb.statics && _.contains(vm.__kb.statics, key)) {
+  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) {
     return;
   }
   if (!(vm_key = assignViewModelKey(vm, key))) {
@@ -4164,7 +4163,7 @@ kb.viewModel = function(model, options, view_model) {
 
   // Set up Backbone appropriately for the environment. Start with AMD.
   if (true) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4), __webpack_require__(24), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4), __webpack_require__(23), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
       // Export global even in AMD case in case this script is loaded with
       // others that may still expect a global Backbone.
       root.Backbone = factory(root, exports, _, $);
@@ -6490,93 +6489,6 @@ module.exports = BackboneRelational = (function() {
 
 /***/ }),
 /* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {
-/*
-  knockback.js 1.2.0
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
- */
-var Supermodel, _, kb, root;
-
-root = typeof window !== "undefined" && window !== null ? window : global;
-
-_ = (kb = __webpack_require__(0))._;
-
-Supermodel = null;
-
-module.exports = Supermodel = (function() {
-  function Supermodel() {}
-
-  Supermodel.isAvailable = function() {
-    return !!(Supermodel = root.Supermodel);
-  };
-
-  Supermodel.keys = function(model) {
-    if (!(model instanceof Supermodel.Model)) {
-      return null;
-    }
-    return _.keys(model.constructor.associations());
-  };
-
-  Supermodel.relationType = function(model, key) {
-    var relation;
-    if (!(model instanceof Supermodel.Model)) {
-      return null;
-    }
-    if (!(relation = model.constructor.associations()[key])) {
-      return null;
-    }
-    if (relation.add) {
-      return kb.TYPE_COLLECTION;
-    } else {
-      return kb.TYPE_MODEL;
-    }
-  };
-
-  Supermodel.bind = function(model, key, update, path) {
-    var rel_fn, type;
-    if (!(type = this.relationType(model, key))) {
-      return null;
-    }
-    rel_fn = function(model, other) {
-      var previous, relation;
-      !kb.statistics || kb.statistics.addModelEvent({
-        name: 'update (supermodel)',
-        model: model,
-        key: key,
-        path: path
-      });
-      relation = model.constructor.associations()[key];
-      previous = model[relation.store];
-      model[relation.store] = other;
-      update(other);
-      return model[relation.store] = previous;
-    };
-    if (type === kb.TYPE_MODEL) {
-      model.bind("associate:" + key, rel_fn);
-      return function() {
-        return model.unbind("associate:" + key, rel_fn);
-      };
-    }
-  };
-
-  Supermodel.useFunction = function(model, key) {
-    return !!this.relationType(model, key);
-  };
-
-  return Supermodel;
-
-})();
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
-
-/***/ }),
-/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -16803,7 +16715,7 @@ return jQuery;
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -22706,7 +22618,7 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 
 
 /***/ }),
-/* 26 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(5);

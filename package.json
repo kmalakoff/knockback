@@ -81,7 +81,6 @@
     "jquery": "*",
     "moment": "*",
     "backbone-associations": "*",
-    "supermodel": "git+https://github.com/pathable/supermodel",
     "parse": "1.5.x"
   },
   "jam": {

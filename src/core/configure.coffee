@@ -5,7 +5,6 @@ ALL_ORMS =
   'backbone-orm': null
   'backbone-associations': require './orms/backbone-associations'
   'backbone-relational': require './orms/backbone-relational'
-  supermodel: require './orms/supermodel'
 
 # set up defaults
 kb.orm = ALL_ORMS.default
