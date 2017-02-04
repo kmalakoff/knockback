@@ -14,7 +14,7 @@ KNOCKBACK =
   core_stack: ['./knockback-core-stack.js']
 
 REQUIRED_DEPENDENCIES =
-  backbone_underscore_latest: (resolveModule(module_name) for module_name in ['underscore', 'backbone', 'knockout'])
+  backbone_underscore_latest: (resolveModule(module_name) for module_name in ['jquery', 'underscore', 'backbone', 'knockout'])
   backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
   backbone_lodash_latest: (resolveModule(module_name) for module_name in ['lodash', 'backbone', 'knockout'])
   backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
@@ -34,7 +34,7 @@ TEST_GROUPS.browser_globals = []
 for library_name, library_files of KNOCKBACK when (library_name.indexOf('browser_globals') >= 0 and library_name.indexOf('stack') < 0)
   for dep_name, dep_files of REQUIRED_DEPENDENCIES
     if dep_name.indexOf('backbone') >= 0 # Backbone
-      TEST_GROUPS.browser_globals.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])})
+      TEST_GROUPS.browser_globals.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee', './test/spec/issues/**/*.tests.coffee'])})
     else # Parse
       TEST_GROUPS.browser_globals.push({name: "#{dep_name}_#{library_name}", files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])})
 

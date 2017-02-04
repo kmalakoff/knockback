@@ -13,3 +13,5 @@ module.exports =
   logLevel: 'INFO'
   browsers: ['PhantomJS'] # ['Firefox', 'Chrome', 'Safari']
   singleRun: true
+  # browsers: ['Chrome']
+  # singleRun: false

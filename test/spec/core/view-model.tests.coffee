@@ -3,7 +3,8 @@ assert = assert or require?('chai').assert
 describe 'view-model @quick @view-model', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  {_, ko, $} = kb
+  {_, ko} = kb
+  $ = window?.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -563,7 +564,7 @@ describe 'view-model @quick @view-model', ->
     done()
 
   it '14. model replacement with select', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
 
     kb.statistics = new kb.Statistics()
 
@@ -611,7 +612,7 @@ describe 'view-model @quick @view-model', ->
     done()
 
   it '16. model replacement with input', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
 
     kb.statistics = new kb.Statistics()
 
@@ -655,7 +656,7 @@ describe 'view-model @quick @view-model', ->
     done()
 
   it '17. model replacement with multiple selects and weird backbone bug', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
 
     kb.statistics = new kb.Statistics()
 

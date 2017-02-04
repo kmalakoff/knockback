@@ -2,7 +2,8 @@ assert = assert or require?('chai').assert
 
 describe 'knockback_core utils @quick @core', ->
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  {_, ko, $} = kb
+  {_, ko} = kb
+  $ = window?.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -13,7 +14,7 @@ describe 'knockback_core utils @quick @core', ->
     done()
 
   it 'kb.renderTemplate', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
 
     kb.statistics = new kb.Statistics() # turn on stats
 

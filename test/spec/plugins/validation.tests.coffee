@@ -3,7 +3,8 @@ window = if window? then window else global
 
 describe 'validation @quick @validation', ->
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  {_, ko, $} = kb
+  {_, ko} = kb
+  $ = window?.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -48,7 +49,7 @@ describe 'validation @quick @validation', ->
     done()
 
   it 'kb.inputValidator', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -90,7 +91,7 @@ describe 'validation @quick @validation', ->
     done()
 
   it 'kb.inputValidator with custom validators', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -144,7 +145,7 @@ describe 'validation @quick @validation', ->
     done()
 
   it 'kb.inputValidator with validation_options', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -213,7 +214,7 @@ describe 'validation @quick @validation', ->
     done()
 
   it 'kb.formValidator with name', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -285,7 +286,7 @@ describe 'validation @quick @validation', ->
     done()
 
   it 'kb.formValidator no name with validation_options', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 
@@ -364,7 +365,7 @@ describe 'validation @quick @validation', ->
     done()
 
   it 'kb.formValidator with inject and disable', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
     window.kb = kb unless window.kb # make kb global for bindings
     kb.statistics = new kb.Statistics() # turn on stats
 

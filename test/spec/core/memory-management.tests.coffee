@@ -3,7 +3,8 @@ assert = assert or require?('chai').assert
 describe 'knockback.js memory management @quick @memory', ->
 
   kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
-  {_, ko, $} = kb
+  {_, ko} = kb
+  $ = window?.$
 
   it 'TEST DEPENDENCY MISSING', (done) ->
     assert.ok(!!ko, 'ko')
@@ -80,7 +81,7 @@ describe 'knockback.js memory management @quick @memory', ->
     done()
 
   it 'Releasing with nodes', (done) ->
-    return done() unless $
+    return done() unless ($ and window?.document)
 
     kb.statistics = new kb.Statistics() # turn on stats
 

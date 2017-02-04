@@ -175,7 +175,7 @@ kb.inputValidator = (view_model, el, validation_options={}) ->
   # collect the types to identifier
   bindings = {}
   (not validators[type = el.getAttribute('type')]) or (bindings[type] = validators[type])
-  (not el.getAttribute('required')) or (bindings.required = validators.required)
+  _.isUndefined(el.getAttribute('required')) or (bindings.required = validators.required)
   if options.validations
     bindings[identifier] = validator for identifier, validator of options.validations
   result = kb.valueValidator(options.value, bindings, validation_options)

@@ -68,9 +68,9 @@ testBrowsers = (callback) ->
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'test-node', ['minify'], testNode
-gulp.task 'test-browsers', ['minify'], testBrowsers
+gulp.task 'test-browsers', ['build'], testBrowsers
 gulp.task 'test', ['minify'], (callback) ->
-  Async.series [testNode, testBrowsers], (err) -> process.exit(if err then 1 else 0)
+  Async.series [testNode, testBrowsers], (err) -> not err || console.log(err); process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'publish', ['minify'], (callback) ->
@@ -87,5 +87,5 @@ gulp.task 'publish', ['minify'], (callback) ->
     gulp.src('packages/nuget/*.nuspec')
       .pipe(nugetGulp())
       .on('end', callback)
-  queue.await (err) -> process.exit(if err then 1 else 0)
+  queue.await (err) -> not err || console.log(err); process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455

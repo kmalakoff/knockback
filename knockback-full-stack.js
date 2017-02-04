@@ -4624,7 +4624,7 @@ kb.inputValidator = function(view_model, el, validation_options) {
   (!options.validation_options) || (_.defaults(options.validation_options, validation_options), validation_options = options.validation_options);
   bindings = {};
   (!validators[type = el.getAttribute('type')]) || (bindings[type] = validators[type]);
-  (!el.getAttribute('required')) || (bindings.required = validators.required);
+  _.isUndefined(el.getAttribute('required')) || (bindings.required = validators.required);
   if (options.validations) {
     ref1 = options.validations;
     for (identifier in ref1) {

@@ -56,6 +56,7 @@
     "gulp-wrap-amd-infer": "*",
     "gulp-zip": "*",
     "imports-loader": "*",
+    "jsdom": "^9.9.1",
     "karma": "*",
     "karma-chai": "*",
     "karma-chrome-launcher": "*",
