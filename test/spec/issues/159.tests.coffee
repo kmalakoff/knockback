@@ -25,7 +25,14 @@ describe 'issue 159 @issue159 @quick', ->
     # test without options override
     view_model = new ViewModel()
     assert.ok(!view_model.was_called, 'afterRender not called yet')
-    el = $('<script type="text/x-jquery-tmpl" id="the_template1"><div>...</div></script>')
+    el = $("""<script type="text/x-jquery-tmpl" id="the_template1">
+        <div>
+          <div>...</div>
+        </div>
+        <div>
+          <div>...</div>
+        </div>
+      </script>""")
     $('body').append(el)
     kb.renderTemplate('the_template1', view_model)
     assert.ok(view_model.was_called, 'afterRender was called')
