@@ -11,15 +11,15 @@
 
 # @nodoc
 assignViewModelKey = (vm, key) ->
-  vm_key = if vm.__kb.internals and _.contains(vm.__kb.internals, key) then "_#{key}" else key
+  vm_key = if vm.__kb.internals and ~_.indexOf(vm.__kb.internals, key) then "_#{key}" else key
   return if vm.__kb.view_model.hasOwnProperty(vm_key) # already exists, skip
   vm.__kb.view_model[vm_key] = null
   return vm_key
 
 # @nodoc
 createObservable = (vm, model, key, create_options) ->
-  return if vm.__kb.excludes and _.contains(vm.__kb.excludes, key)
-  return if vm.__kb.statics and _.contains(vm.__kb.statics, key)
+  return if vm.__kb.excludes and ~_.indexOf(vm.__kb.excludes, key)
+  return if vm.__kb.statics and ~_.indexOf(vm.__kb.statics, key)
   return unless vm_key = assignViewModelKey(vm, key)
   vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm)
 

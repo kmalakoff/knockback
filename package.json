@@ -82,7 +82,7 @@
     "moment": "*",
     "backbone-associations": "*",
     "supermodel": "git+https://github.com/pathable/supermodel",
-    "parse": "*"
+    "parse": "1.5.x"
   },
   "jam": {
     "dependencies": {

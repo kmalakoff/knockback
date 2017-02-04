@@ -9,16 +9,18 @@ generate = require './generate'
 BASE_CONFIG = require './base-config'
 
 module.exports = (options={}, callback) ->
-  # fs.removeSync('./_temp', true)
-  # fs.removeSync('node_modules/knockback', true)
+  fs.removeSync('./_temp', true)
+  fs.removeSync('node_modules/knockback', true)
   queue = new Queue(1)
-  # queue.defer (callback) -> generate(options, callback)
+  queue.defer (callback) -> generate(options, callback)
 
   TEST_GROUPS = require '../test_groups'
   TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)} if options.tags.indexOf('@quick') >= 0
 
   for name, tests of TEST_GROUPS then do (name, tests) -> 
     for test in tests then do (test) -> 
+      # return unless (name == 'browser_globals') and (test.name == 'parse_latest_compatibile_browser_globals')
+
       queue.defer (callback) ->
         gutil.log "RUNNING TESTS: #{name} #{test.name}"
         gutil.log "#{JSON.stringify test.files}"
@@ -30,6 +32,5 @@ module.exports = (options={}, callback) ->
         ).start()
 
   queue.await (err) ->
-    console.log('DONE');
     fs.removeSync('./_temp', true) unless err
     callback(err)

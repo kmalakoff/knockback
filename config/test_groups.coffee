@@ -18,7 +18,7 @@ REQUIRED_DEPENDENCIES =
   backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
   backbone_lodash_latest: (resolveModule(module_name) for module_name in ['lodash', 'backbone', 'knockout'])
   backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js']
-  parse_latest: (resolveModule(module_name) for module_name in ['knockout', 'parse'])
+  parse_latest_compatibile: (resolveModule(module_name) for module_name in ['knockout', 'parse'])
   parse_legacy: (resolveModule(module_name) for module_name in ['knockout']).concat(['./vendor/parse-1.2.0.js'])
 
 LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize.culture.en-GB.js', './test/lib/globalize.culture.fr-FR.js']
