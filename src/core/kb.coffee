@@ -12,7 +12,7 @@ ko = require 'knockout'
 
 LIFECYCLE_METHODS = ['release', 'destroy', 'dispose']
 
-# The 'kb' namespace for classes, factory functions, constants, etc. Aliased to 'Knockback'
+# The 'kb' namespace for classes, factory functions, constants, etc.
 #
 # @method .collectionObservable(collection, options)
 #   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
