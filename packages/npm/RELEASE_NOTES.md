@@ -1,6 +1,14 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 1.2.0
+* Remove exporting symbols like Knockout into global namespace: https://github.com/kmalakoff/knockback/issues/148
+* Removed dependency on jquery: https://github.com/kmalakoff/knockback/issues/148
+* Simplified API usage for compatibility with lodash 4.x: https://github.com/kmalakoff/knockback/issues/151
+* Added a configure option `deep_retain` given the conflicts between https://github.com/kmalakoff/knockback/issues/157 and https://github.com/kmalakoff/knockback/issues/155
+* Updated tests for last Parse compatible with Backbone (1.5.x)
+* Removed support for supermodel due to project inactivity
+
+## 1.1.0
 * Updated reference counting to fix over-eager releasing: https://github.com/kmalakoff/knockback/issues/155
 
 ## 1.0.0
