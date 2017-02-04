@@ -64,11 +64,12 @@ testBrowsers = (callback) ->
   tags = ("@#{tag.replace(/^[-]+/, '')}" for tag in process.argv.slice(3)).join(' ')
 
   gutil.log "Running Browser tests #{tags}"
-  (require './config/karma/run')({tags: tags}, callback)
+  (require './config/karma/run')({tags}, callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
 gulp.task 'test-node', ['minify'], testNode
-gulp.task 'test-browsers', ['build'], testBrowsers
+gulp.task 'test-browsers', testBrowsers
+# gulp.task 'test-browsers', ['build'], testBrowsers
 gulp.task 'test', ['minify'], (callback) ->
   Async.series [testNode, testBrowsers], (err) -> not err || console.log(err); process.exit(if err then 1 else 0)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455

@@ -3538,7 +3538,7 @@ module.exports = kb.Store = (function() {
       return obj;
     }
     if (observable = this.find(obj, creator)) {
-      return (retainExisting ? this.retain(observable, obj, creator) : observable);
+      return observable;
     }
     if (!_.isFunction(creator.create || creator)) {
       throw new Error("Invalid factory for \"" + options.path + "\"");
