@@ -62,13 +62,13 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place')
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count')
     for occupant_observable in house_view_model.occupants()
-      assert.ok(_.contains(['John', 'Paul'], occupant_observable.name()), 'Expected name')
+      assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable.name()), 'Expected name')
       assert.equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
 
       # nested check
       assert.equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count")
       for occupant_observable2 in occupant_observable.occupies().occupants()
-        assert.ok(_.contains(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
+        assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
         assert.equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
 
     kb.release(house_view_model)
@@ -119,13 +119,13 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place')
         assert.equal(place_view_model.occupants().length, 4, "Everyone is here")
         for occupant_observable in place_view_model.occupants()
-          assert.ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
+          assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
           assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
           # nested check
           assert.equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here")
           for occupant_observable2 in occupant_observable.occupies().occupants()
-            assert.ok(_.contains(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
+            assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
             assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
       else
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place')
@@ -139,13 +139,13 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place')
         assert.equal(place_view_model.occupants().length, 3, "Almost everyone is here")
         for occupant_observable in place_view_model.occupants()
-          assert.ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
+          assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name')
           assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
           # nested check
           assert.equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here")
           for occupant_observable2 in occupant_observable.occupies().occupants()
-            assert.ok(_.contains(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
+            assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
             assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
       else
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place')
@@ -205,7 +205,7 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     john_view_model = new kb.ViewModel(john)
     assert.equal(john_view_model.name(), 'John', "Name is correct")
     for friend in john_view_model.friends()
-      assert.ok(_.contains(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
+      assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name')
     assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name')
     # assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
     kb.release(john_view_model); john_view_model = null
@@ -213,7 +213,7 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     paul_view_model = new kb.ViewModel(paul)
     assert.equal(paul_view_model.name(), 'Paul', "Name is correct")
     for friend in paul_view_model.friends()
-      assert.ok(_.contains(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
+      assert.ok(~_.indexOf(['John', 'George', 'Ringo'], friend.name()), 'Expected name')
     assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name')
     # assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
     kb.release(paul_view_model); paul_view_model = null
@@ -221,7 +221,7 @@ describe 'Knockback.js with Backbone Supermodel @supermodel', ->
     george_view_model = new kb.ViewModel(george)
     assert.equal(george_view_model.name(), 'George', "Name is correct")
     for friend in george_view_model.friends()
-      assert.ok(_.contains(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
+      assert.ok(~_.indexOf(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name')
     assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name')
     # assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
     # assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')

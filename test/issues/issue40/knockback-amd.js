@@ -1249,7 +1249,7 @@
       };
       for (_i = 0, _len = keys.length; _i < _len; _i++) {
         key = keys[_i];
-        vm_key = this.__kb.internals && _.contains(this.__kb.internals, key) ? "_" + key : key;
+        vm_key = this.__kb.internals && ~_.indexOf(this.__kb.internals, key) ? "_" + key : key;
         if (this[vm_key]) {
           continue;
         }
