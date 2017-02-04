@@ -1,7 +1,7 @@
 {
   "name": "knockback",
   "author": "Kevin Malakoff (https://github.com/kmalakoff)",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "keywords" : ["knockback", "knockbackjs", "backbone", "backbonejs", "knockout", "knockoutjs"],
   "repo": "kmalakoff/knockback",
