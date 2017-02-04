@@ -1,15 +1,16 @@
 {_, ko} = kb = require './kb'
 
 ALL_ORMS =
-  default: null
+  'default': null
   'backbone-orm': null
   'backbone-associations': require './orms/backbone-associations'
   'backbone-relational': require './orms/backbone-relational'
 
-# set up defaults
+# @nodoc
 kb.settings = {orm: ALL_ORMS.default}
 (kb.settings.orm = value; break) for key, value of ALL_ORMS when value and value.isAvailable()
 
+# @nodoc
 module.exports = (options={}) ->
   for key, value of options
     switch key

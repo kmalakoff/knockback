@@ -397,7 +397,7 @@ var ALL_ORMS, _, kb, key, ko, ref, value;
 ref = kb = __webpack_require__(0), _ = ref._, ko = ref.ko;
 
 ALL_ORMS = {
-  "default": null,
+  'default': null,
   'backbone-orm': null,
   'backbone-associations': __webpack_require__(26),
   'backbone-relational': __webpack_require__(27)

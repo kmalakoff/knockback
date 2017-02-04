@@ -14,6 +14,10 @@ LIFECYCLE_METHODS = ['release', 'destroy', 'dispose']
 
 # The 'kb' namespace for classes, factory functions, constants, etc.
 #
+# @method .configure(options)
+#   Method to update Knockback global configuration.
+#   @param [Object] configuration options. 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational), 2) deep_retain - true to multiply retain view models in the store
+#
 # @method .collectionObservable(collection, options)
 #   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
 #   @param [Collection] collection the collection to observe (can be null)
