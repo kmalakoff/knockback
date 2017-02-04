@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 2.0.0
+* Remove exporting symbols on $
+* Removed dependency on jquery
+
 ## 1.1.0
 * Updated reference counting to fix over-eager releasing: https://github.com/kmalakoff/knockback/issues/155
 
