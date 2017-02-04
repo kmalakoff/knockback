@@ -12,12 +12,15 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.1.0.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-1.2.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -27,32 +30,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -67,15 +70,15 @@
       <header class="page">
       </header>
       <content class="page">
-        <section><p>#Models, Views, and ViewModels: One-To-Many Relationships</p>
+        <section><h1>Models, Views, and ViewModels: One-To-Many Relationships</h1>
 <p>The distinction between Models and ViewModels is important:</p>
-<p><em>Backbone.Models encapsulate the data and operations on the data, are serialized/deserialized from/to the server, and are in short Models.
-</em>ViewModels provide the attributes and logic to the templates often interacting with the Model data like Controllers. However, they may have their own data and logic that is purely View-related and that the server should never know about.</p>
+<p>*Backbone.Models encapsulate the data and operations on the data, are serialized/deserialized from/to the server, and are in short Models.
+*ViewModels provide the attributes and logic to the templates often interacting with the Model data like Controllers. However, they may have their own data and logic that is purely View-related and that the server should never know about.</p>
 <p>Besides providing a clean separation between data and display, this separation becomes important in a larger application. In a larger application, you often have different ways to present the same Model with different ViewModels. For example, a Model could have the following ViewModels:</p>
 <ul>
-<li><strong>Thumbnail View</strong>: the ViewModel could only expose a subset of the Model&#39;s attributes, dates/time may be in the shortest format possible, or maybe just an image would be provided to the template.</li>
+<li><strong>Thumbnail View</strong>: the ViewModel could only expose a subset of the Model's attributes, dates/time may be in the shortest format possible, or maybe just an image would be provided to the template.</li>
 <li><strong>Cell View</strong>: the ViewModel could again expose a subset of only the most relevant summary attributes, routing information to a detailed summary view, etc.</li>
-<li><strong>Editing View</strong>: the ViewModel could expose almost all of the Model&#39;s attributes, localized labels for each, data and functions for the editing controls and functionality, routing information to specialized editing views, etc.</li>
+<li><strong>Editing View</strong>: the ViewModel could expose almost all of the Model's attributes, localized labels for each, data and functions for the editing controls and functionality, routing information to specialized editing views, etc.</li>
 </ul>
 <p>Important to understand that in a larger application the relationship between Models and ViewModels tends to be one-to-many. In this application, there is a one-to-many relationship from the Priority model through the the HeaderViewModel and TodoViewModel ViewModels because each one uses the Priority for rendering their priority colors and providing priority settings data to their tooltip, but the actions on selecting a priority in the tool tip differ.</p>
 

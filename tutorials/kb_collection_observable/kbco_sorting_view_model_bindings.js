@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var people = new Backbone.Collection([{first: 'Jeremy', last: 'Sanderson'}, {first: 'Steven', last: 'Ashkenas'}]);
 var sort_attribute = ko.observable('first');
 

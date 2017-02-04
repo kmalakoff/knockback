@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var model = new Backbone.Model({first_name: "Planet", last_name: "Earth"});
 
 var ViewModel = function(model) {

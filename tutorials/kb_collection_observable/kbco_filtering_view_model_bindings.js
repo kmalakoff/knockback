@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var people = new Backbone.Collection([{first: 'Jeremy', last: 'Ashkenas'}, {first: 'Steven', last: 'Sanderson'}, {first: 'Kevin', last: 'Malakoff'}]);
 var filtered_names = ko.observableArray(['Kevin']);
 

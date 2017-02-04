@@ -12,12 +12,15 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.1.0.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-1.2.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -27,32 +30,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -62,7 +65,7 @@
                 <div class="separator">
                   <div class="selection codestyle">
                     <div class="option">
-                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <input class="auto" id="cs-cs" type="radio" name="codestyle" value="cs"/>
                       <label for="cs-cs">CS</label>
                     </div>
                     <div class="option">
@@ -80,17 +83,17 @@
     <div class="container">
       <header class="page">
       </header>
-      <content class="page"><p>#Tutorial: Knockback Todos App</p>
+      <content class="page"><h1>Tutorial: Knockback Todos App</h1>
 <p><a href="http://kmalakoff.github.com/knockback-todos-app/">Try the demo</a> or <a href="https://github.com/kmalakoff/knockback-todos-app">Look at the Code</a></p>
-<h2 id="todos-architecture">Todos Architecture</h2>
-<h3 id="knockback-follows-the-mvvm-pattern">Knockback follows the MVVM Pattern</h3>
+<h3>Todos Architecture</h3>
+<h3>Knockback follows the MVVM Pattern</h3>
 <p>With the MVVM pattern, instead of Model, View, Controller you use Model, View, ViewModel. As an simple approximation using MVC terminology:</p>
 <ul>
 <li>Models are handled by Backbone.Models and Backbone.Collections</li>
 <li>Views are handled by Templates (inline or jQuery)</li>
 <li>ViewModels take the place of Controllers</li>
 </ul>
-<h3 id="knockback-viewmodel-injection">Knockback ViewModel Injection</h3>
+<h3>Knockback ViewModel Injection</h3>
 <p>Like <a href="http://angularjs.org/">AngularJS</a>, Knockback.js provides a mechanism through the <code>kb-inject</code> attribute or the data-bind <code>inject</code> Knockback custom binding to bind HTML Views without a central application control point.</p>
 
         <pre>&lt;section id=&quot;todoapp&quot; kb-inject=&quot;AppViewModel&quot;&gt;
@@ -98,42 +101,48 @@
   ...
 &lt;/section&gt;
 </pre><p>Please look at the <a href="doc/class/kb/Inject.html#injectViewModels-static">API Documentation</a> or the <a href="tutorial_inject.html">ViewModel Injection Tutorial</a> for more information and examples.</p>
-<h2 id="mvvm-in-todos-classic-">MVVM in &quot;Todos - Classic&quot;</h2>
-<p>The Classic application is an upgraded port of the Backbone Todos application so it has the same ORM with Todo (Backbone.Model) and TodoCollection (Backbone.Collection), but the application&#39;s Views are controlled by two ViewModels (AppViewModel and TodoViewModel).</p>
-<h3 id="models-backbone-model-backbone-collection-">Models (Backbone.Model + Backbone.Collection)</h3>
+<h3>MVVM in &quot;Todos - Classic&quot;</h3>
+<p>The Classic application is an upgraded port of the Backbone Todos application so it has the same ORM with Todo (Backbone.Model) and TodoCollection (Backbone.Collection), but the application's Views are controlled by two ViewModels (AppViewModel and TodoViewModel).</p>
+<h3>Models (Backbone.Model + Backbone.Collection)</h3>
 <ul>
 <li><strong>Todo:</strong> provides the data and operations for a Todo like setting its complete state and saving changes on the server/local-storage.</li>
 <li><strong>TodoCollection:</strong> fetches models from the server and provides summary information on the Todo data like how many are completed, remaining, etc.</li>
 </ul>
-<h3 id="viewmodels">ViewModels</h3>
+<h3>ViewModels</h3>
 <ul>
-<li><p><strong>AppViewModel:</strong> is bound directly in the View HTML and loads the Backbone.Collection with the Todos, to set up Knockout observables to control the sections of the application, to configure the page routing.</p>
+<li>
+<p><strong>AppViewModel:</strong> is bound directly in the View HTML and loads the Backbone.Collection with the Todos, to set up Knockout observables to control the sections of the application, to configure the page routing.</p>
 </li>
-<li><p><strong>TodoViewModel:</strong> is instantiated for each Backbone.Model in the todos Collection.</p>
+<li>
+<p><strong>TodoViewModel:</strong> is instantiated for each Backbone.Model in the todos Collection.</p>
 </li>
 </ul>
-<h2 id="mvvm-in-todos-extended-">MVVM in &quot;Todos - Extended&quot;</h2>
+<h3>MVVM in &quot;Todos - Extended&quot;</h3>
 <p>This application extends the &quot;Todos - Classic&quot; by adding settings including todo priorities (display colors and orders), language selection and localized text, adding todos list sorting options (by name, created date, and priority). Along with the following changes:</p>
-<h3 id="models-backbone-model-backbone-collection-">Models (Backbone.Model + Backbone.Collection)</h3>
+<h3>Models (Backbone.Model + Backbone.Collection)</h3>
 <ul>
-<li><p><strong>Priority:</strong> provides the data for the priority and color information that is saved on the server/local-storage. It could be a generic Backbone.Model but for clarity and consistency with the mock up, it is given a class.</p>
+<li>
+<p><strong>Priority:</strong> provides the data for the priority and color information that is saved on the server/local-storage. It could be a generic Backbone.Model but for clarity and consistency with the mock up, it is given a class.</p>
 </li>
-<li><p><strong>PriorityCollection:</strong> a very basic collection for fetching all of the priority settings</p>
+<li>
+<p><strong>PriorityCollection:</strong> a very basic collection for fetching all of the priority settings</p>
 </li>
 </ul>
-<h3 id="viewmodels">ViewModels</h3>
+<h3>ViewModels</h3>
 <ul>
-<li><p><strong>PrioritiesViewModel:</strong> provides localized text (that shouldn&#39;t be saved to the server) and color properties to the &#39;priority-setting-template&#39; template</p>
+<li>
+<p><strong>PrioritiesViewModel:</strong> provides localized text (that shouldn't be saved to the server) and color properties to the 'priority-setting-template' template</p>
 </li>
-<li><p><strong>SettingsViewModel:</strong> provides the priority settings globally to the application, the current default priority and color for new tasks, a priority ranking to the TodosViewModel for sorting, the selected and available locales from the locale manager (&#39;en&#39;, &#39;fr-FR&#39;, &#39;it-IT&#39;, &#39;ja-JA&#39;) into display strings (&#39;EN&#39;, &#39;FR&#39;, &#39;IT&#39;, &#39;JA&#39;), todos sorting radio buttons.</p>
+<li>
+<p><strong>SettingsViewModel:</strong> provides the priority settings globally to the application, the current default priority and color for new tasks, a priority ranking to the TodosViewModel for sorting, the selected and available locales from the locale manager ('en', 'fr-FR', 'it-IT', 'ja-JA') into display strings ('EN', 'FR', 'IT', 'JA'), todos sorting radio buttons.</p>
 </li>
 </ul>
-<h3 id="localization">Localization</h3>
+<h3>Localization</h3>
 <p>Localization is key for the global applications we create today. It should not be an afterthought!</p>
 <p>Knockback does not provide a locale manager (although there is a sample implementation with this todos application in: models/locale_manager.coffee) because different applications will retrieve their localized strings in different ways. Instead, Knockback provides a localization pattern by using a simpified Backbone.Model-like signature that hooks into Knockback like any other model:</p>
 <ul>
 <li>Emulate a simplified Backbone.Model through a get method like &quot;get: (string_id) -&gt; ...&quot;</li>
-<li>Mixin Backbone.Events &#39;_.extend(LocaleManager.prototype, Backbone.Events)&#39; and trigger Backbone.Events &#39;change&#39; and &#39;change:string_id&#39; like:</li>
+<li>Mixin Backbone.Events '_.extend(LocaleManager.prototype, Backbone.Events)' and trigger Backbone.Events 'change' and 'change:string_id' like:</li>
 </ul>
 
         <pre data-for="cs">@trigger('change', @)
@@ -157,29 +166,29 @@ for (var key in this.translations_by_locale[this.locale_identifier]) {
   write: (localized_string, value, observable) ->
     new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale())
     value.setTime(new_value.valueOf())
-    </pre>
+</pre>
         <pre data-for="js">var LongDateLocalizer =  kb.LocalizedObservable.extend({
   constructor: function LongDateLocalizer() {
     return LongDateLocalizer.__super__.constructor.apply(this, arguments);
   },
-  
+
   read: function(value) {
     return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.f, kb.locale_manager.getLocale());
   },
-  
+
   write: function(localized_string, value, observable) {
     var new_value;
     new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
     return value.setTime(new_value.valueOf());
   }
 });
-</pre><p><strong>Note:</strong> kb.LocalizedObservable&#39;s constructor actually returns a ko.computed (not the instance itself) so you either need to return super result or if you have custom initialization, return the underlying observable using the following helper: &#39;kb.wrappedObservable(this)&#39;</p>
+</pre><p><strong>Note:</strong> kb.LocalizedObservable's constructor actually returns a ko.computed (not the instance itself) so you either need to return super result or if you have custom initialization, return the underlying observable using the following helper: 'kb.wrappedObservable(this)'</p>
 <p>You can simply watch an attribute on the locale manager as follows:</p>
 
         <pre data-for="cs">AppViewModel = ->
   ...
   @input_placeholder_text = kb.observable(kb.locale_manager, {key: 'placeholder_create'})
-  </pre>
+</pre>
         <pre data-for="js">var AppViewModel = function() {
   ...
   this.input_placeholder_text = kb.observable(kb.locale_manager, {key: 'placeholder_create'});
@@ -189,12 +198,12 @@ for (var key in this.translations_by_locale[this.locale_identifier]) {
         <pre data-for="cs">TodoViewModel = (model) ->
   ...
   @completed = kb.observable(model, {key: 'completed', localizer: LongDateLocalizer})
-  </pre>
+</pre>
         <pre data-for="js">var TodoViewModel = function(model) {
   ...
   this.completed = kb.observable(model, {key: 'completed', localizer: LongDateLocalizer});
 };
-</pre><h2 id="lazy-loading">Lazy Loading</h2>
+</pre><h3>Lazy Loading</h3>
 <p>By using Knockback with <a href="https://github.com/kmalakoff/backbone-modelref">Backbone.ModelRef</a>, you can start rendering your views before the models are loaded.</p>
 <p>As demonstration, you can see that the colors arrive a little after the rendering. It is achieved by passing model references instead of models to the settings view model:</p>
 
@@ -215,7 +224,7 @@ window.app.viewmodels.settings = new SettingsViewModel([
   new Backbone.ModelRef(priorities, 'medium'),
   new Backbone.ModelRef(priorities, 'low')
 ]);
-</pre><p>and then lazy fetching them (which creates them if they don&#39;t exist):</p>
+</pre><p>and then lazy fetching them (which creates them if they don't exist):</p>
 
         <pre data-for="cs"># Load the prioties late to show the dynamic nature of Knockback with Backbone.ModelRef
 _.delay((->

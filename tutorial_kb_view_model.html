@@ -12,12 +12,15 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.1.0.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-1.2.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -27,32 +30,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -62,7 +65,7 @@
                 <div class="separator">
                   <div class="selection codestyle">
                     <div class="option">
-                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <input class="auto" id="cs-cs" type="radio" name="codestyle" value="cs"/>
                       <label for="cs-cs">CS</label>
                     </div>
                     <div class="option">
@@ -82,18 +85,18 @@
       </header>
       <content class="page"><p>#Tutorial: kb.ViewModel</p>
 <p><a href="index.html">Knockback.js</a> has a helper called <a href="doc/class/kb/ViewModel.html">kb.ViewModel</a> to automatically generate observables for each attribute. Most likely you will use the <a href="doc/class/kb/ViewModel.html#extend-static">kb.viewModel(model) factory method</a> to create a kb.ViewModel.</p>
-<p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/class/kb/ViewModel.html#constructor-dynamic">constructor options</a> like &#39;keys&#39; or &#39;excludes&#39; to limit the attributes which have kb.Observables for them or &#39;requires&#39; to ensure that observables are created consistently irregardless of the Model.</p>
-<p>In this case, Knockback will skip creating an observable for the &#39;id&#39; attribute:</p>
+<p>Unless you specify otherwise, a kb.ViewModel creates an observable for every attribute (including the id) which can cause performance issues on a page with many models. It is recommended to get started quickly with kb.ViewModels and then optimize them using <a href="doc/class/kb/ViewModel.html#constructor-dynamic">constructor options</a> like 'keys' or 'excludes' to limit the attributes which have kb.Observables for them or 'requires' to ensure that observables are created consistently irregardless of the Model.</p>
+<p>In this case, Knockback will skip creating an observable for the 'id' attribute:</p>
 
         <pre data-for="cs">view_model = kb.viewModel(new Backbone.Model({id: 20, name: 'Bob'}), {keys: ['name']})
 </pre>
-        <pre data-for="js">var view_model = kb.viewModel(new Backbone.Model({id: 20, name: 'Bob'}), {keys: ['name']});</pre><p>In this case, even if the &#39;date&#39; attribute doesn&#39;t exist, Knockback will create both &#39;name&#39; and &#39;date&#39; observables:</p>
+        <pre data-for="js">var view_model = kb.viewModel(new Backbone.Model({id: 20, name: 'Bob'}), {keys: ['name']});</pre><p>In this case, even if the 'date' attribute doesn't exist, Knockback will create both 'name' and 'date' observables:</p>
 
         <pre data-for="cs">view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), {requires: ['name', 'date']})
 </pre>
         <pre data-for="js">var view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}), {requires: ['name', 'date']});
-</pre><p>##Attribute Type: Backbone.Model</p>
-<p>If Knockback encounters a attribute that is a Backbone.Model, it automatically creates a kb.ViewModel for it. Because the model can change behind the scenes, you must access the view model using the &#39;attribute_name()&#39; syntax rather than as a simple property such as &#39;friend().name&#39; below.</p>
+</pre><h3>Attribute Type: Backbone.Model</h3>
+<p>If Knockback encounters a attribute that is a Backbone.Model, it automatically creates a kb.ViewModel for it. Because the model can change behind the scenes, you must access the view model using the 'attribute_name()' syntax rather than as a simple property such as 'friend().name' below.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -102,7 +105,7 @@
               <li><a href="#kbvm_bb_model_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbvm_bb_model_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbvm_bb_model_view">
                 <pre>&lt;div id=&#39;kbvm_bb_model&#39;&gt;
   &lt;p&gt;
     &lt;span&gt;First Person: &lt;/span&gt;
@@ -122,13 +125,15 @@
   &lt;/p&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbvm_bb_model_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbvm_bb_model_view_model">
                 <pre data-for="cs">bob = new Backbone.Model({name: &#39;Bob&#39;, friend: new Backbone.Model({name: &#39;Fred&#39;})})
 
 view_model = kb.viewModel(bob)
 
 ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0])</pre>
-                <pre data-for="js">var bob = new Backbone.Model({name: &#39;Bob&#39;, friend: new Backbone.Model({name: &#39;Fred&#39;})});
+                <pre data-for="js">var ko = kb.ko;
+
+var bob = new Backbone.Model({name: &#39;Bob&#39;, friend: new Backbone.Model({name: &#39;Fred&#39;})});
 
 var view_model = kb.viewModel(bob);
 
@@ -159,8 +164,8 @@ ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_view_model/kbvm_bb_model_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><p>##Attribute Type: Backbone.Collection</p>
-<p>If Knockback encounters a attribute that is a Backbone.Collection, it automatically creates a kb.CollectionObservable for it and a kb.ViewModel for each of it&#39;s models. Because the collection can change behind the scenes, you must access the collection observable using the &#39;attribute_name()&#39; syntax rather than as a simple property.</p>
+        </div><h3>Attribute Type: Backbone.Collection</h3>
+<p>If Knockback encounters a attribute that is a Backbone.Collection, it automatically creates a kb.CollectionObservable for it and a kb.ViewModel for each of it's models. Because the collection can change behind the scenes, you must access the collection observable using the 'attribute_name()' syntax rather than as a simple property.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -169,7 +174,7 @@ ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0]);</pre>
               <li><a href="#kbvm_bb_collection_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbvm_bb_collection_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbvm_bb_collection_view">
                 <pre>&lt;div id=&#39;kbvm_bb_collection&#39;&gt;
   &lt;p&gt;
     &lt;span&gt;First Person: &lt;/span&gt;
@@ -195,13 +200,15 @@ ko.applyBindings(view_model, $(&#39;#kbvm_bb_model&#39;)[0]);</pre>
   &lt;/p&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbvm_bb_collection_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbvm_bb_collection_view_model">
                 <pre data-for="cs">bob = new Backbone.Model({name: &#39;Bob&#39;, friends: new Backbone.Collection([new Backbone.Model({name: &#39;Fred&#39;}), new Backbone.Model({name: &#39;John&#39;})])})
 
 view_model = kb.viewModel(bob)
 
 ko.applyBindings(view_model, $(&#39;#kbvm_bb_collection&#39;)[0])</pre>
-                <pre data-for="js">var bob = new Backbone.Model({name: &#39;Bob&#39;, friends: new Backbone.Collection([new Backbone.Model({name: &#39;Fred&#39;}), new Backbone.Model({name: &#39;John&#39;})])});
+                <pre data-for="js">var ko = kb.ko;
+
+var bob = new Backbone.Model({name: &#39;Bob&#39;, friends: new Backbone.Collection([new Backbone.Model({name: &#39;Fred&#39;}), new Backbone.Model({name: &#39;John&#39;})])});
 
 var view_model = kb.viewModel(bob);
 

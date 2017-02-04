@@ -3,36 +3,34 @@
   <head>
   <meta charset='UTF-8'>
   <title>CoffeeScript API Documentation</title>
-  <script src='../../javascript/application.js'></script>
-  <script src='../../javascript/search.js'></script>
-  <link rel='stylesheet' href='../../stylesheets/application.css' type='text/css'>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
 </head>
   <body>
-    <div id='base' data-path='../../'></div>
+    <div id='base' data-path='../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../extra/README.md.html' title='Knockback.js'>
+    <a href='../extra/README.md.html' title='Knockback.js'>
       Knockback.js
     </a>
     &raquo;
-    <a href='../../alphabetical_index.html' title='Index'>
+    <a href='../alphabetical_index.html' title='Index'>
       Index
     </a>
     &raquo;
-    <span class='title'>kb</span>
-    &raquo;
-    <span class='title'>DefaultObservable</span>
+    <span class='title'>TypedValue</span>
   </div>
 </div>
     <div id='content'>
       <h1>
         Class:
-        kb.DefaultObservable
+        TypedValue
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>src&#47;defaults&#47;default-observable.coffee</td>
+          <td>src&#47;core&#47;typed-value.coffee</td>
         </tr>
       </table>
       <h2>Instance Method Summary</h2>
@@ -46,19 +44,72 @@
       </a>
     </span>
     <span class='desc'>
-      Required clean up function to break cycles, release view models, etc. 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#setToDefault-dynamic'>
+      <a href='#value-dynamic'>
         #
 (void)
-<b>setToDefault</b><span>()</span>
+<b>value</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
-      Forces the observable to take the default value. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#rawValue-dynamic'>
+        #
+(void)
+<b>rawValue</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#valueType-dynamic'>
+        #
+(void)
+<b>valueType</b><span>(model, key)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#update-dynamic'>
+        #
+(void)
+<b>update</b><span>(new_value)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_updateValueObservable-dynamic'>
+        #
+(void)
+<b>_updateValueObservable</b><span>(new_value, new_observable)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#_inferType-dynamic'>
+        #
+(void)
+<b>_inferType</b><span>(value)</span>
+      </a>
+    </span>
+    <span class='desc'>
     </span>
   </li>
 </ul>
@@ -67,53 +118,11 @@
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
-(ko.observable)
-<b>constructor</b><span>(target_observable, dv)</span>
+(void)
+<b>constructor</b><span>(create_options)</span>
       <br>
     </p>
-    <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    the constructor does not return &#39;this&#39; but a ko.observable 
-  </div>
-  <p>Used to create a new kb.DefaultObservable.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>target_observable</span>
-      <span class='type'>
-        (
-          <tt>ko.observable</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the observable to check for null, undefined, or the empty string </span>
-    </li>
-    <li>
-      <span class='name'>default_value</span>
-      <span class='type'>
-        (
-          <tt>Any</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the default value. Can be a value, string or ko.observable </span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>ko.observable</tt>
-      )
-      &mdash;
-      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable </span>
-    </li>
-  </ul>
-</div>
+    
   </div>
 </div>
       <h2>Instance Method Details</h2>
@@ -125,29 +134,61 @@
 <b>destroy</b><span>()</span>
       <br>
     </p>
-    <div class='docstring'>
-  <p>Required clean up function to break cycles, release view models, etc.
-Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).</p>
-</div>
-<div class='tags'>
-</div>
+    
   </div>
   <div class='method_details'>
-    <p class='signature' id='setToDefault-dynamic'>
+    <p class='signature' id='value-dynamic'>
       #
 (void)
-<b>setToDefault</b><span>()</span>
+<b>value</b><span>()</span>
       <br>
     </p>
-    <div class='docstring'>
-  <div class='note'>
-    <strong>Note:</strong>
-    Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault 
+    
   </div>
-  <p>Forces the observable to take the default value.</p>
-</div>
-<div class='tags'>
-</div>
+  <div class='method_details'>
+    <p class='signature' id='rawValue-dynamic'>
+      #
+(void)
+<b>rawValue</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='valueType-dynamic'>
+      #
+(void)
+<b>valueType</b><span>(model, key)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='update-dynamic'>
+      #
+(void)
+<b>update</b><span>(new_value)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_updateValueObservable-dynamic'>
+      #
+(void)
+<b>_updateValueObservable</b><span>(new_value, new_observable)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='_inferType-dynamic'>
+      #
+(void)
+<b>_inferType</b><span>(value)</span>
+      <br>
+    </p>
+    
   </div>
 </div>
     </div>

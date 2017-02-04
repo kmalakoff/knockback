@@ -35,22 +35,6 @@
           <td>src&#47;core&#47;store.coffee</td>
         </tr>
       </table>
-      <h2>Overview</h2>
-      <div class='docstring'>
-  <p>Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      How to create a ko.CollectionObservable using the ko.collectionObservable factory.
-    </h4>
-    <pre><code class='coffeescript'>var co = kb.collectionObservable(new Backbone.Collection());
-var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
-  store: kb.utils.wrappedStore(co)
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-</div>
       <h2>Variables Summary</h2>
       <dl class='constants'>
   <dt id='instances-variable'>
@@ -132,7 +116,7 @@ var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
       <a href='#retainOrCreate-dynamic'>
         #
 (void)
-<b>retainOrCreate</b><span>(obj, options)</span>
+<b>retainOrCreate</b><span>(obj, options, deep_retain)</span>
       </a>
     </span>
     <span class='desc'>
@@ -369,7 +353,7 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
     <p class='signature' id='retainOrCreate-dynamic'>
       #
 (void)
-<b>retainOrCreate</b><span>(obj, options)</span>
+<b>retainOrCreate</b><span>(obj, options, deep_retain)</span>
       <br>
     </p>
     <div class='docstring'>
@@ -404,6 +388,16 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
       </span>
       &mdash;
       <span class='desc'>please pass the options from your constructor to the register method. For example, constructor(model, options) </span>
+    </li>
+    <li>
+      <span class='name'>deep_retain</span>
+      <span class='type'>
+        (
+          <tt>boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>setting to true retains an existing observable when found. </span>
     </li>
   </ul>
   <h3>
@@ -470,11 +464,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 </div>
     </div>
     <div id='footer'>
-  September 07, 15 20:49:40 by
+  By
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.0.11
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

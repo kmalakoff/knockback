@@ -95,18 +95,6 @@ name.setToDefault(); &#47;&#47; name is (none)</code></pre>
     <span class='desc'>
     </span>
   </li>
-  <li>
-    <span class='signature'>
-      <a href='#model-dynamic'>
-        #
-(Model|ModelRef|void)
-<b>model</b><span>()</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Dual-purpose getter/setter ko.computed for the observed model. 
-    </span>
-  </li>
 </ul>
       <h2>Constructor Details</h2>
       <div class='methods'>
@@ -326,47 +314,14 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
   </ul>
 </div>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='model-dynamic'>
-      #
-(Model|ModelRef|void)
-<b>model</b><span>()</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Dual-purpose getter/setter ko.computed for the observed model.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>var observable = kb.observable(new Backbone.Model({name: &#39;bob&#39;}), &#39;name&#39;);
-var the_model = observable.model(); &#47;&#47; get
-observable.model(new Backbone.Model({name: &#39;fred&#39;})); &#47;&#47; set</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>Model|ModelRef|void</tt>
-      )
-      &mdash;
-      <span class='desc'>getter: the model whose attributes are being observed (can be null) OR setter: void </span>
-    </li>
-  </ul>
-</div>
-  </div>
 </div>
     </div>
     <div id='footer'>
-  September 07, 15 20:49:40 by
+  By
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.0.11
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

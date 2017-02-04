@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var TodoCtrl = function(view_model) {
   view_model.todos = ko.observableArray([
     {text: 'learn knockback', done: ko.observable(true)},

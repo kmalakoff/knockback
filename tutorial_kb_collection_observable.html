@@ -12,12 +12,15 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.1.0.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-1.2.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -27,32 +30,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -62,7 +65,7 @@
                 <div class="separator">
                   <div class="selection codestyle">
                     <div class="option">
-                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <input class="auto" id="cs-cs" type="radio" name="codestyle" value="cs"/>
                       <label for="cs-cs">CS</label>
                     </div>
                     <div class="option">
@@ -82,7 +85,7 @@
       </header>
       <content class="page"><p>#Tutorial: kb.CollectionObservable</p>
 <p><a href="index.html">Knockback.js</a> provides an <a href="doc/class/kb/CollectionObservable.html">kb.CollectionObservable</a> that watches Backbone.Collections when models are added, removed, and changed. In addition, kb.CollectionObservables can be used to sort models independently from the Backbone.Collection order, to bind HTML select elements, to render/edit <a href="tutorial_relational_models.html">model relationships</a>, and to filter collections.</p>
-<p>##Sorting Models</p>
+<h3>Sorting Models</h3>
 <p>You can sort models using an <a href="doc/class/kb/CollectionObservable.html#sortAttribute-dynamic">attribute name</a> or by providing a <a href="doc/class/kb/CollectionObservable.html#sortedIndex-dynamic">sorted_index function</a>.</p>
 
         <div class="row-fluid">
@@ -92,7 +95,7 @@
               <li><a href="#kbco_sorting_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbco_sorting_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbco_sorting_view">
                 <pre>&lt;div id=&#39;kbco_sorting&#39; &gt;
   &lt;legend&gt;Sort Attribute
     &lt;select data-bind=&quot;options: sort_attributes, selectedOptions: sort_attribute&quot;&gt;&lt;/select&gt;
@@ -111,7 +114,7 @@
   &lt;/div&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbco_sorting_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbco_sorting_view_model">
                 <pre data-for="cs">people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Steven&#39;, last: &#39;Ashkenas&#39;}])
 sort_attribute = ko.observable(&#39;first&#39;)
 
@@ -121,7 +124,9 @@ view_model =
   people: kb.collectionObservable(people, {sort_attribute: sort_attribute})
 
 ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0])</pre>
-                <pre data-for="js">var people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Steven&#39;, last: &#39;Ashkenas&#39;}]);
+                <pre data-for="js">var ko = kb.ko;
+
+var people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Steven&#39;, last: &#39;Ashkenas&#39;}]);
 var sort_attribute = ko.observable(&#39;first&#39;);
 
 var view_model = {
@@ -156,8 +161,8 @@ ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_collection_observable/kbco_sorting_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><p>##Filtering Models</p>
-<p>You can use kb.CollectionObservables to filter both ViewModels or Models (using the &#39;models_only&#39; option) using the filters constructor option. Filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.</p>
+        </div><h3>Filtering Models</h3>
+<p>You can use kb.CollectionObservables to filter both ViewModels or Models (using the 'models_only' option) using the filters constructor option. Filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -166,7 +171,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0]);</pre>
               <li><a href="#kbco_filtering_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbco_filtering_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbco_filtering_view">
                 <pre>&lt;div id=&#39;kbco_filtering&#39; &gt;
   &lt;legend&gt;Filter Name
    &lt;select data-bind=&quot;options: available_names, selectedOptions: filtered_names&quot;&gt;&lt;/select&gt;
@@ -185,7 +190,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_sorting&#39;)[0]);</pre>
   &lt;/div&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbco_filtering_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbco_filtering_view_model">
                 <pre data-for="cs">people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Ashkenas&#39;}, {first: &#39;Steven&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Kevin&#39;, last: &#39;Malakoff&#39;}])
 filtered_names = ko.observableArray([&#39;Kevin&#39;])
 
@@ -195,7 +200,9 @@ view_model =
   people: kb.collectionObservable(people, {filters: (model) -&gt; return model.get(&#39;first&#39;) is filtered_names()[0]})
 
 ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0])</pre>
-                <pre data-for="js">var people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Ashkenas&#39;}, {first: &#39;Steven&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Kevin&#39;, last: &#39;Malakoff&#39;}]);
+                <pre data-for="js">var ko = kb.ko;
+
+var people = new Backbone.Collection([{first: &#39;Jeremy&#39;, last: &#39;Ashkenas&#39;}, {first: &#39;Steven&#39;, last: &#39;Sanderson&#39;}, {first: &#39;Kevin&#39;, last: &#39;Malakoff&#39;}]);
 var filtered_names = ko.observableArray([&#39;Kevin&#39;]);
 
 var view_model = {
@@ -230,7 +237,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0]);</pre>
               <script type="application/javascript" src="tutorials/kb_collection_observable/kbco_filtering_view_model_bindings.js"></script>
             </div>
           </div>
-        </div><p>##HTML Select Statements</p>
+        </div><h3>HTML Select Statements</h3>
 <p>You can use kb.CollectionObservables to bind HTML select statements using <a href="http://knockoutjs.com/">Knockout.js selectOptions</a>.</p>
 
         <div class="row-fluid">
@@ -240,7 +247,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0]);</pre>
               <li><a href="#kbco_html_select_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbco_html_select_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbco_html_select_view">
                 <pre>&lt;div id=&#39;kbco_html_select&#39;&gt;
   &lt;select multiple=&quot;multiple&quot; data-bind=&quot;options: people, optionsText: &#39;name&#39;, selectedOptions: selected_people&quot;&gt;&lt;/select&gt;
   &lt;div&gt;
@@ -251,7 +258,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_filtering&#39;)[0]);</pre>
   &lt;/div&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbco_html_select_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbco_html_select_view_model">
                 <pre data-for="cs">people = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Sarah&#39;}, {name: &#39;George&#39;}])
 selected_people = new Backbone.Collection()
 
@@ -260,7 +267,9 @@ view_model =
   selected_people: kb.collectionObservable(selected_people)
 
 ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0])</pre>
-                <pre data-for="js">var people = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Sarah&#39;}, {name: &#39;George&#39;}]);
+                <pre data-for="js">var ko = kb.ko;
+
+var people = new Backbone.Collection([{name: &#39;Bob&#39;}, {name: &#39;Sarah&#39;}, {name: &#39;George&#39;}]);
 var selected_people = new Backbone.Collection();
 
 var view_model = {
@@ -296,7 +305,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0]);</pre>
               <li><a href="#kbco_share_options_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbco_share_options_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbco_share_options_view">
                 <pre>&lt;div id=&#39;kbco_share_options&#39;&gt;
   &lt;div data-bind=&quot;text: name&quot;&gt;&lt;/div&gt;
   &lt;select multiple=&quot;multiple&quot; data-bind=&quot;options: available_things, optionsText: &#39;name&#39;, selectedOptions: my_things&quot;&gt;&lt;/select&gt;
@@ -309,7 +318,7 @@ ko.applyBindings(view_model, $(&#39;#kbco_html_select&#39;)[0]);</pre>
   &lt;/p&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbco_share_options_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbco_share_options_view_model">
                 <pre data-for="cs">chair = new Backbone.Model({name: &#39;chair&#39;, my_things: new Backbone.Collection()})
 things = new Backbone.Collection([{name: &#39;leg1&#39;}, {name: &#39;leg2&#39;}, {name: &#39;leg3&#39;}])
 
@@ -320,7 +329,9 @@ view_model =
   my_things: kb.collectionObservable(chair.get(&#39;my_things&#39;), available_things.shareOptions())
 
 ko.applyBindings(view_model, $(&#39;#kbco_share_options&#39;)[0])</pre>
-                <pre data-for="js">var chair = new Backbone.Model({name: &#39;chair&#39;, my_things: new Backbone.Collection()});
+                <pre data-for="js">var ko = kb.ko;
+
+var chair = new Backbone.Model({name: &#39;chair&#39;, my_things: new Backbone.Collection()});
 var things = new Backbone.Collection([{name: &#39;leg1&#39;}, {name: &#39;leg2&#39;}, {name: &#39;leg3&#39;}]);
 
 var available_things = kb.collectionObservable(things);

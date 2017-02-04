@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
@@ -23,32 +23,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -65,17 +65,16 @@
       <content class="page">
         <section><p>#Knockback.js Tutorials</p>
 <p>We have prepared some tutorials to help explain introduct Knockback.js concepts and to provide solutions to common problems.</p>
-<p>##Tutorials</p>
-<p>You can find the various &#39;Tutorials&#39; in the navigation bar above:</p>
+<h3>Tutorials</h3>
+<p>You can find the various 'Tutorials' in the navigation bar above:</p>
 <ul>
 <li><a href="tutorial_kb_observable.html">kb.Observable</a>: shows how to create and customize an observable for a single Model attribute</li>
-<li><a href="tutorial_kb_view_model.html">kb.ViewModel</a>: show how to create and customize ViewModel that holds observables for some or all of a Model&#39;s attributes.</li>
-<li><a href="tutorial_nested_models.html">Nested Models</a>: shows how to choose the ViewModel used for a Model stored in another Model&#39;s attributes.</li>
-<li><a href="tutorial_relational_models.html">Relational Models</a>: shows how to display and manipulate collections of Models stored in a Model&#39;s attributes. You can manage relationships by hand or using a compatible component like Backbone-Relational.js.</li>
+<li><a href="tutorial_kb_view_model.html">kb.ViewModel</a>: show how to create and customize ViewModel that holds observables for some or all of a Model's attributes.</li>
+<li><a href="tutorial_nested_models.html">Nested Models</a>: shows how to choose the ViewModel used for a Model stored in another Model's attributes.</li>
+<li><a href="tutorial_relational_models.html">Relational Models</a>: shows how to display and manipulate collections of Models stored in a Model's attributes. You can manage relationships by hand or using a compatible component like Backbone-Relational.js.</li>
 <li><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a>: shows how to add observables that automatically change when a global locale for your application changes.</li>
 <li><a href="tutorial_locale_manager.html">Custom Locale Manager</a> - shows how to store translated strings by locale in a simple locale manager and notify observers when the locale changes.</li>
-<li><a href="tutorial_inject.html">ViewModel Injection</a> (<strong>new!</strong>) - demonstrates how you can dynamically inject observables and ViewModels from your HTML in a similar way to AngularJS.</li>
-<li><a href="tutorial_knockback_inspector.html">Knockback-Inspector</a> - a walkthrough showing the steps followed to create Knockback-Inspector V1.0.</li>
+<li><a href="tutorial_inject.html">ViewModel Injection</a> - demonstrates how you can dynamically inject observables and ViewModels from your HTML in a similar way to AngularJS.</li>
 </ul>
 
         </section>

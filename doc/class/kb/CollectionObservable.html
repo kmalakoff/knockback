@@ -57,21 +57,6 @@ var view_model = {
 </div>
 <div class='tags'>
 </div>
-      <h2>Class Method Summary</h2>
-      <ul class='summary'>
-  <li>
-    <span class='signature'>
-      <a href='#extend-static'>
-        .
-(ko.observable)
-<b>extend</b><span>(prototype_properties, class_properties)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Class method for JavaScript inheritance. 
-    </span>
-  </li>
-</ul>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -170,83 +155,7 @@ var view_model = {
       Compacts the Collection Observable to use the least amount of memory. 
     </span>
   </li>
-  <li>
-    <span class='signature'>
-      <a href='#collection-dynamic'>
-        #
-(Collection|void)
-<b>collection</b><span>()</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Dual-purpose getter/setter ko.computed for the observed collection. 
-    </span>
-  </li>
 </ul>
-      <h2>Class Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='extend-static'>
-      .
-(ko.observable)
-<b>extend</b><span>(prototype_properties, class_properties)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>var MyCollectionObservable = kb.CollectionObservable.extend({
-   constructor: function(collection, options) {
-     &#47;&#47; the constructor does not return &#39;this&#39; but a ko.observableArray
-     return kb.CollectionObservable.prototype.constructor.call(this, collection, {
-       view_model: MyViewModel,
-       options: options
-   });
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>prototype_properties</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the prototype </span>
-    </li>
-    <li>
-      <span class='name'>class_properties</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the class </span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>ko.observable</tt>
-      )
-      &mdash;
-      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observableArray </span>
-    </li>
-  </ul>
-</div>
-  </div>
-</div>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -638,38 +547,14 @@ todos2.hasViewModels();     &#47;&#47; true</code></pre>
 <div class='tags'>
 </div>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='collection-dynamic'>
-      #
-(Collection|void)
-<b>collection</b><span>()</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Dual-purpose getter/setter ko.computed for the observed collection.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>Collection|void</tt>
-      )
-      &mdash;
-      <span class='desc'>getter: the collection whose models are being observed (can be null) OR setter: void </span>
-    </li>
-  </ul>
-</div>
-  </div>
 </div>
     </div>
     <div id='footer'>
-  September 07, 15 20:49:40 by
+  By
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.0.11
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

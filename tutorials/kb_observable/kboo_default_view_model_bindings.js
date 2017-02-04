@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var model = new Backbone.Model({});
 
 var ViewModel = function(model) {

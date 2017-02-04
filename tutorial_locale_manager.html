@@ -12,12 +12,15 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.1.0.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-1.2.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -27,32 +30,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -62,7 +65,7 @@
                 <div class="separator">
                   <div class="selection codestyle">
                     <div class="option">
-                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <input class="auto" id="cs-cs" type="radio" name="codestyle" value="cs"/>
                       <label for="cs-cs">CS</label>
                     </div>
                     <div class="option">
@@ -103,7 +106,9 @@
     @trigger(&#39;change&#39;, @)
 
 _.extend(LocaleManager.prototype, Backbone.Events)</pre>
-          <pre data-for="js">var LocaleManager = function(locale_identifier, translations_by_locale) {
+          <pre data-for="js">var ko = kb.ko;
+
+var LocaleManager = function(locale_identifier, translations_by_locale) {
   this.translations_by_locale = translations_by_locale;
   this.current_locale = ko.observable(locale_identifier);
 
@@ -149,7 +154,7 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
                 <li><a href="#lm_simple_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
               </ul>
               <div class="tab-content">
-                <div id="lm_simple_view" class="tab-pane active">
+                <div class="tab-pane active" id="lm_simple_view">
                   <pre>&lt;div id=&#39;lm_simple&#39;&gt;
   &lt;p&gt;
     &lt;span data-bind=&quot;text: label_name&quot;&gt;&lt;/span&gt;
@@ -163,7 +168,7 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
   &lt;button data-bind=&quot;click: toggleLocale&quot;&gt;Toggle Locale&lt;/button&gt;
 &lt;/div&gt;</pre>
                 </div>
-                <div id="lm_simple_view_model" class="tab-pane">
+                <div class="tab-pane" id="lm_simple_view_model">
                   <pre data-for="cs"># create and initialize the locale manager with two languages
 simple_locale_manager = new LocaleManager(&#39;en&#39;, {
   &#39;en&#39;:
@@ -257,7 +262,9 @@ ko.applyBindings(view_model, $(&#39;#lm_simple&#39;)[0]);</pre>
     return locales
 
 _.extend(LocaleManager.prototype, Backbone.Events)</pre>
-          <pre data-for="js">var LocaleManager = function() {
+          <pre data-for="js">var ko = kb.ko;
+
+var LocaleManager = function() {
   this.translations_by_locale = translations_by_locale;
   this.current_locale = ko.observable(locale_identifier);
 
@@ -304,7 +311,7 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
                 <li><a href="#lm_bulk_labels_view_model" data-toggle="tab">ViewModel (CS/JS)</a></li>
               </ul>
               <div class="tab-content">
-                <div id="lm_bulk_labels_view" class="tab-pane active">
+                <div class="tab-pane active" id="lm_bulk_labels_view">
                   <pre>&lt;div id=&#39;lm_bulk_labels&#39;&gt;
   &lt;!-- ko foreach:[&#39;name&#39;, &#39;start_date&#39;, &#39;end_date&#39;] --&gt;
   &lt;p&gt;
@@ -320,7 +327,7 @@ _.extend(LocaleManager.prototype, Backbone.Events);</pre>
   &lt;button data-bind=&quot;click: toggleLocale&quot;&gt;Toggle Locale&lt;/button&gt;
 &lt;/div&gt;</pre>
                 </div>
-                <div id="lm_bulk_labels_view_model" class="tab-pane">
+                <div class="tab-pane" id="lm_bulk_labels_view_model">
                   <pre data-for="cs">bulk_locale_manager = new LocaleManager(&#39;en&#39;, {
   &#39;en&#39;:
     name: &#39;Name: &#39;
@@ -340,7 +347,9 @@ view_model.toggleLocale = -&gt;
   bulk_locale_manager.setLocale(if (bulk_locale_manager.getLocale() is &#39;en&#39;) then &#39;fr&#39; else &#39;en&#39;)
 
 ko.applyBindings(view_model, $(&#39;#lm_bulk_labels&#39;)[0])</pre>
-                  <pre data-for="js">var bulk_locale_manager = new LocaleManager(&#39;en&#39;, {
+                  <pre data-for="js">var ko = kb.ko;
+
+var bulk_locale_manager = new LocaleManager(&#39;en&#39;, {
   &#39;en&#39;: {
     name: &#39;Name: &#39;,
     start_date: &#39;Start Date: &#39;,

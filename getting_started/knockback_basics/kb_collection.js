@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var earth = new Backbone.Model({first_name: 'Planet', last_name: 'Earth'});
 var mars = new Backbone.Model({first_name: 'Planet', last_name: 'Mars'});
 var the_moon = new Backbone.Model({first_name: 'The', last_name: 'Moon'});

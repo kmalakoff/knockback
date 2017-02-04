@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var texts = new Backbone.Model({main_text_id: 'body'});
 
 view_model = {

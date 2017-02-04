@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var LocaleManager = function() {
   this.translations_by_locale = translations_by_locale;
   this.current_locale = ko.observable(locale_identifier);

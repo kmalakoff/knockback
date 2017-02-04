@@ -92,7 +92,6 @@ section#content .kb {
   line-height: 18px;
   background-color: #ebd6ff;
   border: 1px solid #ccc;
-  -webkit-border-radius: 4px;
   border-radius: 4px;
 }
 pre.prettyprint span {

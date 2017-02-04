@@ -28,7 +28,6 @@
       <h1>
         Class:
         kb.LocalizedObservable
-        <span class='note title'>Abstract</span>
       </h1>
       <table class='box'>
         <tr>
@@ -36,51 +35,6 @@
           <td>src&#47;localization&#47;localized-observable.coffee</td>
         </tr>
       </table>
-      <h2>Overview</h2>
-      <div class='docstring'>
-  <div class='abstract note'>
-    <strong>
-      This
-      class
-      is abstract.
-    </strong>
-    You must provide the following two methods: <em> read: function(value, observable) called to get the value and each time the locale changes </em> write: function(localized_string, value, observable) called to set the value (optional) 
-  </div>
-  <p>Base class for observing localized data that changes when the locale changes.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      How to create a ko.CollectionObservable using the ko.collectionObservable factory.
-    </h4>
-    <pre><code class='coffeescript'>kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
-  constructor: function(value, options, view_model) {
-    kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-    return kb.utils.wrappedObservable(this);
-  },
-  read: function(value) {
-    return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-  },
-  write: function(localized_string, value) {
-    var new_value;
-    new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-    if (!(new_value &amp;&amp; _.isDate(new_value))) {
-      return kb.utils.wrappedObservable(this).resetToCurrent();
-    }
-    return value.setTime(new_value.valueOf());
-  }
-});
-var ViewModel = function(model) {
-  this.localized_date = kb.observable(model, {
-    key: &#39;date&#39;,
-    &#39;default&#39;: this.loading_message,
-    localizer: ShortDateLocalizer
-  }, this);
-};
-var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></pre>
-  </div>
-</div>
-<div class='tags'>
-</div>
       <h2>Variables Summary</h2>
       <dl class='constants'>
   <dt id='extend-variable'>
@@ -92,21 +46,6 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     
   </dd>
 </dl>
-      <h2>Class Method Summary</h2>
-      <ul class='summary'>
-  <li>
-    <span class='signature'>
-      <a href='#extend-static'>
-        .
-(ko.observable)
-<b>extend</b><span>(prototype_properties, class_properties)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Class method for JavaScript inheritance. 
-    </span>
-  </li>
-</ul>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -146,68 +85,6 @@ var view_model = new ViewModel(new Backbone.Model({date: new Date()}));</code></
     </span>
   </li>
 </ul>
-      <h2>Class Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='extend-static'>
-      .
-(ko.observable)
-<b>extend</b><span>(prototype_properties, class_properties)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>var MyLocalizedObservable = kb.LocalizedObservable.extend({
-   constructor: function(value, options, view_model) {
-     &#47;&#47; the constructor does not return &#39;this&#39; but a ko.observable
-     return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-   }
-});</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>prototype_properties</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the prototype </span>
-    </li>
-    <li>
-      <span class='name'>class_properties</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the class </span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>ko.observable</tt>
-      )
-      &mdash;
-      <span class='desc'>the constructor does not return &#39;this&#39; but a ko.observable </span>
-    </li>
-  </ul>
-</div>
-  </div>
-</div>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -333,11 +210,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 </div>
     </div>
     <div id='footer'>
-  September 07, 15 20:49:40 by
+  By
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.0.11
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

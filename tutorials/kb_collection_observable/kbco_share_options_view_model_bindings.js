@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var chair = new Backbone.Model({name: 'chair', my_things: new Backbone.Collection()});
 var things = new Backbone.Collection([{name: 'leg1'}, {name: 'leg2'}, {name: 'leg3'}]);
 

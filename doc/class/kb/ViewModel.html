@@ -67,21 +67,6 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); &#47;&#47; ob
 </div>
 <div class='tags'>
 </div>
-      <h2>Class Method Summary</h2>
-      <ul class='summary'>
-  <li>
-    <span class='signature'>
-      <a href='#extend-static'>
-        .
-(kb.ViewModel)
-<b>extend</b><span>(prototype_properties, class_properties)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Class method for JavaScript inheritance. 
-    </span>
-  </li>
-</ul>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -120,93 +105,7 @@ kb.viewModel(model, [&#39;name&#39;, &#39;date&#39;], view_model); &#47;&#47; ob
       create observables manually 
     </span>
   </li>
-  <li>
-    <span class='signature'>
-      <a href='#model-dynamic'>
-        #
-(Model|ModelRef|void)
-<b>model</b><span>()</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Dual-purpose getter/setter ko.computed for the observed model. 
-    </span>
-  </li>
 </ul>
-      <h2>Class Method Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='extend-static'>
-      .
-(kb.ViewModel)
-<b>extend</b><span>(prototype_properties, class_properties)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Class method for JavaScript inheritance.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>var ContactViewModel = kb.ViewModel.extend({
-  constructor: function(model) {
-    kb.ViewModel.prototype.constructor.call(this, model, {internals: [&#39;email&#39;, &#39;date&#39;]});   &#47;&#47; call super constructor: @name, @_email, and @_date created in super from the model attributes
-    this.email = kb.defaultObservable(this._email, &#39;your.name@yourplace.com&#39;);
-    this.date = new LongDateLocalizer(this._date);
-    return this;
-  }
-});</code></pre>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>var ViewModel = kb.ViewModel.extend({
-  constructor: function(model){
-    kb.ViewModel.prototype.constructor.apply(this, arguments);
-    this.full_name = ko.computed(function() { return this.first_name() + &quot; &quot; + this.last_name(); }, this);
-  }
-});
-var view_model = new ViewModel(model);</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>prototype_properties</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the prototype </span>
-    </li>
-    <li>
-      <span class='name'>class_properties</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>the properties to add to the class </span>
-    </li>
-  </ul>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt><a href='../../class/kb/ViewModel.html'>kb.ViewModel</a></tt>
-      )
-      &mdash;
-      <span class='desc'>the constructor returns &#39;this&#39; </span>
-    </li>
-  </ul>
-</div>
-  </div>
-</div>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -425,47 +324,14 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 <div class='tags'>
 </div>
   </div>
-  <div class='method_details'>
-    <p class='signature' id='model-dynamic'>
-      #
-(Model|ModelRef|void)
-<b>model</b><span>()</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Dual-purpose getter/setter ko.computed for the observed model.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      
-    </h4>
-    <pre><code class='coffeescript'>var view_model = kb.viewModel(new Backbone.Model({name: &#39;bob&#39;}));
-var the_model = view_model.model(); &#47;&#47; get
-view_model.model(new Backbone.Model({name: &#39;fred&#39;})); &#47;&#47; set</code></pre>
-  </div>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>Model|ModelRef|void</tt>
-      )
-      &mdash;
-      <span class='desc'>getter: the model whose attributes are being observed (can be null) OR setter: void </span>
-    </li>
-  </ul>
-</div>
-  </div>
 </div>
     </div>
     <div id='footer'>
-  September 07, 15 20:49:40 by
+  By
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.0.11
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

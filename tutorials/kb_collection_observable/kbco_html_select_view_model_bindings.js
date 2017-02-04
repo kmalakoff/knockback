@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var people = new Backbone.Collection([{name: 'Bob'}, {name: 'Sarah'}, {name: 'George'}]);
 var selected_people = new Backbone.Collection();
 

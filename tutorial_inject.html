@@ -12,12 +12,15 @@
     <link rel="stylesheet" href="./css/layout.css">
     <link rel="stylesheet" href="./css/layout_components.css">
     <link rel="icon" type="image/x-icon" href="./img/favicon.ico">
-    <script type="application/javascript" src="./vendor/js/jquery-1.9.1.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <link rel="stylesheet" href="css/tutorial.css">
     <script type="application/javascript" src="vendor/globalize/globalize.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.en-GB.js"></script>
     <script type="application/javascript" src="vendor/globalize/globalize.culture.fr-FR.js"></script>
-    <script type="application/javascript" src="vendor/js/knockback-full-stack-1.1.0.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone-min.js"></script>
+    <script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.1/knockout-min.js"></script>
+    <script type="application/javascript" src="vendor/js/knockback-1.2.0.js"></script>
     <script type="application/javascript" src="./vendor/bootstrap/js/bootstrap.min.js"></script>
     <script type="application/javascript" src="./vendor/google-code-prettify/prettify.js"></script>
     <script type="application/javascript" src="./js/stylecode.js"></script>
@@ -27,32 +30,32 @@
     <div class="page navbar">
       <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="navbar-inner">
-          <div class="container"><a data-toggle="collapse" data-target=".nav-collapse" class="btn btn-navbar"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a href="https://github.com/kmalakoff/knockback" class="brand kb">Knockback.js</a>
+          <div class="container"><a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand kb" href="https://github.com/kmalakoff/knockback">Knockback.js</a>
             <div class="nav-collapse">
               <ul class="nav">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="doc/index.html">API</a></li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Getting Started<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Getting Started<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
                     <li><a href="getting_started_introduction.html">Overview</a><a href="getting_started_dependent_library_basics.html">Dependent Library Basics</a><a href="getting_started_knockback_basics.html">Knockback Basics</a><a href="getting_started_views_view_models_models.html">Models, Views, and ViewModels</a><a href="getting_started_memory_lifecycle_management.html">Memory and Lifecycle Management</a><a href="getting_started_knockback_important_details.html">Knockback Important Details</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Components<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a><a href="components_knockback_inspector.html">Knockback Inspector</a><a href="components_knockback_navigators.html">Knockback Navigators</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Components<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="components_backbone_relational.html">Backbone Relational</a><a href="components_backbone_modelref.html">Backbone ModelRef</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Applications<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="app_knockback_reference.html">Knockback Reference App</a><a href="app_todos.html">Todos App</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Applications<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="app_todos.html">Todos App</a>
                     </li>
                   </ul>
                 </li>
-                <li class="dropdown"><a href="#" data-toggle="dropdown" class="dropdown-toggle">Tutorials<b class="caret"></b></a>
-                  <ul role="menu" class="dropdown-menu">
-                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a><a href="tutorial_knockback_inspector.html">Knockback Inspector (Advanced)</a>
+                <li class="dropdown"><a class="dropdown-toggle" href="#" data-toggle="dropdown">Tutorials<b class="caret"></b></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="tutorials_introduction.html">Introduction</a><a href="tutorial_kb_observable.html">kb.Observable</a><a href="tutorial_kb_view_model.html">kb.ViewModel</a><a href="tutorial_kb_collection_observable.html">kb.CollectionObservable</a><a href="tutorial_nested_models.html">Nested Models</a><a href="tutorial_relational_models.html">Relational Models</a><a href="tutorial_kb_localized_observable.html">kb.LocalizedObservable</a><a href="tutorial_locale_manager.html">Custom Locale Manager</a><a href="tutorial_inject.html">ViewModel Injection</a>
                     </li>
                   </ul>
                 </li>
@@ -62,7 +65,7 @@
                 <div class="separator">
                   <div class="selection codestyle">
                     <div class="option">
-                      <input id="cs-cs" type="radio" name="codestyle" value="cs" class="auto"/>
+                      <input class="auto" id="cs-cs" type="radio" name="codestyle" value="cs"/>
                       <label for="cs-cs">CS</label>
                     </div>
                     <div class="option">
@@ -81,8 +84,8 @@
       <header class="page">
       </header>
       <content class="page"><p>#Tutorial: ViewModel Injection</p>
-<p><a href="index.html">Knockback.js</a> provides an a few helpers to inject ViewModels into your HTML Views in a similar way to <a href="http://angularjs.org/">AngularJS&#39;s</a> <code>ng-app</code> so you can build up an application by dynamically binding observables directly from your HTML.</p>
-<p>The following examples show how you might port AngularJS samples to Knockback to help you compare approaches. There&#39;s nothing complicated here, just a <code>kb-inject</code> attribute and a custom <code>inject</code> Knockout binding to add observables to your ViewModel.</p>
+<p><a href="index.html">Knockback.js</a> provides an a few helpers to inject ViewModels into your HTML Views in a similar way to <a href="http://angularjs.org/">AngularJS's</a> <code>ng-app</code> so you can build up an application by dynamically binding observables directly from your HTML.</p>
+<p>The following examples show how you might port AngularJS samples to Knockback to help you compare approaches. There's nothing complicated here, just a <code>kb-inject</code> attribute and a custom <code>inject</code> Knockout binding to add observables to your ViewModel.</p>
 <p>The main way to bind a View when your page is loaded, is to use a <code>kb-inject</code> attribute on your HTML elements. You can optionally provide some hooks if you like:</p>
 <p>For more examples and information, please see the <a href="doc/class/kb/Inject.html#injectViewModels-static">API Documentation</a>.</p>
 
@@ -95,15 +98,15 @@
 &lt;html kb-inject=&quot;view_model: {name: ko.observable(&#39;&#39;)}, afterBinding: yourFunction&quot;&gt;
   &lt;!-- YOUR VIEW HERE !! --&gt;
 &lt;/html&gt;
-</pre><p>In addition to help you inject observables to your ViewModel, you can use the &#39;inject&#39; custom binding. It accepts an object to extend your ViewModel or a function of the form yourFunction(view_model, element) to allow you to extend the view model by hand:</p>
+</pre><p>In addition to help you inject observables to your ViewModel, you can use the 'inject' custom binding. It accepts an object to extend your ViewModel or a function of the form yourFunction(view_model, element) to allow you to extend the view model by hand:</p>
 
         <pre>&lt;!-- INJECT A TO EXTEND YOUR VIEW MODEL --&gt;
 &lt;div data-bind=&quot;inject: {name: ko.observable(&#39;&#39;)}&quot;&gt;&lt;/div&gt;
 
 &lt;!-- INJECT A USING A CUSTOM FUNCTION --&gt;
 &lt;div data-bind=&quot;inject: ProjectAppController&quot;&gt;&lt;/div&gt;
-</pre><p>That&#39;s basically it...it&#39;s really a lot easier than memorizing or looking up a large number of custom <code>ng-{something}</code> bindings and you can reuse your knowledge of Knockback.js, Knockout.js, and Backbone.js!</p>
-<p>##Getting Started - Hello World!</p>
+</pre><p>That's basically it...it's really a lot easier than memorizing or looking up a large number of custom <code>ng-{something}</code> bindings and you can reuse your knowledge of Knockback.js, Knockout.js, and Backbone.js!</p>
+<h3>Getting Started - Hello World!</h3>
 <p>There are a few helpers to get us started:</p>
 
         <pre data-for="cs"># helper to toggle classes
@@ -127,8 +130,8 @@ ko.bindingHandlers[&#39;classes&#39;] = {
 
 // helpers to manage push state
 window.loadUrl = function(url) { return Backbone.history.loadUrl(url); };
-window.loadUrlFn = function(url) { return function() { return Backbone.history.loadUrl(url); }; };</pre><p>##Hello Example</p>
-<p>This example uses the &#39;kb-inject&#39; attribute to seed a root application ViewModel with a yourName observable (like a more flexible ng-model binding).</p>
+window.loadUrlFn = function(url) { return function() { return Backbone.history.loadUrl(url); }; };</pre><h3>Hello Example</h3>
+<p>This example uses the 'kb-inject' attribute to seed a root application ViewModel with a yourName observable (like a more flexible ng-model binding).</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -153,8 +156,8 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
         </div><p>You could have just as easily written the first line like:</p>
 
         <pre>&lt;div data-bind=&quot;inject: {yourName: ko.observable(&#39;&#39;)}&quot; kb-inject&gt;
-</pre><p>##Todo Example</p>
-<p>The todo example uses a custom &#39;TodoCtrl&#39; inject function to add some functions and observables to your view model. Then you can bind them to your HTML using standard Knockout bindings.</p>
+</pre><h3>Todo Example</h3>
+<p>The todo example uses a custom 'TodoCtrl' inject function to add some functions and observables to your view model. Then you can bind them to your HTML using standard Knockout bindings.</p>
 
         <div class="row-fluid">
           <div class="span8">
@@ -164,7 +167,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
               <li><a href="#kbi_todo_css" data-toggle="tab">Styling (CSS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbi_todo_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbi_todo_view">
                 <pre>&lt;div kb-inject&gt;
   &lt;h2&gt;Todo&lt;/h2&gt;
   &lt;div data-bind=&quot;inject: TodoCtrl&quot;&gt;
@@ -184,7 +187,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
   &lt;/div&gt;
 &lt;/div&gt;</pre>
               </div>
-              <div id="kbi_todo_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbi_todo_view_model">
                 <pre data-for="cs">TodoCtrl = (view_model) -&gt;
   view_model.todos = ko.observableArray([
     {text:&#39;learn knockback&#39;, done:ko.observable(true)},
@@ -203,7 +206,9 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
   view_model.archive = -&gt;
     view_model.todos.remove((todo) -&gt; return todo.done())
   return</pre>
-                <pre data-for="js">var TodoCtrl = function(view_model) {
+                <pre data-for="js">var ko = kb.ko;
+
+var TodoCtrl = function(view_model) {
   view_model.todos = ko.observableArray([
     {text: &#39;learn knockback&#39;, done: ko.observable(true)},
     {text: &#39;build a knockback app&#39;, done: ko.observable(false)}
@@ -224,7 +229,7 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
   };
 };</pre>
               </div>
-              <div id="kbi_todo_css" class="tab-pane">
+              <div class="tab-pane" id="kbi_todo_css">
                 <pre>.done {
   text-decoration: line-through;
   color: grey;
@@ -256,12 +261,12 @@ window.loadUrlFn = function(url) { return function() { return Backbone.history.l
 </div>
             </div>
           </div>
-        </div><p>##Project Example</p>
+        </div><h3>Project Example</h3>
 <p>Before we start the example, you should review the <a href="doc/class/kb/Validation.html">validations documentation</a>.
 Now on with the example! This example shows:</p>
 <ul>
-<li>how you can set up a Backbone.Router to control an embedded page using the &#39;kb-inject&#39; afterBinding callback</li>
-<li>how to inject Knockback-Validation&#39;s kb.formValidator which will look for named inputs and other keywords to create an observable that will update when form state changes.</li>
+<li>how you can set up a Backbone.Router to control an embedded page using the 'kb-inject' afterBinding callback</li>
+<li>how to inject Knockback-Validation's kb.formValidator which will look for named inputs and other keywords to create an observable that will update when form state changes.</li>
 </ul>
 
         <script type="application/javascript" src="tutorials/inject/kbi_helpers.js"></script>
@@ -334,13 +339,13 @@ Now on with the example! This example shows:</p>
               <li><a href="#kbi_project_view_model" data-toggle="tab">Project ViewModel (CS/JS)</a></li>
             </ul>
             <div class="tab-content">
-              <div id="kbi_project_app_view" class="tab-pane active">
+              <div class="tab-pane active" id="kbi_project_app_view">
                 <pre>&lt;div kb-inject=&quot;options: {afterBinding: projectAppStartRouting}&quot;&gt;
   &lt;h2&gt;JavaScript Projects&lt;/h2&gt;
   &lt;div data-bind=&quot;inject: ProjectAppController&quot;&gt;&lt;/div&gt;
 &lt;div&gt;</pre>
               </div>
-              <div id="kbi_project_list_view" class="tab-pane">
+              <div class="tab-pane" id="kbi_project_list_view">
                 <pre>&lt;script type=&quot;text/x-jquery-tmpl&quot; id=&quot;list.html&quot;&gt;
   &lt;div&gt;
     &lt;input type=&quot;text&quot; class=&quot;search-query&quot; placeholder=&quot;Search&quot; data-bind=&quot;value: filter, valueUpdate: &#39;keyup&#39;&quot;&gt;
@@ -367,7 +372,7 @@ Now on with the example! This example shows:</p>
   &lt;/div&gt;
 &lt;/script&gt;</pre>
               </div>
-              <div id="kbi_project_detail_view" class="tab-pane">
+              <div class="tab-pane" id="kbi_project_detail_view">
                 <pre>&lt;script type=&quot;text/x-jquery-tmpl&quot; id=&quot;detail.html&quot;&gt;
   &lt;form name=&quot;myForm&quot; data-bind=&quot;inject: kb.formValidator&quot;&gt;
     &lt;div class=&quot;control-group&quot; data-bind=&quot;classes: {error: $myForm.name().$error_count}&quot;&gt;
@@ -398,7 +403,7 @@ Now on with the example! This example shows:</p>
   &lt;/form&gt;
 &lt;/script&gt;</pre>
               </div>
-              <div id="kbi_project_app_controller" class="tab-pane">
+              <div class="tab-pane" id="kbi_project_app_controller">
                 <pre data-for="cs">ProjectAppController = (view_model, element) -&gt;
   knockback_model = {id: &#39;id_kb&#39;, name: &#39;Knockback.js&#39;, description: &#39;Backbone.js + Knockout.js is amazingly!&#39;, site: &#39;http://kmalakoff.github.com/knockback/&#39;}
   projects = new ProjectCollection([knockback_model])
@@ -458,7 +463,7 @@ var projectAppStartRouting = function() {
   }
 };</pre>
               </div>
-              <div id="kbi_project_collection" class="tab-pane">
+              <div class="tab-pane" id="kbi_project_collection">
                 <pre data-for="cs">PROJECTS_BASE_URL = &#39;https://api.mongolab.com/api/1/databases/angularjs/collections/projects&#39;
 PROJECTS_API_KEY_PARAM = &#39;apiKey=4f847ad3e4b08a2eed5f3b54&#39;
 
@@ -481,7 +486,7 @@ var Project = Backbone.Model.extend({
   model: Project
 });</pre>
               </div>
-              <div id="kbi_project_list_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbi_project_list_view_model">
                 <pre data-for="cs">ProjectListViewModel = (projects) -&gt;
   @filter = ko.observable(&#39;&#39;)
   @projects = kb.collectionObservable(projects, {
@@ -489,11 +494,13 @@ var Project = Backbone.Model.extend({
     sort_attribute: &#39;name&#39;
     filters: [(model) =&gt;
       return true unless filter = @filter()
-      return (model.get(&#39;name&#39;).search(filter) &gt;= 0)
+      return model.get(&#39;name&#39;) and ((model.get(&#39;name&#39;).search(filter) &gt;= 0))
     ]
   })
   return</pre>
-                <pre data-for="js">var ProjectListViewModel = function(projects) {
+                <pre data-for="js">var ko = kb.ko;
+
+var ProjectListViewModel = function(projects) {
   var _this = this;
   this.filter = ko.observable(&#39;&#39;);
   this.projects = kb.collectionObservable(projects, {
@@ -502,12 +509,12 @@ var Project = Backbone.Model.extend({
     filters: [function(model) {
       var filter = _this.filter();
       if (!filter) return true;
-      return model.get(&#39;name&#39;).search(filter) &gt;= 0;
+      return model.get(&#39;name&#39;) &amp;&amp; (model.get(&#39;name&#39;).search(filter) &gt;= 0);
     }]
   });
 };</pre>
               </div>
-              <div id="kbi_project_view_model" class="tab-pane">
+              <div class="tab-pane" id="kbi_project_view_model">
                 <pre data-for="cs">ProjectViewModel = kb.ViewModel.extend({
   constructor: (project, projects) -&gt;
     kb.ViewModel.prototype.constructor.call(@, project, {requires: [&#39;id&#39;, &#39;name&#39;, &#39;site&#39;, &#39;description&#39;]})

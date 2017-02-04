@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var bob = new Person({id: 'person-1', name: 'Bob'});
 var fred = new Person({id: 'person-2', name: 'Fred'});
 

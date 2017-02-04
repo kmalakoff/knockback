@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var bulk_locale_manager = new LocaleManager('en', {
   'en': {
     name: 'Name: ',

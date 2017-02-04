@@ -35,34 +35,6 @@
           <td>src&#47;triggering&#47;triggered-observable.coffee</td>
         </tr>
       </table>
-      <h2>Overview</h2>
-      <div class='docstring'>
-  <p>Class for observing emitter events.</p>
-  <div class='examples'>
-    <h3>Examples:</h3>
-    <h4>
-      create an observable whose subscriptions are notified with the change event is triggered.
-    </h4>
-    <pre><code class='coffeescript'>var triggered_observable = kb.triggeredObservable(name, &#39;change&#39;);</code></pre>
-    <h4>
-      How to watch a emitter for events.
-    </h4>
-    <pre><code class='coffeescript'>var trigger_count = 0;
-var emitter = new Backbone.Model();
-var view_emitter = {
-  triggered_observable: kb.triggeredObservable(emitter, &#39;change&#39;)
-};
-view_emitter.counter = ko.computed(function() {
-  view_emitter.triggered_observable() &#47;&#47; add a dependency
-  return trigger_count++
-});
-emitter.set(name: &#39;bob&#39;);       # trigger_count: 1
-emitter.set(name: &#39;george&#39;);    # trigger_count: 2
-emitter.set(last: &#39;smith&#39;);     # trigger_count: 3</code></pre>
-  </div>
-</div>
-<div class='tags'>
-</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
@@ -231,11 +203,11 @@ Can be called directly, via kb.release(object) or as a consequence of ko.release
 </div>
     </div>
     <div id='footer'>
-  September 07, 15 20:49:40 by
+  By
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
-  2.0.11
+  2.1.2
   &#10034;
   Press H to see the keyboard shortcuts
   &#10034;

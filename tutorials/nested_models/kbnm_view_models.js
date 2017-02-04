@@ -1,3 +1,5 @@
+var ko = kb.ko;
+
 var bob = new Backbone.Model({name: "Bob"});
 var fred = new Backbone.Model({name: "Fred", friends: new Backbone.Collection([bob])});
 bob.set({friends: new Backbone.Collection([fred])});
