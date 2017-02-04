@@ -90,7 +90,7 @@ module.exports = class kb.Store
   #
   # @param [Model|Collection|Data] obj the object to create the observable for. Only Models are cached in the store.
   # @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
-  # @param [boolean] retainExisting setting to true retains an existing observable when found.
+  # @param [boolean] deep_retain setting to true retains an existing observable when found.
   # @option options [Constructor|Function] creator the constructor or function used to create the observable. It is used to match observables in the store.
   # @option options [String] path the path to the value (used to create related observables from the factory).
   # @option options [kb.Store] store a store used to cache and share view models.
@@ -98,10 +98,10 @@ module.exports = class kb.Store
   #
   # @example register an observable with the store
   #   observable = store.retainOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
-  retainOrCreate: (obj, options, retainExisting) ->
+  retainOrCreate: (obj, options, deep_retain) ->
     return kb.utils.createFromDefaultCreator(obj, options) unless creator = @_creator(obj, options)
     return obj if creator.models_only
-    return (if retainExisting then @retain(observable, obj, creator) else observable) if observable = @find(obj, creator)
+    return (if deep_retain and kb.settings.deep_retain then @retain(observable, obj, creator) else observable) if observable = @find(obj, creator)
 
     throw new Error "Invalid factory for \"#{options.path}\"" unless _.isFunction(creator.create or creator)
 

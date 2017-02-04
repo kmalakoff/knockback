@@ -67,7 +67,8 @@ testBrowsers = (callback) ->
   (require './config/karma/run')({tags}, callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-gulp.task 'test-node', ['minify'], testNode
+gulp.task 'test-node', testNode
+# gulp.task 'test-node', ['minify'], testNode
 gulp.task 'test-browsers', testBrowsers
 # gulp.task 'test-browsers', ['build'], testBrowsers
 # gulp.task 'test-browsers', ['minify'], testBrowsers

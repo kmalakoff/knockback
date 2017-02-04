@@ -7,8 +7,8 @@ ALL_ORMS =
   'backbone-relational': require './orms/backbone-relational'
 
 # set up defaults
-kb.orm = ALL_ORMS.default
-(kb.orm = value; break) for key, value of ALL_ORMS when value and value.isAvailable()
+kb.settings = {orm: ALL_ORMS.default}
+(kb.settings.orm = value; break) for key, value of ALL_ORMS when value and value.isAvailable()
 
 module.exports = (options={}) ->
   for key, value of options
@@ -18,13 +18,13 @@ module.exports = (options={}) ->
         if _.isString(value)
           (console.log "Knockback configure: could not find orm: #{value}. Available: #{_.keys(ALL_ORMS).join(', ')}"; continue) unless ALL_ORMS.hasOwnProperty(value)
           (console.log "Knockback configure: could not enable orm #{value}. Make sure it is included before Knockback"; continue) if (orm = ALL_ORMS[value]) and not orm.isAvailable()
-          kb.orm = orm
+          kb.settings.orm = orm
           continue
 
         # set by functions
         else
-          kb.orm = value
+          kb.settings.orm = value
 
       else
-        kb[key] = value
+        kb.settings[key] = value
   return

@@ -994,6 +994,7 @@ describe 'view-model @quick @view-model', ->
 
   it 'cannot update a shared null', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
+    kb.configure({deep_retain: true})
 
     class CustomViewModel extends kb.ViewModel
 
@@ -1014,6 +1015,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal view_model.model1().name(), 'Bob', 'name has been added to the new view model'
 
     kb.release(view_model)
+    kb.configure({deep_retain: false})
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
@@ -1033,7 +1035,7 @@ describe 'view-model @quick @view-model', ->
     assert.equal view_model.model2().name(), 'Fred', 'name is Fred'
 
     # cannot change a shared model
-    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Ref count: 3'
+    assert.throw (-> view_model.model1().model(new kb.Model({name: 'Bob'}))), 'Trying to change a shared view model. Ref count: 2'
     assert.equal view_model.model1().model(), model, 'model1 is still model'
     assert.equal view_model.model1().name(), 'Fred', 'name has not been changed'
 

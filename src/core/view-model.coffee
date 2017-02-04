@@ -167,7 +167,7 @@ class kb.ViewModel
     if not keys
       return if @__kb.keys or not model # only use the keys provided
       createObservable(@, model, key, @__kb.create_options) for key of model.attributes
-      (createObservable(@, model, key, @__kb.create_options) for key in rel_keys) if rel_keys = kb.orm?.keys?(model)
+      (createObservable(@, model, key, @__kb.create_options) for key in rel_keys) if rel_keys = kb.settings.orm?.keys?(model)
     else if _.isArray(keys)
       createObservable(@, model, key, @__kb.create_options) for key in keys
     else

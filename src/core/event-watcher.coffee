@@ -130,7 +130,7 @@ class kb.EventWatcher
 
       (callbacks.model = model; model.bind(event_name, callbacks.fn)) unless callbacks.model
       for info in callbacks.list
-        info.unbind_fn or= kb.orm?.bind(model, info.key, info.update, info.path)
+        info.unbind_fn or= kb.settings.orm?.bind(model, info.key, info.update, info.path)
         (info.emitter(model) if info.emitter)
     return
 

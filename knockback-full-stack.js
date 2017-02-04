@@ -269,7 +269,7 @@ module.exports = kb = (function() {
     if (!model) {
       return;
     }
-    if (_.isFunction(model[key]) && ((ref = kb.orm) != null ? ref.useFunction(model, key) : void 0)) {
+    if (_.isFunction(model[key]) && ((ref = kb.settings.orm) != null ? ref.useFunction(model, key) : void 0)) {
       return model[key]();
     }
     if (!args) {
@@ -285,7 +285,7 @@ module.exports = kb = (function() {
     if (!model) {
       return;
     }
-    if (_.isFunction(model[key]) && ((ref = kb.orm) != null ? ref.useFunction(model, key) : void 0)) {
+    if (_.isFunction(model[key]) && ((ref = kb.settings.orm) != null ? ref.useFunction(model, key) : void 0)) {
       return model[key](value);
     }
     (attributes = {})[key] = value;
@@ -403,12 +403,14 @@ ALL_ORMS = {
   'backbone-relational': __webpack_require__(27)
 };
 
-kb.orm = ALL_ORMS["default"];
+kb.settings = {
+  orm: ALL_ORMS["default"]
+};
 
 for (key in ALL_ORMS) {
   value = ALL_ORMS[key];
   if (value && value.isAvailable()) {
-    kb.orm = value;
+    kb.settings.orm = value;
     break;
   }
 }
@@ -431,14 +433,14 @@ module.exports = function(options) {
             console.log("Knockback configure: could not enable orm " + value + ". Make sure it is included before Knockback");
             continue;
           }
-          kb.orm = orm;
+          kb.settings.orm = orm;
           continue;
         } else {
-          kb.orm = value;
+          kb.settings.orm = value;
         }
         break;
       default:
-        kb[key] = value;
+        kb.settings[key] = value;
     }
   }
 };
@@ -2794,7 +2796,7 @@ kb.EventWatcher = (function() {
       ref2 = callbacks.list;
       for (i = 0, len = ref2.length; i < len; i++) {
         info = ref2[i];
-        info.unbind_fn || (info.unbind_fn = (ref3 = kb.orm) != null ? ref3.bind(model, info.key, info.update, info.path) : void 0);
+        info.unbind_fn || (info.unbind_fn = (ref3 = kb.settings.orm) != null ? ref3.bind(model, info.key, info.update, info.path) : void 0);
         if (info.emitter) {
           info.emitter(model);
         }
@@ -3535,7 +3537,7 @@ module.exports = kb.Store = (function() {
     return observable;
   };
 
-  Store.prototype.retainOrCreate = function(obj, options, retainExisting) {
+  Store.prototype.retainOrCreate = function(obj, options, deep_retain) {
     var creator, observable;
     if (!(creator = this._creator(obj, options))) {
       return kb.utils.createFromDefaultCreator(obj, options);
@@ -3544,7 +3546,7 @@ module.exports = kb.Store = (function() {
       return obj;
     }
     if (observable = this.find(obj, creator)) {
-      return (retainExisting ? this.retain(observable, obj, creator) : observable);
+      return (deep_retain && kb.settings.deep_retain ? this.retain(observable, obj, creator) : observable);
     }
     if (!_.isFunction(creator.create || creator)) {
       throw new Error("Invalid factory for \"" + options.path + "\"");
@@ -4116,7 +4118,7 @@ kb.ViewModel = (function() {
       for (key in model.attributes) {
         createObservable(this, model, key, this.__kb.create_options);
       }
-      if (rel_keys = (ref1 = kb.orm) != null ? typeof ref1.keys === "function" ? ref1.keys(model) : void 0 : void 0) {
+      if (rel_keys = (ref1 = kb.settings.orm) != null ? typeof ref1.keys === "function" ? ref1.keys(model) : void 0 : void 0) {
         for (i = 0, len = rel_keys.length; i < len; i++) {
           key = rel_keys[i];
           createObservable(this, model, key, this.__kb.create_options);
