@@ -1,10 +1,7 @@
 module.exports =
   module:
-    loaders: [
-      {test: /\.coffee$/, loader: 'coffee'}
-    ]
+    rules: [{test: /\.coffee$/, loader: 'coffee-loader'}]
 
   resolve:
-    root: '.'
-    extensions: ['', '.coffee', '.js']
-    moduleDirectories: ['node_modules']
+    extensions: ['.coffee', '.js']
+    modules: ['node_modules']
