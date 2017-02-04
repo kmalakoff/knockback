@@ -64,7 +64,7 @@ AMD_OPTIONS = require './amd/gulp-options'
 TEST_GROUPS.amd = []
 for test in TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core) when (test.name.indexOf('_min') < 0 and test.name.indexOf('legacy_') < 0 and test.name.indexOf('parse_') < 0)
   test_files = ['./node_modules/chai/chai.js'].concat(test.files); files = []; test_patterns = []; path_files = []
-  files.push({pattern: './test/lib/requirejs-2.1.14.js'})
+  files.push({pattern: './test/lib/requirejs-2.3.2.js'})
   for file in test_files
     (test_patterns.push(file); continue) if file.indexOf('.tests.') >= 0
     files.push({pattern: file, included: false})

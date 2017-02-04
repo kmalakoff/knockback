@@ -1,8 +1,8 @@
 assert = assert or require?('chai').assert
-window = if window? then window else global
+root = if window? then window else if global? then global else this
 
 describe 'inject @quick @inject', ->
-  kb = window?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
+  kb = root?.kb; try kb or= require?('knockback') catch; try kb or= require?('../../../knockback')
   {_, ko, $} = kb
   return unless $ # no jquery
 
@@ -14,16 +14,16 @@ describe 'inject @quick @inject', ->
     assert.ok(!!kb, 'kb')
     done()
 
-  window.kb = kb
-  window.appCreate = (view_model) -> view_model.app_create = true
+  root.kb = kb
+  root.appCreate = (view_model) -> view_model.app_create = true
 
-  window.app = (view_model) ->
+  root.app = (view_model) ->
     @app = true
     kb.statistics.register('app', @)
     @destroy = => kb.statistics.unregister('app', @)
     return @ # return self
 
-  window.appCallbacks = (view_model) ->
+  root.appCallbacks = (view_model) ->
     @app = true
     kb.statistics.register('app', @)
     @destroy = => kb.statistics.unregister('app', @)
@@ -33,14 +33,14 @@ describe 'inject @quick @inject', ->
 
     return @ # return self
 
-  window.SuperClass = class SuperClass
+  root.SuperClass = class SuperClass
     constructor: ->
       @super_class = true
       kb.statistics.register('SuperClass', @)
     destroy: ->
       kb.statistics.unregister('SuperClass', @)
 
-  window.SubClass = class SubClass extends SuperClass
+  root.SubClass = class SubClass extends SuperClass
     constructor: ->
       super
       @sub_class = true
@@ -56,13 +56,13 @@ describe 'inject @quick @inject', ->
     ko.removeNode(inject_el)
 
     # properties
-    window.hello = true
+    root.hello = true
     inject_el = $('<div kb-inject="hello: hello"><span data-bind="visible: hello"></span></div>')[0]
     $('body').append(inject_el)
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "Properties: app was injected")
-    assert.equal(view_model.hello, window.hello, "Properties: hello was injected")
+    assert.equal(view_model.hello, root.hello, "Properties: hello was injected")
     assert.equal(view_model.hello, true, "Properties: hello is true")
     ko.removeNode(inject_el)
 
@@ -72,7 +72,7 @@ describe 'inject @quick @inject', ->
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "ViewModel Solo: app was injected")
-    assert.ok(view_model instanceof window.app, "ViewModel Solo: view_model type app")
+    assert.ok(view_model instanceof root.app, "ViewModel Solo: view_model type app")
     assert.equal(view_model.app, true, "ViewModel Solo: app is true")
     ko.removeNode(inject_el)
 
@@ -87,10 +87,10 @@ describe 'inject @quick @inject', ->
     view_model = injected[0].view_model
     view_model1 = injected[1].view_model
     assert.equal(injected[0].el, inject_el.children[0], "ViewModel Solo: app was injected")
-    assert.ok(view_model instanceof window.app, "ViewModel Solo: view_model type app")
+    assert.ok(view_model instanceof root.app, "ViewModel Solo: view_model type app")
     assert.equal(view_model.app, true, "ViewModel Solo: app is true")
     assert.equal(injected[1].el, inject_el.children[1], "ViewModel Solo: app was injected")
-    assert.ok(injected[1].view_model instanceof window.app, "ViewModel Solo: view_model type app")
+    assert.ok(injected[1].view_model instanceof root.app, "ViewModel Solo: view_model type app")
     assert.equal(injected[1].view_model.app, true, "ViewModel Solo: app is true")
     ko.removeNode(inject_el)
 
@@ -100,7 +100,7 @@ describe 'inject @quick @inject', ->
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "Create: app was injected")
-    assert.ok(not (view_model instanceof window.appCreate), "Create: view_model not type appCreate")
+    assert.ok(not (view_model instanceof root.appCreate), "Create: view_model not type appCreate")
     assert.ok(_.isObject(view_model), "Create: view_model is basic type")
     assert.equal(view_model.app_create, true, "Create + Callbacks: view model was injected")
     ko.removeNode(inject_el)
@@ -111,7 +111,7 @@ describe 'inject @quick @inject', ->
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "ViewModel Property: app was injected")
-    assert.ok(view_model instanceof window.app, "ViewModel Property: view_model type app")
+    assert.ok(view_model instanceof root.app, "ViewModel Property: view_model type app")
     assert.equal(view_model.app, true, "ViewModel Property: hello is true")
     ko.removeNode(inject_el)
 
@@ -121,9 +121,9 @@ describe 'inject @quick @inject', ->
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "Create: app was injected")
-    assert.ok(not (view_model instanceof window.appCreate), "Create: view_model not type appCreate")
+    assert.ok(not (view_model instanceof root.appCreate), "Create: view_model not type appCreate")
     assert.ok(_.isObject(view_model), "Create: view_model is basic type")
-    assert.ok(view_model instanceof window.app, "ViewModel Property: view_model type app")
+    assert.ok(view_model instanceof root.app, "ViewModel Property: view_model type app")
     assert.equal(view_model.app, true, "Create + Callbacks: view model was injected - ViewModel")
     assert.equal(view_model.app_create, true, "Create + Callbacks: view model was injected - ViewModel, Create")
     ko.removeNode(inject_el)
@@ -134,9 +134,9 @@ describe 'inject @quick @inject', ->
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "Create: app was injected")
-    assert.ok(not (view_model instanceof window.appCreate), "Create: view_model not type appCreate")
+    assert.ok(not (view_model instanceof root.appCreate), "Create: view_model not type appCreate")
     assert.ok(_.isObject(view_model), "Create: view_model is basic type")
-    assert.ok(view_model instanceof window.app, "ViewModel Property: view_model type app")
+    assert.ok(view_model instanceof root.app, "ViewModel Property: view_model type app")
     assert.equal(view_model.app, true, "Create + Callbacks: view model was injected - ViewModel")
     assert.equal(view_model.app_create, true, "Create + Callbacks: view model was injected - Create, ViewModel")
     ko.removeNode(inject_el)
@@ -176,8 +176,8 @@ describe 'inject @quick @inject', ->
     # Properties with callbacks
     before_was_called = false
     after_was_called = false
-    window.beforeBinding = (view_model) -> before_was_called = view_model.hello
-    window.afterBinding = (view_model) -> after_was_called = view_model.hello
+    root.beforeBinding = (view_model) -> before_was_called = view_model.hello
+    root.afterBinding = (view_model) -> after_was_called = view_model.hello
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0]
     $('body').append(inject_el)
     injected = kb.injectViewModels()
@@ -191,14 +191,14 @@ describe 'inject @quick @inject', ->
     # Create function with callbacks
     before_was_called = false
     after_was_called = false
-    window.beforeBinding = (view_model) -> before_was_called = view_model.hello
-    window.afterBinding = (view_model) -> after_was_called = view_model.hello
+    root.beforeBinding = (view_model) -> before_was_called = view_model.hello
+    root.afterBinding = (view_model) -> after_was_called = view_model.hello
     inject_el = $('<div kb-inject="create: appCreate, hello: true, beforeBinding: beforeBinding, afterBinding: afterBinding"><span data-bind="visible: app_create"></span></div>')[0]
     $('body').append(inject_el)
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "Create + Callbacks: app was injected")
-    assert.ok(not (view_model instanceof window.appCreate), "Create: view_model not type appCreate")
+    assert.ok(not (view_model instanceof root.appCreate), "Create: view_model not type appCreate")
     assert.ok(_.isObject(view_model), "Create: view_model is basic type")
     assert.equal(view_model.app_create, true, "Create + Callbacks: view model was injected")
     assert.ok(before_was_called, "Create + Callbacks: before_was_called was called")
@@ -211,7 +211,7 @@ describe 'inject @quick @inject', ->
     injected = kb.injectViewModels()
     view_model = injected[0].view_model
     assert.equal(injected[0].el, inject_el, "ViewModel Property + Callbacks: app was injected")
-    assert.ok((view_model instanceof window.appCallbacks), "Create: view_model type appCallbacks")
+    assert.ok((view_model instanceof root.appCallbacks), "Create: view_model type appCallbacks")
     assert.equal(view_model.app, true, "ViewModel Property + Callbacks: view model was injected")
     assert.ok(view_model.before_was_called, "ViewModel Property + Callbacks: before_was_called was called")
     assert.ok(view_model.after_was_called, "ViewModel Property + Callbacks: after_was_called was called")
@@ -220,8 +220,8 @@ describe 'inject @quick @inject', ->
     # ViewModel Object with callbacks
     before_was_called = false
     after_was_called = false
-    window.beforeBinding = (view_model) -> before_was_called = view_model.hello
-    window.afterBinding = (view_model) -> after_was_called = view_model.hello
+    root.beforeBinding = (view_model) -> before_was_called = view_model.hello
+    root.afterBinding = (view_model) -> after_was_called = view_model.hello
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0]
     $('body').append(inject_el)
     injected = kb.injectViewModels()
@@ -241,7 +241,7 @@ describe 'inject @quick @inject', ->
     previous = kb.RECUSIVE_AUTO_INJECT; kb.RECUSIVE_AUTO_INJECT = true
 
     was_auto_injected = 0
-    class window.AutoInject
+    class root.AutoInject
       constructor: ->
         was_auto_injected++
       destroy: ->
@@ -293,18 +293,18 @@ describe 'inject @quick @inject', ->
     ko.removeNode(inject_el)
 
     # Function
-    window.testFunction = (view_model) -> view_model.hello = true
+    root.testFunction = (view_model) -> view_model.hello = true
     inject_el = $('<div data-bind="inject: {embedded: testFunction}"><span data-bind="click: embedded.testFunction"></span></div>')[0]
     view_model = {}
     kb.applyBindings(view_model, inject_el)
-    assert.equal(view_model.embedded, window.testFunction, "Function: is type testFunction")
+    assert.equal(view_model.embedded, root.testFunction, "Function: is type testFunction")
     ko.removeNode(inject_el)
 
     # Create function
     inject_el = $('<div data-bind="inject: {embedded: {create: appCreate}}"><span data-bind="visible: embedded.app_create"></span></div>')[0]
     view_model = {}
     kb.applyBindings(view_model, inject_el)
-    assert.ok(not (view_model.embedded instanceof window.appCreate), "Create: view_model not type appCreate")
+    assert.ok(not (view_model.embedded instanceof root.appCreate), "Create: view_model not type appCreate")
     assert.ok(_.isObject(view_model.embedded), "Create: view_model is basic type")
     assert.equal(view_model.embedded.app_create, true, "Create: view model was injected")
     ko.removeNode(inject_el)
@@ -313,7 +313,7 @@ describe 'inject @quick @inject', ->
     inject_el = $('<div data-bind="inject: {embedded: {view_model: app}}"><span data-bind="visible: embedded.app"></span></div>')[0]
     view_model = {}
     kb.applyBindings(view_model, inject_el)
-    assert.ok(view_model.embedded instanceof window.app, "ViewModel Property: view_model type app")
+    assert.ok(view_model.embedded instanceof root.app, "ViewModel Property: view_model type app")
     assert.equal(view_model.embedded.app, true, "ViewModel Property: hello is true")
     ko.removeNode(inject_el)
 

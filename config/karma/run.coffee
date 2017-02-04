@@ -19,7 +19,7 @@ module.exports = (options={}, callback) ->
 
   for name, tests of TEST_GROUPS then do (name, tests) -> 
     for test in tests then do (test) -> 
-      # return unless (name == 'browser_globals') and (test.name == 'parse_latest_compatibile_browser_globals')
+      # return unless (name == 'browser_globals') and (test.name == 'backbone_underscore_latest_browser_globals')
 
       queue.defer (callback) ->
         gutil.log "RUNNING TESTS: #{name} #{test.name}"

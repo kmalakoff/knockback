@@ -127,7 +127,7 @@ module.exports = kb = (function() {
   };
 
   kb.isReleaseable = function(obj, depth) {
-    var i, key, len, method, value;
+    var j, key, len, method, value;
     if (depth == null) {
       depth = 0;
     }
@@ -140,8 +140,8 @@ module.exports = kb = (function() {
     if ((typeof obj === 'function') || kb.isModel(obj) || kb.isCollection(obj)) {
       return false;
     }
-    for (i = 0, len = LIFECYCLE_METHODS.length; i < len; i++) {
-      method = LIFECYCLE_METHODS[i];
+    for (j = 0, len = LIFECYCLE_METHODS.length; j < len; j++) {
+      method = LIFECYCLE_METHODS[j];
       if (typeof obj[method] === 'function') {
         return true;
       }
@@ -159,7 +159,7 @@ module.exports = kb = (function() {
   };
 
   kb.release = function(obj) {
-    var array, i, index, len, method, value;
+    var array, index, j, len, method, value;
     if (!kb.isReleaseable(obj)) {
       return;
     }
@@ -190,8 +190,8 @@ module.exports = kb = (function() {
       }
       return;
     }
-    for (i = 0, len = LIFECYCLE_METHODS.length; i < len; i++) {
-      method = LIFECYCLE_METHODS[i];
+    for (j = 0, len = LIFECYCLE_METHODS.length; j < len; j++) {
+      method = LIFECYCLE_METHODS[j];
       if (typeof obj[method] === 'function') {
         return obj[method].call(obj);
       }
@@ -221,7 +221,7 @@ module.exports = kb = (function() {
   };
 
   kb.renderTemplate = function(template, view_model, options) {
-    var document, el, observable;
+    var document, el, i, j, observable, ref;
     if (options == null) {
       options = {};
     }
@@ -233,7 +233,14 @@ module.exports = kb = (function() {
     if (el.childNodes.length === 1) {
       el = el.childNodes[0];
     } else if (el.childNodes.length) {
-      ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[0]));
+      for (i = j = 0, ref = el.childNodes.length; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
+        try {
+          ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i]));
+          break;
+        } catch (error) {
+
+        }
+      }
     }
     kb.releaseOnNodeRemove(view_model, el);
     observable.dispose();
@@ -244,11 +251,11 @@ module.exports = kb = (function() {
   };
 
   kb.applyBindings = function(view_model, node) {
-    var child, children, i, len, ref;
+    var child, children, j, len, ref;
     if (node.length) {
       ref = [document.createElement('div'), node], node = ref[0], children = ref[1];
-      for (i = 0, len = children.length; i < len; i++) {
-        child = children[i];
+      for (j = 0, len = children.length; j < len; j++) {
+        child = children[j];
         node.appendChild(child);
       }
     }
@@ -305,9 +312,9 @@ module.exports = kb = (function() {
   };
 
   kb.publishMethods = function(observable, instance, methods) {
-    var fn, i, len;
-    for (i = 0, len = methods.length; i < len; i++) {
-      fn = methods[i];
+    var fn, j, len;
+    for (j = 0, len = methods.length; j < len; j++) {
+      fn = methods[j];
       observable[fn] = kb._.bind(instance[fn], instance);
     }
   };
