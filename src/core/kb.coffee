@@ -151,7 +151,8 @@ module.exports = class kb
     if el.childNodes.length is 1 # do not return the template wrapper if possible
       el = el.childNodes[0]
     else if el.childNodes.length
-      ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[0])) # ensure the context is passed up to wrapper
+      for i in [0..el.childNodes.length] # ensure the context is passed up to wrapper from a child
+        try ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i])); break catch; 
     kb.releaseOnNodeRemove(view_model, el)
     observable.dispose() # we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
 
