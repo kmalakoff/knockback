@@ -26,8 +26,9 @@ module.exports = (options={}, callback) ->
         gutil.log "RUNNING TESTS: #{name} #{test.name}"
         gutil.log "#{JSON.stringify test.files}"
         karma_config = if (name == 'amd') then KARMA_CONFIG_AMD else KARMA_CONFIG_BASE
+        args = if options.tags then ['--grep', options.tags] else []
         new Server(
-          _.defaults({files: test.files, client: {args: ['--grep', options.tags or '']}}, karma_config),
+          _.defaults({files: test.files, client: {args}}, karma_config),
           (return_value) ->
             console.log("DONE TESTS: #{name} #{test.name}. Return value: #{return_value}")
             callback(new Error "Tests failed: #{return_value}" if return_value)

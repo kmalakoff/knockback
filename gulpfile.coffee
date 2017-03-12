@@ -54,9 +54,11 @@ gulp.task 'minify', ['build'], (callback) ->
 testNode = (callback) ->
   tags = ("@#{tag.replace(/^[-]+/, '')}" for tag in process.argv.slice(3)).join(' ')
 
+  mochaOptions = {reporter: 'dot'}
+  mochaOptions.grep = tags if tags
   gutil.log "Running Node.js tests #{tags}"
   gulp.src('test/spec/**/*.tests.coffee')
-    .pipe(mocha({reporter: 'dot', grep: tags}))
+    .pipe(mocha(mochaOptions))
     .pipe es.writeArray callback
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
