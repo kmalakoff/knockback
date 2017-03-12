@@ -46,7 +46,7 @@
     "gulp-coffee": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
-    "gulp-mocha": "*",
+    "gulp-mocha": "3.x",
     "gulp-mocha-phantomjs": "*",
     "gulp-rename": "*",
     "gulp-shell": "*",

@@ -54,7 +54,7 @@ gulp.task 'minify', ['build'], (callback) ->
 testNode = (callback) ->
   tags = ("@#{tag.replace(/^[-]+/, '')}" for tag in process.argv.slice(3)).join(' ')
 
-  mochaOptions = {reporter: 'dot'}
+  mochaOptions = {reporter: 'dot', compilers: 'coffee:coffee-script/register'}
   mochaOptions.grep = tags if tags
   gutil.log "Running Node.js tests #{tags}"
   gulp.src('test/spec/**/*.tests.coffee')
@@ -69,8 +69,8 @@ testBrowsers = (callback) ->
   (require './config/karma/run')({tags}, callback)
   return # promises workaround: https://github.com/gulpjs/gulp/issues/455
 
-# gulp.task 'test-node', testNode
-gulp.task 'test-node', ['minify'], testNode
+gulp.task 'test-node', testNode
+# gulp.task 'test-node', ['minify'], testNode
 
 # gulp.task 'test-browsers', testBrowsers
 gulp.task 'test-browsers', ['minify'], testBrowsers
