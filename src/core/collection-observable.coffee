@@ -8,6 +8,7 @@
 ###
 
 {_, ko} = kb = require './kb'
+extend = require './functions/extend'
 
 COMPARE_EQUAL = 0
 COMPARE_ASCENDING = -1
@@ -57,7 +58,7 @@ kb.compare = (value_a, value_b) ->
 #
 class kb.CollectionObservable
   # @nodoc
-  @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+  @extend = extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.CollectionObservable.
   #

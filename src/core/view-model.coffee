@@ -8,6 +8,7 @@
 ###
 
 {_, ko} = kb = require './kb'
+extend = require './functions/extend'
 
 # @nodoc
 assignViewModelKey = (vm, key) ->
@@ -91,7 +92,7 @@ KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults']
 #
 class kb.ViewModel
   # @nodoc
-  @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+  @extend = extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.ViewModel.
   #

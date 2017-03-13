@@ -301,8 +301,6 @@ module.exports = kb = (function() {
     return value;
   };
 
-  kb.extend = __webpack_require__(21);
-
   kb._throwMissing = function(instance, message) {
     throw (_.isString(instance) ? instance : instance.constructor.name) + ": " + message + " is missing";
   };
@@ -359,10 +357,63 @@ kb.Model = Backbone.Object || Backbone.Model;
 
 kb.Events = Backbone.Events;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* ###
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+### */
+
+const _ = __webpack_require__(0)._;
+
+// Helper function to correctly set up the prototype chain for subclasses.
+// Similar to 'goog.inherits', but uses a hash of prototype properties and
+// class properties to be extended.
+function inherits(parent, protoProps, staticProps) {
+  var child;
+
+  // The constructor function for the new subclass is either defined by you
+  // (the "constructor" property in your 'extend' definition), or defaulted
+  // by us to simply call the parent constructor.
+  if (protoProps && _.has(protoProps, 'constructor')) {
+    child = protoProps.constructor;
+  } else {
+    child = function(){ return parent.apply(this, arguments); };
+  }
+
+  // Add static properties to the constructor function, if supplied.
+  _.extend(child, parent, staticProps);
+
+  // Set the prototype chain to inherit from 'parent', without calling
+  // parent's constructor function and add the prototype properties.
+  child.prototype = _.create(parent.prototype, protoProps);
+  child.prototype.constructor = child;
+
+  // Set a convenience property in case the parent's prototype is needed
+  // later.
+  child.__super__ = parent.prototype;
+
+  return child;
+};
+  
+// The self-propagating extend function that BacLCone classes use.
+module.exports = function extend(protoProps, classProps) {
+  var child = inherits(this, protoProps, classProps);
+  child.extend = this.extend;
+  return child;
+};
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var ALL_ORMS, _, kb, key, ko, ref, value;
@@ -420,7 +471,7 @@ module.exports = function(options) {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var TypedValue, _, kb, ko, ref;
@@ -583,7 +634,7 @@ module.exports = TypedValue = (function() {
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 var g;
@@ -610,7 +661,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -622,11 +673,13 @@ module.exports = g;
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
  */
-var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KEYS_PUBLISH, _, kb, ko, ref,
+var COMPARE_ASCENDING, COMPARE_DESCENDING, COMPARE_EQUAL, KEYS_PUBLISH, _, extend, kb, ko, ref,
   bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 ref = kb = __webpack_require__(0), _ = ref._, ko = ref.ko;
+
+extend = __webpack_require__(1);
 
 COMPARE_EQUAL = 0;
 
@@ -655,7 +708,7 @@ kb.compare = function(value_a, value_b) {
 };
 
 kb.CollectionObservable = (function() {
-  CollectionObservable.extend = kb.extend;
+  CollectionObservable.extend = extend;
 
   function CollectionObservable(collection, view_model, options) {
     this._onCollectionChange = bind(this._onCollectionChange, this);
@@ -1080,7 +1133,7 @@ kb.observableCollection = kb.collectionObservable;
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1291,7 +1344,7 @@ kb.emitterObservable = function(emitter, observable) {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1371,7 +1424,7 @@ kb.Factory = (function() {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1387,7 +1440,7 @@ var kb;
 
 module.exports = kb = __webpack_require__(0);
 
-kb.configure = __webpack_require__(1);
+kb.configure = __webpack_require__(2);
 
 kb.modules = {
   underscore: kb._,
@@ -1397,7 +1450,7 @@ kb.modules = {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {
@@ -1539,10 +1592,10 @@ if (typeof document !== "undefined" && document !== null) {
   })();
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1580,7 +1633,7 @@ if ((ref = ko.subscribable) != null ? (ref1 = ref.fn) != null ? ref1.extend : vo
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1596,7 +1649,7 @@ var KEYS_INFO, KEYS_PUBLISH, TypedValue, _, kb, ko, ref;
 
 ref = kb = __webpack_require__(0), _ = ref._, ko = ref.ko;
 
-TypedValue = __webpack_require__(2);
+TypedValue = __webpack_require__(3);
 
 KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 
@@ -1752,7 +1805,7 @@ kb.observable = function(model, key, options, view_model) {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -1887,7 +1940,7 @@ module.exports = kb.Statistics = (function() {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2198,7 +2251,7 @@ module.exports = kb.Store = (function() {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2377,7 +2430,7 @@ kb.utils = (function() {
     return ko.observable(obj);
   };
 
-  utils.collapseOptions = __webpack_require__(20);
+  utils.collapseOptions = __webpack_require__(21);
 
   utils.unwrapModels = __webpack_require__(22);
 
@@ -2395,7 +2448,7 @@ kb.utils = (function() {
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2407,9 +2460,11 @@ kb.utils = (function() {
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
  */
-var KEYS_OPTIONS, _, assignViewModelKey, createObservable, createStaticObservables, kb, ko, ref;
+var KEYS_OPTIONS, _, assignViewModelKey, createObservable, createStaticObservables, extend, kb, ko, ref;
 
 ref = kb = __webpack_require__(0), _ = ref._, ko = ref.ko;
+
+extend = __webpack_require__(1);
 
 assignViewModelKey = function(vm, key) {
   var vm_key;
@@ -2455,7 +2510,7 @@ createStaticObservables = function(vm, model) {
 KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'];
 
 kb.ViewModel = (function() {
-  ViewModel.extend = kb.extend;
+  ViewModel.extend = extend;
 
   function ViewModel(model, options, view_model) {
     var args;
@@ -2598,7 +2653,7 @@ kb.viewModel = function(model, options, view_model) {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2662,7 +2717,7 @@ kb.observableDefault = kb.defaultObservable;
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2798,7 +2853,7 @@ kb.observableFormatted = kb.formattedObservable;
 
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2810,16 +2865,18 @@ kb.observableFormatted = kb.formattedObservable;
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
  */
-var KEYS_PUBLISH, _, kb, ko, ref;
+var KEYS_PUBLISH, _, extend, kb, ko, ref;
 
 ref = kb = __webpack_require__(0), _ = ref._, ko = ref.ko;
+
+extend = __webpack_require__(1);
 
 KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
 kb.locale_manager || (kb.locale_manager = void 0);
 
 module.exports = kb.LocalizedObservable = (function() {
-  LocalizedObservable.extend = kb.extend;
+  LocalizedObservable.extend = extend;
 
   function LocalizedObservable(value1, options, vm) {
     var observable, value;
@@ -2911,7 +2968,7 @@ kb.observableLocalized = kb.localizedObservable;
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -2986,7 +3043,7 @@ kb.observableTriggered = kb.triggeredObservable;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -3144,7 +3201,7 @@ kb.formValidator = function(view_model, el) {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -3238,83 +3295,6 @@ _mergeOptions = function(result, options) {
 module.exports = function(options) {
   return _mergeOptions({}, options);
 };
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports) {
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
- */
-var copyProps;
-
-copyProps = function(dest, source) {
-  var key, value;
-  for (key in source) {
-    value = source[key];
-    dest[key] = value;
-  }
-  return dest;
-};
-
-// Shared empty constructor function to aid in prototype-chain creation.
-var ctor = function(){};
-
-// Helper function to correctly set up the prototype chain, for subclasses.
-// Similar to 'goog.inherits', but uses a hash of prototype properties and
-// class properties to be extended.
-var inherits = function(parent, protoProps, staticProps) {
-  var child;
-
-  // The constructor function for the new subclass is either defined by you
-  // (the "constructor" property in your extend definition), or defaulted
-  // by us to simply call the parent's constructor.
-  if (protoProps && protoProps.hasOwnProperty('constructor')) {
-    child = protoProps.constructor;
-  } else {
-    child = function(){ parent.apply(this, arguments); };
-  }
-
-  // Inherit class (static) properties from parent.
-  copyProps(child, parent);
-
-  // Set the prototype chain to inherit from parent, without calling
-  // parent's constructor function.
-  ctor.prototype = parent.prototype;
-  child.prototype = new ctor();
-
-  // Add prototype properties (instance properties) to the subclass,
-  // if supplied.
-  if (protoProps) copyProps(child.prototype, protoProps);
-
-  // Add static properties to the constructor function, if supplied.
-  if (staticProps) copyProps(child, staticProps);
-
-  // Correctly set child's 'prototype.constructor'.
-  child.prototype.constructor = child;
-
-  // Set a convenience property in case the parent's prototype is needed later.
-  child.__super__ = parent.prototype;
-
-  return child;
-};
-
-// The self-propagating extend function that BacLCone classes use.
-var extend = function (protoProps, classProps) {
-  var child = inherits(this, protoProps, classProps);
-  child.extend = this.extend;
-  return child;
-};
-;
-
-module.exports = extend;
 
 
 /***/ }),
@@ -3755,25 +3735,25 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_30__;
 /* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(4);
-__webpack_require__(1);
 __webpack_require__(5);
+__webpack_require__(2);
 __webpack_require__(6);
-__webpack_require__(8);
-__webpack_require__(0);
+__webpack_require__(7);
 __webpack_require__(9);
+__webpack_require__(0);
 __webpack_require__(10);
 __webpack_require__(11);
 __webpack_require__(12);
-__webpack_require__(2);
 __webpack_require__(13);
+__webpack_require__(3);
 __webpack_require__(14);
 __webpack_require__(15);
 __webpack_require__(16);
 __webpack_require__(17);
 __webpack_require__(18);
 __webpack_require__(19);
-module.exports = __webpack_require__(7);
+__webpack_require__(20);
+module.exports = __webpack_require__(8);
 
 
 /***/ })

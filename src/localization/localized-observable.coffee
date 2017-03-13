@@ -8,6 +8,7 @@
 ###
 
 {_, ko} = kb = require '../core/kb'
+extend = require '../core/functions/extend'
 
 KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent']
 
@@ -61,7 +62,7 @@ kb.locale_manager or= undefined
 #        }
 #     });
 module.exports = class kb.LocalizedObservable
-  @extend = kb.extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+  @extend = extend # for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   # Used to create a new kb.LocalizedObservable. This an abstract class.
   #
