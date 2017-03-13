@@ -1,32 +1,32 @@
-var Model = Backbone.RelationalModel.extend({
-    url: '...'
+const Model = Backbone.RelationalModel.extend({
+  url: '...',
 });
 
 
-var ListModel = Backbone.RelationalModel.extend({
-    url: '...',
-    relations: [{
-            type: Backbone.HasMany,
-            key: 'coll',
-            relatedModel: Model
-        }
-    ]
+const ListModel = Backbone.RelationalModel.extend({
+  url: '...',
+  relations: [{
+    type: Backbone.HasMany,
+    key: 'coll',
+    relatedModel: Model,
+  },
+  ],
 });
 
 ModelViewModel = kb.ViewModel.extend({
-    constructor: function (model) {
-        kb.ViewModel.prototype.constructor.apply(this, arguments);
-        this.cancel = function () {this.model().destroy();}
-    }
+  constructor(model) {
+    kb.ViewModel.prototype.constructor.apply(this, arguments);
+    this.cancel = function () { this.model().destroy(); };
+  },
 });
 
-var listModel = new ListModel();
+const listModel = new ListModel();
 listModel.get('coll').reset([new Model(), new Model()]);
 
-var viewModel = new kb.viewModel(listModel, {
-    factories: {
-        'coll.models': ModelViewModel
-    }
+const viewModel = new kb.viewModel(listModel, {
+  factories: {
+    'coll.models': ModelViewModel,
+  },
 });
 
 

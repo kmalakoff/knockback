@@ -15,49 +15,49 @@ const browserify = require('gulp-browserify');
 
 const TEST_GROUPS = require('../test_groups');
 
-module.exports = function(callback) {
+module.exports = function (callback) {
   const queue = new Queue(1);
 
   // install knockback
   queue.defer(callback =>
     gulp.src(['./knockback.js', './package.json'])
       .pipe(gulp.dest('node_modules/knockback'))
-      .on('end', callback)
+      .on('end', callback),
   );
 
   // build webpack
   queue.defer(callback =>
-    gulp.src(['config/builds/test/**/*.webpack.config.js'], {read: false, buffer: false})
+    gulp.src(['config/builds/test/**/*.webpack.config.js'], { read: false, buffer: false })
       .pipe(webpack())
       .pipe(gulp.dest('_temp/webpack'))
-      .on('end', callback)
+      .on('end', callback),
   );
 
   // build test browserify
   for (var test of TEST_GROUPS.browserify || []) {
     (test => queue.defer(callback =>
       gulp.src(test.build.files)
-        .pipe(babel({presets: ['es2015']}))
+        .pipe(babel({ presets: ['es2015'] }))
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
-        .on('end', callback)
-    ) )(test);
+        .on('end', callback),
+    ))(test);
   }
 
   // wrap AMD tests
   for (test of TEST_GROUPS.amd || []) {
     (test => queue.defer(callback =>
       gulp.src(test.build.files)
-        .pipe(babel({presets: ['es2015']}))
+        .pipe(babel({ presets: ['es2015'] }))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
-        .on('end', callback)
-    ) )(test);
+        .on('end', callback),
+    ))(test);
   }
 
   // uninstall knockback
-  return queue.await(function(err) {
+  return queue.await((err) => {
     fs.removeSync('node_modules/knockback', true);
     return callback(err);
   });

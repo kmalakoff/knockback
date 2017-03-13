@@ -1,11 +1,11 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe('knockback_core utils @quick @core', function() {
-  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
-  const {_, ko} = kb;
+describe('knockback_core utils @quick @core', () => {
+  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  const { _, ko } = kb;
   const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
 
-  it('TEST DEPENDENCY MISSING', function(done) {
+  it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
@@ -14,7 +14,7 @@ describe('knockback_core utils @quick @core', function() {
     return done();
   });
 
-  it('kb.renderTemplate', function(done) {
+  it('kb.renderTemplate', (done) => {
     if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -29,48 +29,48 @@ describe('knockback_core utils @quick @core', function() {
     }
 
     // test without options override
-    var view_model = new ViewModel();
+    let view_model = new ViewModel();
     assert.ok(!view_model.was_called, 'afterRender not called yet');
-    var el = $('<script type="text/x-jquery-tmpl" id="the_template1"><div data-bind="text: name"></div></script>');
+    let el = $('<script type="text/x-jquery-tmpl" id="the_template1"><div data-bind="text: name"></div></script>');
     $('body').append(el);
     kb.renderTemplate('the_template1', view_model);
     assert.ok(view_model.was_called, 'afterRender was called');
 
     // test with options override
-    var was_called = false;
+    let was_called = false;
     view_model = new ViewModel();
     assert.ok(!view_model.was_called, 'afterRender (options) not called yet');
     assert.ok(!view_model.was_called, 'afterRender not called yet');
     el = $('<script type="text/x-jquery-tmpl" id="the_template2"><div data-bind="text: name"></div></script>');
     $('body').append(el);
-    kb.renderTemplate('the_template2', view_model, {afterRender() { return was_called = true; }});
+    kb.renderTemplate('the_template2', view_model, { afterRender() { return was_called = true; } });
     assert.ok(was_called, 'afterRender (options) was called');
     assert.ok(!view_model.was_called, 'afterRender was not called');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
   });
 
-  return it('kb.ignore', function(done) {
+  return it('kb.ignore', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    var counter = 0;
-    var counter_ignore = 0;
+    let counter = 0;
+    let counter_ignore = 0;
 
     const name = ko.observable('Bob');
     const counter_computed = ko.computed(() => {
       name();
       return ++counter;
-    }
+    },
     );
 
     const counter_computed_ignore = ko.computed(() => {
-      const value = kb.ignore(function() {
+      const value = kb.ignore(() => {
         name();
         return ++counter_ignore;
       });
       return assert.equal(value, counter_ignore);
-    }
+    },
     );
 
     assert.equal(counter, 1);
@@ -81,9 +81,9 @@ describe('knockback_core utils @quick @core', function() {
     assert.equal(counter_ignore, 1);
 
     // ignore with arguments
-    kb.ignore((function(arg1, arg2) { assert.equal(arg1, 1); return assert.equal(arg2, 2); }), null, [1, 2]);
+    kb.ignore(((arg1, arg2) => { assert.equal(arg1, 1); return assert.equal(arg2, 2); }), null, [1, 2]);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
   });
 });

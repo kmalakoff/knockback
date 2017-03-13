@@ -7,7 +7,7 @@ module.exports = {
   colors: true,
   logLevel: 'INFO',
   browsers: ['PhantomJS'], // ['Firefox', 'Chrome', 'Safari']
-  singleRun: true
+  singleRun: true,
   // browsers: ['Chrome']
   // singleRun: false
 };

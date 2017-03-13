@@ -1,4 +1,4 @@
-var filename;
+let filename;
 const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
@@ -9,7 +9,7 @@ const PLUGIN_ENTRIES = {
   formatting: './src/formatting/formatted-observable.js',
   localization: './src/localization/localized-observable.js',
   triggering: './src/triggering/triggered-observable.js',
-  validation: './src/validation/validation.js'
+  validation: './src/validation/validation.js',
 };
 
 module.exports = {
@@ -20,7 +20,7 @@ module.exports = {
 
   tests_core: ((() => {
     const result = [];
-    for (filename of readdirSyncRecursive(__dirname + '/../test/spec/core')) {
+    for (filename of readdirSyncRecursive(`${__dirname}/../test/spec/core`)) {
       if (/\.tests.js$/.test(filename)) {
         result.push(`./test/spec/core/${filename}`);
       }
@@ -29,7 +29,7 @@ module.exports = {
   })()),
   tests_plugin: ((() => {
     const result1 = [];
-    for (filename of readdirSyncRecursive(__dirname + '/../test/spec/plugins')) {
+    for (filename of readdirSyncRecursive(`${__dirname}/../test/spec/plugins`)) {
       if (/\.tests.js$/.test(filename)) {
         result1.push(`./test/spec/plugins/${filename}`);
       }
@@ -37,5 +37,5 @@ module.exports = {
     return result1;
   })()),
 
-  tests_webpack: _.map(_.filter(fs.readdirSync('./config/builds/test'), file => (path.extname(file) === '.js') && (file.indexOf('.tests.webpack.config.js') >= 0)), file => `_temp/webpack/${file.replace('.tests.webpack.config.js', '.tests.js')}`)
+  tests_webpack: _.map(_.filter(fs.readdirSync('./config/builds/test'), file => (path.extname(file) === '.js') && (file.indexOf('.tests.webpack.config.js') >= 0)), file => `_temp/webpack/${file.replace('.tests.webpack.config.js', '.tests.js')}`),
 };

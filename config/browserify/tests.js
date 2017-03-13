@@ -7,9 +7,9 @@ module.exports = {
     options: {
       // basedir: path.resolve(__dirname, '../..')
       shim: {
-        knockback: {path: './knockback.js', exports: 'kb', depends: {underscore: '_', backbone: 'Backbone', knockout: 'ko'}}
-      }
-    }
+        knockback: { path: './knockback.js', exports: 'kb', depends: { underscore: '_', backbone: 'Backbone', knockout: 'ko' } },
+      },
+    },
   },
 
   core: {
@@ -18,8 +18,8 @@ module.exports = {
     options: {
       // basedir: path.resolve(__dirname, '../..')
       shim: {
-        knockback: {path: './knockback.js', exports: 'kb', depends: {underscore: '_', backbone: 'Backbone', knockout: 'ko'}}
-      }
-    }
-  }
+        knockback: { path: './knockback.js', exports: 'kb', depends: { underscore: '_', backbone: 'Backbone', knockout: 'ko' } },
+      },
+    },
+  },
 };
