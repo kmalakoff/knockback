@@ -6,8 +6,8 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
   // after -> delete root.Person
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Person;
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var Person;
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, Backbone, ko} = kb;
   if (!(Backbone != null ? Backbone.Relational : undefined)) { if (typeof require === 'function') {
     require('backbone-relational');
@@ -125,7 +125,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
 
     // ref counted view model
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(band, {view_model: RefCountableViewModel});
+    var collection_observable = kb.collectionObservable(band, {view_model: RefCountableViewModel});
     assert.equal(RefCountableViewModel.view_models.length, 4, "Created: 4");
 
     const instance = collection_observable()[0].retain();
@@ -149,7 +149,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 4, "Destroyed: 4");
-    for (let view_model of SimpleViewModel.view_models) { assert.ok(!view_model.prop, "Prop destroyed"); }
+    for (var view_model of SimpleViewModel.view_models) { assert.ok(!view_model.prop, "Prop destroyed"); }
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null;
     return done();
@@ -182,9 +182,9 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     const band = new kb.Collection([john, paul, george, ringo]);
 
     // ref counted view model
-    let store = new kb.Store();
+    var store = new kb.Store();
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(band, {view_model: RefCountableViewModel, store});
+    var collection_observable = kb.collectionObservable(band, {view_model: RefCountableViewModel, store});
     assert.equal(RefCountableViewModel.view_models.length, 4, "Created: 4");
 
     const instance = collection_observable()[0].retain();

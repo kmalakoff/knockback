@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 
 describe('knockback_core utils @quick @utils', function() {
 
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
 
   it('TEST DEPENDENCY MISSING', function(done) {
@@ -47,7 +47,7 @@ describe('knockback_core utils @quick @utils', function() {
     assert.ok(!!kb.utils.wrappedStore(collection_observable), 'Store is available on a collection observable');
 
     // can get and share store
-    let collection_observable_shared = kb.collectionObservable(new kb.Collection(), {store: kb.utils.wrappedStore(collection_observable)});
+    var collection_observable_shared = kb.collectionObservable(new kb.Collection(), {store: kb.utils.wrappedStore(collection_observable)});
     assert.equal(kb.utils.wrappedStore(collection_observable), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observables');
     kb.release(collection_observable_shared); // clean up
 
@@ -80,7 +80,7 @@ describe('knockback_core utils @quick @utils', function() {
     kb.release(o); // clean up
 
     const model = new kb.Model({simple_type: 3, model_type: new kb.Model(), collection_type: new kb.Collection()});
-    let view_model = kb.viewModel(model);
+    var view_model = kb.viewModel(model);
 
     assert.equal(kb.utils.valueType(view_model.simple_type), kb.TYPE_SIMPLE, "simple is kb.TYPE_SIMPLE");
     assert.equal(kb.utils.valueType(view_model.model_type), kb.TYPE_MODEL, "model is kb.TYPE_MODEL");

@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 
 // https://github.com/kmalakoff/knockback/issues/159
 describe('issue 159 @issue159 @quick', function() {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
   const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
 

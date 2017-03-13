@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 
 describe('collection-observable @quick @collection-observable', function() {
 
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
 
   it('TEST DEPENDENCY MISSING', function(done) {
@@ -34,7 +34,7 @@ describe('collection-observable @quick @collection-observable', function() {
     constructor() {
       super(...arguments);
       this.test = ko.observable('hello');
-      let value = this.test();
+      var value = this.test();
       value = this.name();
     }
   }
@@ -128,7 +128,7 @@ describe('collection-observable @quick @collection-observable', function() {
     assert.equal(collection.length, 1, "one models");
     assert.equal(collection_observable().length, 1, "one view models");
     assert.equal(collection.models[0].get('name'), 'Ringo', "Ringo is left");
-    let model = kb.utils.wrappedModel(collection_observable()[0]);
+    var model = kb.utils.wrappedModel(collection_observable()[0]);
     assert.equal(model.get('name'), 'Ringo', "Ringo is left");
     model = collection_observable()[0];
     assert.equal(model.get('name'), 'Ringo', "Ringo is left");
@@ -136,7 +136,7 @@ describe('collection-observable @quick @collection-observable', function() {
     const view_model = collection_observable.viewModelByModel(model);
     assert.ok(!view_model, "no view model found since the collection observable is not wrapping models in view models");
 
-    let model_count = 0;
+    var model_count = 0;
     _.each(collection_observable(), model=> model_count++);
     assert.equal(model_count, 1, "one model");
 
@@ -181,7 +181,7 @@ describe('collection-observable @quick @collection-observable', function() {
     const view_model = collection_observable.viewModelByModel(model);
     assert.equal(kb.utils.wrappedModel(view_model).get('name'), 'Ringo', "Ringo is left");
 
-    let view_model_count = 0;
+    var view_model_count = 0;
     _.each(collection_observable(), view_model=> view_model_count++);
     assert.equal(view_model_count, 1, "one view model");
 
@@ -251,7 +251,7 @@ describe('collection-observable @quick @collection-observable', function() {
       const parts_b = kb.utils.wrappedModel(model_b).get('number').split('-');
 
       if (parts_a.length !== parts_b.length) { return (parts_a.length-parts_b.length); }
-      for (let index in parts_b) {
+      for (var index in parts_b) {
         var delta;
         const part = parts_b[index];
         if ((delta = parts_a[index] - parseInt(part, 10)) !== 0) { return delta; }
@@ -260,8 +260,8 @@ describe('collection-observable @quick @collection-observable', function() {
     };
 
     // without view models
-    let collection = new Contacts();
-    let collection_observable = kb.collectionObservable(collection, {
+    var collection = new Contacts();
+    var collection_observable = kb.collectionObservable(collection, {
       models_only:  true,
       comparator:   sortNumber
     });
@@ -454,7 +454,7 @@ describe('collection-observable @quick @collection-observable', function() {
 
       // set from the view model
       view_model.date(new Date(1963, 11, 10));
-      let current_date = model.get('date');
+      var current_date = model.get('date');
       assert.equal(current_date.getFullYear(), 1963, `${name}: year is good`);
       assert.equal(current_date.getMonth(), 11, `${name}: month is good`);
       assert.equal(current_date.getDate(), 10, `${name}: day is good`);
@@ -582,13 +582,13 @@ describe('collection-observable @quick @collection-observable', function() {
     const collection = new kb.Collection([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}]);
 
     // set the viewmodels (simulating a selectOptions)
-    let collection_observable = kb.collectionObservable(collection);
-    let view_models = _.map(collection.models, model => kb.viewModel(model));
-    let previous_view_model = collection_observable()[0];
+    var collection_observable = kb.collectionObservable(collection);
+    var view_models = _.map(collection.models, model => kb.viewModel(model));
+    var previous_view_model = collection_observable()[0];
     collection_observable(view_models);
     assert.ok(collection_observable()[0] !== previous_view_model, 'view model updated');
     assert.ok(collection_observable()[0] === view_models[0], 'view model updated from new list');
-    let store = kb.utils.wrappedStore(collection_observable);
+    var store = kb.utils.wrappedStore(collection_observable);
     store.compact(); // ensure compact does not throw
     assert.ok(store.find(collection.models[0], kb.ViewModel) === view_models[0], 'view model was added to the store');
     assert.ok(store.find(collection.models[0], kb.ViewModel) !== previous_view_model, 'previous view model was removed from the store');
@@ -621,7 +621,7 @@ describe('collection-observable @quick @collection-observable', function() {
 
     const collection_observable = kb.collectionObservable(collection);
 
-    let count = 0;
+    var count = 0;
     ko.computed(function() { collection_observable.collection(); return count++; });
     assert.ok(collection_observable()[0] instanceof kb.ViewModel, 'is a kb.ViewModel');
 
@@ -641,7 +641,7 @@ describe('collection-observable @quick @collection-observable', function() {
     const collection = collection_observable.collection();
     collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}]);
 
-    let count = 0;
+    var count = 0;
     ko.computed(function() { collection_observable.collection(); return count++; });
     assert.ok(collection_observable()[0] instanceof kb.ViewModel, 'is a kb.ViewModel');
 
@@ -661,7 +661,7 @@ describe('collection-observable @quick @collection-observable', function() {
     const collection = collection_observable.collection();
     collection.reset([{id: 1, name: 'Bob'}, {id: 2, name: 'Fred'}, {id: 3, name: 'George'}]);
 
-    let count = 0;
+    var count = 0;
     ko.computed(function() { collection_observable.collection(); return count++; });
     assert.ok(collection_observable()[0] instanceof ContactViewModel, 'is a ContactViewModel');
 
@@ -680,31 +680,31 @@ describe('collection-observable @quick @collection-observable', function() {
     const collection_observable = kb.collectionObservable({view_model: TestViewModel});
     const collection = collection_observable.collection();
 
-    let count_manual = 0;
+    var count_manual = 0;
     ko.computed(function() {
       collection_observable([new TestViewModel(new kb.Model({id: 10, name: 'Manual'}))]); // should not depend
       return count_manual++;
     });
 
-    let count_reset = 0;
+    var count_reset = 0;
     ko.computed(function() {
       collection.reset([{id: 20, name: 'Reset1'}, {id: 21, name: 'Reset2'}]); // should not depend
       return count_reset++;
     });
 
-    let count_add = 0;
+    var count_add = 0;
     ko.computed(function() {
       collection.add([{id: 30, name: 'Add1'}, {id: 31, name: 'Add2'}]); // should not depend
       return count_add++;
     });
 
-    let count_remove = 0;
+    var count_remove = 0;
     ko.computed(function() {
       collection.remove(collection.at(0));
       return count_remove++;
     });
 
-    let observable_count = 0;
+    var observable_count = 0;
     ko.computed(function() {
       collection_observable(); // should depend
       return observable_count++;
@@ -742,7 +742,7 @@ describe('collection-observable @quick @collection-observable', function() {
     collection_observable.collection().reset(models);
     assert.equal(collection_observable.collection().length, 4);
 
-    for (let view_models of collection_observable()) {
+    for (var view_models of collection_observable()) {
       assert.ok(!!view_models.date());
       assert.ok(view_models.model() instanceof Contact);
     }
@@ -761,7 +761,7 @@ describe('collection-observable @quick @collection-observable', function() {
     const collection_observable = kb.collectionObservable(models, {view_model: PersonViewModel});
     assert.equal(collection_observable.collection().length, 4);
 
-    for (let view_model of collection_observable()) {
+    for (var view_model of collection_observable()) {
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact);
     }
@@ -819,10 +819,10 @@ describe('collection-observable @quick @collection-observable', function() {
   });
 
   it('21. Auto compact for collections', function(done) {
-    let id;
+    var id;
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    let models = ((() => {
+    var models = ((() => {
       const result = [];
       for (id = 1; id <= 4; id++) {
         result.push(new Contact({id}));
@@ -839,7 +839,7 @@ describe('collection-observable @quick @collection-observable', function() {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'ViewModel: 4\n CollectionObservable: 1', "Expected stats");
 
     collection_observable.collection().add(new Contact({id: 5}));
-    let new_view_models = collection_observable();
+    var new_view_models = collection_observable();
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
     for (var vm of new_view_models) {
@@ -860,7 +860,7 @@ describe('collection-observable @quick @collection-observable', function() {
     kb.release(collection_observable);
 
     assert.ok(kb.Statistics.eventsStats(collection).count === 0, `All collection events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(collection))}`);
-    for (let model of models) {
+    for (var model of models) {
       collection.remove(model);
       assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     }
@@ -877,7 +877,7 @@ describe('collection-observable @quick @collection-observable', function() {
     collection_observable.collection().reset(([1, 2, 3, 4].map((id) => new Contact({id}))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (let view_model of collection_observable()) {
+    for (var view_model of collection_observable()) {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -899,7 +899,7 @@ describe('collection-observable @quick @collection-observable', function() {
     collection_observable.collection().reset(([1, 2, 3, 4].map((id) => new Contact({id, other: null}))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (let view_model of collection_observable()) {
+    for (var view_model of collection_observable()) {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -922,7 +922,7 @@ describe('collection-observable @quick @collection-observable', function() {
     collection_observable.collection().reset(([1, 2, 3, 4].map((id) => new Contact({id, other: null}))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (let view_model of collection_observable()) {
+    for (var view_model of collection_observable()) {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -945,7 +945,7 @@ describe('collection-observable @quick @collection-observable', function() {
     collection_observable.collection().reset(([1, 2, 3, 4].map((id) => new Contact({id, other: null}))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (let view_model of collection_observable()) {
+    for (var view_model of collection_observable()) {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -968,7 +968,7 @@ describe('collection-observable @quick @collection-observable', function() {
     collection_observable.collection().reset(models);
     assert.equal(collection_observable.collection().length, 4);
 
-    for (let view_models of collection_observable()) {
+    for (var view_models of collection_observable()) {
       assert.ok(!!view_models.date());
       assert.ok(view_models.model() instanceof Contact);
     }

@@ -43,11 +43,13 @@ const buildLibraries = function(callback) {
 gulp.task('build', buildLibraries);
 
 gulp.task('watch', ['build'], function() {
-  gulp.watch('./src/**/*.coffee', () => buildLibraries(function() {}));
+  gulp.watch('./src/**/*.js', () => buildLibraries(function() {}));
 });
 
 gulp.task('minify', ['build'], function(callback) {
-  gulp.src(['*.js', '!gulpfile.js', '!*.min.js', '!_temp/**/*.js', '!node_modules/'])
+  gulp.src(['knockback.js', 'knockback-*.js'])
+    .pipe(es.map((d, cb) => { console.log(d); cb(null, d); }))
+
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
     .pipe(header(HEADER, {pkg: require('./package.json')}))
@@ -69,8 +71,8 @@ const testBrowsers = function(callback) {
   
 };
 
-gulp.task('test-node', testNode);
-// gulp.task('test-node', ['build'], testNode);
+// gulp.task('test-node', testNode);
+gulp.task('test-node', ['build'], testNode);
 
 gulp.task('test-browsers', testBrowsers);
 // gulp.task('test-browsers', ['minify'], testBrowsers);

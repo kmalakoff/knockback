@@ -1,7 +1,7 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('knockback_core utils @quick @core', function() {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
   const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
 
@@ -29,15 +29,15 @@ describe('knockback_core utils @quick @core', function() {
     }
 
     // test without options override
-    let view_model = new ViewModel();
+    var view_model = new ViewModel();
     assert.ok(!view_model.was_called, 'afterRender not called yet');
-    let el = $('<script type="text/x-jquery-tmpl" id="the_template1"><div data-bind="text: name"></div></script>');
+    var el = $('<script type="text/x-jquery-tmpl" id="the_template1"><div data-bind="text: name"></div></script>');
     $('body').append(el);
     kb.renderTemplate('the_template1', view_model);
     assert.ok(view_model.was_called, 'afterRender was called');
 
     // test with options override
-    let was_called = false;
+    var was_called = false;
     view_model = new ViewModel();
     assert.ok(!view_model.was_called, 'afterRender (options) not called yet');
     assert.ok(!view_model.was_called, 'afterRender not called yet');
@@ -54,8 +54,8 @@ describe('knockback_core utils @quick @core', function() {
   return it('kb.ignore', function(done) {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    let counter = 0;
-    let counter_ignore = 0;
+    var counter = 0;
+    var counter_ignore = 0;
 
     const name = ko.observable('Bob');
     const counter_computed = ko.computed(() => {

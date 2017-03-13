@@ -1,7 +1,7 @@
-let Globalize;
+var Globalize;
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
 const {_, ko} = kb;
 if (kb.Backbone) { kb.Backbone.ModelRef || (typeof require === 'function' ? require('backbone-modelref') : undefined); }
 
@@ -26,13 +26,13 @@ class LocaleManager {
   }
 
   get(string_id, parameters) {
-    let culture_map;
+    var culture_map;
     if (this.locale_identifier) { culture_map = this.translations_by_locale[this.locale_identifier]; }
     if (!culture_map) { return ''; }
-    let string = culture_map.hasOwnProperty(string_id) ? culture_map[string_id] : '';
+    var string = culture_map.hasOwnProperty(string_id) ? culture_map[string_id] : '';
     if (arguments === 1) { return string; }
     const iterable = Array.prototype.slice.call(arguments, 1);
-    for (let index = 0; index < iterable.length; index++) { const arg = iterable[index]; string = string.replace(`{${index}}`, arg); }
+    for (var index = 0; index < iterable.length; index++) { const arg = iterable[index]; string = string.replace(`{${index}}`, arg); }
     return string;
   }
 
@@ -42,12 +42,12 @@ class LocaleManager {
     this.locale_identifier = locale_identifier;
     this.trigger('change', this);
     const object = this.translations_by_locale[this.locale_identifier] || {};
-    for (let key in object) { const value = object[key]; this.trigger(`change:${key}`, value); }
+    for (var key in object) { const value = object[key]; this.trigger(`change:${key}`, value); }
   }
 
   getLocales() {
     const locales = [];
-    for (let string_id in this.translations_by_locale) { const value = this.translations_by_locale[string_id]; locales.push(string_id); }
+    for (var string_id in this.translations_by_locale) { const value = this.translations_by_locale[string_id]; locales.push(string_id); }
     return locales;
   }
 }
@@ -222,7 +222,7 @@ describe('localized-observable @quick @localization', function() {
     kb.locale_manager.setLocale('en-GB');
     assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -318,7 +318,7 @@ describe('localized-observable @quick @localization', function() {
     kb.locale_manager.setLocale('en-GB');
     assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -396,7 +396,7 @@ describe('localized-observable @quick @localization', function() {
     kb.locale_manager.setLocale('en-GB');
     assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -455,7 +455,7 @@ describe('localized-observable @quick @localization', function() {
     kb.locale_manager.setLocale('en-GB');
     assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -514,7 +514,7 @@ describe('localized-observable @quick @localization', function() {
     kb.locale_manager.setLocale('en-GB');
     assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -609,7 +609,7 @@ describe('localized-observable @quick @localization', function() {
       const formatted_date = new kb.LongDateLocalizer(birthdate);
       assert.equal(view_model.date(), formatted_date(), `${name}: Birthdate in Great Britain format`);
       view_model.date('10 December 1963');
-      let current_date = model.get('date');
+      var current_date = model.get('date');
       assert.equal(current_date.getFullYear(), 1963, `${name}: year is good`);
       assert.equal(current_date.getMonth(), 11, `${name}: month is good`);
       assert.equal(current_date.getDate(), 10, `${name}: day is good`);
@@ -705,7 +705,7 @@ describe('localized-observable @quick @localization', function() {
     assert.equal(view_model.number(), '9222-222-222', "Number was changed");
     kb.locale_manager.setLocale('en-GB');
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -833,7 +833,7 @@ describe('defaults @quick @defaults', function() {
       assert.equal(view_model.number(), '9222-222-222', "Number was changed");
       kb.locale_manager.setLocale('en-GB');
       view_model.date('10/12/1963');
-      let current_date = model.get('date');
+      var current_date = model.get('date');
       assert.equal(current_date.getFullYear(), 1963, "year is good");
       assert.equal(current_date.getMonth(), 11, "month is good");
       assert.equal(current_date.getDate(), 10, "day is good");
@@ -911,7 +911,7 @@ describe('defaults @quick @defaults', function() {
       assert.equal(view_model.number(), '9222-222-222', "Number was changed");
       kb.locale_manager.setLocale('en-GB');
       view_model.date('10 December 1963');
-      let current_date = model.get('date');
+      var current_date = model.get('date');
       assert.equal(current_date.getFullYear(), 1963, "year is good");
       assert.equal(current_date.getMonth(), 11, "month is good");
       assert.equal(current_date.getDate(), 10, "day is good");
@@ -980,7 +980,7 @@ describe('defaults @quick @defaults', function() {
     kb.locale_manager.setLocale('en-GB');
     assert.equal(view_model.date(), '09 November 1940', "John's birthdate in Great Britain format");
     view_model.date('10 December 1963');
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");

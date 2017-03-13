@@ -1,10 +1,10 @@
 module.exports = {
   module: {
-    rules: [{test: /\.coffee$/, loader: 'coffee-loader'}]
+    rules: [{test: /\.js$/, loader: 'babel-loader'}]
   },
 
   resolve: {
-    extensions: ['.coffee', '.js'],
+    extensions: ['.js'],
     modules: ['node_modules']
   }
 };

@@ -6,8 +6,8 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
   // after -> delete root.Person; delete root.Building
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Building, Person;
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var Building, Person;
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, Backbone, ko} = kb;
   if (!(Backbone != null ? Backbone.Relational : undefined)) { if (typeof require === 'function') {
     require('backbone-relational');
@@ -84,13 +84,13 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     const house_view_model = new kb.ViewModel(our_house);
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place');
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count');
-    for (let occupant_observable of house_view_model.occupants()) {
+    for (var occupant_observable of house_view_model.occupants()) {
       assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable.name()), 'Expected name');
       assert.equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location');
 
       // nested check
       assert.equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count");
-      for (let occupant_observable2 of occupant_observable.occupies().occupants()) {
+      for (var occupant_observable2 of occupant_observable.occupies().occupants()) {
         assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable2.name()), 'Expected name');
         assert.equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location');
       }
@@ -98,7 +98,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
 
     kb.release(house_view_model);
 
-    for (let name in model_stats) {
+    for (var name in model_stats) {
       const stats = model_stats[name];
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
@@ -107,7 +107,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
   });
 
   it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', function(done) {
-    let occupant_observable, occupant_observable2;
+    var occupant_observable, occupant_observable2;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -236,7 +236,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     model_stats.paul = {model: paul, event_stats: kb.Statistics.eventsStats(paul)};
     model_stats.ringo = {model: ringo, event_stats: kb.Statistics.eventsStats(ringo)};
 
-    let john_view_model = new kb.ViewModel(john);
+    var john_view_model = new kb.ViewModel(john);
     assert.equal(john_view_model.name(), 'John', "Name is correct");
     for (var friend of john_view_model.friends()) {
       assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name');
@@ -245,7 +245,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name');
     kb.release(john_view_model); john_view_model = null;
 
-    let paul_view_model = new kb.ViewModel(paul);
+    var paul_view_model = new kb.ViewModel(paul);
     assert.equal(paul_view_model.name(), 'Paul', "Name is correct");
     for (friend of paul_view_model.friends()) {
       assert.ok(~_.indexOf(['John', 'George', 'Ringo'], friend.name()), 'Expected name');
@@ -254,7 +254,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me');
     kb.release(paul_view_model); paul_view_model = null;
 
-    let george_view_model = new kb.ViewModel(george);
+    var george_view_model = new kb.ViewModel(george);
     assert.equal(george_view_model.name(), 'George', "Name is correct");
     for (friend of george_view_model.friends()) {
       assert.ok(~_.indexOf(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name');
@@ -264,7 +264,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
     kb.release(george_view_model); george_view_model = null;
 
-    for (let name in model_stats) {
+    for (var name in model_stats) {
       const stats = model_stats[name];
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
@@ -379,9 +379,9 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
       })
     };
 
-    for (let book of view_model.books()) {
+    for (var book of view_model.books()) {
       const author = book.author();
-      for (let authored_book of author.books()) {
+      for (var authored_book of author.books()) {
         authored_book.editMode(true);
         assert.equal(authored_book.editMode(), true, 'edit mode set');
       }
@@ -810,9 +810,9 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
     });
 
     const validateFriends = function(co, names) {
-      for (let name of names) {
-        let found = false;
-        for (let vm of co()) {
+      for (var name of names) {
+        var found = false;
+        for (var vm of co()) {
           if (vm.name && (vm.name() === name)) {
             found = true;
             validateFriend(vm, name);
@@ -1008,7 +1008,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
 
     const filter_group = new FilterGroupViewModel(filter_group_model);
 
-    let filter = filter_group.Filters()[0];
+    var filter = filter_group.Filters()[0];
     assert.equal(filter.Name(), 'String');
     assert.ok(filter.Parameter() instanceof StringParameterViewModel);
 
@@ -1063,7 +1063,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', functi
 
   // https://github.com/kmalakoff/knockback/issues/122
   it('14. Issue 122', function(done) {
-    let model;
+    var model;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const Model2 = Backbone.RelationalModel.extend({});

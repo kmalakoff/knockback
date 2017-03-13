@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 
 describe('knockback.js memory management @quick @memory', function() {
 
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
   const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
 
@@ -94,7 +94,7 @@ describe('knockback.js memory management @quick @memory', function() {
     const view_model = new ViewModel();
     kb.release(view_model);
 
-    for (let index = 1; index <= 9; index++) { assert.ok(!view_model[`prop${index}`], `Property released: prop${index}`); }
+    for (var index = 1; index <= 9; index++) { assert.ok(!view_model[`prop${index}`], `Property released: prop${index}`); }
     assert.ok(!view_model.name, "Property released: view_model.name"); // kb.viewModel(new kb.Model({name: 'name1'}), 'name', @)
     assert.ok(!nested_view_model.name, "Property released: nested_view_model.name"); // nested_view_model
 
@@ -103,7 +103,7 @@ describe('knockback.js memory management @quick @memory', function() {
   });
 
   it('Releasing with nodes', function(done) {
-    let model;
+    var model;
     if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -120,7 +120,7 @@ describe('knockback.js memory management @quick @memory', function() {
 
     assert.equal($vm_el.text(), 'Bob', 'found Bob');
     const iterable = $co_el.children();
-    for (let index = 0; index < iterable.length; index++) {
+    for (var index = 0; index < iterable.length; index++) {
       const child = iterable[index];
       const name = index ? 'Mary' : 'Fred';
       assert.equal($(child).text(), name, `found ${name}`);
@@ -191,7 +191,7 @@ describe('knockback.js memory management @quick @memory', function() {
 
     // ref counted view model
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(new kb.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: RefCountableViewModel});
+    var collection_observable = kb.collectionObservable(new kb.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: RefCountableViewModel});
     assert.equal(RefCountableViewModel.view_models.length, 2, "Created: 2");
 
     const instance = collection_observable()[0].retain();
@@ -215,7 +215,7 @@ describe('knockback.js memory management @quick @memory', function() {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, "Destroyed: 2");
-    for (let view_model of SimpleViewModel.view_models) { assert.ok(!view_model.prop, "Prop destroyed"); }
+    for (var view_model of SimpleViewModel.view_models) { assert.ok(!view_model.prop, "Prop destroyed"); }
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null;
     return done();
@@ -225,9 +225,9 @@ describe('knockback.js memory management @quick @memory', function() {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ref counted view model
-    let store = new kb.Store();
+    var store = new kb.Store();
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(new kb.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: RefCountableViewModel, store});
+    var collection_observable = kb.collectionObservable(new kb.Collection([{name: 'name1'},{name: 'name2'}]), {view_model: RefCountableViewModel, store});
     assert.equal(RefCountableViewModel.view_models.length, 2, "Created: 2");
 
     const instance = collection_observable()[0].retain();

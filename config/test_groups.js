@@ -1,4 +1,4 @@
-let dep_files, dep_name, file, files, library_files, module_name, test_files, TEST_GROUPS;
+var dep_files, dep_name, file, files, library_files, module_name, test_files, TEST_GROUPS;
 const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
@@ -58,7 +58,7 @@ module.exports = (TEST_GROUPS = {});
 // Full Library
 //##############################
 TEST_GROUPS.browser_globals = [];
-for (let library_name in KNOCKBACK) {
+for (var library_name in KNOCKBACK) {
   library_files = KNOCKBACK[library_name];
   if ((library_name.indexOf('browser_globals') >= 0) && (library_name.indexOf('stack') < 0)) {
     for (dep_name in REQUIRED_DEPENDENCIES) {
@@ -104,7 +104,7 @@ for (dep_name in object) {
 //##############################
 const AMD_OPTIONS = require('./amd/gulp-options');
 TEST_GROUPS.amd = [];
-for (let test of TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core)) {
+for (var test of TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core)) {
   if ((test.name.indexOf('_min') < 0) && (test.name.indexOf('legacy_') < 0) && (test.name.indexOf('parse_') < 0)) {
     test_files = test.files.concat(['./node_modules/chai/chai.js', './node_modules/jquery/dist/jquery.js']); files = []; const test_patterns = []; const path_files = [];
     files.push({pattern: './node_modules/requirejs/require.js'});

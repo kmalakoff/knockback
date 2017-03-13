@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 
 describe('view-model @quick @view-model', function() {
 
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
   const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
 
@@ -22,7 +22,7 @@ describe('view-model @quick @view-model', function() {
     constructor() {
       super(...arguments);
       this.test = ko.observable('hello');
-      let value = this.test();
+      var value = this.test();
       value = this.name();
     }
   }
@@ -141,8 +141,8 @@ describe('view-model @quick @view-model', function() {
       }
     }
 
-    let model = new kb.Model();
-    let view_model = new ContactViewModelFullName(model);
+    var model = new kb.Model();
+    var view_model = new ContactViewModelFullName(model);
     assert.equal(view_model.full_name(), 'Last: null, First: null', "full name is good");
 
     model.set({first: 'Ringo', last: 'Starr'});
@@ -326,7 +326,7 @@ describe('view-model @quick @view-model', function() {
 
       // set from the view model
       view_model.date(new Date(1963, 11, 10));
-      let current_date = model.get('date');
+      var current_date = model.get('date');
       assert.equal(current_date.getFullYear(), 1963, `${name}: year is good`);
       assert.equal(current_date.getMonth(), 11, `${name}: month is good`);
       assert.equal(current_date.getDate(), 10, `${name}: day is good`);
@@ -468,7 +468,7 @@ describe('view-model @quick @view-model', function() {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // keys - array
-    let view_model = kb.viewModel(new kb.Model({name: 'Bob'}), {keys: ['name', 'date']});
+    var view_model = kb.viewModel(new kb.Model({name: 'Bob'}), {keys: ['name', 'date']});
     assert.equal(view_model.name(), 'Bob', 'keys: Bob');
     assert.ok(view_model.date, 'keys: date');
     assert.equal(view_model.date(), null, 'keys: date fn');
@@ -565,7 +565,7 @@ describe('view-model @quick @view-model', function() {
 
     const view_model = kb.viewModel(model);
 
-    let count = 0;
+    var count = 0;
     ko.computed(function() { view_model.model(); return count++; });
 
     view_model.model(null);
@@ -828,14 +828,14 @@ describe('view-model @quick @view-model', function() {
   });
 
   it('20. can merge keys as object', function(done) {
-    let options = {
+    var options = {
       keys: {name: {key: 'name'}},
       options: {
         keys: {thing: {key: 'thing'}}
       }
     };
 
-    let collapsed_options = kb.utils.collapseOptions(options);
+    var collapsed_options = kb.utils.collapseOptions(options);
     assert.deepEqual(collapsed_options.keys, {name: {key: 'name'}, thing: {key: 'thing'}});
 
     options = {
@@ -884,39 +884,39 @@ describe('view-model @quick @view-model', function() {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = new TestViewModel(new kb.Model({id: 1, name: 'Initial'}));
-    let model = view_model.model();
+    var model = view_model.model();
 
-    let count_manual = 0;
+    var count_manual = 0;
     ko.computed(function() {
       view_model.model(new kb.Model({id: 10, name: 'Manual'})); // should not depend
       return count_manual++;
     });
 
-    let count_set_existing = 0;
+    var count_set_existing = 0;
     ko.computed(function() {
       model.set({name: 'Existing'}); // should not depend
       return count_set_existing++;
     });
 
-    let count_set_new = 0;
+    var count_set_new = 0;
     ko.computed(function() {
       model.set({new_attribute: 'New'}); // should not depend
       return count_set_new++;
     });
 
-    let count_set_model = 0;
+    var count_set_model = 0;
     ko.computed(function() {
       model.set({model: new kb.Model({name: 'NestedModel'})}); // should not depend
       return count_set_model++;
     });
 
-    let count_set_collection = 0;
+    var count_set_collection = 0;
     ko.computed(function() {
       model.set({collection: new kb.Collection([{name: 'NestedModel'}])}); // should not depend
       return count_set_collection++;
     });
 
-    let observable_count = 0;
+    var observable_count = 0;
     ko.computed(function() {
       view_model.model(); // should depend
       return observable_count++;
@@ -996,7 +996,7 @@ describe('view-model @quick @view-model', function() {
       const view_model = kb.viewModel(model);
 
       view_model.nameComputed = ko.computed(() => {
-        let ret = "no name function!";
+        var ret = "no name function!";
         if (view_model.name) { ret = `Hello, ${view_model.name()}`; }
         return ret;
       }
@@ -1054,7 +1054,7 @@ describe('view-model @quick @view-model', function() {
 
   // https://github.com/kmalakoff/knockback/issues/121
   it('25. Issue 121', function(done) {
-    let model1;
+    var model1;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = kb.viewModel(model1 = new kb.Model());

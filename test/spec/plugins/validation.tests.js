@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 var window = (window != null) ? window : global;
 
 describe('validation @quick @validation', function() {
-  let kb = window != null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = window != null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
   const $ = window != null ? window.$ : undefined;
 
@@ -153,13 +153,13 @@ describe('validation @quick @validation', function() {
     if (!window.kb) { window.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    let view_model =
+    var view_model =
       {name: ko.observable()};
     window.disable = ko.observable(true);
-    let el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: \'url\'}" required>')[0];
+    var el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: \'url\'}" required>')[0];
     ko.applyBindings(view_model, el);
 
-    let validator = view_model.$name;
+    var validator = view_model.$name;
     assert.ok(validator().hasOwnProperty('required'), "obs: has required");
     assert.ok(validator().hasOwnProperty('url'), "obs: has url");
     assert.ok(validator().hasOwnProperty('$valid'), "obs: has $valid");
@@ -243,7 +243,7 @@ describe('validation @quick @validation', function() {
     ko.applyBindings(view_model, el);
 
     // check name
-    let validator = view_model.$my_form.name;
+    var validator = view_model.$my_form.name;
     assert.ok(validator().hasOwnProperty('required'), "has required");
     assert.ok(!validator().hasOwnProperty('url'), "has url");
     assert.ok(validator().hasOwnProperty('$valid'), "has $valid");
@@ -318,7 +318,7 @@ describe('validation @quick @validation', function() {
     ko.applyBindings(view_model, el);
 
     // check name
-    let validator = view_model.$name;
+    var validator = view_model.$name;
     assert.ok(validator().hasOwnProperty('required'), "has required");
     assert.ok(!validator().hasOwnProperty('url'), "has url");
     assert.ok(validator().hasOwnProperty('$valid'), "has $valid");
@@ -407,7 +407,7 @@ describe('validation @quick @validation', function() {
     const { view_model } = injected[0];
 
     // check name
-    let validator = view_model.$my_form.name;
+    var validator = view_model.$my_form.name;
     assert.ok(validator().hasOwnProperty('required'), "has required");
     assert.ok(!validator().hasOwnProperty('url'), "has url");
     assert.ok(validator().hasOwnProperty('$valid'), "has $valid");

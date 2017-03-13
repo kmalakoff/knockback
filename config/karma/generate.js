@@ -7,7 +7,7 @@ const es = require('event-stream');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const shell = require('gulp-shell');
-const coffee = require('gulp-coffee');
+const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const wrapAMD = require('gulp-wrap-amd-infer');
 const webpack = require('gulp-webpack-config');
@@ -37,7 +37,7 @@ module.exports = function(callback) {
   for (var test of TEST_GROUPS.browserify || []) {
     (test => queue.defer(callback =>
       gulp.src(test.build.files)
-        .pipe(coffee({bare: true}))
+        .pipe(babel({presets: ['es2015']}))
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
@@ -49,7 +49,7 @@ module.exports = function(callback) {
   for (test of TEST_GROUPS.amd || []) {
     (test => queue.defer(callback =>
       gulp.src(test.build.files)
-        .pipe(coffee({bare: true, header: false}))
+        .pipe(babel({presets: ['es2015']}))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
         .on('end', callback)

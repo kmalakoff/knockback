@@ -4,7 +4,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 describe('Knockback.js with Backbone.ModelRef.js @backbone-modelref', function() {
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, Backbone, ko} = kb;
   if (root.Backbone != null) {
     root.Backbone.ModelRef || (root.Backbone.ModelRef = typeof require === 'function' ? require('backbone-modelref') : undefined);
@@ -56,7 +56,7 @@ describe('Knockback.js with Backbone.ModelRef.js @backbone-modelref', function()
     assert.equal(model.get('number'), '9222-222-222', "Number was changed");
     assert.equal(view_model.number(), '9222-222-222', "Number was changed");
     view_model.date(new Date(1963, 11, 10));
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");
@@ -110,7 +110,7 @@ describe('Knockback.js with Backbone.ModelRef.js @backbone-modelref', function()
     assert.equal(model.get('number'), '9222-222-222', "Number was changed");
     assert.equal(view_model.number(), '9222-222-222', "Number was changed");
     view_model.date(new Date(1963, 11, 10));
-    let current_date = model.get('date');
+    var current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1963, "year is good");
     assert.equal(current_date.getMonth(), 11, "month is good");
     assert.equal(current_date.getDate(), 10, "day is good");

@@ -16,7 +16,7 @@ module.exports = function(callback) {
   const queue = new Queue(1);
   queue.defer(callback => generate(callback));
 
-  for (let name in TEST_GROUPS) { const tests = TEST_GROUPS[name]; ((name, tests) => 
+  for (var name in TEST_GROUPS) { const tests = TEST_GROUPS[name]; ((name, tests) => 
     tests.map((test) => (test => 
       queue.defer(function(callback) {
         gutil.log(`RUNNING TESTS: ${name} ${test.name}`);

@@ -4170,7 +4170,7 @@
           }
           if (all_functions) {
             // This attrs object looks like it's really an options object,
-            // and there's no other options object, so let's just use it.
+            // and there's no other options object, so var's just use it.
             return this.save(null, attrs);
           }
         }
@@ -4619,7 +4619,7 @@
       var OldClassObject = Parse.Object._classMap[className];
       // This new subclass has been told to extend both from "this" and from
       // OldClassObject. This is multiple inheritance, which isn't supported.
-      // For now, let's just pick one.
+      // For now, var's just pick one.
       NewClassObject = OldClassObject._extend(protoProps, classProps);
     } else {
       protoProps = protoProps || {};

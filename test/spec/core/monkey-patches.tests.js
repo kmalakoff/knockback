@@ -1,7 +1,7 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('money-patches @quick @monkey', function() {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
 
   it('TEST DEPENDENCY MISSING', function(done) {
@@ -39,12 +39,12 @@ describe('money-patches @quick @monkey', function() {
 
   //# https://github.com/kmalakoff/knockback/issues/124
   it('fixes memory management for extend on kb.CollectionObservable', function(done) {
-    let collection;
+    var collection;
     if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) { return done(); }
     kb.statistics = new kb.Statistics(); // turn on stats
 
     ko.extenders.lazyArray = function(target, timeout) {
-      let addTimeout = null;
+      var addTimeout = null;
       target.elementsToDisplay = ko.observable(0);
 
       return ko.computed(function() {

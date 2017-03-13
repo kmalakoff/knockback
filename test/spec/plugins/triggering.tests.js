@@ -2,7 +2,7 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 
 describe('triggered-observable @quick @triggering', function() {
 
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko} = kb;
 
   it('TEST DEPENDENCY MISSING', function(done) {
@@ -19,7 +19,7 @@ describe('triggered-observable @quick @triggering', function() {
     const model = new kb.Model;
     model.setLocale = () => model.trigger('change', model);
 
-    let trigger_count = 0;
+    var trigger_count = 0;
 
     const view_model =
       {triggered_observable: kb.triggeredObservable(model, 'change')};
@@ -53,7 +53,7 @@ describe('triggered-observable @quick @triggering', function() {
     const model = new kb.Model;
     model.setLocale = () => model.trigger('change', model);
 
-    let trigger_count = 0;
+    var trigger_count = 0;
 
     const view_model =
       {triggered_observable: kb.observableTriggered(model, 'change')};

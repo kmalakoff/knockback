@@ -2,8 +2,8 @@ var assert = assert || (typeof require === 'function' ? require('chai').assert :
 const root = (typeof window !== 'undefined' && window !== null) ? window : (typeof global !== 'undefined' && global !== null) ? global : this;
 
 describe('inject @quick @inject', function() {
-  let SubClass, SuperClass;
-  let kb = root != null ? root.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  var SubClass, SuperClass;
+  var kb = root != null ? root.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const {_, ko, $} = kb;
   if (!$) { return; } // no jquery
 
@@ -58,9 +58,9 @@ describe('inject @quick @inject', function() {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // no attributes
-    let inject_el = $('<div kb-inject></div>')[0];
+    var inject_el = $('<div kb-inject></div>')[0];
     $('body').append(inject_el);
-    let injected = kb.injectViewModels();
+    var injected = kb.injectViewModels();
     assert.equal(injected[0].el, inject_el, "no attr: app was injected");
     ko.removeNode(inject_el);
 
@@ -69,7 +69,7 @@ describe('inject @quick @inject', function() {
     inject_el = $('<div kb-inject="hello: hello"><span data-bind="visible: hello"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    let { view_model } = injected[0];
+    var { view_model } = injected[0];
     assert.equal(injected[0].el, inject_el, "Properties: app was injected");
     assert.equal(view_model.hello, root.hello, "Properties: hello was injected");
     assert.equal(view_model.hello, true, "Properties: hello is true");
@@ -183,8 +183,8 @@ describe('inject @quick @inject', function() {
     ko.removeNode(inject_el);
 
     // Properties with callbacks
-    let before_was_called = false;
-    let after_was_called = false;
+    var before_was_called = false;
+    var after_was_called = false;
     root.beforeBinding = view_model => before_was_called = view_model.hello;
     root.afterBinding = view_model => after_was_called = view_model.hello;
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
@@ -250,7 +250,7 @@ describe('inject @quick @inject', function() {
 
     const previous = kb.RECUSIVE_AUTO_INJECT; kb.RECUSIVE_AUTO_INJECT = true;
 
-    let was_auto_injected = 0;
+    var was_auto_injected = 0;
     root.AutoInject = class AutoInject {
       constructor() {
         was_auto_injected++;
@@ -262,7 +262,7 @@ describe('inject @quick @inject', function() {
 
     // no attributes
     assert.ok(!was_auto_injected, "Not auto injected");
-    let inject_el = $('<div kb-inject="AutoInject"></div>')[0];
+    var inject_el = $('<div kb-inject="AutoInject"></div>')[0];
     ko.applyBindings({}, inject_el);
     assert.equal(was_auto_injected, 1, "Was auto injected");
     ko.removeNode(inject_el);
@@ -286,8 +286,8 @@ describe('inject @quick @inject', function() {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // properties
-    let inject_el = $('<div data-bind="inject: {hello: true}"><span data-bind="visible: hello"></span></div>')[0];
-    let view_model = {};
+    var inject_el = $('<div data-bind="inject: {hello: true}"><span data-bind="visible: hello"></span></div>')[0];
+    var view_model = {};
     kb.applyBindings(view_model, inject_el);
     assert.equal(view_model.hello, true, "Properties: hello is true");
     ko.removeNode(inject_el);
