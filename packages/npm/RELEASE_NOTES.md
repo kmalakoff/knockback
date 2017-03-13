@@ -1,6 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
 ## 1.2.2
+* Release of 1.2.2 due to failed release
+
+## 1.2.1
 * Bug fix for validations: https://github.com/kmalakoff/knockback/issues/160
 
 ## 1.2.0
