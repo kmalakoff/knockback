@@ -1,6 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
-## 1.2.1
+## 1.2.2
+* Bug fix for validations: https://github.com/kmalakoff/knockback/issues/160
+
+## 1.2.0
 * Remove exporting symbols like Knockout into global namespace: https://github.com/kmalakoff/knockback/issues/148
 * Removed dependency on jquery: https://github.com/kmalakoff/knockback/issues/148
 * Simplified API usage for compatibility with lodash 4.x: https://github.com/kmalakoff/knockback/issues/151
@@ -92,7 +95,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * improved AMD module loading support: https://github.com/kmalakoff/knockback/pull/80
 * kb.collectionObservable: added automatic creation of a collection is one isn't passed or if an array is passed since you can reference it using collection() on the observable
 * bug fix for findOrCreate refering to incorrect class
-* updated tests for latest libraries (Knockout 3.0.0, Backbone 1.2.1, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
+* updated tests for latest libraries (Knockout 3.0.0, Backbone 1.2.0, Underscore 1.5.2, LoDash 2.3, and BackboneRelational 0.8.6)
 * added 'sort' collection message in addition to 'resort'
 * bug fix for removed model: https://github.com/kmalakoff/knockback/issues/87
 * added statics and static_defaults: kb.viewModel(model, {statics: ['name'], staticDefaults: {name: '(no name)'}})
@@ -116,7 +119,7 @@ Please refer to the following release notes when upgrading your version of Knock
 * bug fix for nested filter dependencies: https://github.com/addyosmani/todomvc/issues/381
 * bug fix for filtering notifications: https://github.com/kmalakoff/knockback/issues/53
 * bug fix for models_only on change event: https://github.com/kmalakoff/knockback/issues/59
-* added support for Backbone 1.2.1. Note: needed to patch Backbone-relational to 0.8.0plus and to add _.findWhere to lodash.
+* added support for Backbone 1.2.0. Note: needed to patch Backbone-relational to 0.8.0plus and to add _.findWhere to lodash.
 * added automatic call of afterRender on a view model in kb.renderTemplate unless afterRender is also provided in the options (to avoid multiple calls).
 
 ## 0.16.8

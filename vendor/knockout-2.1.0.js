@@ -1393,7 +1393,7 @@ ko.exportSymbol('toJSON', ko.toJSON);
                             ko.utils.domData.set(element, ko.bindingHandlers.options.optionValueDomDataKey, value);
                             element[hasDomDataExpandoProperty] = true;
 
-                            // Special treatment of numbers is just for backward compatibility. KO 1.2.1 wrote numerical values to element.value.
+                            // Special treatment of numbers is just for backward compatibility. KO 1.2.2 wrote numerical values to element.value.
                             element.value = typeof value === "number" ? value : "";
                             break;
                     }

@@ -1,5 +1,5 @@
 /*
-  knockback-full-stack.js 1.2.1
+  knockback-full-stack.js 1.2.2
   Copyright (c)  2011-2017 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -19,41 +19,41 @@
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
 /******/ 			l: false,
 /******/ 			exports: {}
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.l = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// identity function for calling harmony imports with the correct context
 /******/ 	__webpack_require__.i = function(value) { return value; };
-
+/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 			});
 /******/ 		}
 /******/ 	};
-
+/******/
 /******/ 	// getDefaultExport function for compatibility with non-harmony modules
 /******/ 	__webpack_require__.n = function(module) {
 /******/ 		var getter = module && module.__esModule ?
@@ -73,13 +73,13 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 		__webpack_require__.d(getter, 'a', getter);
 /******/ 		return getter;
 /******/ 	};
-
+/******/
 /******/ 	// Object.prototype.hasOwnProperty.call
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(__webpack_require__.s = 32);
 /******/ })
@@ -90,7 +90,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /* WEBPACK VAR INJECTION */(function(global) {
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -110,7 +110,7 @@ module.exports = kb = (function() {
 
   function kb() {}
 
-  kb.VERSION = '1.2.1';
+  kb.VERSION = '1.2.2';
 
   kb.TYPE_UNKNOWN = 0;
 
@@ -2170,7 +2170,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscor
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -2640,7 +2640,7 @@ kb.observableCollection = kb.collectionObservable;
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -2851,7 +2851,7 @@ kb.emitterObservable = function(emitter, observable) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -2931,7 +2931,7 @@ kb.Factory = (function() {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -2957,7 +2957,7 @@ kb.modules = {
 
 /* WEBPACK VAR INJECTION */(function(global) {
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3102,7 +3102,7 @@ if (typeof document !== "undefined" && document !== null) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3140,7 +3140,7 @@ if ((ref = ko.subscribable) != null ? (ref1 = ref.fn) != null ? ref1.extend : vo
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3312,7 +3312,7 @@ kb.observable = function(model, key, options, view_model) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3447,7 +3447,7 @@ module.exports = kb.Statistics = (function() {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3758,7 +3758,7 @@ module.exports = kb.Store = (function() {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3955,7 +3955,7 @@ kb.utils = (function() {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4158,7 +4158,7 @@ kb.viewModel = function(model, options, view_model) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4222,7 +4222,7 @@ kb.observableDefault = kb.defaultObservable;
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4358,7 +4358,7 @@ kb.observableFormatted = kb.formattedObservable;
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4471,7 +4471,7 @@ kb.observableLocalized = kb.localizedObservable;
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4546,7 +4546,7 @@ kb.observableTriggered = kb.triggeredObservable;
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4632,7 +4632,7 @@ kb.inputValidator = function(view_model, el, validation_options) {
   (!options.validation_options) || (_.defaults(options.validation_options, validation_options), validation_options = options.validation_options);
   bindings = {};
   (!validators[type = el.getAttribute('type')]) || (bindings[type] = validators[type]);
-  _.isUndefined(el.getAttribute('required')) || (bindings.required = validators.required);
+  !el.hasAttribute('required') || (bindings.required = validators.required);
   if (options.validations) {
     ref1 = options.validations;
     for (identifier in ref1) {
@@ -6632,7 +6632,7 @@ kb.formValidator = function(view_model, el) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -6729,7 +6729,7 @@ module.exports = function(options) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -6806,7 +6806,7 @@ module.exports = extend;
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -6848,7 +6848,7 @@ module.exports = unwrapModels = function(obj) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -6899,7 +6899,7 @@ module.exports = wrappedDestroy = function(obj) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -6960,7 +6960,7 @@ module.exports = BackboneAssociations = (function() {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7048,7 +7048,7 @@ module.exports = BackboneRelational = (function() {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7106,7 +7106,7 @@ kb.utils.setToDefault = function(obj) {
 
 
 /*
-  knockback.js 1.2.1
+  knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -17448,7 +17448,7 @@ return jQuery;
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * Knockout JavaScript library v3.4.1
+ * Knockout JavaScript library v3.4.2
  * (c) The Knockout.js team - http://knockoutjs.com/
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
@@ -17497,7 +17497,7 @@ ko.exportSymbol = function(koPath, object) {
 ko.exportProperty = function(owner, publicName, object) {
     owner[publicName] = object;
 };
-ko.version = "3.4.1";
+ko.version = "3.4.2";
 
 ko.exportSymbol('version', ko.version);
 // For any options that may affect various areas of Knockout and aren't directly associated with data binding.
@@ -18641,11 +18641,20 @@ ko.extenders = {
         if (!target._deferUpdates) {
             target._deferUpdates = true;
             target.limit(function (callback) {
-                var handle;
+                var handle,
+                    ignoreUpdates = false;
                 return function () {
-                    ko.tasks.cancel(handle);
-                    handle = ko.tasks.schedule(callback);
-                    target['notifySubscribers'](undefined, 'dirty');
+                    if (!ignoreUpdates) {
+                        ko.tasks.cancel(handle);
+                        handle = ko.tasks.schedule(callback);
+
+                        try {
+                            ignoreUpdates = true;
+                            target['notifySubscribers'](undefined, 'dirty');
+                        } finally {
+                            ignoreUpdates = false;
+                        }
+                    }
                 };
             });
         }
@@ -18731,7 +18740,7 @@ function limitNotifySubscribers(value, event) {
 
 var ko_subscribable_fn = {
     init: function(instance) {
-        instance._subscriptions = {};
+        instance._subscriptions = { "change": [] };
         instance._versionNumber = 1;
     },
 
@@ -18763,9 +18772,10 @@ var ko_subscribable_fn = {
             this.updateVersion();
         }
         if (this.hasSubscriptionsForEvent(event)) {
+            var subs = event === defaultEvent && this._changeSubscriptions || this._subscriptions[event].slice(0);
             try {
                 ko.dependencyDetection.begin(); // Begin suppressing dependency detection (by setting the top frame to undefined)
-                for (var a = this._subscriptions[event].slice(0), i = 0, subscription; subscription = a[i]; ++i) {
+                for (var i = 0, subscription; subscription = subs[i]; ++i) {
                     // In case a subscription was disposed during the arrayForEach cycle, check
                     // for isDisposed on each subscription before invoking its callback
                     if (!subscription.isDisposed)
@@ -18791,7 +18801,7 @@ var ko_subscribable_fn = {
 
     limit: function(limitFunction) {
         var self = this, selfIsObservable = ko.isObservable(self),
-            ignoreBeforeChange, previousValue, pendingValue, beforeChange = 'beforeChange';
+            ignoreBeforeChange, notifyNextChange, previousValue, pendingValue, beforeChange = 'beforeChange';
 
         if (!self._origNotifySubscribers) {
             self._origNotifySubscribers = self["notifySubscribers"];
@@ -18804,15 +18814,19 @@ var ko_subscribable_fn = {
             // If an observable provided a reference to itself, access it to get the latest value.
             // This allows computed observables to delay calculating their value until needed.
             if (selfIsObservable && pendingValue === self) {
-                pendingValue = self();
+                pendingValue = self._evalIfChanged ? self._evalIfChanged() : self();
             }
-            ignoreBeforeChange = false;
-            if (self.isDifferent(previousValue, pendingValue)) {
+            var shouldNotify = notifyNextChange || self.isDifferent(previousValue, pendingValue);
+
+            notifyNextChange = ignoreBeforeChange = false;
+
+            if (shouldNotify) {
                 self._origNotifySubscribers(previousValue = pendingValue);
             }
         });
 
         self._limitChange = function(value) {
+            self._changeSubscriptions = self._subscriptions[defaultEvent].slice(0);
             self._notificationIsPending = ignoreBeforeChange = true;
             pendingValue = value;
             finish();
@@ -18821,6 +18835,11 @@ var ko_subscribable_fn = {
             if (!ignoreBeforeChange) {
                 previousValue = value;
                 self._origNotifySubscribers(value, beforeChange);
+            }
+        };
+        self._notifyNextChangeIfValueIsDifferent = function() {
+            if (self.isDifferent(previousValue, self.peek(true /*evaluate*/))) {
+                notifyNextChange = true;
             }
         };
     },
@@ -19312,6 +19331,7 @@ ko.computed = ko.dependentObservable = function (evaluatorFunctionOrOptions, eva
     var state = {
         latestValue: undefined,
         isStale: true,
+        isDirty: true,
         isBeingEvaluated: false,
         suppressDisposalUntilDisposeWhenReturnsFalse: false,
         isDisposed: false,
@@ -19339,7 +19359,7 @@ ko.computed = ko.dependentObservable = function (evaluatorFunctionOrOptions, eva
         } else {
             // Reading the value
             ko.dependencyDetection.registerDependency(computedObservable);
-            if (state.isStale || (state.isSleeping && computedObservable.haveDependenciesChanged())) {
+            if (state.isDirty || (state.isSleeping && computedObservable.haveDependenciesChanged())) {
                 computedObservable.evaluateImmediate();
             }
             return state.latestValue;
@@ -19429,6 +19449,10 @@ function computedBeginDependencyDetectionCallback(subscribable, id) {
             // Brand new subscription - add it
             computedObservable.addDependencyTracking(id, subscribable, state.isSleeping ? { _target: subscribable } : computedObservable.subscribeToDependency(subscribable));
         }
+        // If the observable we've accessed has a pending notification, ensure we get notified of the actual final value (bypass equality checks)
+        if (subscribable._notificationIsPending) {
+            subscribable._notifyNextChangeIfValueIsDifferent();
+        }
     }
 }
 
@@ -19451,7 +19475,7 @@ var computedFn = {
         for (id in dependencyTracking) {
             if (dependencyTracking.hasOwnProperty(id)) {
                 dependency = dependencyTracking[id];
-                if (dependency._target.hasChanged(dependency._version)) {
+                if ((this._evalDelayed && dependency._target._notificationIsPending) || dependency._target.hasChanged(dependency._version)) {
                     return true;
                 }
             }
@@ -19460,16 +19484,19 @@ var computedFn = {
     markDirty: function () {
         // Process "dirty" events if we can handle delayed notifications
         if (this._evalDelayed && !this[computedState].isBeingEvaluated) {
-            this._evalDelayed();
+            this._evalDelayed(false /*isChange*/);
         }
     },
     isActive: function () {
-        return this[computedState].isStale || this[computedState].dependenciesCount > 0;
+        var state = this[computedState];
+        return state.isDirty || state.dependenciesCount > 0;
     },
     respondToChange: function () {
         // Ignore "change" events if we've already scheduled a delayed notification
         if (!this._notificationIsPending) {
             this.evaluatePossiblyAsync();
+        } else if (this[computedState].isDirty) {
+            this[computedState].isStale = true;
         }
     },
     subscribeToDependency: function (target) {
@@ -19496,7 +19523,7 @@ var computedFn = {
                 computedObservable.evaluateImmediate(true /*notifyChange*/);
             }, throttleEvaluationTimeout);
         } else if (computedObservable._evalDelayed) {
-            computedObservable._evalDelayed();
+            computedObservable._evalDelayed(true /*isChange*/);
         } else {
             computedObservable.evaluateImmediate(true /*notifyChange*/);
         }
@@ -19614,13 +19641,14 @@ var computedFn = {
                 ko.utils.objectForEach(dependencyDetectionContext.disposalCandidates, computedDisposeDependencyCallback);
             }
 
-            state.isStale = false;
+            state.isStale = state.isDirty = false;
         }
     },
-    peek: function () {
-        // Peek won't re-evaluate, except while the computed is sleeping or to get the initial value when "deferEvaluation" is set.
+    peek: function (evaluate) {
+        // By default, peek won't re-evaluate, except while the computed is sleeping or to get the initial value when "deferEvaluation" is set.
+        // Pass in true to evaluate if needed.
         var state = this[computedState];
-        if ((state.isStale && !state.dependenciesCount) || (state.isSleeping && this.haveDependenciesChanged())) {
+        if ((state.isDirty && (evaluate || !state.dependenciesCount)) || (state.isSleeping && this.haveDependenciesChanged())) {
             this.evaluateImmediate();
         }
         return state.latestValue;
@@ -19628,15 +19656,27 @@ var computedFn = {
     limit: function (limitFunction) {
         // Override the limit function with one that delays evaluation as well
         ko.subscribable['fn'].limit.call(this, limitFunction);
-        this._evalDelayed = function () {
+        this._evalIfChanged = function () {
+            if (this[computedState].isStale) {
+                this.evaluateImmediate();
+            } else {
+                this[computedState].isDirty = false;
+            }
+            return this[computedState].latestValue;
+        };
+        this._evalDelayed = function (isChange) {
             this._limitBeforeChange(this[computedState].latestValue);
 
-            this[computedState].isStale = true; // Mark as dirty
+            // Mark as dirty
+            this[computedState].isDirty = true;
+            if (isChange) {
+                this[computedState].isStale = true;
+            }
 
-            // Pass the observable to the "limit" code, which will access it when
+            // Pass the observable to the "limit" code, which will evaluate it when
             // it's time to do the notification.
             this._limitChange(this);
-        }
+        };
     },
     dispose: function () {
         var state = this[computedState];
@@ -19653,6 +19693,7 @@ var computedFn = {
         state.dependenciesCount = 0;
         state.isDisposed = true;
         state.isStale = false;
+        state.isDirty = false;
         state.isSleeping = false;
         state.disposeWhenNodeIsRemoved = null;
     }
@@ -19668,7 +19709,6 @@ var pureComputedOverrides = {
             if (state.isStale || computedObservable.haveDependenciesChanged()) {
                 state.dependencyTracking = null;
                 state.dependenciesCount = 0;
-                state.isStale = true;
                 if (computedObservable.evaluateImmediate()) {
                     computedObservable.updateVersion();
                 }
@@ -19904,7 +19944,7 @@ ko.exportSymbol('toJSON', ko.toJSON);
                             ko.utils.domData.set(element, ko.bindingHandlers.options.optionValueDomDataKey, value);
                             element[hasDomDataExpandoProperty] = true;
 
-                            // Special treatment of numbers is just for backward compatibility. KO 1.2.1 wrote numerical values to element.value.
+                            // Special treatment of numbers is just for backward compatibility. KO 1.2.2 wrote numerical values to element.value.
                             element.value = typeof value === "number" ? value : "";
                             break;
                     }
