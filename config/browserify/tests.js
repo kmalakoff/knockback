@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   full: {
     output: './_temp/browserify/knockback.tests.js',
-    files: ['./test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'],
+    files: ['./test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js'],
     options: {
       // basedir: path.resolve(__dirname, '../..')
       shim: {
@@ -14,7 +14,7 @@ module.exports = {
 
   core: {
     output: './_temp/browserify/knockback-core.tests.js',
-    files: ['./test/spec/core/**/*.tests.coffee'],
+    files: ['./test/spec/core/**/*.tests.js'],
     options: {
       // basedir: path.resolve(__dirname, '../..')
       shim: {

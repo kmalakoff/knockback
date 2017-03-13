@@ -1,7 +1,6 @@
 module.exports = {
   basePath: '.',
   frameworks: ['mocha', 'chai'],
-  preprocessors: {'**/*.coffee': ['coffee']},
 
   coffeePreprocessor: {
     options: {bare: true, sourceMap: false},

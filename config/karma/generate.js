@@ -15,10 +15,7 @@ const browserify = require('gulp-browserify');
 
 const TEST_GROUPS = require('../test_groups');
 
-module.exports = function(options, callback) {
-  if (options == null) { options = {}; }
-  if (options.tags.indexOf('@quick') >= 0) { return callback(); }
-
+module.exports = function(callback) {
   const queue = new Queue(1);
 
   // install knockback
@@ -30,7 +27,7 @@ module.exports = function(options, callback) {
 
   // build webpack
   queue.defer(callback =>
-    gulp.src(['config/builds/test/**/*.webpack.config.coffee'], {read: false, buffer: false})
+    gulp.src(['config/builds/test/**/*.webpack.config.js'], {read: false, buffer: false})
       .pipe(webpack())
       .pipe(gulp.dest('_temp/webpack'))
       .on('end', callback)

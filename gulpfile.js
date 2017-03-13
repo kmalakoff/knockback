@@ -56,30 +56,24 @@ gulp.task('minify', ['build'], function(callback) {
 });
 
 const testNode = function(callback) {
-  const tags = (Array.from(process.argv.slice(3)).map((tag) => `@${tag.replace(/^[-]+/, '')}`)).join(' ');
-
   const mochaOptions = {reporter: 'dot'};
-  if (tags) { mochaOptions.grep = tags; }
-  gutil.log(`Running Node.js tests ${tags}`);
+  gutil.log(`Running Node.js tests`);
   gulp.src('test/spec/**/*.tests.js')
     .pipe(mocha(mochaOptions))
-    .pipe(es.writeArray(callback));
-  
+    .pipe(es.writeArray(callback));  
 };
 
 const testBrowsers = function(callback) {
-  const tags = (Array.from(process.argv.slice(3)).map((tag) => `@${tag.replace(/^[-]+/, '')}`)).join(' ');
-
-  gutil.log(`Running Browser tests ${tags}`);
-  (require('./config/karma/run'))({tags}, callback);
+  gutil.log(`Running Browser tests`);
+  (require('./config/karma/run'))(callback);
   
 };
 
 gulp.task('test-node', testNode);
 // gulp.task('test-node', ['build'], testNode);
 
-// gulp.task 'test-browsers', testBrowsers
-gulp.task('test-browsers', ['minify'], testBrowsers);
+gulp.task('test-browsers', testBrowsers);
+// gulp.task('test-browsers', ['minify'], testBrowsers);
 
 gulp.task('test', ['minify'], function(callback) {
   Async.series([testNode, testBrowsers], function(err) { !err || console.log(err); return process.exit(err ? 1 : 0); });

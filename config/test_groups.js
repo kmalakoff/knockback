@@ -64,9 +64,9 @@ for (let library_name in KNOCKBACK) {
     for (dep_name in REQUIRED_DEPENDENCIES) {
       dep_files = REQUIRED_DEPENDENCIES[dep_name];
       if (dep_name.indexOf('backbone') >= 0) { // Backbone
-        TEST_GROUPS.browser_globals.push({name: `${dep_name}_${library_name}`, files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee', './test/spec/issues/**/*.tests.coffee'])});
+        TEST_GROUPS.browser_globals.push({name: `${dep_name}_${library_name}`, files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js', './test/spec/issues/**/*.tests.js'])});
       } else { // Parse
-        TEST_GROUPS.browser_globals.push({name: `${dep_name}_${library_name}`, files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.coffee', './test/spec/plugins/**/*.tests.coffee'])});
+        TEST_GROUPS.browser_globals.push({name: `${dep_name}_${library_name}`, files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js'])});
       }
     }
   }
@@ -79,7 +79,7 @@ TEST_GROUPS.core = [];
 for (var test_name in KNOCKBACK) {
   library_files = KNOCKBACK[test_name];
   if ((test_name.indexOf('core') >= 0) && (test_name.indexOf('stack') < 0)) {
-    TEST_GROUPS.core.push({name: `core_${test_name}`, files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.coffee'])});
+    TEST_GROUPS.core.push({name: `core_${test_name}`, files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.js'])});
   }
 }
 
@@ -87,9 +87,9 @@ for (var test_name in KNOCKBACK) {
 // ORM
 //##############################
 const ORM_TESTS = {
-  backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/spec/ecosystem/**/backbone-orm*.tests.coffee'],
-  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/spec/ecosystem/**/backbone-relational*.tests.coffee'],
-  backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/spec/ecosystem/**/backbone-associations*.tests.coffee']
+  backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/spec/ecosystem/**/backbone-orm*.tests.js'],
+  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/spec/ecosystem/**/backbone-relational*.tests.js'],
+  backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/spec/ecosystem/**/backbone-associations*.tests.js']
 };
 
 TEST_GROUPS.orm = [];
