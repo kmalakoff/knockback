@@ -48,8 +48,6 @@ gulp.task('watch', ['build'], function() {
 
 gulp.task('minify', ['build'], function(callback) {
   gulp.src(['knockback.js', 'knockback-*.js'])
-    .pipe(es.map((d, cb) => { console.log(d); cb(null, d); }))
-
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
     .pipe(header(HEADER, {pkg: require('./package.json')}))
