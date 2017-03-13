@@ -91,15 +91,15 @@ Now, the greeting updates as you type!
 * [API Docs](http://kmalakoff.github.com/knockback/doc/index.html) - dig into the API
 * [TodoMVC App (Live!)](http://kmalakoff.github.com/knockback-todos-app/) - compare client-side framworks
 
-# Download Latest (1.2.0):
+# Download Latest (1.2.1):
 
 Please see the [release notes](https://github.com/kmalakoff/knockback/blob/master/RELEASE_NOTES.md) for upgrade pointers.
 
-* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback.min.js)
-* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback-full-stack.min.js)
+* Full Library [(dev, 64k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback.js) or [(min+gzip, 8k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback.min.js)
+* Full Stack [(dev, 330k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback-full-stack.js) or [(min+gzip, 32k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback-full-stack.min.js)
 
-* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback-core.min.js)
-* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/1.2.0/knockback-core-stack.min.js)
+* Core Library [(dev, 54k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback-core.js) or [(min+gzip, 7k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback-core.min.js)
+* Core Stack [(dev, 315k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback-core-stack.js) or [(min+gzip, 31k)](https://raw.github.com/kmalakoff/knockback/1.2.1/knockback-core-stack.min.js)
 
 The **full versions** bundle advanced features.
 
