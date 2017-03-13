@@ -452,3 +452,42 @@ describe 'validation @quick @validation', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  it 'kb.inputValidator without required', (done) ->
+    return done() unless ($ and window?.document)
+    window.kb = kb unless window.kb # make kb global for bindings
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    view_model =
+      name: ko.observable()
+
+    el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator">')[0]
+    ko.applyBindings(view_model, el)
+
+    validator = view_model.$name
+    assert.ok(!validator().hasOwnProperty('required'), "does not have required")
+    assert.ok(validator().hasOwnProperty('url'), "has url")
+    assert.ok(validator().hasOwnProperty('$valid'), "has $valid")
+    assert.ok(validator().hasOwnProperty('$error_count'), "has $error_count")
+
+    assert.ok(validator().url, "url is invalid")
+    assert.ok(!validator().$valid, "validator not valid")
+    assert.ok(validator().$error_count, "validator is invalid")
+    assert.ok(validator().$active_error, "active error exists")
+
+    view_model.name('Bob')
+    assert.ok(validator().url, "url is invalid")
+    assert.ok(!validator().$valid, "validator not valid")
+    assert.ok(validator().$error_count, "validator is invalid")
+    assert.ok(validator().$active_error, "active error exists")
+
+    view_model.name('http://Bob')
+    assert.ok(!validator().url, "url is valid")
+    assert.ok(validator().$valid, "validator is valid")
+    assert.ok(!validator().$error_count, "validator is not invalid")
+    assert.ok(!validator().$active_error, "active error does not exist")
+
+    kb.release(view_model)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

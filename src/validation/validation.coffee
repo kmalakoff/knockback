@@ -1,5 +1,5 @@
 ###
-  knockback.js 1.2.0
+  knockback.js 1.2.1
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -175,7 +175,7 @@ kb.inputValidator = (view_model, el, validation_options={}) ->
   # collect the types to identifier
   bindings = {}
   (not validators[type = el.getAttribute('type')]) or (bindings[type] = validators[type])
-  _.isUndefined(el.getAttribute('required')) or (bindings.required = validators.required)
+  !el.hasAttribute('required') or (bindings.required = validators.required)
   if options.validations
     bindings[identifier] = validator for identifier, validator of options.validations
   result = kb.valueValidator(options.value, bindings, validation_options)

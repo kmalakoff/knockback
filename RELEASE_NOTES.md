@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 1.2.1
+* Bug fix for validations: https://github.com/kmalakoff/knockback/issues/160
+
 ## 1.2.0
 * Remove exporting symbols like Knockout into global namespace: https://github.com/kmalakoff/knockback/issues/148
 * Removed dependency on jquery: https://github.com/kmalakoff/knockback/issues/148
