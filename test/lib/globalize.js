@@ -552,9 +552,7 @@
         case 'dd':
 				// Day of month, with leading zero for single-digit days
           foundDay = true;
-          ret.push(
-					padZeros(getPart(value, 2), clength),
-				);
+          ret.push(padZeros(getPart(value, 2), clength));
           break;
         case 'MMM':
 				// Month, as a three-letter abbreviation
@@ -566,16 +564,14 @@
 					?
 					cal.monthsGenitive[clength === 3 ? 'namesAbbr' : 'names'][part]
 					:
-					cal.months[clength === 3 ? 'namesAbbr' : 'names'][part],
+					cal.months[clength === 3 ? 'namesAbbr' : 'names'][part]
 				);
           break;
         case 'M':
 				// Month, as digits, with no leading zero for single-digit months
         case 'MM':
 				// Month, as digits, with leading zero for single-digit months
-          ret.push(
-					padZeros(getPart(value, 1) + 1, clength),
-				);
+          ret.push(padZeros(getPart(value, 1) + 1, clength));
           break;
         case 'y':
 				// Year, as two digits, but with no leading zero for years less than 10
@@ -587,9 +583,7 @@
           if (clength < 4) {
             part %= 100;
           }
-          ret.push(
-					padZeros(part, clength),
-				);
+          ret.push(padZeros(part, clength));
           break;
         case 'h':
 				// Hours with no leading zero for single-digit hours, using 12-hour clock
@@ -597,33 +591,25 @@
 				// Hours with leading zero for single-digit hours, using 12-hour clock
           hour = value.getHours() % 12;
           if (hour === 0) hour = 12;
-          ret.push(
-					padZeros(hour, clength),
-				);
+          ret.push(padZeros(hour, clength));
           break;
         case 'H':
 				// Hours with no leading zero for single-digit hours, using 24-hour clock
         case 'HH':
 				// Hours with leading zero for single-digit hours, using 24-hour clock
-          ret.push(
-					padZeros(value.getHours(), clength),
-				);
+          ret.push(padZeros(value.getHours(), clength));
           break;
         case 'm':
 				// Minutes with no leading zero for single-digit minutes
         case 'mm':
 				// Minutes with leading zero for single-digit minutes
-          ret.push(
-					padZeros(value.getMinutes(), clength),
-				);
+          ret.push(padZeros(value.getMinutes(), clength));
           break;
         case 's':
 				// Seconds with no leading zero for single-digit seconds
         case 'ss':
 				// Seconds with leading zero for single-digit seconds
-          ret.push(
-					padZeros(value.getSeconds(), clength),
-				);
+          ret.push(padZeros(value.getSeconds(), clength));
           break;
         case 't':
 				// One character am/pm indicator ("a" or "p")
@@ -638,18 +624,14 @@
 				// Centiseconds
         case 'fff':
 				// Milliseconds
-          ret.push(
-					padZeros(value.getMilliseconds(), 3).substr(0, clength),
-				);
+          ret.push(padZeros(value.getMilliseconds(), 3).substr(0, clength));
           break;
         case 'z':
 				// Time zone offset, no leading zero
         case 'zz':
 				// Time zone offset with leading zero
           hour = value.getTimezoneOffset() / 60;
-          ret.push(
-					(hour <= 0 ? '+' : '-') + padZeros(Math.floor(Math.abs(hour)), clength),
-				);
+          ret.push((hour <= 0 ? '+' : '-') + padZeros(Math.floor(Math.abs(hour)), clength));
           break;
         case 'zzz':
 				// Time zone offset with leading zero
@@ -658,15 +640,13 @@
 					`${(hour <= 0 ? '+' : '-') + padZeros(Math.floor(Math.abs(hour)), 2)
 					// Hard coded ":" separator, rather than using cal.TimeSeparator
 					// Repeated here for consistency, plus ":" was already assumed in date parsing.
-					 }:${padZeros(Math.abs(value.getTimezoneOffset() % 60), 2)}`,
+					 }:${padZeros(Math.abs(value.getTimezoneOffset() % 60), 2)}`
 				);
           break;
         case 'g':
         case 'gg':
           if (cal.eras) {
-            ret.push(
-						cal.eras[getEra(value, eras)].name,
-					);
+            ret.push(cal.eras[getEra(value, eras)].name);
           }
           break;
         case '/':
@@ -1317,10 +1297,7 @@
       base = this.cultures[baseCultureName];
     }
 
-    this.cultures[cultureName] = extend(true, {},
-		base,
-		info,
-	);
+    this.cultures[cultureName] = extend(true, {}, base, info);
 	// Make the standard calendar the current culture if it's a new culture
     if (isNew) {
       this.cultures[cultureName].calendar = this.cultures[cultureName].calendars.standard;

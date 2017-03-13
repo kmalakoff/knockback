@@ -95,21 +95,25 @@ kb.LongDateLocalizer = class LongDateLocalizer extends kb.LocalizedObservable {
   }
 };
 
+// // NOTE: dependency on globalize - notice the alternative formulation with extend
+// kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 // NOTE: dependency on globalize - notice the alternative formulation with extend
-kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
+kb.ShortDateLocalizer = class ShortDateLocalizer extends kb.LocalizedObservable {
   constructor(value, options, view_model) {
     kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
     return kb.utils.wrappedObservable(this);
-  }, // return the observable instead of this
+  } // return the observable instead of this
+
   read(value) {
     return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-  },
+  }
+
   write(localized_string, value) {
     const new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
     if (!(new_value && _.isDate(new_value))) { return kb.utils.wrappedObservable(this).resetToCurrent(); } // reset if invalid
     return value.setTime(new_value.valueOf());
-  },
-});
+  }
+};
 // ##############################
 
 describe('localized-observable @quick @localization', () => {

@@ -61,8 +61,7 @@ describe('knockback_core utils @quick @core', () => {
     const counter_computed = ko.computed(() => {
       name();
       return ++counter;
-    },
-    );
+    });
 
     const counter_computed_ignore = ko.computed(() => {
       const value = kb.ignore(() => {
@@ -70,8 +69,7 @@ describe('knockback_core utils @quick @core', () => {
         return ++counter_ignore;
       });
       return assert.equal(value, counter_ignore);
-    },
-    );
+    });
 
     assert.equal(counter, 1);
     assert.equal(counter_ignore, 1);

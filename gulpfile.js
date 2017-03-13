@@ -32,7 +32,7 @@ const HEADER = (module.exports = `\
 `);
 const LIBRARY_FILES = require('./config/files').libraries;
 
-const buildLibraries = function(callback) {
+function buildLibraries(callback) {
   const errors = [];
   gulp.src('config/builds/library/**/*.webpack.config.js')
     .pipe(webpack())
@@ -42,12 +42,12 @@ const buildLibraries = function(callback) {
 };
 gulp.task('build', buildLibraries);
 
-gulp.task('watch', ['build'], function() {
-  gulp.watch('./src/**/*.js', () => buildLibraries(function() {}));
+gulp.task('watch', ['build'], () => {
+  gulp.watch('./src/**/*.js', () => buildLibraries(() => {}));
 });
 
-gulp.task('minify', ['build'], function(callback) {
-  gulp.src(['knockback.js', 'knockback-*.js'])
+gulp.task('minify', ['build'], (callback) => {
+  gulp.src(['knockback.js', 'knockback-*.js', '!*.min.js'])
     .pipe(uglify())
     .pipe(rename({suffix: '.min'}))
     .pipe(header(HEADER, {pkg: require('./package.json')}))
@@ -55,7 +55,7 @@ gulp.task('minify', ['build'], function(callback) {
     .on('end', callback);
 });
 
-const testNode = function(callback) {
+function testNode(callback) {
   const mochaOptions = {reporter: 'dot'};
   gutil.log(`Running Node.js tests`);
   gulp.src('test/spec/**/*.tests.js')
@@ -63,10 +63,9 @@ const testNode = function(callback) {
     .pipe(es.writeArray(callback));  
 };
 
-const testBrowsers = function(callback) {
+function testBrowsers(callback) {
   gutil.log(`Running Browser tests`);
   (require('./config/karma/run'))(callback);
-  
 };
 
 // gulp.task('test-node', testNode);
@@ -75,8 +74,8 @@ gulp.task('test-node', ['build'], testNode);
 gulp.task('test-browsers', testBrowsers);
 // gulp.task('test-browsers', ['minify'], testBrowsers);
 
-gulp.task('test', ['minify'], function(callback) {
-  Async.series([testNode, testBrowsers], function(err) { !err || console.log(err); return process.exit(err ? 1 : 0); });
+gulp.task('test', ['minify'], (callback) => {
+  Async.series([testNode, testBrowsers], (err) => { !err || console.log(err); return process.exit(err ? 1 : 0); });
 });
 
 const copyLibraryFiles = (destination, others, callback) =>
@@ -85,7 +84,7 @@ const copyLibraryFiles = (destination, others, callback) =>
     .on('end', callback)
 ;
 
-gulp.task('publish', ['minify'], function(callback) {
+gulp.task('publish', ['minify'], (callback) => {
   const queue = new Queue(1);
   // queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
   queue.defer(callback => copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback));
@@ -95,5 +94,5 @@ gulp.task('publish', ['minify'], function(callback) {
       .pipe(nugetGulp())
       .on('end', callback)
   );
-  queue.await(function(err) { !err || console.log(err); return process.exit(err ? 1 : 0); });
+  queue.await((err) => { !err || console.log(err); return process.exit(err ? 1 : 0); });
 });

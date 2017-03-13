@@ -577,6 +577,7 @@ var kb = function () {
 }();
 
 kb.initClass();
+module.exports = kb;
 
 if (window.Parse) {
   Backbone = kb.Parse = window.Parse;
@@ -591,8 +592,6 @@ kb.ko = ko;
 kb.Collection = Backbone.Collection;
 kb.Model = Backbone.Object || Backbone.Model;
 kb.Events = Backbone.Events;
-
-module.exports = kb;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
@@ -2569,7 +2568,8 @@ kb.compare = function (value_a, value_b) {
 //   Dual-purpose getter/setter ko.computed for the observed collection.
 //   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 //
-kb.CollectionObservable = function () {
+
+var CollectionObservable = function () {
   _createClass(CollectionObservable, null, [{
     key: 'initClass',
     value: function initClass() {
@@ -3252,7 +3252,10 @@ kb.CollectionObservable = function () {
 
   return CollectionObservable;
 }();
-undefined.initClass();
+
+;
+CollectionObservable.initClass();
+kb.CollectionObservable = CollectionObservable;
 
 // factory function
 kb.collectionObservable = function (collection, view_model, options) {
@@ -5128,7 +5131,7 @@ var _kb = kb = __webpack_require__(0),
 // Library of general-purpose utilities
 
 
-kb.utils = function () {
+var utils = function () {
   function utils() {
     _classCallCheck(this, utils);
   }
@@ -5471,7 +5474,10 @@ kb.utils = function () {
 
   return utils;
 }();
-undefined.initClass();
+
+;
+utils.initClass();
+kb.utils = utils;
 
 /***/ }),
 /* 16 */
@@ -5618,7 +5624,8 @@ var KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults
 //     var the_model = view_model.model(); // get
 //     view_model.model(new Backbone.Model({name: 'fred'})); // set
 //
-kb.ViewModel = function () {
+
+var ViewModel = function () {
   _createClass(ViewModel, null, [{
     key: 'initClass',
     value: function initClass() {
@@ -5883,7 +5890,10 @@ kb.ViewModel = function () {
 
   return ViewModel;
 }();
-undefined.initClass();
+
+;
+ViewModel.initClass();
+kb.ViewModel = ViewModel;
 
 // Factory function to create a kb.ViewModel.
 kb.viewModel = function (model, options, view_model) {

@@ -99,7 +99,7 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
 //     var the_model = view_model.model(); // get
 //     view_model.model(new Backbone.Model({name: 'fred'})); // set
 //
-kb.ViewModel = class ViewModel {
+class ViewModel {
   static initClass() {
     // @nodoc
     this.extend = extend;
@@ -220,7 +220,8 @@ kb.ViewModel = class ViewModel {
     }
   }
 };
-undefined.initClass();
+ViewModel.initClass();
+kb.ViewModel = ViewModel;
 
 // Factory function to create a kb.ViewModel.
 kb.viewModel = function (model, options, view_model) { return new kb.ViewModel(arguments); };

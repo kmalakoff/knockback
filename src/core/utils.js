@@ -15,7 +15,7 @@ const { _, ko } = (kb = require('./kb'));
 // ###################################################
 
 // Library of general-purpose utilities
-kb.utils = class utils {
+class utils {
   static initClass() {
     // Clean up function that releases all of the wrapped values on an owner.
     this.wrappedDestroy = require('./functions/wrapped_destroy');
@@ -212,4 +212,5 @@ kb.utils = class utils {
   // @nodoc
   static resolveModel(model) { if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) { return model.model(); } return model; }
 };
-undefined.initClass();
+utils.initClass();
+kb.utils = utils;

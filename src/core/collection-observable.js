@@ -58,7 +58,7 @@ kb.compare = function (value_a, value_b) {
 //   Dual-purpose getter/setter ko.computed for the observed collection.
 //   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 //
-kb.CollectionObservable = class CollectionObservable {
+class CollectionObservable {
   static initClass() {
     // @nodoc
     this.extend = extend;
@@ -501,7 +501,8 @@ kb.CollectionObservable = class CollectionObservable {
     return true;
   }
 };
-undefined.initClass();
+CollectionObservable.initClass();
+kb.CollectionObservable = CollectionObservable;
 
 // factory function
 kb.collectionObservable = function (collection, view_model, options) { return new kb.CollectionObservable(arguments); };

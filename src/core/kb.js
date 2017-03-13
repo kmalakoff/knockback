@@ -241,6 +241,7 @@ class kb {
   static isCollection(obj) { return obj && (obj instanceof kb.Collection); }
 }
 kb.initClass();
+module.exports = kb;
 
 if (window.Parse) {
   Backbone = (kb.Parse = window.Parse);
@@ -255,5 +256,3 @@ kb.ko = ko;
 kb.Collection = Backbone.Collection;
 kb.Model = Backbone.Object || Backbone.Model;
 kb.Events = Backbone.Events;
-
-module.exports = kb;
