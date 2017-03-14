@@ -1,5 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => {
   // after -> delete root.Person

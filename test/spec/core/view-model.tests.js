@@ -1,4 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('view-model @quick @view-model', () => {
   let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
@@ -607,7 +608,7 @@ describe('view-model @quick @view-model', () => {
   });
 
   it('14. model replacement with select', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
 
     kb.statistics = new kb.Statistics();
 
@@ -659,7 +660,7 @@ describe('view-model @quick @view-model', () => {
   });
 
   it('16. model replacement with input', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
 
     kb.statistics = new kb.Statistics();
 
@@ -707,7 +708,7 @@ describe('view-model @quick @view-model', () => {
   });
 
   it('17. model replacement with multiple selects and weird backbone bug', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
 
     kb.statistics = new kb.Statistics();
 
@@ -978,7 +979,7 @@ describe('view-model @quick @view-model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ECOSYSTEM
-    if (kb.Parse) { return done(); }
+    if (kb.Parse) return done();
 
     const Child = kb.Model.extend();
 

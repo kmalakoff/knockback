@@ -1,4 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 // https://github.com/kmalakoff/knockback/issues/159
 describe('issue 159 @issue159 @quick', () => {
@@ -16,7 +17,7 @@ describe('issue 159 @issue159 @quick', () => {
   });
 
   return it('has no issue', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
 
     kb.statistics = new kb.Statistics(); // turn on stats
 

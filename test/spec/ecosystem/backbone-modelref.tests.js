@@ -1,5 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('Knockback.js with Backbone.ModelRef.js @backbone-modelref', () => {
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback

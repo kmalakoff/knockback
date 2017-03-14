@@ -1,5 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe.skip('Knockback.js with Backbone-Associations.js @backbone-associations', () => {
   // after -> delete root.Person; delete root.Building

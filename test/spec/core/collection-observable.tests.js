@@ -1,4 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('collection-observable @quick @collection-observable', () => {
   let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined;
@@ -771,7 +772,7 @@ describe('collection-observable @quick @collection-observable', () => {
   });
 
   it('20. push and unshift', (done) => {
-    if (kb.Backbone && (kb.Backbone.VERSION[0] !== '1')) { return done(); }
+    if (kb.Backbone && (kb.Backbone.VERSION[0] !== '1')) return done();
 
     kb.statistics = new kb.Statistics(); // turn on stats
 

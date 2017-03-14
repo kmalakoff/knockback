@@ -1,4 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('knockback_core utils @quick @core', () => {
   let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
@@ -15,7 +16,7 @@ describe('knockback_core utils @quick @core', () => {
   });
 
   it('kb.renderTemplate', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
 
     kb.statistics = new kb.Statistics(); // turn on stats
 

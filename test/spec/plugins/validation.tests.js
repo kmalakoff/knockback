@@ -1,10 +1,10 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
-var window = (window != null) ? window : global;
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('validation @quick @validation', () => {
-  let kb = window != null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? root.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
-  const $ = window != null ? window.$ : undefined;
+  const $ = root ? root.$ : undefined;
 
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
@@ -51,8 +51,8 @@ describe('validation @quick @validation', () => {
   });
 
   it('kb.inputValidator', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model =
@@ -94,14 +94,14 @@ describe('validation @quick @validation', () => {
   });
 
   it('kb.inputValidator with custom validators', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model =
       { name: ko.observable() };
 
-    window.nameTaken = value => value === 'Bob';
+    root.nameTaken = value => value === 'Bob';
     const el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {unique: nameTaken}" required>')[0];
     ko.applyBindings(view_model, el);
 
@@ -149,13 +149,13 @@ describe('validation @quick @validation', () => {
   });
 
   it('kb.inputValidator with validation_options', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     let view_model =
       { name: ko.observable() };
-    window.disable = ko.observable(true);
+    root.disable = ko.observable(true);
     let el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: \'url\'}" required>')[0];
     ko.applyBindings(view_model, el);
 
@@ -171,21 +171,21 @@ describe('validation @quick @validation', () => {
     assert.ok(!validator().$error_count, 'obs: validator is not invalid');
     assert.ok(!validator().$active_error, 'obs: active error does not exist');
 
-    window.disable(false);
+    root.disable(false);
     assert.ok(validator().required, 'obs: required is invalid');
     assert.ok(validator().url, 'obs: url is invalid');
     assert.ok(!validator().$valid, 'obs: validator not valid');
     assert.ok(validator().$error_count, 'obs: validator is invalid');
     assert.equal(validator().$active_error, 'url', 'obs: active error is url');
 
-    window.disable(() => true);
+    root.disable(() => true);
     assert.ok(!validator().required, 'obs fn: required is valid');
     assert.ok(!validator().url, 'obs fn: url is valid');
     assert.ok(validator().$valid, 'obs fn: validator is valid');
     assert.ok(!validator().$error_count, 'obs fn: validator is not invalid');
     assert.ok(!validator().$active_error, 'obs fn: error does not exist');
 
-    window.disable(() => false);
+    root.disable(() => false);
     assert.ok(validator().required, 'obs fn: required is invalid');
     assert.ok(validator().url, 'obs fn: url is invalid');
     assert.ok(!validator().$valid, 'obs fn: validator not valid');
@@ -196,7 +196,7 @@ describe('validation @quick @validation', () => {
 
     view_model =
       { name: ko.observable() };
-    window.disable = () => true;
+    root.disable = () => true;
     el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable}" required>')[0];
     ko.applyBindings(view_model, el);
 
@@ -219,8 +219,8 @@ describe('validation @quick @validation', () => {
   });
 
   it('kb.formValidator with name', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = {
@@ -293,8 +293,8 @@ describe('validation @quick @validation', () => {
   });
 
   it('kb.formValidator no name with validation_options', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = {
@@ -313,7 +313,7 @@ describe('validation @quick @validation', () => {
 </form>\
 `;
 
-    window.enable = ko.observable(false);
+    root.enable = ko.observable(false);
     const el = $(HTML)[0];
     ko.applyBindings(view_model, el);
 
@@ -330,7 +330,7 @@ describe('validation @quick @validation', () => {
     assert.ok(!validator().$error_count, 'validator is not invalid');
 
     // enabled
-    window.enable(() => true);
+    root.enable(() => true);
     assert.ok(validator().required, 'required is invalid');
     assert.ok(!validator().$valid, 'validator not valid');
     assert.ok(validator().$error_count, 'validator is invalid');
@@ -374,11 +374,11 @@ describe('validation @quick @validation', () => {
   });
 
   it('kb.formValidator with inject and disable', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    window.MyViewModel = kb.ViewModel.extend({
+    root.MyViewModel = kb.ViewModel.extend({
       constructor() {
         const model = new kb.Model({ name: '', site: '' });
         kb.ViewModel.prototype.constructor.call(this, model);
@@ -400,7 +400,7 @@ describe('validation @quick @validation', () => {
 </div>\
 `;
 
-    window.disable = ko.observable(true);
+    root.disable = ko.observable(true);
     const inject_el = $(HTML)[0];
     const injected = kb.injectViewModels(inject_el);
     assert.equal(injected[0].el, inject_el, 'app was injected');
@@ -419,7 +419,7 @@ describe('validation @quick @validation', () => {
     assert.ok(!validator().$error_count, 'validator is not invalid');
 
     // enabled
-    window.disable(() => false);
+    root.disable(() => false);
     assert.ok(validator().required, 'required is invalid');
     assert.ok(!validator().$valid, 'validator not valid');
     assert.ok(validator().$error_count, 'validator is invalid');
@@ -464,8 +464,8 @@ describe('validation @quick @validation', () => {
   });
 
   return it('kb.inputValidator without required', (done) => {
-    if (!$ || !(window != null ? window.document : undefined)) { return done(); }
-    if (!window.kb) { window.kb = kb; } // make kb global for bindings
+    if (!$ || !root.document) return done();
+    if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model =
