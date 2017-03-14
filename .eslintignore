@@ -1,4 +1,5 @@
 node_modules
+test/lib
 vendor
 knockback-core-stack.js
 knockback-core-stack.min.js
