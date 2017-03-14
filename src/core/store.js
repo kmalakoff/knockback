@@ -74,7 +74,9 @@ module.exports = __initClass__(kb.Store = class Store {
   compact() {
     for (const creator_id in this.observable_records) {
       const records = this.observable_records[creator_id];
-      records.forEach((cid) => { const observable = records[cid]; if (observable.__kb_released) { delete records[cid]; } });
+      for (const cid in records) {
+        if (records[cid].__kb_released) delete records[cid];
+      };
     }
   }
 
@@ -92,7 +94,7 @@ module.exports = __initClass__(kb.Store = class Store {
   //   store.retain(observable, obj, creator);
   retain(observable, obj, creator) {
     let current_observable;
-    if (!this._canRegister(observable)) { return; }
+    if (!this._canRegister(observable)) return;
     if (!creator) { creator = observable.constructor; } // default is to use the constructor
 
     if (current_observable = this.find(obj, creator)) {
@@ -144,7 +146,7 @@ module.exports = __initClass__(kb.Store = class Store {
   reuse(observable, obj) {
     let current_obj,
       current_observable;
-    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) { return; }
+    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) return;
     if (!this._canRegister(observable)) { throw new Error('Cannot reuse a simple observable'); }
     if (this._refCount(observable) !== 1) { throw new Error(`Trying to change a shared view model. Ref count: ${this._refCount(observable)}`); }
 
@@ -161,12 +163,12 @@ module.exports = __initClass__(kb.Store = class Store {
 
     // maybe be externally added
     if (store_references = this._storeReferences(observable)) {
-      if (!force && (--store_references.ref_count > 0)) { return; } // do not release yet
+      if (!force && (--store_references.ref_count > 0)) return; // do not release yet
       this._clearStoreReferences(observable);
     }
 
     this._remove(observable);
-    if (observable.__kb_released) { return; }
+    if (observable.__kb_released) return;
     if (force || (this._refCount(observable) <= 1)) { return kb.release(observable); } // allow for a single initial reference in another store
   }
 

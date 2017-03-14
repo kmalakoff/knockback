@@ -20,7 +20,7 @@ kb.ViewModel.prototype.setToDefault = function () { for (const vm_key in this.__
 //   }; // view_model.wrapped name: Bob
 //   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
 kb.utils.setToDefault = function (obj) {
-  if (!obj) { return; }
+  if (!obj) return;
 
   // observable
   if (ko.isObservable(obj)) {

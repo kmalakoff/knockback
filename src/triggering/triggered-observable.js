@@ -79,7 +79,7 @@ module.exports = kb.TriggeredObservable = class TriggeredObservable {
   // ###################################################
   // @nodoc
   update() {
-    if (!this.ee) { return; } // do not trigger if there is no emitter
+    if (!this.ee) return; // do not trigger if there is no emitter
     if (this.vo() !== this.ee) { return this.vo(this.ee); } return this.vo.valueHasMutated();  // manually trigger the dependable
   }
 };

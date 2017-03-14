@@ -142,17 +142,18 @@ class CollectionObservable {
         read: () => this._collection(),
         write: new_collection => kb.ignore(() => {
           let previous_collection;
-          if ((previous_collection = this._collection()) === new_collection) { return; } // no change
-        // @create_options.store.reuse(@, new_collection) # not meant to be shared
+          if ((previous_collection = this._collection()) === new_collection) return; // no change
+
+          // @create_options.store.reuse(@, new_collection) # not meant to be shared
           kb.utils.wrappedObject(observable, new_collection);
 
-        // clean up
+          // clean up
           if (previous_collection) { previous_collection.unbind('all', this._onCollectionChange); }
 
-        // store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
+          // store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
           if (new_collection) { new_collection.bind('all', this._onCollectionChange); }
 
-        // update references (including notification)
+          // update references (including notification)
           return this._collection(new_collection);
         },
       ),
@@ -161,16 +162,14 @@ class CollectionObservable {
 
       // observable that will re-trigger when sort or filters or collection changes
       this._mapper = ko.computed(() => {
-        let filter,
-          models,
-          view_models;
+        let filter, models, view_models;
         const comparator = this._comparator(); // create dependency
         const filters = this._filters(); // create dependency
         if (filters) {
           ((() => filters.map(filter => ko.utils.unwrapObservable(filter)))());
         } // create a dependency
         const current_collection = this._collection(); // create dependency
-        if (this.in_edit) { return; } // we are doing the editing
+        if (this.in_edit) return; // we are doing the editing
 
         // no models
         observable = kb.utils.wrappedObservable(this);
@@ -309,7 +308,7 @@ class CollectionObservable {
   compact() {
     return kb.ignore(() => {
       const observable = kb.utils.wrappedObservable(this);
-      if (!kb.utils.wrappedStoreIsOwned(observable)) { return; }
+      if (!kb.utils.wrappedStoreIsOwned(observable)) return;
       kb.utils.wrappedStore(observable).clear();
       return this._collection.notifySubscribers(this._collection());
     },
@@ -364,9 +363,8 @@ class CollectionObservable {
   // @nodoc
   _onCollectionChange(event, arg) {
     return kb.ignore(() => {
-      let comparator,
-        view_model;
-      if (this.in_edit || kb.wasReleased(this)) { return; } // we are doing the editing or have been released
+      let comparator, view_model;
+      if (this.in_edit || kb.wasReleased(this)) return; // we are doing the editing or have been released
 
       switch (event) {
         case 'reset':
@@ -377,12 +375,12 @@ class CollectionObservable {
           break;
 
         case 'new': case 'add':
-          if (!this._selectModel(arg)) { return; } // filtered
+          if (!this._selectModel(arg)) return; // filtered
 
           const observable = kb.utils.wrappedObservable(this);
           const collection = this._collection();
-          if (collection.indexOf(arg) === -1) { return; } // the model may have been removed before we got a chance to add it
-          if (view_model = this.viewModelByModel(arg)) { return; } // it may have already been added by a change event
+          if (collection.indexOf(arg) === -1) return; // the model may have been removed before we got a chance to add it
+          if (view_model = this.viewModelByModel(arg)) return; // it may have already been added by a change event
           this.in_edit++;
           if (comparator = this._comparator()) {
             observable().push(this._createViewModel(arg));
@@ -400,7 +398,7 @@ class CollectionObservable {
 
           view_model = this.models_only ? arg : this.viewModelByModel(arg);
           if (!view_model) { return this._onCollectionChange('add', arg); } // add new
-          if (!(comparator = this._comparator())) { return; }
+          if (!(comparator = this._comparator())) return;
 
           this.in_edit++;
           kb.utils.wrappedObservable(this).sort(comparator);
@@ -414,7 +412,7 @@ class CollectionObservable {
   // @nodoc
   _onModelRemove(model) {
     const view_model = this.models_only ? model : this.viewModelByModel(model); // either remove a view model or a model
-    if (!view_model) { return; }  // it may have already been removed
+    if (!view_model) return;  // it may have already been removed
     const observable = kb.utils.wrappedObservable(this);
     this.in_edit++;
     observable.remove(view_model);
@@ -425,7 +423,7 @@ class CollectionObservable {
   _onObservableArrayChange = (models_or_view_models) => {
     return kb.ignore(() => {
       let models;
-      if (this.in_edit) { return; } // we are doing the editing
+      if (this.in_edit) return; // we are doing the editing
 
     // validate input
       (this.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0]))) || (!this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])))) || kb._throwUnexpected(this, 'incorrect type passed');
@@ -433,7 +431,7 @@ class CollectionObservable {
       const observable = kb.utils.wrappedObservable(this);
       const collection = kb.peek(this._collection);
       const has_filters = kb.peek(this._filters).length;
-      if (!collection) { return; } // no collection or we are updating ourselves
+      if (!collection) return; // no collection or we are updating ourselves
 
       let view_models = models_or_view_models;
 

@@ -1,7 +1,7 @@
 const root = (typeof window !== 'undefined' && window !== null) ? window : global;
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe('Knockback.js with Backbone-Associations.js @backbone-associations', () => {
+describe.skip('Knockback.js with Backbone-Associations.js @backbone-associations', () => {
   // after -> delete root.Person; delete root.Building
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
@@ -25,7 +25,7 @@ describe('Knockback.js with Backbone-Associations.js @backbone-associations', ()
     return done();
   });
 
-  if (!(Backbone != null ? Backbone.Associations : undefined)) { return; }
+  if (!(Backbone != null ? Backbone.Associations : undefined)) return;
   Backbone.Associations.scopes.push(root);
 
   root.Person = (Person = Backbone.AssociatedModel.extend({

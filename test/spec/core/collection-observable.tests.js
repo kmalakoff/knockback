@@ -1,6 +1,6 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe.only('collection-observable @quick @collection-observable', () => {
+describe('collection-observable @quick @collection-observable', () => {
   let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
 
@@ -104,7 +104,7 @@ describe.only('collection-observable @quick @collection-observable', () => {
     return done();
   });
 
-  it.only('4. Basic Usage: no view models', (done) => {
+  it('4. Basic Usage: no view models', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();

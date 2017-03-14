@@ -119,7 +119,7 @@ kb.Observable = class Observable {
       observable.model = (this.model = ko.computed({
         read: () => ko.utils.unwrapObservable(this._model),
         write: new_model => kb.ignore(() => {
-          if (this.__kb_released || (kb.peek(this._model) === new_model)) { return; } // destroyed or no change
+          if (this.__kb_released || (kb.peek(this._model) === new_model)) return; // destroyed or no change
 
         // update references
           const new_value = kb.getValue(new_model, kb.peek(this.key), this.args);
@@ -164,7 +164,7 @@ kb.Observable = class Observable {
   // ###################################################
   // @nodoc
   update(new_value) {
-    if (this.__kb_released) { return; } // destroyed, nothing to do
+    if (this.__kb_released) return; // destroyed, nothing to do
     if (!arguments.length) { new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key)); }
     return this._value.update(new_value);
   }

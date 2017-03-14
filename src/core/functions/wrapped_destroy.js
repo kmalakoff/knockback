@@ -12,7 +12,7 @@ const { _ } = require('../kb');
 
 // @nodoc
 module.exports = (wrappedDestroy = function (obj) {
-  if (!obj.__kb) { return; }
+  if (!obj.__kb) return;
   if (obj.__kb.event_watcher) { obj.__kb.event_watcher.releaseCallbacks(obj); }
 
   const { __kb } = obj; obj.__kb = null; // clear now to break cycles

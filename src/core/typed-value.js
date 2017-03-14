@@ -29,7 +29,7 @@ module.exports = TypedValue = class TypedValue {
   }
 
   update(new_value) {
-    if (this.__kb_released) { return; } // destroyed, nothing to do
+    if (this.__kb_released) return; // destroyed, nothing to do
 
     // determine the new type
     (new_value !== undefined) || (new_value = null); // ensure null instead of undefined

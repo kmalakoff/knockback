@@ -197,7 +197,7 @@ describe('view-model @quick @view-model', () => {
       release() {
         --this.ref_count;
         if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
-        if (this.ref_count) { return; }
+        if (this.ref_count) return;
         this.is_destroyed = true;
         return this.super_destroy();
       }
@@ -245,7 +245,7 @@ describe('view-model @quick @view-model', () => {
       release() {
         --this.ref_count;
         if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
-        if (this.ref_count) { return; }
+        if (this.ref_count) return;
         this.is_destroyed = true;
         this.super_destroy();
       },

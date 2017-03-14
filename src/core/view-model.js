@@ -14,7 +14,7 @@ const extend = require('./functions/extend');
 // @nodoc
 const assignViewModelKey = function (vm, key) {
   const vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? `_${key}` : key;
-  if (vm.__kb.view_model.hasOwnProperty(vm_key)) { return; } // already exists, skip
+  if (vm.__kb.view_model.hasOwnProperty(vm_key)) return; // already exists, skip
   vm.__kb.view_model[vm_key] = null;
   return vm_key;
 };
@@ -22,9 +22,9 @@ const assignViewModelKey = function (vm, key) {
 // @nodoc
 const createObservable = function (vm, model, key, create_options) {
   let vm_key;
-  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) { return; }
-  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) { return; }
-  if (!(vm_key = assignViewModelKey(vm, key))) { return; }
+  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) return;
+  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return;
+  if (!(vm_key = assignViewModelKey(vm, key))) return;
   return vm[vm_key] = (vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm));
 };
 
@@ -144,7 +144,7 @@ class ViewModel {
       this.model = ko.computed({
         read: () => ko.utils.unwrapObservable(_model),
         write: new_model => kb.ignore(() => {
-          if ((kb.utils.wrappedObject(this) === new_model) || kb.wasReleased(this) || !event_watcher) { return; }
+          if ((kb.utils.wrappedObject(this) === new_model) || kb.wasReleased(this) || !event_watcher) return;
 
           this.__kb.store.reuse(this, kb.utils.resolveModel(new_model));
           event_watcher.emitter(new_model); _model(event_watcher.ee);
@@ -197,7 +197,7 @@ class ViewModel {
     let key;
     if (!keys) {
       let rel_keys;
-      if (this.__kb.keys || !model) { return; } // only use the keys provided
+      if (this.__kb.keys || !model) return; // only use the keys provided
       for (key in model.attributes) { createObservable(this, model, key, this.__kb.create_options); }
       if (rel_keys = __guardMethod__(kb.settings.orm, 'keys', o => o.keys(model))) {
         ((() => rel_keys.map(key => createObservable(this, model, key, this.__kb.create_options)))());

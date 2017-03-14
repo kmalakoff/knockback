@@ -25,7 +25,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
     return done();
   });
 
-  if (!(Backbone != null ? Backbone.Relational : undefined)) { return; }
+  if (!(Backbone != null ? Backbone.Relational : undefined)) return;
   kb.configure({ orm: 'backbone-relational' });
   Backbone.Relational.store = new Backbone.Store(); if (typeof Backbone.Relational.store.addModelScope === 'function') {
     Backbone.Relational.store.addModelScope(root);

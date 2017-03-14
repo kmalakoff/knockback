@@ -26,7 +26,7 @@ const _mergeObject = function (result, key, value) {
 // @nodoc
 const _keyArrayToObject = function (value) {
   const result = {};
-  value.forEach((value) => { result[item] = { key: item }; });
+  value.forEach((item) => { result[item] = { key: item }; });
   return result;
 };
 
@@ -55,8 +55,7 @@ var _mergeOptions = function (result, options) {
         if (_.isFunction(value)) { result[key] = value; } else { _mergeObject(result, key, value); }
         break;
       case 'static_defaults': _mergeObject(result, key, value); break;
-      case 'options': then;
-        break;
+      case 'options': break;
       default:
         result[key] = value;
     }

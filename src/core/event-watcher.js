@@ -158,7 +158,7 @@ kb.EventWatcher = class EventWatcher {
 
   // @nodoc
   _onModelUnloaded(model) {
-    if (this.ee !== model) { return; }
+    if (this.ee !== model) return;
     this.ee = null;
     for (const event_name in this.__kb.callbacks) { const callbacks = this.__kb.callbacks[event_name]; this._unbindCallbacks(event_name, callbacks); } // unbind all events
   }

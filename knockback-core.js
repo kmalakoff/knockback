@@ -243,9 +243,7 @@ var kb = function () {
       var array = void 0,
           index = void 0,
           value = void 0;
-      if (!kb.isReleaseable(obj)) {
-        return;
-      }
+      if (!kb.isReleaseable(obj)) return;
       obj.__kb_released = true; // mark as released
 
       // release array's items
@@ -400,9 +398,7 @@ var kb = function () {
     key: 'setValue',
     value: function setValue(model, key, value) {
       var attributes = void 0;
-      if (!model) {
-        return;
-      }
+      if (!model) return;
       if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
       (attributes = {})[key] = value;
       return model.set(attributes);
@@ -617,9 +613,7 @@ module.exports = TypedValue = function () {
   }, {
     key: 'update',
     value: function update(new_value) {
-      if (this.__kb_released) {
-        return;
-      } // destroyed, nothing to do
+      if (this.__kb_released) return; // destroyed, nothing to do
 
       // determine the new type
       new_value !== undefined || (new_value = null); // ensure null instead of undefined
@@ -989,9 +983,8 @@ var CollectionObservable = function () {
         write: function write(new_collection) {
           return kb.ignore(function () {
             var previous_collection = void 0;
-            if ((previous_collection = _this._collection()) === new_collection) {
-              return;
-            } // no change
+            if ((previous_collection = _this._collection()) === new_collection) return; // no change
+
             // @create_options.store.reuse(@, new_collection) # not meant to be shared
             kb.utils.wrappedObject(observable, new_collection);
 
@@ -1029,9 +1022,7 @@ var CollectionObservable = function () {
           })();
         } // create a dependency
         var current_collection = _this._collection(); // create dependency
-        if (_this.in_edit) {
-          return;
-        } // we are doing the editing
+        if (_this.in_edit) return; // we are doing the editing
 
         // no models
         observable = kb.utils.wrappedObservable(_this);
@@ -1215,9 +1206,7 @@ var CollectionObservable = function () {
 
       return kb.ignore(function () {
         var observable = kb.utils.wrappedObservable(_this2);
-        if (!kb.utils.wrappedStoreIsOwned(observable)) {
-          return;
-        }
+        if (!kb.utils.wrappedStoreIsOwned(observable)) return;
         kb.utils.wrappedStore(observable).clear();
         return _this2._collection.notifySubscribers(_this2._collection());
       });
@@ -1288,9 +1277,7 @@ var CollectionObservable = function () {
       return kb.ignore(function () {
         var comparator = void 0,
             view_model = void 0;
-        if (_this3.in_edit || kb.wasReleased(_this3)) {
-          return;
-        } // we are doing the editing or have been released
+        if (_this3.in_edit || kb.wasReleased(_this3)) return; // we are doing the editing or have been released
 
         switch (event) {
           case 'reset':
@@ -1305,18 +1292,12 @@ var CollectionObservable = function () {
             break;
 
           case 'new':case 'add':
-            if (!_this3._selectModel(arg)) {
-              return;
-            } // filtered
+            if (!_this3._selectModel(arg)) return; // filtered
 
             var observable = kb.utils.wrappedObservable(_this3);
             var collection = _this3._collection();
-            if (collection.indexOf(arg) === -1) {
-              return;
-            } // the model may have been removed before we got a chance to add it
-            if (view_model = _this3.viewModelByModel(arg)) {
-              return;
-            } // it may have already been added by a change event
+            if (collection.indexOf(arg) === -1) return; // the model may have been removed before we got a chance to add it
+            if (view_model = _this3.viewModelByModel(arg)) return; // it may have already been added by a change event
             _this3.in_edit++;
             if (comparator = _this3._comparator()) {
               observable().push(_this3._createViewModel(arg));
@@ -1339,9 +1320,7 @@ var CollectionObservable = function () {
             if (!view_model) {
               return _this3._onCollectionChange('add', arg);
             } // add new
-            if (!(comparator = _this3._comparator())) {
-              return;
-            }
+            if (!(comparator = _this3._comparator())) return;
 
             _this3.in_edit++;
             kb.utils.wrappedObservable(_this3).sort(comparator);
@@ -1357,9 +1336,7 @@ var CollectionObservable = function () {
     key: '_onModelRemove',
     value: function _onModelRemove(model) {
       var view_model = this.models_only ? model : this.viewModelByModel(model); // either remove a view model or a model
-      if (!view_model) {
-        return;
-      } // it may have already been removed
+      if (!view_model) return; // it may have already been removed
       var observable = kb.utils.wrappedObservable(this);
       this.in_edit++;
       observable.remove(view_model);
@@ -1422,9 +1399,7 @@ var _initialiseProps = function _initialiseProps() {
   this._onObservableArrayChange = function (models_or_view_models) {
     return kb.ignore(function () {
       var models = void 0;
-      if (_this4.in_edit) {
-        return;
-      } // we are doing the editing
+      if (_this4.in_edit) return; // we are doing the editing
 
       // validate input
       _this4.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0])) || !_this4.models_only && (!models_or_view_models.length || _.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])) || kb._throwUnexpected(_this4, 'incorrect type passed');
@@ -1432,9 +1407,7 @@ var _initialiseProps = function _initialiseProps() {
       var observable = kb.utils.wrappedObservable(_this4);
       var collection = kb.peek(_this4._collection);
       var has_filters = kb.peek(_this4._filters).length;
-      if (!collection) {
-        return;
-      } // no collection or we are updating ourselves
+      if (!collection) return; // no collection or we are updating ourselves
 
       var view_models = models_or_view_models;
 
@@ -1711,9 +1684,7 @@ kb.EventWatcher = function () {
   }, {
     key: '_onModelUnloaded',
     value: function _onModelUnloaded(model) {
-      if (this.ee !== model) {
-        return;
-      }
+      if (this.ee !== model) return;
       this.ee = null;
       for (var event_name in this.__kb.callbacks) {
         var callbacks = this.__kb.callbacks[event_name];this._unbindCallbacks(event_name, callbacks);
@@ -2342,9 +2313,7 @@ kb.Observable = function () {
         },
         write: function write(new_model) {
           return kb.ignore(function () {
-            if (_this.__kb_released || kb.peek(_this._model) === new_model) {
-              return;
-            } // destroyed or no change
+            if (_this.__kb_released || kb.peek(_this._model) === new_model) return; // destroyed or no change
 
             // update references
             var new_value = kb.getValue(new_model, kb.peek(_this.key), _this.args);
@@ -2413,9 +2382,7 @@ kb.Observable = function () {
   }, {
     key: 'update',
     value: function update(new_value) {
-      if (this.__kb_released) {
-        return;
-      } // destroyed, nothing to do
+      if (this.__kb_released) return; // destroyed, nothing to do
       if (!arguments.length) {
         new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
       }
@@ -2743,19 +2710,11 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: 'compact',
     value: function compact() {
-      var _this2 = this;
-
-      var _loop = function _loop(creator_id) {
-        var records = _this2.observable_records[creator_id];
-        records.forEach(function (cid) {
-          var observable = records[cid];if (observable.__kb_released) {
-            delete records[cid];
-          }
-        });
-      };
-
       for (var creator_id in this.observable_records) {
-        _loop(creator_id);
+        var records = this.observable_records[creator_id];
+        for (var cid in records) {
+          if (records[cid].__kb_released) delete records[cid];
+        };
       }
     }
 
@@ -2776,9 +2735,7 @@ module.exports = __initClass__(kb.Store = function () {
     key: 'retain',
     value: function retain(observable, obj, creator) {
       var current_observable = void 0;
-      if (!this._canRegister(observable)) {
-        return;
-      }
+      if (!this._canRegister(observable)) return;
       if (!creator) {
         creator = observable.constructor;
       } // default is to use the constructor
@@ -2813,7 +2770,7 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: 'retainOrCreate',
     value: function retainOrCreate(obj, options, deep_retain) {
-      var _this3 = this;
+      var _this2 = this;
 
       var creator = void 0,
           observable = void 0;
@@ -2832,7 +2789,7 @@ module.exports = __initClass__(kb.Store = function () {
       }
 
       observable = kb.ignore(function () {
-        options = _.defaults({ store: _this3, creator: creator }, options); // set our own creator so we can register ourselves above
+        options = _.defaults({ store: _this2, creator: creator }, options); // set our own creator so we can register ourselves above
         observable = creator.create ? creator.create(obj, options) : new creator(obj, options);
         return observable || ko.observable(null);
       }); // default to null
@@ -2848,9 +2805,7 @@ module.exports = __initClass__(kb.Store = function () {
     value: function reuse(observable, obj) {
       var current_obj = void 0,
           current_observable = void 0;
-      if ((current_obj = kb.utils.wrappedObject(observable)) === obj) {
-        return;
-      }
+      if ((current_obj = kb.utils.wrappedObject(observable)) === obj) return;
       if (!this._canRegister(observable)) {
         throw new Error('Cannot reuse a simple observable');
       }
@@ -2880,16 +2835,12 @@ module.exports = __initClass__(kb.Store = function () {
 
       // maybe be externally added
       if (store_references = this._storeReferences(observable)) {
-        if (!force && --store_references.ref_count > 0) {
-          return;
-        } // do not release yet
+        if (!force && --store_references.ref_count > 0) return; // do not release yet
         this._clearStoreReferences(observable);
       }
 
       this._remove(observable);
-      if (observable.__kb_released) {
-        return;
-      }
+      if (observable.__kb_released) return;
       if (force || this._refCount(observable) <= 1) {
         return kb.release(observable);
       } // allow for a single initial reference in another store
@@ -2972,13 +2923,13 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: '_storeReferences',
     value: function _storeReferences(observable) {
-      var _this4 = this;
+      var _this3 = this;
 
       var stores_references = kb.utils.get(observable, 'stores_references');
       if (!stores_references) return;
 
       return _.find(stores_references, function (ref) {
-        return ref.store === _this4;
+        return ref.store === _this3;
       });
     }
 
@@ -2987,15 +2938,15 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: '_getOrCreateStoreReferences',
     value: function _getOrCreateStoreReferences(observable) {
-      var _this5 = this;
+      var _this4 = this;
 
       var stores_references = kb.utils.orSet(observable, 'stores_references', []);
 
       var ref = _.find(stores_references, function (ref) {
-        return ref.store === _this5;
+        return ref.store === _this4;
       });
       if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: function release() {
-          return _this5.release(observable);
+          return _this4.release(observable);
         } });
       return ref;
     }
@@ -3257,11 +3208,9 @@ var utils = function () {
   }, {
     key: 'wrappedModel',
     value: function wrappedModel(obj, value) {
-      if (arguments.length === 1) {
-        _.isUndefined(value = kb.utils.get(obj, 'object')) ? obj : value;
-      } else {
-        return kb.utils.set(obj, 'object', value);
-      }
+      if (arguments.length !== 1) return kb.utils.set(obj, 'object', value);
+      value = kb.utils.get(obj, 'object');
+      return _.isUndefined(value) ? obj : value;
     }
 
     // Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
@@ -3495,9 +3444,7 @@ var extend = __webpack_require__(4);
 // @nodoc
 var assignViewModelKey = function assignViewModelKey(vm, key) {
   var vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? '_' + key : key;
-  if (vm.__kb.view_model.hasOwnProperty(vm_key)) {
-    return;
-  } // already exists, skip
+  if (vm.__kb.view_model.hasOwnProperty(vm_key)) return; // already exists, skip
   vm.__kb.view_model[vm_key] = null;
   return vm_key;
 };
@@ -3505,15 +3452,9 @@ var assignViewModelKey = function assignViewModelKey(vm, key) {
 // @nodoc
 var createObservable = function createObservable(vm, model, key, create_options) {
   var vm_key = void 0;
-  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) {
-    return;
-  }
-  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) {
-    return;
-  }
-  if (!(vm_key = assignViewModelKey(vm, key))) {
-    return;
-  }
+  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) return;
+  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return;
+  if (!(vm_key = assignViewModelKey(vm, key))) return;
   return vm[vm_key] = vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm);
 };
 
@@ -3659,9 +3600,7 @@ var ViewModel = function () {
         },
         write: function write(new_model) {
           return kb.ignore(function () {
-            if (kb.utils.wrappedObject(_this) === new_model || kb.wasReleased(_this) || !event_watcher) {
-              return;
-            }
+            if (kb.utils.wrappedObject(_this) === new_model || kb.wasReleased(_this) || !event_watcher) return;
 
             _this.__kb.store.reuse(_this, kb.utils.resolveModel(new_model));
             event_watcher.emitter(new_model);_model(event_watcher.ee);
@@ -3733,9 +3672,7 @@ var ViewModel = function () {
       var key = void 0;
       if (!keys) {
         var rel_keys = void 0;
-        if (this.__kb.keys || !model) {
-          return;
-        } // only use the keys provided
+        if (this.__kb.keys || !model) return; // only use the keys provided
         for (key in model.attributes) {
           createObservable(this, model, key, this.__kb.create_options);
         }
@@ -3828,7 +3765,7 @@ var _mergeObject = function _mergeObject(result, key, value) {
 // @nodoc
 var _keyArrayToObject = function _keyArrayToObject(value) {
   var result = {};
-  value.forEach(function (value) {
+  value.forEach(function (item) {
     result[item] = { key: item };
   });
   return result;
@@ -3872,7 +3809,6 @@ var _mergeOptions = function _mergeOptions(result, options) {
       case 'static_defaults':
         _mergeObject(result, key, value);break;
       case 'options':
-        then;
         break;
       default:
         result[key] = value;
@@ -3961,9 +3897,7 @@ var _require = __webpack_require__(0),
 
 
 module.exports = _wrappedDestroy = function wrappedDestroy(obj) {
-  if (!obj.__kb) {
-    return;
-  }
+  if (!obj.__kb) return;
   if (obj.__kb.event_watcher) {
     obj.__kb.event_watcher.releaseCallbacks(obj);
   }

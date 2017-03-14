@@ -6,7 +6,7 @@ describe('inject @quick @inject', () => {
     SuperClass;
   let kb = root != null ? root.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko, $ } = kb;
-  if (!$) { return; } // no jquery
+  if (!$) return; // no jquery
 
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');

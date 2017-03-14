@@ -133,7 +133,7 @@ module.exports = __initClass__(kb.LocalizedObservable = class LocalizedObservabl
   resetToCurrent() {
     const observable = kb.utils.wrappedObservable(this);
     const current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
-    if (observable() === current_value) { return; }
+    if (observable() === current_value) return;
     return observable(current_value);
   }
 

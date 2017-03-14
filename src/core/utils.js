@@ -106,7 +106,11 @@ class utils {
   //   Sets the observable on an object
   //   @param [Object|kb.ViewModel] view_model the owning ViewModel for the Model.
   //   @param [Model] model the Model
-  static wrappedModel(obj, value) { if (arguments.length === 1) { (_.isUndefined(value = kb.utils.get(obj, 'object')) ? obj : value); } else { return kb.utils.set(obj, 'object', value); } }
+  static wrappedModel(obj, value) {
+    if (arguments.length !== 1) return kb.utils.set(obj, 'object', value);
+    value = kb.utils.get(obj, 'object');
+    return _.isUndefined(value) ? obj : value;
+  }
 
   // Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
   //

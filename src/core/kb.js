@@ -118,7 +118,7 @@ class kb {
     let array,
       index,
       value;
-    if (!kb.isReleaseable(obj)) { return; }
+    if (!kb.isReleaseable(obj)) return;
     obj.__kb_released = true; // mark as released
 
     // release array's items
@@ -227,7 +227,7 @@ class kb {
 
   static setValue(model, key, value) {
     let attributes;
-    if (!model) { return; }
+    if (!model) return;
     if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
     (attributes = {})[key] = value;
     return model.set(attributes);
