@@ -85,7 +85,7 @@ module.exports = TypedValue = class TypedValue {
     create_options.creator = creator;
 
     let value_type = kb.TYPE_UNKNOWN;
-    [previous_value, this.__kb_value] = Array.from([this.__kb_value, undefined]);
+    [previous_value, this.__kb_value] = [this.__kb_value, undefined];
 
     if (new_observable) {
       value = new_observable;

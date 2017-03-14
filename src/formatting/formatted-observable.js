@@ -97,7 +97,7 @@ module.exports = kb.FormattedObservable = class FormattedObservable {
     const observable = kb.utils.wrappedObservable(this, ko.computed({
       read() {
         args = [ko.utils.unwrapObservable(format)];
-        for (const arg of observable_args) { args.push(ko.utils.unwrapObservable(arg)); }
+        observable_args.forEach(arg => args.push(ko.utils.unwrapObservable(arg)));
         return kb.toFormattedString.apply(null, args);
       },
       write(value) {

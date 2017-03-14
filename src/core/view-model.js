@@ -30,7 +30,7 @@ const createObservable = function (vm, model, key, create_options) {
 
 // @nodoc
 const createStaticObservables = function (vm, model) {
-  for (const key of vm.__kb.statics) {
+  vm.__kb.statics.forEach(key => {
     var vm_key;
     if ((vm_key = assignViewModelKey(vm, key))) {
       if (model.has(vm_key)) {
@@ -41,7 +41,7 @@ const createStaticObservables = function (vm, model) {
         delete vm.__kb.view_model[vm_key];
       }
     }
-  }
+  });
 };
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'];
@@ -123,18 +123,20 @@ class ViewModel {
   // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   // @return [ko.observable] the constructor returns 'this'
   // @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  constructor(model, options, view_model) {
-    if (options == null) { options = {}; } const args = Array.prototype.slice.call(_.isArguments(model) ? model : arguments); return kb.ignore(() => {
+  constructor(model, options = {}, view_model) {
+    const args = Array.prototype.slice.call(_.isArguments(model) ? model : arguments);
+    return kb.ignore(() => {
       !(model = args.shift()) || kb.isModel(model) || kb._throwUnexpected(this, 'not a model');
       if (_.isArray(args[0])) { args[0] = { keys: args[0] }; }
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
-      options = {}; for (const arg of args) { _.extend(options, arg); options = kb.utils.collapseOptions(options); }
-      for (const key of KEYS_OPTIONS) { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } }
+      options = {};
+      args.forEach(arg => { _.extend(options, arg); options = kb.utils.collapseOptions(options); });
+      KEYS_OPTIONS.forEach(key => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
 
-    // always use a store to ensure recursive view models are handled correctly
+      // always use a store to ensure recursive view models are handled correctly
       kb.Store.useOptionsOrCreate(options, model, this);
 
-    // view model factory
+      // view model factory
       this.__kb.path = options.path;
       kb.Factory.useOptionsOrCreate(options, this, options.path);
 
@@ -199,15 +201,11 @@ class ViewModel {
       for (key in model.attributes) { createObservable(this, model, key, this.__kb.create_options); }
       if (rel_keys = __guardMethod__(kb.settings.orm, 'keys', o => o.keys(model))) {
         ((() => {
-          const result = [];
-          for (key of rel_keys) {
-            result.push(createObservable(this, model, key, this.__kb.create_options));
-          }
-          return result;
+          return rel_keys.map(key => createObservable(this, model, key, this.__kb.create_options));
         })());
       }
     } else if (_.isArray(keys)) {
-      for (key of keys) { createObservable(this, model, key, this.__kb.create_options); }
+      keys.forEach(key => createObservable(this, model, key, this.__kb.create_options));
     } else {
       for (key in keys) {
         var vm_key;

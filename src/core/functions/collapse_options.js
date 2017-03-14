@@ -18,13 +18,21 @@ const _mergeArray = function (result, key, value) {
 };
 
 // @nodoc
-const _mergeObject = function (result, key, value) { if (!result[key]) { result[key] = {}; } return _.extend(result[key], value); };
+const _mergeObject = function (result, key, value) {
+  if (!result[key]) result[key] = {};
+  return _.extend(result[key], value);
+};
 
 // @nodoc
-const _keyArrayToObject = function (value) { const result = {}; for (const item of value) { result[item] = { key: item }; return result; } };
+const _keyArrayToObject = function (value) {
+  const result = {};
+  value.forEach(value => { result[item] = { key: item }; })
+  return result;
+};
 
 var _mergeOptions = function (result, options) {
-  if (!options) { return result; }
+  if (!options) return result;
+
   for (const key in options) {
     let value = options[key];
     switch (key) {

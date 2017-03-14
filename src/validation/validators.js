@@ -33,7 +33,7 @@ kb.hasChangedFn = function (model) {
       attributes = (m ? m.toJSON() : null);
       return false;
     }
-    if (!(m && attributes)) { return false; }
+    if (!(m && attributes)) return false;
     return !_.isEqual(m.toJSON(), attributes);
   };
 };
@@ -43,7 +43,7 @@ kb.minLengthFn = length => value => !value || (value.length < length);
 kb.uniqueValueFn = (model, key, collection) =>
   function (value) {
     const m = ko.utils.unwrapObservable(model); const k = ko.utils.unwrapObservable(key); const c = ko.utils.unwrapObservable(collection);
-    if (!(m && k && c)) { return false; }
+    if (!(m && k && c)) return false;
     return !!_.find(c.models, test => (test !== m) && (test.get(k) === value));
   }
 ;

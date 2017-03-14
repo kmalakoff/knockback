@@ -25,8 +25,7 @@ module.exports = BackboneRelational = class BackboneRelational {
   }
 
   static bind(model, key, update, path) {
-    let event,
-      type;
+    let event, type;
     if (!(type = this.relationType(model, key))) { return null; }
     const rel_fn = function (model) {
       !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });
@@ -35,18 +34,12 @@ module.exports = BackboneRelational = class BackboneRelational {
 
     // VERSIONING: pre Backbone-Relational 0.8.0
     const events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-    if (type === kb.TYPE_COLLECTION) {
-      for (event of events) { model.bind(`${event}:${key}`, rel_fn); }
-    } else {
-      model.bind(`${events[0]}:${key}`, rel_fn);
-    }
+    if (type === kb.TYPE_COLLECTION) events.forEach(event => model.bind(`${event}:${key}`, rel_fn));
+    else model.bind(`${events[0]}:${key}`, rel_fn);
 
     return function () {
-      if (type === kb.TYPE_COLLECTION) {
-        for (event of events) { model.unbind(`${event}:${key}`, rel_fn); }
-      } else {
-        model.unbind(`${events[0]}:${key}`, rel_fn);
-      }
+      if (type === kb.TYPE_COLLECTION) events.forEach(event => model.unbind(`${event}:${key}`, rel_fn));
+      else model.unbind(`${events[0]}:${key}`, rel_fn);
     };
   }
 

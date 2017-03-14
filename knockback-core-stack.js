@@ -91,8 +91,6 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -213,48 +211,17 @@ var kb = function () {
       if (depth == null) {
         depth = 0;
       }
-      if (!obj || obj !== Object(obj) || obj.__kb_released) {
-        return false;
-      } // must be an object and not already released
-      if (ko.isObservable(obj) || obj instanceof kb.ViewModel) {
-        return true;
-      } // a known type that is releasable
-      if (typeof obj === 'function' || kb.isModel(obj) || kb.isCollection(obj)) {
-        return false;
-      } // a known type that is not releaseable
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = LIFECYCLE_METHODS[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var method = _step.value;
-          if (typeof obj[method] === 'function') {
-            return true;
-          }
-        } // a releaseable signature
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
+      if (!obj || obj !== Object(obj) || obj.__kb_released) return false; // must be an object and not already released
+      if (ko.isObservable(obj) || obj instanceof kb.ViewModel) return true; // a known type that is releasable
+      if (typeof obj === 'function' || kb.isModel(obj) || kb.isCollection(obj)) return false; // a known type that is not releaseable
+      for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+        var method = LIFECYCLE_METHODS[i];
+        if (typeof obj[method] === 'function') return true;
       }
 
-      if (depth > 0) {
-        return false;
-      } // max depth check for ViewModel inside of ViewModel
+      if (depth > 0) return false; // max depth check for ViewModel inside of ViewModel
       for (var key in obj) {
-        var value = obj[key];if (key !== '__kb' && kb.isReleaseable(value, depth + 1)) {
-          return true;
-        }
+        var value = obj[key];if (key !== '__kb' && kb.isReleaseable(value, depth + 1)) return true;
       }
       return false;
     }
@@ -307,35 +274,11 @@ var kb = function () {
       }
 
       // releaseable signature
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = LIFECYCLE_METHODS[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var method = _step2.value;
-          if (typeof obj[method] === 'function') {
-            return obj[method].call(obj);
-          }
-        } // a releaseable signature
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
+      for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+        var method = LIFECYCLE_METHODS[i];
+        if (typeof obj[method] === 'function') return obj[method].call(obj);;
       }
-
-      if (!ko.isObservable(obj)) {
-        return this.releaseKeys(obj);
-      } // view model
+      if (!ko.isObservable(obj)) return this.releaseKeys(obj); // view model
     }
 
     // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
@@ -344,8 +287,10 @@ var kb = function () {
     key: 'releaseKeys',
     value: function releaseKeys(obj) {
       for (var key in obj) {
-        var value = obj[key];if (key !== '__kb' && kb.isReleaseable(value)) {
-          obj[key] = null, kb.release(value);
+        var value = obj[key];
+        if (key !== '__kb' && kb.isReleaseable(value)) {
+          obj[key] = null;
+          kb.release(value);
         }
       }
     }
@@ -428,36 +373,13 @@ var kb = function () {
       if (node.length) {
         // convert to a root element
         var children = void 0;
+        var _ref = [document.createElement('div'), node];
+        node = _ref[0];
+        children = _ref[1];
 
-        var _Array$from = Array.from([document.createElement('div'), node]);
-
-        var _Array$from2 = _slicedToArray(_Array$from, 2);
-
-        node = _Array$from2[0];
-        children = _Array$from2[1];
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-          for (var _iterator3 = children[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var child = _step3.value;
-            node.appendChild(child);
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
-        }
+        children.forEach(function (child) {
+          return node.appendChild(child);
+        });
       }
       ko.applyBindings(view_model, node);
       kb.releaseOnNodeRemove(view_model, node);
@@ -466,15 +388,9 @@ var kb = function () {
   }, {
     key: 'getValue',
     value: function getValue(model, key, args) {
-      if (!model) {
-        return;
-      }
-      if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) {
-        return model[key]();
-      }
-      if (!args) {
-        return model.get(key);
-      }
+      if (!model) return;
+      if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key]();
+      if (!args) return model.get(key);
       return model.get.apply(model, _toConsumableArray(_.map([key].concat(args), function (value) {
         return kb.peek(value);
       })));
@@ -486,9 +402,7 @@ var kb = function () {
       if (!model) {
         return;
       }
-      if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) {
-        return model[key](value);
-      }
+      if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
       (attributes = {})[key] = value;
       return model.set(attributes);
     }
@@ -517,29 +431,9 @@ var kb = function () {
   }, {
     key: 'publishMethods',
     value: function publishMethods(observable, instance, methods) {
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = methods[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var fn = _step4.value;
-          observable[fn] = kb._.bind(instance[fn], instance);return;
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
+      methods.forEach(function (fn) {
+        observable[fn] = kb._.bind(instance[fn], instance);return;
+      });
     }
 
     // @nodoc
@@ -697,8 +591,6 @@ module.exports = function (options) {
 "use strict";
 
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -828,13 +720,9 @@ module.exports = TypedValue = function () {
       create_options.creator = creator;
 
       var value_type = kb.TYPE_UNKNOWN;
-
-      var _Array$from = Array.from([this.__kb_value, undefined]);
-
-      var _Array$from2 = _slicedToArray(_Array$from, 2);
-
-      previous_value = _Array$from2[0];
-      this.__kb_value = _Array$from2[1];
+      var _ref = [this.__kb_value, undefined];
+      previous_value = _ref[0];
+      this.__kb_value = _ref[1];
 
 
       if (new_observable) {
@@ -2610,34 +2498,18 @@ var CollectionObservable = function () {
 
     _classCallCheck(this, CollectionObservable);
 
-    this._onCollectionChange = this._onCollectionChange.bind(this);var args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);return kb.ignore(function () {
+    this._onCollectionChange = this._onCollectionChange.bind(this);
+    var args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
+    return kb.ignore(function () {
       collection = args[0] instanceof kb.Collection ? args.shift() : _.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection();
       if (_.isFunction(args[0])) {
         args[0] = { view_model: args[0] };
       }
-      options = {};var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
 
-      try {
-        for (var _iterator = args[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var arg = _step.value;
-          _.extend(options, arg);
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      options = {};
+      args.forEach(function (arg) {
+        return _.extend(options, arg);
+      });
 
       var observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
       observable.__kb_is_co = true; // mark as a kb.CollectionObservable
@@ -2729,33 +2601,9 @@ var CollectionObservable = function () {
         var filters = _this._filters(); // create dependency
         if (filters) {
           (function () {
-            var result = [];
-            var _iteratorNormalCompletion2 = true;
-            var _didIteratorError2 = false;
-            var _iteratorError2 = undefined;
-
-            try {
-              for (var _iterator2 = filters[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                filter = _step2.value;
-
-                result.push(ko.utils.unwrapObservable(filter));
-              }
-            } catch (err) {
-              _didIteratorError2 = true;
-              _iteratorError2 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                  _iterator2.return();
-                }
-              } finally {
-                if (_didIteratorError2) {
-                  throw _iteratorError2;
-                }
-              }
-            }
-
-            return result;
+            return filters.map(function (filter) {
+              return ko.utils.unwrapObservable(filter);
+            });
           })();
         } // create a dependency
         var current_collection = _this._collection(); // create dependency
@@ -3131,44 +2979,21 @@ var CollectionObservable = function () {
         } else {
           !has_filters || (view_models = []); // check for filtering of ViewModels
           models = [];
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
-
-          try {
-            for (var _iterator3 = models_or_view_models[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              var view_model = _step3.value;
-
-              var current_view_model;
-              var model = kb.utils.wrappedObject(view_model);
-              if (has_filters) {
-                if (!_this4._selectModel(model)) {
-                  continue;
-                } // filtered so skip
-                view_models.push(view_model);
-              }
-
-              // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
-              if (current_view_model = _this4.create_options.store.find(model, _this4.create_options.creator)) {
-                current_view_model.constructor === view_model.constructor || kb._throwUnexpected(_this4, 'replacing different type of view model');
-              }
-              _this4.create_options.store.retain(view_model, model, _this4.create_options.creator);
-              models.push(model);
+          models_or_view_models.forEach(function (view_model) {
+            var current_view_model;
+            var model = kb.utils.wrappedObject(view_model);
+            if (has_filters) {
+              if (!_this4._selectModel(model)) return; // filtered so skip
+              view_models.push(view_model);
             }
-          } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                _iterator3.return();
-              }
-            } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
-              }
+
+            // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
+            if (current_view_model = _this4.create_options.store.find(model, _this4.create_options.creator)) {
+              current_view_model.constructor === view_model.constructor || kb._throwUnexpected(_this4, 'replacing different type of view model');
             }
-          }
+            _this4.create_options.store.retain(view_model, model, _this4.create_options.creator);
+            models.push(model);
+          });
         }
 
         // a change, update models
@@ -3210,42 +3035,15 @@ var CollectionObservable = function () {
     key: '_selectModel',
     value: function _selectModel(model) {
       var filters = kb.peek(this._filters);
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = filters[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var filter = _step4.value;
-
-          filter = kb.peek(filter);
-          if (_.isFunction(filter)) {
-            if (!filter(model)) {
-              return false;
-            }
-          } else if (_.isArray(filter)) {
-            if (!filter.includes(model.id)) {
-              return false;
-            }
-          } else if (model.id !== filter) {
-            return false;
-          }
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
+      for (var i = 0, l = filters.length; i < l; i++) {
+        var filter = filters[i];
+        filter = kb.peek(filter);
+        if (_.isFunction(filter)) {
+          if (!filter(model)) return false;
+        } else if (_.isArray(filter)) {
+          if (!filter.includes(model.id)) return false;
+        } else if (model.id !== filter) return false;
       }
-
       return true;
     }
   }]);
@@ -3419,83 +3217,29 @@ kb.EventWatcher = function () {
       var event_names = callback_info.event_selector ? callback_info.event_selector.split(' ') : ['change'];
       var model = this.ee;
 
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      event_names.forEach(function (event_name) {
+        if (!event_name) return; // extra spaces
 
-      try {
-        for (var _iterator = event_names[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var event_name = _step.value;
-
-          if (!event_name) {
-            continue;
-          } // extra spaces
-          (function (event_name) {
-            var callbacks = void 0,
-                info = void 0;
-            if (!(callbacks = _this.__kb.callbacks[event_name])) {
-              callbacks = _this.__kb.callbacks[event_name] = {
-                model: null,
-                list: [],
-                fn: function fn(model) {
-                  var _iteratorNormalCompletion2 = true;
-                  var _didIteratorError2 = false;
-                  var _iteratorError2 = undefined;
-
-                  try {
-                    for (var _iterator2 = callbacks.list[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                      info = _step2.value;
-
-                      if (!info.update) {
-                        continue;
-                      }
-                      if (model && info.key && model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key))) {
-                        continue;
-                      } // key doesn't match
-                      !kb.statistics || kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
-                      info.update();
-                    } // trigger update
-                  } catch (err) {
-                    _didIteratorError2 = true;
-                    _iteratorError2 = err;
-                  } finally {
-                    try {
-                      if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                        _iterator2.return();
-                      }
-                    } finally {
-                      if (_didIteratorError2) {
-                        throw _iteratorError2;
-                      }
-                    }
-                  }
-
-                  return null;
-                }
-              };
+        var callbacks = void 0,
+            info = void 0;
+        if (!(callbacks = _this.__kb.callbacks[event_name])) {
+          callbacks = _this.__kb.callbacks[event_name] = {
+            model: null,
+            list: [],
+            fn: function fn(model) {
+              callbacks.list.forEach(function (info) {
+                if (!info.update) return;
+                if (model && info.key && model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
+                !kb.statistics || kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
+                info.update();
+              }); // trigger update
             }
-
-            callbacks.list.push(info = _.defaults({ obj: obj }, callback_info)); // store the callback information
-            if (model) {
-              return _this._onModelLoaded(model);
-            }
-          })(event_name);
+          };
         }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
 
+        callbacks.list.push(info = _.defaults({ obj: obj }, callback_info)); // store the callback information
+        if (model) return _this._onModelLoaded(model);
+      });
       return this;
     }
   }, {
@@ -3531,33 +3275,12 @@ kb.EventWatcher = function () {
         if (!callbacks.model) {
           callbacks.model = model, model.bind(event_name, callbacks.fn);
         }
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-          for (var _iterator3 = callbacks.list[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var info = _step3.value;
-
-            if (!info.unbind_fn) {
-              info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined;
-            }
-            info.emitter ? info.emitter(model) : undefined;
+        callbacks.list.forEach(function (info) {
+          if (!info.unbind_fn) {
+            info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined;
           }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return) {
-              _iterator3.return();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
-        }
+          info.emitter ? info.emitter(model) : undefined;
+        });
       }
     }
 
@@ -3581,37 +3304,18 @@ kb.EventWatcher = function () {
     key: '_unbindCallbacks',
     value: function _unbindCallbacks(event_name, callbacks, skip_emitter) {
       if (callbacks.model) {
-        callbacks.model.unbind(event_name, callbacks.fn), callbacks.model = null;
+        callbacks.model.unbind(event_name, callbacks.fn);
+        callbacks.model = null;
       }
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
 
-      try {
-        for (var _iterator4 = callbacks.list[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var info = _step4.value;
-
-          if (info.unbind_fn) {
-            info.unbind_fn(), info.unbind_fn = null;
-          }
-          if (info.emitter && !skip_emitter && !kb.wasReleased(info.obj)) {
-            info.emitter(null);
-          }
+      callbacks.list.forEach(function (info) {
+        if (info.unbind_fn) {
+          info.unbind_fn(), info.unbind_fn = null;
         }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4.return) {
-            _iterator4.return();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
+        if (info.emitter && !skip_emitter && !kb.wasReleased(info.obj)) {
+          info.emitter(null);
         }
-      }
+      });
     }
   }]);
 
@@ -3936,29 +3640,9 @@ kb.Inject = function () {
             results.push({ el: el, view_model: {}, binding: attr.value });
           }
         }
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = el.childNodes[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var child_el = _step.value;
-            findElements(child_el);
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
+        el.childNodes.forEach(function (child_el) {
+          return findElements(child_el);
+        });
       };
       if (!root && (window != null ? window.document : undefined)) {
         root = window.document;
@@ -3966,53 +3650,31 @@ kb.Inject = function () {
       findElements(root);
 
       // bind the view models
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
+      results.forEach(function (app) {
+        // evaluate the app data
+        var afterBinding, beforeBinding, expression, options;
+        if (expression = app.binding) {
+          var _data;
 
-      try {
-        for (var _iterator2 = results[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var app = _step2.value;
-
-          // evaluate the app data
-          var afterBinding, beforeBinding, expression, options;
-          if (expression = app.binding) {
-            var _data;
-
-            expression.search(/[:]/) < 0 || (expression = '{' + expression + '}'); // wrap if is an object
-            var data = new Function('', 'return ( ' + expression + ' )')();
-            data || (data = {}); // no data
-            !data.options || ((_data = data, options = _data.options, _data), delete data.options); // extract options
-            options || (options = {});
-            app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
-            afterBinding = app.view_model.afterBinding || options.afterBinding;
-            beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
-          }
-
-          // auto-bind
-          if (beforeBinding) {
-            beforeBinding.call(app.view_model, app.view_model, app.el, options);
-          }
-          kb.applyBindings(app.view_model, app.el, options);
-          if (afterBinding) {
-            afterBinding.call(app.view_model, app.view_model, app.el, options);
-          }
+          expression.search(/[:]/) < 0 || (expression = '{' + expression + '}'); // wrap if is an object
+          var data = new Function('', 'return ( ' + expression + ' )')();
+          data || (data = {}); // no data
+          !data.options || ((_data = data, options = _data.options, _data), delete data.options); // extract options
+          options || (options = {});
+          app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
+          afterBinding = app.view_model.afterBinding || options.afterBinding;
+          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
         }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
 
+        // auto-bind
+        if (beforeBinding) {
+          beforeBinding.call(app.view_model, app.view_model, app.el, options);
+        }
+        kb.applyBindings(app.view_model, app.el, options);
+        if (afterBinding) {
+          afterBinding.call(app.view_model, app.view_model, app.el, options);
+        }
+      });
       return results;
     }
   }]);
@@ -4182,31 +3844,11 @@ kb.Observable = function () {
           args = void 0;
       key_or_info || kb._throwMissing(_this, 'key_or_info');
       _this.key = key_or_info.key || key_or_info;
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = KEYS_INFO[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var key = _step.value;
-          if (key_or_info[key]) {
-            _this[key] = key_or_info[key];
-          }
+      KEYS_INFO.forEach(function (key) {
+        if (key_or_info[key]) {
+          _this[key] = key_or_info[key];
         }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      });
 
       var create_options = kb.utils.collapseOptions(options);
       var event_watcher = create_options.event_watcher;
@@ -4218,29 +3860,11 @@ kb.Observable = function () {
       _this._model = ko.observable();
       var observable = kb.utils.wrappedObservable(_this, ko.computed({
         read: function read() {
-          _model = _this._model();var _iteratorNormalCompletion2 = true;
-          var _didIteratorError2 = false;
-          var _iteratorError2 = undefined;
-
-          try {
-            for (var _iterator2 = (args = [_this.key].concat(_this.args || []))[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-              var arg = _step2.value;
-              ko.utils.unwrapObservable(arg);
-            }
-          } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                _iterator2.return();
-              }
-            } finally {
-              if (_didIteratorError2) {
-                throw _iteratorError2;
-              }
-            }
-          }
+          _model = _this._model();
+          args = [_this.key].concat(_this.args || []);
+          args.forEach(function (arg) {
+            return ko.utils.unwrapObservable(arg);
+          });
 
           __guard__(kb.utils.wrappedEventWatcher(_this), function (x) {
             return x.emitter(_model || null);
@@ -4540,46 +4164,25 @@ module.exports = kb.Statistics = function () {
     key: 'eventsStats',
     value: function eventsStats(obj, key) {
       var stats = { count: 0 };
-
       var events = obj._events || obj._callbacks || {};
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
+      var keys = key ? [key] : _.keys(events);
 
-      try {
-        for (var _iterator = (key ? [key] : _.keys(events))[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          key = _step.value;
+      keys.forEach(function (key) {
+        var node = events[key];
+        if (node) {
+          if (_.isArray(node)) {
+            stats[key] = _.compact(node).length;
+          } else {
+            stats[key] = 0;var _node = node,
+                tail = _node.tail;
 
-          var node;
-          if (node = events[key]) {
-            if (_.isArray(node)) {
-              stats[key] = _.compact(node).length;
-            } else {
-              stats[key] = 0;var _node = node,
-                  tail = _node.tail;
-
-              while ((node = node.next) !== tail) {
-                stats[key]++;
-              }
+            while ((node = node.next) !== tail) {
+              stats[key]++;
             }
-            stats.count += stats[key];
           }
+          stats.count += stats[key];
         }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
+      });
       return stats;
     }
   }]);
@@ -4593,8 +4196,6 @@ module.exports = kb.Statistics = function () {
 
 "use strict";
 
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -4683,16 +4284,16 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: 'clear',
     value: function clear() {
+      var _this = this;
+
       var observable = void 0,
           observable_records = void 0,
           replaced_observables = void 0;
 
-      var _Array$from = Array.from([this.observable_records, {}]);
+      var _ref = [this.observable_records, {}];
+      observable_records = _ref[0];
+      this.observable_records = _ref[1];
 
-      var _Array$from2 = _slicedToArray(_Array$from, 2);
-
-      observable_records = _Array$from2[0];
-      this.observable_records = _Array$from2[1];
 
       for (var creator_id in observable_records) {
         var records = observable_records[creator_id];
@@ -4701,37 +4302,15 @@ module.exports = __initClass__(kb.Store = function () {
         }
       }
 
-      var _Array$from3 = Array.from([this.replaced_observables, []]);
+      var _ref2 = [this.replaced_observables, []];
+      replaced_observables = _ref2[0];
+      this.replaced_observables = _ref2[1];
 
-      var _Array$from4 = _slicedToArray(_Array$from3, 2);
-
-      replaced_observables = _Array$from4[0];
-      this.replaced_observables = _Array$from4[1];
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = replaced_observables[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          observable = _step.value;
-          if (!observable.__kb_released) {
-            this.release(observable, true);
-          }
+      replaced_observables.forEach(function (observable) {
+        if (!observable.__kb_released) {
+          _this.release(observable, true);
         }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
+      });
     }
 
     // Manually compact the store by searching for released view models
@@ -4739,13 +4318,19 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: 'compact',
     value: function compact() {
-      for (var creator_id in this.observable_records) {
-        var records = this.observable_records[creator_id];
-        for (var cid in records) {
+      var _this2 = this;
+
+      var _loop = function _loop(creator_id) {
+        var records = _this2.observable_records[creator_id];
+        records.forEach(function (cid) {
           var observable = records[cid];if (observable.__kb_released) {
             delete records[cid];
           }
-        }
+        });
+      };
+
+      for (var creator_id in this.observable_records) {
+        _loop(creator_id);
       }
     }
 
@@ -4803,7 +4388,7 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: 'retainOrCreate',
     value: function retainOrCreate(obj, options, deep_retain) {
-      var _this = this;
+      var _this3 = this;
 
       var creator = void 0,
           observable = void 0;
@@ -4822,7 +4407,7 @@ module.exports = __initClass__(kb.Store = function () {
       }
 
       observable = kb.ignore(function () {
-        options = _.defaults({ store: _this, creator: creator }, options); // set our own creator so we can register ourselves above
+        options = _.defaults({ store: _this3, creator: creator }, options); // set our own creator so we can register ourselves above
         observable = creator.create ? creator.create(obj, options) : new creator(obj, options);
         return observable || ko.observable(null);
       }); // default to null
@@ -4950,32 +4535,10 @@ module.exports = __initClass__(kb.Store = function () {
       if (!create.__kb_cids) {
         create.__kb_cids = [];
       }
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = create.__kb_cids[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var item = _step2.value;
-          if (item.create === create) {
-            return item.cid;
-          }
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
+      for (var i = 0, l = create.__kb_cids.length; i < l; i++) {
+        var item = create.__kb_cids[i];
+        if (item.create === create) return item.cid;
       }
-
       create.__kb_cids.push(item = { create: create, cid: _.uniqueId('kb') });return item.cid;
     }
 
@@ -4984,14 +4547,14 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: '_storeReferences',
     value: function _storeReferences(observable) {
-      var _this2 = this;
+      var _this4 = this;
 
       var stores_references = void 0;
       if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
         return;
       }
       return _.find(stores_references, function (store_references) {
-        return store_references.store === _this2;
+        return store_references.store === _this4;
       });
     }
 
@@ -5000,15 +4563,15 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: '_getOrCreateStoreReferences',
     value: function _getOrCreateStoreReferences(observable) {
-      var _this3 = this;
+      var _this5 = this;
 
       var store_references = void 0;
       var stores_references = kb.utils.orSet(observable, 'stores_references', []);
       if (!(store_references = _.find(stores_references, function (store_references) {
-        return store_references.store === _this3;
+        return store_references.store === _this5;
       }))) {
         stores_references.push(store_references = { store: this, ref_count: 0, release: function release() {
-            return _this3.release(observable);
+            return _this5.release(observable);
           } });
       }
       return store_references;
@@ -5534,39 +5097,18 @@ var createObservable = function createObservable(vm, model, key, create_options)
 
 // @nodoc
 var createStaticObservables = function createStaticObservables(vm, model) {
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = vm.__kb.statics[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var key = _step.value;
-
-      var vm_key;
-      if (vm_key = assignViewModelKey(vm, key)) {
-        if (model.has(vm_key)) {
-          vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key);
-        } else if (vm.__kb.static_defaults && vm_key in vm.__kb.static_defaults) {
-          vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key];
-        } else {
-          delete vm.__kb.view_model[vm_key];
-        }
+  vm.__kb.statics.forEach(function (key) {
+    var vm_key;
+    if (vm_key = assignViewModelKey(vm, key)) {
+      if (model.has(vm_key)) {
+        vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key);
+      } else if (vm.__kb.static_defaults && vm_key in vm.__kb.static_defaults) {
+        vm[vm_key] = vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key];
+      } else {
+        delete vm.__kb.view_model[vm_key];
       }
     }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
+  });
 };
 
 var KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'];
@@ -5654,14 +5196,16 @@ var ViewModel = function () {
 
   }]);
 
-  function ViewModel(model, options, view_model) {
+  function ViewModel(model) {
     var _this = this;
+
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var view_model = arguments[2];
 
     _classCallCheck(this, ViewModel);
 
-    if (options == null) {
-      options = {};
-    }var args = Array.prototype.slice.call(_.isArguments(model) ? model : arguments);return kb.ignore(function () {
+    var args = Array.prototype.slice.call(_.isArguments(model) ? model : arguments);
+    return kb.ignore(function () {
       !(model = args.shift()) || kb.isModel(model) || kb._throwUnexpected(_this, 'not a model');
       if (_.isArray(args[0])) {
         args[0] = { keys: args[0] };
@@ -5669,58 +5213,17 @@ var ViewModel = function () {
       if (!_this.__kb) {
         _this.__kb = {};
       }_this.__kb.view_model = args.length > 1 ? args.pop() : _this;
-      options = {};var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = args[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var arg = _step2.value;
-          _.extend(options, arg);options = kb.utils.collapseOptions(options);
+      options = {};
+      args.forEach(function (arg) {
+        _.extend(options, arg);options = kb.utils.collapseOptions(options);
+      });
+      KEYS_OPTIONS.forEach(function (key) {
+        if (options.hasOwnProperty(key)) {
+          _this.__kb[key] = options[key];
         }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
+      });
 
-      var _iteratorNormalCompletion3 = true;
-      var _didIteratorError3 = false;
-      var _iteratorError3 = undefined;
-
-      try {
-        for (var _iterator3 = KEYS_OPTIONS[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-          var key = _step3.value;
-          if (options.hasOwnProperty(key)) {
-            _this.__kb[key] = options[key];
-          }
-        }
-
-        // always use a store to ensure recursive view models are handled correctly
-      } catch (err) {
-        _didIteratorError3 = true;
-        _iteratorError3 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion3 && _iterator3.return) {
-            _iterator3.return();
-          }
-        } finally {
-          if (_didIteratorError3) {
-            throw _iteratorError3;
-          }
-        }
-      }
-
+      // always use a store to ensure recursive view models are handled correctly
       kb.Store.useOptionsOrCreate(options, model, _this);
 
       // view model factory
@@ -5818,59 +5321,15 @@ var ViewModel = function () {
           return o.keys(model);
         })) {
           (function () {
-            var result = [];
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
-
-            try {
-              for (var _iterator4 = rel_keys[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                key = _step4.value;
-
-                result.push(createObservable(_this3, model, key, _this3.__kb.create_options));
-              }
-            } catch (err) {
-              _didIteratorError4 = true;
-              _iteratorError4 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                  _iterator4.return();
-                }
-              } finally {
-                if (_didIteratorError4) {
-                  throw _iteratorError4;
-                }
-              }
-            }
-
-            return result;
+            return rel_keys.map(function (key) {
+              return createObservable(_this3, model, key, _this3.__kb.create_options);
+            });
           })();
         }
       } else if (_.isArray(keys)) {
-        var _iteratorNormalCompletion5 = true;
-        var _didIteratorError5 = false;
-        var _iteratorError5 = undefined;
-
-        try {
-          for (var _iterator5 = keys[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-            key = _step5.value;
-            createObservable(this, model, key, this.__kb.create_options);
-          }
-        } catch (err) {
-          _didIteratorError5 = true;
-          _iteratorError5 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion5 && _iterator5.return) {
-              _iterator5.return();
-            }
-          } finally {
-            if (_didIteratorError5) {
-              throw _iteratorError5;
-            }
-          }
-        }
+        keys.forEach(function (key) {
+          return createObservable(_this3, model, key, _this3.__kb.create_options);
+        });
       } else {
         for (key in keys) {
           var vm_key;
@@ -23559,42 +23018,22 @@ var _mergeArray = function _mergeArray(result, key, value) {
 
 // @nodoc
 var _mergeObject = function _mergeObject(result, key, value) {
-  if (!result[key]) {
-    result[key] = {};
-  }return _.extend(result[key], value);
+  if (!result[key]) result[key] = {};
+  return _.extend(result[key], value);
 };
 
 // @nodoc
 var _keyArrayToObject = function _keyArrayToObject(value) {
-  var result = {};var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = value[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var item = _step.value;
-      result[item] = { key: item };return result;
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
+  var result = {};
+  value.forEach(function (value) {
+    result[item] = { key: item };
+  });
+  return result;
 };
 
 var _mergeOptions = function _mergeOptions(result, options) {
-  if (!options) {
-    return result;
-  }
+  if (!options) return result;
+
   for (var key in options) {
     var value = options[key];
     switch (key) {
@@ -23901,62 +23340,14 @@ module.exports = BackboneRelational = function () {
 
       // VERSIONING: pre Backbone-Relational 0.8.0
       var events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-      if (type === kb.TYPE_COLLECTION) {
-        var _iteratorNormalCompletion = true;
-        var _didIteratorError = false;
-        var _iteratorError = undefined;
-
-        try {
-          for (var _iterator = events[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            event = _step.value;
-            model.bind(event + ':' + key, rel_fn);
-          }
-        } catch (err) {
-          _didIteratorError = true;
-          _iteratorError = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion && _iterator.return) {
-              _iterator.return();
-            }
-          } finally {
-            if (_didIteratorError) {
-              throw _iteratorError;
-            }
-          }
-        }
-      } else {
-        model.bind(events[0] + ':' + key, rel_fn);
-      }
+      if (type === kb.TYPE_COLLECTION) events.forEach(function (event) {
+        return model.bind(event + ':' + key, rel_fn);
+      });else model.bind(events[0] + ':' + key, rel_fn);
 
       return function () {
-        if (type === kb.TYPE_COLLECTION) {
-          var _iteratorNormalCompletion2 = true;
-          var _didIteratorError2 = false;
-          var _iteratorError2 = undefined;
-
-          try {
-            for (var _iterator2 = events[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-              event = _step2.value;
-              model.unbind(event + ':' + key, rel_fn);
-            }
-          } catch (err) {
-            _didIteratorError2 = true;
-            _iteratorError2 = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                _iterator2.return();
-              }
-            } finally {
-              if (_didIteratorError2) {
-                throw _iteratorError2;
-              }
-            }
-          }
-        } else {
-          model.unbind(events[0] + ':' + key, rel_fn);
-        }
+        if (type === kb.TYPE_COLLECTION) events.forEach(function (event) {
+          return model.unbind(event + ':' + key, rel_fn);
+        });else model.unbind(events[0] + ':' + key, rel_fn);
       };
     }
   }, {

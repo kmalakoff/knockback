@@ -55,24 +55,24 @@ module.exports = __initClass__(kb.Store = class Store {
 
   // Manually clear the store
   clear() {
-    let observable,
-      observable_records,
-      replaced_observables;
-    [observable_records, this.observable_records] = Array.from([this.observable_records, {}]);
+    let observable, observable_records, replaced_observables;
+
+    [observable_records, this.observable_records] = [this.observable_records, {}];
+
     for (const creator_id in observable_records) {
       const records = observable_records[creator_id];
       for (const cid in records) { observable = records[cid]; this.release(observable, true); }
     }
 
-    [replaced_observables, this.replaced_observables] = Array.from([this.replaced_observables, []]);
-    for (observable of replaced_observables) { if (!observable.__kb_released) { this.release(observable, true); } }
+    [replaced_observables, this.replaced_observables] = [this.replaced_observables, []];
+    replaced_observables.forEach(observable => { if (!observable.__kb_released) { this.release(observable, true); } });
   }
 
   // Manually compact the store by searching for released view models
   compact() {
     for (const creator_id in this.observable_records) {
       const records = this.observable_records[creator_id];
-      for (const cid in records) { const observable = records[cid]; if (observable.__kb_released) { delete records[cid]; } }
+      records.forEach(cid => { const observable = records[cid]; if (observable.__kb_released) { delete records[cid]; } });
     }
   }
 
@@ -206,7 +206,10 @@ module.exports = __initClass__(kb.Store = class Store {
   _creatorId(creator) {
     const create = creator.create || creator;
     if (!create.__kb_cids) { create.__kb_cids = []; }
-    for (var item of create.__kb_cids) { if (item.create === create) { return item.cid; } }
+    for (var i = 0, l = create.__kb_cids.length; i < l; i++) {
+      var item = create.__kb_cids[i];
+      if (item.create === create) return item.cid;
+    }
     create.__kb_cids.push(item = { create, cid: _.uniqueId('kb') }); return item.cid;
   }
 

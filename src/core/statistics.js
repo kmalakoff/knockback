@@ -96,11 +96,12 @@ module.exports = kb.Statistics = class Statistics {
 
   static eventsStats(obj, key) {
     const stats = { count: 0 };
-
     const events = obj._events || obj._callbacks || {};
-    for (key of (key ? [key] : _.keys(events))) {
-      var node;
-      if ((node = events[key])) {
+    const keys = key ? [key] : _.keys(events);
+
+    keys.forEach(key => {
+      let node = events[key];
+      if (node) {
         if (_.isArray(node)) {
           stats[key] = _.compact(node).length;
         } else {
@@ -109,7 +110,7 @@ module.exports = kb.Statistics = class Statistics {
         }
         stats.count += stats[key];
       }
-    }
+    });
     return stats;
   }
 };

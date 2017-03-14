@@ -91,12 +91,16 @@ class kb {
   // @param [Any] obj the object to release and also release its keys
   static isReleaseable(obj, depth) {
     if (depth == null) { depth = 0; }
-    if ((!obj || (obj !== Object(obj))) || obj.__kb_released) { return false; } // must be an object and not already released
-    if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) { return true; } // a known type that is releasable
-    if ((typeof (obj) === 'function') || kb.isModel(obj) || kb.isCollection(obj)) { return false; } // a known type that is not releaseable
-    for (const method of LIFECYCLE_METHODS) { if (typeof (obj[method]) === 'function') { return true; } } // a releaseable signature
-    if (depth > 0) { return false; } // max depth check for ViewModel inside of ViewModel
-    for (const key in obj) { const value = obj[key]; if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) { return true; } }
+    if ((!obj || (obj !== Object(obj))) || obj.__kb_released) return false; // must be an object and not already released
+    if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) return true; // a known type that is releasable
+    if ((typeof (obj) === 'function') || kb.isModel(obj) || kb.isCollection(obj)) return false; // a known type that is not releaseable
+    for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+      var method = LIFECYCLE_METHODS[i];
+      if (typeof (obj[method]) === 'function') return true;
+    }
+
+    if (depth > 0) return false; // max depth check for ViewModel inside of ViewModel
+    for (const key in obj) { const value = obj[key]; if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) return true; }
     return false;
   }
 
@@ -131,13 +135,22 @@ class kb {
     }
 
     // releaseable signature
-    for (const method of LIFECYCLE_METHODS) { if (typeof (obj[method]) === 'function') { return obj[method].call(obj); } } // a releaseable signature
-    if (!ko.isObservable(obj)) { return this.releaseKeys(obj); } // view model
+    for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+      var method = LIFECYCLE_METHODS[i];
+      if (typeof (obj[method]) === 'function') return obj[method].call(obj);;
+    }
+    if (!ko.isObservable(obj)) return this.releaseKeys(obj); // view model
   }
 
   // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
   static releaseKeys(obj) {
-    for (const key in obj) { const value = obj[key]; if ((key !== '__kb') && kb.isReleaseable(value)) { ((obj[key] = null), kb.release(value)); } }
+    for (const key in obj) {
+      const value = obj[key];
+      if ((key !== '__kb') && kb.isReleaseable(value)) {
+        obj[key] = null;
+        kb.release(value);
+      }
+    }
   }
 
   // Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
@@ -196,8 +209,8 @@ class kb {
   static applyBindings(view_model, node) {
     if (node.length) { // convert to a root element
       let children;
-      [node, children] = Array.from([document.createElement('div'), node]);
-      for (const child of children) { node.appendChild(child); }
+      [node, children] = [document.createElement('div'), node];
+      children.forEach(child => node.appendChild(child));
     }
     ko.applyBindings(view_model, node);
     kb.releaseOnNodeRemove(view_model, node);
@@ -205,16 +218,16 @@ class kb {
   }
 
   static getValue(model, key, args) {
-    if (!model) { return; }
-    if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) { return model[key](); }
-    if (!args) { return model.get(key); }
+    if (!model) return;
+    if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key]();
+    if (!args) return model.get(key);
     return model.get(..._.map([key].concat(args), value => kb.peek(value)));
   }
 
   static setValue(model, key, value) {
     let attributes;
     if (!model) { return; }
-    if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) { return model[key](value); }
+    if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
     (attributes = {})[key] = value;
     return model.set(attributes);
   }
@@ -229,7 +242,7 @@ class kb {
   static _throwUnexpected(instance, message) { throw `${_.isString(instance) ? instance : instance.constructor.name}: ${message} is unexpected`; }
 
   // @nodoc
-  static publishMethods(observable, instance, methods) { for (const fn of methods) { observable[fn] = kb._.bind(instance[fn], instance); return; } }
+  static publishMethods(observable, instance, methods) { methods.forEach(fn => { observable[fn] = kb._.bind(instance[fn], instance); return; }); }
 
   // @nodoc
   static peek(obs) { if (!ko.isObservable(obs)) { return obs; if (obs.peek) { return obs.peek(); return kb.ignore(() => obs()); } } }

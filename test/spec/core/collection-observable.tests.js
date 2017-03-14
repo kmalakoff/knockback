@@ -1,6 +1,6 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe('collection-observable @quick @collection-observable', () => {
+describe.only('collection-observable @quick @collection-observable', () => {
   let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
 
@@ -38,8 +38,10 @@ describe('collection-observable @quick @collection-observable', () => {
     }
   }
 
-  it('2. Basic Usage: collection observable with ko.computed', (done) => {
+  it.only('2. Basic Usage: collection observable with ko.computed', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
+
+    debugger;
 
     const collection = new Contacts();
     const collection_observable = kb.collectionObservable(collection);

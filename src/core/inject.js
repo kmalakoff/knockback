@@ -137,13 +137,13 @@ kb.Inject = class Inject {
           results.push({ el, view_model: {}, binding: attr.value });
         }
       }
-      for (const child_el of el.childNodes) { findElements(child_el); }
+      el.childNodes.forEach(child_el => findElements(child_el));
     };
     if (!root && (window != null ? window.document : undefined)) { root = window.document; }
     findElements(root);
 
     // bind the view models
-    for (const app of results) {
+    results.forEach(app => {
       // evaluate the app data
       var afterBinding,
         beforeBinding,
@@ -164,7 +164,7 @@ kb.Inject = class Inject {
       if (beforeBinding) { beforeBinding.call(app.view_model, app.view_model, app.el, options); }
       kb.applyBindings(app.view_model, app.el, options);
       if (afterBinding) { afterBinding.call(app.view_model, app.view_model, app.el, options); }
-    }
+    });
     return results;
   }
 };
