@@ -11,9 +11,9 @@
  * Copyright 2009-2012 Jeremy Ashkenas, DocumentCloud Inc.
  * Released under the MIT license.
  */
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  root.Parse.VERSION = 'js1.2.0';
+  root.Parse.VERSION = "js1.2.0";
 }(this));
 
 
@@ -25,48 +25,47 @@
 //     For all details and documentation:
 //     http://documentcloud.github.com/underscore
 
-(function () {
+(function() {
+
   // Baseline setup
   // --------------
 
   // Establish the root object, `window` in the browser, or `global` on the server.
-  const root = this;
+  var root = this;
 
   // Save the previous value of the `_` variable.
-  const previousUnderscore = root._;
+  var previousUnderscore = root._;
 
   // Establish the object that gets returned to break out of a loop iteration.
-  const breaker = {};
+  var breaker = {};
 
   // Save bytes in the minified (but not gzipped) version:
-  let ArrayProto = Array.prototype,
-    ObjProto = Object.prototype,
-    FuncProto = Function.prototype;
+  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
 
   // Create quick reference variables for speed access to core prototypes.
-  let slice = ArrayProto.slice,
-    unshift = ArrayProto.unshift,
-    toString = ObjProto.toString,
-    hasOwnProperty = ObjProto.hasOwnProperty;
+  var slice            = ArrayProto.slice,
+      unshift          = ArrayProto.unshift,
+      toString         = ObjProto.toString,
+      hasOwnProperty   = ObjProto.hasOwnProperty;
 
   // All **ECMAScript 5** native function implementations that we hope to use
   // are declared here.
-  let
-    nativeForEach = ArrayProto.forEach,
-    nativeMap = ArrayProto.map,
-    nativeReduce = ArrayProto.reduce,
-    nativeReduceRight = ArrayProto.reduceRight,
-    nativeFilter = ArrayProto.filter,
-    nativeEvery = ArrayProto.every,
-    nativeSome = ArrayProto.some,
-    nativeIndexOf = ArrayProto.indexOf,
-    nativeLastIndexOf = ArrayProto.lastIndexOf,
-    nativeIsArray = Array.isArray,
-    nativeKeys = Object.keys,
-    nativeBind = FuncProto.bind;
+  var
+    nativeForEach      = ArrayProto.forEach,
+    nativeMap          = ArrayProto.map,
+    nativeReduce       = ArrayProto.reduce,
+    nativeReduceRight  = ArrayProto.reduceRight,
+    nativeFilter       = ArrayProto.filter,
+    nativeEvery        = ArrayProto.every,
+    nativeSome         = ArrayProto.some,
+    nativeIndexOf      = ArrayProto.indexOf,
+    nativeLastIndexOf  = ArrayProto.lastIndexOf,
+    nativeIsArray      = Array.isArray,
+    nativeKeys         = Object.keys,
+    nativeBind         = FuncProto.bind;
 
   // Create a safe reference to the Underscore object for use below.
-  const _ = function (obj) { return new wrapper(obj); };
+  var _ = function(obj) { return new wrapper(obj); };
 
   // Export the Underscore object for **Node.js**, with
   // backwards-compatibility for the old `require()` API. If we're in
@@ -78,7 +77,7 @@
     }
     exports._ = _;
   } else {
-    root._ = _;
+    root['_'] = _;
   }
 
   // Current version.
@@ -90,16 +89,16 @@
   // The cornerstone, an `each` implementation, aka `forEach`.
   // Handles objects with the built-in `forEach`, arrays, and raw objects.
   // Delegates to **ECMAScript 5**'s native `forEach` if available.
-  const each = _.each = _.forEach = function (obj, iterator, context) {
+  var each = _.each = _.forEach = function(obj, iterator, context) {
     if (obj == null) return;
     if (nativeForEach && obj.forEach === nativeForEach) {
       obj.forEach(iterator, context);
     } else if (obj.length === +obj.length) {
-      for (let i = 0, l = obj.length; i < l; i++) {
+      for (var i = 0, l = obj.length; i < l; i++) {
         if (i in obj && iterator.call(context, obj[i], i, obj) === breaker) return;
       }
     } else {
-      for (const key in obj) {
+      for (var key in obj) {
         if (_.has(obj, key)) {
           if (iterator.call(context, obj[key], key, obj) === breaker) return;
         }
@@ -109,11 +108,11 @@
 
   // Return the results of applying the iterator to each element.
   // Delegates to **ECMAScript 5**'s native `map` if available.
-  _.map = _.collect = function (obj, iterator, context) {
-    const results = [];
+  _.map = _.collect = function(obj, iterator, context) {
+    var results = [];
     if (obj == null) return results;
     if (nativeMap && obj.map === nativeMap) return obj.map(iterator, context);
-    each(obj, (value, index, list) => {
+    each(obj, function(value, index, list) {
       results[results.length] = iterator.call(context, value, index, list);
     });
     if (obj.length === +obj.length) results.length = obj.length;
@@ -122,14 +121,14 @@
 
   // **Reduce** builds up a single result from a list of values, aka `inject`,
   // or `foldl`. Delegates to **ECMAScript 5**'s native `reduce` if available.
-  _.reduce = _.foldl = _.inject = function (obj, iterator, memo, context) {
-    let initial = arguments.length > 2;
+  _.reduce = _.foldl = _.inject = function(obj, iterator, memo, context) {
+    var initial = arguments.length > 2;
     if (obj == null) obj = [];
     if (nativeReduce && obj.reduce === nativeReduce) {
       if (context) iterator = _.bind(iterator, context);
       return initial ? obj.reduce(iterator, memo) : obj.reduce(iterator);
     }
-    each(obj, (value, index, list) => {
+    each(obj, function(value, index, list) {
       if (!initial) {
         memo = value;
         initial = true;
@@ -143,22 +142,22 @@
 
   // The right-associative version of reduce, also known as `foldr`.
   // Delegates to **ECMAScript 5**'s native `reduceRight` if available.
-  _.reduceRight = _.foldr = function (obj, iterator, memo, context) {
-    const initial = arguments.length > 2;
+  _.reduceRight = _.foldr = function(obj, iterator, memo, context) {
+    var initial = arguments.length > 2;
     if (obj == null) obj = [];
     if (nativeReduceRight && obj.reduceRight === nativeReduceRight) {
       if (context) iterator = _.bind(iterator, context);
       return initial ? obj.reduceRight(iterator, memo) : obj.reduceRight(iterator);
     }
-    const reversed = _.toArray(obj).reverse();
+    var reversed = _.toArray(obj).reverse();
     if (context && !initial) iterator = _.bind(iterator, context);
     return initial ? _.reduce(reversed, iterator, memo, context) : _.reduce(reversed, iterator);
   };
 
   // Return the first value which passes a truth test. Aliased as `detect`.
-  _.find = _.detect = function (obj, iterator, context) {
-    let result;
-    any(obj, (value, index, list) => {
+  _.find = _.detect = function(obj, iterator, context) {
+    var result;
+    any(obj, function(value, index, list) {
       if (iterator.call(context, value, index, list)) {
         result = value;
         return true;
@@ -170,21 +169,21 @@
   // Return all the elements that pass a truth test.
   // Delegates to **ECMAScript 5**'s native `filter` if available.
   // Aliased as `select`.
-  _.filter = _.select = function (obj, iterator, context) {
-    const results = [];
+  _.filter = _.select = function(obj, iterator, context) {
+    var results = [];
     if (obj == null) return results;
     if (nativeFilter && obj.filter === nativeFilter) return obj.filter(iterator, context);
-    each(obj, (value, index, list) => {
+    each(obj, function(value, index, list) {
       if (iterator.call(context, value, index, list)) results[results.length] = value;
     });
     return results;
   };
 
   // Return all the elements for which a truth test fails.
-  _.reject = function (obj, iterator, context) {
-    const results = [];
+  _.reject = function(obj, iterator, context) {
+    var results = [];
     if (obj == null) return results;
-    each(obj, (value, index, list) => {
+    each(obj, function(value, index, list) {
       if (!iterator.call(context, value, index, list)) results[results.length] = value;
     });
     return results;
@@ -193,11 +192,11 @@
   // Determine whether all of the elements match a truth test.
   // Delegates to **ECMAScript 5**'s native `every` if available.
   // Aliased as `all`.
-  _.every = _.all = function (obj, iterator, context) {
-    let result = true;
+  _.every = _.all = function(obj, iterator, context) {
+    var result = true;
     if (obj == null) return result;
     if (nativeEvery && obj.every === nativeEvery) return obj.every(iterator, context);
-    each(obj, (value, index, list) => {
+    each(obj, function(value, index, list) {
       if (!(result = result && iterator.call(context, value, index, list))) return breaker;
     });
     return !!result;
@@ -206,12 +205,12 @@
   // Determine if at least one element in the object matches a truth test.
   // Delegates to **ECMAScript 5**'s native `some` if available.
   // Aliased as `any`.
-  var any = _.some = _.any = function (obj, iterator, context) {
+  var any = _.some = _.any = function(obj, iterator, context) {
     iterator || (iterator = _.identity);
-    let result = false;
+    var result = false;
     if (obj == null) return result;
     if (nativeSome && obj.some === nativeSome) return obj.some(iterator, context);
-    each(obj, (value, index, list) => {
+    each(obj, function(value, index, list) {
       if (result || (result = iterator.call(context, value, index, list))) return breaker;
     });
     return !!result;
@@ -219,54 +218,57 @@
 
   // Determine if a given value is included in the array or object using `===`.
   // Aliased as `contains`.
-  _.include = _.contains = function (obj, target) {
-    let found = false;
+  _.include = _.contains = function(obj, target) {
+    var found = false;
     if (obj == null) return found;
     if (nativeIndexOf && obj.indexOf === nativeIndexOf) return obj.indexOf(target) != -1;
-    found = any(obj, value => value === target);
+    found = any(obj, function(value) {
+      return value === target;
+    });
     return found;
   };
 
   // Invoke a method (with arguments) on every item in a collection.
-  _.invoke = function (obj, method) {
-    const args = slice.call(arguments, 2);
-    return _.map(obj, value => (_.isFunction(method) ? method || value : value[method]).apply(value, args));
+  _.invoke = function(obj, method) {
+    var args = slice.call(arguments, 2);
+    return _.map(obj, function(value) {
+      return (_.isFunction(method) ? method || value : value[method]).apply(value, args);
+    });
   };
 
   // Convenience version of a common use case of `map`: fetching a property.
-  _.pluck = function (obj, key) {
-    return _.map(obj, value => value[key]);
+  _.pluck = function(obj, key) {
+    return _.map(obj, function(value){ return value[key]; });
   };
 
   // Return the maximum element or (element-based computation).
-  _.max = function (obj, iterator, context) {
-    if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.max(...obj);
+  _.max = function(obj, iterator, context) {
+    if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.max.apply(Math, obj);
     if (!iterator && _.isEmpty(obj)) return -Infinity;
-    let result = { computed: -Infinity };
-    each(obj, (value, index, list) => {
-      const computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed >= result.computed && (result = { value, computed });
+    var result = {computed : -Infinity};
+    each(obj, function(value, index, list) {
+      var computed = iterator ? iterator.call(context, value, index, list) : value;
+      computed >= result.computed && (result = {value : value, computed : computed});
     });
     return result.value;
   };
 
   // Return the minimum element (or element-based computation).
-  _.min = function (obj, iterator, context) {
-    if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.min(...obj);
+  _.min = function(obj, iterator, context) {
+    if (!iterator && _.isArray(obj) && obj[0] === +obj[0]) return Math.min.apply(Math, obj);
     if (!iterator && _.isEmpty(obj)) return Infinity;
-    let result = { computed: Infinity };
-    each(obj, (value, index, list) => {
-      const computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed < result.computed && (result = { value, computed });
+    var result = {computed : Infinity};
+    each(obj, function(value, index, list) {
+      var computed = iterator ? iterator.call(context, value, index, list) : value;
+      computed < result.computed && (result = {value : value, computed : computed});
     });
     return result.value;
   };
 
   // Shuffle an array.
-  _.shuffle = function (obj) {
-    let shuffled = [],
-      rand;
-    each(obj, (value, index, list) => {
+  _.shuffle = function(obj) {
+    var shuffled = [], rand;
+    each(obj, function(value, index, list) {
       rand = Math.floor(Math.random() * (index + 1));
       shuffled[index] = shuffled[rand];
       shuffled[rand] = value;
@@ -275,14 +277,15 @@
   };
 
   // Sort the object's values by a criterion produced by an iterator.
-  _.sortBy = function (obj, val, context) {
-    const iterator = _.isFunction(val) ? val : function (obj) { return obj[val]; };
-    return _.pluck(_.map(obj, (value, index, list) => ({
-      value,
-      criteria: iterator.call(context, value, index, list),
-    })).sort((left, right) => {
-      let a = left.criteria,
-        b = right.criteria;
+  _.sortBy = function(obj, val, context) {
+    var iterator = _.isFunction(val) ? val : function(obj) { return obj[val]; };
+    return _.pluck(_.map(obj, function(value, index, list) {
+      return {
+        value : value,
+        criteria : iterator.call(context, value, index, list)
+      };
+    }).sort(function(left, right) {
+      var a = left.criteria, b = right.criteria;
       if (a === void 0) return 1;
       if (b === void 0) return -1;
       return a < b ? -1 : a > b ? 1 : 0;
@@ -291,11 +294,11 @@
 
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
-  _.groupBy = function (obj, val) {
-    const result = {};
-    const iterator = _.isFunction(val) ? val : function (obj) { return obj[val]; };
-    each(obj, (value, index) => {
-      const key = iterator(value, index);
+  _.groupBy = function(obj, val) {
+    var result = {};
+    var iterator = _.isFunction(val) ? val : function(obj) { return obj[val]; };
+    each(obj, function(value, index) {
+      var key = iterator(value, index);
       (result[key] || (result[key] = [])).push(value);
     });
     return result;
@@ -303,28 +306,27 @@
 
   // Use a comparator function to figure out at what index an object should
   // be inserted so as to maintain order. Uses binary search.
-  _.sortedIndex = function (array, obj, iterator) {
+  _.sortedIndex = function(array, obj, iterator) {
     iterator || (iterator = _.identity);
-    let low = 0,
-      high = array.length;
+    var low = 0, high = array.length;
     while (low < high) {
-      const mid = (low + high) >> 1;
+      var mid = (low + high) >> 1;
       iterator(array[mid]) < iterator(obj) ? low = mid + 1 : high = mid;
     }
     return low;
   };
 
   // Safely convert anything iterable into a real, live array.
-  _.toArray = function (obj) {
-    if (!obj) return [];
-    if (_.isArray(obj)) return slice.call(obj);
-    if (_.isArguments(obj)) return slice.call(obj);
+  _.toArray = function(obj) {
+    if (!obj)                                     return [];
+    if (_.isArray(obj))                           return slice.call(obj);
+    if (_.isArguments(obj))                       return slice.call(obj);
     if (obj.toArray && _.isFunction(obj.toArray)) return obj.toArray();
     return _.values(obj);
   };
 
   // Return the number of elements in an object.
-  _.size = function (obj) {
+  _.size = function(obj) {
     return _.isArray(obj) ? obj.length : _.keys(obj).length;
   };
 
@@ -334,7 +336,7 @@
   // Get the first element of an array. Passing **n** will return the first N
   // values in the array. Aliased as `head` and `take`. The **guard** check
   // allows it to work with `_.map`.
-  _.first = _.head = _.take = function (array, n, guard) {
+  _.first = _.head = _.take = function(array, n, guard) {
     return (n != null) && !guard ? slice.call(array, 0, n) : array[0];
   };
 
@@ -342,35 +344,36 @@
   // the arguments object. Passing **n** will return all the values in
   // the array, excluding the last N. The **guard** check allows it to work with
   // `_.map`.
-  _.initial = function (array, n, guard) {
+  _.initial = function(array, n, guard) {
     return slice.call(array, 0, array.length - ((n == null) || guard ? 1 : n));
   };
 
   // Get the last element of an array. Passing **n** will return the last N
   // values in the array. The **guard** check allows it to work with `_.map`.
-  _.last = function (array, n, guard) {
+  _.last = function(array, n, guard) {
     if ((n != null) && !guard) {
       return slice.call(array, Math.max(array.length - n, 0));
+    } else {
+      return array[array.length - 1];
     }
-    return array[array.length - 1];
   };
 
   // Returns everything but the first entry of the array. Aliased as `tail`.
   // Especially useful on the arguments object. Passing an **index** will return
   // the rest of the values in the array from that index onward. The **guard**
   // check allows it to work with `_.map`.
-  _.rest = _.tail = function (array, index, guard) {
+  _.rest = _.tail = function(array, index, guard) {
     return slice.call(array, (index == null) || guard ? 1 : index);
   };
 
   // Trim out all falsy values from an array.
-  _.compact = function (array) {
-    return _.filter(array, value => !!value);
+  _.compact = function(array) {
+    return _.filter(array, function(value){ return !!value; });
   };
 
   // Return a completely flattened version of an array.
-  _.flatten = function (array, shallow) {
-    return _.reduce(array, (memo, value) => {
+  _.flatten = function(array, shallow) {
+    return _.reduce(array, function(memo, value) {
       if (_.isArray(value)) return memo.concat(shallow ? value : _.flatten(value));
       memo[memo.length] = value;
       return memo;
@@ -378,19 +381,19 @@
   };
 
   // Return a version of the array that does not contain the specified value(s).
-  _.without = function (array) {
+  _.without = function(array) {
     return _.difference(array, slice.call(arguments, 1));
   };
 
   // Produce a duplicate-free version of the array. If the array has already
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
-  _.uniq = _.unique = function (array, isSorted, iterator) {
-    const initial = iterator ? _.map(array, iterator) : array;
-    const results = [];
+  _.uniq = _.unique = function(array, isSorted, iterator) {
+    var initial = iterator ? _.map(array, iterator) : array;
+    var results = [];
     // The `isSorted` flag is irrelevant if the array only contains two elements.
     if (array.length < 3) isSorted = true;
-    _.reduce(initial, (memo, value, index) => {
+    _.reduce(initial, function (memo, value, index) {
       if (isSorted ? _.last(memo) !== value || !memo.length : !_.include(memo, value)) {
         memo.push(value);
         results.push(array[index]);
@@ -402,31 +405,35 @@
 
   // Produce an array that contains the union: each distinct element from all of
   // the passed-in arrays.
-  _.union = function () {
+  _.union = function() {
     return _.uniq(_.flatten(arguments, true));
   };
 
   // Produce an array that contains every item shared between all the
   // passed-in arrays. (Aliased as "intersect" for back-compat.)
-  _.intersection = _.intersect = function (array) {
-    const rest = slice.call(arguments, 1);
-    return _.filter(_.uniq(array), item => _.every(rest, other => _.indexOf(other, item) >= 0));
+  _.intersection = _.intersect = function(array) {
+    var rest = slice.call(arguments, 1);
+    return _.filter(_.uniq(array), function(item) {
+      return _.every(rest, function(other) {
+        return _.indexOf(other, item) >= 0;
+      });
+    });
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
-  _.difference = function (array) {
-    const rest = _.flatten(slice.call(arguments, 1), true);
-    return _.filter(array, value => !_.include(rest, value));
+  _.difference = function(array) {
+    var rest = _.flatten(slice.call(arguments, 1), true);
+    return _.filter(array, function(value){ return !_.include(rest, value); });
   };
 
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
-  _.zip = function () {
-    const args = slice.call(arguments);
-    const length = _.max(_.pluck(args, 'length'));
-    const results = new Array(length);
-    for (let i = 0; i < length; i++) results[i] = _.pluck(args, `${i}`);
+  _.zip = function() {
+    var args = slice.call(arguments);
+    var length = _.max(_.pluck(args, 'length'));
+    var results = new Array(length);
+    for (var i = 0; i < length; i++) results[i] = _.pluck(args, "" + i);
     return results;
   };
 
@@ -436,10 +443,9 @@
   // Delegates to **ECMAScript 5**'s native `indexOf` if available.
   // If the array is large and already in sort order, pass `true`
   // for **isSorted** to use binary search.
-  _.indexOf = function (array, item, isSorted) {
+  _.indexOf = function(array, item, isSorted) {
     if (array == null) return -1;
-    let i,
-      l;
+    var i, l;
     if (isSorted) {
       i = _.sortedIndex(array, item);
       return array[i] === item ? i : -1;
@@ -450,10 +456,10 @@
   };
 
   // Delegates to **ECMAScript 5**'s native `lastIndexOf` if available.
-  _.lastIndexOf = function (array, item) {
+  _.lastIndexOf = function(array, item) {
     if (array == null) return -1;
     if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf) return array.lastIndexOf(item);
-    let i = array.length;
+    var i = array.length;
     while (i--) if (i in array && array[i] === item) return i;
     return -1;
   };
@@ -461,18 +467,18 @@
   // Generate an integer Array containing an arithmetic progression. A port of
   // the native Python `range()` function. See
   // [the Python documentation](http://docs.python.org/library/functions.html#range).
-  _.range = function (start, stop, step) {
+  _.range = function(start, stop, step) {
     if (arguments.length <= 1) {
       stop = start || 0;
       start = 0;
     }
     step = arguments[2] || 1;
 
-    const len = Math.max(Math.ceil((stop - start) / step), 0);
-    let idx = 0;
-    const range = new Array(len);
+    var len = Math.max(Math.ceil((stop - start) / step), 0);
+    var idx = 0;
+    var range = new Array(len);
 
-    while (idx < len) {
+    while(idx < len) {
       range[idx++] = start;
       start += step;
     }
@@ -484,23 +490,22 @@
   // ------------------
 
   // Reusable constructor function for prototype setting.
-  const ctor = function () {};
+  var ctor = function(){};
 
   // Create a function bound to a given object (assigning `this`, and arguments,
   // optionally). Binding with arguments is also known as `curry`.
   // Delegates to **ECMAScript 5**'s native `Function.bind` if available.
   // We check for `func.bind` first, to fail fast when `func` is undefined.
   _.bind = function bind(func, context) {
-    let bound,
-      args;
+    var bound, args;
     if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    if (!_.isFunction(func)) throw new TypeError();
+    if (!_.isFunction(func)) throw new TypeError;
     args = slice.call(arguments, 2);
-    return bound = function () {
+    return bound = function() {
       if (!(this instanceof bound)) return func.apply(context, args.concat(slice.call(arguments)));
       ctor.prototype = func.prototype;
-      const self = new ctor();
-      const result = func.apply(self, args.concat(slice.call(arguments)));
+      var self = new ctor;
+      var result = func.apply(self, args.concat(slice.call(arguments)));
       if (Object(result) === result) return result;
       return self;
     };
@@ -508,49 +513,44 @@
 
   // Bind all of an object's methods to that object. Useful for ensuring that
   // all callbacks defined on an object belong to it.
-  _.bindAll = function (obj) {
-    let funcs = slice.call(arguments, 1);
+  _.bindAll = function(obj) {
+    var funcs = slice.call(arguments, 1);
     if (funcs.length == 0) funcs = _.functions(obj);
-    each(funcs, (f) => { obj[f] = _.bind(obj[f], obj); });
+    each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
     return obj;
   };
 
   // Memoize an expensive function by storing its results.
-  _.memoize = function (func, hasher) {
-    const memo = {};
+  _.memoize = function(func, hasher) {
+    var memo = {};
     hasher || (hasher = _.identity);
-    return function () {
-      const key = hasher.apply(this, arguments);
+    return function() {
+      var key = hasher.apply(this, arguments);
       return _.has(memo, key) ? memo[key] : (memo[key] = func.apply(this, arguments));
     };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
   // it with the arguments supplied.
-  _.delay = function (func, wait) {
-    const args = slice.call(arguments, 2);
-    return setTimeout(() => func(...args), wait);
+  _.delay = function(func, wait) {
+    var args = slice.call(arguments, 2);
+    return setTimeout(function(){ return func.apply(null, args); }, wait);
   };
 
   // Defers a function, scheduling it to run after the current call stack has
   // cleared.
-  _.defer = function (func) {
-    return _.delay(...[func, 1].concat(slice.call(arguments, 1)));
+  _.defer = function(func) {
+    return _.delay.apply(_, [func, 1].concat(slice.call(arguments, 1)));
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
   // during a given window of time.
-  _.throttle = function (func, wait) {
-    let context,
-      args,
-      timeout,
-      throttling,
-      more,
-      result;
-    const whenDone = _.debounce(() => { more = throttling = false; }, wait);
-    return function () {
+  _.throttle = function(func, wait) {
+    var context, args, timeout, throttling, more, result;
+    var whenDone = _.debounce(function(){ more = throttling = false; }, wait);
+    return function() {
       context = this; args = arguments;
-      const later = function () {
+      var later = function() {
         timeout = null;
         if (more) func.apply(context, args);
         whenDone();
@@ -571,12 +571,11 @@
   // be triggered. The function will be called after it stops being called for
   // N milliseconds. If `immediate` is passed, trigger the function on the
   // leading edge, instead of the trailing.
-  _.debounce = function (func, wait, immediate) {
-    let timeout;
-    return function () {
-      let context = this,
-        args = arguments;
-      const later = function () {
+  _.debounce = function(func, wait, immediate) {
+    var timeout;
+    return function() {
+      var context = this, args = arguments;
+      var later = function() {
         timeout = null;
         if (!immediate) func.apply(context, args);
       };
@@ -588,10 +587,9 @@
 
   // Returns a function that will be executed at most one time, no matter how
   // often you call it. Useful for lazy initialization.
-  _.once = function (func) {
-    let ran = false,
-      memo;
-    return function () {
+  _.once = function(func) {
+    var ran = false, memo;
+    return function() {
       if (ran) return memo;
       ran = true;
       return memo = func.apply(this, arguments);
@@ -601,20 +599,20 @@
   // Returns the first function passed as an argument to the second,
   // allowing you to adjust arguments, run code before and after, and
   // conditionally execute the original function.
-  _.wrap = function (func, wrapper) {
-    return function () {
-      const args = [func].concat(slice.call(arguments, 0));
+  _.wrap = function(func, wrapper) {
+    return function() {
+      var args = [func].concat(slice.call(arguments, 0));
       return wrapper.apply(this, args);
     };
   };
 
   // Returns a function that is the composition of a list of functions, each
   // consuming the return value of the function that follows.
-  _.compose = function () {
-    const funcs = arguments;
-    return function () {
-      let args = arguments;
-      for (let i = funcs.length - 1; i >= 0; i--) {
+  _.compose = function() {
+    var funcs = arguments;
+    return function() {
+      var args = arguments;
+      for (var i = funcs.length - 1; i >= 0; i--) {
         args = [funcs[i].apply(this, args)];
       }
       return args[0];
@@ -622,9 +620,9 @@
   };
 
   // Returns a function that will only be executed after being called N times.
-  _.after = function (times, func) {
+  _.after = function(times, func) {
     if (times <= 0) return func();
-    return function () {
+    return function() {
       if (--times < 1) { return func.apply(this, arguments); }
     };
   };
@@ -634,32 +632,32 @@
 
   // Retrieve the names of an object's properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
-  _.keys = nativeKeys || function (obj) {
+  _.keys = nativeKeys || function(obj) {
     if (obj !== Object(obj)) throw new TypeError('Invalid object');
-    const keys = [];
-    for (const key in obj) if (_.has(obj, key)) keys[keys.length] = key;
+    var keys = [];
+    for (var key in obj) if (_.has(obj, key)) keys[keys.length] = key;
     return keys;
   };
 
   // Retrieve the values of an object's properties.
-  _.values = function (obj) {
+  _.values = function(obj) {
     return _.map(obj, _.identity);
   };
 
   // Return a sorted list of the function names available on the object.
   // Aliased as `methods`
-  _.functions = _.methods = function (obj) {
-    const names = [];
-    for (const key in obj) {
+  _.functions = _.methods = function(obj) {
+    var names = [];
+    for (var key in obj) {
       if (_.isFunction(obj[key])) names.push(key);
     }
     return names.sort();
   };
 
   // Extend a given object with all the properties in passed-in object(s).
-  _.extend = function (obj) {
-    each(slice.call(arguments, 1), (source) => {
-      for (const prop in source) {
+  _.extend = function(obj) {
+    each(slice.call(arguments, 1), function(source) {
+      for (var prop in source) {
         obj[prop] = source[prop];
       }
     });
@@ -667,18 +665,18 @@
   };
 
   // Return a copy of the object only containing the whitelisted properties.
-  _.pick = function (obj) {
-    const result = {};
-    each(_.flatten(slice.call(arguments, 1)), (key) => {
+  _.pick = function(obj) {
+    var result = {};
+    each(_.flatten(slice.call(arguments, 1)), function(key) {
       if (key in obj) result[key] = obj[key];
     });
     return result;
   };
 
   // Fill in a given object with default properties.
-  _.defaults = function (obj) {
-    each(slice.call(arguments, 1), (source) => {
-      for (const prop in source) {
+  _.defaults = function(obj) {
+    each(slice.call(arguments, 1), function(source) {
+      for (var prop in source) {
         if (obj[prop] == null) obj[prop] = source[prop];
       }
     });
@@ -686,7 +684,7 @@
   };
 
   // Create a (shallow-cloned) duplicate of an object.
-  _.clone = function (obj) {
+  _.clone = function(obj) {
     if (!_.isObject(obj)) return obj;
     return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
   };
@@ -694,7 +692,7 @@
   // Invokes interceptor with the obj, and then returns obj.
   // The primary purpose of this method is to "tap into" a method chain, in
   // order to perform operations on intermediate results within the chain.
-  _.tap = function (obj, interceptor) {
+  _.tap = function(obj, interceptor) {
     interceptor(obj);
     return obj;
   };
@@ -713,7 +711,7 @@
     if (a.isEqual && _.isFunction(a.isEqual)) return a.isEqual(b);
     if (b.isEqual && _.isFunction(b.isEqual)) return b.isEqual(a);
     // Compare `[[Class]]` names.
-    const className = toString.call(a);
+    var className = toString.call(a);
     if (className != toString.call(b)) return false;
     switch (className) {
       // Strings, numbers, dates, and booleans are compared by value.
@@ -738,10 +736,10 @@
                a.multiline == b.multiline &&
                a.ignoreCase == b.ignoreCase;
     }
-    if (typeof a !== 'object' || typeof b !== 'object') return false;
+    if (typeof a != 'object' || typeof b != 'object') return false;
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-    let length = stack.length;
+    var length = stack.length;
     while (length--) {
       // Linear search. Performance is inversely proportional to the number of
       // unique nested structures.
@@ -749,8 +747,7 @@
     }
     // Add the first object to the stack of traversed objects.
     stack.push(a);
-    let size = 0,
-      result = true;
+    var size = 0, result = true;
     // Recursively compare objects and arrays.
     if (className == '[object Array]') {
       // Compare array lengths to determine if a deep comparison is necessary.
@@ -789,98 +786,98 @@
   }
 
   // Perform a deep comparison to check if two objects are equal.
-  _.isEqual = function (a, b) {
+  _.isEqual = function(a, b) {
     return eq(a, b, []);
   };
 
   // Is a given array, string, or object empty?
   // An "empty" object has no enumerable own-properties.
-  _.isEmpty = function (obj) {
+  _.isEmpty = function(obj) {
     if (obj == null) return true;
     if (_.isArray(obj) || _.isString(obj)) return obj.length === 0;
-    for (const key in obj) if (_.has(obj, key)) return false;
+    for (var key in obj) if (_.has(obj, key)) return false;
     return true;
   };
 
   // Is a given value a DOM element?
-  _.isElement = function (obj) {
+  _.isElement = function(obj) {
     return !!(obj && obj.nodeType == 1);
   };
 
   // Is a given value an array?
   // Delegates to ECMA5's native Array.isArray
-  _.isArray = nativeIsArray || function (obj) {
+  _.isArray = nativeIsArray || function(obj) {
     return toString.call(obj) == '[object Array]';
   };
 
   // Is a given variable an object?
-  _.isObject = function (obj) {
+  _.isObject = function(obj) {
     return obj === Object(obj);
   };
 
   // Is a given variable an arguments object?
-  _.isArguments = function (obj) {
+  _.isArguments = function(obj) {
     return toString.call(obj) == '[object Arguments]';
   };
   if (!_.isArguments(arguments)) {
-    _.isArguments = function (obj) {
+    _.isArguments = function(obj) {
       return !!(obj && _.has(obj, 'callee'));
     };
   }
 
   // Is a given value a function?
-  _.isFunction = function (obj) {
+  _.isFunction = function(obj) {
     return toString.call(obj) == '[object Function]';
   };
 
   // Is a given value a string?
-  _.isString = function (obj) {
+  _.isString = function(obj) {
     return toString.call(obj) == '[object String]';
   };
 
   // Is a given value a number?
-  _.isNumber = function (obj) {
+  _.isNumber = function(obj) {
     return toString.call(obj) == '[object Number]';
   };
 
   // Is a given object a finite number?
-  _.isFinite = function (obj) {
+  _.isFinite = function(obj) {
     return _.isNumber(obj) && isFinite(obj);
   };
 
   // Is the given value `NaN`?
-  _.isNaN = function (obj) {
+  _.isNaN = function(obj) {
     // `NaN` is the only value for which `===` is not reflexive.
     return obj !== obj;
   };
 
   // Is a given value a boolean?
-  _.isBoolean = function (obj) {
+  _.isBoolean = function(obj) {
     return obj === true || obj === false || toString.call(obj) == '[object Boolean]';
   };
 
   // Is a given value a date?
-  _.isDate = function (obj) {
+  _.isDate = function(obj) {
     return toString.call(obj) == '[object Date]';
   };
 
   // Is the given value a regular expression?
-  _.isRegExp = function (obj) {
+  _.isRegExp = function(obj) {
     return toString.call(obj) == '[object RegExp]';
   };
 
   // Is a given value equal to null?
-  _.isNull = function (obj) {
+  _.isNull = function(obj) {
     return obj === null;
   };
 
   // Is a given variable undefined?
-  _.isUndefined = function (obj) {
+  _.isUndefined = function(obj) {
     return obj === void 0;
   };
 
   // Has own property?
-  _.has = function (obj, key) {
+  _.has = function(obj, key) {
     return hasOwnProperty.call(obj, key);
   };
 
@@ -889,123 +886,133 @@
 
   // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
   // previous owner. Returns a reference to the Underscore object.
-  _.noConflict = function () {
+  _.noConflict = function() {
     root._ = previousUnderscore;
     return this;
   };
 
   // Keep the identity function around for default iterators.
-  _.identity = function (value) {
+  _.identity = function(value) {
     return value;
   };
 
   // Run a function **n** times.
   _.times = function (n, iterator, context) {
-    for (let i = 0; i < n; i++) iterator.call(context, i);
+    for (var i = 0; i < n; i++) iterator.call(context, i);
   };
 
   // Escape a string for HTML interpolation.
-  _.escape = function (string) {
-    return (`${string}`).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g, '&#x2F;');
+  _.escape = function(string) {
+    return (''+string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/\//g,'&#x2F;');
   };
 
   // If the value of the named property is a function then invoke it;
   // otherwise, return it.
-  _.result = function (object, property) {
+  _.result = function(object, property) {
     if (object == null) return null;
-    const value = object[property];
+    var value = object[property];
     return _.isFunction(value) ? value.call(object) : value;
   };
 
   // Add your own custom functions to the Underscore object, ensuring that
   // they're correctly added to the OOP wrapper as well.
-  _.mixin = function (obj) {
-    each(_.functions(obj), (name) => {
+  _.mixin = function(obj) {
+    each(_.functions(obj), function(name){
       addToWrapper(name, _[name] = obj[name]);
     });
   };
 
   // Generate a unique integer id (unique within the entire client session).
   // Useful for temporary DOM ids.
-  let idCounter = 0;
-  _.uniqueId = function (prefix) {
-    const id = idCounter++;
+  var idCounter = 0;
+  _.uniqueId = function(prefix) {
+    var id = idCounter++;
     return prefix ? prefix + id : id;
   };
 
   // By default, Underscore uses ERB-style template delimiters, change the
   // following template settings to use alternative delimiters.
   _.templateSettings = {
-    evaluate: /<%([\s\S]+?)%>/g,
-    interpolate: /<%=([\s\S]+?)%>/g,
-    escape: /<%-([\s\S]+?)%>/g,
+    evaluate    : /<%([\s\S]+?)%>/g,
+    interpolate : /<%=([\s\S]+?)%>/g,
+    escape      : /<%-([\s\S]+?)%>/g
   };
 
   // When customizing `templateSettings`, if you don't want to define an
   // interpolation, evaluation or escaping regex, we need one that is
   // guaranteed not to match.
-  const noMatch = /.^/;
+  var noMatch = /.^/;
 
   // Certain characters need to be escaped so that they can be put into a
   // string literal.
-  const escapes = {
+  var escapes = {
     '\\': '\\',
     "'": "'",
-    r: '\r',
-    n: '\n',
-    t: '\t',
-    u2028: '\u2028',
-    u2029: '\u2029',
+    'r': '\r',
+    'n': '\n',
+    't': '\t',
+    'u2028': '\u2028',
+    'u2029': '\u2029'
   };
 
-  for (const p in escapes) escapes[escapes[p]] = p;
-  const escaper = /\\|'|\r|\n|\t|\u2028|\u2029/g;
-  const unescaper = /\\(\\|'|r|n|t|u2028|u2029)/g;
+  for (var p in escapes) escapes[escapes[p]] = p;
+  var escaper = /\\|'|\r|\n|\t|\u2028|\u2029/g;
+  var unescaper = /\\(\\|'|r|n|t|u2028|u2029)/g;
 
   // Within an interpolation, evaluation, or escaping, remove HTML escaping
   // that had been previously added.
-  const unescape = function (code) {
-    return code.replace(unescaper, (match, escape) => escapes[escape]);
+  var unescape = function(code) {
+    return code.replace(unescaper, function(match, escape) {
+      return escapes[escape];
+    });
   };
 
   // JavaScript micro-templating, similar to John Resig's implementation.
   // Underscore templating handles arbitrary delimiters, preserves whitespace,
   // and correctly escapes quotes within interpolated code.
-  _.template = function (text, data, settings) {
+  _.template = function(text, data, settings) {
     settings = _.defaults(settings || {}, _.templateSettings);
 
     // Compile the template source, taking care to escape characters that
     // cannot be included in a string literal and then unescape them in code
     // blocks.
-    let source = `__p+='${text
-      .replace(escaper, match => `\\${escapes[match]}`)
-      .replace(settings.escape || noMatch, (match, code) => `'+\n_.escape(${unescape(code)})+\n'`)
-      .replace(settings.interpolate || noMatch, (match, code) => `'+\n(${unescape(code)})+\n'`)
-      .replace(settings.evaluate || noMatch, (match, code) => `';\n${unescape(code)}\n;__p+='`)}';\n`;
+    var source = "__p+='" + text
+      .replace(escaper, function(match) {
+        return '\\' + escapes[match];
+      })
+      .replace(settings.escape || noMatch, function(match, code) {
+        return "'+\n_.escape(" + unescape(code) + ")+\n'";
+      })
+      .replace(settings.interpolate || noMatch, function(match, code) {
+        return "'+\n(" + unescape(code) + ")+\n'";
+      })
+      .replace(settings.evaluate || noMatch, function(match, code) {
+        return "';\n" + unescape(code) + "\n;__p+='";
+      }) + "';\n";
 
     // If a variable is not specified, place data values in local scope.
-    if (!settings.variable) source = `with(obj||{}){\n${source}}\n`;
+    if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
 
-    source = `${"var __p='';" +
-      "var print=function(){__p+=Array.prototype.join.call(arguments, '')};\n"}${
-      source}return __p;\n`;
+    source = "var __p='';" +
+      "var print=function(){__p+=Array.prototype.join.call(arguments, '')};\n" +
+      source + "return __p;\n";
 
-    const render = new Function(settings.variable || 'obj', '_', source);
+    var render = new Function(settings.variable || 'obj', '_', source);
     if (data) return render(data, _);
-    const template = function (data) {
+    var template = function(data) {
       return render.call(this, data, _);
     };
 
     // Provide the compiled function source as a convenience for build time
     // precompilation.
-    template.source = `function(${settings.variable || 'obj'}){\n${
-      source}}`;
+    template.source = 'function(' + (settings.variable || 'obj') + '){\n' +
+      source + '}';
 
     return template;
   };
 
   // Add a "chain" function, which will delegate to the wrapper.
-  _.chain = function (obj) {
+  _.chain = function(obj) {
     return _(obj).chain();
   };
 
@@ -1015,20 +1022,20 @@
   // If Underscore is called as a function, it returns a wrapped object that
   // can be used OO-style. This wrapper holds altered versions of all the
   // underscore functions. Wrapped objects may be chained.
-  var wrapper = function (obj) { this._wrapped = obj; };
+  var wrapper = function(obj) { this._wrapped = obj; };
 
   // Expose `wrapper.prototype` as `_.prototype`
   _.prototype = wrapper.prototype;
 
   // Helper function to continue chaining intermediate results.
-  const result = function (obj, chain) {
+  var result = function(obj, chain) {
     return chain ? _(obj).chain() : obj;
   };
 
   // A method to easily add functions to the OOP wrapper.
-  var addToWrapper = function (name, func) {
-    wrapper.prototype[name] = function () {
-      const args = slice.call(arguments);
+  var addToWrapper = function(name, func) {
+    wrapper.prototype[name] = function() {
+      var args = slice.call(arguments);
       unshift.call(args, this._wrapped);
       return result(func.apply(_, args), this._chain);
     };
@@ -1038,40 +1045,41 @@
   _.mixin(_);
 
   // Add all mutator Array functions to the wrapper.
-  each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], (name) => {
-    const method = ArrayProto[name];
-    wrapper.prototype[name] = function () {
-      const wrapped = this._wrapped;
+  each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
+    var method = ArrayProto[name];
+    wrapper.prototype[name] = function() {
+      var wrapped = this._wrapped;
       method.apply(wrapped, arguments);
-      const length = wrapped.length;
+      var length = wrapped.length;
       if ((name == 'shift' || name == 'splice') && length === 0) delete wrapped[0];
       return result(wrapped, this._chain);
     };
   });
 
   // Add all accessor Array functions to the wrapper.
-  each(['concat', 'join', 'slice'], (name) => {
-    const method = ArrayProto[name];
-    wrapper.prototype[name] = function () {
+  each(['concat', 'join', 'slice'], function(name) {
+    var method = ArrayProto[name];
+    wrapper.prototype[name] = function() {
       return result(method.apply(this._wrapped, arguments), this._chain);
     };
   });
 
   // Start chaining a wrapped Underscore object.
-  wrapper.prototype.chain = function () {
+  wrapper.prototype.chain = function() {
     this._chain = true;
     return this;
   };
 
   // Extracts the result from a wrapped and chained object.
-  wrapper.prototype.value = function () {
+  wrapper.prototype.value = function() {
     return this._wrapped;
   };
+
 }).call(this);
 
-/* global _: false, $: false, localStorage: false, XMLHttpRequest: false,
+/*global _: false, $: false, localStorage: false, XMLHttpRequest: false,
  XDomainRequest: false, exports: false, require: false */
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
   /**
    * Contains all Parse API classes and functions.
@@ -1080,10 +1088,10 @@
    *
    * Contains all Parse API classes and functions.
    */
-  const Parse = root.Parse;
+  var Parse = root.Parse;
 
   // Import Parse's local copy of underscore.
-  if (typeof (exports) !== 'undefined' && exports._) {
+  if (typeof(exports) !== "undefined" && exports._) {
     // We're running in Node.js.  Pull in the dependencies.
     Parse._ = exports._.noConflict();
     Parse.localStorage = require('localStorage');
@@ -1091,16 +1099,16 @@
     exports.Parse = Parse;
   } else {
     Parse._ = _.noConflict();
-    if (typeof (localStorage) !== 'undefined') {
+    if (typeof(localStorage) !== "undefined") {
       Parse.localStorage = localStorage;
     }
-    if (typeof (XMLHttpRequest) !== 'undefined') {
+    if (typeof(XMLHttpRequest) !== "undefined") {
       Parse.XMLHttpRequest = XMLHttpRequest;
     }
   }
 
   // If jQuery or Zepto has been included, grab a reference to it.
-  if (typeof ($) !== 'undefined') {
+  if (typeof($) !== "undefined") {
     Parse.$ = $;
   }
 
@@ -1108,14 +1116,14 @@
   // -------
 
   // Shared empty constructor function to aid in prototype-chain creation.
-  const EmptyConstructor = function () {};
+  var EmptyConstructor = function() {};
 
-
+  
   // Helper function to correctly set up the prototype chain, for subclasses.
   // Similar to `goog.inherits`, but uses a hash of prototype properties and
   // class properties to be extended.
-  const inherits = function (parent, protoProps, staticProps) {
-    let child;
+  var inherits = function(parent, protoProps, staticProps) {
+    var child;
 
     // The constructor function for the new subclass is either defined by you
     // (the "constructor" property in your `extend` definition), or defaulted
@@ -1124,7 +1132,7 @@
       child = protoProps.constructor;
     } else {
       /** @ignore */
-      child = function () { parent.apply(this, arguments); };
+      child = function(){ parent.apply(this, arguments); };
     }
 
     // Inherit class (static) properties from parent.
@@ -1157,7 +1165,7 @@
   };
 
   // Set the server for Parse to talk to.
-  Parse.serverURL = 'https://api.parse.com';
+  Parse.serverURL = "https://api.parse.com";
 
   /**
    * Call this method first to set up your authentication tokens for Parse.
@@ -1165,7 +1173,7 @@
    * @param {String} applicationId Your Parse Application ID.
    * @param {String} javaScriptKey Your Parse JavaScript Key.
    */
-  Parse.initialize = function (applicationId, javaScriptKey) {
+  Parse.initialize = function(applicationId, javaScriptKey) {
     Parse._initialize(applicationId, javaScriptKey);
   };
 
@@ -1176,7 +1184,7 @@
    * @param {String} javaScriptKey Your Parse JavaScript Key.
    * @param {String} masterKey Your Parse Master Key.
    */
-  Parse._initialize = function (applicationId, javaScriptKey, masterKey) {
+  Parse._initialize = function(applicationId, javaScriptKey, masterKey) {
     Parse.applicationId = applicationId;
     Parse.javaScriptKey = javaScriptKey;
     Parse.masterKey = masterKey;
@@ -1189,20 +1197,20 @@
    *     null or undefined is treated as the empty string.
    * @return {String} The full key name.
    */
-  Parse._getParsePath = function (path) {
+  Parse._getParsePath = function(path) {
     if (!Parse.applicationId) {
-      throw 'You need to call Parse.initialize before using Parse.';
+      throw "You need to call Parse.initialize before using Parse.";
     }
     if (!path) {
-      path = '';
+      path = "";
     }
     if (!Parse._.isString(path)) {
       throw "Tried to get a localStorage path that wasn't a String.";
     }
-    if (path[0] === '/') {
+    if (path[0] === "/") {
       path = path.substring(1);
     }
-    return `Parse/${Parse.applicationId}/${path}`;
+    return "Parse/" + Parse.applicationId + "/" + path;
   };
 
   /**
@@ -1210,58 +1218,58 @@
    * Gets reset when localStorage is cleared.
    */
   Parse._installationId = null;
-  Parse._getInstallationId = function () {
+  Parse._getInstallationId = function() {
     // See if it's cached in RAM.
     if (Parse._installationId) {
       return Parse._installationId;
     }
 
     // Try to get it from localStorage.
-    const path = Parse._getParsePath('installationId');
+    var path = Parse._getParsePath("installationId");
     Parse._installationId = Parse.localStorage.getItem(path);
 
-    if (!Parse._installationId || Parse._installationId === '') {
+    if (!Parse._installationId || Parse._installationId === "") {
       // It wasn't in localStorage, so create a new one.
-      const hexOctet = function () {
-        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+      var hexOctet = function() {
+        return Math.floor((1+Math.random())*0x10000).toString(16).substring(1);
       };
       Parse._installationId = (
-        `${hexOctet() + hexOctet()}-${
-        hexOctet()}-${
-        hexOctet()}-${
-        hexOctet()}-${
-        hexOctet()}${hexOctet()}${hexOctet()}`);
+        hexOctet() + hexOctet() + "-" +
+        hexOctet() + "-" +
+        hexOctet() + "-" +
+        hexOctet() + "-" +
+        hexOctet() + hexOctet() + hexOctet());
       Parse.localStorage.setItem(path, Parse._installationId);
     }
 
     return Parse._installationId;
   };
 
-  Parse._parseDate = function (iso8601) {
-    const regexp = new RegExp(
-      '^([0-9]{1,4})-([0-9]{1,2})-([0-9]{1,2})' + 'T' +
-      '([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})' +
-      '(.([0-9]+))?' + 'Z$');
-    const match = regexp.exec(iso8601);
+  Parse._parseDate = function(iso8601) {
+    var regexp = new RegExp(
+      "^([0-9]{1,4})-([0-9]{1,2})-([0-9]{1,2})" + "T" +
+      "([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})" +
+      "(.([0-9]+))?" + "Z$");
+    var match = regexp.exec(iso8601);
     if (!match) {
       return null;
     }
 
-    const year = match[1] || 0;
-    const month = (match[2] || 1) - 1;
-    const day = match[3] || 0;
-    const hour = match[4] || 0;
-    const minute = match[5] || 0;
-    const second = match[6] || 0;
-    const milli = match[8] || 0;
+    var year = match[1] || 0;
+    var month = (match[2] || 1) - 1;
+    var day = match[3] || 0;
+    var hour = match[4] || 0;
+    var minute = match[5] || 0;
+    var second = match[6] || 0;
+    var milli = match[8] || 0;
 
     return new Date(Date.UTC(year, month, day, hour, minute, second, milli));
   };
 
-  Parse._ajaxIE8 = function (method, url, data, success, error) {
-    const xdr = new XDomainRequest();
-    xdr.onload = function () {
-      let response;
+  Parse._ajaxIE8 = function(method, url, data, success, error) {
+    var xdr = new XDomainRequest();
+    xdr.onload = function() {
+      var response;
       try {
         response = JSON.parse(xdr.responseText);
       } catch (e) {
@@ -1275,23 +1283,23 @@
         }
       }
     };
-    xdr.onerror = xdr.ontimeout = function () {
+    xdr.onerror = xdr.ontimeout = function() {
       error(xdr);
     };
-    xdr.onprogress = function () {};
+    xdr.onprogress = function() {};
     xdr.open(method, url);
     xdr.send(data);
   };
 
-  Parse._ajax = function (method, url, data, success, error) {
-    if (typeof (XDomainRequest) !== 'undefined') {
+  Parse._ajax = function(method, url, data, success, error) {
+    if (typeof(XDomainRequest) !== "undefined") {
       return Parse._ajaxIE8(method, url, data, success, error);
     }
 
-    let handled = false;
+    var handled = false;
 
-    const xhr = new Parse.XMLHttpRequest();
-    xhr.onreadystatechange = function () {
+    var xhr = new Parse.XMLHttpRequest();
+    xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
         if (handled) {
           return;
@@ -1299,7 +1307,7 @@
         handled = true;
 
         if (xhr.status >= 200 && xhr.status < 300) {
-          let response;
+          var response;
           try {
             response = JSON.parse(xhr.responseText);
           } catch (e) {
@@ -1312,19 +1320,21 @@
               success(response, xhr);
             }
           }
-        } else if (error) {
-          error(xhr);
+        } else {
+          if (error) {
+            error(xhr);
+          }
         }
       }
     };
     xhr.open(method, url, true);
-    xhr.setRequestHeader('Content-Type', 'text/plain');  // avoid pre-flight.
+    xhr.setRequestHeader("Content-Type", "text/plain");  // avoid pre-flight.
     xhr.send(data);
   };
 
   // A self-propagating extend function.
-  Parse._extend = function (protoProps, classProps) {
-    const child = inherits(this, protoProps, classProps);
+  Parse._extend = function(protoProps, classProps) {
+    var child = inherits(this, protoProps, classProps);
     child.extend = this.extend;
     return child;
   };
@@ -1337,43 +1347,43 @@
    * options is just a success/error callback hash.
    * @ignore
    */
-  Parse._request = function (route, className, objectId, method, dataObject,
-    options) {
+  Parse._request = function(route, className, objectId, method, dataObject,
+                            options) {
     if (!Parse.applicationId) {
-      throw 'You must specify your applicationId using Parse.initialize';
+      throw "You must specify your applicationId using Parse.initialize";
     }
 
     if (!Parse.javaScriptKey && !Parse.masterKey) {
-      throw 'You must specify a key using Parse.initialize';
+      throw "You must specify a key using Parse.initialize";
     }
 
-
-    if (route !== 'classes' &&
-        route !== 'push' &&
-        route !== 'users' &&
-        route !== 'login' &&
-        route !== 'functions' &&
-        route !== 'requestPasswordReset') {
-      throw `${'First argument must be one of classes, users, functions, or ' +
-            "login, not '"}${route}'.`;
+    
+    if (route !== "classes" &&
+        route !== "push" &&
+        route !== "users" &&
+        route !== "login" &&
+        route !== "functions" &&
+        route !== "requestPasswordReset") {
+      throw "First argument must be one of classes, users, functions, or " +
+            "login, not '" + route + "'.";
     }
 
-    let url = Parse.serverURL;
-    if (url.charAt(url.length - 1) !== '/') {
-      url += '/';
+    var url = Parse.serverURL;
+    if (url.charAt(url.length - 1) !== "/") {
+      url += "/";
     }
-    url += `1/${route}`;
+    url += "1/" + route;
     if (className) {
-      url += `/${className}`;
+      url += "/" + className;
     }
     if (objectId) {
-      url += `/${objectId}`;
+      url += "/" + objectId;
     }
 
     dataObject = Parse._.clone(dataObject || {});
-    if (method !== 'POST') {
+    if (method !== "POST") {
       dataObject._method = method;
-      method = 'POST';
+      method = "POST";
     }
     dataObject._ApplicationId = Parse.applicationId;
     if (!Parse._useMasterKey) {
@@ -1385,18 +1395,18 @@
     dataObject._ClientVersion = Parse.VERSION;
     dataObject._InstallationId = Parse._getInstallationId();
     // Pass the session token on every request.
-    const currentUser = Parse.User.current();
+    var currentUser = Parse.User.current();
     if (currentUser && currentUser._sessionToken) {
       dataObject._SessionToken = currentUser._sessionToken;
     }
-    const data = JSON.stringify(dataObject);
+    var data = JSON.stringify(dataObject);
 
     Parse._ajax(method, url, data, options.success, options.error);
   };
 
   // Helper function to get a value from a Backbone object as a property
   // or as a function.
-  Parse._getValue = function (object, prop) {
+  Parse._getValue = function(object, prop) {
     if (!(object && object[prop])) {
       return null;
     }
@@ -1412,11 +1422,11 @@
    * loop because we have circular references.  If <seenObjects>
    * is set, then none of the Parse Objects that are serialized can be dirty.
    */
-  Parse._encode = function (value, seenObjects, disallowObjects) {
-    const _ = Parse._;
+  Parse._encode = function(value, seenObjects, disallowObjects) {
+    var _ = Parse._;
     if (value instanceof Parse.Object) {
       if (disallowObjects) {
-        throw 'Parse.Objects not allowed here';
+        throw "Parse.Objects not allowed here";
       }
       if (!seenObjects || _.include(seenObjects, value) || !value._hasData) {
         return value._toPointer();
@@ -1425,16 +1435,19 @@
         return Parse._encode(value._toFullJSON(seenObjects),
                              seenObjects,
                              disallowObjects);
+      } else {
+        throw "Can't fully embed a dirty object";
       }
-      throw "Can't fully embed a dirty object";
     } else if (value instanceof Parse.ACL) {
       return value.toJSON();
     } else if (_.isDate(value)) {
-      return { __type: 'Date', iso: value.toJSON() };
+      return { "__type": "Date", "iso": value.toJSON() };
     } else if (value instanceof Parse.GeoPoint) {
       return value.toJSON();
     } else if (_.isArray(value)) {
-      return _.map(value, x => Parse._encode(x, seenObjects, disallowObjects));
+      return _.map(value, function(x) {
+        return Parse._encode(x, seenObjects, disallowObjects);
+      });
     } else if (_.isRegExp(value)) {
       return value.source;
     } else if (value instanceof Parse.Relation) {
@@ -1442,8 +1455,8 @@
     } else if (value instanceof Parse.Op) {
       return value.toJSON();
     } else if (value instanceof Object) {
-      const output = {};
-      Parse._each(value, (v, k) => {
+      var output = {};
+      Parse._each(value, function(v, k) {
         output[k] = Parse._encode(v, seenObjects, disallowObjects);
       });
       return output;
@@ -1456,12 +1469,12 @@
    * The inverse function of Parse._encode.
    * TODO: make decode not mutate value.
    */
-  Parse._decode = function (key, value) {
-    const _ = Parse._;
+  Parse._decode = function(key, value) {
+    var _ = Parse._;
     if (!_.isObject(value)) {
       return value;
     } else if (_.isArray(value)) {
-      Parse._each(value, (v, k) => {
+      Parse._each(value, function(v, k) {
         value[k] = Parse._decode(k, v);
       });
       return value;
@@ -1472,39 +1485,41 @@
     } else if (value.__op) {
       // Must be a Op.
       return Parse.Op._decode(value);
-    } else if (value.__type === 'Pointer') {
-      const pointer = Parse.Object._create(value.className);
+    } else if (value.__type === "Pointer") {
+      var pointer = Parse.Object._create(value.className);
       pointer._finishFetch({ objectId: value.objectId }, false);
       return pointer;
-    } else if (value.__type === 'Object') {
+    } else if (value.__type === "Object") {
       // It's an Object included in a query result.
-      const className = value.className;
+      var className = value.className;
       delete value.__type;
       delete value.className;
-      const object = Parse.Object._create(className);
+      var object = Parse.Object._create(className);
       object._finishFetch(value, true);
       return object;
-    } else if (value.__type === 'Date') {
+    } else if (value.__type === "Date") {
       return Parse._parseDate(value.iso);
-    } else if (value.__type === 'GeoPoint') {
+    } else if (value.__type === "GeoPoint") {
       return new Parse.GeoPoint({
         latitude: value.latitude,
-        longitude: value.longitude,
+        longitude: value.longitude
       });
-    } else if (key === 'ACL') {
+    } else if (key === "ACL") {
       if (value instanceof Parse.ACL) {
         return value;
+      } else {
+        return new Parse.ACL(value);
       }
-      return new Parse.ACL(value);
-    } else if (value.__type === 'Relation') {
-      const relation = new Parse.Relation(null, key);
+    } else if (value.__type === "Relation") {
+      var relation = new Parse.Relation(null, key);
       relation.targetClassName = value.className;
       return relation;
+    } else {
+      Parse._each(value, function(v, k) {
+        value[k] = Parse._decode(k, v);
+      });
+     return value;
     }
-    Parse._each(value, (v, k) => {
-      value[k] = Parse._decode(k, v);
-    });
-    return value;
   };
 
   /**
@@ -1512,10 +1527,10 @@
    * * it doesn't work for so-called array-like objects,
    * * it does work for dictionaries with a "length" attribute.
    */
-  Parse._each = function (obj, callback) {
-    const _ = Parse._;
+  Parse._each = function(obj, callback) {
+    var _ = Parse._;
     if (_.isObject(obj)) {
-      _.each(_.keys(obj), (key) => {
+      _.each(_.keys(obj), function(key) {
         callback(obj[key], key);
       });
     } else {
@@ -1524,15 +1539,15 @@
   };
 
   // Helper function to check null or undefined.
-  Parse._isNullOrUndefined = function (x) {
+  Parse._isNullOrUndefined = function(x) {
     return Parse._.isNull(x) || Parse._.isUndefined(x);
   };
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Constructs a new Parse.Error object with the given code and message.
@@ -1542,7 +1557,7 @@
    *
    * <p>Class used for all objects passed to error callbacks.</p>
    */
-  Parse.Error = function (code, message) {
+  Parse.Error = function(code, message) {
     this.code = code;
     this.message = message;
   };
@@ -1862,16 +1877,17 @@
      * Twitter) is unsupported.
      * @constant
      */
-    UNSUPPORTED_SERVICE: 252,
+    UNSUPPORTED_SERVICE: 252
   });
+
 }(this));
 
-/* global _: false */
-(function () {
-  const root = this;
-  const Parse = (root.Parse || (root.Parse = {}));
-  const eventSplitter = /\s+/;
-  const slice = Array.prototype.slice;
+/*global _: false */
+(function() {
+  var root = this;
+  var Parse = (root.Parse || (root.Parse = {}));
+  var eventSplitter = /\s+/;
+  var slice = Array.prototype.slice;
 
   /**
    * @class
@@ -1900,12 +1916,9 @@
      * Bind one or more space separated events, `events`, to a `callback`
      * function. Passing `"all"` will bind the callback to all events fired.
      */
-    on(events, callback, context) {
-      let calls,
-        event,
-        node,
-        tail,
-        list;
+    on: function(events, callback, context) {
+
+      var calls, event, node, tail, list;
       if (!callback) {
         return this;
       }
@@ -1922,7 +1935,7 @@
         node.next = tail = {};
         node.context = context;
         node.callback = callback;
-        calls[event] = { tail, next: list ? list.next : node };
+        calls[event] = {tail: tail, next: list ? list.next : node};
         event = events.shift();
       }
 
@@ -1934,13 +1947,8 @@
      * with that function. If `callback` is null, removes all callbacks for the
      * event. If `events` is null, removes all bound callbacks for all events.
      */
-    off(events, callback, context) {
-      let event,
-        calls,
-        node,
-        tail,
-        cb,
-        ctx;
+    off: function(events, callback, context) {
+      var event, calls, node, tail, cb, ctx;
 
       // No events, or removing *all* events.
       if (!(calls = this._callbacks)) {
@@ -1984,14 +1992,8 @@
      * (unless you're listening on `"all"`, which will cause your callback to
      * receive the true name of the event as the first argument).
      */
-    trigger(events) {
-      let event,
-        node,
-        calls,
-        tail,
-        args,
-        all,
-        rest;
+    trigger: function(events) {
+      var event, node, calls, tail, args, all, rest;
       if (!(calls = this._callbacks)) {
         return this;
       }
@@ -2022,8 +2024,8 @@
       }
 
       return this;
-    },
-  };
+    }
+  };  
 
   /**
    * @function
@@ -2037,11 +2039,11 @@
 }.call(this));
 
 
-/* global navigator: false */
-(function (root) {
+/*global navigator: false */
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Creates a new GeoPoint with any of the following forms:<br>
@@ -2066,7 +2068,7 @@
    *   object.set("location", point);
    *   object.save();</pre></p>
    */
-  Parse.GeoPoint = function (arg1, arg2) {
+  Parse.GeoPoint = function(arg1, arg2) {
     if (_.isArray(arg1)) {
       Parse.GeoPoint._validate(arg1[0], arg1[1]);
       this.latitude = arg1[0];
@@ -2086,19 +2088,23 @@
 
     // Add properties so that anyone using Webkit or Mozilla will get an error
     // if they try to set values that are out of bounds.
-    const self = this;
+    var self = this;
     if (this.__defineGetter__ && this.__defineSetter__) {
       // Use _latitude and _longitude to actually store the values, and add
       // getters and setters for latitude and longitude.
       this._latitude = this.latitude;
       this._longitude = this.longitude;
-      this.__defineGetter__('latitude', () => self._latitude);
-      this.__defineGetter__('longitude', () => self._longitude);
-      this.__defineSetter__('latitude', (val) => {
+      this.__defineGetter__("latitude", function() {
+        return self._latitude;
+      });
+      this.__defineGetter__("longitude", function() {
+        return self._longitude;
+      });
+      this.__defineSetter__("latitude", function(val) {
         Parse.GeoPoint._validate(val, self.longitude);
         self._latitude = val;
       });
-      this.__defineSetter__('longitude', (val) => {
+      this.__defineSetter__("longitude", function(val) {
         Parse.GeoPoint._validate(self.latitude, val);
         self._longitude = val;
       });
@@ -2116,18 +2122,18 @@
   /**
    * Throws an exception if the given lat-long is out of bounds.
    */
-  Parse.GeoPoint._validate = function (latitude, longitude) {
+  Parse.GeoPoint._validate = function(latitude, longitude) {
     if (latitude < -90.0) {
-      throw `Parse.GeoPoint latitude ${latitude} < -90.0.`;
+      throw "Parse.GeoPoint latitude " + latitude + " < -90.0.";
     }
     if (latitude > 90.0) {
-      throw `Parse.GeoPoint latitude ${latitude} > 90.0.`;
+      throw "Parse.GeoPoint latitude " + latitude + " > 90.0.";
     }
     if (longitude < -180.0) {
-      throw `Parse.GeoPoint longitude ${longitude} < -180.0.`;
+      throw "Parse.GeoPoint longitude " + longitude + " < -180.0.";
     }
     if (longitude > 180.0) {
-      throw `Parse.GeoPoint longitude ${longitude} > 180.0.`;
+      throw "Parse.GeoPoint longitude " + longitude + " > 180.0.";
     }
   };
 
@@ -2136,16 +2142,16 @@
    * Calls options.success with a new GeoPoint instance or calls options.error.
    * @param {Object} options An object with success and error callbacks.
    */
-  Parse.GeoPoint.current = function (options) {
-    const success = function (location) {
+  Parse.GeoPoint.current = function(options) {
+    var success = function(location) {
       if (options.success) {
         options.success(new Parse.GeoPoint({
           latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          longitude: location.coords.longitude
         }));
       }
     };
-    const error = function (e) {
+    var error = function(e) {
       if (options.error) {
         options.error(e);
       }
@@ -2158,12 +2164,12 @@
      * Returns a JSON representation of the GeoPoint, suitable for Parse.
      * @return {Object}
      */
-    toJSON() {
+    toJSON: function() {
       Parse.GeoPoint._validate(this.latitude, this.longitude);
       return {
-        __type: 'GeoPoint',
+        "__type": "GeoPoint",
         latitude: this.latitude,
-        longitude: this.longitude,
+        longitude: this.longitude
       };
     },
 
@@ -2172,18 +2178,18 @@
      * @param {Parse.GeoPoint} point the other Parse.GeoPoint.
      * @return {Number}
      */
-    radiansTo(point) {
-      const d2r = Math.PI / 180.0;
-      const lat1rad = this.latitude * d2r;
-      const long1rad = this.longitude * d2r;
-      const lat2rad = point.latitude * d2r;
-      const long2rad = point.longitude * d2r;
-      const deltaLat = lat1rad - lat2rad;
-      const deltaLong = long1rad - long2rad;
-      const sinDeltaLatDiv2 = Math.sin(deltaLat / 2);
-      const sinDeltaLongDiv2 = Math.sin(deltaLong / 2);
+    radiansTo: function(point) {
+      var d2r = Math.PI / 180.0;
+      var lat1rad = this.latitude * d2r;
+      var long1rad = this.longitude * d2r;
+      var lat2rad = point.latitude * d2r;
+      var long2rad = point.longitude * d2r;
+      var deltaLat = lat1rad - lat2rad;
+      var deltaLong = long1rad - long2rad;
+      var sinDeltaLatDiv2 = Math.sin(deltaLat / 2);
+      var sinDeltaLongDiv2 = Math.sin(deltaLong / 2);
       // Square of half the straight line chord distance between both points.
-      let a = ((sinDeltaLatDiv2 * sinDeltaLatDiv2) +
+      var a = ((sinDeltaLatDiv2 * sinDeltaLatDiv2) +
                (Math.cos(lat1rad) * Math.cos(lat2rad) *
                 sinDeltaLongDiv2 * sinDeltaLongDiv2));
       a = Math.min(1.0, a);
@@ -2195,7 +2201,7 @@
      * @param {Parse.GeoPoint} point the other Parse.GeoPoint.
      * @return {Number}
      */
-    kilometersTo(point) {
+    kilometersTo: function(point) {
       return this.radiansTo(point) * 6371.0;
     },
 
@@ -2204,19 +2210,19 @@
      * @param {Parse.GeoPoint} point the other Parse.GeoPoint.
      * @return {Number}
      */
-    milesTo(point) {
+    milesTo: function(point) {
       return this.radiansTo(point) * 3958.8;
-    },
+    }
   };
 }(this));
 
-/* global navigator: false */
-(function (root) {
+/*global navigator: false */
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
-  const PUBLIC_KEY = '*';
+  var PUBLIC_KEY = "*";
 
   /**
    * Creates a new ACL.
@@ -2232,8 +2238,8 @@
    * <code>Parse.Object</code> to restrict access to only a subset of users
    * of your application.</p>
    */
-  Parse.ACL = function (arg1) {
-    const self = this;
+  Parse.ACL = function(arg1) {
+    var self = this;
     self.permissionsById = {};
     if (_.isObject(arg1)) {
       if (arg1 instanceof Parse.User) {
@@ -2241,19 +2247,19 @@
         self.setWriteAccess(arg1, true);
       } else {
         if (_.isFunction(arg1)) {
-          throw 'Parse.ACL() called with a function.  Did you forget ()?';
+          throw "Parse.ACL() called with a function.  Did you forget ()?";
         }
-        Parse._each(arg1, (accessList, userId) => {
+        Parse._each(arg1, function(accessList, userId) {
           if (!_.isString(userId)) {
-            throw 'Tried to create an ACL with an invalid userId.';
+            throw "Tried to create an ACL with an invalid userId.";
           }
           self.permissionsById[userId] = {};
-          Parse._each(accessList, (allowed, permission) => {
-            if (permission !== 'read' && permission !== 'write') {
-              throw 'Tried to create an ACL with an invalid permission type.';
+          Parse._each(accessList, function(allowed, permission) {
+            if (permission !== "read" && permission !== "write") {
+              throw "Tried to create an ACL with an invalid permission type.";
             }
             if (!_.isBoolean(allowed)) {
-              throw 'Tried to create an ACL with an invalid permission value.';
+              throw "Tried to create an ACL with an invalid permission value.";
             }
             self.permissionsById[userId][permission] = allowed;
           });
@@ -2266,30 +2272,31 @@
    * Returns a JSON-encoded version of the ACL.
    * @return {Object}
    */
-  Parse.ACL.prototype.toJSON = function () {
+  Parse.ACL.prototype.toJSON = function() {
     return _.clone(this.permissionsById);
   };
 
-  Parse.ACL.prototype._setAccess = function (accessType, userId, allowed) {
+  Parse.ACL.prototype._setAccess = function(accessType, userId, allowed) {
     if (userId instanceof Parse.User) {
       userId = userId.id;
     } else if (userId instanceof Parse.Role) {
-      userId = `role:${userId.getName()}`;
+      userId = "role:" + userId.getName();
     }
     if (!_.isString(userId)) {
-      throw 'userId must be a string.';
+      throw "userId must be a string.";
     }
     if (!_.isBoolean(allowed)) {
-      throw 'allowed must be either true or false.';
+      throw "allowed must be either true or false.";
     }
-    let permissions = this.permissionsById[userId];
+    var permissions = this.permissionsById[userId];
     if (!permissions) {
       if (!allowed) {
         // The user already doesn't have this permission, so no action needed.
         return;
+      } else {
+        permissions = {};
+        this.permissionsById[userId] = permissions;
       }
-      permissions = {};
-      this.permissionsById[userId] = permissions;
     }
 
     if (allowed) {
@@ -2302,17 +2309,17 @@
     }
   };
 
-  Parse.ACL.prototype._getAccess = function (accessType, userId) {
+  Parse.ACL.prototype._getAccess = function(accessType, userId) {
     if (userId instanceof Parse.User) {
       userId = userId.id;
     } else if (userId instanceof Parse.Role) {
-      userId = `role:${userId.getName()}`;
+      userId = "role:" + userId.getName();
     }
-    const permissions = this.permissionsById[userId];
+    var permissions = this.permissionsById[userId];
     if (!permissions) {
       return false;
     }
-    return !!permissions[accessType];
+    return permissions[accessType] ? true : false;
   };
 
   /**
@@ -2320,8 +2327,8 @@
    * @param userId An instance of Parse.User or its objectId.
    * @param {Boolean} allowed Whether that user should have read access.
    */
-  Parse.ACL.prototype.setReadAccess = function (userId, allowed) {
-    this._setAccess('read', userId, allowed);
+  Parse.ACL.prototype.setReadAccess = function(userId, allowed) {
+    this._setAccess("read", userId, allowed);
   };
 
   /**
@@ -2332,8 +2339,8 @@
    * @param userId An instance of Parse.User or its objectId, or a Parse.Role.
    * @return {Boolean}
    */
-  Parse.ACL.prototype.getReadAccess = function (userId) {
-    return this._getAccess('read', userId);
+  Parse.ACL.prototype.getReadAccess = function(userId) {
+    return this._getAccess("read", userId);
   };
 
   /**
@@ -2341,8 +2348,8 @@
    * @param userId An instance of Parse.User or its objectId, or a Parse.Role..
    * @param {Boolean} allowed Whether that user should have write access.
    */
-  Parse.ACL.prototype.setWriteAccess = function (userId, allowed) {
-    this._setAccess('write', userId, allowed);
+  Parse.ACL.prototype.setWriteAccess = function(userId, allowed) {
+    this._setAccess("write", userId, allowed);
   };
 
   /**
@@ -2353,15 +2360,15 @@
    * @param userId An instance of Parse.User or its objectId, or a Parse.Role.
    * @return {Boolean}
    */
-  Parse.ACL.prototype.getWriteAccess = function (userId) {
-    return this._getAccess('write', userId);
+  Parse.ACL.prototype.getWriteAccess = function(userId) {
+    return this._getAccess("write", userId);
   };
 
   /**
    * Set whether the public is allowed to read this object.
    * @param {Boolean} allowed
    */
-  Parse.ACL.prototype.setPublicReadAccess = function (allowed) {
+  Parse.ACL.prototype.setPublicReadAccess = function(allowed) {
     this.setReadAccess(PUBLIC_KEY, allowed);
   };
 
@@ -2369,7 +2376,7 @@
    * Get whether the public is allowed to read this object.
    * @return {Boolean}
    */
-  Parse.ACL.prototype.getPublicReadAccess = function () {
+  Parse.ACL.prototype.getPublicReadAccess = function() {
     return this.getReadAccess(PUBLIC_KEY);
   };
 
@@ -2377,7 +2384,7 @@
    * Set whether the public is allowed to write this object.
    * @param {Boolean} allowed
    */
-  Parse.ACL.prototype.setPublicWriteAccess = function (allowed) {
+  Parse.ACL.prototype.setPublicWriteAccess = function(allowed) {
     this.setWriteAccess(PUBLIC_KEY, allowed);
   };
 
@@ -2385,95 +2392,96 @@
    * Get whether the public is allowed to write this object.
    * @return {Boolean}
    */
-  Parse.ACL.prototype.getPublicWriteAccess = function () {
+  Parse.ACL.prototype.getPublicWriteAccess = function() {
     return this.getWriteAccess(PUBLIC_KEY);
   };
-
+  
   /**
    * Get whether users belonging to the given role are allowed
    * to read this object. Even if this returns false, the role may
    * still be able to write it if a parent role has read access.
-   *
+   * 
    * @param role The name of the role, or a Parse.Role object.
    * @return {Boolean} true if the role has read access. false otherwise.
    * @throws {String} If role is neither a Parse.Role nor a String.
    */
-  Parse.ACL.prototype.getRoleReadAccess = function (role) {
+  Parse.ACL.prototype.getRoleReadAccess = function(role) {
     if (role instanceof Parse.Role) {
       // Normalize to the String name
       role = role.getName();
     }
     if (_.isString(role)) {
-      return this.getReadAccess(`role:${role}`);
+      return this.getReadAccess("role:" + role);
     }
-    throw 'role must be a Parse.Role or a String';
+    throw "role must be a Parse.Role or a String";
   };
-
+  
   /**
    * Get whether users belonging to the given role are allowed
    * to write this object. Even if this returns false, the role may
    * still be able to write it if a parent role has write access.
-   *
+   * 
    * @param role The name of the role, or a Parse.Role object.
    * @return {Boolean} true if the role has write access. false otherwise.
    * @throws {String} If role is neither a Parse.Role nor a String.
    */
-  Parse.ACL.prototype.getRoleWriteAccess = function (role) {
+  Parse.ACL.prototype.getRoleWriteAccess = function(role) {
     if (role instanceof Parse.Role) {
       // Normalize to the String name
       role = role.getName();
     }
     if (_.isString(role)) {
-      return this.getWriteAccess(`role:${role}`);
+      return this.getWriteAccess("role:" + role);
     }
-    throw 'role must be a Parse.Role or a String';
+    throw "role must be a Parse.Role or a String";
   };
-
+  
   /**
    * Set whether users belonging to the given role are allowed
    * to read this object.
-   *
+   * 
    * @param role The name of the role, or a Parse.Role object.
    * @param {Boolean} allowed Whether the given role can read this object.
    * @throws {String} If role is neither a Parse.Role nor a String.
    */
-  Parse.ACL.prototype.setRoleReadAccess = function (role, allowed) {
+  Parse.ACL.prototype.setRoleReadAccess = function(role, allowed) {
     if (role instanceof Parse.Role) {
       // Normalize to the String name
       role = role.getName();
     }
     if (_.isString(role)) {
-      this.setReadAccess(`role:${role}`, allowed);
+      this.setReadAccess("role:" + role, allowed);
       return;
     }
-    throw 'role must be a Parse.Role or a String';
+    throw "role must be a Parse.Role or a String";
   };
-
+  
   /**
    * Set whether users belonging to the given role are allowed
    * to write this object.
-   *
+   * 
    * @param role The name of the role, or a Parse.Role object.
    * @param {Boolean} allowed Whether the given role can write this object.
    * @throws {String} If role is neither a Parse.Role nor a String.
    */
-  Parse.ACL.prototype.setRoleWriteAccess = function (role, allowed) {
+  Parse.ACL.prototype.setRoleWriteAccess = function(role, allowed) {
     if (role instanceof Parse.Role) {
       // Normalize to the String name
       role = role.getName();
     }
     if (_.isString(role)) {
-      this.setWriteAccess(`role:${role}`, allowed);
+      this.setWriteAccess("role:" + role, allowed);
       return;
     }
-    throw 'role must be a Parse.Role or a String';
+    throw "role must be a Parse.Role or a String";
   };
+
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * @class
@@ -2487,12 +2495,12 @@
    * You should not create subclasses of Parse.Op or instantiate Parse.Op
    * directly.
    */
-  Parse.Op = function () {
+  Parse.Op = function() {
     this._initialize.apply(this, arguments);
   };
 
   Parse.Op.prototype = {
-    _initialize() {},
+    _initialize: function() {}
   };
 
   _.extend(Parse.Op, {
@@ -2508,28 +2516,29 @@
      * Registers a function to convert a json object with an __op field into an
      * instance of a subclass of Parse.Op.
      */
-    _registerDecoder(opName, decoder) {
+    _registerDecoder: function(opName, decoder) {
       Parse.Op._opDecoderMap[opName] = decoder;
     },
 
     /**
      * Converts a json object into an instance of a subclass of Parse.Op.
      */
-    _decode(json) {
-      const decoder = Parse.Op._opDecoderMap[json.__op];
+    _decode: function(json) {
+      var decoder = Parse.Op._opDecoderMap[json.__op];
       if (decoder) {
         return decoder(json);
+      } else {
+        return undefined;
       }
-      return undefined;
-    },
+    }
   });
 
   /*
    * Add a handler for Batch ops.
    */
-  Parse.Op._registerDecoder('Batch', (json) => {
-    let op = null;
-    _.each(json.ops, (nextOp) => {
+  Parse.Op._registerDecoder("Batch", function(json) {
+    var op = null;
+    _.each(json.ops, function(nextOp) {
       nextOp = Parse.Op._decode(nextOp);
       op = nextOp._mergeWithPrevious(op);
     });
@@ -2543,14 +2552,14 @@
    * changed.
    */
   Parse.Op.Set = Parse.Op._extend(/** @lends Parse.Op.Set.prototype */ {
-    _initialize(value) {
+    _initialize: function(value) {
       this._value = value;
     },
 
     /**
      * Returns the new value of this field after the set.
      */
-    value() {
+    value: function() {
       return this._value;
     },
 
@@ -2558,17 +2567,17 @@
      * Returns a JSON version of the operation suitable for sending to Parse.
      * @return {Object}
      */
-    toJSON() {
+    toJSON: function() {
       return Parse._encode(this.value());
     },
 
-    _mergeWithPrevious(previous) {
+    _mergeWithPrevious: function(previous) {
       return this;
     },
 
-    _estimate(oldValue) {
+    _estimate: function(oldValue) {
       return this.value();
-    },
+    }
   });
 
   /**
@@ -2588,20 +2597,22 @@
      * Returns a JSON version of the operation suitable for sending to Parse.
      * @return {Object}
      */
-    toJSON() {
-      return { __op: 'Delete' };
+    toJSON: function() {
+      return { __op: "Delete" };
     },
 
-    _mergeWithPrevious(previous) {
+    _mergeWithPrevious: function(previous) {
       return this;
     },
 
-    _estimate(oldValue) {
+    _estimate: function(oldValue) {
       return Parse.Op._UNSET;
-    },
+    }
   });
 
-  Parse.Op._registerDecoder('Delete', json => new Parse.Op.Unset());
+  Parse.Op._registerDecoder("Delete", function(json) {
+    return new Parse.Op.Unset();
+  });
 
   /**
    * @class
@@ -2609,50 +2620,53 @@
    * will be increased by a given amount.
    */
   Parse.Op.Increment = Parse.Op._extend(
-    /** @lends Parse.Op.Increment.prototype */ {
+      /** @lends Parse.Op.Increment.prototype */ {
 
-      _initialize(amount) {
-        this._amount = amount;
-      },
+    _initialize: function(amount) {
+      this._amount = amount;
+    },
 
     /**
      * Returns the amount to increment by.
      * @return {Number} the amount to increment by.
      */
-      amount() {
-        return this._amount;
-      },
+    amount: function() {
+      return this._amount;
+    },
 
     /**
      * Returns a JSON version of the operation suitable for sending to Parse.
      * @return {Object}
      */
-      toJSON() {
-        return { __op: 'Increment', amount: this._amount };
-      },
+    toJSON: function() {
+      return { __op: "Increment", amount: this._amount };
+    },
 
-      _mergeWithPrevious(previous) {
-        if (!previous) {
-          return this;
-        } else if (previous instanceof Parse.Op.Unset) {
-          return new Parse.Op.Set(this.amount());
-        } else if (previous instanceof Parse.Op.Set) {
-          return new Parse.Op.Set(previous.value() + this.amount());
-        } else if (previous instanceof Parse.Op.Increment) {
-          return new Parse.Op.Increment(this.amount() + previous.amount());
-        }
-        throw 'Op is invalid after previous op.';
-      },
+    _mergeWithPrevious: function(previous) {
+      if (!previous) {
+        return this;
+      } else if (previous instanceof Parse.Op.Unset) {
+        return new Parse.Op.Set(this.amount());
+      } else if (previous instanceof Parse.Op.Set) {
+        return new Parse.Op.Set(previous.value() + this.amount());
+      } else if (previous instanceof Parse.Op.Increment) {
+        return new Parse.Op.Increment(this.amount() + previous.amount());
+      } else {
+        throw "Op is invalid after previous op.";
+      }
+    },
 
-      _estimate(oldValue) {
-        if (!oldValue) {
-          return this.amount();
-        }
-        return oldValue + this.amount();
-      },
-    });
+    _estimate: function(oldValue) {
+      if (!oldValue) {
+        return this.amount();
+      }
+      return oldValue + this.amount();
+    }
+  });
 
-  Parse.Op._registerDecoder('Increment', json => new Parse.Op.Increment(json.amount));
+  Parse.Op._registerDecoder("Increment", function(json) {
+    return new Parse.Op.Increment(json.amount);
+  });
 
   /**
    * @class
@@ -2660,7 +2674,7 @@
    * array that is stored in this field.
    */
   Parse.Op.Add = Parse.Op._extend(/** @lends Parse.Op.Add.prototype */ {
-    _initialize(objects) {
+    _initialize: function(objects) {
       this._objects = objects;
     },
 
@@ -2668,7 +2682,7 @@
      * Returns the objects to be added to the array.
      * @return {Array} The objects to be added to the array.
      */
-    objects() {
+    objects: function() {
       return this._objects;
     },
 
@@ -2676,11 +2690,11 @@
      * Returns a JSON version of the operation suitable for sending to Parse.
      * @return {Object}
      */
-    toJSON() {
-      return { __op: 'Add', objects: Parse._encode(this.objects()) };
+    toJSON: function() {
+      return { __op: "Add", objects: Parse._encode(this.objects()) };
     },
 
-    _mergeWithPrevious(previous) {
+    _mergeWithPrevious: function(previous) {
       if (!previous) {
         return this;
       } else if (previous instanceof Parse.Op.Unset) {
@@ -2689,19 +2703,23 @@
         return new Parse.Op.Set(this._estimate(previous.value()));
       } else if (previous instanceof Parse.Op.Add) {
         return new Parse.Op.Add(previous.objects().concat(this.objects()));
+      } else {
+        throw "Op is invalid after previous op.";
       }
-      throw 'Op is invalid after previous op.';
     },
 
-    _estimate(oldValue) {
+    _estimate: function(oldValue) {
       if (!oldValue) {
         return _.clone(this.objects());
+      } else {
+        return oldValue.concat(this.objects());
       }
-      return oldValue.concat(this.objects());
-    },
+    }
   });
 
-  Parse.Op._registerDecoder('Add', json => new Parse.Op.Add(Parse._decode(undefined, json.objects)));
+  Parse.Op._registerDecoder("Add", function(json) {
+    return new Parse.Op.Add(Parse._decode(undefined, json.objects));
+  });
 
   /**
    * @class
@@ -2710,67 +2728,17 @@
    * present in the array.
    */
   Parse.Op.AddUnique = Parse.Op._extend(
-    /** @lends Parse.Op.AddUnique.prototype */ {
+      /** @lends Parse.Op.AddUnique.prototype */ {
 
-      _initialize(objects) {
-        this._objects = _.uniq(objects);
-      },
+    _initialize: function(objects) {
+      this._objects = _.uniq(objects);
+    },
 
     /**
      * Returns the objects to be added to the array.
      * @return {Array} The objects to be added to the array.
      */
-      objects() {
-        return this._objects;
-      },
-
-    /**
-     * Returns a JSON version of the operation suitable for sending to Parse.
-     * @return {Object}
-     */
-      toJSON() {
-        return { __op: 'AddUnique', objects: Parse._encode(this.objects()) };
-      },
-
-      _mergeWithPrevious(previous) {
-        if (!previous) {
-          return this;
-        } else if (previous instanceof Parse.Op.Unset) {
-          return new Parse.Op.Set(this.objects());
-        } else if (previous instanceof Parse.Op.Set) {
-          return new Parse.Op.Set(this._estimate(previous.value()));
-        } else if (previous instanceof Parse.Op.AddUnique) {
-          return new Parse.Op.AddUnique(
-          _.union(previous.objects(), this.objects()));
-        }
-        throw 'Op is invalid after previous op.';
-      },
-
-      _estimate(oldValue) {
-        if (!oldValue) {
-          return _.clone(this.objects());
-        }
-        return oldValue.concat(_.difference(this.objects(), oldValue));
-      },
-    });
-
-  Parse.Op._registerDecoder('AddUnique', json => new Parse.Op.AddUnique(Parse._decode(undefined, json.objects)));
-
-  /**
-   * @class
-   * Remove is an atomic operation where the given objects will be removed from
-   * the array that is stored in this field.
-   */
-  Parse.Op.Remove = Parse.Op._extend(/** @lends Parse.Op.Remove.prototype */ {
-    _initialize(objects) {
-      this._objects = _.uniq(objects);
-    },
-
-    /**
-     * Returns the objects to be removed from the array.
-     * @return {Array} The objects to be removed from the array.
-     */
-    objects() {
+    objects: function() {
       return this._objects;
     },
 
@@ -2778,11 +2746,65 @@
      * Returns a JSON version of the operation suitable for sending to Parse.
      * @return {Object}
      */
-    toJSON() {
-      return { __op: 'Remove', objects: Parse._encode(this.objects()) };
+    toJSON: function() {
+      return { __op: "AddUnique", objects: Parse._encode(this.objects()) };
     },
 
-    _mergeWithPrevious(previous) {
+    _mergeWithPrevious: function(previous) {
+      if (!previous) {
+        return this;
+      } else if (previous instanceof Parse.Op.Unset) {
+        return new Parse.Op.Set(this.objects());
+      } else if (previous instanceof Parse.Op.Set) {
+        return new Parse.Op.Set(this._estimate(previous.value()));
+      } else if (previous instanceof Parse.Op.AddUnique) {
+        return new Parse.Op.AddUnique(
+          _.union(previous.objects(), this.objects()));
+      } else {
+        throw "Op is invalid after previous op.";
+      }
+    },
+
+    _estimate: function(oldValue) {
+      if (!oldValue) {
+        return _.clone(this.objects());
+      } else {
+        return oldValue.concat(_.difference(this.objects(), oldValue));
+      }
+    }
+  });
+
+  Parse.Op._registerDecoder("AddUnique", function(json) {
+    return new Parse.Op.AddUnique(Parse._decode(undefined, json.objects));
+  });
+
+  /**
+   * @class
+   * Remove is an atomic operation where the given objects will be removed from
+   * the array that is stored in this field.
+   */
+  Parse.Op.Remove = Parse.Op._extend(/** @lends Parse.Op.Remove.prototype */ {
+    _initialize: function(objects) {
+      this._objects = _.uniq(objects);
+    },
+
+    /**
+     * Returns the objects to be removed from the array.
+     * @return {Array} The objects to be removed from the array.
+     */
+    objects: function() {
+      return this._objects;
+    },
+
+    /**
+     * Returns a JSON version of the operation suitable for sending to Parse.
+     * @return {Object}
+     */
+    toJSON: function() {
+      return { __op: "Remove", objects: Parse._encode(this.objects()) };
+    },
+
+    _mergeWithPrevious: function(previous) {
       if (!previous) {
         return this;
       } else if (previous instanceof Parse.Op.Unset) {
@@ -2791,26 +2813,32 @@
         return new Parse.Op.Set(this._estimate(previous.value()));
       } else if (previous instanceof Parse.Op.Remove) {
         return new Parse.Op.Remove(_.union(previous.objects(), this.objects()));
+      } else {
+        throw "Op is invalid after previous op.";
       }
-      throw 'Op is invalid after previous op.';
     },
 
-    _estimate(oldValue) {
+    _estimate: function(oldValue) {
       if (!oldValue) {
         return [];
-      }
-      let newValue = _.difference(oldValue, this.objects());
+      } else {
+        var newValue = _.difference(oldValue, this.objects());
         // If there are saved Parse Objects being removed, also remove them.
-      _.each(this.objects(), (obj) => {
-        if (obj instanceof Parse.Object && obj.id) {
-          newValue = _.reject(newValue, other => (other instanceof Parse.Object) && (other.id === obj.id));
-        }
-      });
-      return newValue;
-    },
+        _.each(this.objects(), function(obj) {
+          if (obj instanceof Parse.Object && obj.id) {
+            newValue = _.reject(newValue, function(other) {
+              return (other instanceof Parse.Object) && (other.id === obj.id);
+            });
+          }
+        });
+        return newValue;
+      }
+    }
   });
 
-  Parse.Op._registerDecoder('Remove', json => new Parse.Op.Remove(Parse._decode(undefined, json.objects)));
+  Parse.Op._registerDecoder("Remove", function(json) {
+    return new Parse.Op.Remove(Parse._decode(undefined, json.objects));
+  });
 
   /**
    * @class
@@ -2819,149 +2847,154 @@
    * relation.
    */
   Parse.Op.Relation = Parse.Op._extend(
-    /** @lends Parse.Op.Relation.prototype */ {
+      /** @lends Parse.Op.Relation.prototype */ {
 
-      _initialize(adds, removes) {
-        this._targetClassName = null;
+    _initialize: function(adds, removes) {
+      this._targetClassName = null;
 
-        const self = this;
+      var self = this;
 
-        const pointerToId = function (object) {
-          if (object instanceof Parse.Object) {
-            if (!object.id) {
-              throw "You can't add an unsaved Parse.Object to a relation.";
-            }
-            if (!self._targetClassName) {
-              self._targetClassName = object.className;
-            }
-            if (self._targetClassName !== object.className) {
-              throw `Tried to create a Parse.Relation with 2 different types: ${
-                  self._targetClassName} and ${object.className}.`;
-            }
-            return object.id;
+      var pointerToId = function(object) {
+        if (object instanceof Parse.Object) {
+          if (!object.id) {
+            throw "You can't add an unsaved Parse.Object to a relation.";
           }
-          return object;
-        };
+          if (!self._targetClassName) {
+            self._targetClassName = object.className;
+          }
+          if (self._targetClassName !== object.className) {
+            throw "Tried to create a Parse.Relation with 2 different types: " +
+                  self._targetClassName + " and " + object.className + ".";
+          }
+          return object.id;
+        }
+        return object;
+      };
 
-        this.relationsToAdd = _.uniq(_.map(adds, pointerToId));
-        this.relationsToRemove = _.uniq(_.map(removes, pointerToId));
-      },
+      this.relationsToAdd = _.uniq(_.map(adds, pointerToId));
+      this.relationsToRemove = _.uniq(_.map(removes, pointerToId));
+    },
 
     /**
      * Returns an array of unfetched Parse.Object that are being added to the
      * relation.
      * @return {Array}
      */
-      added() {
-        const self = this;
-        return _.map(this.relationsToAdd, (objectId) => {
-          const object = Parse.Object._create(self._targetClassName);
-          object.id = objectId;
-          return object;
-        });
-      },
+    added: function() {
+      var self = this;
+      return _.map(this.relationsToAdd, function(objectId) {
+        var object = Parse.Object._create(self._targetClassName);
+        object.id = objectId;
+        return object;
+      });
+    },
 
     /**
      * Returns an array of unfetched Parse.Object that are being removed from
      * the relation.
      * @return {Array}
      */
-      removed() {
-        const self = this;
-        return _.map(this.relationsToRemove, (objectId) => {
-          const object = Parse.Object._create(self._targetClassName);
-          object.id = objectId;
-          return object;
-        });
-      },
+    removed: function() {
+      var self = this;
+      return _.map(this.relationsToRemove, function(objectId) {
+        var object = Parse.Object._create(self._targetClassName);
+        object.id = objectId;
+        return object;
+      });
+    },
 
     /**
      * Returns a JSON version of the operation suitable for sending to Parse.
      * @return {Object}
      */
-      toJSON() {
-        let adds = null;
-        let removes = null;
-        const self = this;
-        const idToPointer = function (id) {
-          return { __type: 'Pointer',
-            className: self._targetClassName,
-            objectId: id };
-        };
-        let pointers = null;
-        if (this.relationsToAdd.length > 0) {
-          pointers = _.map(this.relationsToAdd, idToPointer);
-          adds = { __op: 'AddRelation', objects: pointers };
-        }
+    toJSON: function() {
+      var adds = null;
+      var removes = null;
+      var self = this;
+      var idToPointer = function(id) {
+        return { __type: 'Pointer',
+                 className: self._targetClassName,
+                 objectId: id };
+      };
+      var pointers = null;
+      if (this.relationsToAdd.length > 0) {
+        pointers = _.map(this.relationsToAdd, idToPointer);
+        adds = { "__op": "AddRelation", "objects": pointers };
+      }
 
-        if (this.relationsToRemove.length > 0) {
-          pointers = _.map(this.relationsToRemove, idToPointer);
-          removes = { __op: 'RemoveRelation', objects: pointers };
-        }
+      if (this.relationsToRemove.length > 0) {
+        pointers = _.map(this.relationsToRemove, idToPointer);
+        removes = { "__op": "RemoveRelation", "objects": pointers };
+      }
 
-        if (adds && removes) {
-          return { __op: 'Batch', ops: [adds, removes] };
-        }
+      if (adds && removes) {
+        return { "__op": "Batch", "ops": [adds, removes]};
+      }
 
-        return adds || removes || {};
-      },
+      return adds || removes || {};
+    },
 
-      _mergeWithPrevious(previous) {
-        if (!previous) {
-          return this;
-        } else if (previous instanceof Parse.Op.Unset) {
-          throw "You can't modify a relation after deleting it.";
-        } else if (previous instanceof Parse.Op.Relation) {
-          if (previous._targetClassName &&
+    _mergeWithPrevious: function(previous) {
+      if (!previous) {
+        return this;
+      } else if (previous instanceof Parse.Op.Unset) {
+        throw "You can't modify a relation after deleting it.";
+      } else if (previous instanceof Parse.Op.Relation) {
+        if (previous._targetClassName &&
             previous._targetClassName !== this._targetClassName) {
-            throw `Related object must be of class ${previous._targetClassName
-              }, but ${this._targetClassName} was passed in.`;
-          }
-          const newAdd = _.union(_.difference(previous.relationsToAdd,
+          throw "Related object must be of class " + previous._targetClassName +
+              ", but " + this._targetClassName + " was passed in.";
+        }
+        var newAdd = _.union(_.difference(previous.relationsToAdd,
                                           this.relationsToRemove),
                              this.relationsToAdd);
-          const newRemove = _.union(_.difference(previous.relationsToRemove,
+        var newRemove = _.union(_.difference(previous.relationsToRemove,
                                              this.relationsToAdd),
                                 this.relationsToRemove);
 
-          const newRelation = new Parse.Op.Relation(newAdd, newRemove);
-          newRelation._targetClassName = this._targetClassName;
-          return newRelation;
-        } else {
-          throw 'Op is invalid after previous op.';
-        }
-      },
+        var newRelation = new Parse.Op.Relation(newAdd, newRemove);
+        newRelation._targetClassName = this._targetClassName;
+        return newRelation;
+      } else {
+        throw "Op is invalid after previous op.";
+      }
+    },
 
-      _estimate(oldValue, object, key) {
-        if (!oldValue) {
-          const relation = new Parse.Relation(object, key);
-          relation.targetClassName = this._targetClassName;
-        } else if (oldValue instanceof Parse.Relation) {
-          if (this._targetClassName) {
-            if (oldValue.targetClassName) {
-              if (oldValue.targetClassName !== this._targetClassName) {
-                throw `Related object must be a ${oldValue.targetClassName
-                  }, but a ${this._targetClassName} was passed in.`;
-              }
-            } else {
-              oldValue.targetClassName = this._targetClassName;
+    _estimate: function(oldValue, object, key) {
+      if (!oldValue) {
+        var relation = new Parse.Relation(object, key);
+        relation.targetClassName = this._targetClassName;
+      } else if (oldValue instanceof Parse.Relation) {
+        if (this._targetClassName) {
+          if (oldValue.targetClassName) {
+            if (oldValue.targetClassName !== this._targetClassName) {
+              throw "Related object must be a " + oldValue.targetClassName +
+                  ", but a " + this._targetClassName + " was passed in.";
             }
+          } else {
+            oldValue.targetClassName = this._targetClassName;
           }
-          return oldValue;
-        } else {
-          throw 'Op is invalid after previous op.';
         }
-      },
-    });
+        return oldValue;
+      } else {
+        throw "Op is invalid after previous op.";
+      }
+    }
+  });
 
-  Parse.Op._registerDecoder('AddRelation', json => new Parse.Op.Relation(Parse._decode(undefined, json.objects), []));
-  Parse.Op._registerDecoder('RemoveRelation', json => new Parse.Op.Relation([], Parse._decode(undefined, json.objects)));
+  Parse.Op._registerDecoder("AddRelation", function(json) {
+    return new Parse.Op.Relation(Parse._decode(undefined, json.objects), []);
+  });
+  Parse.Op._registerDecoder("RemoveRelation", function(json) {
+    return new Parse.Op.Relation([], Parse._decode(undefined, json.objects));
+  });
+
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Creates a new Relation for the given parent object and key. This
@@ -2978,7 +3011,7 @@
    * particular parent object and key.
    * </p>
    */
-  Parse.Relation = function (parent, key) {
+  Parse.Relation = function(parent, key) {
     this.parent = parent;
     this.key = key;
     this.targetClassName = null;
@@ -2988,14 +3021,14 @@
     /**
      * Makes sure that this relation has the right parent and key.
      */
-    _ensureParentAndKey(parent, key) {
+    _ensureParentAndKey: function(parent, key) {
       this.parent = this.parent || parent;
       this.key = this.key || key;
       if (this.parent !== parent) {
-        throw 'Internal Error. Relation retrieved from two different Objects.';
+        throw "Internal Error. Relation retrieved from two different Objects.";
       }
       if (this.key !== key) {
-        throw 'Internal Error. Relation retrieved from two different keys.';
+        throw "Internal Error. Relation retrieved from two different keys.";
       }
     },
 
@@ -3003,12 +3036,12 @@
      * Adds a Parse.Object or an array of Parse.Objects to the relation.
      * @param {} objects The item or items to add.
      */
-    add(objects) {
+    add: function(objects) {
       if (!_.isArray(objects)) {
         objects = [objects];
       }
 
-      const change = new Parse.Op.Relation(objects, []);
+      var change = new Parse.Op.Relation(objects, []);
       this.parent.set(this.key, change);
       this.targetClassName = change._targetClassName;
     },
@@ -3017,12 +3050,12 @@
      * Removes a Parse.Object or an array of Parse.Objects from this relation.
      * @param {} objects The item or items to remove.
      */
-    remove(objects) {
+    remove: function(objects) {
       if (!_.isArray(objects)) {
         objects = [objects];
       }
 
-      const change = new Parse.Op.Relation([], objects);
+      var change = new Parse.Op.Relation([], objects);
       this.parent.set(this.key, change);
       this.targetClassName = change._targetClassName;
     },
@@ -3031,8 +3064,8 @@
      * Returns a JSON version of the object suitable for saving to disk.
      * @return {Object}
      */
-    toJSON() {
-      return { __type: 'Relation', className: this.targetClassName };
+    toJSON: function() {
+      return { "__type": "Relation", "className": this.targetClassName };
     },
 
     /**
@@ -3040,9 +3073,9 @@
      * relation.
      * @return {Parse.Query}
      */
-    query() {
-      let targetClass;
-      let query;
+    query: function() {
+      var targetClass;
+      var query;
       if (!this.targetClassName) {
         targetClass = Parse.Object._getSubclass(this.parent.className);
         query = new Parse.Query(targetClass);
@@ -3051,18 +3084,18 @@
         targetClass = Parse.Object._getSubclass(this.targetClassName);
         query = new Parse.Query(targetClass);
       }
-      query._addCondition('$relatedTo', 'object', this.parent._toPointer());
-      query._addCondition('$relatedTo', 'key', this.key);
+      query._addCondition("$relatedTo", "object", this.parent._toPointer());
+      query._addCondition("$relatedTo", "key", this.key);
 
       return query;
-    },
+    }
   };
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * A Promise is returned by async methods as a hook to provide callbacks to be
@@ -3080,7 +3113,7 @@
    * @see Parse.Promise.prototype.next
    * @class
    */
-  Parse.Promise = function () {
+  Parse.Promise = function() {
     this._resolved = false;
     this._rejected = false;
     this._resolvedCallbacks = [];
@@ -3093,7 +3126,7 @@
      * Returns true iff the given object fulfils the Promise interface.
      * @return {Boolean}
      */
-    is(promise) {
+    is: function(promise) {
       return promise && promise.then && _.isFunction(promise.then);
     },
 
@@ -3101,9 +3134,9 @@
      * Returns a new promise that is resolved with a given value.
      * @return {Parse.Promise} the new promise.
      */
-    as() {
-      const promise = new Parse.Promise();
-      promise.resolve(...arguments);
+    as: function() {
+      var promise = new Parse.Promise();
+      promise.resolve.apply(promise, arguments);
       return promise;
     },
 
@@ -3111,9 +3144,9 @@
      * Returns a new promise that is rejected with a given error.
      * @return {Parse.Promise} the new promise.
      */
-    error() {
-      const promise = new Parse.Promise();
-      promise.reject(...arguments);
+    error: function() {
+      var promise = new Parse.Promise();
+      promise.reject.apply(promise, arguments);
       return promise;
     },
 
@@ -3126,19 +3159,19 @@
      * @param {Array} promises a list of promises to wait for.
      * @return {Parse.Promise} the new promise
      */
-    when(promises) {
+    when: function(promises) {
       // Allow passing in Promises as separate arguments instead of an Array.
-      let objects;
+      var objects;
       if (promises && Parse._isNullOrUndefined(promises.length)) {
         objects = arguments;
       } else {
         objects = promises;
       }
 
-      let total = objects.length;
-      let hadError = false;
-      const results = [];
-      const errors = [];
+      var total = objects.length;
+      var hadError = false;
+      var results = [];
+      var errors = [];
       results.length = objects.length;
       errors.length = objects.length;
 
@@ -3146,25 +3179,25 @@
         return Parse.Promise.as.apply(this, results);
       }
 
-      const promise = new Parse.Promise();
+      var promise = new Parse.Promise();
 
-      const resolveOne = function () {
-        total -= 1;
+      var resolveOne = function() {
+        total = total - 1;
         if (total === 0) {
           if (hadError) {
             promise.reject(errors);
           } else {
-            promise.resolve(...results);
+            promise.resolve.apply(promise, results);
           }
         }
       };
 
-      _.each(objects, (object, i) => {
+      _.each(objects, function(object, i) {
         if (Parse.Promise.is(object)) {
-          object.then((result) => {
+          object.then(function(result) {
             results[i] = result;
             resolveOne();
-          }, (error) => {
+          }, function(error) {
             errors[i] = error;
             hadError = true;
             resolveOne();
@@ -3176,7 +3209,7 @@
       });
 
       return promise;
-    },
+    }
   });
 
   _.extend(Parse.Promise.prototype, /** @lends Parse.Promise.prototype */ {
@@ -3185,15 +3218,15 @@
      * Marks this promise as fulfilled, firing any callbacks waiting on it.
      * @param {Object} result the result to pass to the callbacks.
      */
-    resolve(result) {
+    resolve: function(result) {
       if (this._resolved || this._rejected) {
-        throw `A promise was resolved even though it had already been ${
-          this._resolved ? 'resolved' : 'rejected'}.`;
+        throw "A promise was resolved even though it had already been " +
+          (this._resolved ? "resolved" : "rejected") + ".";
       }
       this._resolved = true;
       this._result = arguments;
-      const results = arguments;
-      _.each(this._resolvedCallbacks, function (resolvedCallback) {
+      var results = arguments;
+      _.each(this._resolvedCallbacks, function(resolvedCallback) {
         resolvedCallback.apply(this, results);
       });
     },
@@ -3202,14 +3235,14 @@
      * Marks this promise as fulfilled, firing any callbacks waiting on it.
      * @param {Object} error the error to pass to the callbacks.
      */
-    reject(error) {
+    reject: function(error) {
       if (this._resolved || this._rejected) {
-        throw `A promise was rejected even though it had already been ${
-          this._resolved ? 'resolved' : 'rejected'}.`;
+        throw "A promise was rejected even though it had already been " +
+          (this._resolved ? "resolved" : "rejected") + ".";
       }
       this._rejected = true;
       this._error = error;
-      _.each(this._rejectedCallbacks, (rejectedCallback) => {
+      _.each(this._rejectedCallbacks, function(rejectedCallback) {
         rejectedCallback(error);
       });
     },
@@ -3233,33 +3266,33 @@
      * returned a Promise, then this Promise will not be fulfilled until that
      * one is.
      */
-    then(resolvedCallback, rejectedCallback) {
-      const promise = new Parse.Promise();
+    then: function(resolvedCallback, rejectedCallback) {
+      var promise = new Parse.Promise();
 
-      const wrappedResolvedCallback = function () {
-        let result = arguments;
+      var wrappedResolvedCallback = function() {
+        var result = arguments;
         if (resolvedCallback) {
           result = [resolvedCallback.apply(this, result)];
         }
         if (result.length === 1 && Parse.Promise.is(result[0])) {
-          result[0].then(function () {
-            promise.resolve(...arguments);
-          }, (error) => {
+          result[0].then(function() {
+            promise.resolve.apply(promise, arguments);
+          }, function(error) {
             promise.reject(error);
           });
         } else {
-          promise.resolve(...result);
+          promise.resolve.apply(promise, result);
         }
       };
 
-      const wrappedRejectedCallback = function (error) {
-        let result = [];
+      var wrappedRejectedCallback = function(error) {
+        var result = [];
         if (rejectedCallback) {
           result = [rejectedCallback(error)];
           if (result.length === 1 && Parse.Promise.is(result[0])) {
-            result[0].then(function () {
-              promise.resolve(...arguments);
-            }, (error) => {
+            result[0].then(function() {
+              promise.resolve.apply(promise, arguments);
+            }, function(error) {
               promise.reject(error);
             });
           } else {
@@ -3282,17 +3315,18 @@
       }
 
       return promise;
-    },
+    }
   });
+
 }(this));
 
 // Parse.Object is analogous to the Java ParseObject.
 // It also implements the same interface as a Backbone model.
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Creates a new model with defined attributes. A client id (cid) is
@@ -3321,7 +3355,7 @@
    * <p>The fundamental unit of Parse data, which implements the Backbone Model
    * interface.</p>
    */
-  Parse.Object = function (attributes, options) {
+  Parse.Object = function(attributes, options) {
     // Allow new Parse.Object("ClassName") as a shortcut to _create.
     if (_.isString(attributes)) {
       return Parse.Object._create.apply(this, arguments);
@@ -3331,7 +3365,7 @@
     if (options && options.parse) {
       attributes = this.parse(attributes);
     }
-    const defaults = Parse._getValue(this, 'defaults');
+    var defaults = Parse._getValue(this, 'defaults');
     if (defaults) {
       attributes = _.extend({}, defaults, attributes);
     }
@@ -3349,7 +3383,7 @@
     this.changed = {};
     this._silent = {};
     this._pending = {};
-    if (!this.set(attributes, { silent: true })) {
+    if (!this.set(attributes, {silent: true})) {
       throw new Error("Can't create an invalid Parse.Object");
     }
     this.changed = {};
@@ -3374,32 +3408,34 @@
    * @param func - function(Parse.Object, callback);
    * @param optionsOrCallback - See saveAll.
    */
-  const _doAll = function (list, func, optionsOrCallback) {
-    let options;
+  var _doAll = function(list, func, optionsOrCallback) {
+    var options;
     if (_.isFunction(optionsOrCallback)) {
-      const callback = optionsOrCallback;
+      var callback = optionsOrCallback;
       options = {
-        success(list) { callback(list, null); },
-        error(e) { callback(null, e); },
+        success: function(list) { callback(list, null); },
+        error: function(e) { callback(null, e); }
       };
     } else {
       options = optionsOrCallback;
     }
     options = options || {};
 
-    const results = [];
-    let promise = new Parse.Promise.as();
-    _.each(list, (item) => {
-      promise = promise.then(() => func(item)).then((result) => {
+    var results = [];
+    var promise = new Parse.Promise.as();
+    _.each(list, function(item) {
+      promise = promise.then(function() {
+        return func(item);
+      }).then(function(result) {
         results.push(result);
       });
     });
 
-    promise = promise.then(() => {
+    promise = promise.then(function() {
       if (options.success) {
         options.success(results);
       }
-    }, (error) => {
+    }, function(error) {
       if (options.error) {
         options.error(error);
       }
@@ -3437,84 +3473,88 @@
    * @param {Array} list A list of <code>Parse.Object</code>.
    * @param {Object} optionsOrCallback A Backbone-style callback object.
    */
-  Parse.Object.saveAll = function (list, optionsOrCallback) {
-    return _doAll(list, (obj, options) => obj.save(null, options), optionsOrCallback);
+  Parse.Object.saveAll = function(list, optionsOrCallback) {
+    return _doAll(list, function(obj, options) {
+      return obj.save(null, options);
+    }, optionsOrCallback);
   };
 
-  Parse.Object._signUpAll = function (list, optionsOrCallback) {
-    return _doAll(list, (obj, options) => obj.signUp(null, options), optionsOrCallback);
+  Parse.Object._signUpAll = function(list, optionsOrCallback) {
+    return _doAll(list, function(obj, options) {
+      return obj.signUp(null, options);
+    }, optionsOrCallback);
   };
 
   // Attach all inheritable methods to the Parse.Object prototype.
   _.extend(Parse.Object.prototype, Parse.Events,
-    /** @lends Parse.Object.prototype */ {
-      _existed: false,
+           /** @lends Parse.Object.prototype */ {
+    _existed: false,
 
     /**
      * Initialize is an empty function by default. Override it with your own
      * initialization logic.
      */
-      initialize() {},
+    initialize: function(){},
 
     /**
      * Returns a JSON version of the object suitable for saving to Parse.
      * @return {Object}
      */
-      toJSON() {
-        const json = this._toFullJSON();
-        _.each(['__type', 'className'],
-             (key) => { delete json[key]; });
-        return json;
-      },
+    toJSON: function() {
+      var json = this._toFullJSON();
+      _.each(["__type", "className"],
+             function(key) { delete json[key]; });
+      return json;
+    },
 
-      _toFullJSON(seenObjects) {
-        const json = _.clone(this.attributes);
-        Parse._each(json, (val, key) => {
-          json[key] = Parse._encode(val, seenObjects);
-        });
-        Parse._each(this._operations, (val, key) => {
-          json[key] = val;
-        });
+    _toFullJSON: function(seenObjects) {
+      var json = _.clone(this.attributes);
+      Parse._each(json, function(val, key) {
+        json[key] = Parse._encode(val, seenObjects);
+      });
+      Parse._each(this._operations, function(val, key) {
+        json[key] = val;
+      });
 
-        if (_.has(this, 'id')) {
-          json.objectId = this.id;
+      if (_.has(this, "id")) {
+        json.objectId = this.id;
+      }
+      if (_.has(this, "createdAt")) {
+        if (_.isDate(this.createdAt)) {
+          json.createdAt = this.createdAt.toJSON();
+        } else {
+          json.createdAt = this.createdAt;
         }
-        if (_.has(this, 'createdAt')) {
-          if (_.isDate(this.createdAt)) {
-            json.createdAt = this.createdAt.toJSON();
-          } else {
-            json.createdAt = this.createdAt;
-          }
-        }
+      }
 
-        if (_.has(this, 'updatedAt')) {
-          if (_.isDate(this.updatedAt)) {
-            json.updatedAt = this.updatedAt.toJSON();
-          } else {
-            json.updatedAt = this.updatedAt;
-          }
+      if (_.has(this, "updatedAt")) {
+        if (_.isDate(this.updatedAt)) {
+          json.updatedAt = this.updatedAt.toJSON();
+        } else {
+          json.updatedAt = this.updatedAt;
         }
-        json.__type = 'Object';
-        json.className = this.className;
-        return json;
-      },
+      }
+      json.__type = "Object";
+      json.className = this.className;
+      return json;
+    },
 
     /**
      * Updates _hashedJSON to reflect the current state of this object.
      * Adds any changed hash values to the set of pending changes.
      */
-      _refreshCache() {
-        const self = this;
-        Parse._each(this.attributes, (value, key) => {
-          if (value instanceof Parse.Object) {
-            value._refreshCache();
-          } else if (_.isObject(value)) {
-            if (self._resetCacheForKey(key)) {
-              self.set(key, new Parse.Op.Set(value), { silent: true });
-            }
+    _refreshCache: function() {
+      var self = this;
+      Parse._each(this.attributes, function(value, key) {
+        if (value instanceof Parse.Object) {
+          value._refreshCache();
+        } else if (_.isObject(value)) {
+          if (self._resetCacheForKey(key)) {
+            self.set(key, new Parse.Op.Set(value), { silent: true });
           }
-        });
-      },
+        }
+      });
+    },
 
     /**
      * Returns true if this object has been modified since its last
@@ -3523,77 +3563,78 @@
      * @param {String} attr An attribute name (optional).
      * @return {Boolean}
      */
-      dirty(attr) {
-        this._refreshCache();
+    dirty: function(attr) {
+      this._refreshCache();
 
-        const currentChanges = _.last(this._opSetQueue);
+      var currentChanges = _.last(this._opSetQueue);
 
-        if (attr) {
-          return (!!currentChanges[attr]);
-        }
-        if (!this.id) {
-          return true;
-        }
-        if (_.keys(currentChanges).length > 0) {
-          return true;
-        }
-        return false;
-      },
+      if (attr) {
+        return (currentChanges[attr] ? true : false);
+      }
+      if (!this.id) {
+        return true;
+      }
+      if (_.keys(currentChanges).length > 0) {
+        return true;
+      }
+      return false;
+    },
 
     /**
      * Gets a Pointer referencing this Object.
      */
-      _toPointer() {
-        if (!this.id) {
-          throw new Error("Can't serialize an unsaved Parse.Object");
-        }
-        return { __type: 'Pointer',
-          className: this.className,
-          objectId: this.id };
-      },
+    _toPointer: function() {
+      if (!this.id) {
+        throw new Error("Can't serialize an unsaved Parse.Object");
+      }
+      return { __type: "Pointer",
+               className: this.className,
+               objectId: this.id };
+    },
 
     /**
      * Gets the value of an attribute.
      * @param {String} attr The string name of an attribute.
      */
-      get(attr) {
-        return this.attributes[attr];
-      },
+    get: function(attr) {
+      return this.attributes[attr];
+    },
 
     /**
      * Gets a relation on the given class for the attribute.
      * @param String attr The attribute to get the relation for.
      */
-      relation(attr) {
-        const value = this.get(attr);
-        if (value) {
-          if (!(value instanceof Parse.Relation)) {
-            throw `Called relation() on non-relation field ${attr}`;
-          }
-          value._ensureParentAndKey(this, attr);
-          return value;
+    relation: function(attr) {
+      var value = this.get(attr);
+      if (value) {
+        if (!(value instanceof Parse.Relation)) {
+          throw "Called relation() on non-relation field " + attr;
         }
+        value._ensureParentAndKey(this, attr);
+        return value;
+      } else {
         return new Parse.Relation(this, attr);
-      },
+      }
+    },
 
     /**
      * Gets the HTML-escaped value of an attribute.
      */
-      escape(attr) {
-        const html = this._escapedAttributes[attr];
-        if (html) {
-          return html;
-        }
-        const val = this.attributes[attr];
-        let escaped;
-        if (Parse._isNullOrUndefined(val)) {
-          escaped = '';
-        } else {
-          escaped = _.escape(val.toString());
-        }
-        this._escapedAttributes[attr] = escaped;
-        return escaped;
-      },
+    escape: function(attr) {
+      var html = this._escapedAttributes[attr];
+      if (html) {
+        return html;
+      }
+      var val = this.attributes[attr];
+      var escaped;
+      if (Parse._isNullOrUndefined(val)) {
+        escaped = '';
+      } else {
+        escaped = _.escape(val.toString());
+      }
+      this._escapedAttributes[attr] = escaped;
+      return escaped;
+    },
 
     /**
      * Returns <code>true</code> if the attribute contains a value that is not
@@ -3601,53 +3642,53 @@
      * @param {String} attr The string name of the attribute.
      * @return {Boolean}
      */
-      has(attr) {
-        return !Parse._isNullOrUndefined(this.attributes[attr]);
-      },
+    has: function(attr) {
+      return !Parse._isNullOrUndefined(this.attributes[attr]);
+    },
 
     /**
      * Pulls "special" fields like objectId, createdAt, etc. out of attrs
      * and puts them on "this" directly.  Removes them from attrs.
      * @param attrs - A dictionary with the data for this Parse.Object.
      */
-      _mergeMagicFields(attrs) {
+    _mergeMagicFields: function(attrs) {
       // Check for changes of magic fields.
-        const model = this;
-        _.each(['id', 'objectId', 'createdAt', 'updatedAt'], (attr) => {
-          if (attrs[attr]) {
-            if (attr === 'objectId') {
-              model.id = attrs[attr];
-            } else if ((attr === 'createdAt' || attr === 'updatedAt') &&
+      var model = this;
+      _.each(["id", "objectId", "createdAt", "updatedAt"], function(attr) {
+        if (attrs[attr]) {
+          if (attr === "objectId") {
+            model.id = attrs[attr];
+          } else if ((attr === "createdAt" || attr === "updatedAt") &&
                      !_.isDate(attrs[attr])) {
-              model[attr] = Parse._parseDate(attrs[attr]);
-            } else {
-              model[attr] = attrs[attr];
-            }
-            delete attrs[attr];
+            model[attr] = Parse._parseDate(attrs[attr]);
+          } else {
+            model[attr] = attrs[attr];
           }
-        });
-      },
+          delete attrs[attr];
+        }
+      });
+    },
 
     /**
      * Returns the json to be sent to the server.
      */
-      _startSave() {
-        this._opSetQueue.push({});
-      },
+    _startSave: function() {
+      this._opSetQueue.push({});
+    },
 
     /**
      * If any save has been started since the current one running, process the
      * next one in the queue.
      */
-      _processSaveQueue() {
-        if (this._saveQueue && this._saveQueue.length > 0) {
-          const nextSave = _.first(this._saveQueue);
-          this._saveQueue = _.rest(this._saveQueue);
-          nextSave();
-        } else {
-          this._saving = false;
-        }
-      },
+    _processSaveQueue: function() {
+      if (this._saveQueue && this._saveQueue.length > 0) {
+        var nextSave = _.first(this._saveQueue);
+        this._saveQueue = _.rest(this._saveQueue);
+        nextSave();
+      } else {
+        this._saving = false;
+      }
+    },
 
     /**
      * Called when a save fails because of an error. Any changes that were part
@@ -3661,150 +3702,150 @@
      * then this will throw when the save fails and the client tries to merge
      * "bar" with the +1.
      */
-      _cancelSave() {
-        const self = this;
-        const failedChanges = _.first(this._opSetQueue);
-        this._opSetQueue = _.rest(this._opSetQueue);
-        const nextChanges = _.first(this._opSetQueue);
-        Parse._each(failedChanges, (op, key) => {
-          const op1 = failedChanges[key];
-          const op2 = nextChanges[key];
-          if (op1 && op2) {
-            nextChanges[key] = op2._mergeWithPrevious(op1);
-          } else if (op1) {
-            nextChanges[key] = op1;
-          }
-        });
-        this._processSaveQueue();
-      },
+    _cancelSave: function() {
+      var self = this;
+      var failedChanges = _.first(this._opSetQueue);
+      this._opSetQueue = _.rest(this._opSetQueue);
+      var nextChanges = _.first(this._opSetQueue);
+      Parse._each(failedChanges, function(op, key) {
+        var op1 = failedChanges[key];
+        var op2 = nextChanges[key];
+        if (op1 && op2) {
+          nextChanges[key] = op2._mergeWithPrevious(op1);
+        } else if (op1) {
+          nextChanges[key] = op1;
+        }
+      });
+      this._processSaveQueue();
+    },
 
     /**
      * Called when a save completes successfully. This merges the changes that
      * were saved into the known server data, and overrides it with any data
      * sent directly from the server.
      */
-      _finishSave(serverData) {
-        const savedChanges = _.first(this._opSetQueue);
-        this._opSetQueue = _.rest(this._opSetQueue);
-        this._applyOpSet(savedChanges, this._serverData);
-        this._mergeMagicFields(serverData);
-        const self = this;
-        Parse._each(serverData, (value, key) => {
-          self._serverData[key] = Parse._decode(key, value);
-        });
-        this._rebuildAllEstimatedData();
-        this._processSaveQueue();
-      },
+    _finishSave: function(serverData) {
+      var savedChanges = _.first(this._opSetQueue);
+      this._opSetQueue = _.rest(this._opSetQueue);
+      this._applyOpSet(savedChanges, this._serverData);
+      this._mergeMagicFields(serverData);
+      var self = this;
+      Parse._each(serverData, function(value, key) {
+        self._serverData[key] = Parse._decode(key, value);
+      });
+      this._rebuildAllEstimatedData();
+      this._processSaveQueue();
+    },
 
     /**
      * Called when a fetch or login is complete to set the known server data to
      * the given object.
      */
-      _finishFetch(serverData, hasData) {
+    _finishFetch: function(serverData, hasData) {
       // Clear out any changes the user might have made previously.
-        this._opSetQueue = [{}];
+      this._opSetQueue = [{}];
 
       // Bring in all the new server data.
-        this._mergeMagicFields(serverData);
-        const self = this;
-        Parse._each(serverData, (value, key) => {
-          self._serverData[key] = Parse._decode(key, value);
-        });
+      this._mergeMagicFields(serverData);
+      var self = this;
+      Parse._each(serverData, function(value, key) {
+        self._serverData[key] = Parse._decode(key, value);
+      });
 
       // Refresh the attributes.
-        this._rebuildAllEstimatedData();
+      this._rebuildAllEstimatedData();
 
       // Clear out the cache of mutable containers.
-        this._refreshCache();
-        this._opSetQueue = [{}];
+      this._refreshCache();
+      this._opSetQueue = [{}];
 
-        this._hasData = hasData;
-      },
+      this._hasData = hasData;
+    },
 
     /**
      * Applies the set of Parse.Op in opSet to the object target.
      */
-      _applyOpSet(opSet, target) {
-        const self = this;
-        Parse._.each(opSet, (change, key) => {
-          target[key] = change._estimate(target[key], self, key);
-          if (target[key] === Parse.Op._UNSET) {
-            delete target[key];
-          }
-        });
-      },
+    _applyOpSet: function(opSet, target) {
+      var self = this;
+      Parse._.each(opSet, function(change, key) {
+        target[key] = change._estimate(target[key], self, key);
+        if (target[key] === Parse.Op._UNSET) {
+          delete target[key];
+        }
+      });
+    },
 
     /**
      * Replaces the cached value for key with the current value.
      * Returns true if the new value is different than the old value.
      */
-      _resetCacheForKey(key) {
-        let value = this.attributes[key];
-        if (_.isObject(value) && !(value instanceof Parse.Object)) {
-          value = value.toJSON ? value.toJSON() : value;
-          const json = JSON.stringify(value);
-          if (this._hashedJSON[key] !== json) {
-            this._hashedJSON[key] = json;
-            return true;
-          }
+    _resetCacheForKey: function(key) {
+      var value = this.attributes[key];
+      if (_.isObject(value) && !(value instanceof Parse.Object)) {
+        value = value.toJSON ? value.toJSON() : value;
+        var json = JSON.stringify(value);
+        if (this._hashedJSON[key] !== json) {
+          this._hashedJSON[key] = json;
+          return true;
         }
-        return false;
-      },
+      }
+      return false;
+    },
 
     /**
      * Populates attributes[key] by starting with the last known data from the
      * server, and applying all of the local changes that have been made to that
      * key since then.
      */
-      _rebuildEstimatedDataForKey(key) {
-        const self = this;
-        delete this.attributes[key];
-        if (this._serverData[key]) {
-          this.attributes[key] = this._serverData[key];
-        }
-        _.each(this._opSetQueue, (opSet) => {
-          const op = opSet[key];
-          if (op) {
-            self.attributes[key] = op._estimate(self.attributes[key], self, key);
-            if (self.attributes[key] === Parse.Op._UNSET) {
-              delete self.attributes[key];
-            } else {
-              self._resetCacheForKey(key);
-            }
+    _rebuildEstimatedDataForKey: function(key) {
+      var self = this;
+      delete this.attributes[key];
+      if (this._serverData[key]) {
+        this.attributes[key] = this._serverData[key];
+      }
+      _.each(this._opSetQueue, function(opSet) {
+        var op = opSet[key];
+        if (op) {
+          self.attributes[key] = op._estimate(self.attributes[key], self, key);
+          if (self.attributes[key] === Parse.Op._UNSET) {
+            delete self.attributes[key];
+          } else {
+            self._resetCacheForKey(key);
           }
-        });
-      },
+        }
+      });
+    },
 
     /**
      * Populates attributes by starting with the last known data from the
      * server, and applying all of the local changes that have been made since
      * then.
      */
-      _rebuildAllEstimatedData() {
-        const self = this;
+    _rebuildAllEstimatedData: function() {
+      var self = this;
 
-        const previousAttributes = _.clone(this.attributes);
+      var previousAttributes = _.clone(this.attributes);
 
-        this.attributes = _.clone(this._serverData);
-        _.each(this._opSetQueue, (opSet) => {
-          self._applyOpSet(opSet, self.attributes);
-          _.each(opSet, (op, key) => {
-            self._resetCacheForKey(key);
-          });
+      this.attributes = _.clone(this._serverData);
+      _.each(this._opSetQueue, function(opSet) {
+        self._applyOpSet(opSet, self.attributes);
+        _.each(opSet, function(op, key) {
+          self._resetCacheForKey(key);
         });
+      });
 
       // Trigger change events for anything that changed because of the fetch.
-        _.each(previousAttributes, (oldValue, key) => {
-          if (self.attributes[key] !== oldValue) {
-            self.trigger(`change:${key}`, self, self.attributes[key], {});
-          }
-        });
-        _.each(this.attributes, (newValue, key) => {
-          if (!_.has(previousAttributes, key)) {
-            self.trigger(`change:${key}`, self, newValue, {});
-          }
-        });
-      },
+      _.each(previousAttributes, function(oldValue, key) {
+        if (self.attributes[key] !== oldValue) {
+          self.trigger('change:' + key, self, self.attributes[key], {});
+        }
+      });
+      _.each(this.attributes, function(newValue, key) {
+        if (!_.has(previousAttributes, key)) {
+          self.trigger('change:' + key, self, newValue, {});
+        }
+      });
+    },
 
     /**
      * Sets a hash of model attributes on the object, firing
@@ -3828,7 +3869,7 @@
      *   });
      *
      *   game.set("finished", true);</pre></p>
-     *
+     * 
      * @param {String} key The key to set.
      * @param {} value The value to give it.
      * @param {Object} options A set of Backbone-like options for the set.
@@ -3838,122 +3879,121 @@
      * @see Parse.Object#validate
      * @see Parse.Error
      */
-      set(key, value, options) {
-        let attrs,
-          attr;
-        if (_.isObject(key) || Parse._isNullOrUndefined(key)) {
-          attrs = key;
-          Parse._each(attrs, (v, k) => {
-            attrs[k] = Parse._decode(k, v);
-          });
-          options = value;
-        } else {
-          attrs = {};
-          attrs[key] = Parse._decode(key, value);
-        }
+    set: function(key, value, options) {
+      var attrs, attr;
+      if (_.isObject(key) || Parse._isNullOrUndefined(key)) {
+        attrs = key;
+        Parse._each(attrs, function(v, k) {
+          attrs[k] = Parse._decode(k, v);
+        });
+        options = value;
+      } else {
+        attrs = {};
+        attrs[key] = Parse._decode(key, value);
+      }
 
       // Extract attributes and options.
-        options = options || {};
-        if (!attrs) {
-          return this;
-        }
-        if (attrs instanceof Parse.Object) {
-          attrs = attrs.attributes;
-        }
+      options = options || {};
+      if (!attrs) {
+        return this;
+      }
+      if (attrs instanceof Parse.Object) {
+        attrs = attrs.attributes;
+      }
 
       // If the unset option is used, every attribute should be a Unset.
-        if (options.unset) {
-          Parse._each(attrs, (unused_value, key) => {
-            attrs[key] = new Parse.Op.Unset();
-          });
-        }
+      if (options.unset) {
+        Parse._each(attrs, function(unused_value, key) {
+          attrs[key] = new Parse.Op.Unset();
+        });
+      }
 
       // Apply all the attributes to get the estimated values.
-        const dataToValidate = _.clone(attrs);
-        const self = this;
-        Parse._each(dataToValidate, (value, key) => {
-          if (value instanceof Parse.Op) {
-            dataToValidate[key] = value._estimate(self.attributes[key],
+      var dataToValidate = _.clone(attrs);
+      var self = this;
+      Parse._each(dataToValidate, function(value, key) {
+        if (value instanceof Parse.Op) {
+          dataToValidate[key] = value._estimate(self.attributes[key],
                                                 self, key);
-            if (dataToValidate[key] === Parse.Op._UNSET) {
-              delete dataToValidate[key];
-            }
+          if (dataToValidate[key] === Parse.Op._UNSET) {
+            delete dataToValidate[key];
           }
-        });
+        }
+      });
 
       // Run validation.
-        if (!this._validate(attrs, options)) {
-          return false;
-        }
+      if (!this._validate(attrs, options)) {
+        return false;
+      }
 
-        this._mergeMagicFields(attrs);
+      this._mergeMagicFields(attrs);
 
-        options.changes = {};
-        const escaped = this._escapedAttributes;
-        const prev = this._previousAttributes || {};
+      options.changes = {};
+      var escaped = this._escapedAttributes;
+      var prev = this._previousAttributes || {};
 
       // Update attributes.
-        Parse._each(_.keys(attrs), (attr) => {
-          let val = attrs[attr];
+      Parse._each(_.keys(attrs), function(attr) {
+        var val = attrs[attr];
 
         // If this is a relation object we need to set the parent correctly,
         // since the location where it was parsed does not have access to
         // this object.
-          if (val instanceof Parse.Relation) {
-            val.parent = self;
-          }
+        if (val instanceof Parse.Relation) {
+          val.parent = self;
+        }
 
-          if (!(val instanceof Parse.Op)) {
-            val = new Parse.Op.Set(val);
-          }
+        if (!(val instanceof Parse.Op)) {
+          val = new Parse.Op.Set(val);
+        }
 
         // See if this change will actually have any effect.
-          let isRealChange = true;
-          if (val instanceof Parse.Op.Set &&
+        var isRealChange = true;
+        if (val instanceof Parse.Op.Set &&
             _.isEqual(self.attributes[attr], val.value)) {
-            isRealChange = false;
-          }
-
-          if (isRealChange) {
-            delete escaped[attr];
-            if (options.silent) {
-              self._silent[attr] = true;
-            } else {
-              options.changes[attr] = true;
-            }
-          }
-
-          const currentChanges = _.last(self._opSetQueue);
-          currentChanges[attr] = val._mergeWithPrevious(currentChanges[attr]);
-          self._rebuildEstimatedDataForKey(attr);
-
-          if (isRealChange) {
-            self.changed[attr] = self.attributes[attr];
-            if (!options.silent) {
-              self._pending[attr] = true;
-            }
-          } else {
-            delete self.changed[attr];
-            delete self._pending[attr];
-          }
-        });
-
-        if (!options.silent) {
-          this.change(options);
+          isRealChange = false;
         }
-        return this;
-      },
+
+        if (isRealChange) {
+          delete escaped[attr];
+          if (options.silent) {
+            self._silent[attr] = true;
+          } else {
+            options.changes[attr] = true;
+          }
+        }
+
+        var currentChanges = _.last(self._opSetQueue);
+        currentChanges[attr] = val._mergeWithPrevious(currentChanges[attr]);
+        self._rebuildEstimatedDataForKey(attr);
+
+        if (isRealChange) {
+          self.changed[attr] = self.attributes[attr];
+          if (!options.silent) {
+            self._pending[attr] = true;
+          }
+        } else {
+          delete self.changed[attr];
+          delete self._pending[attr];
+        }
+      });
+
+      if (!options.silent) {
+        this.change(options);
+      }
+      return this;
+    },
 
     /**
      * Remove an attribute from the model, firing <code>"change"</code> unless
      * you choose to silence it. This is a noop if the attribute doesn't
      * exist.
      */
-      unset(attr, options) {
-        options = options || {};
-        options.unset = true;
-        return this.set(attr, null, options);
-      },
+    unset: function(attr, options) {
+      options = options || {};
+      options.unset = true;
+      return this.set(attr, null, options);
+    },
 
     /**
      * Atomically increments the value of the given attribute the next time the
@@ -3962,12 +4002,12 @@
      * @param attr {String} The key.
      * @param amount {Number} The amount to increment by.
      */
-      increment(attr, amount) {
-        if (_.isUndefined(amount) || _.isNull(amount)) {
-          amount = 1;
-        }
-        return this.set(attr, new Parse.Op.Increment(amount));
-      },
+    increment: function(attr, amount) {
+      if (_.isUndefined(amount) || _.isNull(amount)) {
+        amount = 1;
+      }
+      return this.set(attr, new Parse.Op.Increment(amount));
+    },
 
     /**
      * Atomically add an object to the end of the array associated with a given
@@ -3975,9 +4015,9 @@
      * @param attr {String} The key.
      * @param item {} The item to add.
      */
-      add(attr, item) {
-        return this.set(attr, new Parse.Op.Add([item]));
-      },
+    add: function(attr, item) {
+      return this.set(attr, new Parse.Op.Add([item]));
+    },
 
     /**
      * Atomically add an object to the array associated with a given key, only
@@ -3987,9 +4027,9 @@
      * @param attr {String} The key.
      * @param item {} The object to add.
      */
-      addUnique(attr, item) {
-        return this.set(attr, new Parse.Op.AddUnique([item]));
-      },
+    addUnique: function(attr, item) {
+      return this.set(attr, new Parse.Op.AddUnique([item]));
+    },
 
     /**
      * Atomically remove all instances of an object from the array associated
@@ -3998,9 +4038,9 @@
      * @param attr {String} The key.
      * @param item {} The object to remove.
      */
-      remove(attr, item) {
-        return this.set(attr, new Parse.Op.Remove([item]));
-      },
+    remove: function(attr, item) {
+      return this.set(attr, new Parse.Op.Remove([item]));
+    },
 
     /**
      * Returns an instance of a subclass of Parse.Op describing what kind of
@@ -4011,32 +4051,32 @@
      * @param attr {String} The key.
      * @returns {Parse.Op} The operation, or undefined if none.
      */
-      op(attr) {
-        return _.last(this._opSetQueue)[attr];
-      },
+    op: function(attr) {
+      return _.last(this._opSetQueue)[attr];
+    },
 
     /**
      * Clear all attributes on the model, firing <code>"change"</code> unless
      * you choose to silence it.
      */
-      clear(options) {
-        options = options || {};
-        options.unset = true;
-        const keysToClear = _.extend(this.attributes, this._operations);
-        return this.set(keysToClear, options);
-      },
+    clear: function(options) {
+      options = options || {};
+      options.unset = true;
+      var keysToClear = _.extend(this.attributes, this._operations);
+      return this.set(keysToClear, options);
+    },
 
     /**
      * Returns a JSON-encoded set of operations to be sent with the next save
      * request.
      */
-      _getSaveJSON() {
-        const json = _.clone(_.first(this._opSetQueue));
-        Parse._each(json, (op, key) => {
-          json[key] = op.toJSON();
-        });
-        return json;
-      },
+    _getSaveJSON: function() {
+      var json = _.clone(_.first(this._opSetQueue));
+      Parse._each(json, function(op, key) {
+        json[key] = op.toJSON();
+      });
+      return json;
+    },
 
     /**
      * Fetch the model from the server. If the server's representation of the
@@ -4045,24 +4085,24 @@
      * @return {Parse.Promise} A promise that is fulfilled when the fetch
      *     completes.
      */
-      fetch(options) {
-        const promise = new Parse.Promise();
-        options = options ? _.clone(options) : {};
-        const model = this;
-        const success = options.success;
-        options.success = function (resp, status, xhr) {
-          model._finishFetch(model.parse(resp, status, xhr), true);
-          if (success) {
-            success(model, resp);
-          }
-          promise.resolve(model);
-        };
-        options.error = Parse.Object._wrapError(options.error, model, options,
+    fetch: function(options) {
+      var promise = new Parse.Promise();
+      options = options ? _.clone(options) : {};
+      var model = this;
+      var success = options.success;
+      options.success = function(resp, status, xhr) {
+        model._finishFetch(model.parse(resp, status, xhr), true);
+        if (success) {
+          success(model, resp);
+        }
+        promise.resolve(model);
+      };
+      options.error = Parse.Object._wrapError(options.error, model, options,
                                               promise);
-        Parse._request(
-          'classes', model.className, model.id, 'GET', null, options);
-        return promise;
-      },
+      Parse._request(
+          "classes", model.className, model.id, 'GET', null, options);
+      return promise;
+    },
 
     /**
      * Set a hash of model attributes, and save the model to the server.
@@ -4097,141 +4137,141 @@
      *   }, function(error) {
      *     // The save failed.  Error is an instance of Parse.Error.
      *   });</pre>
-     *
+     * 
      * @return {Parse.Promise} A promise that is fulfilled when the save
      *     completes.
      * @see Parse.Error
      */
-      save(arg1, arg2, arg3) {
-        const promise = new Parse.Promise();
+    save: function(arg1, arg2, arg3) {
+      var promise = new Parse.Promise();
 
-        let i,
-          attrs,
-          current,
-          options,
-          saved;
-        if (_.isObject(arg1) || Parse._isNullOrUndefined(arg1)) {
-          attrs = arg1;
-          options = arg2;
-        } else {
-          attrs = {};
-          attrs[arg1] = arg2;
-          options = arg3;
-        }
+      var i, attrs, current, options, saved;
+      if (_.isObject(arg1) || Parse._isNullOrUndefined(arg1)) {
+        attrs = arg1;
+        options = arg2;
+      } else {
+        attrs = {};
+        attrs[arg1] = arg2;
+        options = arg3;
+      }
 
       // Make save({ success: function() {} }) work.
-        if (!options && attrs) {
-          const extra_keys = _.reject(attrs, (value, key) => _.include(['success', 'error', 'wait'], key));
-          if (extra_keys.length === 0) {
-            let all_functions = true;
-            if (_.has(attrs, 'success') && !_.isFunction(attrs.success)) {
-              all_functions = false;
-            }
-            if (_.has(attrs, 'error') && !_.isFunction(attrs.error)) {
-              all_functions = false;
-            }
-            if (all_functions) {
+      if (!options && attrs) {
+        var extra_keys = _.reject(attrs, function(value, key) {
+          return _.include(["success", "error", "wait"], key);
+        });
+        if (extra_keys.length === 0) {
+          var all_functions = true;
+          if (_.has(attrs, "success") && !_.isFunction(attrs.success)) {
+            all_functions = false;
+          }
+          if (_.has(attrs, "error") && !_.isFunction(attrs.error)) {
+            all_functions = false;
+          }
+          if (all_functions) {
             // This attrs object looks like it's really an options object,
-            // and there's no other options object, so var's just use it.
-              return this.save(null, attrs);
-            }
+            // and there's no other options object, so let's just use it.
+            return this.save(null, attrs);
           }
         }
+      }
 
-        options = options ? _.clone(options) : {};
-        if (options.wait) {
-          current = _.clone(this.attributes);
+      options = options ? _.clone(options) : {};
+      if (options.wait) {
+        current = _.clone(this.attributes);
+      }
+      var setOptions = _.clone(options);
+      if (setOptions.wait) {
+        setOptions.silent = true;
+      }
+      setOptions.error = function(model, error) {
+        if (options.error) {
+          options.error.apply(this, arguments);
         }
-        const setOptions = _.clone(options);
-        if (setOptions.wait) {
-          setOptions.silent = true;
-        }
-        setOptions.error = function (model, error) {
+        promise.reject(error);
+      };
+      if (attrs && !this.set(attrs, setOptions)) {
+        return promise;
+      }
+      var oldOptions = options;  // Psuedonym more accurate in some contexts.
+      var newOptions = _.clone(options);
+
+      var model = this;
+
+      // If there is any unsaved child, save it first.
+      model._refreshCache();
+      var unsavedChildren = Parse.Object._findUnsavedChildren(model.attributes);
+      if (unsavedChildren.length > 0) {
+        return Parse.Object.saveAll(unsavedChildren).then(function() {
+          return model.save(null, oldOptions);
+        }, function(error) {
           if (options.error) {
             options.error.apply(this, arguments);
           }
-          promise.reject(error);
-        };
-        if (attrs && !this.set(attrs, setOptions)) {
-          return promise;
-        }
-        const oldOptions = options;  // Psuedonym more accurate in some contexts.
-        const newOptions = _.clone(options);
-
-        const model = this;
-
-      // If there is any unsaved child, save it first.
-        model._refreshCache();
-        const unsavedChildren = Parse.Object._findUnsavedChildren(model.attributes);
-        if (unsavedChildren.length > 0) {
-          return Parse.Object.saveAll(unsavedChildren).then(() => model.save(null, oldOptions), function (error) {
-            if (options.error) {
-              options.error.apply(this, arguments);
-            }
-            return Parse.Promise.error(error);
-          });
-        }
+          return Parse.Promise.error(error);
+        });
+      }
 
       /** ignore */
-        newOptions.success = function (resp, status, xhr) {
-          let serverAttrs = model.parse(resp, status, xhr);
-          if (newOptions.wait) {
-            serverAttrs = _.extend(attrs || {}, serverAttrs);
-          }
-
-          model._finishSave(serverAttrs);
-
-          if (oldOptions.success) {
-            oldOptions.success(model, resp);
-          } else {
-            model.trigger('sync', model, resp, newOptions);
-          }
-
-          promise.resolve(model);
-        };
-
-        newOptions.error = function (model, error) {
-          model._cancelSave();
-          if (oldOptions.error) {
-            oldOptions.error.apply(this, arguments);
-          }
-
-          promise.reject(error);
-        };
-
-        newOptions.error = Parse.Object._wrapError(newOptions.error, model,
-                                                 newOptions);
-
-        this._startSave();
-
-        const doSave = function () {
-          const method = model.id ? 'PUT' : 'POST';
-
-          const json = model._getSaveJSON();
-
-          let route = 'classes';
-          let className = model.className;
-          if (model.className === '_User' && !model.id) {
-          // Special-case user sign-up.
-            route = 'users';
-            className = null;
-          }
-          Parse._request(route, className, model.id, method, json, newOptions);
-          if (newOptions.wait) {
-            model.set(current, setOptions);
-          }
-        };
-
-        if (this._saving) {
-          this._saveQueue = this._saveQueue || [];
-          this._saveQueue.push(doSave);
-        } else {
-          this._saving = true;
-          doSave();
+      newOptions.success = function(resp, status, xhr) {
+        var serverAttrs = model.parse(resp, status, xhr);
+        if (newOptions.wait) {
+          serverAttrs = _.extend(attrs || {}, serverAttrs);
         }
 
-        return promise;
-      },
+        model._finishSave(serverAttrs);
+
+        if (oldOptions.success) {
+          oldOptions.success(model, resp);
+        } else {
+          model.trigger('sync', model, resp, newOptions);
+        }
+
+        promise.resolve(model);
+      };
+
+      newOptions.error = function(model, error) {
+        model._cancelSave();
+        if (oldOptions.error) {
+          oldOptions.error.apply(this, arguments);
+        }
+
+        promise.reject(error);
+      };
+
+      newOptions.error = Parse.Object._wrapError(newOptions.error, model,
+                                                 newOptions);
+
+      this._startSave();
+
+      var doSave = function() {
+        var method = model.id ? 'PUT' : 'POST';
+
+        var json = model._getSaveJSON();
+
+        var route = "classes";
+        var className = model.className;
+        if (model.className === "_User" && !model.id) {
+          // Special-case user sign-up.
+          route = "users";
+          className = null;
+        }
+        Parse._request(route, className, model.id, method, json, newOptions);
+        if (newOptions.wait) {
+          model.set(current, setOptions);
+        }
+      };
+
+      if (this._saving) {
+        this._saveQueue = this._saveQueue || [];
+        this._saveQueue.push(doSave);
+      } else {
+        this._saving = true;
+        doSave();
+      }
+
+      return promise;
+    },
 
     /**
      * Destroy this model on the server if it was already persisted.
@@ -4242,132 +4282,132 @@
      * @return {Parse.Promise} A promise that is fulfilled when the destroy
      *     completes.
      */
-      destroy(options) {
-        const promise = new Parse.Promise();
-        options = options ? _.clone(options) : {};
-        const model = this;
-        const success = options.success;
+    destroy: function(options) {
+      var promise = new Parse.Promise();
+      options = options ? _.clone(options) : {};
+      var model = this;
+      var success = options.success;
 
-        const triggerDestroy = function () {
-          model.trigger('destroy', model, model.collection, options);
-        };
+      var triggerDestroy = function() {
+        model.trigger('destroy', model, model.collection, options);
+      };
 
-        if (!this.id) {
-          return triggerDestroy();
-        }
+      if (!this.id) {
+        return triggerDestroy();
+      }
       /** ignore */
-        options.success = function (resp) {
-          if (options.wait) {
-            triggerDestroy();
-          }
-          if (success) {
-            success(model, resp);
-          } else {
-            model.trigger('sync', model, resp, options);
-          }
-          promise.resolve(model);
-        };
-        options.error = Parse.Object._wrapError(options.error, model, options,
-                                              promise);
-
-        Parse._request('classes', this.className, this.id, 'DELETE', null,
-                    options);
-        if (!options.wait) {
+      options.success = function(resp) {
+        if (options.wait) {
           triggerDestroy();
         }
-        return promise;
-      },
+        if (success) {
+          success(model, resp);
+        } else {
+          model.trigger('sync', model, resp, options);
+        }
+        promise.resolve(model);
+      };
+      options.error = Parse.Object._wrapError(options.error, model, options,
+                                              promise);
+
+      Parse._request("classes", this.className, this.id, 'DELETE', null,
+                    options);
+      if (!options.wait) {
+        triggerDestroy();
+      }
+      return promise;
+    },
 
     /**
      * Converts a response into the hash of attributes to be set on the model.
      * @ignore
      */
-      parse(resp, status, xhr) {
-        const output = _.clone(resp);
-        _(['createdAt', 'updatedAt']).each((key) => {
-          if (output[key]) {
-            output[key] = Parse._parseDate(output[key]);
-          }
-        });
-        if (!output.updatedAt) {
-          output.updatedAt = output.createdAt;
+    parse: function(resp, status, xhr) {
+      var output = _.clone(resp);
+      _(["createdAt", "updatedAt"]).each(function(key) {
+        if (output[key]) {
+          output[key] = Parse._parseDate(output[key]);
         }
-        if (status) {
-          this._existed = (status.status !== 201);
-        }
-        return output;
-      },
+      });
+      if (!output.updatedAt) {
+        output.updatedAt = output.createdAt;
+      }
+      if (status) {
+        this._existed = (status.status !== 201);
+      }
+      return output;
+    },
 
     /**
      * Creates a new model with identical attributes to this one.
      * @return {Parse.Object}
      */
-      clone() {
-        return new this.constructor(this.attributes);
-      },
+    clone: function() {
+      return new this.constructor(this.attributes);
+    },
 
     /**
      * Returns true if this object has never been saved to Parse.
      * @return {Boolean}
      */
-      isNew() {
-        return !this.id;
-      },
+    isNew: function() {
+      return !this.id;
+    },
 
     /**
      * Call this method to manually fire a `"change"` event for this model and
      * a `"change:attribute"` event for each changed attribute.
      * Calling this will cause all objects observing the model to update.
      */
-      change(options) {
-        options = options || {};
-        const changing = this._changing;
-        this._changing = true;
+    change: function(options) {
+      options = options || {};
+      var changing = this._changing;
+      this._changing = true;
 
       // Silent changes become pending changes.
-        const self = this;
-        Parse._each(this._silent, (attr) => {
-          self._pending[attr] = true;
-        });
+      var self = this;
+      Parse._each(this._silent, function(attr) {
+        self._pending[attr] = true;
+      });
 
       // Silent changes are triggered.
-        const changes = _.extend({}, options.changes, this._silent);
-        this._silent = {};
-        Parse._each(changes, (unused_value, attr) => {
-          self.trigger(`change:${attr}`, self, self.get(attr), options);
-        });
-        if (changing) {
-          return this;
-        }
+      var changes = _.extend({}, options.changes, this._silent);
+      this._silent = {};
+      Parse._each(changes, function(unused_value, attr) {
+        self.trigger('change:' + attr, self, self.get(attr), options);
+      });
+      if (changing) {
+        return this;
+      }
 
       // This is to get around lint not letting us make a function in a loop.
-        const deleteChanged = function (value, attr) {
-          if (!self._pending[attr] && !self._silent[attr]) {
-            delete self.changed[attr];
-          }
-        };
+      var deleteChanged = function(value, attr) {
+        if (!self._pending[attr] && !self._silent[attr]) {
+          delete self.changed[attr];
+        }
+      };
 
       // Continue firing `"change"` events while there are pending changes.
-        while (!_.isEmpty(this._pending)) {
-          this._pending = {};
-          this.trigger('change', this, options);
+      while (!_.isEmpty(this._pending)) {
+        this._pending = {};
+        this.trigger('change', this, options);
         // Pending and silent changes still remain.
-          Parse._each(this.changed, deleteChanged);
-          self._previousAttributes = _.clone(this.attributes);
-        }
+        Parse._each(this.changed, deleteChanged);
+        self._previousAttributes = _.clone(this.attributes);
+      }
 
-        this._changing = false;
-        return this;
-      },
+      this._changing = false;
+      return this;
+    },
 
     /**
      * Returns true if this object was created by the Parse server when the
      * object might have already been there (e.g. in the case of a Facebook
      * login)
      */
-      existed() {
-        return this._existed;
-      },
+    existed: function() {
+      return this._existed;
+    },
 
     /**
      * Determine if the model has changed since the last <code>"change"</code>
@@ -4376,12 +4416,12 @@
      * @param {String} attr Optional attribute name
      * @return {Boolean}
      */
-      hasChanged(attr) {
-        if (!arguments.length) {
-          return !_.isEmpty(this.changed);
-        }
-        return this.changed && _.has(this.changed, attr);
-      },
+    hasChanged: function(attr) {
+      if (!arguments.length) {
+        return !_.isEmpty(this.changed);
+      }
+      return this.changed && _.has(this.changed, attr);
+    },
 
     /**
      * Returns an object containing all the attributes that have changed, or
@@ -4391,99 +4431,99 @@
      * You can also pass an attributes object to diff against the model,
      * determining if there *would be* a change.
      */
-      changedAttributes(diff) {
-        if (!diff) {
-          return this.hasChanged() ? _.clone(this.changed) : false;
+    changedAttributes: function(diff) {
+      if (!diff) {
+        return this.hasChanged() ? _.clone(this.changed) : false;
+      }
+      var changed = {};
+      var old = this._previousAttributes;
+      Parse._each(diff, function(diffVal, attr) {
+        if (!_.isEqual(old[attr], diffVal)) {
+          changed[attr] = diffVal;
         }
-        const changed = {};
-        const old = this._previousAttributes;
-        Parse._each(diff, (diffVal, attr) => {
-          if (!_.isEqual(old[attr], diffVal)) {
-            changed[attr] = diffVal;
-          }
-        });
-        return changed;
-      },
+      });
+      return changed;
+    },
 
     /**
      * Gets the previous value of an attribute, recorded at the time the last
      * <code>"change"</code> event was fired.
      * @param {String} attr Name of the attribute to get.
      */
-      previous(attr) {
-        if (!arguments.length || !this._previousAttributes) {
-          return null;
-        }
-        return this._previousAttributes[attr];
-      },
+    previous: function(attr) {
+      if (!arguments.length || !this._previousAttributes) {
+        return null;
+      }
+      return this._previousAttributes[attr];
+    },
 
     /**
      * Gets all of the attributes of the model at the time of the previous
      * <code>"change"</code> event.
      * @return {Object}
      */
-      previousAttributes() {
-        return _.clone(this._previousAttributes);
-      },
+    previousAttributes: function() {
+      return _.clone(this._previousAttributes);
+    },
 
     /**
      * Checks if the model is currently in a valid state. It's only possible to
      * get into an *invalid* state if you're using silent changes.
      * @return {Boolean}
      */
-      isValid() {
-        return !this.validate(this.attributes);
-      },
+    isValid: function() {
+      return !this.validate(this.attributes);
+    },
 
     /**
      * You should not call this function directly unless you subclass
      * <code>Parse.Object</code>, in which case you can override this method
      * to provide additional validation on <code>set</code> and
-     * <code>save</code>.  Your implementation should return
+     * <code>save</code>.  Your implementation should return 
      *
      * @param {Object} attrs The current data to validate.
      * @param {Object} options A Backbone-like options object.
      * @return {} False if the data is valid.  An error object otherwise.
      * @see Parse.Object#set
      */
-      validate(attrs, options) {
-        if (_.has(attrs, 'ACL') && !(attrs.ACL instanceof Parse.ACL)) {
-          return new Parse.Error(Parse.Error.OTHER_CAUSE,
-                               'ACL must be a Parse.ACL.');
-        }
-        return false;
-      },
+    validate: function(attrs, options) {
+      if (_.has(attrs, "ACL") && !(attrs.ACL instanceof Parse.ACL)) {
+        return new Parse.Error(Parse.Error.OTHER_CAUSE,
+                               "ACL must be a Parse.ACL.");
+      }
+      return false;
+    },
 
     /**
      * Run validation against a set of incoming attributes, returning `true`
      * if all is well. If a specific `error` callback has been passed,
      * call that instead of firing the general `"error"` event.
      */
-      _validate(attrs, options) {
-        if (options.silent || !this.validate) {
-          return true;
-        }
-        attrs = _.extend({}, this.attributes, attrs);
-        const error = this.validate(attrs, options);
-        if (!error) {
-          return true;
-        }
-        if (options && options.error) {
-          options.error(this, error, options);
-        } else {
-          this.trigger('error', this, error, options);
-        }
-        return false;
-      },
+    _validate: function(attrs, options) {
+      if (options.silent || !this.validate) {
+        return true;
+      }
+      attrs = _.extend({}, this.attributes, attrs);
+      var error = this.validate(attrs, options);
+      if (!error) {
+        return true;
+      }
+      if (options && options.error) {
+        options.error(this, error, options);
+      } else {
+        this.trigger('error', this, error, options);
+      }
+      return false;
+    },
 
     /**
      * Returns the ACL for this object.
      * @returns {Parse.ACL} An instance of Parse.ACL.
      * @see Parse.Object#get
      */
-      getACL() {
-        return this.get('ACL');
-      },
+    getACL: function() {
+      return this.get("ACL");
+    },
 
     /**
      * Sets the ACL to be used for this object.
@@ -4493,21 +4533,21 @@
      * @return {Boolean} Whether the set passed validation.
      * @see Parse.Object#set
      */
-      setACL(acl, options) {
-        return this.set('ACL', acl, options);
-      },
+    setACL: function(acl, options) {
+      return this.set("ACL", acl, options);
+    }
 
-    });
+  });
 
   /**
    * Returns the appropriate subclass for making new instances of the given
    * className string.
    */
-  Parse.Object._getSubclass = function (className) {
+  Parse.Object._getSubclass = function(className) {
     if (!_.isString(className)) {
-      throw 'Parse.Object._getSubclass requires a string argument.';
+      throw "Parse.Object._getSubclass requires a string argument.";
     }
-    let ObjectClass = Parse.Object._classMap[className];
+    var ObjectClass = Parse.Object._classMap[className];
     if (!ObjectClass) {
       ObjectClass = Parse.Object.extend(className);
       Parse.Object._classMap[className] = ObjectClass;
@@ -4518,8 +4558,8 @@
   /**
    * Creates an instance of a subclass of Parse.Object for the given classname.
    */
-  Parse.Object._create = function (className, attributes, options) {
-    const ObjectClass = Parse.Object._getSubclass(className);
+  Parse.Object._create = function(className, attributes, options) {
+    var ObjectClass = Parse.Object._getSubclass(className);
     return new ObjectClass(attributes, options);
   };
 
@@ -4558,27 +4598,28 @@
    *     this method.
    * @return {Class} A new subclass of Parse.Object.
    */
-  Parse.Object.extend = function (className, protoProps, classProps) {
+  Parse.Object.extend = function(className, protoProps, classProps) {
     // Handle the case with only two args.
     if (!_.isString(className)) {
-      if (className && _.has(className, 'className')) {
+      if (className && _.has(className, "className")) {
         return Parse.Object.extend(className.className, className, protoProps);
-      }
-      throw new Error(
+      } else {
+        throw new Error(
             "Parse.Object.extend's first argument should be the className.");
+      }
     }
 
     // If someone tries to subclass "User", coerce it to the right type.
-    if (className === 'User') {
-      className = '_User';
+    if (className === "User") {
+      className = "_User";
     }
 
-    let NewClassObject = null;
+    var NewClassObject = null;
     if (_.has(Parse.Object._classMap, className)) {
-      const OldClassObject = Parse.Object._classMap[className];
+      var OldClassObject = Parse.Object._classMap[className];
       // This new subclass has been told to extend both from "this" and from
       // OldClassObject. This is multiple inheritance, which isn't supported.
-      // For now, var's just pick one.
+      // For now, let's just pick one.
       NewClassObject = OldClassObject._extend(protoProps, classProps);
     } else {
       protoProps = protoProps || {};
@@ -4586,11 +4627,11 @@
       NewClassObject = this._extend(protoProps, classProps);
     }
     // Extending a subclass should reuse the classname automatically.
-    NewClassObject.extend = function (arg0) {
-      if (_.isString(arg0) || (arg0 && _.has(arg0, 'className'))) {
+    NewClassObject.extend = function(arg0) {
+      if (_.isString(arg0) || (arg0 && _.has(arg0, "className"))) {
         return Parse.Object.extend.apply(NewClassObject, arguments);
       }
-      const newArguments = [className].concat(Parse._.toArray(arguments));
+      var newArguments = [className].concat(Parse._.toArray(arguments));
       return Parse.Object.extend.apply(NewClassObject, newArguments);
     };
     Parse.Object._classMap[className] = NewClassObject;
@@ -4600,14 +4641,14 @@
   /**
    * Wrap an optional error callback with a fallback error event.
    */
-  Parse.Object._wrapError = function (onError, originalModel, options, promise) {
-    return function (model, response) {
+  Parse.Object._wrapError = function(onError, originalModel, options, promise) {
+    return function(model, response) {
       if (model !== originalModel) {
         response = model;
       }
-      let error = new Parse.Error(-1, response.responseText);
+      var error = new Parse.Error(-1, response.responseText);
       if (response.responseText) {
-        const errorJSON = JSON.parse(response.responseText);
+        var errorJSON = JSON.parse(response.responseText);
         if (errorJSON) {
           error = new Parse.Error(errorJSON.code, errorJSON.error);
         }
@@ -4623,35 +4664,37 @@
     };
   };
 
-  Parse.Object._findUnsavedChildren = function (object) {
-    let results = [];
+  Parse.Object._findUnsavedChildren = function(object) {
+    var results = [];
     if (object instanceof Parse.Object) {
       object._refreshCache();
       if (object.dirty()) {
         results = [object];
       }
-      results.push(...Parse.Object._findUnsavedChildren(object.attributes));
+      results.push.apply(results,
+                         Parse.Object._findUnsavedChildren(object.attributes));
     } else if (object instanceof Parse.Relation) {
       // Nothing needs to be done, but we don't want to recurse into the
       // relation's parent infinitely, so we catch this case.
-      const unused = null;
+      var unused = null;
     } else if (_.isArray(object)) {
-      _.each(object, (child) => {
-        results.push(...Parse.Object._findUnsavedChildren(child));
+      _.each(object, function(child) {
+        results.push.apply(results, Parse.Object._findUnsavedChildren(child));
       });
     } else if (_.isObject(object)) {
-      Parse._each(object, (child) => {
-        results.push(...Parse.Object._findUnsavedChildren(child));
+      Parse._each(object, function(child) {
+        results.push.apply(results, Parse.Object._findUnsavedChildren(child));
       });
     }
     return results;
   };
+
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Represents a Role on the Parse server. Roles represent groupings of
@@ -4666,16 +4709,16 @@
    * A Parse.Role is a local representation of a role persisted to the Parse
    * cloud.
    */
-  Parse.Role = Parse.Object.extend('_Role', /** @lends Parse.Role.prototype */ {
+  Parse.Role = Parse.Object.extend("_Role", /** @lends Parse.Role.prototype */ {
     // Instance Methods
-
+    
     /**
      * Constructs a new ParseRole with the given name and ACL.
-     *
+     * 
      * @param {String} name The name of the Role to create.
      * @param {Parse.ACL} acl The ACL for this role. Roles must have an ACL.
      */
-    constructor(name, acl) {
+    constructor: function(name, acl) {
       if (_.isString(name) && (acl instanceof Parse.ACL)) {
         Parse.Object.prototype.constructor.call(this, null, null);
         this.setName(name);
@@ -4684,72 +4727,72 @@
         Parse.Object.prototype.constructor.call(this, name, acl);
       }
     },
-
+    
     /**
      * Gets the name of the role.  You can alternatively call role.get("name")
-     *
+     * 
      * @return {String} the name of the role.
      */
-    getName() {
-      return this.get('name');
+    getName: function() {
+      return this.get("name");
     },
-
+    
     /**
      * Sets the name for a role. This value must be set before the role has
      * been saved to the server, and cannot be set once the role has been
      * saved.
-     *
+     * 
      * <p>
      *   A role's name can only contain alphanumeric characters, _, -, and
      *   spaces.
      * </p>
      *
      * <p>This is equivalent to calling role.set("name", name)</p>
-     *
+     * 
      * @param {String} name The name of the role.
      * @param {Object} options Standard options object with success and error
      *     callbacks.
      */
-    setName(name, options) {
-      return this.set('name', name, options);
+    setName: function(name, options) {
+      return this.set("name", name, options);
     },
-
+    
     /**
      * Gets the Parse.Relation for the Parse.Users that are direct
      * children of this role. These users are granted any privileges that this
      * role has been granted (e.g. read or write access through ACLs). You can
      * add or remove users from the role through this relation.
-     *
+     * 
      * <p>This is equivalent to calling role.relation("users")</p>
-     *
+     * 
      * @return {Parse.Relation} the relation for the users belonging to this
      *     role.
      */
-    getUsers() {
-      return this.relation('users');
+    getUsers: function() {
+      return this.relation("users");
     },
-
+    
     /**
      * Gets the Parse.Relation for the Parse.Roles that are direct
      * children of this role. These roles' users are granted any privileges that
      * this role has been granted (e.g. read or write access through ACLs). You
      * can add or remove child roles from this role through this relation.
-     *
+     * 
      * <p>This is equivalent to calling role.relation("roles")</p>
-     *
+     * 
      * @return {Parse.Relation} the relation for the roles belonging to this
      *     role.
      */
-    getRoles() {
-      return this.relation('roles');
+    getRoles: function() {
+      return this.relation("roles");
     },
-
+    
     /**
      * @ignore
      */
-    validate(attrs, options) {
-      if ('name' in attrs && attrs.name !== this.getName()) {
-        const newName = attrs.name;
+    validate: function(attrs, options) {
+      if ("name" in attrs && attrs.name !== this.getName()) {
+        var newName = attrs.name;
         if (this.id && this.id !== attrs.objectId) {
           // Check to see if the objectId being set matches this.id.
           // This happens during a fetch -- the id is set before calling fetch.
@@ -4764,23 +4807,23 @@
         if (!(/^[0-9a-zA-Z\-_ ]+$/).test(newName)) {
           return new Parse.Error(Parse.Error.OTHER_CAUSE,
               "A role's name can only contain alphanumeric characters, _," +
-              ' -, and spaces.');
+              " -, and spaces.");
         }
       }
       if (Parse.Object.prototype.validate) {
         return Parse.Object.prototype.validate.call(this, attrs, options);
       }
       return false;
-    },
+    }
   });
 }(this));
 
 
-/* global _: false */
-(function (root) {
+/*global _: false */
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Creates a new instance with the given models and options.  Typically, you
@@ -4805,7 +4848,7 @@
    * <a href="http://documentcloud.github.com/backbone/#Collection">Backbone
    * documentation</a>.</p>
    */
-  Parse.Collection = function (models, options) {
+  Parse.Collection = function(models, options) {
     options = options || {};
     if (options.comparator) {
       this.comparator = options.comparator;
@@ -4819,315 +4862,305 @@
     this._reset();
     this.initialize.apply(this, arguments);
     if (models) {
-      this.reset(models, { silent: true, parse: options.parse });
+      this.reset(models, {silent: true, parse: options.parse});
     }
   };
 
   // Define the Collection's inheritable methods.
   _.extend(Parse.Collection.prototype, Parse.Events,
-    /** @lends Parse.Collection.prototype */ {
+      /** @lends Parse.Collection.prototype */ {
 
     // The default model for a collection is just a Parse.Object.
     // This should be overridden in most cases.
-
-      model: Parse.Object,
+    
+    model: Parse.Object,
 
     /**
      * Initialize is an empty function by default. Override it with your own
      * initialization logic.
      */
-      initialize() {},
+    initialize: function(){},
 
     /**
      * The JSON representation of a Collection is an array of the
      * models' attributes.
      */
-      toJSON() {
-        return this.map(model => model.toJSON());
-      },
+    toJSON: function() {
+      return this.map(function(model){ return model.toJSON(); });
+    },
 
     /**
      * Add a model, or list of models to the set. Pass **silent** to avoid
      * firing the `add` event for every new model.
      */
-      add(models, options) {
-        let i,
-          index,
-          length,
-          model,
-          cid,
-          id,
-          cids = {},
-          ids = {};
-        options = options || {};
-        models = _.isArray(models) ? models.slice() : [models];
+    add: function(models, options) {
+      var i, index, length, model, cid, id, cids = {}, ids = {};
+      options = options || {};
+      models = _.isArray(models) ? models.slice() : [models];
 
       // Begin by turning bare objects into model references, and preventing
       // invalid models or duplicate models from being added.
-        for (i = 0, length = models.length; i < length; i++) {
-          models[i] = this._prepareModel(models[i], options);
-          model = models[i];
-          if (!model) {
-            throw new Error("Can't add an invalid model to a collection");
-          }
-          cid = model.cid;
-          if (cids[cid] || this._byCid[cid]) {
-            throw new Error("Duplicate cid: can't add the same model " +
-                          'to a collection twice');
-          }
-          id = model.id;
-          if (!Parse._isNullOrUndefined(id) && (ids[id] || this._byId[id])) {
-            throw new Error("Duplicate id: can't add the same model " +
-                          'to a collection twice');
-          }
-          ids[id] = model;
-          cids[cid] = model;
+      for (i = 0, length = models.length; i < length; i++) {
+        models[i] = this._prepareModel(models[i], options);
+        model = models[i];
+        if (!model) {
+          throw new Error("Can't add an invalid model to a collection");
         }
+        cid = model.cid;
+        if (cids[cid] || this._byCid[cid]) {
+          throw new Error("Duplicate cid: can't add the same model " +
+                          "to a collection twice");
+        }
+        id = model.id;
+        if (!Parse._isNullOrUndefined(id) && (ids[id] || this._byId[id])) {
+          throw new Error("Duplicate id: can't add the same model " +
+                          "to a collection twice");
+        }
+        ids[id] = model;
+        cids[cid] = model;
+      }
 
       // Listen to added models' events, and index models for lookup by
       // `id` and by `cid`.
-        for (i = 0; i < length; i++) {
-          (model = models[i]).on('all', this._onModelEvent, this);
-          this._byCid[model.cid] = model;
-          if (model.id) {
-            this._byId[model.id] = model;
-          }
+      for (i = 0; i < length; i++) {
+        (model = models[i]).on('all', this._onModelEvent, this);
+        this._byCid[model.cid] = model;
+        if (model.id) {
+          this._byId[model.id] = model;
         }
+      }
 
       // Insert models into the collection, re-sorting if needed, and triggering
       // `add` events unless silenced.
-        this.length += length;
-        index = Parse._isNullOrUndefined(options.at) ?
+      this.length += length;
+      index = Parse._isNullOrUndefined(options.at) ? 
           this.models.length : options.at;
-        this.models.splice.apply(this.models, [index, 0].concat(models));
-        if (this.comparator) {
-          this.sort({ silent: true });
-        }
-        if (options.silent) {
-          return this;
-        }
-        for (i = 0, length = this.models.length; i < length; i++) {
-          model = this.models[i];
-          if (cids[model.cid]) {
-            options.index = i;
-            model.trigger('add', model, this, options);
-          }
-        }
+      this.models.splice.apply(this.models, [index, 0].concat(models));
+      if (this.comparator) {
+        this.sort({silent: true});
+      }
+      if (options.silent) {
         return this;
-      },
+      }
+      for (i = 0, length = this.models.length; i < length; i++) {
+        model = this.models[i];
+        if (cids[model.cid]) {
+          options.index = i;
+          model.trigger('add', model, this, options);
+        }
+      }
+      return this;
+    },
 
     /**
      * Remove a model, or a list of models from the set. Pass silent to avoid
      * firing the <code>remove</code> event for every model removed.
      */
-      remove(models, options) {
-        let i,
-          l,
-          index,
-          model;
-        options = options || {};
-        models = _.isArray(models) ? models.slice() : [models];
-        for (i = 0, l = models.length; i < l; i++) {
-          model = this.getByCid(models[i]) || this.get(models[i]);
-          if (!model) {
-            continue;
-          }
-          delete this._byId[model.id];
-          delete this._byCid[model.cid];
-          index = this.indexOf(model);
-          this.models.splice(index, 1);
-          this.length--;
-          if (!options.silent) {
-            options.index = index;
-            model.trigger('remove', model, this, options);
-          }
-          this._removeReference(model);
+    remove: function(models, options) {
+      var i, l, index, model;
+      options = options || {};
+      models = _.isArray(models) ? models.slice() : [models];
+      for (i = 0, l = models.length; i < l; i++) {
+        model = this.getByCid(models[i]) || this.get(models[i]);
+        if (!model) {
+          continue;
         }
-        return this;
-      },
+        delete this._byId[model.id];
+        delete this._byCid[model.cid];
+        index = this.indexOf(model);
+        this.models.splice(index, 1);
+        this.length--;
+        if (!options.silent) {
+          options.index = index;
+          model.trigger('remove', model, this, options);
+        }
+        this._removeReference(model);
+      }
+      return this;
+    },
 
     /**
      * Gets a model from the set by id.
      */
-      get(id) {
-        return id && this._byId[id.id || id];
-      },
+    get: function(id) {
+      return id && this._byId[id.id || id];
+    },
 
     /**
      * Gets a model from the set by client id.
      */
-      getByCid(cid) {
-        return cid && this._byCid[cid.cid || cid];
-      },
+    getByCid: function(cid) {
+      return cid && this._byCid[cid.cid || cid];
+    },
 
     /**
      * Gets the model at the given index.
      */
-      at(index) {
-        return this.models[index];
-      },
+    at: function(index) {
+      return this.models[index];
+    },
 
     /**
      * Forces the collection to re-sort itself. You don't need to call this
      * under normal circumstances, as the set will maintain sort order as each
      * item is added.
      */
-      sort(options) {
-        options = options || {};
-        if (!this.comparator) {
-          throw new Error('Cannot sort a set without a comparator');
-        }
-        const boundComparator = _.bind(this.comparator, this);
-        if (this.comparator.length === 1) {
-          this.models = this.sortBy(boundComparator);
-        } else {
-          this.models.sort(boundComparator);
-        }
-        if (!options.silent) {
-          this.trigger('reset', this, options);
-        }
-        return this;
-      },
+    sort: function(options) {
+      options = options || {};
+      if (!this.comparator) {
+        throw new Error('Cannot sort a set without a comparator');
+      }
+      var boundComparator = _.bind(this.comparator, this);
+      if (this.comparator.length === 1) {
+        this.models = this.sortBy(boundComparator);
+      } else {
+        this.models.sort(boundComparator);
+      }
+      if (!options.silent) {
+        this.trigger('reset', this, options);
+      }
+      return this;
+    },
 
     /**
      * Plucks an attribute from each model in the collection.
      */
-      pluck(attr) {
-        return _.map(this.models, model => model.get(attr));
-      },
+    pluck: function(attr) {
+      return _.map(this.models, function(model){ return model.get(attr); });
+    },
 
     /**
      * When you have more items than you want to add or remove individually,
      * you can reset the entire set with a new list of models, without firing
      * any `add` or `remove` events. Fires `reset` when finished.
      */
-      reset(models, options) {
-        const self = this;
-        models = models || [];
-        options = options || {};
-        _.each(this.models, (model) => {
-          self._removeReference(model);
-        });
-        this._reset();
-        this.add(models, { silent: true, parse: options.parse });
-        if (!options.silent) {
-          this.trigger('reset', this, options);
-        }
-        return this;
-      },
+    reset: function(models, options) {
+      var self = this;
+      models = models || [];
+      options = options || {};
+      _.each(this.models, function(model) {
+        self._removeReference(model);
+      });
+      this._reset();
+      this.add(models, {silent: true, parse: options.parse});
+      if (!options.silent) {
+        this.trigger('reset', this, options);
+      }
+      return this;
+    },
 
     /**
      * Fetches the default set of models for this collection, resetting the
      * collection when they arrive. If `add: true` is passed, appends the
      * models to the collection instead of resetting.
      */
-      fetch(options) {
-        options = options ? _.clone(options) : {};
-        if (options.parse === undefined) {
-          options.parse = true;
+    fetch: function(options) {
+      options = options ? _.clone(options) : {};
+      if (options.parse === undefined) {
+        options.parse = true;
+      }
+      var collection = this;
+      var success = options.success;
+      options.success = function(results, resp) {
+        if (options.add) {
+          collection.add(results, options);
+        } else {
+          collection.reset(results, options);
         }
-        const collection = this;
-        const success = options.success;
-        options.success = function (results, resp) {
-          if (options.add) {
-            collection.add(results, options);
-          } else {
-            collection.reset(results, options);
-          }
-          if (success) {
-            success(collection, resp);
-          }
-        };
-        options.error = Parse.Object._wrapError(options.error, collection,
+        if (success) {
+          success(collection, resp);
+        }
+      };
+      options.error = Parse.Object._wrapError(options.error, collection,
                                               options);
-        const query = this.query || new Parse.Query(this.model);
-        query.find(options);
-      },
+      var query = this.query || new Parse.Query(this.model);
+      query.find(options);
+    },
 
     /**
      * Creates a new instance of a model in this collection. Add the model to
      * the collection immediately, unless `wait: true` is passed, in which case
      * we wait for the server to agree.
      */
-      create(model, options) {
-        const coll = this;
-        options = options ? _.clone(options) : {};
-        model = this._prepareModel(model, options);
-        if (!model) {
-          return false;
+    create: function(model, options) {
+      var coll = this;
+      options = options ? _.clone(options) : {};
+      model = this._prepareModel(model, options);
+      if (!model) {
+        return false;
+      }
+      if (!options.wait) {
+        coll.add(model, options);
+      }
+      var success = options.success;
+      options.success = function(nextModel, resp, xhr) {
+        if (options.wait) {
+          coll.add(nextModel, options);
         }
-        if (!options.wait) {
-          coll.add(model, options);
+        if (success) {
+          success(nextModel, resp);
+        } else {
+          nextModel.trigger('sync', model, resp, options);
         }
-        const success = options.success;
-        options.success = function (nextModel, resp, xhr) {
-          if (options.wait) {
-            coll.add(nextModel, options);
-          }
-          if (success) {
-            success(nextModel, resp);
-          } else {
-            nextModel.trigger('sync', model, resp, options);
-          }
-        };
-        model.save(null, options);
-        return model;
-      },
+      };
+      model.save(null, options);
+      return model;
+    },
 
     /**
      * Converts a response into a list of models to be added to the collection.
      * The default implementation is just to pass it through.
      * @ignore
      */
-      parse(resp, xhr) {
-        return resp;
-      },
+    parse: function(resp, xhr) {
+      return resp;
+    },
 
     /**
      * Proxy to _'s chain. Can't be proxied the same way the rest of the
      * underscore methods are proxied because it relies on the underscore
      * constructor.
      */
-      chain() {
-        return _(this.models).chain();
-      },
+    chain: function() {
+      return _(this.models).chain();
+    },
 
     /**
      * Reset all internal state. Called when the collection is reset.
      */
-      _reset(options) {
-        this.length = 0;
-        this.models = [];
-        this._byId = {};
-        this._byCid = {};
-      },
+    _reset: function(options) {
+      this.length = 0;
+      this.models = [];
+      this._byId  = {};
+      this._byCid = {};
+    },
 
     /**
      * Prepare a model or hash of attributes to be added to this collection.
      */
-      _prepareModel(model, options) {
-        if (!(model instanceof Parse.Object)) {
-          const attrs = model;
-          options.collection = this;
-          model = new this.model(attrs, options);
-          if (!model._validate(model.attributes, options)) {
-            model = false;
-          }
-        } else if (!model.collection) {
-          model.collection = this;
+    _prepareModel: function(model, options) {
+      if (!(model instanceof Parse.Object)) {
+        var attrs = model;
+        options.collection = this;
+        model = new this.model(attrs, options);
+        if (!model._validate(model.attributes, options)) {
+          model = false;
         }
-        return model;
-      },
+      } else if (!model.collection) {
+        model.collection = this;
+      }
+      return model;
+    },
 
     /**
      * Internal method to remove a model's ties to a collection.
      */
-      _removeReference(model) {
-        if (this === model.collection) {
-          delete model.collection;
-        }
-        model.off('all', this._onModelEvent, this);
-      },
+    _removeReference: function(model) {
+      if (this === model.collection) {
+        delete model.collection;
+      }
+      model.off('all', this._onModelEvent, this);
+    },
 
     /**
      * Internal method called every time a model in the set fires an event.
@@ -5135,33 +5168,33 @@
      * events simply proxy through. "add" and "remove" events that originate
      * in other collections are ignored.
      */
-      _onModelEvent(ev, model, collection, options) {
-        if ((ev === 'add' || ev === 'remove') && collection !== this) {
-          return;
-        }
-        if (ev === 'destroy') {
-          this.remove(model, options);
-        }
-        if (model && ev === 'change:objectId') {
-          delete this._byId[model.previous('objectId')];
-          this._byId[model.id] = model;
-        }
-        this.trigger.apply(this, arguments);
-      },
+    _onModelEvent: function(ev, model, collection, options) {
+      if ((ev === 'add' || ev === 'remove') && collection !== this) {
+        return;
+      }
+      if (ev === 'destroy') {
+        this.remove(model, options);
+      }
+      if (model && ev === 'change:objectId') {
+        delete this._byId[model.previous("objectId")];
+        this._byId[model.id] = model;
+      }
+      this.trigger.apply(this, arguments);
+    }
 
-    });
+  });
 
   // Underscore methods that we want to implement on the Collection.
-  const methods = ['forEach', 'each', 'map', 'reduce', 'reduceRight', 'find',
+  var methods = ['forEach', 'each', 'map', 'reduce', 'reduceRight', 'find',
     'detect', 'filter', 'select', 'reject', 'every', 'all', 'some', 'any',
     'include', 'contains', 'invoke', 'max', 'min', 'sortBy', 'sortedIndex',
     'toArray', 'size', 'first', 'initial', 'rest', 'last', 'without', 'indexOf',
     'shuffle', 'lastIndexOf', 'isEmpty', 'groupBy'];
 
   // Mix in each Underscore method as a proxy to `Collection#models`.
-  _.each(methods, (method) => {
-    Parse.Collection.prototype[method] = function () {
-      return _[method](...[this.models].concat(_.toArray(arguments)));
+  _.each(methods, function(method) {
+    Parse.Collection.prototype[method] = function() {
+      return _[method].apply(_, [this.models].concat(_.toArray(arguments)));
     };
   });
 
@@ -5193,13 +5226,14 @@
    * @return {Class} A new subclass of <code>Parse.Collection</code>.
    */
   Parse.Collection.extend = Parse._extend;
+
 }(this));
 
-/* global _: false, document: false */
-(function (root) {
+/*global _: false, document: false */
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Creating a Parse.View creates its initial element outside of the DOM,
@@ -5213,7 +5247,7 @@
    * documentation</a>.</p>
    * <p><strong><em>Available in the client SDK only.</em></strong></p>
    */
-  Parse.View = function (options) {
+  Parse.View = function(options) {
     this.cid = _.uniqueId('view');
     this._configure(options || {});
     this._ensureElement();
@@ -5222,51 +5256,51 @@
   };
 
   // Cached regex to split keys for `delegate`.
-  const eventSplitter = /^(\S+)\s*(.*)$/;
+  var eventSplitter = /^(\S+)\s*(.*)$/;
 
   // List of view options to be merged as properties.
-
-  const viewOptions = ['model', 'collection', 'el', 'id', 'attributes',
-    'className', 'tagName'];
+  
+  var viewOptions = ['model', 'collection', 'el', 'id', 'attributes',
+                     'className', 'tagName'];
 
   // Set up all inheritable **Parse.View** properties and methods.
   _.extend(Parse.View.prototype, Parse.Events,
-    /** @lends Parse.View.prototype */ {
+           /** @lends Parse.View.prototype */ {
 
     // The default `tagName` of a View's element is `"div"`.
-      tagName: 'div',
+    tagName: 'div',
 
     /**
      * jQuery delegate for element lookup, scoped to DOM elements within the
      * current view. This should be prefered to global lookups where possible.
      */
-      $(selector) {
-        return this.$el.find(selector);
-      },
+    $: function(selector) {
+      return this.$el.find(selector);
+    },
 
     /**
      * Initialize is an empty function by default. Override it with your own
      * initialization logic.
      */
-      initialize() {},
+    initialize: function(){},
 
     /**
      * The core function that your view should override, in order
      * to populate its element (`this.el`), with the appropriate HTML. The
      * convention is for **render** to always return `this`.
      */
-      render() {
-        return this;
-      },
+    render: function() {
+      return this;
+    },
 
     /**
      * Remove this view from the DOM. Note that the view isn't present in the
      * DOM by default, so calling this method may be a no-op.
      */
-      remove() {
-        this.$el.remove();
-        return this;
-      },
+    remove: function() {
+      this.$el.remove();
+      return this;
+    },
 
     /**
      * For small amounts of DOM Elements, where a full-blown template isn't
@@ -5275,29 +5309,29 @@
      *     var el = this.make('li', {'class': 'row'},
      *                        this.model.escape('title'));</pre>
      */
-      make(tagName, attributes, content) {
-        const el = document.createElement(tagName);
-        if (attributes) {
-          Parse.$(el).attr(attributes);
-        }
-        if (content) {
-          Parse.$(el).html(content);
-        }
-        return el;
-      },
+    make: function(tagName, attributes, content) {
+      var el = document.createElement(tagName);
+      if (attributes) {
+        Parse.$(el).attr(attributes);
+      }
+      if (content) {
+        Parse.$(el).html(content);
+      }
+      return el;
+    },
 
     /**
      * Changes the view's element (`this.el` property), including event
      * re-delegation.
      */
-      setElement(element, delegate) {
-        this.$el = Parse.$(element);
-        this.el = this.$el[0];
-        if (delegate !== false) {
-          this.delegateEvents();
-        }
-        return this;
-      },
+    setElement: function(element, delegate) {
+      this.$el = Parse.$(element);
+      this.el = this.$el[0];
+      if (delegate !== false) {
+        this.delegateEvents();
+      }
+      return this;
+    },
 
     /**
      * Set callbacks.  <code>this.events</code> is a hash of
@@ -5316,59 +5350,58 @@
      * This only works for delegate-able events: not `focus`, `blur`, and
      * not `change`, `submit`, and `reset` in Internet Explorer.
      */
-      delegateEvents(events) {
-        events = events || Parse._getValue(this, 'events');
-        if (!events) {
-          return;
+    delegateEvents: function(events) {
+      events = events || Parse._getValue(this, 'events');
+      if (!events) {
+        return;
+      }
+      this.undelegateEvents();
+      var self = this;
+      Parse._each(events, function(method, key) {
+        if (!_.isFunction(method)) {
+          method = self[events[key]];
         }
-        this.undelegateEvents();
-        const self = this;
-        Parse._each(events, (method, key) => {
-          if (!_.isFunction(method)) {
-            method = self[events[key]];
-          }
-          if (!method) {
-            throw new Error(`Event "${events[key]}" does not exist`);
-          }
-          const match = key.match(eventSplitter);
-          let eventName = match[1],
-            selector = match[2];
-          method = _.bind(method, self);
-          eventName += `.delegateEvents${self.cid}`;
-          if (selector === '') {
-            self.$el.bind(eventName, method);
-          } else {
-            self.$el.delegate(selector, eventName, method);
-          }
-        });
-      },
+        if (!method) {
+          throw new Error('Event "' + events[key] + '" does not exist');
+        }
+        var match = key.match(eventSplitter);
+        var eventName = match[1], selector = match[2];
+        method = _.bind(method, self);
+        eventName += '.delegateEvents' + self.cid;
+        if (selector === '') {
+          self.$el.bind(eventName, method);
+        } else {
+          self.$el.delegate(selector, eventName, method);
+        }
+      });
+    },
 
     /**
      * Clears all callbacks previously bound to the view with `delegateEvents`.
      * You usually don't need to use this, but may wish to if you have multiple
      * Backbone views attached to the same DOM element.
      */
-      undelegateEvents() {
-        this.$el.unbind(`.delegateEvents${this.cid}`);
-      },
+    undelegateEvents: function() {
+      this.$el.unbind('.delegateEvents' + this.cid);
+    },
 
     /**
      * Performs the initial configuration of a View with a set of options.
      * Keys with special meaning *(model, collection, id, className)*, are
      * attached directly to the view.
      */
-      _configure(options) {
-        if (this.options) {
-          options = _.extend({}, this.options, options);
+    _configure: function(options) {
+      if (this.options) {
+        options = _.extend({}, this.options, options);
+      }
+      var self = this;
+      _.each(viewOptions, function(attr) {
+        if (options[attr]) {
+          self[attr] = options[attr];
         }
-        const self = this;
-        _.each(viewOptions, (attr) => {
-          if (options[attr]) {
-            self[attr] = options[attr];
-          }
-        });
-        this.options = options;
-      },
+      });
+      this.options = options;
+    },
 
     /**
      * Ensure that the View has a DOM element to render into.
@@ -5376,22 +5409,22 @@
      * matching element, and re-assign it to `el`. Otherwise, create
      * an element from the `id`, `className` and `tagName` properties.
      */
-      _ensureElement() {
-        if (!this.el) {
-          const attrs = Parse._getValue(this, 'attributes') || {};
-          if (this.id) {
-            attrs.id = this.id;
-          }
-          if (this.className) {
-            attrs.class = this.className;
-          }
-          this.setElement(this.make(this.tagName, attrs), false);
-        } else {
-          this.setElement(this.el, false);
+    _ensureElement: function() {
+      if (!this.el) {
+        var attrs = Parse._getValue(this, 'attributes') || {};
+        if (this.id) {
+          attrs.id = this.id;
         }
-      },
+        if (this.className) {
+          attrs['class'] = this.className;
+        }
+        this.setElement(this.make(this.tagName, attrs), false);
+      } else {
+        this.setElement(this.el, false);
+      }
+    }
 
-    });
+  });
 
   /**
    * @function
@@ -5400,12 +5433,13 @@
    * @return {Class} A new subclass of <code>Parse.View</code>.
    */
   Parse.View.extend = Parse._extend;
+
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * @class
@@ -5416,7 +5450,7 @@
    * user specific methods, like authentication, signing up, and validation of
    * uniqueness.</p>
    */
-  Parse.User = Parse.Object.extend('_User', /** @lends Parse.User.prototype */ {
+  Parse.User = Parse.Object.extend("_User", /** @lends Parse.User.prototype */ {
     // Instance Variables
     _isCurrentUser: false,
 
@@ -5426,7 +5460,7 @@
     /**
      * Internal method to handle special fields in a _User response.
      */
-    _mergeMagicFields(attrs) {
+    _mergeMagicFields: function(attrs) {
       if (attrs.sessionToken) {
         this._sessionToken = attrs.sessionToken;
         delete attrs.sessionToken;
@@ -5438,15 +5472,15 @@
      * Removes null values from authData (which exist temporarily for
      * unlinking)
      */
-    _cleanupAuthData() {
+    _cleanupAuthData: function() {
       if (!this.isCurrent()) {
         return;
       }
-      const authData = this.get('authData');
+      var authData = this.get('authData');
       if (!authData) {
         return;
       }
-      _.each(this.get('authData'), (value, key) => {
+      _.each(this.get('authData'), function(value, key) {
         if (!authData[key]) {
           delete authData[key];
         }
@@ -5456,14 +5490,14 @@
     /**
      * Synchronizes authData for all providers.
      */
-    _synchronizeAllAuthData() {
-      const authData = this.get('authData');
+    _synchronizeAllAuthData: function() {
+      var authData = this.get('authData');
       if (!authData) {
         return;
       }
 
-      const self = this;
-      _.each(this.get('authData'), (value, key) => {
+      var self = this;
+      _.each(this.get('authData'), function(value, key) {
         self._synchronizeAuthData(key);
       });
     },
@@ -5472,28 +5506,28 @@
      * Synchronizes auth data for a provider (e.g. puts the access token in the
      * right place to be used by the Facebook SDK).
      */
-    _synchronizeAuthData(provider) {
+    _synchronizeAuthData: function(provider) {
       if (!this.isCurrent()) {
         return;
       }
-      let authType;
+      var authType;
       if (_.isString(provider)) {
         authType = provider;
         provider = Parse.User._authProviders[authType];
       } else {
         authType = provider.getAuthType();
       }
-      const authData = this.get('authData');
+      var authData = this.get('authData');
       if (!authData || !provider) {
         return;
       }
-      const success = provider.restoreAuthentication(authData[authType]);
+      var success = provider.restoreAuthentication(authData[authType]);
       if (!success) {
         this._unlinkFrom(provider);
       }
     },
 
-    _handleSaveResult(makeCurrent) {
+    _handleSaveResult: function(makeCurrent) {
       // Clean up and synchronize the authData object, removing any unset values
       if (makeCurrent) {
         this._isCurrentUser = true;
@@ -5502,7 +5536,7 @@
       this._synchronizeAllAuthData();
       // Don't keep the password around.
       delete this._serverData.password;
-      this._rebuildEstimatedDataForKey('password');
+      this._rebuildEstimatedDataForKey("password");
       this._refreshCache();
       if (makeCurrent || this.isCurrent()) {
         Parse.User._saveCurrentUser(this);
@@ -5513,8 +5547,8 @@
      * Unlike in the Android/iOS SDKs, logInWith is unnecessary, since you can
      * call linkWith on the user (even if it doesn't exist yet on the server).
      */
-    _linkWith(provider, options) {
-      let authType;
+    _linkWith: function(provider, options) {
+      var authType;
       if (_.isString(provider)) {
         authType = provider;
         provider = Parse.User._authProviders[provider];
@@ -5522,52 +5556,53 @@
         authType = provider.getAuthType();
       }
       if (_.has(options, 'authData')) {
-        const authData = this.get('authData') || {};
+        var authData = this.get('authData') || {};
         authData[authType] = options.authData;
         this.set('authData', authData);
 
         // Overridden so that the user can be made the current user.
-        const newOptions = _.clone(options);
-        newOptions.success = function (model) {
+        var newOptions = _.clone(options);
+        newOptions.success = function(model) {
           model._handleSaveResult(true);
           if (options.success) {
             options.success.apply(this, arguments);
           }
         };
-        return this.save({ authData }, newOptions);
-      }
-      const self = this;
-      return provider.authenticate({
-        success(provider, result) {
-          self._linkWith(provider, {
-            authData: result,
-            success: options.success,
-            error: options.error,
-          });
-        },
-        error(provider, error) {
-          if (options.error) {
-            options.error(self, error);
+        return this.save({'authData': authData}, newOptions);
+      } else {
+        var self = this;
+        return provider.authenticate({
+          success: function(provider, result) {
+            self._linkWith(provider, {
+              authData: result,
+              success: options.success,
+              error: options.error
+            });
+          },
+          error: function(provider, error) {
+            if (options.error) {
+              options.error(self, error);
+            }
           }
-        },
-      });
+        });
+      }
     },
 
     /**
      * Unlinks a user from a service.
      */
-    _unlinkFrom(provider, options) {
-      let authType;
+    _unlinkFrom: function(provider, options) {
+      var authType;
       if (_.isString(provider)) {
         authType = provider;
         provider = Parse.User._authProviders[provider];
       } else {
         authType = provider.getAuthType();
       }
-      const newOptions = _.clone(options);
-      const self = this;
+      var newOptions = _.clone(options);
+      var self = this;
       newOptions.authData = null;
-      newOptions.success = function (model) {
+      newOptions.success = function(model) {
         self._synchronizeAuthData(provider);
         if (options.success) {
           options.success.apply(this, arguments);
@@ -5579,27 +5614,27 @@
     /**
      * Checks whether a user is linked to a service.
      */
-    _isLinked(provider) {
-      let authType;
+    _isLinked: function(provider) {
+      var authType;
       if (_.isString(provider)) {
         authType = provider;
       } else {
         authType = provider.getAuthType();
       }
-      const authData = this.get('authData') || {};
+      var authData = this.get('authData') || {};
       return !!authData[authType];
     },
 
     /**
      * Deauthenticates all providers.
      */
-    _logOutWithAll() {
-      const authData = this.get('authData');
+    _logOutWithAll: function() {
+      var authData = this.get('authData');
       if (!authData) {
         return;
       }
-      const self = this;
-      _.each(this.get('authData'), (value, key) => {
+      var self = this;
+      _.each(this.get('authData'), function(value, key) {
         self._logOutWith(key);
       });
     },
@@ -5608,7 +5643,7 @@
      * Deauthenticates a single provider (e.g. removing access tokens from the
      * Facebook SDK).
      */
-    _logOutWith(provider) {
+    _logOutWith: function(provider) {
       if (!this.isCurrent()) {
         return;
       }
@@ -5636,26 +5671,26 @@
      *     finishes.
      * @see Parse.User.signUp
      */
-    signUp(attrs, options) {
-      let error;
+    signUp: function(attrs, options) {
+      var error;
       options = options || {};
 
-      const username = (attrs && attrs.username) || this.get('username');
-      if (!username || (username === '')) {
+      var username = (attrs && attrs.username) || this.get("username");
+      if (!username || (username === "")) {
         error = new Parse.Error(
             Parse.Error.OTHER_CAUSE,
-            'Cannot sign up user with an empty name.');
+            "Cannot sign up user with an empty name.");
         if (options && options.error) {
           options.error(this, error);
         }
         return Parse.Promise.error(error);
       }
 
-      const password = (attrs && attrs.password) || this.get('password');
-      if (!password || (password === '')) {
+      var password = (attrs && attrs.password) || this.get("password");
+      if (!password || (password === "")) {
         error = new Parse.Error(
             Parse.Error.OTHER_CAUSE,
-            'Cannot sign up user with an empty password.');
+            "Cannot sign up user with an empty password.");
         if (options && options.error) {
           options.error(this, error);
         }
@@ -5663,8 +5698,8 @@
       }
 
       // Overridden so that the user can be made the current user.
-      const newOptions = _.clone(options);
-      newOptions.success = function (model) {
+      var newOptions = _.clone(options);
+      newOptions.success = function(model) {
         model._handleSaveResult(true);
         if (options.success) {
           options.success.apply(this, arguments);
@@ -5687,12 +5722,12 @@
      * @return {Parse.Promise} A promise that is fulfilled with the user when
      *     the login is complete.
      */
-    logIn(options) {
-      const promise = new Parse.Promise();
-      const model = this;
-      const newOptions = options ? _.clone(options) : {};
-      newOptions.success = function (resp, status, xhr) {
-        const serverAttrs = model.parse(resp, status, xhr);
+    logIn: function(options) {
+      var promise = new Parse.Promise();
+      var model = this;
+      var newOptions = options ? _.clone(options) : {};
+      newOptions.success = function(resp, status, xhr) {
+        var serverAttrs = model.parse(resp, status, xhr);
         model._finishFetch(serverAttrs);
         model._handleSaveResult(true);
         if (options && options.success) {
@@ -5704,19 +5739,15 @@
       };
       newOptions.error = Parse.Object._wrapError(newOptions.error, model,
                                                  newOptions, promise);
-      Parse._request('login', null, null, 'GET', this.toJSON(), newOptions);
+      Parse._request("login", null, null, "GET", this.toJSON(), newOptions);
       return promise;
     },
 
     /**
      * @see Parse.Object#save
      */
-    save(arg1, arg2, arg3) {
-      let i,
-        attrs,
-        current,
-        options,
-        saved;
+    save: function(arg1, arg2, arg3) {
+      var i, attrs, current, options, saved;
       if (_.isObject(arg1) || _.isNull(arg1) || _.isUndefined(arg1)) {
         attrs = arg1;
         options = arg2;
@@ -5727,8 +5758,8 @@
       }
       options = options || {};
 
-      const newOptions = _.clone(options);
-      newOptions.success = function (model) {
+      var newOptions = _.clone(options);
+      newOptions.success = function(model) {
         model._handleSaveResult(false);
         if (options.success) {
           options.success.apply(this, arguments);
@@ -5740,9 +5771,9 @@
     /**
      * @see Parse.Object#fetch
      */
-    fetch(options) {
-      const newOptions = _.clone(options);
-      newOptions.success = function (model) {
+    fetch: function(options) {
+      var newOptions = _.clone(options);
+      newOptions.success = function(model) {
         model._handleSaveResult(false);
         if (options.success) {
           options.success.apply(this, arguments);
@@ -5755,7 +5786,7 @@
      * Returns true if <code>current</code> would return this user.
      * @see Parse.User#current
      */
-    isCurrent() {
+    isCurrent: function() {
       return this._isCurrentUser;
     },
 
@@ -5764,8 +5795,8 @@
      * @return {String}
      * @see Parse.Object#get
      */
-    getUsername() {
-      return this.get('username');
+    getUsername: function() {
+      return this.get("username");
     },
 
     /**
@@ -5775,8 +5806,8 @@
      * @return {Boolean}
      * @see Parse.Object.set
      */
-    setUsername(username, options) {
-      return this.set('username', username, options);
+    setUsername: function(username, options) {
+      return this.set("username", username, options);
     },
 
     /**
@@ -5786,8 +5817,8 @@
      * @return {Boolean}
      * @see Parse.Object.set
      */
-    setPassword(password, options) {
-      return this.set('password', password, options);
+    setPassword: function(password, options) {
+      return this.set("password", password, options);
     },
 
     /**
@@ -5795,8 +5826,8 @@
      * @return {String}
      * @see Parse.Object#get
      */
-    getEmail() {
-      return this.get('email');
+    getEmail: function() {
+      return this.get("email");
     },
 
     /**
@@ -5806,18 +5837,18 @@
      * @return {Boolean}
      * @see Parse.Object.set
      */
-    setEmail(email, options) {
-      return this.set('email', email, options);
+    setEmail: function(email, options) {
+      return this.set("email", email, options);
     },
 
     /**
      * Checks whether this user is the current user and has been authenticated.
      * @return (Boolean) whether this user is the current user and is logged in.
      */
-    authenticated() {
+    authenticated: function() {
       return !!this._sessionToken &&
           (Parse.User.current() && Parse.User.current().id === this.id);
-    },
+    }
 
   }, /** @lends Parse.User */ {
     // Class Variables
@@ -5831,7 +5862,7 @@
     _currentUserMatchesDisk: false,
 
     // The localStorage key suffix that the current user is stored under.
-    _CURRENT_USER_KEY: 'currentUser',
+    _CURRENT_USER_KEY: "currentUser",
 
     // The mapping of auth provider names to actual providers
     _authProviders: {},
@@ -5855,11 +5886,11 @@
      *     the signup completes.
      * @see Parse.User#signUp
      */
-    signUp(username, password, attrs, options) {
+    signUp: function(username, password, attrs, options) {
       attrs = attrs || {};
       attrs.username = username;
       attrs.password = password;
-      const user = Parse.Object._create('_User');
+      var user = Parse.Object._create("_User");
       return user.signUp(attrs, options);
     },
 
@@ -5877,9 +5908,9 @@
      *     the login completes.
      * @see Parse.User#logIn
      */
-    logIn(username, password, options) {
-      const user = Parse.Object._create('_User');
-      user._finishFetch({ username, password });
+    logIn: function(username, password, options) {
+      var user = Parse.Object._create("_User");
+      user._finishFetch({ username: username, password: password });
       return user.logIn(options);
     },
 
@@ -5888,7 +5919,7 @@
      * session from disk, log out of linked services, and future calls to
      * <code>current</code> will return <code>null</code>.
      */
-    logOut() {
+    logOut: function() {
       if (Parse.User._currentUser !== null) {
         Parse.User._currentUser._logOutWithAll();
         Parse.User._currentUser._isCurrentUser = false;
@@ -5910,10 +5941,10 @@
      *     forgot their password.
      * @param {Object} options A Backbone-style options object.
      */
-    requestPasswordReset(email, options) {
-      const json = { email };
+    requestPasswordReset: function(email, options) {
+      var json = { email: email };
       options.error = Parse.Query._wrapError(options.error, options);
-      Parse._request('requestPasswordReset', null, null, 'POST', json, options);
+      Parse._request("requestPasswordReset", null, null, "POST", json, options);
     },
 
     /**
@@ -5921,27 +5952,29 @@
      * either from memory or localStorage, if necessary.
      * @return {Parse.Object} The currently logged in Parse.User.
      */
-    current() {
+    current: function() {
       if (Parse.User._currentUser) {
         return Parse.User._currentUser;
       }
 
       if (Parse.User._currentUserMatchesDisk) {
+        
         return Parse.User._currentUser;
       }
 
       // Load the user from local storage.
       Parse.User._currentUserMatchesDisk = true;
 
-      const userData = Parse.localStorage.getItem(Parse._getParsePath(
+      var userData = Parse.localStorage.getItem(Parse._getParsePath(
           Parse.User._CURRENT_USER_KEY));
       if (!userData) {
+        
         return null;
       }
-      Parse.User._currentUser = new Parse.Object._create('_User');
+      Parse.User._currentUser = new Parse.Object._create("_User");
       Parse.User._currentUser._isCurrentUser = true;
 
-      const json = JSON.parse(userData);
+      var json = JSON.parse(userData);
       Parse.User._currentUser.id = json._id;
       delete json._id;
       Parse.User._currentUser._sessionToken = json._sessionToken;
@@ -5957,7 +5990,7 @@
     /**
      * Persists a user as currentUser to localStorage, and into the singleton.
      */
-    _saveCurrentUser(user) {
+    _saveCurrentUser: function(user) {
       if (Parse.User._currentUser !== user) {
         Parse.User.logOut();
       }
@@ -5965,7 +5998,7 @@
       Parse.User._currentUser = user;
       Parse.User._currentUserMatchesDisk = true;
 
-      const json = user.toJSON();
+      var json = user.toJSON();
       json._id = user.id;
       json._sessionToken = user._sessionToken;
       Parse.localStorage.setItem(
@@ -5973,7 +6006,7 @@
           JSON.stringify(json));
     },
 
-    _registerAuthenticationProvider(provider) {
+    _registerAuthenticationProvider: function(provider) {
       Parse.User._authProviders[provider.getAuthType()] = provider;
       // Synchronize the current user with the auth provider.
       if (Parse.User.current()) {
@@ -5981,20 +6014,20 @@
       }
     },
 
-    _logInWith(provider, options) {
-      const user = new Parse.User();
+    _logInWith: function(provider, options) {
+      var user = new Parse.User();
       return user._linkWith(provider, options);
-    },
+    }
 
   });
 }(this));
 
 
 // Parse.Query is a way to create a list of Parse.Objects.
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Creates a new parse Parse.Query for the given Parse.Object subclass.
@@ -6007,7 +6040,7 @@
    * <code>find</code> method. For example, this sample code fetches all objects
    * of class <code>MyClass</code>. It calls a different function depending on
    * whether the fetch succeeded or not.
-   *
+   * 
    * <pre>
    * var query = new Parse.Query(MyClass);
    * query.find({
@@ -6019,12 +6052,12 @@
    *     // error is an instance of Parse.Error.
    *   }
    * });</pre></p>
-   *
+   * 
    * <p>A Parse.Query can also be used to retrieve a single object whose id is
    * known, through the get method. For example, this sample code fetches an
    * object of class <code>MyClass</code> and id <code>myId</code>. It calls a
    * different function depending on whether the fetch succeeded or not.
-   *
+   * 
    * <pre>
    * var query = new Parse.Query(MyClass);
    * query.get(myId, {
@@ -6036,7 +6069,7 @@
    *     // error is an instance of Parse.Error.
    *   }
    * });</pre></p>
-   *
+   * 
    * <p>A Parse.Query can also be used to count the number of objects that match
    * the query without retrieving all of those objects. For example, this
    * sample code counts the number of objects of the class <code>MyClass</code>
@@ -6052,7 +6085,7 @@
    *   }
    * });</pre></p>
    */
-  Parse.Query = function (objectClass) {
+  Parse.Query = function(objectClass) {
     if (_.isString(objectClass)) {
       objectClass = Parse.Object._getSubclass(objectClass);
     }
@@ -6078,19 +6111,19 @@
    * @param {...Parse.Query} var_args The list of queries to OR.
    * @return {Parse.Query} The query that is the OR of the passed in queries.
    */
-  Parse.Query.or = function () {
-    const queries = _.toArray(arguments);
-    let className = null;
-    _.each(queries, (q) => {
+  Parse.Query.or = function() {
+    var queries = _.toArray(arguments);
+    var className = null;
+    _.each(queries, function(q) {
       if (_.isNull(className)) {
         className = q.className;
       }
 
       if (className !== q.className) {
-        throw 'All queries must be for the same class';
+        throw "All queries must be for the same class";
       }
     });
-    const query = new Parse.Query(className);
+    var query = new Parse.Query(className);
     query._orQuery(queries);
     return query;
   };
@@ -6104,29 +6137,29 @@
      * @param {} objectId The id of the object to be fetched.
      * @param {Object} options A Backbone-style options object.
      */
-    get(objectId, options) {
-      const self = this;
-      const success = options.success || function () {};
-      const error = options.error || function () {};
-      const promise = new Parse.Promise();
+    get: function(objectId, options) {
+      var self = this;
+      var success = options.success || function() {};
+      var error = options.error || function() {};
+      var promise = new Parse.Promise();
 
       /** ignore */
-      const ajaxOptions = {
-        error(errorObject) {
+      var ajaxOptions = {
+        error: function(errorObject) {
           error(null, errorObject);
           promise.reject(errorObject);
         },
-        success(response) {
+        success: function(response) {
           if (response) {
             success(response);
             promise.resolve(response);
           } else {
-            const errorObject = new Parse.Error(Parse.Error.OBJECT_NOT_FOUND,
-                                              'Object not found.');
+            var errorObject = new Parse.Error(Parse.Error.OBJECT_NOT_FOUND,
+                                              "Object not found.");
             error(null, errorObject);
             promise.reject(errorObject);
           }
-        },
+        }
       };
 
       self.equalTo('objectId', objectId);
@@ -6138,13 +6171,13 @@
      * Returns a JSON representation of this query.
      * @return {Object}
      */
-    toJSON() {
-      const params = {
-        where: this._where,
+    toJSON: function() {
+      var params = {
+        where: this._where
       };
 
       if (this._include.length > 0) {
-        params.include = this._include.join(',');
+        params.include = this._include.join(",");
       }
       if (this._limit >= 0) {
         params.limit = this._limit;
@@ -6156,7 +6189,7 @@
         params.order = this._order;
       }
 
-      Parse._each(this._extraOptions, (v, k) => {
+      Parse._each(this._extraOptions, function(v, k) {
         params[k] = v;
       });
 
@@ -6172,18 +6205,18 @@
      * @return {Parse.Promise} A promise that is resolved with the results when
      * the query completes.
      */
-    find(options) {
-      const self = this;
+    find: function(options) {
+      var self = this;
       options = options || {};
-      const success = options.success || function () {};
-      const promise = new Parse.Promise();
+      var success = options.success || function() {};
+      var promise = new Parse.Promise();
 
       /** ignore */
-      const ajaxOptions = {
+      var ajaxOptions = {
         error: options.error,
-        success(response) {
-          const results = _.map(response.results, (json) => {
-            let obj;
+        success: function(response) {
+          var results = _.map(response.results, function(json) {
+            var obj;
             if (response.className) {
               obj = new Parse.Object(response.className);
             } else {
@@ -6194,13 +6227,13 @@
           });
           success(results);
           promise.resolve(results);
-        },
+        }
       };
 
-      const params = this.toJSON();
+      var params = this.toJSON();
       ajaxOptions.error = Parse.Query._wrapError(options.error, ajaxOptions,
                                                  promise);
-      Parse._request('classes', this.className, null, 'GET', params,
+      Parse._request("classes", this.className, null, "GET", params,
                      ajaxOptions);
       return promise;
     },
@@ -6214,27 +6247,27 @@
      * @return {Parse.Promise} A promise that is resolved with the count when
      * the query completes.
      */
-    count(options) {
-      const self = this;
+    count: function(options) {
+      var self = this;
       options = options || {};
-      const success = options.success || function () {};
-      const promise = new Parse.Promise();
+      var success = options.success || function() {};
+      var promise = new Parse.Promise();
 
       /** ignore */
-      const ajaxOptions = {
+      var ajaxOptions = {
         error: options.error,
-        success(response) {
+        success: function(response) {
           success(response.count);
           promise.resolve(response.count);
-        },
+        }
       };
 
-      const params = this.toJSON();
+      var params = this.toJSON();
       params.limit = 0;
       params.count = 1;
       ajaxOptions.error = Parse.Query._wrapError(options.error, ajaxOptions,
                                                  promise);
-      Parse._request('classes', this.className, null, 'GET', params,
+      Parse._request("classes", this.className, null, "GET", params,
                      ajaxOptions);
       return promise;
     },
@@ -6249,31 +6282,31 @@
      * @return {Parse.Promise} A promise that is resolved with the object when
      * the query completes.
      */
-    first(options) {
-      const self = this;
+    first: function(options) {
+      var self = this;
       options = options || {};
-      const success = options.success || function () {};
-      const promise = new Parse.Promise();
+      var success = options.success || function() {};
+      var promise = new Parse.Promise();
 
       /** ignore */
-      const ajaxOptions = {
+      var ajaxOptions = {
         error: options.error,
-        success(response) {
-          const result = _.map(response.results, (json) => {
-            const obj = new self.objectClass();
+        success: function(response) {
+          var result = _.map(response.results, function(json) {
+            var obj = new self.objectClass();
             obj._finishFetch(json, true);
             return obj;
           })[0];
           success(result);
           promise.resolve(result);
-        },
+        }
       };
 
-      const params = this.toJSON();
+      var params = this.toJSON();
       params.limit = 1;
       ajaxOptions.error = Parse.Query._wrapError(options.error, ajaxOptions,
                                                  promise);
-      Parse._request('classes', this.className, null, 'GET', params,
+      Parse._request("classes", this.className, null, "GET", params,
                      ajaxOptions);
       return promise;
     },
@@ -6282,11 +6315,11 @@
      * Returns a new instance of Parse.Collection backed by this query.
      * @return {Parse.Collection}
      */
-    collection(items, options) {
+    collection: function(items, options) {
       options = options || {};
       return new Parse.Collection(items, _.extend(options, {
         model: this.objectClass,
-        query: this,
+        query: this
       }));
     },
 
@@ -6297,7 +6330,7 @@
      * @param {Number} n the number of results to skip.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    skip(n) {
+    skip: function(n) {
       this._skip = n;
       return this;
     },
@@ -6307,7 +6340,7 @@
      * @param {Number} n the number of results to limit to.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    limit(n) {
+    limit: function(n) {
       this._limit = n;
       return this;
     },
@@ -6319,7 +6352,7 @@
      * @param value The value that the Parse.Object must contain.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    equalTo(key, value) {
+    equalTo: function(key, value) {
       this._where[key] = Parse._encode(value);
       return this;
     },
@@ -6327,7 +6360,7 @@
     /**
      * Helper for condition queries
      */
-    _addCondition(key, condition, value) {
+    _addCondition: function(key, condition, value) {
       // Check if we already have a condition
       if (!this._where[key]) {
         this._where[key] = {};
@@ -6343,8 +6376,8 @@
      * @param value The value that must not be equalled.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    notEqualTo(key, value) {
-      this._addCondition(key, '$ne', value);
+    notEqualTo: function(key, value) {
+      this._addCondition(key, "$ne", value);
       return this;
     },
 
@@ -6355,8 +6388,8 @@
      * @param value The value that provides an upper bound.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    lessThan(key, value) {
-      this._addCondition(key, '$lt', value);
+    lessThan: function(key, value) {
+      this._addCondition(key, "$lt", value);
       return this;
     },
 
@@ -6367,8 +6400,8 @@
      * @param value The value that provides an lower bound.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    greaterThan(key, value) {
-      this._addCondition(key, '$gt', value);
+    greaterThan: function(key, value) {
+      this._addCondition(key, "$gt", value);
       return this;
     },
 
@@ -6379,8 +6412,8 @@
      * @param value The value that provides an upper bound.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    lessThanOrEqualTo(key, value) {
-      this._addCondition(key, '$lte', value);
+    lessThanOrEqualTo: function(key, value) {
+      this._addCondition(key, "$lte", value);
       return this;
     },
 
@@ -6391,8 +6424,8 @@
      * @param value The value that provides an lower bound.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    greaterThanOrEqualTo(key, value) {
-      this._addCondition(key, '$gte', value);
+    greaterThanOrEqualTo: function(key, value) {
+      this._addCondition(key, "$gte", value);
       return this;
     },
 
@@ -6403,8 +6436,8 @@
      * @param {Array} values The values that will match.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    containedIn(key, values) {
-      this._addCondition(key, '$in', values);
+    containedIn: function(key, values) {
+      this._addCondition(key, "$in", values);
       return this;
     },
 
@@ -6415,8 +6448,8 @@
      * @param {Array} values The values that will not match.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    notContainedIn(key, values) {
-      this._addCondition(key, '$nin', values);
+    notContainedIn: function(key, values) {
+      this._addCondition(key, "$nin", values);
       return this;
     },
 
@@ -6426,8 +6459,8 @@
      * @param {String} key The key that should exist.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    exists(key) {
-      this._addCondition(key, '$exists', true);
+    exists: function(key) {
+      this._addCondition(key, "$exists", true);
       return this;
     },
 
@@ -6436,8 +6469,8 @@
      * @param {String} key The key that should not exist
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    doesNotExist(key) {
-      this._addCondition(key, '$exists', false);
+    doesNotExist: function(key) {
+      this._addCondition(key, "$exists", false);
       return this;
     },
 
@@ -6449,17 +6482,17 @@
      * @param {RegExp} regex The regular expression pattern to match.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    matches(key, regex, modifiers) {
-      this._addCondition(key, '$regex', regex);
-      if (!modifiers) { modifiers = ''; }
-      // Javascript regex options support mig as inline options but store them
+    matches: function(key, regex, modifiers) {
+      this._addCondition(key, "$regex", regex);
+      if (!modifiers) { modifiers = ""; }
+      // Javascript regex options support mig as inline options but store them 
       // as properties of the object. We support mi & should migrate them to
       // modifiers
       if (regex.ignoreCase) { modifiers += 'i'; }
       if (regex.multiline) { modifiers += 'm'; }
 
       if (modifiers && modifiers.length) {
-        this._addCondition(key, '$options', modifiers);
+        this._addCondition(key, "$options", modifiers);
       }
       return this;
     },
@@ -6472,10 +6505,10 @@
      * @param {Parse.Query} query The query that should match.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    matchesQuery(key, query) {
-      const queryJSON = query.toJSON();
+    matchesQuery: function(key, query) {
+      var queryJSON = query.toJSON();
       queryJSON.className = query.className;
-      this._addCondition(key, '$inQuery', queryJSON);
+      this._addCondition(key, "$inQuery", queryJSON);
       return this;
     },
 
@@ -6487,10 +6520,10 @@
      * @param {Parse.Query} query The query that should not match.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    doesNotMatchQuery(key, query) {
-      const queryJSON = query.toJSON();
+    doesNotMatchQuery: function(key, query) {
+      var queryJSON = query.toJSON();
       queryJSON.className = query.className;
-      this._addCondition(key, '$notInQuery', queryJSON);
+      this._addCondition(key, "$notInQuery", queryJSON);
       return this;
     },
 
@@ -6505,10 +6538,10 @@
      * @param {Parse.Query} query The query to run.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    matchesKeyInQuery(key, queryKey, query) {
-      const queryJSON = query.toJSON();
+    matchesKeyInQuery: function(key, queryKey, query) {
+      var queryJSON = query.toJSON();
       queryJSON.className = query.className;
-      this._addCondition(key, '$select',
+      this._addCondition(key, "$select",
                          { key: queryKey, query: queryJSON });
       return this;
     },
@@ -6523,10 +6556,10 @@
      * @param {Parse.Query} query The query to run.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    doesNotMatchKeyInQuery(key, queryKey, query) {
-      const queryJSON = query.toJSON();
+    doesNotMatchKeyInQuery: function(key, queryKey, query) {
+      var queryJSON = query.toJSON();
       queryJSON.className = query.className;
-      this._addCondition(key, '$dontSelect',
+      this._addCondition(key, "$dontSelect",
                          { key: queryKey, query: queryJSON });
       return this;
     },
@@ -6536,8 +6569,10 @@
      * @param {Array} queries
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    _orQuery(queries) {
-      const queryJSON = _.map(queries, q => q.toJSON().where);
+    _orQuery: function(queries) {
+      var queryJSON = _.map(queries, function(q) {
+        return q.toJSON().where;
+      });
 
       this._where.$or = queryJSON;
       return this;
@@ -6548,8 +6583,8 @@
      * Surrounding with \Q .. \E does this, we just need to escape \E's in
      * the text separately.
      */
-    _quote(s) {
-      return `\\Q${s.replace('\\E', '\\E\\\\E\\Q')}\\E`;
+    _quote: function(s) {
+      return "\\Q" + s.replace("\\E", "\\E\\\\E\\Q") + "\\E";
     },
 
     /**
@@ -6559,8 +6594,8 @@
      * @param {String} substring The substring that the value must contain.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    contains(key, value) {
-      this._addCondition(key, '$regex', this._quote(value));
+    contains: function(key, value) {
+      this._addCondition(key, "$regex", this._quote(value));
       return this;
     },
 
@@ -6572,8 +6607,8 @@
      * @param {String} prefix The substring that the value must start with.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    startsWith(key, value) {
-      this._addCondition(key, '$regex', `^${this._quote(value)}`);
+    startsWith: function(key, value) {
+      this._addCondition(key, "$regex", "^" + this._quote(value));
       return this;
     },
 
@@ -6584,30 +6619,30 @@
      * @param {String} suffix The substring that the value must end with.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    endsWith(key, value) {
-      this._addCondition(key, '$regex', `${this._quote(value)}$`);
+    endsWith: function(key, value) {
+      this._addCondition(key, "$regex", this._quote(value) + "$");
       return this;
     },
 
     /**
      * Sorts the results in ascending order by the given key.
-     *
+     * 
      * @param {String} key The key to order by.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    ascending(key) {
+    ascending: function(key) {
       this._order = key;
       return this;
     },
 
     /**
      * Sorts the results in descending order by the given key.
-     *
+     * 
      * @param {String} key The key to order by.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    descending(key) {
-      this._order = `-${key}`;
+    descending: function(key) {
+      this._order = "-" + key;
       return this;
     },
 
@@ -6618,12 +6653,12 @@
      * @param {Parse.GeoPoint} point The reference Parse.GeoPoint that is used.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    near(key, point) {
+    near: function(key, point) {
       if (!(point instanceof Parse.GeoPoint)) {
         // Try to cast it to a GeoPoint, so that near("loc", [20,30]) works.
         point = new Parse.GeoPoint(point);
       }
-      this._addCondition(key, '$nearSphere', point);
+      this._addCondition(key, "$nearSphere", point);
       return this;
     },
 
@@ -6635,9 +6670,9 @@
      * @param maxDistance Maximum distance (in radians) of results to return.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    withinRadians(key, point, distance) {
+    withinRadians: function(key, point, distance) {
       this.near(key, point);
-      this._addCondition(key, '$maxDistance', distance);
+      this._addCondition(key, "$maxDistance", distance);
       return this;
     },
 
@@ -6651,7 +6686,7 @@
      *     return.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    withinMiles(key, point, distance) {
+    withinMiles: function(key, point, distance) {
       return this.withinRadians(key, point, distance / 3958.8);
     },
 
@@ -6665,7 +6700,7 @@
      *     to return.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    withinKilometers(key, point, distance) {
+    withinKilometers: function(key, point, distance) {
       return this.withinRadians(key, point, distance / 6371.0);
     },
 
@@ -6680,14 +6715,14 @@
      *     The upper-right inclusive corner of the box.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    withinGeoBox(key, southwest, northeast) {
+    withinGeoBox: function(key, southwest, northeast) {
       if (!(southwest instanceof Parse.GeoPoint)) {
         southwest = new Parse.GeoPoint(southwest);
       }
       if (!(northeast instanceof Parse.GeoPoint)) {
         northeast = new Parse.GeoPoint(northeast);
       }
-      this._addCondition(key, '$within', { $box: [southwest, northeast] });
+      this._addCondition(key, '$within', { '$box': [southwest, northeast] });
       return this;
     },
 
@@ -6697,22 +6732,22 @@
      * @param {String} key The name of the key to include.
      * @return {Parse.Query} Returns the query, so you can chain this call.
      */
-    include(key) {
+    include: function(key) {
       if (_.isArray(key)) {
         this._include = this._include.concat(key);
       } else {
         this._include.push(key);
       }
       return this;
-    },
+    }
   };
 
   // Wrap an optional error callback with a fallback error event.
-  Parse.Query._wrapError = function (onError, options, promise) {
-    return function (response) {
-      let error;
+  Parse.Query._wrapError = function(onError, options, promise) {
+    return function(response) {
+      var error;
       if (response.responseText) {
-        const errorJSON = JSON.parse(response.responseText);
+        var errorJSON = JSON.parse(response.responseText);
         if (errorJSON) {
           error = new Parse.Error(errorJSON.code, errorJSON.error);
         }
@@ -6728,58 +6763,60 @@
   };
 }(this));
 
-/* global FB: false */
-(function (root) {
+/*global FB: false */
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
-  const PUBLIC_KEY = '*';
-
-  let initialized = false;
-  let requestedPermissions;
-  let initOptions;
-  const provider = {
-    authenticate(options) {
-      const self = this;
-      FB.login((response) => {
+  var PUBLIC_KEY = "*";
+  
+  var initialized = false;
+  var requestedPermissions;
+  var initOptions;
+  var provider = {
+    authenticate: function(options) {
+      var self = this;
+      FB.login(function(response) {
         if (response.authResponse) {
           if (options.success) {
             options.success(self, {
               id: response.authResponse.userID,
               access_token: response.authResponse.accessToken,
               expiration_date: new Date(response.authResponse.expiresIn * 1000 +
-                  (new Date()).getTime()).toJSON(),
+                  (new Date()).getTime()).toJSON()
             });
           }
-        } else if (options.error) {
-          options.error(self, response);
+        } else {
+          if (options.error) {
+            options.error(self, response);
+          }
         }
       }, {
-        scope: requestedPermissions,
+        scope: requestedPermissions
       });
     },
-    restoreAuthentication(authData) {
+    restoreAuthentication: function(authData) {
       if (authData) {
-        const authResponse = {
+        var authResponse = {
           userID: authData.id,
           accessToken: authData.access_token,
           expiresIn: (Parse._parseDate(authData.expiration_date).getTime() -
-              (new Date()).getTime()) / 1000,
+              (new Date()).getTime()) / 1000
         };
-        const newOptions = _.clone(initOptions);
+        var newOptions = _.clone(initOptions);
         newOptions.authResponse = authResponse;
         FB.init(newOptions);
       }
       return true;
     },
-    getAuthType() {
-      return 'facebook';
+    getAuthType: function() {
+      return "facebook";
     },
-    deauthenticate() {
+    deauthenticate: function() {
       this.restoreAuthentication(null);
       FB.logout();
-    },
+    }
   };
 
   /**
@@ -6802,33 +6839,33 @@
      *   "https://developers.facebook.com/docs/reference/javascript/FB.init/">
      *   FB.init()</a>
      */
-    init(options) {
-      if (typeof (FB) === 'undefined') {
-        throw 'The Javascript Facebook SDK must be loaded before calling init.';
-      }
+    init: function(options) {
+      if (typeof(FB) === 'undefined') {
+        throw "The Javascript Facebook SDK must be loaded before calling init.";
+      } 
       initOptions = _.clone(options);
       FB.init(initOptions);
       Parse.User._registerAuthenticationProvider(provider);
       initialized = true;
     },
-
+    
     /**
      * Gets whether the user has their account linked to Facebook.
-     *
+     * 
      * @param {Parse.User} user User to check for a facebook link.
      *     The user must be logged in on this device.
      * @return {Boolean} <code>true</code> if the user has their account
      *     linked to Facebook.
      */
-    isLinked(user) {
-      return user._isLinked('facebook');
+    isLinked: function(user) {
+      return user._isLinked("facebook");
     },
-
+    
     /**
      * Logs in a user using Facebook. This method delegates to the Facebook
      * SDK to authenticate the user, and then automatically logs in (or
      * creates, in the case where it is a new user) a Parse.User.
-     *
+     * 
      * @param {String, Object} permissions The permissions required for Facebook
      *    log in.  This is a comma-separated string of permissions.
      *    Alternatively, supply a Facebook authData object as described in our
@@ -6837,19 +6874,20 @@
      * @param {Object} options Standard options object with success and error
      *    callbacks.
      */
-    logIn(permissions, options) {
+    logIn: function(permissions, options) {
       if (!permissions || _.isString(permissions)) {
         if (!initialized) {
-          throw 'You must initialize FacebookUtils before calling logIn.';
+          throw "You must initialize FacebookUtils before calling logIn.";
         }
         requestedPermissions = permissions;
-        return Parse.User._logInWith('facebook', options);
+        return Parse.User._logInWith("facebook", options);
+      } else {
+        var newOptions = _.clone(options);
+        newOptions.authData = permissions;
+        return Parse.User._logInWith("facebook", newOptions);
       }
-      const newOptions = _.clone(options);
-      newOptions.authData = permissions;
-      return Parse.User._logInWith('facebook', newOptions);
     },
-
+    
     /**
      * Links Facebook to an existing PFUser. This method delegates to the
      * Facebook SDK to authenticate the user, and then automatically links
@@ -6858,236 +6896,238 @@
      * @param {Parse.User} user User to link to Facebook. This must be the
      *     current user.
      * @param {String, Object} permissions The permissions required for Facebook
-     *    log in.  This is a comma-separated string of permissions.
+     *    log in.  This is a comma-separated string of permissions. 
      *    Alternatively, supply a Facebook authData object as described in our
      *    REST API docs if you want to handle getting facebook auth tokens
      *    yourself.
      * @param {Object} options Standard options object with success and error
      *    callbacks.
      */
-    link(user, permissions, options) {
+    link: function(user, permissions, options) {
       if (!permissions || _.isString(permissions)) {
         if (!initialized) {
-          throw 'You must initialize FacebookUtils before calling link.';
+          throw "You must initialize FacebookUtils before calling link.";
         }
         requestedPermissions = permissions;
-        return user._linkWith('facebook', options);
+        return user._linkWith("facebook", options);
+      } else {
+        var newOptions = _.clone(options);
+        newOptions.authData = permissions;
+        return user._linkWith("facebook", newOptions);
       }
-      const newOptions = _.clone(options);
-      newOptions.authData = permissions;
-      return user._linkWith('facebook', newOptions);
     },
-
+    
     /**
-     * Unlinks the Parse.User from a Facebook account.
-     *
+     * Unlinks the Parse.User from a Facebook account. 
+     * 
      * @param {Parse.User} user User to unlink from Facebook. This must be the
      *     current user.
      * @param {Object} options Standard options object with success and error
      *    callbacks.
      */
-    unlink(user, options) {
+    unlink: function(user, options) {
       if (!initialized) {
-        throw 'You must initialize FacebookUtils before calling unlink.';
+        throw "You must initialize FacebookUtils before calling unlink.";
       }
-      return user._unlinkFrom('facebook', options);
-    },
+      return user._unlinkFrom("facebook", options);
+    }
   };
+  
 }(this));
 
-/* global _: false, document: false, window: false, navigator: false */
-(function (root) {
+/*global _: false, document: false, window: false, navigator: false */
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * History serves as a global router (per frame) to handle hashchange
    * events or pushState, match the appropriate route, and trigger
    * callbacks. You shouldn't ever have to create one of these yourself
    * — you should use the reference to <code>Parse.history</code>
-   * that will be created for you automatically if you make use of
+   * that will be created for you automatically if you make use of 
    * Routers with routes.
    * @class
-   *
-   * <p>A fork of Backbone.History, provided for your convenience.  If you
-   * use this class, you must also include jQuery, or another library
+   *   
+   * <p>A fork of Backbone.History, provided for your convenience.  If you 
+   * use this class, you must also include jQuery, or another library 
    * that provides a jQuery-compatible $ function.  For more information,
    * see the <a href="http://documentcloud.github.com/backbone/#History">
    * Backbone documentation</a>.</p>
    * <p><strong><em>Available in the client SDK only.</em></strong></p>
    */
-  Parse.History = function () {
+  Parse.History = function() {
     this.handlers = [];
     _.bindAll(this, 'checkUrl');
   };
 
   // Cached regex for cleaning leading hashes and slashes .
-  const routeStripper = /^[#\/]/;
+  var routeStripper = /^[#\/]/;
 
   // Cached regex for detecting MSIE.
-  const isExplorer = /msie [\w.]+/;
+  var isExplorer = /msie [\w.]+/;
 
   // Has the history handling already been started?
   Parse.History.started = false;
 
   // Set up all inheritable **Parse.History** properties and methods.
   _.extend(Parse.History.prototype, Parse.Events,
-    /** @lends Parse.History.prototype */ {
+           /** @lends Parse.History.prototype */ {
 
     // The default interval to poll for hash changes, if necessary, is
     // twenty times a second.
-      interval: 50,
+    interval: 50,
 
     // Gets the true hash value. Cannot use location.hash directly due to bug
     // in Firefox where location.hash will always be decoded.
-      getHash(windowOverride) {
-        const loc = windowOverride ? windowOverride.location : window.location;
-        const match = loc.href.match(/#(.*)$/);
-        return match ? match[1] : '';
-      },
+    getHash: function(windowOverride) {
+      var loc = windowOverride ? windowOverride.location : window.location;
+      var match = loc.href.match(/#(.*)$/);
+      return match ? match[1] : '';
+    },
 
     // Get the cross-browser normalized URL fragment, either from the URL,
     // the hash, or the override.
-      getFragment(fragment, forcePushState) {
-        if (Parse._isNullOrUndefined(fragment)) {
-          if (this._hasPushState || forcePushState) {
-            fragment = window.location.pathname;
-            const search = window.location.search;
-            if (search) {
-              fragment += search;
-            }
-          } else {
-            fragment = this.getHash();
+    getFragment: function(fragment, forcePushState) {
+      if (Parse._isNullOrUndefined(fragment)) {
+        if (this._hasPushState || forcePushState) {
+          fragment = window.location.pathname;
+          var search = window.location.search;
+          if (search) {
+            fragment += search;
           }
+        } else {
+          fragment = this.getHash();
         }
-        if (!fragment.indexOf(this.options.root)) {
-          fragment = fragment.substr(this.options.root.length);
-        }
-        return fragment.replace(routeStripper, '');
-      },
+      }
+      if (!fragment.indexOf(this.options.root)) {
+        fragment = fragment.substr(this.options.root.length);
+      }
+      return fragment.replace(routeStripper, '');
+    },
 
     /**
      * Start the hash change handling, returning `true` if the current
      * URL matches an existing route, and `false` otherwise.
      */
-      start(options) {
-        if (Parse.History.started) {
-          throw new Error('Parse.history has already been started');
-        }
-        Parse.History.started = true;
+    start: function(options) {
+      if (Parse.History.started) {
+        throw new Error("Parse.history has already been started");
+      }
+      Parse.History.started = true;
 
       // Figure out the initial configuration. Do we need an iframe?
       // Is pushState desired ... is it available?
-        this.options = _.extend({}, { root: '/' }, this.options, options);
-        this._wantsHashChange = this.options.hashChange !== false;
-        this._wantsPushState = !!this.options.pushState;
-        this._hasPushState = !!(this.options.pushState &&
+      this.options = _.extend({}, {root: '/'}, this.options, options);
+      this._wantsHashChange = this.options.hashChange !== false;
+      this._wantsPushState = !!this.options.pushState;
+      this._hasPushState = !!(this.options.pushState && 
                               window.history &&
                               window.history.pushState);
-        const fragment = this.getFragment();
-        const docMode = document.documentMode;
-        const oldIE = (isExplorer.exec(navigator.userAgent.toLowerCase()) &&
+      var fragment = this.getFragment();
+      var docMode = document.documentMode;
+      var oldIE = (isExplorer.exec(navigator.userAgent.toLowerCase()) &&
                    (!docMode || docMode <= 7));
 
-        if (oldIE) {
-          this.iframe = Parse.$('<iframe src="javascript:0" tabindex="-1" />')
+      if (oldIE) {
+        this.iframe = Parse.$('<iframe src="javascript:0" tabindex="-1" />')
                       .hide().appendTo('body')[0].contentWindow;
-          this.navigate(fragment);
-        }
+        this.navigate(fragment);
+      }
 
       // Depending on whether we're using pushState or hashes, and whether
       // 'onhashchange' is supported, determine how we check the URL state.
-        if (this._hasPushState) {
-          Parse.$(window).bind('popstate', this.checkUrl);
-        } else if (this._wantsHashChange &&
+      if (this._hasPushState) {
+        Parse.$(window).bind('popstate', this.checkUrl);
+      } else if (this._wantsHashChange &&
                  ('onhashchange' in window) &&
                  !oldIE) {
-          Parse.$(window).bind('hashchange', this.checkUrl);
-        } else if (this._wantsHashChange) {
-          this._checkUrlInterval = window.setInterval(this.checkUrl,
+        Parse.$(window).bind('hashchange', this.checkUrl);
+      } else if (this._wantsHashChange) {
+        this._checkUrlInterval = window.setInterval(this.checkUrl,
                                                     this.interval);
-        }
+      }
 
       // Determine if we need to change the base url, for a pushState link
       // opened by a non-pushState browser.
-        this.fragment = fragment;
-        const loc = window.location;
-        const atRoot = loc.pathname === this.options.root;
+      this.fragment = fragment;
+      var loc = window.location;
+      var atRoot  = loc.pathname === this.options.root;
 
       // If we've started off with a route from a `pushState`-enabled browser,
       // but we're currently in a browser that doesn't support it...
-        if (this._wantsHashChange &&
-          this._wantsPushState &&
+      if (this._wantsHashChange && 
+          this._wantsPushState && 
           !this._hasPushState &&
           !atRoot) {
-          this.fragment = this.getFragment(null, true);
-          window.location.replace(`${this.options.root}#${this.fragment}`);
+        this.fragment = this.getFragment(null, true);
+        window.location.replace(this.options.root + '#' + this.fragment);
         // Return immediately as browser will do redirect to new url
-          return true;
+        return true;
 
       // Or if we've started out with a hash-based route, but we're currently
       // in a browser where it could be `pushState`-based instead...
-        } else if (this._wantsPushState &&
-                 this._hasPushState &&
+      } else if (this._wantsPushState &&
+                 this._hasPushState && 
                  atRoot &&
                  loc.hash) {
-          this.fragment = this.getHash().replace(routeStripper, '');
-          window.history.replaceState({}, document.title,
-            `${loc.protocol}//${loc.host}${this.options.root}${this.fragment}`);
-        }
+        this.fragment = this.getHash().replace(routeStripper, '');
+        window.history.replaceState({}, document.title,
+            loc.protocol + '//' + loc.host + this.options.root + this.fragment);
+      }
 
-        if (!this.options.silent) {
-          return this.loadUrl();
-        }
-      },
+      if (!this.options.silent) {
+        return this.loadUrl();
+      }
+    },
 
     // Disable Parse.history, perhaps temporarily. Not useful in a real app,
     // but possibly useful for unit testing Routers.
-      stop() {
-        Parse.$(window).unbind('popstate', this.checkUrl)
+    stop: function() {
+      Parse.$(window).unbind('popstate', this.checkUrl)
                      .unbind('hashchange', this.checkUrl);
-        window.clearInterval(this._checkUrlInterval);
-        Parse.History.started = false;
-      },
+      window.clearInterval(this._checkUrlInterval);
+      Parse.History.started = false;
+    },
 
     // Add a route to be tested when the fragment changes. Routes added later
     // may override previous routes.
-      route(route, callback) {
-        this.handlers.unshift({ route, callback });
-      },
+    route: function(route, callback) {
+      this.handlers.unshift({route: route, callback: callback});
+    },
 
     // Checks the current URL to see if it has changed, and if it has,
     // calls `loadUrl`, normalizing across the hidden iframe.
-      checkUrl(e) {
-        let current = this.getFragment();
-        if (current === this.fragment && this.iframe) {
-          current = this.getFragment(this.getHash(this.iframe));
-        }
-        if (current === this.fragment) {
-          return false;
-        }
-        if (this.iframe) {
-          this.navigate(current);
-        }
-        if (!this.loadUrl()) {
-          this.loadUrl(this.getHash());
-        }
-      },
+    checkUrl: function(e) {
+      var current = this.getFragment();
+      if (current === this.fragment && this.iframe) {
+        current = this.getFragment(this.getHash(this.iframe));
+      }
+      if (current === this.fragment) {
+        return false;
+      }
+      if (this.iframe) {
+        this.navigate(current);
+      }
+      if (!this.loadUrl()) {
+       this.loadUrl(this.getHash());
+      }
+    },
 
     // Attempt to load the current URL fragment. If a route succeeds with a
     // match, returns `true`. If no defined routes matches the fragment,
     // returns `false`.
-      loadUrl(fragmentOverride) {
-        const fragment = this.fragment = this.getFragment(fragmentOverride);
-        const matched = _.any(this.handlers, (handler) => {
-          if (handler.route.test(fragment)) {
-            handler.callback(fragment);
-            return true;
-          }
-        });
-        return matched;
-      },
+    loadUrl: function(fragmentOverride) {
+      var fragment = this.fragment = this.getFragment(fragmentOverride);
+      var matched = _.any(this.handlers, function(handler) {
+        if (handler.route.test(fragment)) {
+          handler.callback(fragment);
+          return true;
+        }
+      });
+      return matched;
+    },
 
     // Save a fragment into the hash history, or replace the URL state if the
     // 'replace' option is passed. You are responsible for properly URL-encoding
@@ -7097,71 +7137,71 @@
     // route callback be fired (not usually desirable), or `replace: true`, if
     // you wish to modify the current URL without adding an entry to the
     // history.
-      navigate(fragment, options) {
-        if (!Parse.History.started) {
-          return false;
-        }
-        if (!options || options === true) {
-          options = { trigger: options };
-        }
-        let frag = (fragment || '').replace(routeStripper, '');
-        if (this.fragment === frag) {
-          return;
-        }
+    navigate: function(fragment, options) {
+      if (!Parse.History.started) {
+        return false;
+      }
+      if (!options || options === true) {
+        options = {trigger: options};
+      }
+      var frag = (fragment || '').replace(routeStripper, '');
+      if (this.fragment === frag) {
+        return;
+      }
 
       // If pushState is available, we use it to set the fragment as a real URL.
-        if (this._hasPushState) {
-          if (frag.indexOf(this.options.root) !== 0) {
-            frag = this.options.root + frag;
-          }
-          this.fragment = frag;
-          const replaceOrPush = options.replace ? 'replaceState' : 'pushState';
-          window.history[replaceOrPush]({}, document.title, frag);
+      if (this._hasPushState) {
+        if (frag.indexOf(this.options.root) !== 0) {
+          frag = this.options.root + frag;
+        }
+        this.fragment = frag;
+        var replaceOrPush = options.replace ? 'replaceState' : 'pushState';
+        window.history[replaceOrPush]({}, document.title, frag);
 
       // If hash changes haven't been explicitly disabled, update the hash
       // fragment to store history.
-        } else if (this._wantsHashChange) {
-          this.fragment = frag;
-          this._updateHash(window.location, frag, options.replace);
-          if (this.iframe &&
+      } else if (this._wantsHashChange) {
+        this.fragment = frag;
+        this._updateHash(window.location, frag, options.replace);
+        if (this.iframe &&
             (frag !== this.getFragment(this.getHash(this.iframe)))) {
           // Opening and closing the iframe tricks IE7 and earlier
           // to push a history entry on hash-tag change.
           // When replace is true, we don't want this.
-            if (!options.replace) {
-              this.iframe.document.open().close();
-            }
-            this._updateHash(this.iframe.location, frag, options.replace);
+          if (!options.replace) {
+            this.iframe.document.open().close();
           }
+          this._updateHash(this.iframe.location, frag, options.replace);
+        }
 
       // If you've told us that you explicitly don't want fallback hashchange-
       // based history, then `navigate` becomes a page refresh.
-        } else {
-          window.location.assign(this.options.root + fragment);
-        }
-        if (options.trigger) {
-          this.loadUrl(fragment);
-        }
-      },
+      } else {
+        window.location.assign(this.options.root + fragment);
+      }
+      if (options.trigger) {
+        this.loadUrl(fragment);
+      }
+    },
 
     // Update the hash location, either replacing the current entry, or adding
     // a new one to the browser history.
-      _updateHash(location, fragment, replace) {
-        if (replace) {
-          const s = location.toString().replace(/(javascript:|#).*$/, '');
-          location.replace(`${s}#${fragment}`);
-        } else {
-          location.hash = fragment;
-        }
-      },
-    });
+    _updateHash: function(location, fragment, replace) {
+      if (replace) {
+        var s = location.toString().replace(/(javascript:|#).*$/, '');
+        location.replace(s + '#' + fragment);
+      } else {
+        location.hash = fragment;
+      }
+    }
+  });
 }(this));
 
-/* global _: false*/
-(function (root) {
+/*global _: false*/
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
    * Routers map faux-URLs to actions, and fire events when routes are
@@ -7174,7 +7214,7 @@
    * documentation</a>.</p>
    * <p><strong><em>Available in the client SDK only.</em></strong></p>
    */
-  Parse.Router = function (options) {
+  Parse.Router = function(options) {
     options = options || {};
     if (options.routes) {
       this.routes = options.routes;
@@ -7185,19 +7225,19 @@
 
   // Cached regular expressions for matching named param parts and splatted
   // parts of route strings.
-  const namedParam = /:\w+/g;
-  const splatParam = /\*\w+/g;
-  const escapeRegExp = /[\-\[\]{}()+?.,\\\^\$\|#\s]/g;
+  var namedParam    = /:\w+/g;
+  var splatParam    = /\*\w+/g;
+  var escapeRegExp  = /[\-\[\]{}()+?.,\\\^\$\|#\s]/g;
 
   // Set up all inheritable **Parse.Router** properties and methods.
   _.extend(Parse.Router.prototype, Parse.Events,
-    /** @lends Parse.Router.prototype */ {
+           /** @lends Parse.Router.prototype */ {
 
     /**
      * Initialize is an empty function by default. Override it with your own
      * initialization logic.
      */
-      initialize() {},
+    initialize: function(){},
 
     /**
      * Manually bind a single named route to a callback. For example:
@@ -7206,70 +7246,70 @@
      *       ...
      *     });</pre>
      */
-      route(route, name, callback) {
-        Parse.history = Parse.history || new Parse.History();
-        if (!_.isRegExp(route)) {
-          route = this._routeToRegExp(route);
+    route: function(route, name, callback) {
+      Parse.history = Parse.history || new Parse.History();
+      if (!_.isRegExp(route)) {
+        route = this._routeToRegExp(route);
+      } 
+      if (!callback) {
+        callback = this[name];
+      }
+      Parse.history.route(route, _.bind(function(fragment) {
+        var args = this._extractParameters(route, fragment);
+        if (callback) {
+          callback.apply(this, args);
         }
-        if (!callback) {
-          callback = this[name];
-        }
-        Parse.history.route(route, _.bind(function (fragment) {
-          const args = this._extractParameters(route, fragment);
-          if (callback) {
-            callback.apply(this, args);
-          }
-          this.trigger.apply(this, [`route:${name}`].concat(args));
-          Parse.history.trigger('route', this, name, args);
-        }, this));
-        return this;
-      },
+        this.trigger.apply(this, ['route:' + name].concat(args));
+        Parse.history.trigger('route', this, name, args);
+      }, this));
+      return this;
+    },
 
     /**
      * Whenever you reach a point in your application that you'd
      * like to save as a URL, call navigate in order to update the
-     * URL. If you wish to also call the route function, set the
+     * URL. If you wish to also call the route function, set the 
      * trigger option to true. To update the URL without creating
      * an entry in the browser's history, set the replace option
      * to true.
      */
-      navigate(fragment, options) {
-        Parse.history.navigate(fragment, options);
-      },
+    navigate: function(fragment, options) {
+      Parse.history.navigate(fragment, options);
+    },
 
     // Bind all defined routes to `Parse.history`. We have to reverse the
     // order of the routes here to support behavior where the most general
     // routes can be defined at the bottom of the route map.
-      _bindRoutes() {
-        if (!this.routes) {
-          return;
+    _bindRoutes: function() {
+      if (!this.routes) { 
+        return;
+      }
+      var routes = [];
+      for (var route in this.routes) {
+        if (this.routes.hasOwnProperty(route)) {
+          routes.unshift([route, this.routes[route]]);
         }
-        const routes = [];
-        for (const route in this.routes) {
-          if (this.routes.hasOwnProperty(route)) {
-            routes.unshift([route, this.routes[route]]);
-          }
-        }
-        for (let i = 0, l = routes.length; i < l; i++) {
-          this.route(routes[i][0], routes[i][1], this[routes[i][1]]);
-        }
-      },
+      }
+      for (var i = 0, l = routes.length; i < l; i++) {
+        this.route(routes[i][0], routes[i][1], this[routes[i][1]]);
+      }
+    },
 
     // Convert a route string into a regular expression, suitable for matching
     // against the current location hash.
-      _routeToRegExp(route) {
-        route = route.replace(escapeRegExp, '\\$&')
+    _routeToRegExp: function(route) {
+      route = route.replace(escapeRegExp, '\\$&')
                    .replace(namedParam, '([^\/]+)')
                    .replace(splatParam, '(.*?)');
-        return new RegExp(`^${route}$`);
-      },
+      return new RegExp('^' + route + '$');
+    },
 
     // Given a route, and a URL fragment that it matches, return the array of
     // extracted parameters.
-      _extractParameters(route, fragment) {
-        return route.exec(fragment).slice(1);
-      },
-    });
+    _extractParameters: function(route, fragment) {
+      return route.exec(fragment).slice(1);
+    }
+  });
 
   /**
    * @function
@@ -7279,13 +7319,13 @@
    */
   Parse.Router.extend = Parse._extend;
 }(this));
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
-  const _ = Parse._;
+  var Parse = root.Parse;
+  var _ = Parse._;
 
   /**
-   *
+   * 
    *
    * @namespace Contains functions for calling and declaring
    * <a href="/docs/cloud_code_guide#functions">cloud functions</a>.
@@ -7304,18 +7344,18 @@
      * handles an error running the cloud function.  Both functions are
      * optional.  Both functions take a single argument.
      */
-    run(name, data, options) {
-      const oldOptions = options;
-      const newOptions = _.clone(options);
-      newOptions.success = function (resp) {
-        const results = Parse._decode(null, resp);
+    run: function(name, data, options) {
+      var oldOptions = options;
+      var newOptions = _.clone(options);
+      newOptions.success = function(resp) {
+        var results = Parse._decode(null, resp);
         if (oldOptions.success) {
           oldOptions.success(results.result);
         }
       };
 
       newOptions.error = Parse.Cloud._wrapError(oldOptions.error, options);
-      Parse._request('functions',
+      Parse._request("functions",
                      name,
                      null,
                      'POST',
@@ -7323,12 +7363,12 @@
                      newOptions);
     },
 
-    _wrapError(onError, options) {
-      return function (response) {
+    _wrapError: function(onError, options) {
+      return function(response) {
         if (onError) {
-          let error = new Parse.Error(-1, response.responseText);
+          var error = new Parse.Error(-1, response.responseText);
           if (response.responseText) {
-            const errorJSON = JSON.parse(response.responseText);
+            var errorJSON = JSON.parse(response.responseText);
             if (errorJSON) {
               error = new Parse.Error(errorJSON.code, errorJSON.error);
             }
@@ -7336,15 +7376,15 @@
           onError(error, options);
         }
       };
-    },
+    }
   };
 }(this));
 
-(function (root) {
+(function(root) {
   root.Parse = root.Parse || {};
-  const Parse = root.Parse;
+  var Parse = root.Parse;
 
-  Parse.Installation = Parse.Object.extend('_Installation');
+  Parse.Installation = Parse.Object.extend("_Installation");
 
   /**
    * Contains functions to deal with Push in Parse
@@ -7372,7 +7412,7 @@
    * an error function that takes a Parse.Error and will be called if the push
    * failed.
    */
-  Parse.Push.send = function (data, options) {
+  Parse.Push.send = function(data, options) {
     if (data.where) {
       data.where = data.where.toJSON().where;
     }
@@ -7388,9 +7428,9 @@
     if (data.expiration_time && data.expiration_time_interval) {
       throw "Both expiration_time and expiration_time_interval can't be set";
     }
-    const ajaxOptions = {
+    var ajaxOptions = {
       error: options.error,
-      success: options.success,
+      success: options.success
     };
     ajaxOptions.error = Parse.Query._wrapError(options.error, ajaxOptions);
     Parse._request('push', null, null, 'POST', data, ajaxOptions);
