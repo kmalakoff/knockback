@@ -211,6 +211,6 @@ class utils {
 
   // @nodoc
   static resolveModel(model) { if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) { return model.model(); } return model; }
-};
+}
 utils.initClass();
 kb.utils = utils;

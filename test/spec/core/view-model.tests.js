@@ -947,7 +947,7 @@ describe('view-model @quick @view-model', () => {
 
     const view_model = kb.viewModel(
       new kb.Model({ id: 1, name: 'Initial', date: new Date() }),
-      { statics: ['name', 'author', 'description', 'tags'], static_defaults: { author: '(none)', description: null } }
+      { statics: ['name', 'author', 'description', 'tags'], static_defaults: { author: '(none)', description: null } },
     );
 
     assert.ok(view_model.name && !ko.isObservable(view_model.name), 'name: non-observable');

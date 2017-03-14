@@ -14,11 +14,11 @@ const mocha = require('gulp-mocha');
 const nuget = require('nuget');
 
 const nugetGulp = () => es.map((file, callback) =>
-  nuget.pack(file, function(err, nupkg_file) {
+  nuget.pack(file, (err, nupkg_file) => {
     if (err) { return callback(err); }
-    return nuget.push(nupkg_file, function(err) { if (err) { return gutil.log(err); } else { return callback(); } });
-  })
-) ;
+    return nuget.push(nupkg_file, (err) => { if (err) { return gutil.log(err); } return callback(); });
+  }),
+);
 
 const HEADER = (module.exports = `\
 /*
@@ -36,10 +36,10 @@ function buildLibraries(callback) {
   const errors = [];
   gulp.src('config/builds/library/**/*.webpack.config.js')
     .pipe(webpack())
-    .pipe(header(HEADER, {pkg: require('./package.json')}))
+    .pipe(header(HEADER, { pkg: require('./package.json') }))
     .pipe(gulp.dest('.'))
     .on('end', callback);
-};
+}
 gulp.task('build', buildLibraries);
 
 gulp.task('watch', ['build'], () => {
@@ -49,24 +49,24 @@ gulp.task('watch', ['build'], () => {
 gulp.task('minify', ['build'], (callback) => {
   gulp.src(['knockback.js', 'knockback-*.js', '!*.min.js'])
     .pipe(uglify())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(header(HEADER, {pkg: require('./package.json')}))
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(header(HEADER, { pkg: require('./package.json') }))
     .pipe(gulp.dest(file => file.base))
     .on('end', callback);
 });
 
 function testNode(callback) {
-  const mochaOptions = {reporter: 'dot'};
-  gutil.log(`Running Node.js tests`);
+  const mochaOptions = { reporter: 'dot' };
+  gutil.log('Running Node.js tests');
   gulp.src('test/spec/**/*.tests.js')
     .pipe(mocha(mochaOptions))
-    .pipe(es.writeArray(callback));  
-};
+    .pipe(es.writeArray(callback));
+}
 
 function testBrowsers(callback) {
-  gutil.log(`Running Browser tests`);
+  gutil.log('Running Browser tests');
   (require('./config/karma/run'))(callback);
-};
+}
 
 // gulp.task('test-node', testNode);
 gulp.task('test-node', ['build'], testNode);
@@ -92,7 +92,7 @@ gulp.task('publish', ['minify'], (callback) => {
   queue.defer(callback =>
     gulp.src('packages/nuget/*.nuspec')
       .pipe(nugetGulp())
-      .on('end', callback)
+      .on('end', callback),
   );
   queue.await((err) => { !err || console.log(err); return process.exit(err ? 1 : 0); });
 });

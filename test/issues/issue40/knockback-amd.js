@@ -769,8 +769,8 @@
                 info = list[_i];
                 if (info.update && !info.rel_fn) {
                   if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
-                  continue;
-                }
+                    continue;
+                  }
                   !kb.statistics || addStatisticsEvent(model, event_name, info);
                   info.update();
                 }

@@ -102,16 +102,17 @@ kb.EventWatcher = class EventWatcher {
     const event_names = callback_info.event_selector ? callback_info.event_selector.split(' ') : ['change'];
     const model = this.ee;
 
-    event_names.forEach(event_name => {
-      if (!event_name) return // extra spaces
+    event_names.forEach((event_name) => {
+      if (!event_name) return; // extra spaces
 
-      let callbacks, info;
+      let callbacks,
+        info;
       if (!(callbacks = this.__kb.callbacks[event_name])) {
         callbacks = (this.__kb.callbacks[event_name] = {
           model: null,
           list: [],
           fn: (model) => {
-            callbacks.list.forEach(info => {
+            callbacks.list.forEach((info) => {
               if (!info.update) return;
               if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) return; // key doesn't match
               !kb.statistics || kb.statistics.addModelEvent({ name: event_name, model, key: info.key, path: info.path });
@@ -148,7 +149,7 @@ kb.EventWatcher = class EventWatcher {
       if (callbacks.model && (callbacks.model !== model)) { this._unbindCallbacks(event_name, callbacks, true); }
 
       if (!callbacks.model) { ((callbacks.model = model), model.bind(event_name, callbacks.fn)); }
-      callbacks.list.forEach(info => {
+      callbacks.list.forEach((info) => {
         if (!info.unbind_fn) { info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined; }
         (info.emitter ? info.emitter(model) : undefined);
       });
@@ -169,7 +170,7 @@ kb.EventWatcher = class EventWatcher {
       callbacks.model = null;
     }
 
-    callbacks.list.forEach(info => {
+    callbacks.list.forEach((info) => {
       if (info.unbind_fn) { (info.unbind_fn(), (info.unbind_fn = null)); }
       if (info.emitter && !skip_emitter && !kb.wasReleased(info.obj)) { info.emitter(null); }
     });

@@ -5,60 +5,58 @@
  * <http://documentcloud.github.com/underscore>
  * Available under MIT license <http://lodash.com/license>
  */
-;(function(window, undefined) {
-  'use strict';
-
+(function (window, undefined) {
   /** Detect free variable `exports` */
-  var freeExports = typeof exports == 'object' && exports &&
-    (typeof global == 'object' && global && global == global.global && (window = global), exports);
+  const freeExports = typeof exports === 'object' && exports &&
+    (typeof global === 'object' && global && global == global.global && (window = global), exports);
 
   /**
    * Detect the JScript [[DontEnum]] bug:
    * In IE < 9 an objects own properties, shadowing non-enumerable ones, are
    * made non-enumerable as well.
    */
-  var hasDontEnumBug = !{ 'valueOf': 0 }.propertyIsEnumerable('valueOf');
+  const hasDontEnumBug = !{ valueOf: 0 }.propertyIsEnumerable('valueOf');
 
   /** Used to generate unique IDs */
-  var idCounter = 0;
+  let idCounter = 0;
 
   /** Used to restore the original `_` reference in `noConflict` */
-  var oldDash = window._;
+  const oldDash = window._;
 
   /** Used to detect if a method is native */
-  var reNative = RegExp('^' + ({}.valueOf + '')
+  const reNative = RegExp(`^${(`${{}.valueOf}`)
     .replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&')
-    .replace(/valueOf|for [^\]]+/g, '.+?') + '$');
+    .replace(/valueOf|for [^\]]+/g, '.+?')}$`);
 
   /** Used to match tokens in template text */
-  var reToken = /__token__(\d+)/g;
+  const reToken = /__token__(\d+)/g;
 
   /** Used to match unescaped characters in HTML */
-  var reUnescapedHtml = /[&<"']/g;
+  const reUnescapedHtml = /[&<"']/g;
 
   /** Used to match unescaped characters in compiled string literals */
-  var reUnescapedString = /['\n\r\t\u2028\u2029\\]/g;
+  const reUnescapedString = /['\n\r\t\u2028\u2029\\]/g;
 
   /** Used to fix the JScript [[DontEnum]] bug */
-  var shadowed = [
+  const shadowed = [
     'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable',
-    'toLocaleString', 'toString', 'valueOf'
+    'toLocaleString', 'toString', 'valueOf',
   ];
 
   /** Used to make template sourceURLs easier to identify */
-  var templateCounter = 0;
+  let templateCounter = 0;
 
   /** Used to replace template delimiters */
-  var token = '__token__';
+  const token = '__token__';
 
   /** Used to store tokenized template text snippets */
-  var tokenized = [];
+  const tokenized = [];
 
   /** Detect if sourceURL syntax is usable without erroring */
   try {
     // Adobe's and Narwhal's JS engines will error
     var useSourceURL = (Function('//@')(), true);
-  } catch(e){ }
+  } catch (e) { }
 
   /**
    * Used to escape characters for inclusion in HTML.
@@ -66,53 +64,53 @@
    * special meaning unless they're part of a tag or an unquoted attribute value
    * http://mathiasbynens.be/notes/ambiguous-ampersands (semi-related fun fact)
    */
-  var htmlEscapes = {
+  const htmlEscapes = {
     '&': '&amp;',
     '<': '&lt;',
     '"': '&quot;',
-    "'": '&#x27;'
+    "'": '&#x27;',
   };
 
   /** Used to determine if values are of the language type Object */
-  var valueTypes = {
-    'boolean': false,
-    'function': true,
-    'object': true,
-    'number': false,
-    'string': false,
-    'undefined': false
+  const valueTypes = {
+    boolean: false,
+    function: true,
+    object: true,
+    number: false,
+    string: false,
+    undefined: false,
   };
 
   /** Used to escape characters for inclusion in compiled string literals */
-  var stringEscapes = {
+  const stringEscapes = {
     '\\': '\\',
     "'": "'",
     '\n': 'n',
     '\r': 'r',
     '\t': 't',
     '\u2028': 'u2028',
-    '\u2029': 'u2029'
+    '\u2029': 'u2029',
   };
 
   /** Object#toString result shortcuts */
-  var arrayClass = '[object Array]',
-      boolClass = '[object Boolean]',
-      dateClass = '[object Date]',
-      funcClass = '[object Function]',
-      numberClass = '[object Number]',
-      regexpClass = '[object RegExp]',
-      stringClass = '[object String]';
+  let arrayClass = '[object Array]',
+    boolClass = '[object Boolean]',
+    dateClass = '[object Date]',
+    funcClass = '[object Function]',
+    numberClass = '[object Number]',
+    regexpClass = '[object RegExp]',
+    stringClass = '[object String]';
 
   /** Native prototype shortcuts */
-  var ArrayProto = Array.prototype,
-      ObjectProto = Object.prototype;
+  let ArrayProto = Array.prototype,
+    ObjectProto = Object.prototype;
 
   /** Native method shortcuts */
-  var concat = ArrayProto.concat,
-      hasOwnProperty = ObjectProto.hasOwnProperty,
-      push = ArrayProto.push,
-      slice = ArrayProto.slice,
-      toString = ObjectProto.toString;
+  let concat = ArrayProto.concat,
+    hasOwnProperty = ObjectProto.hasOwnProperty,
+    push = ArrayProto.push,
+    slice = ArrayProto.slice,
+    toString = ObjectProto.toString;
 
   /* Used if `Function#bind` exists and is inferred to be fast (i.e. all but V8) */
   var nativeBind = reNative.test(nativeBind = slice.bind) &&
@@ -120,12 +118,12 @@
 
   /* Native method shortcuts for methods with the same name as other `lodash` methods */
   var nativeIsArray = reNative.test(nativeIsArray = Array.isArray) && nativeIsArray,
-      nativeIsFinite = window.isFinite,
-      nativeKeys = reNative.test(nativeKeys = Object.keys) && nativeKeys;
+    nativeIsFinite = window.isFinite,
+    nativeKeys = reNative.test(nativeKeys = Object.keys) && nativeKeys;
 
   /** Timer shortcuts */
-  var clearTimeout = window.clearTimeout,
-      setTimeout = window.setTimeout;
+  let clearTimeout = window.clearTimeout,
+    setTimeout = window.setTimeout;
 
   /*--------------------------------------------------------------------------*/
 
@@ -174,7 +172,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'escape': /<%-([\s\S]+?)%>/g,
+    escape: /<%-([\s\S]+?)%>/g,
 
     /**
      * Used to detect code to be evaluated.
@@ -183,7 +181,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'evaluate': /<%([\s\S]+?)%>/g,
+    evaluate: /<%([\s\S]+?)%>/g,
 
     /**
      * Used to detect `data` property values to inject.
@@ -192,7 +190,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'interpolate': /<%=([\s\S]+?)%>/g,
+    interpolate: /<%=([\s\S]+?)%>/g,
 
     /**
      * Used to reference the data object in the template text.
@@ -201,7 +199,7 @@
      * @memberOf _.templateSettings
      * @type String
      */
-    'variable': 'obj'
+    variable: 'obj',
   };
 
   /*--------------------------------------------------------------------------*/
@@ -213,7 +211,7 @@
    * @param {Obect} data The data object used to populate the text.
    * @returns {String} Returns the interpolated text.
    */
-  var iteratorTemplate = template(
+  const iteratorTemplate = template(
     // assign the `result` variable an initial value
     'var index, result<% if (init) { %> = <%= init %><% } %>;\n' +
     // add code to exit early or do so if the first argument is falsey
@@ -281,76 +279,76 @@
     // add code to the bottom of the iteration function
     '<%= bottom %>;\n' +
     // finally, return the `result`
-    'return result'
+    'return result',
   );
 
   /**
    * Reusable iterator options shared by
    * `every`, `filter`, `find`, `forEach`, `forIn`, `forOwn`, `map`, `reject`, and `some`.
    */
-  var baseIteratorOptions = {
-    'args': 'collection, callback, thisArg',
-    'init': 'collection',
-    'top':
+  const baseIteratorOptions = {
+    args: 'collection, callback, thisArg',
+    init: 'collection',
+    top:
       'if (!callback) {\n' +
       '  callback = identity\n' +
       '}\n' +
       'else if (thisArg) {\n' +
       '  callback = iteratorBind(callback, thisArg)\n' +
       '}',
-    'inLoop': 'callback(collection[index], index, collection)'
+    inLoop: 'callback(collection[index], index, collection)',
   };
 
   /** Reusable iterator options for `every` and `some` */
-  var everyIteratorOptions = {
-    'init': 'true',
-    'inLoop': 'if (!callback(collection[index], index, collection)) return !result'
+  const everyIteratorOptions = {
+    init: 'true',
+    inLoop: 'if (!callback(collection[index], index, collection)) return !result',
   };
 
   /** Reusable iterator options for `defaults` and `extend` */
-  var extendIteratorOptions = {
-    'args': 'object',
-    'init': 'object',
-    'top':
-      'for (var source, sourceIndex = 1, length = arguments.length; sourceIndex < length; sourceIndex++) {\n' +
-      '  source = arguments[sourceIndex];\n' +
-      (hasDontEnumBug ? '  if (source) {' : ''),
-    'loopExp': 'index in source',
-    'useHas': false,
-    'inLoop': 'object[index] = source[index]',
-    'bottom': (hasDontEnumBug ? '  }\n' : '') + '}'
+  const extendIteratorOptions = {
+    args: 'object',
+    init: 'object',
+    top:
+      `${'for (var source, sourceIndex = 1, length = arguments.length; sourceIndex < length; sourceIndex++) {\n' +
+      '  source = arguments[sourceIndex];\n'}${
+      hasDontEnumBug ? '  if (source) {' : ''}`,
+    loopExp: 'index in source',
+    useHas: false,
+    inLoop: 'object[index] = source[index]',
+    bottom: `${hasDontEnumBug ? '  }\n' : ''}}`,
   };
 
   /** Reusable iterator options for `filter` and `reject` */
-  var filterIteratorOptions = {
-    'init': '[]',
-    'inLoop': 'callback(collection[index], index, collection) && result.push(collection[index])'
+  const filterIteratorOptions = {
+    init: '[]',
+    inLoop: 'callback(collection[index], index, collection) && result.push(collection[index])',
   };
 
   /** Reusable iterator options for `find`, `forEach`, `forIn`, and `forOwn` */
-  var forEachIteratorOptions = {
-    'top': 'if (thisArg) callback = iteratorBind(callback, thisArg)'
+  const forEachIteratorOptions = {
+    top: 'if (thisArg) callback = iteratorBind(callback, thisArg)',
   };
 
   /** Reusable iterator options for `forIn` and `forOwn` */
-  var forOwnIteratorOptions = {
-    'inLoop': {
-      'object': baseIteratorOptions.inLoop
-    }
+  const forOwnIteratorOptions = {
+    inLoop: {
+      object: baseIteratorOptions.inLoop,
+    },
   };
 
  /** Reusable iterator options for `invoke`, `map`, and `pluck` */
-  var mapIteratorOptions = {
-    'init': '',
-    'exit': 'if (!collection) return []',
-    'beforeLoop': {
-      'array':  'result = Array(length)',
-      'object': 'result = []'
+  const mapIteratorOptions = {
+    init: '',
+    exit: 'if (!collection) return []',
+    beforeLoop: {
+      array: 'result = Array(length)',
+      object: 'result = []',
     },
-    'inLoop': {
-      'array':  'result[index] = callback(collection[index], index, collection)',
-      'object': 'result.push(callback(collection[index], index, collection))'
-    }
+    inLoop: {
+      array: 'result[index] = callback(collection[index], index, collection)',
+      object: 'result.push(callback(collection[index], index, collection))',
+    },
   };
 
   /*--------------------------------------------------------------------------*/
@@ -392,20 +390,20 @@
    * @returns {Function} Returns the compiled function.
    */
   function createIterator() {
-    var object,
-        prop,
-        value,
-        index = -1,
-        length = arguments.length;
+    let object,
+      prop,
+      value,
+      index = -1,
+      length = arguments.length;
 
     // merge options into a template data object
-    var data = {
-      'bottom': '',
-      'exit': '',
-      'init': '',
-      'top': '',
-      'arrayBranch': { 'beforeLoop': '', 'loopExp': '++index < length' },
-      'objectBranch': { 'beforeLoop': '' }
+    const data = {
+      bottom: '',
+      exit: '',
+      init: '',
+      top: '',
+      arrayBranch: { beforeLoop: '', loopExp: '++index < length' },
+      objectBranch: { beforeLoop: '' },
     };
 
     while (++index < length) {
@@ -414,8 +412,8 @@
         value = (value = object[prop]) == null ? '' : value;
         // keep this regexp explicit for the build pre-process
         if (/beforeLoop|loopExp|inLoop/.test(prop)) {
-          if (typeof value == 'string') {
-            value = { 'array': value, 'object': value };
+          if (typeof value === 'string') {
+            value = { array: value, object: value };
           }
           data.arrayBranch[prop] = value.array;
           data.objectBranch[prop] = value.object;
@@ -425,39 +423,39 @@
       }
     }
     // set additional template data values
-    var args = data.args,
-        arrayBranch = data.arrayBranch,
-        objectBranch = data.objectBranch,
-        firstArg = /^[^,]+/.exec(args)[0],
-        loopExp = objectBranch.loopExp,
-        iteratedObject = /\S+$/.exec(loopExp || firstArg)[0];
+    let args = data.args,
+      arrayBranch = data.arrayBranch,
+      objectBranch = data.objectBranch,
+      firstArg = /^[^,]+/.exec(args)[0],
+      loopExp = objectBranch.loopExp,
+      iteratedObject = /\S+$/.exec(loopExp || firstArg)[0];
 
     data.firstArg = firstArg;
     data.hasDontEnumBug = hasDontEnumBug;
-    data.hasExp = 'hasOwnProperty.call(' + iteratedObject + ', index)';
+    data.hasExp = `hasOwnProperty.call(${iteratedObject}, index)`;
     data.iteratedObject = iteratedObject;
     data.shadowed = shadowed;
     data.useHas = data.useHas !== false;
 
     if (!data.exit) {
-      data.exit = 'if (!' + firstArg + ') return result';
+      data.exit = `if (!${firstArg}) return result`;
     }
     if (firstArg == 'object' || !arrayBranch.inLoop) {
       data.arrayBranch = null;
     }
     if (!loopExp) {
-      objectBranch.loopExp = 'index in ' + iteratedObject;
+      objectBranch.loopExp = `index in ${iteratedObject}`;
     }
     // create the function factory
-    var factory = Function(
+    const factory = Function(
         'arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes, ' +
         'slice, stringClass, toString, undefined',
-      '"use strict"; return function(' + args + ') {\n' + iteratorTemplate(data) + '\n}'
+      `"use strict"; return function(${args}) {\n${iteratorTemplate(data)}\n}`,
     );
     // return the compiled function
     return factory(
       arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes,
-      slice, stringClass, toString
+      slice, stringClass, toString,
     );
   }
 
@@ -482,7 +480,7 @@
    * @returns {String} Returns the escaped character.
    */
   function escapeStringChar(match) {
-    return '\\' + stringEscapes[match];
+    return `\\${stringEscapes[match]}`;
   }
 
   /**
@@ -506,7 +504,7 @@
    * @returns {Function} Returns the new bound function.
    */
   function iteratorBind(func, thisArg) {
-    return function(value, index, object) {
+    return function (value, index, object) {
       return func.call(thisArg, value, index, object);
     };
   }
@@ -528,11 +526,11 @@
    * @param {Object} object The object to inspect.
    * @returns {Array} Returns a new array of property names.
    */
-  var shimKeys = createIterator({
-    'args': 'object',
-    'exit': 'if (!valueTypes[typeof object] || object === null) throw TypeError()',
-    'init': '[]',
-    'inLoop': 'result.push(index)'
+  const shimKeys = createIterator({
+    args: 'object',
+    exit: 'if (!valueTypes[typeof object] || object === null) throw TypeError()',
+    init: '[]',
+    inLoop: 'result.push(index)',
   });
 
   /**
@@ -544,8 +542,8 @@
    * @returns {String} Returns a token.
    */
   function tokenizeEscape(match, value) {
-    var index = tokenized.length;
-    tokenized[index] = "'+\n_.escape(" + value + ") +\n'";
+    const index = tokenized.length;
+    tokenized[index] = `'+\n_.escape(${value}) +\n'`;
     return token + index;
   }
 
@@ -558,8 +556,8 @@
    * @returns {String} Returns a token.
    */
   function tokenizeInterpolate(match, value) {
-    var index = tokenized.length;
-    tokenized[index] = "'+\n((__t = (" + value + ")) == null ? '' : __t) +\n'";
+    const index = tokenized.length;
+    tokenized[index] = `'+\n((__t = (${value})) == null ? '' : __t) +\n'`;
     return token + index;
   }
 
@@ -572,8 +570,8 @@
    * @returns {String} Returns a token.
    */
   function tokenizeEvaluate(match, value) {
-    var index = tokenized.length;
-    tokenized[index] = "';\n" + value + ";\n__p += '";
+    const index = tokenized.length;
+    tokenized[index] = `';\n${value};\n__p += '`;
     return token + index;
   }
 
@@ -595,10 +593,10 @@
    * _.contains([1, 2, 3], 3);
    * // => true
    */
-  var contains = createIterator({
-    'args': 'collection, target',
-    'init': 'false',
-    'inLoop': 'if (collection[index] === target) return true'
+  const contains = createIterator({
+    args: 'collection, target',
+    init: 'false',
+    inLoop: 'if (collection[index] === target) return true',
   });
 
   /**
@@ -620,7 +618,7 @@
    * _.every([true, 1, null, 'yes'], Boolean);
    * // => false
    */
-  var every = createIterator(baseIteratorOptions, everyIteratorOptions);
+  const every = createIterator(baseIteratorOptions, everyIteratorOptions);
 
   /**
    * Examines each value in a `collection`, returning an array of all values the
@@ -641,7 +639,7 @@
    * var evens = _.filter([1, 2, 3, 4, 5, 6], function(num) { return num % 2 == 0; });
    * // => [2, 4, 6]
    */
-  var filter = createIterator(baseIteratorOptions, filterIteratorOptions);
+  const filter = createIterator(baseIteratorOptions, filterIteratorOptions);
 
   /**
    * Examines each value in a `collection`, returning the first one the `callback`
@@ -663,9 +661,9 @@
    * var even = _.find([1, 2, 3, 4, 5, 6], function(num) { return num % 2 == 0; });
    * // => 2
    */
-  var find = createIterator(baseIteratorOptions, forEachIteratorOptions, {
-    'init': '',
-    'inLoop': 'if (callback(collection[index], index, collection)) return collection[index]'
+  const find = createIterator(baseIteratorOptions, forEachIteratorOptions, {
+    init: '',
+    inLoop: 'if (callback(collection[index], index, collection)) return collection[index]',
   });
 
   /**
@@ -690,7 +688,7 @@
    * _.forEach({ 'one': 1, 'two': 2, 'three': 3 }, alert);
    * // => alerts each number (order is not guaranteed)
    */
-  var forEach = createIterator(baseIteratorOptions, forEachIteratorOptions);
+  const forEach = createIterator(baseIteratorOptions, forEachIteratorOptions);
 
   /**
    * Invokes the method named by `methodName` on each element in the `collection`.
@@ -714,15 +712,15 @@
    * _.invoke([123, 456], String.prototype.split, '');
    * // => [['1', '2', '3'], ['4', '5', '6']]
    */
-  var invoke = createIterator(mapIteratorOptions, {
-    'args': 'collection, methodName',
-    'top':
+  const invoke = createIterator(mapIteratorOptions, {
+    args: 'collection, methodName',
+    top:
       'var args = slice.call(arguments, 2),\n' +
       '    isFunc = typeof methodName == \'function\'',
-    'inLoop': {
-      'array': 'result[index] = (isFunc ? methodName : collection[index][methodName]).apply(collection[index], args)',
-      'object': 'result.push((isFunc ? methodName : collection[index][methodName]).apply(collection[index], args))'
-    }
+    inLoop: {
+      array: 'result[index] = (isFunc ? methodName : collection[index][methodName]).apply(collection[index], args)',
+      object: 'result.push((isFunc ? methodName : collection[index][methodName]).apply(collection[index], args))',
+    },
   });
 
   /**
@@ -747,7 +745,7 @@
    * _.map({ 'one': 1, 'two': 2, 'three': 3 }, function(num) { return num * 3; });
    * // => [3, 6, 9] (order is not guaranteed)
    */
-  var map = createIterator(baseIteratorOptions, mapIteratorOptions);
+  const map = createIterator(baseIteratorOptions, mapIteratorOptions);
 
   /**
    * Retrieves the value of a specified property from all elements in
@@ -770,12 +768,12 @@
    * _.pluck(stooges, 'name');
    * // => ['moe', 'larry', 'curly']
    */
-  var pluck = createIterator(mapIteratorOptions, {
-    'args': 'collection, property',
-    'inLoop': {
-      'array':  'result[index] = collection[index][property]',
-      'object': 'result.push(collection[index][property])'
-    }
+  const pluck = createIterator(mapIteratorOptions, {
+    args: 'collection, property',
+    inLoop: {
+      array: 'result[index] = collection[index][property]',
+      object: 'result.push(collection[index][property])',
+    },
   });
 
   /**
@@ -799,23 +797,23 @@
    * var sum = _.reduce([1, 2, 3], function(memo, num) { return memo + num; });
    * // => 6
    */
-  var reduce = createIterator({
-    'args': 'collection, callback, accumulator, thisArg',
-    'init': 'accumulator',
-    'top':
+  const reduce = createIterator({
+    args: 'collection, callback, accumulator, thisArg',
+    init: 'accumulator',
+    top:
       'var noaccum = arguments.length < 3;\n' +
       'if (thisArg) callback = iteratorBind(callback, thisArg)',
-    'beforeLoop': {
-      'array': 'if (noaccum) result = collection[++index]'
+    beforeLoop: {
+      array: 'if (noaccum) result = collection[++index]',
     },
-    'inLoop': {
-      'array':
+    inLoop: {
+      array:
         'result = callback(result, collection[index], index, collection)',
-      'object':
+      object:
         'result = noaccum\n' +
         '  ? (noaccum = false, collection[index])\n' +
-        '  : callback(result, collection[index], index, collection)'
-    }
+        '  : callback(result, collection[index], index, collection)',
+    },
   });
 
   /**
@@ -841,10 +839,10 @@
       return accumulator;
     }
 
-    var length = collection.length,
-        noaccum = arguments.length < 3;
+    let length = collection.length,
+      noaccum = arguments.length < 3;
 
-    if(thisArg) {
+    if (thisArg) {
       callback = iteratorBind(callback, thisArg);
     }
     if (length === length >>> 0) {
@@ -857,8 +855,8 @@
       return accumulator;
     }
 
-    var prop,
-        props = keys(collection);
+    let prop,
+      props = keys(collection);
 
     length = props.length;
     if (length && noaccum) {
@@ -887,8 +885,8 @@
    * var odds = _.reject([1, 2, 3, 4, 5, 6], function(num) { return num % 2 == 0; });
    * // => [1, 3, 5]
    */
-  var reject = createIterator(baseIteratorOptions, filterIteratorOptions, {
-    'inLoop': '!' + filterIteratorOptions.inLoop
+  const reject = createIterator(baseIteratorOptions, filterIteratorOptions, {
+    inLoop: `!${filterIteratorOptions.inLoop}`,
   });
 
   /**
@@ -911,9 +909,9 @@
    * _.some([null, 0, 'yes', false]);
    * // => true
    */
-  var some = createIterator(baseIteratorOptions, everyIteratorOptions, {
-    'init': 'false',
-    'inLoop': everyIteratorOptions.inLoop.replace('!', '')
+  const some = createIterator(baseIteratorOptions, everyIteratorOptions, {
+    init: 'false',
+    inLoop: everyIteratorOptions.inLoop.replace('!', ''),
   });
 
   /**
@@ -937,7 +935,7 @@
     if (toString.call(collection.toArray) == funcClass) {
       return collection.toArray();
     }
-    var length = collection.length;
+    const length = collection.length;
     if (length === length >>> 0) {
       return slice.call(collection);
     }
@@ -961,12 +959,12 @@
    * // => [1, 2, 3]
    */
   function compact(array) {
-    var result = [];
+    const result = [];
     if (!array) {
       return result;
     }
-    var index = -1,
-        length = array.length;
+    let index = -1,
+      length = array.length;
 
     while (++index < length) {
       if (array[index]) {
@@ -993,13 +991,13 @@
    * // => [1, 3, 4]
    */
   function difference(array) {
-    var result = [];
+    const result = [];
     if (!array) {
       return result;
     }
-    var index = -1,
-        length = array.length,
-        flattened = concat.apply(result, slice.call(arguments, 1));
+    let index = -1,
+      length = array.length,
+      flattened = concat.apply(result, slice.call(arguments, 1));
 
     while (++index < length) {
       if (indexOf(flattened, array[index]) < 0) {
@@ -1053,13 +1051,13 @@
    * // => [1, 2, 3, [[4]]];
    */
   function flatten(array, shallow) {
-    var result = [];
+    const result = [];
     if (!array) {
       return result;
     }
-    var value,
-        index = -1,
-        length = array.length;
+    let value,
+      index = -1,
+      length = array.length;
 
     while (++index < length) {
       value = array[index];
@@ -1098,15 +1096,15 @@
    * // => { '3': ['one', 'two'], '5': ['three'] }
    */
   function groupBy(array, callback, thisArg) {
-    var result = {};
+    const result = {};
     if (!array) {
       return result;
     }
-    var prop,
-        value,
-        index = -1,
-        isFunc = typeof callback == 'function',
-        length = array.length;
+    let prop,
+      value,
+      index = -1,
+      isFunc = typeof callback === 'function',
+      length = array.length;
 
     if (isFunc && thisArg) {
       callback = iteratorBind(callback, thisArg);
@@ -1147,11 +1145,11 @@
     if (!array) {
       return -1;
     }
-    var index = -1,
-        length = array.length;
+    let index = -1,
+      length = array.length;
 
     if (fromIndex) {
-      if (typeof fromIndex == 'number') {
+      if (typeof fromIndex === 'number') {
         index = (fromIndex < 0 ? Math.max(0, length + fromIndex) : fromIndex) - 1;
       } else {
         index = sortedIndex(array, value);
@@ -1205,19 +1203,19 @@
    * // => [1, 2]
    */
   function intersection(array) {
-    var result = [];
+    const result = [];
     if (!array) {
       return result;
     }
-    var value,
-        index = -1,
-        length = array.length,
-        others = slice.call(arguments, 1);
+    let value,
+      index = -1,
+      length = array.length,
+      others = slice.call(arguments, 1);
 
     while (++index < length) {
       value = array[index];
       if (indexOf(result, value) < 0 &&
-          every(others, function(other) { return indexOf(other, value) > -1; })) {
+          every(others, other => indexOf(other, value) > -1)) {
         result.push(value);
       }
     }
@@ -1244,7 +1242,7 @@
    */
   function last(array, n, guard) {
     if (array) {
-      var length = array.length;
+      const length = array.length;
       return (n == undefined || guard) ? array[length - 1] : slice.call(array, -n || length);
     }
   }
@@ -1272,8 +1270,8 @@
     if (!array) {
       return -1;
     }
-    var index = array.length;
-    if (fromIndex && typeof fromIndex == 'number') {
+    let index = array.length;
+    if (fromIndex && typeof fromIndex === 'number') {
       index = (fromIndex < 0 ? Math.max(0, index + fromIndex) : Math.min(fromIndex, index - 1)) + 1;
     }
     while (index--) {
@@ -1309,15 +1307,15 @@
    * // => { 'name': 'curly', 'age': 60 };
    */
   function max(array, callback, thisArg) {
-    var computed = -Infinity,
-        result = computed;
+    let computed = -Infinity,
+      result = computed;
 
     if (!array) {
       return result;
     }
-    var current,
-        index = -1,
-        length = array.length;
+    let current,
+      index = -1,
+      length = array.length;
 
     if (!callback) {
       while (++index < length) {
@@ -1359,15 +1357,15 @@
    * // => 2
    */
   function min(array, callback, thisArg) {
-    var computed = Infinity,
-        result = computed;
+    let computed = Infinity,
+      result = computed;
 
     if (!array) {
       return result;
     }
-    var current,
-        index = -1,
-        length = array.length;
+    let current,
+      index = -1,
+      length = array.length;
 
     if (!callback) {
       while (++index < length) {
@@ -1426,9 +1424,9 @@
       start = 0;
     }
 
-    var index = -1,
-        length = Math.max(Math.ceil((end - start) / step), 0),
-        result = Array(length);
+    let index = -1,
+      length = Math.max(Math.ceil((end - start) / step), 0),
+      result = Array(length);
 
     while (++index < length) {
       result[index] = start;
@@ -1480,10 +1478,10 @@
     if (!array) {
       return [];
     }
-    var rand,
-        index = -1,
-        length = array.length,
-        result = Array(length);
+    let rand,
+      index = -1,
+      length = array.length,
+      result = Array(length);
 
     while (++index < length) {
       rand = Math.floor(Math.random() * (index + 1));
@@ -1522,25 +1520,25 @@
     if (!array) {
       return [];
     }
-    if (typeof callback == 'string') {
-      var prop = callback;
-      callback = function(array) { return array[prop]; };
+    if (typeof callback === 'string') {
+      const prop = callback;
+      callback = function (array) { return array[prop]; };
     } else if (thisArg) {
       callback = iteratorBind(callback, thisArg);
     }
-    var index = -1,
-        length = array.length,
-        result = Array(length);
+    let index = -1,
+      length = array.length,
+      result = Array(length);
 
     while (++index < length) {
       result[index] = {
-        'criteria': callback(array[index], index, array),
-        'value': array[index]
+        criteria: callback(array[index], index, array),
+        value: array[index],
       };
     }
-    result.sort(function(left, right) {
-      var a = left.criteria,
-          b = right.criteria;
+    result.sort((left, right) => {
+      let a = left.criteria,
+        b = right.criteria;
 
       if (a === undefined) {
         return 1;
@@ -1596,9 +1594,9 @@
     if (!array) {
       return 0;
     }
-    var mid,
-        low = 0,
-        high = array.length;
+    let mid,
+      low = 0,
+      high = array.length;
 
     if (callback) {
       if (thisArg) {
@@ -1633,10 +1631,10 @@
    * // => [1, 2, 3, 101, 10]
    */
   function union() {
-    var index = -1,
-        result = [],
-        flattened = concat.apply(result, arguments),
-        length = flattened.length;
+    let index = -1,
+      result = [],
+      flattened = concat.apply(result, arguments),
+      length = flattened.length;
 
     while (++index < length) {
       if (indexOf(result, flattened[index]) < 0) {
@@ -1678,17 +1676,17 @@
    * // => [1, 2, 3]
    */
   function uniq(array, isSorted, callback, thisArg) {
-    var result = [];
+    const result = [];
     if (!array) {
       return result;
     }
-    var computed,
-        index = -1,
-        length = array.length,
-        seen = [];
+    let computed,
+      index = -1,
+      length = array.length,
+      seen = [];
 
     // juggle arguments
-    if (typeof isSorted == 'function') {
+    if (typeof isSorted === 'function') {
       thisArg = callback;
       callback = isSorted;
       isSorted = false;
@@ -1727,13 +1725,13 @@
    * // => [2, 3, 4]
    */
   function without(array) {
-    var result = [];
+    const result = [];
     if (!array) {
       return result;
     }
-    var excluded = slice.call(arguments, 1),
-        index = -1,
-        length = array.length;
+    let excluded = slice.call(arguments, 1),
+      index = -1,
+      length = array.length;
 
     while (++index < length) {
       if (indexOf(excluded, array[index]) < 0) {
@@ -1763,9 +1761,9 @@
     if (!array) {
       return [];
     }
-    var index = -1,
-        length = max(pluck(arguments, 'length')),
-        result = Array(length);
+    let index = -1,
+      length = max(pluck(arguments, 'length')),
+      result = Array(length);
 
     while (++index < length) {
       result[index] = pluck(arguments, index);
@@ -1798,7 +1796,7 @@
     if (n < 1) {
       return func();
     }
-    return function() {
+    return function () {
       if (--n < 1) {
         return func.apply(this, arguments);
       }
@@ -1849,8 +1847,8 @@
    * // => 'hi, moe!'
    */
   function bind(func, thisArg) {
-    var methodName,
-        isFunc = toString.call(func) == funcClass;
+    let methodName,
+      isFunc = toString.call(func) == funcClass;
 
     // juggle arguments
     if (!isFunc) {
@@ -1859,16 +1857,16 @@
     }
     // use if `Function#bind` is faster
     else if (nativeBind) {
-      return nativeBind.call.apply(nativeBind, arguments);
+      return nativeBind.call(...arguments);
     }
 
-    var partialArgs = slice.call(arguments, 2);
+    const partialArgs = slice.call(arguments, 2);
 
     function bound() {
       // `Function#bind` spec
       // http://es5.github.com/#x15.3.4.5
-      var args = arguments,
-          thisBinding = thisArg;
+      let args = arguments,
+        thisBinding = thisArg;
 
       if (!isFunc) {
         func = thisArg[methodName];
@@ -1881,14 +1879,14 @@
       if (this instanceof bound) {
         // get `func` instance if `bound` is invoked in a `new` expression
         noop.prototype = func.prototype;
-        thisBinding = new noop;
+        thisBinding = new noop();
 
         // mimic the constructor's `return` behavior
         // http://es5.github.com/#x13.2.2
-        var result = func.apply(thisBinding, args);
+        const result = func.apply(thisBinding, args);
         return valueTypes[typeof result] && result !== null
           ? result
-          : thisBinding
+          : thisBinding;
       }
       return func.apply(thisBinding, args);
     }
@@ -1920,14 +1918,14 @@
    * // => When the button is clicked, `this.label` will have the correct value
    */
   function bindAll(object) {
-    var funcs = arguments,
-        index = 1;
+    let funcs = arguments,
+      index = 1;
 
     if (funcs.length == 1) {
       index = 0;
       funcs = functions(object);
     }
-    for (var length = funcs.length; index < length; index++) {
+    for (let length = funcs.length; index < length; index++) {
       object[funcs[index]] = bind(object[funcs[index]], object);
     }
     return object;
@@ -1952,10 +1950,10 @@
    * // => 'hi: moe!'
    */
   function compose() {
-    var funcs = arguments;
-    return function() {
-      var args = arguments,
-          length = funcs.length;
+    const funcs = arguments;
+    return function () {
+      let args = arguments,
+        length = funcs.length;
 
       while (length--) {
         args = [funcs[length].apply(this, args)];
@@ -1985,10 +1983,10 @@
    * jQuery(window).on('resize', lazyLayout);
    */
   function debounce(func, wait, immediate) {
-    var args,
-        result,
-        thisArg,
-        timeoutId;
+    let args,
+      result,
+      thisArg,
+      timeoutId;
 
     function delayed() {
       timeoutId = undefined;
@@ -1997,8 +1995,8 @@
       }
     }
 
-    return function() {
-      var isImmediate = immediate && !timeoutId;
+    return function () {
+      const isImmediate = immediate && !timeoutId;
       args = arguments;
       thisArg = this;
 
@@ -2030,8 +2028,8 @@
    * // => 'logged later' (Appears after one second.)
    */
   function delay(func, wait) {
-    var args = slice.call(arguments, 2);
-    return setTimeout(function() { return func.apply(undefined, args); }, wait);
+    const args = slice.call(arguments, 2);
+    return setTimeout(() => func(...args), wait);
   }
 
   /**
@@ -2050,8 +2048,8 @@
    * // returns from the function before `alert` is called
    */
   function defer(func) {
-    var args = slice.call(arguments, 1);
-    return setTimeout(function() { return func.apply(undefined, args); }, 1);
+    const args = slice.call(arguments, 1);
+    return setTimeout(() => func(...args), 1);
   }
 
   /**
@@ -2073,9 +2071,9 @@
    * });
    */
   function memoize(func, resolver) {
-    var cache = {};
-    return function() {
-      var prop = resolver ? resolver.apply(this, arguments) : arguments[0];
+    const cache = {};
+    return function () {
+      const prop = resolver ? resolver.apply(this, arguments) : arguments[0];
       return hasOwnProperty.call(cache, prop)
         ? cache[prop]
         : (cache[prop] = func.apply(this, arguments));
@@ -2099,10 +2097,10 @@
    * // Application is only created once.
    */
   function once(func) {
-    var result,
-        ran = false;
+    let result,
+      ran = false;
 
-    return function() {
+    return function () {
       if (ran) {
         return result;
       }
@@ -2132,12 +2130,12 @@
    * // => 'hi: moe'
    */
   function partial(func) {
-    var args = slice.call(arguments, 1),
-        argsLength = args.length;
+    let args = slice.call(arguments, 1),
+      argsLength = args.length;
 
-    return function() {
-      var result,
-          others = arguments;
+    return function () {
+      let result,
+        others = arguments;
 
       if (others.length) {
         args.length = argsLength;
@@ -2168,21 +2166,21 @@
    * jQuery(window).on('scroll', throttled);
    */
   function throttle(func, wait) {
-    var args,
-        result,
-        thisArg,
-        timeoutId,
-        lastCalled = 0;
+    let args,
+      result,
+      thisArg,
+      timeoutId,
+      lastCalled = 0;
 
     function trailingCall() {
-      lastCalled = new Date;
+      lastCalled = new Date();
       timeoutId = undefined;
       func.apply(thisArg, args);
     }
 
-    return function() {
-      var now = new Date,
-          remain = wait - (now - lastCalled);
+    return function () {
+      let now = new Date(),
+        remain = wait - (now - lastCalled);
 
       args = arguments;
       thisArg = this;
@@ -2190,8 +2188,7 @@
       if (remain <= 0) {
         lastCalled = now;
         result = func.apply(thisArg, args);
-      }
-      else if (!timeoutId) {
+      } else if (!timeoutId) {
         timeoutId = setTimeout(trailingCall, remain);
       }
       return result;
@@ -2220,8 +2217,8 @@
    * // => 'before, hello: moe, after'
    */
   function wrap(func, wrapper) {
-    return function() {
-      var args = [func];
+    return function () {
+      const args = [func];
       if (arguments.length) {
         push.apply(args, arguments);
       }
@@ -2268,8 +2265,8 @@
    * _.defaults(iceCream, { 'flavor': 'vanilla', 'sprinkles': 'rainbow' });
    * // => { 'flavor': 'chocolate', 'sprinkles': 'rainbow' }
    */
-  var defaults = createIterator(extendIteratorOptions, {
-    'inLoop': 'if (object[index] == undefined)' + extendIteratorOptions.inLoop
+  const defaults = createIterator(extendIteratorOptions, {
+    inLoop: `if (object[index] == undefined)${extendIteratorOptions.inLoop}`,
   });
 
   /**
@@ -2316,8 +2313,8 @@
    * });
    * // => alerts 'name' and 'bark' (order is not guaranteed)
    */
-  var forIn = createIterator(baseIteratorOptions, forEachIteratorOptions, forOwnIteratorOptions, {
-    'useHas': false
+  const forIn = createIterator(baseIteratorOptions, forEachIteratorOptions, forOwnIteratorOptions, {
+    useHas: false,
   });
 
   /**
@@ -2339,7 +2336,7 @@
    * });
    * // => alerts '0', '1', and 'length' (order is not guaranteed)
    */
-  var forOwn = createIterator(baseIteratorOptions, forEachIteratorOptions, forOwnIteratorOptions);
+  const forOwn = createIterator(baseIteratorOptions, forEachIteratorOptions, forOwnIteratorOptions);
 
   /**
    * Produces a sorted array of the enumerable properties, own and inherited,
@@ -2357,11 +2354,11 @@
    * // => ['all', 'any', 'bind', 'bindAll', 'clone', 'compact', 'compose', ...]
    */
   var functions = createIterator({
-    'args': 'object',
-    'init': '[]',
-    'useHas': false,
-    'inLoop': 'if (toString.call(object[index]) == funcClass) result.push(index)',
-    'bottom': 'result.sort()'
+    args: 'object',
+    init: '[]',
+    useHas: false,
+    inLoop: 'if (toString.call(object[index]) == funcClass) result.push(index)',
+    bottom: 'result.sort()',
   });
 
   /**
@@ -2399,12 +2396,12 @@
    * _.isArguments([1, 2, 3]);
    * // => false
    */
-  var isArguments = function(value) {
+  let isArguments = function (value) {
     return toString.call(value) == '[object Arguments]';
   };
   // fallback for browser like IE < 9 which detect `arguments` as `[object Object]`
   if (!isArguments(arguments)) {
-    isArguments = function(value) {
+    isArguments = function (value) {
       return !!(value && hasOwnProperty.call(value, 'callee'));
     };
   }
@@ -2425,7 +2422,7 @@
    * _.isArray([1, 2, 3]);
    * // => true
    */
-  var isArray = nativeIsArray || function(value) {
+  var isArray = nativeIsArray || function (value) {
     return toString.call(value) == arrayClass;
   };
 
@@ -2497,15 +2494,15 @@
    * _.isEmpty({});
    * // => true
    */
-  var isEmpty = createIterator({
-    'args': 'value',
-    'init': 'true',
-    'top':
+  const isEmpty = createIterator({
+    args: 'value',
+    init: 'true',
+    top:
       'var className = toString.call(value);\n' +
       'if (className == arrayClass || className == stringClass) return !value.length',
-    'inLoop': {
-      'object': 'return false'
-    }
+    inLoop: {
+      object: 'return false',
+    },
   });
 
   /**
@@ -2558,7 +2555,7 @@
       return b.isEqual(a);
     }
     // compare [[Class]] names
-    var className = toString.call(a);
+    const className = toString.call(a);
     if (className != toString.call(b)) {
       return false;
     }
@@ -2589,12 +2586,12 @@
                a.multiline == b.multiline &&
                a.ignoreCase == b.ignoreCase;
     }
-    if (typeof a != 'object' || typeof b != 'object') {
+    if (typeof a !== 'object' || typeof b !== 'object') {
       return false;
     }
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
     // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
-    var length = stack.length;
+    let length = stack.length;
     while (length--) {
       // Linear search. Performance is inversely proportional to the number of
       // unique nested structures.
@@ -2603,9 +2600,9 @@
       }
     }
 
-    var index = -1,
-        result = true,
-        size = 0;
+    let index = -1,
+      result = true,
+      size = 0;
 
     // add the first collection to the stack of traversed objects
     stack.push(a);
@@ -2764,7 +2761,7 @@
   function isNaN(value) {
     // `NaN` as a primitive is the only value that is not equal to itself
     // (perform the [[Class]] check first to avoid errors with some host objects in IE)
-    return toString.call(value) == numberClass && value != +value
+    return toString.call(value) == numberClass && value != +value;
   }
 
   /**
@@ -2870,9 +2867,9 @@
    * _.keys({ 'one': 1, 'two': 2, 'three': 3 });
    * // => ['one', 'two', 'three'] (order is not guaranteed)
    */
-  var keys = !nativeKeys ? shimKeys : function(object) {
+  var keys = !nativeKeys ? shimKeys : function (object) {
     // avoid iterating over the `prototype` property
-    return typeof object == 'function'
+    return typeof object === 'function'
       ? shimKeys(object)
       : nativeKeys(object);
   };
@@ -2893,11 +2890,11 @@
    * // => { 'name': 'moe', 'age': 40 }
    */
   function pick(object) {
-    var prop,
-        index = 0,
-        props = concat.apply(ArrayProto, arguments),
-        length = props.length,
-        result = {};
+    let prop,
+      index = 0,
+      props = concat.apply(ArrayProto, arguments),
+      length = props.length,
+      result = {};
 
     // start `index` at `1` to skip `object`
     while (++index < length) {
@@ -2932,7 +2929,7 @@
    * // => 5
    */
   function size(value) {
-    var className = toString.call(value);
+    const className = toString.call(value);
     return className == arrayClass || className == stringClass
       ? value.length
       : keys(value).length;
@@ -2952,9 +2949,9 @@
    * // => [1, 2, 3]
    */
   var values = createIterator({
-    'args': 'object',
-    'init': '[]',
-    'inLoop': 'result.push(object[index])'
+    args: 'object',
+    init: '[]',
+    inLoop: 'result.push(object[index])',
   });
 
   /*--------------------------------------------------------------------------*/
@@ -2974,7 +2971,7 @@
    * // => "Curly, Larry &amp; Moe"
    */
   function escape(string) {
-    return string == null ? '' : (string + '').replace(reUnescapedHtml, escapeHtmlChar);
+    return string == null ? '' : (`${string}`).replace(reUnescapedHtml, escapeHtmlChar);
   }
 
   /**
@@ -3019,15 +3016,15 @@
    * // => 'Larry'
    */
   function mixin(object) {
-    forEach(functions(object), function(methodName) {
-      var func = lodash[methodName] = object[methodName];
+    forEach(functions(object), (methodName) => {
+      const func = lodash[methodName] = object[methodName];
 
-      LoDash.prototype[methodName] = function() {
-        var args = [this._wrapped];
+      LoDash.prototype[methodName] = function () {
+        const args = [this._wrapped];
         if (arguments.length) {
           push.apply(args, arguments);
         }
-        var result = func.apply(lodash, args);
+        let result = func.apply(lodash, args);
         if (this._chain) {
           result = new LoDash(result);
           result._chain = true;
@@ -3087,7 +3084,7 @@
     if (!object) {
       return null;
     }
-    var value = object[property];
+    const value = object[property];
     return toString.call(value) == funcClass ? object[property]() : value;
   }
 
@@ -3145,12 +3142,12 @@
   function template(text, data, options) {
     options || (options = {});
 
-    var result,
-        defaults = lodash.templateSettings,
-        escapeDelimiter = options.escape,
-        evaluateDelimiter = options.evaluate,
-        interpolateDelimiter = options.interpolate,
-        variable = options.variable;
+    let result,
+      defaults = lodash.templateSettings,
+      escapeDelimiter = options.escape,
+      evaluateDelimiter = options.evaluate,
+      interpolateDelimiter = options.interpolate,
+      variable = options.variable;
 
     // use template defaults if no option is provided
     if (escapeDelimiter == null) {
@@ -3176,9 +3173,9 @@
 
     // escape characters that cannot be included in string literals and
     // detokenize delimiter code snippets
-    text = "__p='" + text
+    text = `__p='${text
       .replace(reUnescapedString, escapeStringChar)
-      .replace(reToken, detokenize) + "';\n";
+      .replace(reToken, detokenize)}';\n`;
 
     // clear stored code snippets
     tokenized.length = 0;
@@ -3186,22 +3183,22 @@
     // if `options.variable` is not specified, add `data` to the top of the scope chain
     if (!variable) {
       variable = defaults.variable;
-      text = 'with (' + variable + ' || {}) {\n' + text + '\n}\n';
+      text = `with (${variable} || {}) {\n${text}\n}\n`;
     }
 
-    text = 'function(' + variable + ') {\n' +
+    text = `function(${variable}) {\n` +
       'var __p, __t, __j = Array.prototype.join;\n' +
-      'function print() { __p += __j.call(arguments, \'\') }\n' +
-      text +
-      'return __p\n}';
+      `function print() { __p += __j.call(arguments, '') }\n${
+      text
+      }return __p\n}`;
 
     // add a sourceURL for easier debugging
     // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/#toc-sourceurl
     if (useSourceURL) {
-      text += '\n//@ sourceURL=/lodash/template/source[' + (templateCounter++) + ']';
+      text += `\n//@ sourceURL=/lodash/template/source[${templateCounter++}]`;
     }
 
-    result = Function('_', 'return ' + text)(lodash);
+    result = Function('_', `return ${text}`)(lodash);
 
     if (data) {
       return result(data);
@@ -3232,7 +3229,7 @@
    * // => also calls `genie.grantWish()` 3 times
    */
   function times(n, callback, thisArg) {
-    var index = -1;
+    let index = -1;
     if (thisArg) {
       while (++index < n) {
         callback.call(thisArg, index);
@@ -3259,7 +3256,7 @@
    * // => 'contact_104'
    */
   function uniqueId(prefix) {
-    var id = idCounter++;
+    const id = idCounter++;
     return prefix ? prefix + id : id;
   }
 
@@ -3485,11 +3482,11 @@
   LoDash.prototype.value = wrapperValue;
 
   // add all mutator Array functions to the wrapper.
-  forEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(methodName) {
-    var func = ArrayProto[methodName];
+  forEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], (methodName) => {
+    const func = ArrayProto[methodName];
 
-    LoDash.prototype[methodName] = function() {
-      var value = this._wrapped;
+    LoDash.prototype[methodName] = function () {
+      let value = this._wrapped;
       func.apply(value, arguments);
 
       // IE compatibility mode and IE < 9 have buggy Array `shift()` and `splice()`
@@ -3509,12 +3506,12 @@
   });
 
   // add all accessor Array functions to the wrapper.
-  forEach(['concat', 'join', 'slice'], function(methodName) {
-    var func = ArrayProto[methodName];
+  forEach(['concat', 'join', 'slice'], (methodName) => {
+    const func = ArrayProto[methodName];
 
-    LoDash.prototype[methodName] = function() {
-      var value = this._wrapped,
-          result = func.apply(value, arguments);
+    LoDash.prototype[methodName] = function () {
+      let value = this._wrapped,
+        result = func.apply(value, arguments);
 
       if (this._chain) {
         result = new LoDash(result);
@@ -3528,7 +3525,7 @@
 
   // expose Lo-Dash
   // some AMD build optimizers, like r.js, check for specific condition patterns like the following:
-  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+  if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
     // Expose Lo-Dash to the global object even when an AMD loader is present in
     // case Lo-Dash was injected by a third-party script and not intended to be
     // loaded as a module. The global assignment can be reverted in the Lo-Dash
@@ -3537,22 +3534,19 @@
 
     // define as an anonymous module so, through path mapping, it can be
     // referenced as the "underscore" module
-    define(function() {
-      return lodash;
-    });
+    define(() => lodash);
   }
   // check for `exports` after `define` in case a build optimizer adds an `exports` object
   else if (freeExports) {
     // in Node.js or RingoJS v0.8.0+
-    if (typeof module == 'object' && module && module.exports == freeExports) {
+    if (typeof module === 'object' && module && module.exports == freeExports) {
       (module.exports = lodash)._ = lodash;
     }
     // in Narwhal or RingoJS v0.7.0-
     else {
       freeExports._ = lodash;
     }
-  }
-  else {
+  } else {
     // in a browser or Rhino
     window._ = lodash;
   }

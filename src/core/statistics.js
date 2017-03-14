@@ -99,7 +99,7 @@ module.exports = kb.Statistics = class Statistics {
     const events = obj._events || obj._callbacks || {};
     const keys = key ? [key] : _.keys(events);
 
-    keys.forEach(key => {
+    keys.forEach((key) => {
       let node = events[key];
       if (node) {
         if (_.isArray(node)) {

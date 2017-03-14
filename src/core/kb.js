@@ -7,7 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _, Backbone;
+let _,
+  Backbone;
 var window = (window != null) ? window : global;
 const ko = require('knockout');
 
@@ -94,8 +95,8 @@ class kb {
     if ((!obj || (obj !== Object(obj))) || obj.__kb_released) return false; // must be an object and not already released
     if (ko.isObservable(obj) || (obj instanceof kb.ViewModel)) return true; // a known type that is releasable
     if ((typeof (obj) === 'function') || kb.isModel(obj) || kb.isCollection(obj)) return false; // a known type that is not releaseable
-    for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
-      var method = LIFECYCLE_METHODS[i];
+    for (let i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+      const method = LIFECYCLE_METHODS[i];
       if (typeof (obj[method]) === 'function') return true;
     }
 
@@ -135,9 +136,9 @@ class kb {
     }
 
     // releaseable signature
-    for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
-      var method = LIFECYCLE_METHODS[i];
-      if (typeof (obj[method]) === 'function') return obj[method].call(obj);;
+    for (let i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+      const method = LIFECYCLE_METHODS[i];
+      if (typeof (obj[method]) === 'function') return obj[method].call(obj);
     }
     if (!ko.isObservable(obj)) return this.releaseKeys(obj); // view model
   }
@@ -242,7 +243,7 @@ class kb {
   static _throwUnexpected(instance, message) { throw `${_.isString(instance) ? instance : instance.constructor.name}: ${message} is unexpected`; }
 
   // @nodoc
-  static publishMethods(observable, instance, methods) { methods.forEach(fn => { observable[fn] = kb._.bind(instance[fn], instance); return; }); }
+  static publishMethods(observable, instance, methods) { methods.forEach((fn) => { observable[fn] = kb._.bind(instance[fn], instance); }); }
 
   // @nodoc
   static peek(obs) { if (!ko.isObservable(obs)) { return obs; if (obs.peek) { return obs.peek(); return kb.ignore(() => obs()); } } }

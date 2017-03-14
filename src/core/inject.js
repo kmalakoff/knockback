@@ -143,9 +143,9 @@ kb.Inject = class Inject {
     findElements(root);
 
     // bind the view models
-    results.forEach(app => {
+    results.forEach((app) => {
       // evaluate the app data
-      var afterBinding,
+      let afterBinding,
         beforeBinding,
         expression,
         options;

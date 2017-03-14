@@ -167,9 +167,7 @@ class CollectionObservable {
         const comparator = this._comparator(); // create dependency
         const filters = this._filters(); // create dependency
         if (filters) {
-          ((() => {
-            return filters.map(filter => ko.utils.unwrapObservable(filter));
-          })());
+          ((() => filters.map(filter => ko.utils.unwrapObservable(filter)))());
         } // create a dependency
         const current_collection = this._collection(); // create dependency
         if (this.in_edit) { return; } // we are doing the editing
@@ -447,8 +445,8 @@ class CollectionObservable {
       } else {
         !has_filters || (view_models = []); // check for filtering of ViewModels
         models = [];
-        models_or_view_models.forEach(view_model => {
-          var current_view_model;
+        models_or_view_models.forEach((view_model) => {
+          let current_view_model;
           const model = kb.utils.wrappedObject(view_model);
           if (has_filters) {
             if (!this._selectModel(model)) return; // filtered so skip
@@ -491,8 +489,8 @@ class CollectionObservable {
   // @nodoc
   _selectModel(model) {
     const filters = kb.peek(this._filters);
-    for (var i = 0, l = filters.length; i < l; i++) {
-      var filter = filters[i];
+    for (let i = 0, l = filters.length; i < l; i++) {
+      let filter = filters[i];
       filter = kb.peek(filter);
       if (_.isFunction(filter)) {
         if (!filter(model)) return false;
@@ -502,7 +500,7 @@ class CollectionObservable {
     }
     return true;
   }
-};
+}
 CollectionObservable.initClass();
 kb.CollectionObservable = CollectionObservable;
 

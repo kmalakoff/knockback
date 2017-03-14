@@ -25,7 +25,8 @@ module.exports = BackboneRelational = class BackboneRelational {
   }
 
   static bind(model, key, update, path) {
-    let event, type;
+    let event,
+      type;
     if (!(type = this.relationType(model, key))) { return null; }
     const rel_fn = function (model) {
       !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });

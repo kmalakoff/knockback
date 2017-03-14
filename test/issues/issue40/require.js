@@ -990,10 +990,10 @@ let requirejs,
                             // to that instead of throwing an error.
               if (this.events.error) {
                 try {
-                    exports = context.execCb(id, factory, depExports, exports);
-                  } catch (e) {
-                    err = e;
-                  }
+                  exports = context.execCb(id, factory, depExports, exports);
+                } catch (e) {
+                  err = e;
+                }
               } else {
                 exports = context.execCb(id, factory, depExports, exports);
               }
@@ -1007,11 +1007,11 @@ let requirejs,
                                         cjsModule.exports !== undefined &&
                                         // Make sure it is not already the exports value
                                         cjsModule.exports !== this.exports) {
-                    exports = cjsModule.exports;
-                  } else if (exports === undefined && this.usingExports) {
+                  exports = cjsModule.exports;
+                } else if (exports === undefined && this.usingExports) {
                                     // exports already set the defined value.
-                      exports = this.exports;
-                    }
+                  exports = this.exports;
+                }
               }
 
               if (err) {

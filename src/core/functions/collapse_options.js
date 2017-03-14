@@ -26,7 +26,7 @@ const _mergeObject = function (result, key, value) {
 // @nodoc
 const _keyArrayToObject = function (value) {
   const result = {};
-  value.forEach(value => { result[item] = { key: item }; })
+  value.forEach((value) => { result[item] = { key: item }; });
   return result;
 };
 

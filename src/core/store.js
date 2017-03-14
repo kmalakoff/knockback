@@ -55,7 +55,9 @@ module.exports = __initClass__(kb.Store = class Store {
 
   // Manually clear the store
   clear() {
-    let observable, observable_records, replaced_observables;
+    let observable,
+      observable_records,
+      replaced_observables;
 
     [observable_records, this.observable_records] = [this.observable_records, {}];
 
@@ -65,14 +67,14 @@ module.exports = __initClass__(kb.Store = class Store {
     }
 
     [replaced_observables, this.replaced_observables] = [this.replaced_observables, []];
-    replaced_observables.forEach(observable => { if (!observable.__kb_released) { this.release(observable, true); } });
+    replaced_observables.forEach((observable) => { if (!observable.__kb_released) { this.release(observable, true); } });
   }
 
   // Manually compact the store by searching for released view models
   compact() {
     for (const creator_id in this.observable_records) {
       const records = this.observable_records[creator_id];
-      records.forEach(cid => { const observable = records[cid]; if (observable.__kb_released) { delete records[cid]; } });
+      records.forEach((cid) => { const observable = records[cid]; if (observable.__kb_released) { delete records[cid]; } });
     }
   }
 
@@ -206,7 +208,7 @@ module.exports = __initClass__(kb.Store = class Store {
   _creatorId(creator) {
     const create = creator.create || creator;
     if (!create.__kb_cids) { create.__kb_cids = []; }
-    for (var i = 0, l = create.__kb_cids.length; i < l; i++) {
+    for (let i = 0, l = create.__kb_cids.length; i < l; i++) {
       var item = create.__kb_cids[i];
       if (item.create === create) return item.cid;
     }

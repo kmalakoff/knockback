@@ -20,7 +20,7 @@ module.exports = {
 
   tests_core: ((() => {
     const result = [];
-    readdirSyncRecursive(`${__dirname}/../test/spec/core`).forEach(filename => {
+    readdirSyncRecursive(`${__dirname}/../test/spec/core`).forEach((filename) => {
       if (/\.tests.js$/.test(filename)) {
         result.push(`./test/spec/core/${filename}`);
       }
@@ -29,7 +29,7 @@ module.exports = {
   })()),
   tests_plugin: ((() => {
     const result1 = [];
-    readdirSyncRecursive(`${__dirname}/../test/spec/plugins`).forEach(filename => {
+    readdirSyncRecursive(`${__dirname}/../test/spec/plugins`).forEach((filename) => {
       if (/\.tests.js$/.test(filename)) {
         result1.push(`./test/spec/plugins/${filename}`);
       }
