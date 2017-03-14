@@ -18,14 +18,14 @@ module.exports = BackboneAssociations = class BackboneAssociations {
   static isAvailable() { return !!(AssociatedModel = Backbone != null ? Backbone.AssociatedModel : undefined); } // or require?('backbone-associations')?.AssociatedModel # webpack optionals
 
   static keys(model) {
-    if (!(model instanceof AssociatedModel)) { return null; }
+    if (!(model instanceof AssociatedModel)) return null;
     return _.map(model.relations, test => test.key);
   }
 
   static relationType(model, key) {
     let relation;
-    if (!(model instanceof AssociatedModel)) { return null; }
-    if (!(relation = _.find(model.relations, test => test.key === key))) { return null; }
+    if (!(model instanceof AssociatedModel)) return null;
+    if (!(relation = _.find(model.relations, test => test.key === key))) return null;
     return (relation.type === 'Many') ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
   }
 

@@ -19,15 +19,15 @@ module.exports = BackboneRelational = class BackboneRelational {
 
   static relationType(model, key) {
     let relation;
-    if (!(model instanceof RelationalModel)) { return null; }
-    if (!(relation = _.find(model.getRelations(), test => test.key === key))) { return null; }
+    if (!(model instanceof RelationalModel)) return null;
+    if (!(relation = _.find(model.getRelations(), test => test.key === key))) return null;
     return (relation.collectionType || _.isArray(relation.keyContents)) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
   }
 
   static bind(model, key, update, path) {
     let event,
       type;
-    if (!(type = this.relationType(model, key))) { return null; }
+    if (!(type = this.relationType(model, key))) return null;
     const rel_fn = function (model) {
       !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });
       return update();

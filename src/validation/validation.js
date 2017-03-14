@@ -181,9 +181,9 @@ kb.inputValidator = function (view_model, el, validation_options) {
   if ((input_name = el.getAttribute('name')) && !_.isString(input_name)) { input_name = null; }
 
   // only set up form elements with a value bindings
-  if (!(bindings = el.getAttribute('data-bind'))) { return null; }
+  if (!(bindings = el.getAttribute('data-bind'))) return null;
   const options = (new Function('sc', `with(sc[0]) { return { ${bindings} } }`))([view_model]);
-  if (!(options && options.value)) { return null; }
+  if (!(options && options.value)) return null;
   (!options.validation_options) || (_.defaults(options.validation_options, validation_options), ({ validation_options } = options));
 
   // collect the types to identifier
@@ -217,12 +217,14 @@ kb.formValidator = function (view_model, el) {
   validation_options.no_attach = !!form_name;
 
   // build up the results
-  el.getElementsByTagName('input').forEach((input_el) => {
-    let name;
-    if (!(name = input_el.getAttribute('name'))) return; // need named inputs to set up an object
+  const input_els = el.getElementsByTagName('input');
+  for (var i = 0, l = input_els.length; i < l; i++) {
+    const input_el = input_els[i];
+    let name = input_el.getAttribute('name');
+    if (!name) continue; // need named inputs to set up an object
     validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
-  });
+  };
 
   // collect stats, error count and valid
   results.$error_count = ko.computed(() => {

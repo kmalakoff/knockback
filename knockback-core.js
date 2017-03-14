@@ -876,7 +876,7 @@ var CollectionObservable = function () {
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      this.extend = extend;
+      CollectionObservable.extend = extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -1171,9 +1171,7 @@ var CollectionObservable = function () {
   }, {
     key: 'viewModelByModel',
     value: function viewModelByModel(model) {
-      if (this.models_only) {
-        return null;
-      }
+      if (this.models_only) return null;
       var id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
       return _.find(kb.peek(kb.utils.wrappedObservable(this)), function (test) {
         return __guard__(test != null ? test.__kb : undefined, function (x) {
@@ -1449,6 +1447,7 @@ var _initialiseProps = function _initialiseProps() {
 
 CollectionObservable.initClass();
 kb.CollectionObservable = CollectionObservable;
+module.exports = CollectionObservable;
 
 // factory function
 kb.collectionObservable = function (collection, view_model, options) {
@@ -2617,12 +2616,12 @@ var _kb = kb = __webpack_require__(0),
 //   });
 
 
-module.exports = __initClass__(kb.Store = function () {
+var Store = function () {
   _createClass(Store, null, [{
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      this.instances = [];
+      Store.instances = [];
     }
 
     // Used to either register yourself with the existing store or to create a new store.
@@ -2829,9 +2828,7 @@ module.exports = __initClass__(kb.Store = function () {
     key: 'release',
     value: function release(observable, force) {
       var store_references = void 0;
-      if (!this._canRegister(observable)) {
-        return kb.release(observable);
-      } // just release
+      if (!this._canRegister(observable)) return kb.release(observable); // just release
 
       // maybe be externally added
       if (store_references = this._storeReferences(observable)) {
@@ -2841,9 +2838,7 @@ module.exports = __initClass__(kb.Store = function () {
 
       this._remove(observable);
       if (observable.__kb_released) return;
-      if (force || this._refCount(observable) <= 1) {
-        return kb.release(observable);
-      } // allow for a single initial reference in another store
+      if (force || this._refCount(observable) <= 1) return kb.release(observable); // allow for a single initial reference in another store
     }
 
     // @nodoc
@@ -2851,14 +2846,11 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: 'find',
     value: function find(obj, creator) {
-      var observable = void 0,
-          records = void 0;
-      if (!(records = this.observable_records[this._creatorId(creator)])) {
-        return null;
-      }
-      if (__guard__(observable = records[this._cid(obj)], function (x) {
-        return x.__kb_released;
-      })) {
+      var records = this.observable_records[this._creatorId(creator)];
+      if (!records) return null;
+
+      var observable = records[this._cid(obj)];
+      if (observable && observable.__kb_released) {
         delete records[this._cid(obj)];
         return null;
       }
@@ -2877,9 +2869,7 @@ module.exports = __initClass__(kb.Store = function () {
         }
         return 0;
       }
-      if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
-        return 1;
-      }
+      if (!(stores_references = kb.utils.get(observable, 'stores_references'))) return 1;
       return _.reduce(stores_references, function (memo, store_references) {
         return memo + store_references.ref_count;
       }, 0);
@@ -3025,12 +3015,13 @@ module.exports = __initClass__(kb.Store = function () {
   }]);
 
   return Store;
-}());
+}();
 
-function __initClass__(c) {
-  c.initClass();
-  return c;
-}
+;
+Store.initClass();
+kb.Store = Store;
+module.exports = Store;
+
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
 }
@@ -3367,9 +3358,7 @@ var utils = function () {
       }
 
       // try fallbacks
-      if (!value) {
-        return null;
-      }
+      if (!value) return null;
       if (value instanceof kb.Model) {
         return kb.ViewModel;
       }
@@ -3535,7 +3524,7 @@ var ViewModel = function () {
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      this.extend = extend;
+      ViewModel.extend = extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -3711,6 +3700,7 @@ var ViewModel = function () {
 
 ViewModel.initClass();
 kb.ViewModel = ViewModel;
+module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
 kb.viewModel = function (model, options, view_model) {
@@ -3976,9 +3966,7 @@ module.exports = BackboneAssociations = function () {
   }, {
     key: 'keys',
     value: function keys(model) {
-      if (!(model instanceof AssociatedModel)) {
-        return null;
-      }
+      if (!(model instanceof AssociatedModel)) return null;
       return _.map(model.relations, function (test) {
         return test.key;
       });
@@ -3987,14 +3975,10 @@ module.exports = BackboneAssociations = function () {
     key: 'relationType',
     value: function relationType(model, key) {
       var relation = void 0;
-      if (!(model instanceof AssociatedModel)) {
-        return null;
-      }
+      if (!(model instanceof AssociatedModel)) return null;
       if (!(relation = _.find(model.relations, function (test) {
         return test.key === key;
-      }))) {
-        return null;
-      }
+      }))) return null;
       return relation.type === 'Many' ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
     }
   }, {
@@ -4052,14 +4036,10 @@ module.exports = BackboneRelational = function () {
     key: 'relationType',
     value: function relationType(model, key) {
       var relation = void 0;
-      if (!(model instanceof RelationalModel)) {
-        return null;
-      }
+      if (!(model instanceof RelationalModel)) return null;
       if (!(relation = _.find(model.getRelations(), function (test) {
         return test.key === key;
-      }))) {
-        return null;
-      }
+      }))) return null;
       return relation.collectionType || _.isArray(relation.keyContents) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
     }
   }, {
@@ -4067,9 +4047,7 @@ module.exports = BackboneRelational = function () {
     value: function bind(model, key, update, path) {
       var event = void 0,
           type = void 0;
-      if (!(type = this.relationType(model, key))) {
-        return null;
-      }
+      if (!(type = this.relationType(model, key))) return null;
       var rel_fn = function rel_fn(model) {
         !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model: model, key: key, path: path });
         return update();

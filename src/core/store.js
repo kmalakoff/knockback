@@ -17,10 +17,10 @@ const { _, ko } = (kb = require('./kb'));
 //   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 //     store: kb.utils.wrappedStore(co)
 //   });
-module.exports = __initClass__(kb.Store = class Store {
+class Store {
   static initClass() {
     // @nodoc
-    this.instances = [];
+    Store.instances = [];
   }
 
   // Used to either register yourself with the existing store or to create a new store.
@@ -159,7 +159,7 @@ module.exports = __initClass__(kb.Store = class Store {
   // Release a reference to a a ViewModel in this store.
   release(observable, force) {
     let store_references;
-    if (!this._canRegister(observable)) { return kb.release(observable); } // just release
+    if (!this._canRegister(observable)) return kb.release(observable); // just release
 
     // maybe be externally added
     if (store_references = this._storeReferences(observable)) {
@@ -169,15 +169,16 @@ module.exports = __initClass__(kb.Store = class Store {
 
     this._remove(observable);
     if (observable.__kb_released) return;
-    if (force || (this._refCount(observable) <= 1)) { return kb.release(observable); } // allow for a single initial reference in another store
+    if (force || (this._refCount(observable) <= 1)) return kb.release(observable); // allow for a single initial reference in another store
   }
 
   // @nodoc
   find(obj, creator) {
-    let observable,
-      records;
-    if (!(records = this.observable_records[this._creatorId(creator)])) { return null; }
-    if (__guard__((observable = records[this._cid(obj)]), x => x.__kb_released)) {
+    const records = this.observable_records[this._creatorId(creator)];
+    if (!records) return null;
+
+    const observable = records[this._cid(obj)];
+    if (observable && observable.__kb_released) {
       delete records[this._cid(obj)];
       return null;
     }
@@ -193,7 +194,7 @@ module.exports = __initClass__(kb.Store = class Store {
       }
       return 0;
     }
-    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) { return 1; }
+    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) return 1;
     return _.reduce(stores_references, ((memo, store_references) => memo + store_references.ref_count), 0);
   }
 
@@ -277,12 +278,11 @@ module.exports = __initClass__(kb.Store = class Store {
     if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) { return creator; }
     if (kb.isModel(obj)) { return kb.ViewModel; }
   }
-});
+};
+Store.initClass();
+kb.Store = Store;
+module.exports = Store;
 
-function __initClass__(c) {
-  c.initClass();
-  return c;
-}
 function __guard__(value, transform) {
   return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
 }

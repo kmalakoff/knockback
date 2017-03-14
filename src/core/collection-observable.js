@@ -61,7 +61,7 @@ kb.compare = function (value_a, value_b) {
 class CollectionObservable {
   static initClass() {
     // @nodoc
-    this.extend = extend;
+    CollectionObservable.extend = extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
@@ -289,7 +289,7 @@ class CollectionObservable {
 
   // Reverse lookup for a view model by model. If created with models_only option, will return null.
   viewModelByModel(model) {
-    if (this.models_only) { return null; }
+    if (this.models_only) return null;
     const id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
     return _.find(kb.peek(kb.utils.wrappedObservable(this)), test => __guard__(test != null ? test.__kb : undefined, x => x.object) ? (test.__kb.object[id_attribute] === model[id_attribute]) : false);
   }
@@ -501,6 +501,7 @@ class CollectionObservable {
 }
 CollectionObservable.initClass();
 kb.CollectionObservable = CollectionObservable;
+module.exports = CollectionObservable;
 
 // factory function
 kb.collectionObservable = function (collection, view_model, options) { return new kb.CollectionObservable(arguments); };

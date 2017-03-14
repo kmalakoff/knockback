@@ -11,8 +11,8 @@ const { _ } = require('../kb');
 
 // @nodoc
 const _mergeArray = function (result, key, value) {
-  if (!result[key]) { result[key] = []; }
-  if (!_.isArray(value)) { value = [value]; }
+  if (!result[key]) result[key] = [];
+  if (!_.isArray(value)) value = [value];
   result[key] = result[key].length ? _.union(result[key], value) : value;
   return result;
 };
@@ -26,7 +26,7 @@ const _mergeObject = function (result, key, value) {
 // @nodoc
 const _keyArrayToObject = function (value) {
   const result = {};
-  value.forEach((item) => { result[item] = { key: item }; });
+  value.forEach(item => { result[item] = { key: item }; });
   return result;
 };
 
@@ -56,8 +56,7 @@ var _mergeOptions = function (result, options) {
         break;
       case 'static_defaults': _mergeObject(result, key, value); break;
       case 'options': break;
-      default:
-        result[key] = value;
+      default: result[key] = value; break;
     }
   }
 

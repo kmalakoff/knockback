@@ -102,7 +102,7 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
 class ViewModel {
   static initClass() {
     // @nodoc
-    this.extend = extend;
+    ViewModel.extend = extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
@@ -218,6 +218,7 @@ class ViewModel {
 }
 ViewModel.initClass();
 kb.ViewModel = ViewModel;
+module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
 kb.viewModel = function (model, options, view_model) { return new kb.ViewModel(arguments); };

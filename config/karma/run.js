@@ -8,7 +8,8 @@ const generate = require('./generate');
 
 const KARMA_CONFIG_BASE = require('./config-base');
 const KARMA_CONFIG_AMD = require('./config-amd');
-const TEST_GROUPS = require('../test_groups');
+// const TEST_GROUPS = require('../test_groups');
+const TEST_GROUPS = {browser_globals: require('../test_groups').browser_globals.slice(0, 1)};
 
 module.exports = function (callback) {
   fs.removeSync('./_temp', true);

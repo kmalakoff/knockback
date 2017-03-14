@@ -62,9 +62,9 @@ if (!kb.locale_manager) { kb.locale_manager = undefined; }
 //          return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
 //        }
 //     });
-module.exports = __initClass__(kb.LocalizedObservable = class LocalizedObservable {
+class LocalizedObservable {
   static initClass() {
-    this.extend = extend;
+    LocalizedObservable.extend = extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
@@ -153,13 +153,11 @@ module.exports = __initClass__(kb.LocalizedObservable = class LocalizedObservabl
     this.vo(value);
     if (this.__kb._onChange) { return this.__kb._onChange(value); }
   }
-});
+};
+LocalizedObservable.initClass();
+kb.LocalizedObservable = LocalizedObservable;
+module.exports = LocalizedObservable;
 
 // factory function
 kb.localizedObservable = (value, options, view_model) => new kb.LocalizedObservable(value, options, view_model);
 kb.observableLocalized = kb.localizedObservable;
-
-function __initClass__(c) {
-  c.initClass();
-  return c;
-}

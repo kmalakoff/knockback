@@ -203,7 +203,7 @@ class utils {
     if (factory && (creator = factory.creatorForPath(value, path))) { return creator; }
 
     // try fallbacks
-    if (!value) { return null; }
+    if (!value) return null;
     if (value instanceof kb.Model) { return kb.ViewModel; }
     if (value instanceof kb.Collection) { return kb.CollectionObservable; }
     return null;

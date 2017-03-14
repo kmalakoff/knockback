@@ -1,10 +1,10 @@
-let Globalize;
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
 const { _, ko } = kb;
 if (kb.Backbone) { kb.Backbone.ModelRef || (typeof require === 'function' ? require('backbone-modelref') : undefined); }
 
+let Globalize = typeof window !== 'undefined' && window !== null ? window.Globalize : undefined;
 if (!Globalize) {
   Globalize = typeof require === 'function' ? require('../../lib/globalize') : undefined;
   if (typeof require === 'function') {
@@ -100,8 +100,9 @@ kb.LongDateLocalizer = class LongDateLocalizer extends kb.LocalizedObservable {
 // NOTE: dependency on globalize - notice the alternative formulation with extend
 kb.ShortDateLocalizer = class ShortDateLocalizer extends kb.LocalizedObservable {
   constructor(value, options, view_model) {
-    kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-    return kb.utils.wrappedObservable(this);
+    // kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+    // return kb.utils.wrappedObservable(this);
+    return super(...arguments); // return the observable instead of this
   } // return the observable instead of this
 
   read(value) {

@@ -13,7 +13,8 @@ const wrapAMD = require('gulp-wrap-amd-infer');
 const webpack = require('gulp-webpack-config');
 const browserify = require('gulp-browserify');
 
-const TEST_GROUPS = require('../test_groups');
+// const TEST_GROUPS = require('../test_groups');
+const TEST_GROUPS = {browser_globals: require('../test_groups').browser_globals.slice(0, 1)};
 
 module.exports = function (callback) {
   const queue = new Queue(1);
@@ -22,7 +23,7 @@ module.exports = function (callback) {
   queue.defer(callback =>
     gulp.src(['./knockback.js', './package.json'])
       .pipe(gulp.dest('node_modules/knockback'))
-      .on('end', callback),
+      .on('end', callback)
   );
 
   // build webpack
@@ -30,7 +31,7 @@ module.exports = function (callback) {
     gulp.src(['config/builds/test/**/*.webpack.config.js'], { read: false, buffer: false })
       .pipe(webpack())
       .pipe(gulp.dest('_temp/webpack'))
-      .on('end', callback),
+      .on('end', callback)
   );
 
   // build test browserify
@@ -41,7 +42,7 @@ module.exports = function (callback) {
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
-        .on('end', callback),
+        .on('end', callback)
     ))(test);
   }
 
@@ -52,7 +53,7 @@ module.exports = function (callback) {
         .pipe(babel({ presets: ['es2015'] }))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
-        .on('end', callback),
+        .on('end', callback)
     ))(test);
   }
 
