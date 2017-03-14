@@ -132,7 +132,7 @@ module.exports = kb.Validation = class Validation {};
 // ############################
 // Aliases
 // ############################
-kb.valueValidator = function (value, bindings, validation_options) {
+kb.valueValidator = (value, bindings, validation_options) => {
   if (validation_options == null) { validation_options = {}; }
   (validation_options && !(typeof (validation_options) === 'function')) || (validation_options = {});
   return ko.computed(() => {
@@ -171,10 +171,8 @@ kb.valueValidator = function (value, bindings, validation_options) {
   });
 };
 
-kb.inputValidator = function (view_model, el, validation_options) {
-  let bindings,
-    input_name,
-    type;
+kb.inputValidator = (view_model, el, validation_options) => {
+  let bindings, input_name, type;
   if (validation_options == null) { validation_options = {}; }
   (validation_options && !(typeof (validation_options) === 'function')) || (validation_options = {});
   const validators = kb.valid;
@@ -200,7 +198,7 @@ kb.inputValidator = function (view_model, el, validation_options) {
   return result;
 };
 
-kb.formValidator = function (view_model, el) {
+kb.formValidator = (view_model, el) => {
   let bindings,
     form_name,
     validation_options,

@@ -1,7 +1,8 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('collection-observable @quick @collection-observable', () => {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined;
+  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
 
   it('TEST DEPENDENCY MISSING', (done) => {
@@ -739,10 +740,10 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(models);
     assert.equal(collection_observable.collection().length, 4);
 
-    for (const view_models of collection_observable()) {
+    collection_observable().forEach(view_models => {
       assert.ok(!!view_models.date());
       assert.ok(view_models.model() instanceof Contact);
-    }
+    });
 
     kb.release(collection_observable);
 
@@ -758,10 +759,10 @@ describe('collection-observable @quick @collection-observable', () => {
     const collection_observable = kb.collectionObservable(models, { view_model: PersonViewModel });
     assert.equal(collection_observable.collection().length, 4);
 
-    for (const view_model of collection_observable()) {
+    collection_observable().forEach(view_model => {
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact);
-    }
+    });
 
     kb.release(collection_observable);
 
@@ -839,28 +840,28 @@ describe('collection-observable @quick @collection-observable', () => {
     let new_view_models = collection_observable();
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
-    for (var vm of new_view_models) {
+    new_view_models.forEach(vm => {
       if (vm.model() === collection_observable.collection().models[4]) {
         assert.ok(!(previous_view_models.includes(vm)));
       } else {
         assert.ok(previous_view_models.includes(vm));
       }
-    }
+    });
 
     models = collection_observable.collection().models.slice();
     collection_observable.collection().reset(models);
     new_view_models = collection_observable();
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
-    for (vm of new_view_models) { assert.ok(!(previous_view_models.includes(vm))); }
+    new_view_models.forEach(vm => { assert.ok(!(previous_view_models.includes(vm))); });
 
     kb.release(collection_observable);
 
     assert.ok(kb.Statistics.eventsStats(collection).count === 0, `All collection events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(collection))}`);
-    for (const model of models) {
+    models.forEach(model => {
       collection.remove(model);
       assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
-    }
+    });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
   });
@@ -874,11 +875,11 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (const view_model of collection_observable()) {
+    collection_observable().forEach(view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
-    }
+    });
 
     kb.release(collection_observable);
 
@@ -896,12 +897,12 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (const view_model of collection_observable()) {
+    collection_observable().forEach(view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
       assert.ok(view_model.other() instanceof OtherViewModel, 'view_model correct type');
-    }
+    });
 
     kb.release(collection_observable);
 
@@ -919,12 +920,12 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (const view_model of collection_observable()) {
+    collection_observable().forEach(view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
       assert.ok(view_model.other() instanceof OtherViewModel, 'view_model correct type');
-    }
+    });
 
     kb.release(collection_observable);
 
@@ -942,12 +943,12 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    for (const view_model of collection_observable()) {
+    collection_observable().forEach(view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
       assert.ok(view_model.other() instanceof OtherViewModel, 'view_model correct type');
-    }
+    });
 
     kb.release(collection_observable);
 
@@ -965,10 +966,10 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(models);
     assert.equal(collection_observable.collection().length, 4);
 
-    for (const view_models of collection_observable()) {
-      assert.ok(!!view_models.date());
-      assert.ok(view_models.model() instanceof Contact);
-    }
+    collection_observable().forEach(vm => {
+      assert.ok(!!vm.date());
+      assert.ok(vm.model() instanceof Contact);
+    });
 
     kb.release(collection_observable);
 

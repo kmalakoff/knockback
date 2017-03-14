@@ -63,7 +63,7 @@
     "imports-loader": "*",
     "jsdom": "*",
     "karma": "*",
-    "karma-babel-preprocessor": "*",
+    "karma-babel-preprocessor": "^6.0.1",
     "karma-chai": "*",
     "karma-chrome-launcher": "*",
     "karma-cli": "*",

@@ -1,9 +1,9 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('knockback.js memory management @quick @memory', () => {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
-  const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
+  const $ = typeof window !== 'undefined' ? window.$ : undefined;
 
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
@@ -100,7 +100,7 @@ describe('knockback.js memory management @quick @memory', () => {
 
   it('Releasing with nodes', (done) => {
     let model;
-    if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -211,7 +211,7 @@ describe('knockback.js memory management @quick @memory', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Destroyed: 2');
-    for (const view_model of SimpleViewModel.view_models) { assert.ok(!view_model.prop, 'Prop destroyed'); }
+    SimpleViewModel.view_models.forEach(view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
@@ -260,13 +260,13 @@ describe('knockback.js memory management @quick @memory', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Remaining: 2');
-    for (var view_model of SimpleViewModel.view_models) { assert.ok(view_model.prop, 'Prop destroyed'); }
+    SimpleViewModel.view_models.forEach(view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     store.destroy(); store = null;
 
     // all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     assert.equal(SimpleViewModel.view_models.length, 2, 'Destroyed: 2');
-    for (view_model of SimpleViewModel.view_models) { assert.ok(!view_model.prop, 'Prop destroyed'); }
+    SimpleViewModel.view_models.forEach(view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();

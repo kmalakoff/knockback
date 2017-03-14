@@ -1,9 +1,9 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('view-model @quick @view-model', () => {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
-  const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
+  const $ = typeof window !== 'undefined' ? window.$ : undefined;
 
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
@@ -607,7 +607,7 @@ describe('view-model @quick @view-model', () => {
   });
 
   it('14. model replacement with select', (done) => {
-    if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics();
 
@@ -659,7 +659,7 @@ describe('view-model @quick @view-model', () => {
   });
 
   it('16. model replacement with input', (done) => {
-    if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics();
 
@@ -707,7 +707,7 @@ describe('view-model @quick @view-model', () => {
   });
 
   it('17. model replacement with multiple selects and weird backbone bug', (done) => {
-    if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics();
 

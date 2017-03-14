@@ -1,10 +1,10 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 // https://github.com/kmalakoff/knockback/issues/159
 describe('issue 159 @issue159 @quick', () => {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko } = kb;
-  const $ = typeof window !== 'undefined' && window !== null ? window.$ : undefined;
+  const $ = typeof window !== 'undefined' ? window.$ : undefined;
 
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
@@ -16,7 +16,7 @@ describe('issue 159 @issue159 @quick', () => {
   });
 
   return it('has no issue', (done) => {
-    if (!$ || !(typeof window !== 'undefined' && window !== null ? window.document : undefined)) { return done(); }
+    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) { return done(); }
 
     kb.statistics = new kb.Statistics(); // turn on stats
 

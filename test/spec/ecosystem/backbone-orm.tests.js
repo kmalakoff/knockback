@@ -1,9 +1,9 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
-var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 describe('Knockback.js with BackboneORM @backbone-orm', () => {
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, Backbone, ko } = kb;
   const { Queue } = root.BackboneORM || (root.BackboneORM = typeof require === 'function' ? require('backbone-orm') : undefined);
 

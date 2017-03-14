@@ -2020,7 +2020,6 @@ kb.Inject = function () {
     value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
       var inject = function inject(data) {
         if (_.isFunction(data)) {
-          debugger;
           view_model = new data(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
           kb.releaseOnNodeRemove(view_model, element);
         } else {
@@ -2083,9 +2082,9 @@ kb.Inject = function () {
             results.push({ el: el, view_model: {}, binding: attr.value });
           }
         }
-        el.childNodes.forEach(function (child_el) {
-          return findElements(child_el);
-        });
+        for (var i = 0, l = el.childNodes; i < l; i++) {
+          findElements(el.childNodes[i]);
+        }
       };
       if (!root && (window != null ? window.document : undefined)) {
         root = window.document;

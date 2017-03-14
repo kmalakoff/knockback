@@ -1,5 +1,5 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
-var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => {
   // after -> delete root.Person; delete root.Building
@@ -7,7 +7,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   let Building,
     Person;
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, Backbone, ko } = kb;
   if (!(Backbone != null ? Backbone.Relational : undefined)) {
     if (typeof require === 'function') {

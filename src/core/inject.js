@@ -137,7 +137,7 @@ kb.Inject = class Inject {
           results.push({ el, view_model: {}, binding: attr.value });
         }
       }
-      el.childNodes.forEach(child_el => findElements(child_el));
+      for (var i = 0, l = el.childNodes; i < l; i++) findElements(el.childNodes[i]);
     };
     if (!root && (window != null ? window.document : undefined)) { root = window.document; }
     findElements(root);

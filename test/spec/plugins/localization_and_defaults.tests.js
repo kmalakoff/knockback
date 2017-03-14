@@ -1,7 +1,7 @@
-var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
-var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
-let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
 const { _, ko } = kb;
 if (kb.Backbone) { kb.Backbone.ModelRef || (typeof require === 'function' ? require('backbone-modelref') : undefined); }
 
@@ -18,7 +18,7 @@ if (!Globalize) {
 // ##############################
 class LocaleManager {
   static initClass() {
-    Object.assign(this.prototype, kb.Events);
+    _.assign(this.prototype, kb.Events);
   }
 
   constructor(locale_identifier, translations_by_locale) {
