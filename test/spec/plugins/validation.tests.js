@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 var window = (window != null) ? window : global;
 
 describe('validation @quick @validation', () => {

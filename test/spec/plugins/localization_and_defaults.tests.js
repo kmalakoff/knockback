@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}

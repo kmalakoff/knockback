@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('money-patches @quick @monkey', () => {
   let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}

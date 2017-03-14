@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('collection-observable @quick @collection-observable', () => {
   let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined;

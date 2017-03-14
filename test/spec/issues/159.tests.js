@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 // https://github.com/kmalakoff/knockback/issues/159
 describe('issue 159 @issue159 @quick', () => {

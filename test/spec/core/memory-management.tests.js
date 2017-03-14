@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('knockback.js memory management @quick @memory', () => {
   let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
@@ -260,7 +260,7 @@ describe('knockback.js memory management @quick @memory', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Remaining: 2');
-    SimpleViewModel.view_models.forEach(view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    SimpleViewModel.view_models.forEach(view_model => { assert.ok(view_model.prop, 'Prop destroyed'); });
 
     store.destroy(); store = null;
 

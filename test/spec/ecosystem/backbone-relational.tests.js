@@ -1,4 +1,4 @@
-const assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => {
