@@ -520,6 +520,56 @@ module.exports = g;
 "use strict";
 
 
+/* ###
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+### */
+
+var _ = __webpack_require__(0)._;
+
+// Helper function to correctly set up the prototype chain for subclasses.
+// Similar to 'goog.inherits', but uses a hash of prototype properties and
+// class properties to be extended.
+function inherits(parent, protoProps, staticProps) {
+  var child;
+
+  // The constructor function for the new subclass is either defined by you
+  // (the "constructor" property in your 'extend' definition), or defaulted
+  // by us to simply call the parent constructor.
+  if (protoProps && _.has(protoProps, 'constructor')) {
+    child = protoProps.constructor;
+  } else {
+    child = function child() {
+      return parent.apply(this, arguments);
+    };
+  }
+
+  // Add static properties to the constructor function, if supplied.
+  _.extend(child, parent, staticProps);
+
+  // Set the prototype chain to inherit from 'parent', without calling
+  // parent's constructor function and add the prototype properties.
+  child.prototype = _.create(parent.prototype, protoProps);
+  child.prototype.constructor = child;
+
+  // Set a convenience property in case the parent's prototype is needed
+  // later.
+  child.__super__ = parent.prototype;
+
+  return child;
+};
+
+// The self-propagating extend function that BacLCone classes use.
+module.exports = function extend(protoProps, classProps) {
+  var child = inherits(this, protoProps, classProps);
+  child.extend = this.extend;
+  return child;
+};
+
 /***/ }),
 /* 3 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -23840,12 +23890,8 @@ var _require = __webpack_require__(0),
 
 
 var _mergeArray = function _mergeArray(result, key, value) {
-  if (!result[key]) {
-    result[key] = [];
-  }
-  if (!_.isArray(value)) {
-    value = [value];
-  }
+  if (!result[key]) result[key] = [];
+  if (!_.isArray(value)) value = [value];
   result[key] = result[key].length ? _.union(result[key], value) : value;
   return result;
 };
@@ -23905,7 +23951,7 @@ var _mergeOptions = function _mergeOptions(result, options) {
       case 'options':
         break;
       default:
-        result[key] = value;
+        result[key] = value;break;
     }
   }
 
@@ -23958,9 +24004,8 @@ module.exports = _unwrapModels = function unwrapModels(obj) {
     // a simple object
     var result = {};
     for (var key in obj) {
-      var value = obj[key];result[key] = _unwrapModels(value);
-    }
-    return result;
+      result[key] = _unwrapModels(obj[key]);
+    }return result;
   }
 
   return obj;
@@ -23982,40 +24027,34 @@ module.exports = _unwrapModels = function unwrapModels(obj) {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _wrappedDestroy = void 0;
-
 var _require = __webpack_require__(0),
     _ = _require._;
 
 // @nodoc
 
 
-module.exports = _wrappedDestroy = function wrappedDestroy(obj) {
+var wrappedDestroy = function wrappedDestroy(obj) {
   if (!obj.__kb) return;
-  if (obj.__kb.event_watcher) {
-    obj.__kb.event_watcher.releaseCallbacks(obj);
-  }
+  if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
 
   var __kb = obj.__kb;
+
   obj.__kb = null; // clear now to break cycles
 
   if (__kb.observable) {
     __kb.observable.destroy = __kb.observable.release = null;
-    _wrappedDestroy(__kb.observable);
+    wrappedDestroy(__kb.observable);
     __kb.observable = null;
   }
 
   __kb.factory = null;
 
-  if (__kb.event_watcher_is_owned) {
-    __kb.event_watcher.destroy();
-  } // release the event_watcher
+  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy(); // release the event_watcher
   __kb.event_watcher = null;
 
-  if (__kb.store_is_owned) {
-    __kb.store.destroy();
-  } // release the store
+  if (__kb.store_is_owned) __kb.store.destroy(); // release the store
   __kb.store = null;
+
   if (__kb.stores_references) {
     var store_references = void 0;
     while (store_references = __kb.stores_references.pop()) {
@@ -24025,6 +24064,7 @@ module.exports = _wrappedDestroy = function wrappedDestroy(obj) {
     }
   }
 };
+module.exports = wrappedDestroy;
 
 /***/ }),
 /* 29 */

@@ -1,10 +1,11 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
 const { _, ko } = kb;
 if (kb.Backbone) { kb.Backbone.ModelRef || (typeof require === 'function' ? require('backbone-modelref') : undefined); }
 
-let Globalize = typeof window !== 'undefined' && window !== null ? window.Globalize : undefined;
+let Globalize = root.Globalize;
 if (!Globalize) {
   Globalize = typeof require === 'function' ? require('../../lib/globalize') : undefined;
   if (typeof require === 'function') {

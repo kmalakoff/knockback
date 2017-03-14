@@ -1,9 +1,7 @@
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
-const root = (typeof window !== 'undefined' && window !== null) ? window : (typeof global !== 'undefined' && global !== null) ? global : this;
+var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 describe('inject @quick @inject', () => {
-  let SubClass,
-    SuperClass;
   let kb = root != null ? root.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, ko, $ } = kb;
   if (!$) return; // no jquery
@@ -38,7 +36,7 @@ describe('inject @quick @inject', () => {
     return this; // return self
   };
 
-  root.SuperClass = SuperClass = class SuperClass {
+  root.SuperClass = class SuperClass {
     constructor() {
       this.super_class = true;
       kb.statistics.register('SuperClass', this);
@@ -48,7 +46,7 @@ describe('inject @quick @inject', () => {
     }
   };
 
-  root.SubClass = SubClass = class SubClass extends SuperClass {
+  root.SubClass = class SubClass extends SuperClass {
     constructor() {
       super(...arguments);
       this.sub_class = true;

@@ -1,5 +1,5 @@
-const root = (typeof window !== 'undefined' && window !== null) ? window : global;
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 describe('Knockback.js with Backbone.ModelRef.js @backbone-modelref', () => {
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback

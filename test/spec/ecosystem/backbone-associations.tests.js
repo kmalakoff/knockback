@@ -1,12 +1,11 @@
-const root = (typeof window !== 'undefined' && window !== null) ? window : global;
 var assert = assert || (typeof require === 'function' ? require('chai').assert : undefined);
+var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 describe.skip('Knockback.js with Backbone-Associations.js @backbone-associations', () => {
   // after -> delete root.Person; delete root.Building
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Building,
-    Person;
+  let Building, Person;
   let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
   const { _, Backbone, ko } = kb;
   if (!(Backbone != null ? Backbone.Associations : undefined)) {

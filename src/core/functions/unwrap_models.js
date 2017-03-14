@@ -18,7 +18,7 @@ module.exports = (unwrapModels = function (obj) {
   if (_.isArray(obj)) { return _.map(obj, test => unwrapModels(test)); }
   if (_.isObject(obj) && (obj.constructor === {}.constructor)) { // a simple object
     const result = {};
-    for (const key in obj) { const value = obj[key]; result[key] = unwrapModels(value); }
+    for (const key in obj) result[key] = unwrapModels(obj[key]);
     return result;
   }
 
