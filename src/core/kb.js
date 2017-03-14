@@ -246,7 +246,11 @@ class kb {
   static publishMethods(observable, instance, methods) { methods.forEach((fn) => { observable[fn] = kb._.bind(instance[fn], instance); }); }
 
   // @nodoc
-  static peek(obs) { if (!ko.isObservable(obs)) { return obs; if (obs.peek) { return obs.peek(); return kb.ignore(() => obs()); } } }
+  static peek(obs) {
+    if (!ko.isObservable(obs)) return obs;
+    if (obs.peek) return obs.peek();
+    return kb.ignore(() => obs());
+  }
 
   // @nodoc
   static isModel(obj) { return obj && ((obj instanceof kb.Model) || ((typeof (obj.get) === 'function') && (typeof (obj.bind) === 'function'))); }

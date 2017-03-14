@@ -124,19 +124,19 @@ class CollectionObservable {
       const create_options = (this.create_options = { store: kb.Store.useOptionsOrCreate(options, collection, observable) }); // create options
       kb.utils.wrappedObject(observable, collection);
 
-    // view model factory create factories
+      // view model factory create factories
       this.path = options.path;
       create_options.factory = kb.utils.wrappedFactory(observable, this._shareOrCreateFactory(options));
       create_options.path = kb.utils.pathJoin(options.path, 'models');
 
-    // check for models only
+      // check for models only
       create_options.creator = create_options.factory.creatorForPath(null, create_options.path);
       if (create_options.creator) { this.models_only = create_options.creator.models_only; }
 
-    // publish public interface on the observable and return instead of this
+      // publish public interface on the observable and return instead of this
       kb.publishMethods(observable, this, KEYS_PUBLISH);
 
-    // start the processing
+      // start the processing
       this._collection = ko.observable(collection);
       observable.collection = (this.collection = ko.computed({
         read: () => this._collection(),
@@ -159,7 +159,7 @@ class CollectionObservable {
       }));
       if (collection) { collection.bind('all', this._onCollectionChange); } // bind now
 
-    // observable that will re-trigger when sort or filters or collection changes
+      // observable that will re-trigger when sort or filters or collection changes
       this._mapper = ko.computed(() => {
         let filter,
           models,
@@ -172,14 +172,14 @@ class CollectionObservable {
         const current_collection = this._collection(); // create dependency
         if (this.in_edit) { return; } // we are doing the editing
 
-      // no models
+        // no models
         observable = kb.utils.wrappedObservable(this);
         const previous_view_models = kb.peek(observable);
         if (current_collection) { ({ models } = current_collection); }
         if (!models || (current_collection.models.length === 0)) {
           view_models = [];
 
-      // process filters, sorting, etc
+        // process filters, sorting, etc
         } else {
           // apply filters
           models = _.filter(models, model => !filters.length || this._selectModel(model));
@@ -207,7 +207,7 @@ class CollectionObservable {
       },
     );
 
-    // start subscribing
+      // start subscribing
       observable.subscribe(_.bind(this._onObservableArrayChange, this));
 
       !kb.statistics || kb.statistics.register('CollectionObservable', this);     // collect memory management statistics
@@ -422,7 +422,7 @@ class CollectionObservable {
   }
 
   // @nodoc
-  _onObservableArrayChange(models_or_view_models) {
+  _onObservableArrayChange = (models_or_view_models) => {
     return kb.ignore(() => {
       let models;
       if (this.in_edit) { return; } // we are doing the editing

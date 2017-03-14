@@ -106,7 +106,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _, Backbone;
+var _ = void 0,
+    Backbone = void 0;
 var window = window != null ? window : global;
 var ko = __webpack_require__(24);
 
@@ -276,7 +277,7 @@ var kb = function () {
       // releaseable signature
       for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
         var method = LIFECYCLE_METHODS[i];
-        if (typeof obj[method] === 'function') return obj[method].call(obj);;
+        if (typeof obj[method] === 'function') return obj[method].call(obj);
       }
       if (!ko.isObservable(obj)) return this.releaseKeys(obj); // view model
     }
@@ -432,7 +433,7 @@ var kb = function () {
     key: 'publishMethods',
     value: function publishMethods(observable, instance, methods) {
       methods.forEach(function (fn) {
-        observable[fn] = kb._.bind(instance[fn], instance);return;
+        observable[fn] = kb._.bind(instance[fn], instance);
       });
     }
 
@@ -441,13 +442,11 @@ var kb = function () {
   }, {
     key: 'peek',
     value: function peek(obs) {
-      if (!ko.isObservable(obs)) {
-        return obs;if (obs.peek) {
-          return obs.peek();return kb.ignore(function () {
-            return obs();
-          });
-        }
-      }
+      if (!ko.isObservable(obs)) return obs;
+      if (obs.peek) return obs.peek();
+      return kb.ignore(function () {
+        return obs();
+      });
     }
 
     // @nodoc
@@ -2498,6 +2497,8 @@ var CollectionObservable = function () {
 
     _classCallCheck(this, CollectionObservable);
 
+    _initialiseProps.call(this);
+
     this._onCollectionChange = this._onCollectionChange.bind(this);
     var args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
     return kb.ignore(function () {
@@ -2947,67 +2948,10 @@ var CollectionObservable = function () {
     // @nodoc
 
   }, {
-    key: '_onObservableArrayChange',
-    value: function _onObservableArrayChange(models_or_view_models) {
-      var _this4 = this;
+    key: '_attributeComparator',
 
-      return kb.ignore(function () {
-        var models = void 0;
-        if (_this4.in_edit) {
-          return;
-        } // we are doing the editing
-
-        // validate input
-        _this4.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0])) || !_this4.models_only && (!models_or_view_models.length || _.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])) || kb._throwUnexpected(_this4, 'incorrect type passed');
-
-        var observable = kb.utils.wrappedObservable(_this4);
-        var collection = kb.peek(_this4._collection);
-        var has_filters = kb.peek(_this4._filters).length;
-        if (!collection) {
-          return;
-        } // no collection or we are updating ourselves
-
-        var view_models = models_or_view_models;
-
-        // set Models
-        if (_this4.models_only) {
-          models = _.filter(models_or_view_models, function (model) {
-            return !has_filters || _this4._selectModel(model);
-          });
-
-          // set ViewModels
-        } else {
-          !has_filters || (view_models = []); // check for filtering of ViewModels
-          models = [];
-          models_or_view_models.forEach(function (view_model) {
-            var current_view_model;
-            var model = kb.utils.wrappedObject(view_model);
-            if (has_filters) {
-              if (!_this4._selectModel(model)) return; // filtered so skip
-              view_models.push(view_model);
-            }
-
-            // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
-            if (current_view_model = _this4.create_options.store.find(model, _this4.create_options.creator)) {
-              current_view_model.constructor === view_model.constructor || kb._throwUnexpected(_this4, 'replacing different type of view model');
-            }
-            _this4.create_options.store.retain(view_model, model, _this4.create_options.creator);
-            models.push(model);
-          });
-        }
-
-        // a change, update models
-        _this4.in_edit++;
-        models_or_view_models.length === view_models.length || observable(view_models); // replace the ViewModels because they were filtered
-        _.isEqual(collection.models, models) || collection.reset(models);
-        _this4.in_edit--;
-      });
-    }
 
     // @nodoc
-
-  }, {
-    key: '_attributeComparator',
     value: function _attributeComparator(sort_attribute) {
       var modelAttributeCompare = function modelAttributeCompare(model_a, model_b) {
         var attribute_name = ko.utils.unwrapObservable(sort_attribute);
@@ -3051,7 +2995,64 @@ var CollectionObservable = function () {
   return CollectionObservable;
 }();
 
-;
+var _initialiseProps = function _initialiseProps() {
+  var _this4 = this;
+
+  this._onObservableArrayChange = function (models_or_view_models) {
+    return kb.ignore(function () {
+      var models = void 0;
+      if (_this4.in_edit) {
+        return;
+      } // we are doing the editing
+
+      // validate input
+      _this4.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0])) || !_this4.models_only && (!models_or_view_models.length || _.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])) || kb._throwUnexpected(_this4, 'incorrect type passed');
+
+      var observable = kb.utils.wrappedObservable(_this4);
+      var collection = kb.peek(_this4._collection);
+      var has_filters = kb.peek(_this4._filters).length;
+      if (!collection) {
+        return;
+      } // no collection or we are updating ourselves
+
+      var view_models = models_or_view_models;
+
+      // set Models
+      if (_this4.models_only) {
+        models = _.filter(models_or_view_models, function (model) {
+          return !has_filters || _this4._selectModel(model);
+        });
+
+        // set ViewModels
+      } else {
+        !has_filters || (view_models = []); // check for filtering of ViewModels
+        models = [];
+        models_or_view_models.forEach(function (view_model) {
+          var current_view_model = void 0;
+          var model = kb.utils.wrappedObject(view_model);
+          if (has_filters) {
+            if (!_this4._selectModel(model)) return; // filtered so skip
+            view_models.push(view_model);
+          }
+
+          // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
+          if (current_view_model = _this4.create_options.store.find(model, _this4.create_options.creator)) {
+            current_view_model.constructor === view_model.constructor || kb._throwUnexpected(_this4, 'replacing different type of view model');
+          }
+          _this4.create_options.store.retain(view_model, model, _this4.create_options.creator);
+          models.push(model);
+        });
+      }
+
+      // a change, update models
+      _this4.in_edit++;
+      models_or_view_models.length === view_models.length || observable(view_models); // replace the ViewModels because they were filtered
+      _.isEqual(collection.models, models) || collection.reset(models);
+      _this4.in_edit--;
+    });
+  };
+};
+
 CollectionObservable.initClass();
 kb.CollectionObservable = CollectionObservable;
 
@@ -3652,7 +3653,10 @@ kb.Inject = function () {
       // bind the view models
       results.forEach(function (app) {
         // evaluate the app data
-        var afterBinding, beforeBinding, expression, options;
+        var afterBinding = void 0,
+            beforeBinding = void 0,
+            expression = void 0,
+            options = void 0;
         if (expression = app.binding) {
           var _data;
 
@@ -4549,12 +4553,11 @@ module.exports = __initClass__(kb.Store = function () {
     value: function _storeReferences(observable) {
       var _this4 = this;
 
-      var stores_references = void 0;
-      if (!(stores_references = kb.utils.get(observable, 'stores_references'))) {
-        return;
-      }
-      return _.find(stores_references, function (store_references) {
-        return store_references.store === _this4;
+      var stores_references = kb.utils.get(observable, 'stores_references');
+      if (!stores_references) return;
+
+      return _.find(stores_references, function (ref) {
+        return ref.store === _this4;
       });
     }
 
@@ -4565,16 +4568,15 @@ module.exports = __initClass__(kb.Store = function () {
     value: function _getOrCreateStoreReferences(observable) {
       var _this5 = this;
 
-      var store_references = void 0;
       var stores_references = kb.utils.orSet(observable, 'stores_references', []);
-      if (!(store_references = _.find(stores_references, function (store_references) {
-        return store_references.store === _this5;
-      }))) {
-        stores_references.push(store_references = { store: this, ref_count: 0, release: function release() {
-            return _this5.release(observable);
-          } });
-      }
-      return store_references;
+
+      var ref = _.find(stores_references, function (ref) {
+        return ref.store === _this5;
+      });
+      if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: function release() {
+          return _this5.release(observable);
+        } });
+      return ref;
     }
 
     // @nodoc
@@ -4582,14 +4584,14 @@ module.exports = __initClass__(kb.Store = function () {
   }, {
     key: '_clearStoreReferences',
     value: function _clearStoreReferences(observable) {
-      var stores_references = void 0;
-      if (stores_references = kb.utils.get(observable, 'stores_references')) {
-        for (var index in observable.__kb.stores_references) {
-          var store_references = observable.__kb.stores_references[index];
-          if (store_references.store === this) {
-            observable.__kb.stores_references.splice(index, 1);
-            break;
-          }
+      var stores_references = kb.utils.orSet(observable, 'stores_references', []);
+      if (!stores_references) return;
+
+      for (var i = 0, l = observable.__kb.stores_references.length; i < l; i++) {
+        var ref = observable.__kb.stores_references[i];
+        if (ref.store === this) {
+          observable.__kb.stores_references.splice(i, 1);
+          break;
         }
       }
     }
@@ -4738,9 +4740,9 @@ var utils = function () {
   }, {
     key: 'orSet',
     value: function orSet(obj, key, value) {
-      if (!(obj.__kb || (obj.__kb = {})).hasOwnProperty(key)) {
-        obj.__kb[key] = value;return obj.__kb[key];
-      }
+      if (!obj.__kb) obj.__kb = {};
+      if (!obj.__kb.hasOwnProperty(key)) obj.__kb[key] = value;
+      return obj.__kb[key];
     }
 
     // @nodoc
@@ -5038,7 +5040,6 @@ var utils = function () {
   return utils;
 }();
 
-;
 utils.initClass();
 kb.utils = utils;
 
@@ -5098,7 +5099,7 @@ var createObservable = function createObservable(vm, model, key, create_options)
 // @nodoc
 var createStaticObservables = function createStaticObservables(vm, model) {
   vm.__kb.statics.forEach(function (key) {
-    var vm_key;
+    var vm_key = void 0;
     if (vm_key = assignViewModelKey(vm, key)) {
       if (model.has(vm_key)) {
         vm[vm_key] = vm.__kb.view_model[vm_key] = model.get(vm_key);
@@ -5350,7 +5351,6 @@ var ViewModel = function () {
   return ViewModel;
 }();
 
-;
 ViewModel.initClass();
 kb.ViewModel = ViewModel;
 
@@ -6240,7 +6240,7 @@ kb.formValidator = function (view_model, el) {
 
   // build up the results
   el.getElementsByTagName('input').forEach(function (input_el) {
-    var name;
+    var name = void 0;
     if (!(name = input_el.getAttribute('name'))) return; // need named inputs to set up an object
     validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);

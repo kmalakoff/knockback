@@ -39,7 +39,11 @@ class utils {
   static set(obj, key, value) { return ((obj.__kb || (obj.__kb = {})))[key] = value; }
 
   // @nodoc
-  static orSet(obj, key, value) { if (!((obj.__kb || (obj.__kb = {}))).hasOwnProperty(key)) { obj.__kb[key] = value; return obj.__kb[key]; } }
+  static orSet(obj, key, value) {
+    if (!obj.__kb) obj.__kb = {};
+    if (!obj.__kb.hasOwnProperty(key)) obj.__kb[key] = value;
+    return obj.__kb[key];
+  }
 
   // @nodoc
   static has(obj, key) { return obj.__kb && obj.__kb.hasOwnProperty(key); }

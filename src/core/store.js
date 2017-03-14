@@ -217,31 +217,31 @@ module.exports = __initClass__(kb.Store = class Store {
 
   // @nodoc
   _storeReferences(observable) {
-    let stores_references;
-    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) { return; }
-    return _.find(stores_references, store_references => store_references.store === this);
+    let stores_references = kb.utils.get(observable, 'stores_references');
+    if (!stores_references) return;
+
+    return _.find(stores_references, (ref) => ref.store === this);
   }
 
   // @nodoc
   _getOrCreateStoreReferences(observable) {
-    let store_references;
     const stores_references = kb.utils.orSet(observable, 'stores_references', []);
-    if (!(store_references = _.find(stores_references, store_references => store_references.store === this))) {
-      stores_references.push(store_references = { store: this, ref_count: 0, release: () => this.release(observable) });
-    }
-    return store_references;
+
+    let ref = _.find(stores_references, (ref) => ref.store === this);
+    if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: () => this.release(observable) });
+    return ref;
   }
 
   // @nodoc
   _clearStoreReferences(observable) {
-    let stores_references;
-    if (stores_references = kb.utils.get(observable, 'stores_references')) {
-      for (const index in observable.__kb.stores_references) {
-        const store_references = observable.__kb.stores_references[index];
-        if (store_references.store === this) {
-          observable.__kb.stores_references.splice(index, 1);
-          break;
-        }
+    const stores_references = kb.utils.orSet(observable, 'stores_references', []);
+    if (!stores_references) return;
+
+    for (var i = 0, l = observable.__kb.stores_references.length; i < l; i++) {
+      const ref = observable.__kb.stores_references[i];
+      if (ref.store === this) {
+        observable.__kb.stores_references.splice(i, 1);
+        break;
       }
     }
   }

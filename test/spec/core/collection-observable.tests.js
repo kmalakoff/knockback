@@ -38,10 +38,8 @@ describe.only('collection-observable @quick @collection-observable', () => {
     }
   }
 
-  it.only('2. Basic Usage: collection observable with ko.computed', (done) => {
+  it('2. Basic Usage: collection observable with ko.computed', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
-
-    debugger;
 
     const collection = new Contacts();
     const collection_observable = kb.collectionObservable(collection);
@@ -106,11 +104,10 @@ describe.only('collection-observable @quick @collection-observable', () => {
     return done();
   });
 
-  it('4. Basic Usage: no view models', (done) => {
+  it.only('4. Basic Usage: no view models', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
-
     const collection_observable = kb.collectionObservable(collection, { models_only: true });
 
     assert.equal(collection.length, 0, 'no models');
@@ -199,7 +196,6 @@ describe.only('collection-observable @quick @collection-observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
-
     const collection_observable = kb.collectionObservable(collection, {
       view_model: ContactViewModelClass,
       sort_attribute: 'name',

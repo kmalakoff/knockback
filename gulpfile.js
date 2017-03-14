@@ -14,10 +14,13 @@ const mocha = require('gulp-mocha');
 const nuget = require('nuget');
 
 const nugetGulp = () => es.map((file, callback) =>
-  nuget.pack(file, (err, nupkg_file) => {
+  nuget.pack(file, (err, nupkgFile) => {
     if (err) { return callback(err); }
-    return nuget.push(nupkg_file, (err) => { if (err) { return gutil.log(err); } return callback(); });
-  }),
+    return nuget.push(nupkgFile, (err) => {
+      if (err) return gutil.log(err);
+      return callback();
+    });
+  })
 );
 
 const HEADER = (module.exports = `\
@@ -92,7 +95,7 @@ gulp.task('publish', ['minify'], (callback) => {
   queue.defer(callback =>
     gulp.src('packages/nuget/*.nuspec')
       .pipe(nugetGulp())
-      .on('end', callback),
+      .on('end', callback)
   );
   queue.await((err) => { !err || console.log(err); return process.exit(err ? 1 : 0); });
 });

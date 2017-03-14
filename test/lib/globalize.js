@@ -564,7 +564,7 @@
 					?
 					cal.monthsGenitive[clength === 3 ? 'namesAbbr' : 'names'][part]
 					:
-					cal.months[clength === 3 ? 'namesAbbr' : 'names'][part],
+					cal.months[clength === 3 ? 'namesAbbr' : 'names'][part]
 				);
           break;
         case 'M':
@@ -640,7 +640,7 @@
 					`${(hour <= 0 ? '+' : '-') + padZeros(Math.floor(Math.abs(hour)), 2)
 					// Hard coded ":" separator, rather than using cal.TimeSeparator
 					// Repeated here for consistency, plus ":" was already assumed in date parsing.
-					 }:${padZeros(Math.abs(value.getTimezoneOffset() % 60), 2)}`,
+					 }:${padZeros(Math.abs(value.getTimezoneOffset() % 60), 2)}`
 				);
           break;
         case 'g':
