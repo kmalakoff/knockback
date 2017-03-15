@@ -417,7 +417,7 @@ describe('collection-observable @quick @collection-observable', () => {
 
     class ContactViewModelDate extends kb.ViewModel {
       constructor(model, options) {
-        super(model, Object.assign({ requires: ['date'] }, options));
+        super(model, kb.assign({ requires: ['date'] }, options));
       }
     }
 
@@ -741,7 +741,7 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(models);
     assert.equal(collection_observable.collection().length, 4);
 
-    collection_observable().forEach(view_models => {
+    _.each(collection_observable(), view_models => {
       assert.ok(!!view_models.date());
       assert.ok(view_models.model() instanceof Contact);
     });
@@ -760,7 +760,7 @@ describe('collection-observable @quick @collection-observable', () => {
     const collection_observable = kb.collectionObservable(models, { view_model: PersonViewModel });
     assert.equal(collection_observable.collection().length, 4);
 
-    collection_observable().forEach(view_model => {
+    _.each(collection_observable(), view_model => {
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact);
     });
@@ -841,7 +841,7 @@ describe('collection-observable @quick @collection-observable', () => {
     let new_view_models = collection_observable();
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
-    new_view_models.forEach(vm => {
+    _.each(new_view_models, vm => {
       if (vm.model() === collection_observable.collection().models[4]) {
         assert.ok(!(previous_view_models.includes(vm)));
       } else {
@@ -854,12 +854,12 @@ describe('collection-observable @quick @collection-observable', () => {
     new_view_models = collection_observable();
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
-    new_view_models.forEach(vm => { assert.ok(!(previous_view_models.includes(vm))); });
+    _.each(new_view_models, vm => { assert.ok(!(previous_view_models.includes(vm))); });
 
     kb.release(collection_observable);
 
     assert.ok(kb.Statistics.eventsStats(collection).count === 0, `All collection events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(collection))}`);
-    models.forEach(model => {
+    _.each(models,model => {
       collection.remove(model);
       assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     });
@@ -876,7 +876,7 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    collection_observable().forEach(view_model => {
+    _.each(collection_observable(), view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -898,7 +898,7 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    collection_observable().forEach(view_model => {
+    _.each(collection_observable(), view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -921,7 +921,7 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    collection_observable().forEach(view_model => {
+    _.each(collection_observable(), view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -944,7 +944,7 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
 
-    collection_observable().forEach(view_model => {
+    _.each(collection_observable(), view_model => {
       assert.ok(view_model instanceof PersonViewModel, 'view model correct type');
       assert.ok(!!view_model.date());
       assert.ok(view_model.model() instanceof Contact, 'model correct type');
@@ -967,7 +967,7 @@ describe('collection-observable @quick @collection-observable', () => {
     collection_observable.collection().reset(models);
     assert.equal(collection_observable.collection().length, 4);
 
-    collection_observable().forEach(vm => {
+    _.each(collection_observable(), vm => {
       assert.ok(!!vm.date());
       assert.ok(vm.model() instanceof Contact);
     });

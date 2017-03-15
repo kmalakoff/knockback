@@ -18,7 +18,7 @@
         options = {};
       }
       common_requires = ['_selected', '_for_delete', 'active', 'name', 'type', '_change_type', 'zone', 'value'];
-      Object.assign(options, {
+      kb.assign(options, {
         requires: common_requires,
       });
       RecordViewModel.__super__.constructor.call(this, model, options);

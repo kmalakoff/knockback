@@ -7,7 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const { _ } = require('../kb');
+const kb = require('../kb');
+const { _ } = kb;
 
 // @nodoc
 const _mergeArray = function (result, key, value) {
@@ -20,7 +21,7 @@ const _mergeArray = function (result, key, value) {
 // @nodoc
 const _mergeObject = function (result, key, value) {
   if (!result[key]) result[key] = {};
-  return Object.assign(result[key], value);
+  return kb.assign(result[key], value);
 };
 
 // @nodoc

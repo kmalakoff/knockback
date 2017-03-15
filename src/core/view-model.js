@@ -130,7 +130,7 @@ class ViewModel {
       if (_.isArray(args[0])) { args[0] = { keys: args[0] }; }
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
       options = {};
-      args.forEach((arg) => { Object.assign(options, arg); options = kb.utils.collapseOptions(options); });
+      args.forEach((arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
       KEYS_OPTIONS.forEach((key) => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
 
       // always use a store to ensure recursive view models are handled correctly

@@ -93,17 +93,17 @@ class CollectionObservable {
     const args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
     return kb.ignore(() => {
       collection = args[0] instanceof kb.Collection ? args.shift() : (_.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection());
-      if (_.isFunction(args[0])) { args[0] = { view_model: args[0] }; }
+      if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       options = {};
-      args.forEach(arg => Object.assign(options, arg));
+      args.forEach(arg => kb.assign(options, arg));
 
       let observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true; // mark as a kb.CollectionObservable
       this.in_edit = 0;
 
       // bind callbacks
-      if (!this.__kb) { this.__kb = {}; }
+      if (!this.__kb) this.__kb = {};
 
       // options
       options = kb.utils.collapseOptions(options);

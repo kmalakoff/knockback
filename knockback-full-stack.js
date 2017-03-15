@@ -481,6 +481,9 @@ kb.ko = ko;
 kb.Collection = Backbone.Collection;
 kb.Model = Backbone.Object || Backbone.Model;
 kb.Events = Backbone.Events;
+
+// Object.assign
+kb.assign = _.extend || _.assign;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
@@ -549,7 +552,7 @@ function inherits(parent, protoProps, staticProps) {
   }
 
   // Add static properties to the constructor function, if supplied.
-  Object.assign(child, parent, staticProps);
+  kb.assign(child, parent, staticProps);
 
   // Set the prototype chain to inherit from 'parent', without calling
   // parent's constructor function and add the prototype properties.
@@ -2546,13 +2549,11 @@ var CollectionObservable = function () {
     var args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
     return kb.ignore(function () {
       collection = args[0] instanceof kb.Collection ? args.shift() : _.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection();
-      if (_.isFunction(args[0])) {
-        args[0] = { view_model: args[0] };
-      }
+      if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       options = {};
       args.forEach(function (arg) {
-        return Object.assign(options, arg);
+        return kb.assign(options, arg);
       });
 
       var observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
@@ -2560,9 +2561,7 @@ var CollectionObservable = function () {
       _this.in_edit = 0;
 
       // bind callbacks
-      if (!_this.__kb) {
-        _this.__kb = {};
-      }
+      if (!_this.__kb) _this.__kb = {};
 
       // options
       options = kb.utils.collapseOptions(options);
@@ -3643,9 +3642,9 @@ kb.Inject = function () {
             results.push({ el: el, view_model: {}, binding: attr.value });
           }
         }
-        for (var i = 0, l = el.childNodes; i < l; i++) {
-          findElements(el.childNodes[i]);
-        }
+        _.each(el.childNodes, function (child) {
+          return findElements(child);
+        });
       };
       if (!root && (window != null ? window.document : undefined)) {
         root = window.document;
@@ -5166,7 +5165,7 @@ var ViewModel = function () {
       }_this.__kb.view_model = args.length > 1 ? args.pop() : _this;
       options = {};
       args.forEach(function (arg) {
-        Object.assign(options, arg);options = kb.utils.collapseOptions(options);
+        kb.assign(options, arg);options = kb.utils.collapseOptions(options);
       });
       KEYS_OPTIONS.forEach(function (key) {
         if (options.hasOwnProperty(key)) {
@@ -6179,14 +6178,12 @@ kb.formValidator = function (view_model, el) {
   validation_options.no_attach = !!form_name;
 
   // build up the results
-  var input_els = el.getElementsByTagName('input');
-  for (var i = 0, l = input_els.length; i < l; i++) {
-    var input_el = input_els[i];
+  _.each(el.getElementsByTagName('input'), function (input_el) {
     var name = input_el.getAttribute('name');
-    if (!name) continue; // need named inputs to set up an object
+    if (!name) return; // need named inputs to set up an object
     validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
-  };
+  });
 
   // collect stats, error count and valid
   results.$error_count = ko.computed(function () {
@@ -23853,11 +23850,10 @@ module.exports = function (module) {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _require = __webpack_require__(0),
-    _ = _require._;
+var kb = __webpack_require__(0);
+var _ = kb._;
 
 // @nodoc
-
 
 var _mergeArray = function _mergeArray(result, key, value) {
   if (!result[key]) result[key] = [];
@@ -23869,7 +23865,7 @@ var _mergeArray = function _mergeArray(result, key, value) {
 // @nodoc
 var _mergeObject = function _mergeObject(result, key, value) {
   if (!result[key]) result[key] = {};
-  return Object.assign(result[key], value);
+  return kb.assign(result[key], value);
 };
 
 // @nodoc

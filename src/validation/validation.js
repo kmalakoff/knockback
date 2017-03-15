@@ -215,14 +215,12 @@ kb.formValidator = (view_model, el) => {
   validation_options.no_attach = !!form_name;
 
   // build up the results
-  const input_els = el.getElementsByTagName('input');
-  for (var i = 0, l = input_els.length; i < l; i++) {
-    const input_el = input_els[i];
+  _.each(el.getElementsByTagName('input'), (input_el) => {
     let name = input_el.getAttribute('name');
-    if (!name) continue; // need named inputs to set up an object
+    if (!name) return; // need named inputs to set up an object
     validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
-  };
+  });
 
   // collect stats, error count and valid
   results.$error_count = ko.computed(() => {

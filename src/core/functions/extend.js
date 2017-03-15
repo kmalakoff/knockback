@@ -25,7 +25,7 @@ function inherits(parent, protoProps, staticProps) {
   }
 
   // Add static properties to the constructor function, if supplied.
-  Object.assign(child, parent, staticProps);
+  kb.assign(child, parent, staticProps);
 
   // Set the prototype chain to inherit from 'parent', without calling
   // parent's constructor function and add the prototype properties.

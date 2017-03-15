@@ -7,8 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let _,
-  Backbone;
+let _, Backbone;
 var window = (window != null) ? window : global;
 const ko = require('knockout');
 
@@ -274,3 +273,6 @@ kb.ko = ko;
 kb.Collection = Backbone.Collection;
 kb.Model = Backbone.Object || Backbone.Model;
 kb.Events = Backbone.Events;
+
+// Object.assign
+kb.assign = _.extend || _.assign;

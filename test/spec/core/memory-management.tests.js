@@ -212,7 +212,7 @@ describe('knockback.js memory management @quick @memory', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Destroyed: 2');
-    SimpleViewModel.view_models.forEach(view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
@@ -261,13 +261,13 @@ describe('knockback.js memory management @quick @memory', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Remaining: 2');
-    SimpleViewModel.view_models.forEach(view_model => { assert.ok(view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => { assert.ok(view_model.prop, 'Prop destroyed'); });
 
     store.destroy(); store = null;
 
     // all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     assert.equal(SimpleViewModel.view_models.length, 2, 'Destroyed: 2');
-    SimpleViewModel.view_models.forEach(view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
