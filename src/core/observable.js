@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _, ko } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _, ko } = kb;
 const TypedValue = require('./typed-value');
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'];

@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _, ko } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _, ko } = kb;
 const extend = require('./functions/extend');
 
 // @nodoc

@@ -187,17 +187,17 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
       } else {
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 1, 'In the studio');
-        for (occupant_observable of place_view_model.occupants()) {
+        _.each(place_view_model.occupants(), occupant_observable => {
           assert.equal(occupant_observable.name(), 'John', 'Expected name');
           assert.equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location');
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 1, 'In the studio');
-          for (occupant_observable2 of occupant_observable.occupies().occupants()) {
+          _.each(occupant_observable.occupies().occupants(), occupant_observable2 => {
             assert.equal(occupant_observable2.name(), 'John', 'Expected name');
             assert.equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location');
-          }
-        }
+          });
+        });
       }
     });
 
@@ -268,10 +268,10 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
     assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
     kb.release(george_view_model); george_view_model = null;
 
-    _.each(model_stats, name => {
+    for (const name in model_stats) {
       const stats = model_stats[name];
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    });
+    };
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
   });

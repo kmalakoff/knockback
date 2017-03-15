@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-module.exports = (kb = require('./kb'));
+const kb = require('./kb');
+module.exports = kb;
 
 kb.configure = require('./configure');
 

@@ -552,12 +552,9 @@ module.exports = function extend(protoProps, classProps) {
 "use strict";
 
 
-var kb = void 0,
-    value = void 0;
+var kb = __webpack_require__(0);
+var _ = kb._;
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
 
 var ALL_ORMS = {
   default: null,
@@ -569,7 +566,7 @@ var ALL_ORMS = {
 // @nodoc
 kb.settings = { orm: ALL_ORMS.default };
 for (var key in ALL_ORMS) {
-  value = ALL_ORMS[key];
+  var value = ALL_ORMS[key];
   if (value && value.isAvailable()) {
     kb.settings.orm = value;
     break;
@@ -582,18 +579,19 @@ module.exports = function (options) {
     options = {};
   }
   for (key in options) {
-    var orm;
-    value = options[key];
+    var _value = options[key];
     switch (key) {
       case 'orm':
         // set by name
-        if (_.isString(value)) {
-          if (!ALL_ORMS.hasOwnProperty(value)) {
-            console.log('Knockback configure: could not find orm: ' + value + '. Available: ' + _.keys(ALL_ORMS).join(', '));
+        if (_.isString(_value)) {
+          if (!ALL_ORMS.hasOwnProperty(_value)) {
+            console.log('Knockback configure: could not find orm: ' + _value + '. Available: ' + _.keys(ALL_ORMS).join(', '));
             continue;
           }
-          if ((orm = ALL_ORMS[value]) && !orm.isAvailable()) {
-            console.log('Knockback configure: could not enable orm ' + value + '. Make sure it is included before Knockback');
+
+          var orm = ALL_ORMS[_value];
+          if (orm && !orm.isAvailable()) {
+            console.log('Knockback configure: could not enable orm ' + _value + '. Make sure it is included before Knockback');
             continue;
           }
           kb.settings.orm = orm;
@@ -601,12 +599,12 @@ module.exports = function (options) {
 
           // set by functions
         } else {
-          kb.settings.orm = value;
+          kb.settings.orm = _value;
         }
         break;
 
       default:
-        kb.settings[key] = value;
+        kb.settings[key] = _value;
     }
   }
 };
@@ -622,17 +620,13 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var kb = void 0,
-    TypedValue = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 // @nodoc
 
-
-module.exports = TypedValue = function () {
+module.exports = function () {
   function TypedValue(create_options) {
     _classCallCheck(this, TypedValue);
 
@@ -866,11 +860,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 var extend = __webpack_require__(1);
 
@@ -1513,15 +1505,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 //
-
 
 kb.EventWatcher = function () {
   _createClass(EventWatcher, null, [{
@@ -1767,10 +1756,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._;
+var kb = __webpack_require__(0);
+var _ = kb._;
 
 // Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 //
@@ -1778,7 +1765,6 @@ var _kb = kb = __webpack_require__(0),
 //   var factory = new kb.Factory();
 //   factory.addPathMapping('bob.the.builder', kb.ViewModel);
 //   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
-
 
 kb.Factory = function () {
   _createClass(Factory, null, [{
@@ -1879,8 +1865,8 @@ kb.Factory = function () {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-module.exports = kb = __webpack_require__(0);
+var kb = __webpack_require__(0);
+module.exports = kb;
 
 kb.configure = __webpack_require__(2);
 
@@ -2142,13 +2128,10 @@ if (typeof document !== 'undefined' && document !== null) {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var ko = kb.ko;
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
-
 
 if (__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, function (x) {
   return x.extend;
@@ -2195,11 +2178,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 var TypedValue = __webpack_require__(3);
 
@@ -2440,16 +2421,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._;
+var kb = __webpack_require__(0);
+var _ = kb._;
 
 // kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
 //
 // kb.Statistics is not included in `knockback.js` nor `knockback-core.js` so you need to manually include it from the `lib` directory.
 //
-
 
 module.exports = kb.Statistics = function () {
   function Statistics() {
@@ -2619,11 +2597,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 // Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 //
@@ -2632,7 +2608,6 @@ var _kb = kb = __webpack_require__(0),
 //   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 //     store: kb.utils.wrappedStore(co)
 //   });
-
 
 var Store = function () {
   _createClass(Store, null, [{
@@ -3058,18 +3033,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 // ###################################################
 // Public API
 // ###################################################
 
 // Library of general-purpose utilities
-
 
 var utils = function () {
   function utils() {
@@ -3434,11 +3406,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 var extend = __webpack_require__(1);
 

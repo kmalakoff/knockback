@@ -1,9 +1,8 @@
-let kb,
-  TypedValue;
-const { _, ko } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _, ko } = kb;
 
 // @nodoc
-module.exports = TypedValue = class TypedValue {
+module.exports = class TypedValue {
   constructor(create_options) {
     this.create_options = create_options;
     this._vo = ko.observable(null); // create a value observable for the first dependency

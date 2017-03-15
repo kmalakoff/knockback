@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _ } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _ } = kb;
 
 // Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 //

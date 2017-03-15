@@ -1,6 +1,5 @@
-let kb,
-  value;
-const { _, ko } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _ } = kb;
 
 const ALL_ORMS = {
   default: null,
@@ -12,7 +11,7 @@ const ALL_ORMS = {
 // @nodoc
 kb.settings = { orm: ALL_ORMS.default };
 for (var key in ALL_ORMS) {
-  value = ALL_ORMS[key];
+  const value = ALL_ORMS[key];
   if (value && value.isAvailable()) {
     kb.settings.orm = value;
     break;
@@ -23,8 +22,7 @@ for (var key in ALL_ORMS) {
 module.exports = function (options) {
   if (options == null) { options = {}; }
   for (key in options) {
-    var orm;
-    value = options[key];
+    const value = options[key];
     switch (key) {
       case 'orm':
         // set by name
@@ -33,7 +31,9 @@ module.exports = function (options) {
             console.log(`Knockback configure: could not find orm: ${value}. Available: ${_.keys(ALL_ORMS).join(', ')}`);
             continue;
           }
-          if ((orm = ALL_ORMS[value]) && !orm.isAvailable()) {
+
+          const orm = ALL_ORMS[value];
+          if (orm && !orm.isAvailable()) {
             console.log(`Knockback configure: could not enable orm ${value}. Make sure it is included before Knockback`);
             continue;
           }

@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _, ko } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _, ko } = kb;
 
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 //
