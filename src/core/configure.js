@@ -38,16 +38,10 @@ module.exports = function (options) {
             continue;
           }
           kb.settings.orm = orm;
-          continue;
-
-        // set by functions
-        } else {
-          kb.settings.orm = value;
-        }
+        } else kb.settings.orm = value;
         break;
 
-      default:
-        kb.settings[key] = value;
+      default: kb.settings[key] = value; break;
     }
   }
 };

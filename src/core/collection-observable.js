@@ -456,7 +456,7 @@ class CollectionObservable {
         });
       }
 
-    // a change, update models
+      // a change, update models
       this.in_edit++;
       (models_or_view_models.length === view_models.length) || observable(view_models); // replace the ViewModels because they were filtered
       _.isEqual(collection.models, models) || collection.reset(models);
@@ -486,11 +486,9 @@ class CollectionObservable {
     for (let i = 0, l = filters.length; i < l; i++) {
       let filter = filters[i];
       filter = kb.peek(filter);
-      if (_.isFunction(filter)) {
-        if (!filter(model)) return false;
-      } else if (_.isArray(filter)) {
-        if (!filter.includes(model.id)) return false;
-      } else if (model.id !== filter) return false;
+      if (_.isFunction(filter)) { if (!filter(model)) return false; }
+      else if (_.isArray(filter)) { if (!filter.includes(model.id)) return false; }
+      else if (model.id !== filter) return false;
     }
     return true;
   }
