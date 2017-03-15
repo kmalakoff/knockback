@@ -18,7 +18,7 @@ if (!Globalize) {
 // ##############################
 class LocaleManager {
   static initClass() {
-    _.assign(this.prototype, kb.Events);
+    Object.assign(this.prototype, kb.Events);
   }
 
   constructor(locale_identifier, translations_by_locale) {
@@ -563,7 +563,7 @@ describe('localized-observable @quick @localization', () => {
 
     class ContactViewModelDate extends kb.ViewModel {
       constructor(model, options) {
-        super(model, _.extend({ internals: ['date'] }, options));
+        super(model, Object.assign({ internals: ['date'] }, options));
         this.date = new kb.LongDateLocalizer(this._date);
       }
     }

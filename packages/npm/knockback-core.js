@@ -2969,11 +2969,11 @@ module.exports = BackboneRelational = (function() {
   };
 
   BackboneRelational.bind = function(model, key, update, path) {
-    var event, events, i, len, rel_fn, type;
+    var event, events, i, len, relFn, type;
     if (!(type = this.relationType(model, key))) {
       return null;
     }
-    rel_fn = function(model) {
+    relFn = function(model) {
       !kb.statistics || kb.statistics.addModelEvent({
         name: 'update (relational)',
         model: model,
@@ -2986,20 +2986,20 @@ module.exports = BackboneRelational = (function() {
     if (type === kb.TYPE_COLLECTION) {
       for (i = 0, len = events.length; i < len; i++) {
         event = events[i];
-        model.bind(event + ":" + key, rel_fn);
+        model.bind(event + ":" + key, relFn);
       }
     } else {
-      model.bind(events[0] + ":" + key, rel_fn);
+      model.bind(events[0] + ":" + key, relFn);
     }
     return function() {
       var j, len1;
       if (type === kb.TYPE_COLLECTION) {
         for (j = 0, len1 = events.length; j < len1; j++) {
           event = events[j];
-          model.unbind(event + ":" + key, rel_fn);
+          model.unbind(event + ":" + key, relFn);
         }
       } else {
-        model.unbind(events[0] + ":" + key, rel_fn);
+        model.unbind(events[0] + ":" + key, relFn);
       }
     };
   };

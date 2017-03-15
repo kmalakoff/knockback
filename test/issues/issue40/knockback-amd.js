@@ -767,7 +767,7 @@
                 _len;
               for (_i = 0, _len = list.length; _i < _len; _i++) {
                 info = list[_i];
-                if (info.update && !info.rel_fn) {
+                if (info.update && !info.relFn) {
                   if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) {
                     continue;
                   }
@@ -814,7 +814,7 @@
             info = _ref1[index];
             if (info.obj === obj) {
               callbacks.list.splice(index, 1);
-              if (info.rel_fn) {
+              if (info.relFn) {
                 this._modelUnbindRelatationalInfo(event_name, info);
               }
               if (info.model) {
@@ -871,7 +871,7 @@
           list = callbacks.list;
           for (_i = 0, _len = list.length; _i < _len; _i++) {
             info = list[_i];
-            if (info.rel_fn) {
+            if (info.relFn) {
               this._modelUnbindRelatationalInfo(event_name, info);
             }
             if (info.model) {
@@ -891,32 +891,32 @@
           if (!relation) {
             return;
           }
-          info.rel_fn = function (model) {
+          info.relFn = function (model) {
             !kb.statistics || addStatisticsEvent(model, `${event_name} (relational)`, info);
             return info.update();
           };
           if (relation.collectionType || _.isArray(relation.keyContents)) {
             info.is_collection = true;
-            this.m.bind(`add:${info.key}`, info.rel_fn);
-            this.m.bind(`remove:${info.key}`, info.rel_fn);
+            this.m.bind(`add:${info.key}`, info.relFn);
+            this.m.bind(`remove:${info.key}`, info.relFn);
           } else {
-            this.m.bind(`update:${info.key}`, info.rel_fn);
+            this.m.bind(`update:${info.key}`, info.relFn);
           }
         }
         return this;
       };
 
       ModelWatcher.prototype._modelUnbindRelatationalInfo = function (event_name, info) {
-        if (!info.rel_fn) {
+        if (!info.relFn) {
           return;
         }
         if (info.is_collection) {
-          this.m.unbind(`add:${info.key}`, info.rel_fn);
-          this.m.unbind(`remove:${info.key}`, info.rel_fn);
+          this.m.unbind(`add:${info.key}`, info.relFn);
+          this.m.unbind(`remove:${info.key}`, info.relFn);
         } else {
-          this.m.unbind(`update:${info.key}`, info.rel_fn);
+          this.m.unbind(`update:${info.key}`, info.relFn);
         }
-        info.rel_fn = null;
+        info.relFn = null;
         return this;
       };
 

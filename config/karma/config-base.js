@@ -9,8 +9,10 @@ module.exports = {
   port: 9876,
   colors: true,
   logLevel: 'INFO',
-  browsers: ['PhantomJS'], // ['Firefox', 'Chrome', 'Safari']
+  browsers: ['PhantomJS'],
   singleRun: true,
+  // browsers: ['Chrome', 'Firefox', 'Chrome', 'Safari'],
+  // singleRun: true,
   // browsers: ['Chrome'],
   // singleRun: false,
 };

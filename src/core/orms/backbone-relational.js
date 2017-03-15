@@ -7,40 +7,39 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let BackboneRelational,
-  kb;
-const { _, Backbone } = (kb = require('../kb'));
+const kb = require('../kb');
+const { _, Backbone } = kb;
 
-let RelationalModel = null; // lazy check
+let RelationalModel = null; // lazy bind so this file can be loaded before relational library
 
 // @nodoc
-module.exports = BackboneRelational = class BackboneRelational {
-  static isAvailable() { return !!(RelationalModel = Backbone != null ? Backbone.RelationalModel : undefined); } // or require?('backbone-relational')?.RelationalModel # webpack optionals
+module.exports = class BackboneRelational {
+  static isAvailable() { return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null); }
 
   static relationType(model, key) {
-    let relation;
     if (!(model instanceof RelationalModel)) return null;
-    if (!(relation = _.find(model.getRelations(), test => test.key === key))) return null;
+    const relation = _.find(model.getRelations(), test => test.key === key);
+    if (!relation) return null;
     return (relation.collectionType || _.isArray(relation.keyContents)) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
   }
 
   static bind(model, key, update, path) {
-    let event,
-      type;
-    if (!(type = this.relationType(model, key))) return null;
-    const rel_fn = function (model) {
+    const type = this.relationType(model, key);
+    if (!type) return null;
+
+    const relFn = function (model) {
       !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });
       return update();
     };
 
     // VERSIONING: pre Backbone-Relational 0.8.0
     const events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-    if (type === kb.TYPE_COLLECTION) events.forEach(event => model.bind(`${event}:${key}`, rel_fn));
-    else model.bind(`${events[0]}:${key}`, rel_fn);
+    if (type === kb.TYPE_COLLECTION) events.forEach(event => model.bind(`${event}:${key}`, relFn));
+    else model.bind(`${events[0]}:${key}`, relFn);
 
-    return function () {
-      if (type === kb.TYPE_COLLECTION) events.forEach(event => model.unbind(`${event}:${key}`, rel_fn));
-      else model.unbind(`${events[0]}:${key}`, rel_fn);
+    return () => {
+      if (type === kb.TYPE_COLLECTION) events.forEach(event => model.unbind(`${event}:${key}`, relFn));
+      else model.unbind(`${events[0]}:${key}`, relFn);
     };
   }
 

@@ -173,7 +173,7 @@ kb.Inject = class Inject {
 const _ko_applyBindings = ko.applyBindings;
 ko.applyBindings = function (context, element) {
   const results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(element) : [];
-  if (!results.length) { return _ko_applyBindings.apply(this, arguments); }
+  if (!results.length) return _ko_applyBindings.apply(this, arguments);
 };
 
 // ############################
@@ -188,7 +188,7 @@ if (typeof document !== 'undefined' && document !== null) {
   // use simple ready check
   let onReady;
   (onReady = function () {
-    if (document.readyState !== 'complete') { return setTimeout(onReady, 0); } // keep waiting for the document to load
+    if (document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
     return kb.injectViewModels(); // the document is loaded
   }
   )();

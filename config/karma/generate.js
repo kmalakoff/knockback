@@ -13,8 +13,8 @@ const wrapAMD = require('gulp-wrap-amd-infer');
 const webpack = require('gulp-webpack-config');
 const browserify = require('gulp-browserify');
 
-// const TEST_GROUPS = require('../test_groups');
-const TEST_GROUPS = {browser_globals: require('../test_groups').browser_globals.slice(0, 1)};
+const TEST_GROUPS = require('../test_groups');
+// const TEST_GROUPS = {browser_globals: require('../test_groups').browser_globals.slice(0, 1)};
 
 module.exports = function (callback) {
   const queue = new Queue(1);

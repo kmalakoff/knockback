@@ -90,14 +90,13 @@ class CollectionObservable {
   // @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   // @note the constructor does not return 'this' but a ko.observableArray
   constructor(collection, view_model, options) {
-    this._onCollectionChange = this._onCollectionChange.bind(this);
     const args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
     return kb.ignore(() => {
       collection = args[0] instanceof kb.Collection ? args.shift() : (_.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection());
       if (_.isFunction(args[0])) { args[0] = { view_model: args[0] }; }
 
       options = {};
-      args.forEach(arg => _.extend(options, arg));
+      args.forEach(arg => Object.assign(options, arg));
 
       let observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true; // mark as a kb.CollectionObservable
@@ -328,12 +327,12 @@ class CollectionObservable {
     // check the existing factory
     if (factory = options.factory) {
       // models matches, check additional paths
-      let existing_creator;
-      if ((existing_creator = factory.creatorForPath(null, absolute_models_path)) && (!factories || (factories.models === existing_creator))) {
-        if (!factories) { return factory; } // all match, share the factory
+      const existing_creator = factory.creatorForPath(null, absolute_models_path);
+      if (existing_creator && (!factories || (factories.models === existing_creator))) {
+        if (!factories) return factory; // all match, share the factory
 
         // all match, share the factory
-        if (factory.hasPathMappings(factories, options.path)) { return factory; }
+        if (factory.hasPathMappings(factories, options.path)) return factory;
       }
     }
 
@@ -361,7 +360,7 @@ class CollectionObservable {
   }
 
   // @nodoc
-  _onCollectionChange(event, arg) {
+  _onCollectionChange = (event, arg) => {
     return kb.ignore(() => {
       let comparator, view_model;
       if (this.in_edit || kb.wasReleased(this)) return; // we are doing the editing or have been released

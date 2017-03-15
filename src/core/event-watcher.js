@@ -34,9 +34,6 @@ kb.EventWatcher = class EventWatcher {
   }
 
   constructor(emitter, obj, callback_options) {
-    this._onModelLoaded = this._onModelLoaded.bind(this);
-    this._onModelUnloaded = this._onModelUnloaded.bind(this);
-    this._unbindCallbacks = this._unbindCallbacks.bind(this);
     if (!this.__kb) { this.__kb = {}; }
     this.__kb.callbacks = {};
 
@@ -62,7 +59,7 @@ kb.EventWatcher = class EventWatcher {
   //   @param [Model|ModelRef] new_emitter the emitter whose attributes will be observed (can be null)
   emitter(new_emitter) {
     // get or no change
-    if ((arguments.length === 0) || (this.ee === new_emitter)) { return this.ee; }
+    if ((arguments.length === 0) || (this.ee === new_emitter)) return this.ee;
 
     // clear and unbind previous
     if (this.model_ref) {
@@ -142,7 +139,7 @@ kb.EventWatcher = class EventWatcher {
   // @nodoc
   // NOTE: this is called by registerCallbacks so the model could already be bound and we just want to bind the new info
   // NOTE: this is called by emitter so it may be used to clear a previous emitter without triggering an intermediate change
-  _onModelLoaded(model) {
+  _onModelLoaded = (model) => {
     this.ee = model;
     for (const event_name in this.__kb.callbacks) { // bind all events
       const callbacks = this.__kb.callbacks[event_name];
@@ -157,14 +154,14 @@ kb.EventWatcher = class EventWatcher {
   }
 
   // @nodoc
-  _onModelUnloaded(model) {
+  _onModelUnloaded = (model) => {
     if (this.ee !== model) return;
     this.ee = null;
     for (const event_name in this.__kb.callbacks) { const callbacks = this.__kb.callbacks[event_name]; this._unbindCallbacks(event_name, callbacks); } // unbind all events
   }
 
   // @nodoc
-  _unbindCallbacks(event_name, callbacks, skip_emitter) {
+  _unbindCallbacks = (event_name, callbacks, skip_emitter) => {
     if (callbacks.model) {
       callbacks.model.unbind(event_name, callbacks.fn);
       callbacks.model = null;

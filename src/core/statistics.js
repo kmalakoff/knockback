@@ -57,17 +57,23 @@ module.exports = kb.Statistics = class Statistics {
 
   // Unregister an object by key
   unregister(key, obj) {
-    let index;
     const type_tracker = this.registeredTracker(key);
-    if ((index = _.indexOf(type_tracker, obj)) < 0) { return (typeof console !== 'undefined' && console !== null ? console.log(`kb.Statistics: failed to unregister type: ${key}`) : undefined); }
+    const index = _.indexOf(type_tracker, obj)
+    if (!~index) {
+      if (typeof console !== 'undefined') console.log(`kb.Statistics: failed to unregister type: ${key}`);
+      return; 
+    }
     return type_tracker.splice(index, 1);
   }
 
   // @return [Integer] the number of registered objects by type
   registeredCount(type) {
-    if (type) { return this.registeredTracker(type).length; }
+    if (type) return this.registeredTracker(type).length;
     let count = 0;
-    for (type in this.registered_tracker[type]) { const type_tracker = this.registered_tracker[type][type]; count += type_tracker.length; }
+    for (type in this.registered_tracker[type]) {
+      const type_tracker = this.registered_tracker[type][type];
+      count += type_tracker.length;
+    }
     return count;
   }
 
@@ -79,7 +85,7 @@ module.exports = kb.Statistics = class Statistics {
     let stats_string = '';
     for (const type in this.registered_tracker) {
       const type_tracker = this.registered_tracker[type];
-      if (!type_tracker.length) { continue; }
+      if (!type_tracker.length) continue;
       if (written) { stats_string += '\n '; }
       stats_string += `${type || 'No Name'}: ${type_tracker.length}`;
       var written = true;

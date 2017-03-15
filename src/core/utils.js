@@ -199,8 +199,8 @@ class utils {
 
   // Helper to find the creator constructor or function from a factory or ORM solution
   static inferCreator(value, factory, path) {
-    let creator;
-    if (factory && (creator = factory.creatorForPath(value, path))) { return creator; }
+    let creator = factory ? factory.creatorForPath(value, path) : null;
+    if (creator) { return creator; }
 
     // try fallbacks
     if (!value) return null;

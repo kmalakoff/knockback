@@ -21,11 +21,11 @@ function inherits(parent, protoProps, staticProps) {
   if (protoProps && _.has(protoProps, 'constructor')) {
     child = protoProps.constructor;
   } else {
-    child = function(){ return parent.apply(this, arguments); };
+    child = function() { return parent.apply(this, arguments); };
   }
 
   // Add static properties to the constructor function, if supplied.
-  _.extend(child, parent, staticProps);
+  Object.assign(child, parent, staticProps);
 
   // Set the prototype chain to inherit from 'parent', without calling
   // parent's constructor function and add the prototype properties.

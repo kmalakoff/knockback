@@ -47,27 +47,25 @@ class Store {
   // Required clean up function to break cycles, release view models, etc.
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy() {
-    let index;
     this.__kb_released = true;
     this.clear();
-    if ((index = _.indexOf(kb.Store.instances, this)) >= 0) { return kb.Store.instances.splice(index, 1); }
+    const index = _.indexOf(kb.Store.instances, this);
+    if (~index) return kb.Store.instances.splice(index, 1);
   }
 
   // Manually clear the store
   clear() {
-    let observable,
-      observable_records,
-      replaced_observables;
-
+    let observable, observable_records, replaced_observables;
     [observable_records, this.observable_records] = [this.observable_records, {}];
-
     for (const creator_id in observable_records) {
       const records = observable_records[creator_id];
       for (const cid in records) { observable = records[cid]; this.release(observable, true); }
     }
 
     [replaced_observables, this.replaced_observables] = [this.replaced_observables, []];
-    replaced_observables.forEach((observable) => { if (!observable.__kb_released) { this.release(observable, true); } });
+    replaced_observables.forEach((observable) => {
+      if (!observable.__kb_released) this.release(observable, true);
+    });
   }
 
   // Manually compact the store by searching for released view models

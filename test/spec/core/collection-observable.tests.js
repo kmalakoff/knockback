@@ -417,7 +417,7 @@ describe('collection-observable @quick @collection-observable', () => {
 
     class ContactViewModelDate extends kb.ViewModel {
       constructor(model, options) {
-        super(model, _.extend({ requires: ['date'] }, options));
+        super(model, Object.assign({ requires: ['date'] }, options));
       }
     }
 

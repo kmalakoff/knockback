@@ -36,22 +36,30 @@ kb.Factory = class Factory {
     return factory;
   }
 
-  constructor(parent_factory) { this.paths = {}; if (parent_factory) { this.parent_factory = parent_factory; } }
+  constructor(parent_factory) {
+    this.paths = {};
+    if (parent_factory) this.parent_factory = parent_factory;
+  }
 
-  hasPath(path) { return this.paths.hasOwnProperty(path) || (this.parent_factory != null ? this.parent_factory.hasPath(path) : undefined); }
+  hasPath(path) {
+    return this.paths.hasOwnProperty(path) || (this.parent_factory != null ? this.parent_factory.hasPath(path) : undefined);
+  }
 
   addPathMapping(path, create_info) { return this.paths[path] = create_info; }
 
   addPathMappings(factories, owner_path) {
-    for (const path in factories) { const create_info = factories[path]; this.paths[kb.utils.pathJoin(owner_path, path)] = create_info; }
+    for (const path in factories) {
+      const create_info = factories[path];
+      this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
+    }
   }
 
   hasPathMappings(factories, owner_path) {
     let all_exist = true;
     for (const path in factories) {
-      var existing_creator;
       const creator = factories[path];
-      all_exist &= ((existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path))) && (creator === existing_creator));
+      const existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path));
+      all_exist &= (existing_creator && (creator === existing_creator));
     }
     return all_exist;
   }
@@ -63,9 +71,9 @@ kb.Factory = class Factory {
   //   factory.addPathMapping('bob.the.builder', kb.ViewModel);
   //   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
   creatorForPath(obj, path) {
-    let creator;
-    if (creator = this.paths[path]) { return (creator.view_model ? creator.view_model : creator); }
-    if (creator = this.parent_factory != null ? this.parent_factory.creatorForPath(obj, path) : undefined) { return creator; }
+    const creator = this.paths[path];
+    if (creator) return (creator.view_model ? creator.view_model : creator);
+    if (this.parent_factory) return this.parent_factory.creatorForPath(obj, path);
     return null;
   }
 };

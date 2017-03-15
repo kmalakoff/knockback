@@ -20,7 +20,7 @@ const _mergeArray = function (result, key, value) {
 // @nodoc
 const _mergeObject = function (result, key, value) {
   if (!result[key]) result[key] = {};
-  return _.extend(result[key], value);
+  return Object.assign(result[key], value);
 };
 
 // @nodoc
