@@ -483,7 +483,7 @@ kb.Model = Backbone.Object || Backbone.Model;
 kb.Events = Backbone.Events;
 
 // Object.assign
-kb.assign = _.extend || _.assign;
+kb.assign = _.assign || _.extend;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
@@ -502,11 +502,13 @@ kb.assign = _.extend || _.assign;
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ### */
 
-var _ = __webpack_require__(0)._;
+var kb = __webpack_require__(0);
+var _ = kb._;
 
 // Helper function to correctly set up the prototype chain for subclasses.
 // Similar to 'goog.inherits', but uses a hash of prototype properties and
 // class properties to be extended.
+
 function inherits(parent, protoProps, staticProps) {
   var child;
 
@@ -989,23 +991,14 @@ var CollectionObservable = function () {
       if (options.auto_compact) {
         _this.auto_compact = true;
       }
-      if (options.sort_attribute) {
-        _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));
-      } else {
-        _this._comparator = ko.observable(options.comparator);
-      }
-      if (options.filters) {
-        _this._filters = ko.observableArray(function () {
-          if (_.isArray(options.filters)) {
-            return options.filters;
-          } else if (options.filters) {
-            return [options.filters];
-          }
-        }());
-      } else {
-        _this._filters = ko.observableArray([]);
-      }
-      var create_options = _this.create_options = { store: kb.Store.useOptionsOrCreate(options, collection, observable) }; // create options
+
+      if (options.sort_attribute) _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));else _this._comparator = ko.observable(options.comparator);
+
+      if (options.filters) _this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : [options.filters]);else _this._filters = ko.observableArray([]);
+
+      // create options
+      _this.create_options = { store: kb.Store.useOptionsOrCreate(options, collection, observable) };
+      var create_options = _this.create_options;
       kb.utils.wrappedObject(observable, collection);
 
       // view model factory create factories
@@ -1914,12 +1907,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
 var window = window != null ? window : global;
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
+
 
 kb.RECUSIVE_AUTO_INJECT = true;
 

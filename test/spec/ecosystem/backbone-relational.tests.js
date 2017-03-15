@@ -5,9 +5,10 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
   // after -> delete root.Person; delete root.Building
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Building,
-    Person;
-  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let Building, Person;
+  let kb = typeof window !== 'undefined' ? root.kb : undefined;
+  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
+  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
   const { _, Backbone, ko } = kb;
   if (!(Backbone != null ? Backbone.Relational : undefined)) {
     if (typeof require === 'function') {
@@ -86,17 +87,17 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
     const house_view_model = new kb.ViewModel(our_house);
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place');
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count');
-    for (const occupant_observable of house_view_model.occupants()) {
+    _.each(house_view_model.occupants(), occupant_observable => {
       assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable.name()), 'Expected name');
       assert.equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location');
 
       // nested check
       assert.equal(occupant_observable.occupies().occupants().length, 2, 'Excepted occupant count');
-      for (const occupant_observable2 of occupant_observable.occupies().occupants()) {
+      _.each(occupant_observable.occupies().occupants(), occupant_observable2 => {
         assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable2.name()), 'Expected name');
         assert.equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location');
-      }
-    }
+      });
+    });
 
     kb.release(house_view_model);
 
@@ -144,45 +145,45 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
     // check the set up state
     const places = new kb.Collection([abbey_flats, abbey_studios]);
     const places_observable = kb.collectionObservable(places, { view_model: kb.ViewModel });
-    for (var place_view_model of places_observable()) {
+    _.each(places_observable(), place_view_model => {
       if (place_view_model.id() === 'house-2-1') {
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 4, 'Everyone is here');
-        for (occupant_observable of place_view_model.occupants()) {
+        _.each(place_view_model.occupants(), occupant_observable => {
           assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
           assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location');
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 4, 'Everyone is here');
-          for (occupant_observable2 of occupant_observable.occupies().occupants()) {
+          _.each(occupant_observable.occupies().occupants(), occupant_observable2 => {
             assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
             assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
-          }
-        }
+          });
+        });
       } else {
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 0, 'No one is here');
       }
-    }
+    });
 
     // a beattle crosses the road
     abbey_studios.get('occupants').add(john);
 
-    for (place_view_model of places_observable()) {
+    _.each(places_observable(), place_view_model => {
       if (place_view_model.id() === 'house-2-1') {
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 3, 'Almost everyone is here');
-        for (occupant_observable of place_view_model.occupants()) {
+        _.each(place_view_model.occupants(), occupant_observable => {
           assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
           assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location');
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 3, 'Almost everyone is here');
-          for (occupant_observable2 of occupant_observable.occupies().occupants()) {
+          _.each(occupant_observable.occupies().occupants(), occupant_observable2 => {
             assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
             assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
-          }
-        }
+          });
+        });
       } else {
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 1, 'In the studio');
@@ -198,7 +199,7 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
           }
         }
       }
-    }
+    });
 
     kb.release(places_observable);
 
@@ -241,36 +242,36 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
 
     let john_view_model = new kb.ViewModel(john);
     assert.equal(john_view_model.name(), 'John', 'Name is correct');
-    for (var friend of john_view_model.friends()) {
+    _.each(john_view_model.friends(), friend => {
       assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name');
-    }
+    });
     assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name');
     assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name');
     kb.release(john_view_model); john_view_model = null;
 
     let paul_view_model = new kb.ViewModel(paul);
     assert.equal(paul_view_model.name(), 'Paul', 'Name is correct');
-    for (friend of paul_view_model.friends()) {
+    _.each(paul_view_model.friends(), friend => {
       assert.ok(~_.indexOf(['John', 'George', 'Ringo'], friend.name()), 'Expected name');
-    }
+    });
     assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name');
     assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me');
     kb.release(paul_view_model); paul_view_model = null;
 
     let george_view_model = new kb.ViewModel(george);
     assert.equal(george_view_model.name(), 'George', 'Name is correct');
-    for (friend of george_view_model.friends()) {
+    _.each(george_view_model.friends(), friend => {
       assert.ok(~_.indexOf(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name');
-    }
+    });
     assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name');
     assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name');
     assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
     kb.release(george_view_model); george_view_model = null;
 
-    for (const name in model_stats) {
+    _.each(model_stats, name => {
       const stats = model_stats[name];
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
     return done();
   });
@@ -382,13 +383,13 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
       }),
     };
 
-    for (const book of view_model.books()) {
+    _.each(view_model.books(), book => {
       const author = book.author();
-      for (const authored_book of author.books()) {
+      _.each(author.books(), authored_book => {
         authored_book.editMode(true);
         assert.equal(authored_book.editMode(), true, 'edit mode set');
-      }
-    }
+      });
+    });
     return done();
   });
 
@@ -821,16 +822,16 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
     });
 
     const validateFriends = function (co, names) {
-      for (const name of names) {
+      _.each(names, name => {
         let found = false;
-        for (const vm of co()) {
+        _.each(co(), vm => {
           if (vm.name && (vm.name() === name)) {
             found = true;
             validateFriend(vm, name);
           }
-        }
+        });
         assert.ok(found, `${name} was found`);
-      }
+      });
     };
     var validateFriend = function (vm, name) {
       assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);

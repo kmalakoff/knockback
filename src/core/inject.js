@@ -7,10 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
 var window = (window != null) ? window : global;
 
-const { _, ko } = (kb = require('./kb'));
+const kb = require('./kb');
+const { _, ko } = kb;
 
 kb.RECUSIVE_AUTO_INJECT = true;
 

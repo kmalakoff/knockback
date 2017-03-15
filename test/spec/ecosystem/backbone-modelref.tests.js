@@ -3,7 +3,9 @@ const assert = root.assert || (typeof require === 'function' ? require('chai').a
 
 describe('Knockback.js with Backbone.ModelRef.js @backbone-modelref', () => {
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? root.kb : undefined;
+  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
+  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
   const { _, Backbone, ko } = kb;
   if (root.Backbone != null) {
     root.Backbone.ModelRef || (root.Backbone.ModelRef = typeof require === 'function' ? require('backbone-modelref') : undefined);

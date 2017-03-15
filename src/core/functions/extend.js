@@ -7,7 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 ### */
 
-const _ = require('../kb')._;
+const kb = require('../kb');
+const { _ } = kb;
 
 // Helper function to correctly set up the prototype chain for subclasses.
 // Similar to 'goog.inherits', but uses a hash of prototype properties and

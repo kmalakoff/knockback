@@ -6,7 +6,9 @@ describe('Knockback.js with Backbone-Relational.js @backbone-relational', () => 
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   let Person;
-  let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? root.kb : undefined;
+  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
+  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
   const { _, Backbone, ko } = kb;
   if (!(Backbone != null ? Backbone.Relational : undefined)) {
     if (typeof require === 'function') {

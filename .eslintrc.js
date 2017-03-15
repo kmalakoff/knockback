@@ -20,5 +20,8 @@ module.exports = {
 
     // http://eslint.org/docs/rules/no-underscore-dangle
     'import/no-unresolved': 'off',
+
+    // http://eslint.org/docs/rules/global-require
+    'global-require': 'off',
   }
 };

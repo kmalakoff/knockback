@@ -275,4 +275,4 @@ kb.Model = Backbone.Object || Backbone.Model;
 kb.Events = Backbone.Events;
 
 // Object.assign
-kb.assign = _.extend || _.assign;
+kb.assign = _.assign || _.extend;

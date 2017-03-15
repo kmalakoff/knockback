@@ -1,7 +1,9 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-let kb = typeof window !== 'undefined' ? window.kb : undefined; try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+let kb = typeof window !== 'undefined' ? root.kb : undefined;
+try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
+try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
 const { _, ko } = kb;
 if (kb.Backbone) { kb.Backbone.ModelRef || (typeof require === 'function' ? require('backbone-modelref') : undefined); }
 
@@ -30,7 +32,7 @@ class LocaleManager {
     let culture_map;
     if (this.locale_identifier) { culture_map = this.translations_by_locale[this.locale_identifier]; }
     if (!culture_map) { return ''; }
-    let string = culture_map.hasOwnProperty(string_id) ? culture_map[string_id] : '';
+    let string = Object.prototype.hasOwnProperty.call(culture_map, string_id) ? culture_map[string_id] : '';
     if (arguments === 1) { return string; }
     const iterable = Array.prototype.slice.call(arguments, 1);
     for (let index = 0; index < iterable.length; index++) { const arg = iterable[index]; string = string.replace(`{${index}}`, arg); }

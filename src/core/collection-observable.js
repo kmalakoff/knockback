@@ -108,19 +108,16 @@ class CollectionObservable {
       // options
       options = kb.utils.collapseOptions(options);
       if (options.auto_compact) { this.auto_compact = true; }
-      if (options.sort_attribute) {
-        this._comparator = ko.observable(this._attributeComparator(options.sort_attribute));
-      } else {
-        this._comparator = ko.observable(options.comparator);
-      }
-      if (options.filters) {
-        this._filters = ko.observableArray((() => {
-          if (_.isArray(options.filters)) { return options.filters; } else if (options.filters) { return [options.filters]; }
-        })());
-      } else {
-        this._filters = ko.observableArray([]);
-      }
-      const create_options = (this.create_options = { store: kb.Store.useOptionsOrCreate(options, collection, observable) }); // create options
+
+      if (options.sort_attribute) this._comparator = ko.observable(this._attributeComparator(options.sort_attribute));
+      else this._comparator = ko.observable(options.comparator);
+
+      if (options.filters) this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : [options.filters]);
+      else this._filters = ko.observableArray([]);
+
+      // create options
+      this.create_options = { store: kb.Store.useOptionsOrCreate(options, collection, observable) };
+      const create_options = this.create_options;
       kb.utils.wrappedObject(observable, collection);
 
       // view model factory create factories

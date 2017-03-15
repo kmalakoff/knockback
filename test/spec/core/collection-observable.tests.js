@@ -2,8 +2,9 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
 describe('collection-observable @quick @collection-observable', () => {
-  let kb = typeof window !== 'undefined' && window !== null ? window.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) {} try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) {}
+  let kb = typeof window !== 'undefined' ? root.kb : undefined;
+  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
+  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
   const { _, ko } = kb;
 
   it('TEST DEPENDENCY MISSING', (done) => {
@@ -841,20 +842,26 @@ describe('collection-observable @quick @collection-observable', () => {
     let new_view_models = collection_observable();
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
-    _.each(new_view_models, vm => {
-      if (vm.model() === collection_observable.collection().models[4]) {
-        assert.ok(!(previous_view_models.includes(vm)));
-      } else {
-        assert.ok(previous_view_models.includes(vm));
-      }
-    });
 
-    models = collection_observable.collection().models.slice();
-    collection_observable.collection().reset(models);
-    new_view_models = collection_observable();
-    assert.equal(new_view_models.length, 5);
-    assert.equal(previous_view_models.length, 4);
-    _.each(new_view_models, vm => { assert.ok(!(previous_view_models.includes(vm))); });
+    try {
+      _.each(new_view_models, vm => {
+        if (vm.model() === collection_observable.collection().models[4]) {
+          assert.ok(!(previous_view_models.includes(vm)));
+        } else {
+          assert.ok(previous_view_models.includes(vm));
+        }
+      });
+
+      models = collection_observable.collection().models.slice();
+      collection_observable.collection().reset(models);
+      new_view_models = collection_observable();
+      assert.equal(new_view_models.length, 5);
+      assert.equal(previous_view_models.length, 4);
+      _.each(new_view_models, vm => {
+        assert.ok(!(previous_view_models.includes(vm)));
+      });
+    }
+    catch (err) { console.trace(err); }
 
     kb.release(collection_observable);
 
