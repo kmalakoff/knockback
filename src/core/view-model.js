@@ -30,7 +30,7 @@ const createObservable = function (vm, model, key, create_options) {
 
 // @nodoc
 const createStaticObservables = function (vm, model) {
-  vm.__kb.statics.forEach((key) => {
+  _.each(vm.__kb.statics, key => {
     let vm_key;
     if ((vm_key = assignViewModelKey(vm, key))) {
       if (model.has(vm_key)) {
@@ -130,8 +130,8 @@ class ViewModel {
       if (_.isArray(args[0])) { args[0] = { keys: args[0] }; }
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
       options = {};
-      args.forEach((arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
-      KEYS_OPTIONS.forEach((key) => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
+      _.each(args, arg => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
+      _.each(KEYS_OPTIONS, key => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
 
       // always use a store to ensure recursive view models are handled correctly
       kb.Store.useOptionsOrCreate(options, model, this);
@@ -203,7 +203,7 @@ class ViewModel {
         ((() => rel_keys.map(key => createObservable(this, model, key, this.__kb.create_options)))());
       }
     } else if (_.isArray(keys)) {
-      keys.forEach(key => createObservable(this, model, key, this.__kb.create_options));
+      _.map(keys, key => createObservable(this, model, key, this.__kb.create_options));
     } else {
       for (key in keys) {
         var vm_key;

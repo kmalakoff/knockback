@@ -63,7 +63,7 @@ class Store {
     }
 
     [replaced_observables, this.replaced_observables] = [this.replaced_observables, []];
-    replaced_observables.forEach((observable) => {
+    _.each(replaced_observables, observable => {
       if (!observable.__kb_released) this.release(observable, true);
     });
   }

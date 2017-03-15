@@ -86,18 +86,11 @@ module.exports = kb.FormattedObservable = class FormattedObservable {
   // @note the constructor does not return 'this' but a ko.observable
   constructor(format, args) {
     // being called by the factory function
-    let observable_args;
-    if (_.isArray(args)) {
-      format = format;
-      observable_args = args;
-    } else {
-      observable_args = arraySlice.call(arguments, 1);
-    }
-
+    const observable_args = _.isArray(args) ? args : arraySlice.call(arguments, 1);
     const observable = kb.utils.wrappedObservable(this, ko.computed({
       read() {
         args = [ko.utils.unwrapObservable(format)];
-        observable_args.forEach(arg => args.push(ko.utils.unwrapObservable(arg)));
+        _.each(observable_args, arg => args.push(ko.utils.unwrapObservable(arg)));
         return kb.toFormattedString.apply(null, args);
       },
       write(value) {

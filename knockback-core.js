@@ -376,7 +376,7 @@ var kb = function () {
         node = _ref[0];
         children = _ref[1];
 
-        children.forEach(function (child) {
+        _.each(children, function (child) {
           return node.appendChild(child);
         });
       }
@@ -428,7 +428,7 @@ var kb = function () {
   }, {
     key: 'publishMethods',
     value: function publishMethods(observable, instance, methods) {
-      methods.forEach(function (fn) {
+      _.each(methods, function (fn) {
         observable[fn] = kb._.bind(instance[fn], instance);
       });
     }
@@ -967,7 +967,7 @@ var CollectionObservable = function () {
       if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       options = {};
-      args.forEach(function (arg) {
+      _.each(args, function (arg) {
         return kb.assign(options, arg);
       });
 
@@ -1445,7 +1445,7 @@ var _initialiseProps = function _initialiseProps() {
       } else {
         !has_filters || (view_models = []); // check for filtering of ViewModels
         models = [];
-        models_or_view_models.forEach(function (view_model) {
+        _.each(models_or_view_models, function (view_model) {
           var current_view_model = void 0;
           var model = kb.utils.wrappedObject(view_model);
           if (has_filters) {
@@ -1556,7 +1556,7 @@ kb.EventWatcher = function () {
         if (!callbacks.model) {
           callbacks.model = model, model.bind(event_name, callbacks.fn);
         }
-        callbacks.list.forEach(function (info) {
+        _.each(callbacks.list, function (info) {
           if (!info.unbind_fn) {
             info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined;
           }
@@ -1579,7 +1579,7 @@ kb.EventWatcher = function () {
         callbacks.model = null;
       }
 
-      callbacks.list.forEach(function (info) {
+      _.each(callbacks.list, function (info) {
         if (info.unbind_fn) {
           info.unbind_fn(), info.unbind_fn = null;
         }
@@ -1595,12 +1595,8 @@ kb.EventWatcher = function () {
     this.__kb.callbacks = {};
 
     this.ee = null;
-    if (callback_options) {
-      this.registerCallbacks(obj, callback_options);
-    }
-    if (emitter) {
-      this.emitter(emitter);
-    }
+    if (callback_options) this.registerCallbacks(obj, callback_options);
+    if (emitter) this.emitter(emitter);
   }
 
   // Required clean up function to break cycles, release view emitters, etc.
@@ -1676,17 +1672,16 @@ kb.EventWatcher = function () {
       var event_names = callback_info.event_selector ? callback_info.event_selector.split(' ') : ['change'];
       var model = this.ee;
 
-      event_names.forEach(function (event_name) {
+      _.each(event_names, function (event_name) {
         if (!event_name) return; // extra spaces
 
-        var callbacks = void 0,
-            info = void 0;
-        if (!(callbacks = _this2.__kb.callbacks[event_name])) {
+        var callbacks = _this2.__kb.callbacks[event_name];;
+        if (!callbacks) {
           callbacks = _this2.__kb.callbacks[event_name] = {
             model: null,
             list: [],
             fn: function fn(model) {
-              callbacks.list.forEach(function (info) {
+              _.each(callbacks.list, function (info) {
                 if (!info.update) return;
                 if (model && info.key && model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
                 !kb.statistics || kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
@@ -1696,7 +1691,8 @@ kb.EventWatcher = function () {
           };
         }
 
-        callbacks.list.push(info = _.defaults({ obj: obj }, callback_info)); // store the callback information
+        var info = _.defaults({ obj: obj }, callback_info);
+        callbacks.list.push(info); // store the callback information
         if (model) return _this2._onModelLoaded(model);
       });
       return this;
@@ -2052,7 +2048,7 @@ kb.Inject = function () {
       findElements(root);
 
       // bind the view models
-      results.forEach(function (app) {
+      _.each(results, function (app) {
         // evaluate the app data
         var afterBinding = void 0,
             beforeBinding = void 0,
@@ -2240,7 +2236,7 @@ kb.Observable = function () {
           args = void 0;
       key_or_info || kb._throwMissing(_this, 'key_or_info');
       _this.key = key_or_info.key || key_or_info;
-      KEYS_INFO.forEach(function (key) {
+      _.map(KEYS_INFO, function (key) {
         if (key_or_info[key]) {
           _this[key] = key_or_info[key];
         }
@@ -2258,7 +2254,7 @@ kb.Observable = function () {
         read: function read() {
           _model = _this._model();
           args = [_this.key].concat(_this.args || []);
-          args.forEach(function (arg) {
+          _.each(args, function (arg) {
             return ko.utils.unwrapObservable(arg);
           });
 
@@ -2554,7 +2550,7 @@ module.exports = kb.Statistics = function () {
       var events = obj._events || obj._callbacks || {};
       var keys = key ? [key] : _.keys(events);
 
-      keys.forEach(function (key) {
+      _.map(keys, function (key) {
         var node = events[key];
         if (node) {
           if (_.isArray(node)) {
@@ -2686,7 +2682,7 @@ var Store = function () {
       replaced_observables = _ref2[0];
       this.replaced_observables = _ref2[1];
 
-      replaced_observables.forEach(function (observable) {
+      _.each(replaced_observables, function (observable) {
         if (!observable.__kb_released) _this.release(observable, true);
       });
     }
@@ -3431,7 +3427,7 @@ var createObservable = function createObservable(vm, model, key, create_options)
 
 // @nodoc
 var createStaticObservables = function createStaticObservables(vm, model) {
-  vm.__kb.statics.forEach(function (key) {
+  _.each(vm.__kb.statics, function (key) {
     var vm_key = void 0;
     if (vm_key = assignViewModelKey(vm, key)) {
       if (model.has(vm_key)) {
@@ -3548,10 +3544,10 @@ var ViewModel = function () {
         _this.__kb = {};
       }_this.__kb.view_model = args.length > 1 ? args.pop() : _this;
       options = {};
-      args.forEach(function (arg) {
+      _.each(args, function (arg) {
         kb.assign(options, arg);options = kb.utils.collapseOptions(options);
       });
-      KEYS_OPTIONS.forEach(function (key) {
+      _.each(KEYS_OPTIONS, function (key) {
         if (options.hasOwnProperty(key)) {
           _this.__kb[key] = options[key];
         }
@@ -3657,7 +3653,7 @@ var ViewModel = function () {
           })();
         }
       } else if (_.isArray(keys)) {
-        keys.forEach(function (key) {
+        _.map(keys, function (key) {
           return createObservable(_this3, model, key, _this3.__kb.create_options);
         });
       } else {
@@ -3732,7 +3728,7 @@ var _mergeObject = function _mergeObject(result, key, value) {
 // @nodoc
 var _keyArrayToObject = function _keyArrayToObject(value) {
   var result = {};
-  value.forEach(function (item) {
+  _.each(value, function (item) {
     result[item] = { key: item };
   });
   return result;
@@ -4013,12 +4009,12 @@ module.exports = function () {
 
       // VERSIONING: pre Backbone-Relational 0.8.0
       var events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-      if (type === kb.TYPE_COLLECTION) events.forEach(function (event) {
+      if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
         return model.bind(event + ':' + key, relFn);
       });else model.bind(events[0] + ':' + key, relFn);
 
       return function () {
-        if (type === kb.TYPE_COLLECTION) events.forEach(function (event) {
+        if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
           return model.unbind(event + ':' + key, relFn);
         });else model.unbind(events[0] + ':' + key, relFn);
       };

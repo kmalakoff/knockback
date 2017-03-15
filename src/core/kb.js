@@ -210,7 +210,7 @@ class kb {
     if (node.length) { // convert to a root element
       let children;
       [node, children] = [document.createElement('div'), node];
-      children.forEach(child => node.appendChild(child));
+      _.each(children, child => node.appendChild(child));
     }
     ko.applyBindings(view_model, node);
     kb.releaseOnNodeRemove(view_model, node);
@@ -242,7 +242,7 @@ class kb {
   static _throwUnexpected(instance, message) { throw `${_.isString(instance) ? instance : instance.constructor.name}: ${message} is unexpected`; }
 
   // @nodoc
-  static publishMethods(observable, instance, methods) { methods.forEach((fn) => { observable[fn] = kb._.bind(instance[fn], instance); }); }
+  static publishMethods(observable, instance, methods) { _.each(methods, fn => { observable[fn] = kb._.bind(instance[fn], instance); }); }
 
   // @nodoc
   static peek(obs) {

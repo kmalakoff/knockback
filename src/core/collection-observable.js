@@ -96,7 +96,7 @@ class CollectionObservable {
       if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       options = {};
-      args.forEach(arg => kb.assign(options, arg));
+      _.each(args, arg => kb.assign(options, arg));
 
       let observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true; // mark as a kb.CollectionObservable
@@ -439,7 +439,7 @@ class CollectionObservable {
       } else {
         !has_filters || (view_models = []); // check for filtering of ViewModels
         models = [];
-        models_or_view_models.forEach((view_model) => {
+        _.each(models_or_view_models, view_model => {
           let current_view_model;
           const model = kb.utils.wrappedObject(view_model);
           if (has_filters) {

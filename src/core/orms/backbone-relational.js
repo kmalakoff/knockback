@@ -34,11 +34,11 @@ module.exports = class BackboneRelational {
 
     // VERSIONING: pre Backbone-Relational 0.8.0
     const events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-    if (type === kb.TYPE_COLLECTION) events.forEach(event => model.bind(`${event}:${key}`, relFn));
+    if (type === kb.TYPE_COLLECTION) _.each(events, event => model.bind(`${event}:${key}`, relFn));
     else model.bind(`${events[0]}:${key}`, relFn);
 
     return () => {
-      if (type === kb.TYPE_COLLECTION) events.forEach(event => model.unbind(`${event}:${key}`, relFn));
+      if (type === kb.TYPE_COLLECTION) _.each(events, event => model.unbind(`${event}:${key}`, relFn));
       else model.unbind(`${events[0]}:${key}`, relFn);
     };
   }

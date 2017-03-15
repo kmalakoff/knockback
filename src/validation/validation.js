@@ -225,7 +225,7 @@ kb.formValidator = (view_model, el) => {
   // collect stats, error count and valid
   results.$error_count = ko.computed(() => {
     let error_count = 0;
-    validators.forEach((validator) => { error_count += validator().$error_count; });
+    _.each(validators, validator => { error_count += validator().$error_count; });
     return error_count;
   });
   results.$valid = ko.computed(() => results.$error_count() === 0);
@@ -233,7 +233,7 @@ kb.formValidator = (view_model, el) => {
   // enabled and disabled
   results.$enabled = ko.computed(() => {
     let enabled = true;
-    validators.forEach((validator) => { enabled &= validator().$enabled; });
+    _.each(validators, validator => { enabled &= validator().$enabled; });
     return enabled;
   });
   results.$disabled = ko.computed(() => !results.$enabled());

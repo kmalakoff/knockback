@@ -61,7 +61,7 @@ kb.Observable = class Observable {
         args;
       key_or_info || kb._throwMissing(this, 'key_or_info');
       this.key = key_or_info.key || key_or_info;
-      KEYS_INFO.forEach((key) => { if (key_or_info[key]) { this[key] = key_or_info[key]; } });
+      _.map(KEYS_INFO, key => { if (key_or_info[key]) { this[key] = key_or_info[key]; } });
 
       const create_options = kb.utils.collapseOptions(options);
       const { event_watcher } = create_options;
@@ -74,7 +74,7 @@ kb.Observable = class Observable {
         read: () => {
           _model = this._model();
           args = [this.key].concat(this.args || []);
-          args.forEach(arg => ko.utils.unwrapObservable(arg));
+          _.each(args, arg => ko.utils.unwrapObservable(arg));
 
           __guard__(kb.utils.wrappedEventWatcher(this), x => x.emitter(_model || null)); // update the event watcher
           if (this.read) {
