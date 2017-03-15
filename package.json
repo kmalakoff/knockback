@@ -25,7 +25,7 @@
   },
   "scripts": {
     "test": "gulp test",
-    "lint": "eslint src",
+    "lint": "eslint .",
     "lint-fix": "eslint . --fix",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
   },
