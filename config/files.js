@@ -1,7 +1,7 @@
 let filename;
 const fs = require('fs');
 const path = require('path');
-const _ = require('underscore');
+const _ = require('lodash');
 const readdirSyncRecursive = require('fs-readdir-recursive');
 
 const PLUGIN_ENTRIES = {
@@ -13,7 +13,7 @@ const PLUGIN_ENTRIES = {
 };
 
 module.exports = {
-  libraries: _.flatten(_.map(_.filter(fs.readdirSync('./config/builds/library'), file => (path.extname(file) === '.js') && (file.indexOf('webpack.config.js') >= 0)), file => [file.replace('webpack.config.js', 'js'), file.replace('webpack.config.js', 'min.js')])),
+  libraries: _.flattenDeep(_.map(_.filter(fs.readdirSync('./config/builds/library'), file => (path.extname(file) === '.js') && (file.indexOf('webpack.config.js') >= 0)), file => [file.replace('webpack.config.js', 'js'), file.replace('webpack.config.js', 'min.js')])),
 
   src_core: _.map(_.filter(fs.readdirSync('./src/core'), file => (path.extname(file) === '.js') && (file !== 'index.js')), file => `./src/core/${file}`),
   src_plugin: _.values(PLUGIN_ENTRIES),

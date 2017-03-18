@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const _ = require('underscore');
+const _ = require('lodash');
 const gutil = require('gulp-util');
 
 const resolveModule = module_name => path.relative('.', require.resolve(module_name));
@@ -39,9 +39,9 @@ for (const library_name in KNOCKBACK) {
     for (const dep_name in REQUIRED_DEPENDENCIES) {
       const dep_files = REQUIRED_DEPENDENCIES[dep_name];
       if (~dep_name.indexOf('backbone')) { // Backbone
-        TEST_GROUPS.browser_globals.push({ name: `${dep_name}_${library_name}`, files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js', './test/spec/issues/**/*.tests.js']) });
+        TEST_GROUPS.browser_globals.push({ name: `${dep_name}_${library_name}`, files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js', './test/spec/issues/**/*.tests.js']) });
       } else { // Parse
-        TEST_GROUPS.browser_globals.push({ name: `${dep_name}_${library_name}`, files: _.flatten([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js']) });
+        TEST_GROUPS.browser_globals.push({ name: `${dep_name}_${library_name}`, files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js']) });
       }
     }
   }
@@ -54,7 +54,7 @@ TEST_GROUPS.core = [];
 for (var test_name in KNOCKBACK) {
   const library_files = KNOCKBACK[test_name];
   if (~test_name.indexOf('core') && !~test_name.indexOf('stack')) {
-    TEST_GROUPS.core.push({ name: `core_${test_name}`, files: _.flatten([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.js']) });
+    TEST_GROUPS.core.push({ name: `core_${test_name}`, files: _.flattenDeep([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.js']) });
   }
 }
 
@@ -73,7 +73,7 @@ for (const dep_name in object) {
   const dep_files = object[dep_name];
   for (test_name in ORM_TESTS) {
     const test_files = ORM_TESTS[test_name];
-    TEST_GROUPS.orm.push({ name: `${dep_name}_${test_name}`, files: _.flatten([dep_files, test_files]) });
+    TEST_GROUPS.orm.push({ name: `${dep_name}_${test_name}`, files: _.flattenDeep([dep_files, test_files]) });
   }
 }
 
@@ -106,7 +106,7 @@ TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach(test => {
 // ##############################
 TEST_GROUPS.webpack = [];
 FILES.tests_webpack.forEach(file => {
-  TEST_GROUPS.webpack.push({ name: `webpack_${file.replace('.js', '')}`, files: _.flatten([(~file.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), file]) });
+  TEST_GROUPS.webpack.push({ name: `webpack_${file.replace('.js', '')}`, files: _.flattenDeep([(~file.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), file]) });
 });
 
 // ##############################
@@ -116,7 +116,7 @@ TEST_GROUPS.browserify = [];
 const object1 = require('./browserify/tests');
 for (test_name in object1) {
   const test_info = object1[test_name];
-  TEST_GROUPS.browserify.push({ name: `browserify_${test_name}`, files: _.flatten([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]), build: { destination: test_info.output, options: test_info.options, files: test_info.files } });
+  TEST_GROUPS.browserify.push({ name: `browserify_${test_name}`, files: _.flattenDeep([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]), build: { destination: test_info.output, options: test_info.options, files: test_info.files } });
 }
 
 // TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)};

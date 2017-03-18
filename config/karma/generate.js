@@ -1,12 +1,9 @@
 const fs = require('fs-extra');
 const path = require('path');
-const _ = require('underscore');
-const Queue = require('queue-async');
+const _ = require('lodash');
 const es = require('event-stream');
 
 const gulp = require('gulp');
-const gutil = require('gulp-util');
-const shell = require('gulp-shell');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const wrapAMD = require('gulp-wrap-amd-infer');
@@ -15,50 +12,49 @@ const browserify = require('gulp-browserify');
 
 const TEST_GROUPS = require('../test_groups');
 
-module.exports = (callback) => {
-  const queue = new Queue(1);
+module.exports = async () => {
+  console.log('GENERATE START')
 
   // install knockback
-  queue.defer(callback =>
+  await new Promise((resolve, reject) =>
     gulp.src(['./knockback.js', './package.json'])
       .pipe(gulp.dest('node_modules/knockback'))
-      .on('end', callback)
+      .on('error', reject).on('end', resolve)
   );
 
   // build webpack
-  queue.defer(callback =>
+  await new Promise((resolve, reject) =>
     gulp.src(['config/builds/test/**/*.webpack.config.js'], { read: false, buffer: false })
       .pipe(webpack())
       .pipe(gulp.dest('_temp/webpack'))
-      .on('end', callback)
+      .on('error', reject).on('end', resolve)
   );
 
   // build test browserify
   for (const test of (TEST_GROUPS.browserify || [])) {
-    (test => queue.defer(callback =>
+    await new Promise((resolve, reject) =>
       gulp.src(test.build.files)
         .pipe(babel({ presets: ['es2015'] }))
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
-        .on('end', callback)
-    ))(test);
+        .on('error', reject).on('end', resolve)
+    );
   }
 
   // wrap AMD tests
   for (const test of (TEST_GROUPS.amd || [])) {
-    (test => queue.defer(callback =>
+    await new Promise((resolve, reject) =>
       gulp.src(test.build.files)
         .pipe(babel({ presets: ['es2015'] }))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
-        .on('end', callback)
-    ))(test);
+        .on('error', reject).on('end', resolve)
+    );
   }
 
   // uninstall knockback
-  return queue.await((err) => {
-    fs.removeSync('node_modules/knockback', true);
-    return callback(err);
-  });
+  fs.removeSync('node_modules/knockback', true);
+
+  console.log('GENERATE END')
 };

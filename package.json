@@ -35,7 +35,6 @@
     "knockout": ">=2.1.0"
   },
   "devDependencies": {
-    "async": "*",
     "babel-core": "*",
     "babel-loader": "*",
     "babel-plugin-transform-async-to-generator": "*",
@@ -56,14 +55,9 @@
     "gulp-concat": "*",
     "gulp-header": "*",
     "gulp-rename": "*",
-    "gulp-shell": "*",
     "gulp-uglify": "*",
-    "gulp-util": "*",
     "gulp-webpack-config": "*",
     "gulp-wrap-amd-infer": "*",
-    "gulp-zip": "*",
-    "imports-loader": "*",
-    "install": "^0.8.7",
     "jsdom": "*",
     "karma": "*",
     "karma-babel-preprocessor": "*",
@@ -78,8 +72,7 @@
     "karma-spec-reporter": "*",
     "mocha": "*",
     "nuget": "*",
-    "queue-async": "*",
-    "requirejs": "*",
+    "requirejs": "^2.3.3",
     "webpack": "*"
   },
   "optionalDependencies": {

@@ -1,9 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
-const _ = require('underscore');
-const Queue = require('queue-async');
+const _ = require('lodash');
 const { Server } = require('karma');
-const gutil = require('gulp-util');
 const generate = require('./generate');
 
 const KARMA_CONFIG_BASE = require('./config-base');
@@ -11,33 +9,33 @@ const KARMA_CONFIG_AMD = require('./config-amd');
 
 const TEST_GROUPS = require('../test_groups');
 
-module.exports = async (callback) => {
+module.exports = async () => {
   fs.removeSync('./_temp', true);
   fs.removeSync('node_modules/knockback', true);
 
-  const queue = new Queue(1);
-  queue.defer(callback => generate(callback));
+  try {
+    await generate();
 
-  for (const name in TEST_GROUPS) {
-    const tests = TEST_GROUPS[name]; ((name, tests) =>
-    tests.map(test => (test =>
-      queue.defer((callback) => {
-        gutil.log(`RUNNING TESTS: ${name} ${test.name}`);
-        gutil.log(`${JSON.stringify(test.files)}`);
+    console.log('TEST START')
+
+    for (const name in TEST_GROUPS) {
+      for (const test of TEST_GROUPS[name]) {
+        console.log(`RUNNING TESTS: ${name} ${test.name}`);
+        console.log(`${JSON.stringify(test.files)}`);
         const karma_config = (name === 'amd') ? KARMA_CONFIG_AMD : KARMA_CONFIG_BASE;
-        return new Server(
-          _.defaults({ files: test.files }, karma_config),
-          (return_value) => {
-            console.log(`DONE TESTS: ${name} ${test.name}. Return value: ${return_value}`);
-            return callback(return_value ? new Error(`Tests failed: ${return_value}`) : undefined);
-          }).start();
-      })
-    )(test))
-  )(name, tests);
-  }
+        await new Promise((resolve, reject) => {
+          new Server(
+            _.defaults({ files: test.files }, karma_config),
+            (result) => {
+              console.log(`DONE TESTS: ${name} ${test.name}. Return value: ${result}`);
+              result ? reject(new Error(`Tests failed: ${result}`)) : resolve();
+            }).start();
+        });
+      }
+    }
 
-  return queue.await((err) => {
-    if (!err) { fs.removeSync('./_temp', true); }
-    return callback(err);
-  });
+    console.log('TEST END')
+
+    fs.removeSync('./_temp', true);
+  } catch (err) { /**/ }
 };

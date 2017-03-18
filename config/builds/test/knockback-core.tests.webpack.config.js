@@ -1,5 +1,5 @@
 const path = require('path');
-const _ = require('underscore');
+const _ = require('lodash');
 
 module.exports = _.extend(_.clone(require('../../webpack/base-config')), {
   entry: {

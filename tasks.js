@@ -3,7 +3,6 @@ const _ = require('lodash');
 const es = require('event-stream');
 
 const gulp = require('gulp');
-const gutil = require('gulp-util');
 const webpack = require('gulp-webpack-config');
 const rename = require('gulp-rename');
 const uglify = require('gulp-uglify');
@@ -15,7 +14,7 @@ const nugetGulp = () => es.map((file, callback) =>
   nuget.pack(file, (err, nupkgFile) => {
     if (err) { return callback(err); }
     return nuget.push(nupkgFile, (err) => {
-      if (err) return gutil.log(err);
+      if (err) return console.log(err);
       return callback();
     });
   })
@@ -50,7 +49,7 @@ gulp.task('minify', ['build'], () => {
 
 const testNode = () => {
   return new Promise((resolve, reject) => {
-    gutil.log('Running Node tests');
+    console.log('Running Node tests');
     const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'dot', '--recursive']);
     res.stdout.pipe(process.stdout);
     res.stderr.pipe(process.stderr);
@@ -59,32 +58,33 @@ const testNode = () => {
   });
 }
 
-const testBrowsers = () => {
-  return new Promise((resolve, reject) => {
-    gutil.log('Running Browser tests');
-    require('./config/karma/run')((err) => { err ? reject(err) : resolve(); });
-  });
+const testBrowsers = async () => {
+  console.log('Running Browser tests');
+  await require('./config/karma/run')();
 }
 
 // gulp.task('test-node', testNode);
 gulp.task('test-node', ['build'], testNode);
 
-gulp.task('test-browsers', testBrowsers);
+// gulp.task('test-browsers', testBrowsers);
 // gulp.task('test-browsers', ['build'], testBrowsers);
-// gulp.task('test-browsers', ['minify'], testBrowsers);
+gulp.task('test-browsers', ['minify'], testBrowsers);
 
-gulp.task('test', ['minify'], () => {
-  return Promise.all([testNode(), testBrowsers()]); // , (err) => { !err || console.log(err); return process.exit(err ? 1 : 0); });
+gulp.task('test', ['minify'], async () => {
+  await testNode();
+  await testBrowsers();
 });
 
-const copyLibraryFiles = (destination, others) =>
-  gulp.src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
-    .pipe(gulp.dest(file => path.join(destination, path.dirname(file.path).replace(__dirname, ''))));
+const copyLibraryFiles = async (destination, others) => {
+  await new Promise((resolve, reject) =>
+    gulp.src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
+      .pipe(gulp.dest(file => path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
+      .on('error', reject).on('end', resolve)
+  );
+}
 
 gulp.task('publish', ['minify'], async () => {
-  await Promise.all([
-    copyLibraryFiles('packages/npm', ['component.json', 'bower.json']),
-    copyLibraryFiles('packages/nuget/Content/Scripts', [])
-  ]);
+  await copyLibraryFiles('packages/npm', ['component.json', 'bower.json']);
+  await copyLibraryFiles('packages/nuget/Content/Scripts', []);
   await gulp.src('packages/nuget/*.nuspec').pipe(nugetGulp());
 });
