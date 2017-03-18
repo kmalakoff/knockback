@@ -7441,7 +7441,7 @@ jQuery.extend = jQuery.fn.extend = function() {
 		i--;
 	}
 
-	for ( ; i < length; i++ ) {
+	for ( ; i < length; i++) {
 
 		// Only deal with non-null/undefined values
 		if ( ( options = arguments[ i ] ) != null ) {
@@ -7586,7 +7586,7 @@ jQuery.extend( {
 
 		if ( isArrayLike( obj ) ) {
 			length = obj.length;
-			for ( ; i < length; i++ ) {
+			for ( ; i < length; i++) {
 				if ( callback.call( obj[ i ], i, obj[ i ] ) === false ) {
 					break;
 				}
@@ -7656,7 +7656,7 @@ jQuery.extend( {
 
 		// Go through the array, only saving the items
 		// that pass the validator function
-		for ( ; i < length; i++ ) {
+		for ( ; i < length; i++) {
 			callbackInverse = !callback( elems[ i ], i );
 			if ( callbackInverse !== callbackExpect ) {
 				matches.push( elems[ i ] );
@@ -7675,7 +7675,7 @@ jQuery.extend( {
 		// Go through the array, translating each of the items to their new values
 		if ( isArrayLike( elems ) ) {
 			length = elems.length;
-			for ( ; i < length; i++ ) {
+			for ( ; i < length; i++) {
 				value = callback( elems[ i ], i, arg );
 
 				if ( value != null ) {
@@ -7825,7 +7825,7 @@ var i,
 	indexOf = function( list, elem ) {
 		var i = 0,
 			len = list.length;
-		for ( ; i < len; i++ ) {
+		for ( ; i < len; i++) {
 			if ( list[i] === elem ) {
 				return i;
 			}
@@ -9466,7 +9466,7 @@ function toSelector( tokens ) {
 	var i = 0,
 		len = tokens.length,
 		selector = "";
-	for ( ; i < len; i++ ) {
+	for ( ; i < len; i++) {
 		selector += tokens[i].value;
 	}
 	return selector;
@@ -9553,7 +9553,7 @@ function elementMatcher( matchers ) {
 function multipleContexts( selector, contexts, results ) {
 	var i = 0,
 		len = contexts.length;
-	for ( ; i < len; i++ ) {
+	for ( ; i < len; i++) {
 		Sizzle( selector, contexts[i], results );
 	}
 	return results;
@@ -9566,7 +9566,7 @@ function condense( unmatched, map, filter, context, xml ) {
 		len = unmatched.length,
 		mapped = map != null;
 
-	for ( ; i < len; i++ ) {
+	for ( ; i < len; i++) {
 		if ( (elem = unmatched[i]) ) {
 			if ( !filter || filter( elem, context, xml ) ) {
 				newUnmatched.push( elem );
@@ -9697,7 +9697,7 @@ function matcherFromTokens( tokens ) {
 			return ret;
 		} ];
 
-	for ( ; i < len; i++ ) {
+	for ( ; i < len; i++) {
 		if ( (matcher = Expr.relative[ tokens[i].type ]) ) {
 			matchers = [ addCombinator(elementMatcher( matchers ), matcher) ];
 		} else {
@@ -9754,7 +9754,7 @@ function matcherFromGroupMatchers( elementMatchers, setMatchers ) {
 			// Add elements passing elementMatchers directly to results
 			// Support: IE<9, Safari
 			// Tolerate NodeList properties (IE: "length"; Safari: <number>) matching elements by id
-			for ( ; i !== len && (elem = elems[i]) != null; i++ ) {
+			for ( ; i !== len && (elem = elems[i]) != null; i++) {
 				if ( byElement && elem ) {
 					j = 0;
 					if ( !context && elem.ownerDocument !== document ) {
@@ -10129,7 +10129,7 @@ jQuery.fn.extend( {
 
 		if ( typeof selector !== "string" ) {
 			return this.pushStack( jQuery( selector ).filter( function() {
-				for ( i = 0; i < len; i++ ) {
+				for ( i = 0; i < len; i++) {
 					if ( jQuery.contains( self[ i ], this ) ) {
 						return true;
 					}
@@ -10139,7 +10139,7 @@ jQuery.fn.extend( {
 
 		ret = this.pushStack( [] );
 
-		for ( i = 0; i < len; i++ ) {
+		for ( i = 0; i < len; i++) {
 			jQuery.find( selector, self[ i ], ret );
 		}
 
@@ -10301,7 +10301,7 @@ jQuery.fn.extend( {
 
 		return this.filter( function() {
 			var i = 0;
-			for ( ; i < l; i++ ) {
+			for ( ; i < l; i++) {
 				if ( jQuery.contains( this, targets[ i ] ) ) {
 					return true;
 				}
@@ -10318,7 +10318,7 @@ jQuery.fn.extend( {
 
 		// Positional selectors never match, since there's no _selection_ context
 		if ( !rneedsContext.test( selectors ) ) {
-			for ( ; i < l; i++ ) {
+			for ( ; i < l; i++) {
 				for ( cur = this[ i ]; cur && cur !== context; cur = cur.parentNode ) {
 
 					// Always skip document fragments
@@ -11208,7 +11208,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 		}
 
 		if ( fn ) {
-			for ( ; i < len; i++ ) {
+			for ( ; i < len; i++) {
 				fn(
 					elems[ i ], key, raw ?
 					value :
@@ -11968,7 +11968,7 @@ function setGlobalEval( elems, refElements ) {
 	var i = 0,
 		l = elems.length;
 
-	for ( ; i < l; i++ ) {
+	for ( ; i < l; i++) {
 		dataPriv.set(
 			elems[ i ],
 			"globalEval",
@@ -11987,7 +11987,7 @@ function buildFragment( elems, context, scripts, selection, ignored ) {
 		i = 0,
 		l = elems.length;
 
-	for ( ; i < l; i++ ) {
+	for ( ; i < l; i++) {
 		elem = elems[ i ];
 
 		if ( elem || elem === 0 ) {
@@ -12389,7 +12389,7 @@ jQuery.event = {
 		// Use the fix-ed jQuery.Event rather than the (read-only) native event
 		args[ 0 ] = event;
 
-		for ( i = 1; i < arguments.length; i++ ) {
+		for ( i = 1; i < arguments.length; i++) {
 			args[ i ] = arguments[ i ];
 		}
 
@@ -12467,7 +12467,7 @@ jQuery.event = {
 				if ( cur.nodeType === 1 && !( event.type === "click" && cur.disabled === true ) ) {
 					matchedHandlers = [];
 					matchedSelectors = {};
-					for ( i = 0; i < delegateCount; i++ ) {
+					for ( i = 0; i < delegateCount; i++) {
 						handleObj = handlers[ i ];
 
 						// Don't conflict with Object.prototype properties (#13203)
@@ -12892,7 +12892,7 @@ function cloneCopyEvent( src, dest ) {
 			pdataCur.events = {};
 
 			for ( type in events ) {
-				for ( i = 0, l = events[ type ].length; i < l; i++ ) {
+				for ( i = 0, l = events[ type ].length; i < l; i++) {
 					jQuery.event.add( dest, type, events[ type ][ i ] );
 				}
 			}
@@ -12963,7 +12963,7 @@ function domManip( collection, args, callback, ignored ) {
 			// Use the original fragment for the last item
 			// instead of the first because it can end up
 			// being emptied incorrectly in certain situations (#8070).
-			for ( ; i < l; i++ ) {
+			for ( ; i < l; i++) {
 				node = fragment;
 
 				if ( i !== iNoClone ) {
@@ -12988,7 +12988,7 @@ function domManip( collection, args, callback, ignored ) {
 				jQuery.map( scripts, restoreScript );
 
 				// Evaluate executable scripts on first document insertion
-				for ( i = 0; i < hasScripts; i++ ) {
+				for ( i = 0; i < hasScripts; i++) {
 					node = scripts[ i ];
 					if ( rscriptType.test( node.type || "" ) &&
 						!dataPriv.access( node, "globalEval" ) &&
@@ -13017,7 +13017,7 @@ function remove( elem, selector, keepData ) {
 		nodes = selector ? jQuery.filter( selector, elem ) : elem,
 		i = 0;
 
-	for ( ; ( node = nodes[ i ] ) != null; i++ ) {
+	for ( ; ( node = nodes[ i ] ) != null; i++) {
 		if ( !keepData && node.nodeType === 1 ) {
 			jQuery.cleanData( getAll( node ) );
 		}
@@ -13051,7 +13051,7 @@ jQuery.extend( {
 			destElements = getAll( clone );
 			srcElements = getAll( elem );
 
-			for ( i = 0, l = srcElements.length; i < l; i++ ) {
+			for ( i = 0, l = srcElements.length; i < l; i++) {
 				fixInput( srcElements[ i ], destElements[ i ] );
 			}
 		}
@@ -13062,7 +13062,7 @@ jQuery.extend( {
 				srcElements = srcElements || getAll( elem );
 				destElements = destElements || getAll( clone );
 
-				for ( i = 0, l = srcElements.length; i < l; i++ ) {
+				for ( i = 0, l = srcElements.length; i < l; i++) {
 					cloneCopyEvent( srcElements[ i ], destElements[ i ] );
 				}
 			} else {
@@ -13085,7 +13085,7 @@ jQuery.extend( {
 			special = jQuery.event.special,
 			i = 0;
 
-		for ( ; ( elem = elems[ i ] ) !== undefined; i++ ) {
+		for ( ; ( elem = elems[ i ] ) !== undefined; i++) {
 			if ( acceptData( elem ) ) {
 				if ( ( data = elem[ dataPriv.expando ] ) ) {
 					if ( data.events ) {
@@ -13174,7 +13174,7 @@ jQuery.fn.extend( {
 		var elem,
 			i = 0;
 
-		for ( ; ( elem = this[ i ] ) != null; i++ ) {
+		for ( ; ( elem = this[ i ] ) != null; i++) {
 			if ( elem.nodeType === 1 ) {
 
 				// Prevent memory leaks
@@ -13214,7 +13214,7 @@ jQuery.fn.extend( {
 				value = jQuery.htmlPrefilter( value );
 
 				try {
-					for ( ; i < l; i++ ) {
+					for ( ; i < l; i++) {
 						elem = this[ i ] || {};
 
 						// Remove element nodes and prevent memory leaks
@@ -13269,7 +13269,7 @@ jQuery.each( {
 			last = insert.length - 1,
 			i = 0;
 
-		for ( ; i <= last; i++ ) {
+		for ( ; i <= last; i++) {
 			elems = i === last ? this : this.clone( true );
 			jQuery( insert[ i ] )[ original ]( elems );
 
@@ -13807,7 +13807,7 @@ jQuery.each( {
 				// Assumes a single number if not a string
 				parts = typeof value === "string" ? value.split( " " ) : [ value ];
 
-			for ( ; i < 4; i++ ) {
+			for ( ; i < 4; i++) {
 				expanded[ prefix + cssExpand[ i ] + suffix ] =
 					parts[ i ] || parts[ i - 2 ] || parts[ 0 ];
 			}
@@ -13832,7 +13832,7 @@ jQuery.fn.extend( {
 				styles = getStyles( elem );
 				len = name.length;
 
-				for ( ; i < len; i++ ) {
+				for ( ; i < len; i++) {
 					map[ name[ i ] ] = jQuery.css( elem, name[ i ], false, styles );
 				}
 
@@ -14581,7 +14581,7 @@ jQuery.fx.tick = function() {
 
 	fxNow = jQuery.now();
 
-	for ( ; i < timers.length; i++ ) {
+	for ( ; i < timers.length; i++) {
 		timer = timers[ i ];
 
 		// Checks the timer has not already been removed
@@ -15218,7 +15218,7 @@ jQuery.extend( {
 				}
 
 				// Loop through all the selected options
-				for ( ; i < max; i++ ) {
+				for ( ; i < max; i++) {
 					option = options[ i ];
 
 					// Support: IE <=9 only

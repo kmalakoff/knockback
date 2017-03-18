@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var window = (window != null) ? window : global;
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 const kb = require('./kb');
 const { _, ko } = kb;
@@ -126,35 +126,34 @@ kb.Inject = class Inject {
   // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered. Also, used with the data-bind `'inject'` custom binding.
   // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
   // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-  static injectViewModels(root) {
+  static injectViewModels(el) {
+    if (!el) return;
+
     // find all of the app elements
     const results = [];
-    var findElements = function (el) {
+    const findElements = el => {
       if (!el.__kb_injected) { // already injected -> skip, but still process children in case they were added afterwards
-        let attr;
-        if (el.attributes && (attr = _.find(el.attributes, attr => attr.name === 'kb-inject'))) {
+        const attr = _.find(el.attributes || [], attr => attr.name === 'kb-inject');
+        if (attr) {
           el.__kb_injected = true; // mark injected
           results.push({ el, view_model: {}, binding: attr.value });
         }
       }
       _.each(el.childNodes, child => findElements(child));
     };
-    if (!root && (window != null ? window.document : undefined)) { root = window.document; }
-    findElements(root);
+    findElements(el);
 
     // bind the view models
     _.each(results, app => {
+      let options = {};
+      let afterBinding, beforeBinding;
+
       // evaluate the app data
-      let afterBinding,
-        beforeBinding,
-        expression,
-        options;
-      if (expression = app.binding) {
-        (expression.search(/[:]/) < 0) || (expression = `{${expression}}`); // wrap if is an object
-        let data = (new Function('', `return ( ${expression} )`))();
-        data || (data = {}); // no data
-        (!data.options) || ((({ options } = data)), delete data.options); // extract options
-        options || (options = {});
+      let expression = app.binding;
+      if (expression) {
+        (!~expression.search(/[:]/)) || (expression = `{${expression}}`); // wrap if is an object
+        const data = (new Function('', `return ( ${expression} )`))() || {};
+        if (data.options) { options = data.options; delete data.options; }
         app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
         afterBinding = app.view_model.afterBinding || options.afterBinding;
         beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
@@ -184,12 +183,11 @@ kb.injectViewModels = kb.Inject.injectViewModels;
 // ############################
 // Auto Inject results
 // ############################
-if (typeof document !== 'undefined' && document !== null) {
+if (root && (typeof root.document !== 'undefined')) {
   // use simple ready check
-  let onReady;
-  (onReady = function () {
-    if (document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
-    return kb.injectViewModels(); // the document is loaded
-  }
-  )();
+  const onReady = () => {
+    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
+    kb.injectViewModels(root.document); // the document is loaded
+  };
+  onReady();
 }

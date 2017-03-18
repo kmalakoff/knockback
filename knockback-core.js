@@ -484,7 +484,7 @@ kb.Events = Backbone.Events;
 
 // Object.assign
 kb.assign = _.assign || _.extend;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 1 */
@@ -753,36 +753,6 @@ module.exports = function () {
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var g;
-
-// This works in non-strict mode
-g = function () {
-	return this;
-}();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
-} catch (e) {
-	// This works if the window reference is available
-	if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
 /* ###
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -836,6 +806,33 @@ module.exports = function extend(protoProps, classProps) {
 };
 
 /***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -859,7 +856,7 @@ var kb = __webpack_require__(0);
 var _ = kb._,
     ko = kb.ko;
 
-var extend = __webpack_require__(4);
+var extend = __webpack_require__(3);
 
 var COMPARE_EQUAL = 0;
 var COMPARE_ASCENDING = -1;
@@ -1345,7 +1342,7 @@ var CollectionObservable = function () {
         if (_.isFunction(filter)) {
           if (!filter(model)) return false;
         } else if (_.isArray(filter)) {
-          if (!filter.includes(model.id)) return false;
+          if (!~filter.indexOf(model.id)) return false;
         } else if (model.id !== filter) return false;
       }
       return true;
@@ -1884,7 +1881,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var window = window != null ? window : global;
+var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
 var kb = __webpack_require__(0);
 var _ = kb._,
@@ -2019,16 +2016,18 @@ kb.Inject = function () {
 
   }, {
     key: 'injectViewModels',
-    value: function injectViewModels(root) {
+    value: function injectViewModels(el) {
+      if (!el) return;
+
       // find all of the app elements
       var results = [];
       var findElements = function findElements(el) {
         if (!el.__kb_injected) {
           // already injected -> skip, but still process children in case they were added afterwards
-          var attr = void 0;
-          if (el.attributes && (attr = _.find(el.attributes, function (attr) {
+          var attr = _.find(el.attributes || [], function (attr) {
             return attr.name === 'kb-inject';
-          }))) {
+          });
+          if (attr) {
             el.__kb_injected = true; // mark injected
             results.push({ el: el, view_model: {}, binding: attr.value });
           }
@@ -2037,26 +2036,22 @@ kb.Inject = function () {
           return findElements(child);
         });
       };
-      if (!root && (window != null ? window.document : undefined)) {
-        root = window.document;
-      }
-      findElements(root);
+      findElements(el);
 
       // bind the view models
       _.each(results, function (app) {
-        // evaluate the app data
+        var options = {};
         var afterBinding = void 0,
-            beforeBinding = void 0,
-            expression = void 0,
-            options = void 0;
-        if (expression = app.binding) {
-          var _data;
+            beforeBinding = void 0;
 
-          expression.search(/[:]/) < 0 || (expression = '{' + expression + '}'); // wrap if is an object
-          var data = new Function('', 'return ( ' + expression + ' )')();
-          data || (data = {}); // no data
-          !data.options || ((_data = data, options = _data.options, _data), delete data.options); // extract options
-          options || (options = {});
+        // evaluate the app data
+        var expression = app.binding;
+        if (expression) {
+          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
+          var data = new Function('', 'return ( ' + expression + ' )')() || {};
+          if (data.options) {
+            options = data.options;delete data.options;
+          }
           app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
           afterBinding = app.view_model.afterBinding || options.afterBinding;
           beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
@@ -2093,15 +2088,15 @@ kb.injectViewModels = kb.Inject.injectViewModels;
 // ############################
 // Auto Inject results
 // ############################
-if (typeof document !== 'undefined' && document !== null) {
+if (root && typeof root.document !== 'undefined') {
   // use simple ready check
-  var _onReady = void 0;
-  (_onReady = function onReady() {
-    if (document.readyState !== 'complete') return setTimeout(_onReady, 0); // keep waiting for the document to load
-    return kb.injectViewModels(); // the document is loaded
-  })();
+  var onReady = function onReady() {
+    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
+    kb.injectViewModels(root.document); // the document is loaded
+  };
+  onReady();
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
 /* 10 */
@@ -3401,7 +3396,7 @@ var kb = __webpack_require__(0);
 var _ = kb._,
     ko = kb.ko;
 
-var extend = __webpack_require__(4);
+var extend = __webpack_require__(3);
 
 // @nodoc
 var assignViewModelKey = function assignViewModelKey(vm, key) {

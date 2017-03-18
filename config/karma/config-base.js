@@ -14,6 +14,9 @@ module.exports = {
   // browsers: ['PhantomJS_custom'],
   // singleRun: false,
 
+  // browsers: ['Chrome'],
+  // singleRun: false,
+
   browsers: ['PhantomJS'],
   singleRun: true,
 

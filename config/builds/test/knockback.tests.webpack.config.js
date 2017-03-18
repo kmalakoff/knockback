@@ -7,5 +7,6 @@ module.exports = _.extend(_.clone(require('../../webpack/base-config')), {
   },
 });
 
-module.exports.resolve.alias =
-  { knockback: path.resolve('./knockback.js') };
+module.exports.resolve.alias = {
+  knockback: path.resolve('./knockback.js'),
+};

@@ -1,6 +1,3 @@
-let 
-  module_name,
-  TEST_GROUPS;
 const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
@@ -30,7 +27,7 @@ const LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize
 
 const FILES = require('./files');
 
-module.exports = (TEST_GROUPS = {});
+let TEST_GROUPS = {};
 
 // ##############################
 // Full Library
@@ -118,3 +115,11 @@ for (test_name in object1) {
   const test_info = object1[test_name];
   TEST_GROUPS.browserify.push({ name: `browserify_${test_name}`, files: _.flatten([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]), build: { destination: test_info.output, options: test_info.options, files: test_info.files } });
 }
+
+// TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)};
+// TEST_GROUPS = {amd: TEST_GROUPS.amd.slice(0, 1)};
+// TEST_GROUPS = {webpack: TEST_GROUPS.webpack.slice(0, 1)};
+// TEST_GROUPS = {browserify: TEST_GROUPS.browserify.slice(0, 1)};
+// console.log('TEST_GROUPS', JSON.stringify(TEST_GROUPS));
+
+module.exports = TEST_GROUPS;
