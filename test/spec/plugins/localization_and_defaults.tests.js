@@ -120,7 +120,7 @@ kb.ShortDateLocalizer = class ShortDateLocalizer extends kb.LocalizedObservable 
 };
 // ##############################
 
-describe('localized-observable @quick @localization', () => {
+describe('localized-observable', () => {
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
@@ -775,7 +775,7 @@ describe('localized-observable @quick @localization', () => {
   });
 });
 
-describe('defaults @quick @defaults', () => {
+describe('defaults', () => {
   it('TEST DEPENDENCY MISSING', (done) => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');

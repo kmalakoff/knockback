@@ -1,7 +1,7 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe('knockback.js memory management @quick @memory', () => {
+describe('knockback.js memory management', () => {
   let kb = typeof window !== 'undefined' ? root.kb : undefined;
   try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
   try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
@@ -94,7 +94,7 @@ describe('knockback.js memory management @quick @memory', () => {
     kb.release(view_model);
 
     for (let index = 1; index <= 9; index++) { assert.ok(!view_model[`prop${index}`], `Property released: prop${index}`); }
-    assert.ok(!view_model.name, 'Property released: view_model.name'); // kb.viewModel(new kb.Model({name: 'name1'}), 'name', @)
+    assert.ok(!view_model.name, 'Property released: view_model.name'); // kb.viewModel(new kb.Model({name: 'name1'}), 'name', this)
     assert.ok(!nested_view_model.name, 'Property released: nested_view_model.name'); // nested_view_model
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;

@@ -1,7 +1,7 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe.skip('Knockback.js with Backbone-Associations.js @backbone-associations', () => {
+describe.skip('Knockback.js with Backbone-Associations.js', () => {
   // after -> delete root.Person; delete root.Building
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback

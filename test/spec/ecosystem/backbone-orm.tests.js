@@ -1,7 +1,7 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe('Knockback.js with BackboneORM @backbone-orm', () => {
+describe('Knockback.js with BackboneORM', () => {
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
   let kb = typeof window !== 'undefined' ? root.kb : undefined;
   try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }

@@ -1,7 +1,7 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
 
-describe('knockback_core utils @quick @utils', () => {
+describe('knockback_core utils', () => {
   let kb = typeof window !== 'undefined' ? root.kb : undefined;
   try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
   try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
