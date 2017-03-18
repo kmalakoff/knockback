@@ -15,7 +15,7 @@ const browserify = require('gulp-browserify');
 
 const TEST_GROUPS = require('../test_groups');
 
-module.exports = function (callback) {
+module.exports = (callback) => {
   const queue = new Queue(1);
 
   // install knockback
@@ -34,7 +34,7 @@ module.exports = function (callback) {
   );
 
   // build test browserify
-  for (var test of TEST_GROUPS.browserify || []) {
+  for (const test of (TEST_GROUPS.browserify || [])) {
     (test => queue.defer(callback =>
       gulp.src(test.build.files)
         .pipe(babel({ presets: ['es2015'] }))
@@ -46,7 +46,7 @@ module.exports = function (callback) {
   }
 
   // wrap AMD tests
-  for (test of TEST_GROUPS.amd || []) {
+  for (const test of (TEST_GROUPS.amd || [])) {
     (test => queue.defer(callback =>
       gulp.src(test.build.files)
         .pipe(babel({ presets: ['es2015'] }))

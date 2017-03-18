@@ -18,24 +18,7 @@ module.exports = {
   src_core: _.map(_.filter(fs.readdirSync('./src/core'), file => (path.extname(file) === '.js') && (file !== 'index.js')), file => `./src/core/${file}`),
   src_plugin: _.values(PLUGIN_ENTRIES),
 
-  tests_core: ((() => {
-    const result = [];
-    readdirSyncRecursive(`${__dirname}/../test/spec/core`).forEach((filename) => {
-      if (/\.tests.js$/.test(filename)) {
-        result.push(`./test/spec/core/${filename}`);
-      }
-    });
-    return result;
-  })()),
-  tests_plugin: ((() => {
-    const result1 = [];
-    readdirSyncRecursive(`${__dirname}/../test/spec/plugins`).forEach((filename) => {
-      if (/\.tests.js$/.test(filename)) {
-        result1.push(`./test/spec/plugins/${filename}`);
-      }
-    });
-    return result1;
-  })()),
-
-  tests_webpack: _.map(_.filter(fs.readdirSync('./config/builds/test'), file => (path.extname(file) === '.js') && (file.indexOf('.tests.webpack.config.js') >= 0)), file => `_temp/webpack/${file.replace('.tests.webpack.config.js', '.tests.js')}`),
+  tests_core: readdirSyncRecursive(`${__dirname}/../test/spec/core`).filter(x => /\.tests.js$/.test(x)).map(x => `./test/spec/core/${x}`),
+  tests_plugin: readdirSyncRecursive(`${__dirname}/../test/spec/plugins`).filter(x => /\.tests.js$/.test(x)).map(x => `./test/spec/plugins/${x}`),
+  tests_webpack: fs.readdirSync('./config/builds/test').filter(x => path.extname(x) === '.js' && ~x.indexOf('.tests.webpack.config.js')).map(x => `_temp/webpack/${x.replace('.tests.webpack.config.js', '.tests.js')}`),
 };

@@ -15,12 +15,12 @@ const KNOCKBACK = {
 };
 
 const REQUIRED_DEPENDENCIES = {
-  backbone_underscore_latest: _.map(['jquery', 'underscore', 'backbone', 'knockout'], module_name => resolveModule(module_name)),
+  backbone_underscore_latest: ['jquery', 'underscore', 'backbone', 'knockout'].map(x => resolveModule(x)),
   backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
-  backbone_lodash_latest: _.map(['lodash', 'backbone', 'knockout'], module_name => resolveModule(module_name)),
+  backbone_lodash_latest: ['lodash', 'backbone', 'knockout'].map(x => resolveModule(x)),
   backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
-  parse_latest_compatibile: _.map(['knockout', 'parse'], module_name => resolveModule(module_name)),
-  parse_legacy: _.map(['knockout'], module_name => resolveModule(module_name)).concat(['./vendor/parse-1.2.0.js']),
+  parse_latest_compatibile: ['knockout', 'parse'].map(x => resolveModule(x)),
+  parse_legacy: ['knockout'].map(x => resolveModule(x)).concat(['./vendor/parse-1.2.0.js']),
 };
 
 const LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize.culture.en-GB.js', './test/lib/globalize.culture.fr-FR.js'];
@@ -71,7 +71,10 @@ TEST_GROUPS.orm = [];
 const object = _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest');
 for (const dep_name in object) {
   const dep_files = object[dep_name];
-  for (test_name in ORM_TESTS) { test_files = ORM_TESTS[test_name]; TEST_GROUPS.orm.push({ name: `${dep_name}_${test_name}`, files: _.flatten([dep_files, test_files]) }); }
+  for (test_name in ORM_TESTS) {
+    const test_files = ORM_TESTS[test_name];
+    TEST_GROUPS.orm.push({ name: `${dep_name}_${test_name}`, files: _.flatten([dep_files, test_files]) });
+  }
 }
 
 // ##############################
@@ -79,13 +82,13 @@ for (const dep_name in object) {
 // ##############################
 const AMD_OPTIONS = require('./amd/gulp-options');
 TEST_GROUPS.amd = [];
-_.each(TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core), test => {
+TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach(test => {
   if (!~test.name.indexOf('_min') && !~test.name.indexOf('legacy_') && !~test.name.indexOf('parse_')) {
     const test_files = test.files.concat(['./node_modules/jquery/dist/jquery.js']);
     const files = [];
     const test_patterns = [];
     const path_files = [];
-    // files.push({ pattern: './node_modules/requirejs/require.js' });
+
     _.each(test_files, file => {
       if (~file.indexOf('.tests.')) test_patterns.push(file);
       else {
@@ -102,7 +105,7 @@ _.each(TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core), test => {
 // Webpack
 // ##############################
 TEST_GROUPS.webpack = [];
-_.each(FILES.tests_webpack, file => {
+FILES.tests_webpack.forEach(file => {
   TEST_GROUPS.webpack.push({ name: `webpack_${file.replace('.js', '')}`, files: _.flatten([(~file.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), file]) });
 });
 

@@ -37,8 +37,10 @@
   "devDependencies": {
     "async": "*",
     "babel-loader": "*",
+    "babel-plugin-transform-async-to-generator": "*",
+    "babel-plugin-transform-runtime": "*",
     "babel-preset-es2015": "*",
-    "babel-preset-stage-1": "^6.22.0",
+    "babel-preset-stage-1": "*",
     "chai": "*",
     "eslint": "*",
     "eslint-config-airbnb-base": "*",
