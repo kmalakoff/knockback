@@ -70,6 +70,7 @@
     "karma-firefox-launcher": "*",
     "karma-mocha": "*",
     "karma-phantomjs-launcher": "*",
+    "karma-requirejs": "^1.1.0",
     "karma-safari-launcher": "*",
     "karma-spec-reporter": "*",
     "mocha": "*",

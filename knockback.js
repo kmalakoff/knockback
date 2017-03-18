@@ -595,16 +595,11 @@ module.exports = function (options) {
             continue;
           }
           kb.settings.orm = orm;
-          continue;
-
-          // set by functions
-        } else {
-          kb.settings.orm = _value;
-        }
+        } else kb.settings.orm = _value;
         break;
 
       default:
-        kb.settings[key] = _value;
+        kb.settings[key] = _value;break;
     }
   }
 };

@@ -1,4 +1,4 @@
 const _ = require('lodash');
 
 module.exports = _.clone(require('./config-base'));
-module.exports.frameworks = ['mocha'];
+module.exports.frameworks = ['mocha', 'requirejs', 'chai'];

@@ -487,7 +487,7 @@ class CollectionObservable {
       let filter = filters[i];
       filter = kb.peek(filter);
       if (_.isFunction(filter)) { if (!filter(model)) return false; }
-      else if (_.isArray(filter)) { if (!filter.includes(model.id)) return false; }
+      else if (_.isArray(filter)) { if (!~filter.indexOf(model.id)) return false; }
       else if (model.id !== filter) return false;
     }
     return true;

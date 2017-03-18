@@ -845,9 +845,9 @@ describe('collection-observable @quick @collection-observable', () => {
 
     _.each(new_view_models, vm => {
       if (vm.model() === collection_observable.collection().models[4]) {
-        assert.ok(!(previous_view_models.includes(vm)));
+        assert.ok(!~previous_view_models.indexOf(vm));
       } else {
-        assert.ok(previous_view_models.includes(vm));
+        assert.ok(~previous_view_models.indexOf(vm));
       }
     });
 
@@ -857,7 +857,7 @@ describe('collection-observable @quick @collection-observable', () => {
     assert.equal(new_view_models.length, 5);
     assert.equal(previous_view_models.length, 4);
     _.each(new_view_models, vm => {
-      assert.ok(!(previous_view_models.includes(vm)));
+      assert.ok(!~previous_view_models.indexOf(vm));
     });
 
     kb.release(collection_observable);

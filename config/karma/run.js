@@ -11,10 +11,15 @@ const KARMA_CONFIG_AMD = require('./config-amd');
 
 const TEST_GROUPS = require('../test_groups');
 // const TEST_GROUPS = {browser_globals: require('../test_groups').browser_globals.slice(0, 1)};
+// const TEST_GROUPS = {amd: require('../test_groups').amd.slice(0, 1)};
+// const TEST_GROUPS = {webpack: require('../test_groups').webpack.slice(0, 1)};
+// const TEST_GROUPS = {browserify: require('../test_groups').browserify.slice(0, 1)};
+// console.log('TEST_GROUPS', JSON.stringify(TEST_GROUPS));
 
 module.exports = function (callback) {
   fs.removeSync('./_temp', true);
   fs.removeSync('node_modules/knockback', true);
+
   const queue = new Queue(1);
   queue.defer(callback => generate(callback));
 
