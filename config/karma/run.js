@@ -11,7 +11,7 @@ const KARMA_CONFIG_AMD = require('./config-amd');
 
 const TEST_GROUPS = require('../test_groups');
 
-module.exports = function (callback) {
+module.exports = async (callback) => {
   fs.removeSync('./_temp', true);
   fs.removeSync('node_modules/knockback', true);
 

@@ -1,4 +1,5 @@
-// require('babel-register');
+require('babel-core/register');
+require('babel-polyfill');
 
 const path = require('path');
 const _ = require('underscore');
@@ -12,7 +13,7 @@ const webpack = require('gulp-webpack-config');
 const rename = require('gulp-rename');
 const uglify = require('gulp-uglify');
 const header = require('gulp-header');
-const mocha = require('gulp-mocha');
+const spawn = require('cross-spawn');
 const nuget = require('nuget');
 
 const nugetGulp = () => es.map((file, callback) =>
@@ -61,11 +62,12 @@ gulp.task('minify', ['build'], (callback) => {
 });
 
 function testNode(callback) {
-  const mochaOptions = { reporter: 'dot' };
-  gutil.log('Running Node.js tests');
-  gulp.src('test/spec/**/*.tests.js')
-    .pipe(mocha(mochaOptions))
-    .pipe(es.writeArray(callback));
+  gutil.log('Running Node tests');
+  const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'dot', '--recursive']);
+  res.stdout.pipe(process.stdout);
+  res.stderr.pipe(process.stderr);
+  res.on('error', callback);
+  res.on('close', callback);
 }
 
 function testBrowsers(callback) {
