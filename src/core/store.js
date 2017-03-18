@@ -55,7 +55,9 @@ class Store {
 
   // Manually clear the store
   clear() {
-    let observable, observable_records, replaced_observables;
+    let observable,
+      observable_records,
+      replaced_observables;
     [observable_records, this.observable_records] = [this.observable_records, {}];
     for (const creator_id in observable_records) {
       const records = observable_records[creator_id];
@@ -63,7 +65,7 @@ class Store {
     }
 
     [replaced_observables, this.replaced_observables] = [this.replaced_observables, []];
-    _.each(replaced_observables, observable => {
+    _.each(replaced_observables, (observable) => {
       if (!observable.__kb_released) this.release(observable, true);
     });
   }
@@ -74,7 +76,7 @@ class Store {
       const records = this.observable_records[creator_id];
       for (const cid in records) {
         if (records[cid].__kb_released) delete records[cid];
-      };
+      }
     }
   }
 
@@ -218,17 +220,17 @@ class Store {
 
   // @nodoc
   _storeReferences(observable) {
-    let stores_references = kb.utils.get(observable, 'stores_references');
+    const stores_references = kb.utils.get(observable, 'stores_references');
     if (!stores_references) return;
 
-    return _.find(stores_references, (ref) => ref.store === this);
+    return _.find(stores_references, ref => ref.store === this);
   }
 
   // @nodoc
   _getOrCreateStoreReferences(observable) {
     const stores_references = kb.utils.orSet(observable, 'stores_references', []);
 
-    let ref = _.find(stores_references, (ref) => ref.store === this);
+    let ref = _.find(stores_references, ref => ref.store === this);
     if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: () => this.release(observable) });
     return ref;
   }
@@ -238,7 +240,7 @@ class Store {
     const stores_references = kb.utils.orSet(observable, 'stores_references', []);
     if (!stores_references) return;
 
-    for (var i = 0, l = observable.__kb.stores_references.length; i < l; i++) {
+    for (let i = 0, l = observable.__kb.stores_references.length; i < l; i++) {
       const ref = observable.__kb.stores_references[i];
       if (ref.store === this) {
         observable.__kb.stores_references.splice(i, 1);
@@ -276,7 +278,7 @@ class Store {
     if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) { return creator; }
     if (kb.isModel(obj)) { return kb.ViewModel; }
   }
-};
+}
 Store.initClass();
 kb.Store = Store;
 module.exports = Store;

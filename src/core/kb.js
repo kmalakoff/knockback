@@ -7,8 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let _, Backbone;
-var window = (window != null) ? window : global;
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+
+let _ = null;
+let Backbone = null;
 const ko = require('knockout');
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
@@ -178,12 +180,10 @@ class kb {
   //   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
   //   ...
   //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-  static renderTemplate(template, view_model, options) {
-    let document;
-    if (options == null) { options = {}; }
-    if (!(document = window != null ? window.document : undefined)) { return (typeof console !== 'undefined' && console !== null ? console.log('renderTemplate: document is undefined') : undefined); }
+  static renderTemplate(template, view_model, options = {}) {
+    if (!root.document) return (typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined);
 
-    let el = document.createElement('div');
+    let el = root.document.createElement('div');
     const observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
     if (el.childNodes.length === 1) { // do not return the template wrapper if possible
       el = el.childNodes[0];
@@ -207,9 +207,11 @@ class kb {
   //   ...
   //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   static applyBindings(view_model, node) {
+    if (!root.document) return (typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined);
+
     if (node.length) { // convert to a root element
       let children;
-      [node, children] = [document.createElement('div'), node];
+      [node, children] = [root.document.createElement('div'), node];
       _.each(children, child => node.appendChild(child));
     }
     ko.applyBindings(view_model, node);
@@ -242,7 +244,7 @@ class kb {
   static _throwUnexpected(instance, message) { throw `${_.isString(instance) ? instance : instance.constructor.name}: ${message} is unexpected`; }
 
   // @nodoc
-  static publishMethods(observable, instance, methods) { _.each(methods, fn => { observable[fn] = kb._.bind(instance[fn], instance); }); }
+  static publishMethods(observable, instance, methods) { _.each(methods, (fn) => { observable[fn] = kb._.bind(instance[fn], instance); }); }
 
   // @nodoc
   static peek(obs) {
@@ -260,9 +262,9 @@ class kb {
 kb.initClass();
 module.exports = kb;
 
-if (window.Parse) {
-  Backbone = (kb.Parse = window.Parse);
-  _ = (kb._ = window.Parse._);
+if (root.Parse) {
+  Backbone = (kb.Parse = root.Parse);
+  _ = (kb._ = root.Parse._);
 } else {
   Backbone = (kb.Backbone = require('backbone'));
   _ = (kb._ = require('underscore'));

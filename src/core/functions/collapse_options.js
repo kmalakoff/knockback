@@ -27,7 +27,7 @@ const _mergeObject = function (result, key, value) {
 // @nodoc
 const _keyArrayToObject = function (value) {
   const result = {};
-  _.each(value, item => { result[item] = { key: item }; });
+  _.each(value, (item) => { result[item] = { key: item }; });
   return result;
 };
 

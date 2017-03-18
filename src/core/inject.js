@@ -131,7 +131,7 @@ kb.Inject = class Inject {
 
     // find all of the app elements
     const results = [];
-    const findElements = el => {
+    const findElements = (el) => {
       if (!el.__kb_injected) { // already injected -> skip, but still process children in case they were added afterwards
         const attr = _.find(el.attributes || [], attr => attr.name === 'kb-inject');
         if (attr) {
@@ -144,9 +144,10 @@ kb.Inject = class Inject {
     findElements(el);
 
     // bind the view models
-    _.each(results, app => {
+    _.each(results, (app) => {
       let options = {};
-      let afterBinding, beforeBinding;
+      let afterBinding = null;
+      let beforeBinding = null;
 
       // evaluate the app data
       let expression = app.binding;

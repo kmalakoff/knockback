@@ -30,7 +30,7 @@ const createObservable = function (vm, model, key, create_options) {
 
 // @nodoc
 const createStaticObservables = function (vm, model) {
-  _.each(vm.__kb.statics, key => {
+  _.each(vm.__kb.statics, (key) => {
     let vm_key;
     if ((vm_key = assignViewModelKey(vm, key))) {
       if (model.has(vm_key)) {
@@ -130,8 +130,8 @@ class ViewModel {
       if (_.isArray(args[0])) { args[0] = { keys: args[0] }; }
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
       options = {};
-      _.each(args, arg => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
-      _.each(KEYS_OPTIONS, key => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
+      _.each(args, (arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
+      _.each(KEYS_OPTIONS, (key) => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
 
       // always use a store to ensure recursive view models are handled correctly
       kb.Store.useOptionsOrCreate(options, model, this);

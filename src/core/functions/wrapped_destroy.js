@@ -10,7 +10,7 @@
 const { _ } = require('../kb');
 
 // @nodoc
-const wrappedDestroy = obj => {
+const wrappedDestroy = (obj) => {
   if (!obj.__kb) return;
   if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
 

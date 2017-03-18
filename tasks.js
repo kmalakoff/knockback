@@ -17,7 +17,7 @@ const nugetGulp = () => es.map((file, callback) =>
       if (err) return console.log(err);
       return callback();
     });
-  })
+  }),
 );
 
 const HEADER = (module.exports = `\
@@ -32,36 +32,30 @@ const HEADER = (module.exports = `\
 `);
 const LIBRARY_FILES = require('./config/files').libraries;
 
-gulp.task('build', () => {
-  return gulp.src('config/builds/library/**/*.webpack.config.js')
+gulp.task('build', () => gulp.src('config/builds/library/**/*.webpack.config.js')
     .pipe(webpack())
     .pipe(header(HEADER, { pkg: require('./package.json') }))
-    .pipe(gulp.dest('.'));
-});
+    .pipe(gulp.dest('.')));
 
-gulp.task('minify', ['build'], () => {
-  return gulp.src(['knockback.js', 'knockback-*.js', '!*.min.js'])
+gulp.task('minify', ['build'], () => gulp.src(['knockback.js', 'knockback-*.js', '!*.min.js'])
     .pipe(uglify())
     .pipe(rename({ suffix: '.min' }))
     .pipe(header(HEADER, { pkg: require('./package.json') }))
-    .pipe(gulp.dest(file => file.base))
-});
+    .pipe(gulp.dest(file => file.base)));
 
-const testNode = () => {
-  return new Promise((resolve, reject) => {
-    console.log('Running Node tests');
-    const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'dot', '--recursive']);
-    res.stdout.pipe(process.stdout);
-    res.stderr.pipe(process.stderr);
-    res.on('close', resolve);
-    res.on('error', reject);
-  });
-}
+const testNode = () => new Promise((resolve, reject) => {
+  console.log('Running Node tests');
+  const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'dot', '--recursive']);
+  res.stdout.pipe(process.stdout);
+  res.stderr.pipe(process.stderr);
+  res.on('close', resolve);
+  res.on('error', reject);
+});
 
 const testBrowsers = async () => {
   console.log('Running Browser tests');
   await require('./config/karma/run')();
-}
+};
 
 // gulp.task('test-node', testNode);
 gulp.task('test-node', ['build'], testNode);
@@ -79,9 +73,9 @@ const copyLibraryFiles = async (destination, others) => {
   await new Promise((resolve, reject) =>
     gulp.src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
       .pipe(gulp.dest(file => path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
-      .on('error', reject).on('end', resolve)
+      .on('error', reject).on('end', resolve),
   );
-}
+};
 
 gulp.task('publish', ['minify'], async () => {
   await copyLibraryFiles('packages/npm', ['component.json', 'bower.json']);

@@ -172,7 +172,9 @@ kb.valueValidator = (value, bindings, validation_options) => {
 };
 
 kb.inputValidator = (view_model, el, validation_options) => {
-  let bindings, input_name, type;
+  let bindings,
+    input_name,
+    type;
   if (validation_options == null) { validation_options = {}; }
   (validation_options && !(typeof (validation_options) === 'function')) || (validation_options = {});
   const validators = kb.valid;
@@ -216,7 +218,7 @@ kb.formValidator = (view_model, el) => {
 
   // build up the results
   _.each(el.getElementsByTagName('input'), (input_el) => {
-    let name = input_el.getAttribute('name');
+    const name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
     validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
@@ -225,7 +227,7 @@ kb.formValidator = (view_model, el) => {
   // collect stats, error count and valid
   results.$error_count = ko.computed(() => {
     let error_count = 0;
-    _.each(validators, validator => { error_count += validator().$error_count; });
+    _.each(validators, (validator) => { error_count += validator().$error_count; });
     return error_count;
   });
   results.$valid = ko.computed(() => results.$error_count() === 0);
@@ -233,7 +235,7 @@ kb.formValidator = (view_model, el) => {
   // enabled and disabled
   results.$enabled = ko.computed(() => {
     let enabled = true;
-    _.each(validators, validator => { enabled &= validator().$enabled; });
+    _.each(validators, (validator) => { enabled &= validator().$enabled; });
     return enabled;
   });
   results.$disabled = ko.computed(() => !results.$enabled());

@@ -27,7 +27,7 @@ const LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize
 
 const FILES = require('./files');
 
-let TEST_GROUPS = {};
+const TEST_GROUPS = {};
 
 // ##############################
 // Full Library
@@ -82,14 +82,14 @@ for (const dep_name in object) {
 // ##############################
 const AMD_OPTIONS = require('./amd/gulp-options');
 TEST_GROUPS.amd = [];
-TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach(test => {
+TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach((test) => {
   if (!~test.name.indexOf('_min') && !~test.name.indexOf('legacy_') && !~test.name.indexOf('parse_')) {
     const test_files = test.files.concat(['./node_modules/jquery/dist/jquery.js']);
     const files = [];
     const test_patterns = [];
     const path_files = [];
 
-    _.each(test_files, file => {
+    _.each(test_files, (file) => {
       if (~file.indexOf('.tests.')) test_patterns.push(file);
       else {
         files.push({ pattern: file, included: false });
@@ -105,7 +105,7 @@ TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach(test => {
 // Webpack
 // ##############################
 TEST_GROUPS.webpack = [];
-FILES.tests_webpack.forEach(file => {
+FILES.tests_webpack.forEach((file) => {
   TEST_GROUPS.webpack.push({ name: `webpack_${file.replace('.js', '')}`, files: _.flattenDeep([(~file.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), file]) });
 });
 

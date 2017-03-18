@@ -58,10 +58,10 @@ module.exports = kb.Statistics = class Statistics {
   // Unregister an object by key
   unregister(key, obj) {
     const type_tracker = this.registeredTracker(key);
-    const index = _.indexOf(type_tracker, obj)
+    const index = _.indexOf(type_tracker, obj);
     if (!~index) {
       if (typeof console !== 'undefined') console.log(`kb.Statistics: failed to unregister type: ${key}`);
-      return; 
+      return;
     }
     return type_tracker.splice(index, 1);
   }
@@ -105,7 +105,7 @@ module.exports = kb.Statistics = class Statistics {
     const events = obj._events || obj._callbacks || {};
     const keys = key ? [key] : _.keys(events);
 
-    _.map(keys, key => {
+    _.map(keys, (key) => {
       let node = events[key];
       if (node) {
         if (_.isArray(node)) {

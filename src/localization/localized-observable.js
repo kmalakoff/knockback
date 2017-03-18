@@ -153,7 +153,7 @@ class LocalizedObservable {
     this.vo(value);
     if (this.__kb._onChange) { return this.__kb._onChange(value); }
   }
-};
+}
 LocalizedObservable.initClass();
 kb.LocalizedObservable = LocalizedObservable;
 module.exports = LocalizedObservable;

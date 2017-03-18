@@ -106,9 +106,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _ = void 0,
-    Backbone = void 0;
-var window = window != null ? window : global;
+var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
+
+var _ = null;
+var Backbone = null;
 var ko = __webpack_require__(23);
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
@@ -327,16 +328,12 @@ var kb = function () {
 
   }, {
     key: 'renderTemplate',
-    value: function renderTemplate(template, view_model, options) {
-      var document = void 0;
-      if (options == null) {
-        options = {};
-      }
-      if (!(document = window != null ? window.document : undefined)) {
-        return typeof console !== 'undefined' && console !== null ? console.log('renderTemplate: document is undefined') : undefined;
-      }
+    value: function renderTemplate(template, view_model) {
+      var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      var el = document.createElement('div');
+      if (!root.document) return typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined;
+
+      var el = root.document.createElement('div');
       var observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
       if (el.childNodes.length === 1) {
         // do not return the template wrapper if possible
@@ -369,10 +366,12 @@ var kb = function () {
   }, {
     key: 'applyBindings',
     value: function applyBindings(view_model, node) {
+      if (!root.document) return typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined;
+
       if (node.length) {
         // convert to a root element
         var children = void 0;
-        var _ref = [document.createElement('div'), node];
+        var _ref = [root.document.createElement('div'), node];
         node = _ref[0];
         children = _ref[1];
 
@@ -468,9 +467,9 @@ var kb = function () {
 kb.initClass();
 module.exports = kb;
 
-if (window.Parse) {
-  Backbone = kb.Parse = window.Parse;
-  _ = kb._ = window.Parse._;
+if (root.Parse) {
+  Backbone = kb.Parse = root.Parse;
+  _ = kb._ = root.Parse._;
 } else {
   Backbone = kb.Backbone = __webpack_require__(21);
   _ = kb._ = __webpack_require__(22);
@@ -770,7 +769,7 @@ var _ = kb._;
 // class properties to be extended.
 
 function inherits(parent, protoProps, staticProps) {
-  var child;
+  var child = void 0;
 
   // The constructor function for the new subclass is either defined by you
   // (the "constructor" property in your 'extend' definition), or defaulted
@@ -796,7 +795,7 @@ function inherits(parent, protoProps, staticProps) {
   child.__super__ = parent.prototype;
 
   return child;
-};
+}
 
 // The self-propagating extend function that BacLCone classes use.
 module.exports = function extend(protoProps, classProps) {
@@ -2041,8 +2040,8 @@ kb.Inject = function () {
       // bind the view models
       _.each(results, function (app) {
         var options = {};
-        var afterBinding = void 0,
-            beforeBinding = void 0;
+        var afterBinding = null;
+        var beforeBinding = null;
 
         // evaluate the app data
         var expression = app.binding;
@@ -2686,7 +2685,7 @@ var Store = function () {
         var records = this.observable_records[creator_id];
         for (var cid in records) {
           if (records[cid].__kb_released) delete records[cid];
-        };
+        }
       }
     }
 
@@ -2990,7 +2989,6 @@ var Store = function () {
   return Store;
 }();
 
-;
 Store.initClass();
 kb.Store = Store;
 module.exports = Store;

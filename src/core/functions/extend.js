@@ -14,7 +14,7 @@ const { _ } = kb;
 // Similar to 'goog.inherits', but uses a hash of prototype properties and
 // class properties to be extended.
 function inherits(parent, protoProps, staticProps) {
-  var child;
+  let child;
 
   // The constructor function for the new subclass is either defined by you
   // (the "constructor" property in your 'extend' definition), or defaulted
@@ -22,7 +22,7 @@ function inherits(parent, protoProps, staticProps) {
   if (protoProps && _.has(protoProps, 'constructor')) {
     child = protoProps.constructor;
   } else {
-    child = function() { return parent.apply(this, arguments); };
+    child = function () { return parent.apply(this, arguments); };
   }
 
   // Add static properties to the constructor function, if supplied.
@@ -38,8 +38,8 @@ function inherits(parent, protoProps, staticProps) {
   child.__super__ = parent.prototype;
 
   return child;
-};
-  
+}
+
 // The self-propagating extend function that BacLCone classes use.
 module.exports = function extend(protoProps, classProps) {
   const child = inherits(this, protoProps, classProps);

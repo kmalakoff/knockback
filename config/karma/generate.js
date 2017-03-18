@@ -13,13 +13,11 @@ const browserify = require('gulp-browserify');
 const TEST_GROUPS = require('../test_groups');
 
 module.exports = async () => {
-  console.log('GENERATE START')
-
   // install knockback
   await new Promise((resolve, reject) =>
     gulp.src(['./knockback.js', './package.json'])
       .pipe(gulp.dest('node_modules/knockback'))
-      .on('error', reject).on('end', resolve)
+      .on('error', reject).on('end', resolve),
   );
 
   // build webpack
@@ -27,7 +25,7 @@ module.exports = async () => {
     gulp.src(['config/builds/test/**/*.webpack.config.js'], { read: false, buffer: false })
       .pipe(webpack())
       .pipe(gulp.dest('_temp/webpack'))
-      .on('error', reject).on('end', resolve)
+      .on('error', reject).on('end', resolve),
   );
 
   // build test browserify
@@ -38,7 +36,7 @@ module.exports = async () => {
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
-        .on('error', reject).on('end', resolve)
+        .on('error', reject).on('end', resolve),
     );
   }
 
@@ -49,12 +47,10 @@ module.exports = async () => {
         .pipe(babel({ presets: ['es2015'] }))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
-        .on('error', reject).on('end', resolve)
+        .on('error', reject).on('end', resolve),
     );
   }
 
   // uninstall knockback
   fs.removeSync('node_modules/knockback', true);
-
-  console.log('GENERATE END')
 };

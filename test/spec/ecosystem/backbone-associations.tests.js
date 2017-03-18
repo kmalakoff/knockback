@@ -5,7 +5,8 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
   // after -> delete root.Person; delete root.Building
 
   // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Building, Person;
+  let Building,
+    Person;
   let kb = typeof window !== 'undefined' ? root.kb : undefined;
   try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
   try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
@@ -83,7 +84,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     const house_view_model = new kb.ViewModel(our_house);
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place');
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count');
-    _.each(house_view_model.occupants(), occupant_observable => {
+    _.each(house_view_model.occupants(), (occupant_observable) => {
       assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable.name()), 'Expected name');
     });
       // assert.equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
@@ -144,11 +145,11 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     // check the set up state
     const places = new kb.Collection([abbey_flats, abbey_studios]);
     const places_observable = kb.collectionObservable(places, { view_model: kb.ViewModel });
-    _.each(places_observable(), place_view_model => {
+    _.each(places_observable(), (place_view_model) => {
       if (place_view_model.id() === 'house-2-1') {
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 4, 'Everyone is here');
-        _.each(place_view_model.occupants(), occupant_observable => {
+        _.each(place_view_model.occupants(), (occupant_observable) => {
           assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
         });
           // assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
@@ -167,14 +168,14 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     // a beattle crosses the road
     abbey_studios.get('occupants').add(john);
 
-    _.each(places_observable(), place_view_model => {
+    _.each(places_observable(), (place_view_model) => {
       if (place_view_model.id() === 'house-2-1') {
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place');
 
         // assert.equal(place_view_model.occupants().length, 3, "Almost everyone is here") # no backlink maintenance
         assert.equal(place_view_model.occupants().length, 4, 'Everyone is here');
 
-        _.each(place_view_model.occupants(), occupant_observable => {
+        _.each(place_view_model.occupants(), (occupant_observable) => {
           assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
         });
           // assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
@@ -187,7 +188,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
       } else {
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 1, 'In the studio');
-        _.each(place_view_model.occupants(), occupant_observable => {
+        _.each(place_view_model.occupants(), (occupant_observable) => {
           assert.equal(occupant_observable.name(), 'John', 'Expected name');
         });
       }
@@ -249,7 +250,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
 
     let john_view_model = new kb.ViewModel(john);
     assert.equal(john_view_model.name(), 'John', 'Name is correct');
-    _.each(john_view_model.friends(), friend => {
+    _.each(john_view_model.friends(), (friend) => {
       assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name');
     });
     assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name');
@@ -258,7 +259,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
 
     let paul_view_model = new kb.ViewModel(paul);
     assert.equal(paul_view_model.name(), 'Paul', 'Name is correct');
-    _.each(paul_view_model.friends(), friend => {
+    _.each(paul_view_model.friends(), (friend) => {
       assert.ok(~_.indexOf(['John', 'George', 'Ringo'], friend.name()), 'Expected name');
     });
     assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name');
@@ -267,7 +268,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
 
     let george_view_model = new kb.ViewModel(george);
     assert.equal(george_view_model.name(), 'George', 'Name is correct');
-    _.each(george_view_model.friends(), friend => {
+    _.each(george_view_model.friends(), (friend) => {
       assert.ok(~_.indexOf(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name');
     });
     assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name');
@@ -824,9 +825,9 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     });
 
     const validateFriends = function (co, names) {
-      _.each(names, name => {
+      _.each(names, (name) => {
         let found = false;
-        _.each(co(), vm => {
+        _.each(co(), (vm) => {
           if (vm.name && (vm.name() === name)) {
             found = true;
             validateFriend(vm, name);

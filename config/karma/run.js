@@ -16,8 +16,6 @@ module.exports = async () => {
   try {
     await generate();
 
-    console.log('TEST START')
-
     for (const name in TEST_GROUPS) {
       for (const test of TEST_GROUPS[name]) {
         console.log(`RUNNING TESTS: ${name} ${test.name}`);
@@ -33,8 +31,6 @@ module.exports = async () => {
         });
       }
     }
-
-    console.log('TEST END')
 
     fs.removeSync('./_temp', true);
   } catch (err) { /**/ }
