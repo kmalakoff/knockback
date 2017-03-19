@@ -4,7 +4,7 @@ let assert = root.assert; try { assert = assert || (r ? require('chai').assert :
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, Backbone, ko } = kb;
-if (Backbone && !Backbone.Associations) try { !r || require('backbone-associations'); } catch (e) { /**/ }
+if (Backbone && !Backbone.Associations && r) try { require('backbone-associations'); } catch (e) { /**/ }
 
 describe.skip('Knockback.js with Backbone-Associations.js', () => {
   it('TEST DEPENDENCY MISSING', () => {

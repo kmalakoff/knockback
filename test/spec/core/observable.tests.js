@@ -54,7 +54,7 @@ describe('observable', () => {
   it('2. Standard use case: direct attributes with custom read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelCustom = (model) => {
+    const ContactViewModelCustom = function (model) {
       this.name = kb.observable(model, { key: 'name', read() { return `First: ${model.get('name')}`; } });
       this.number = kb.observable(model, {
         key: 'number',
@@ -92,7 +92,7 @@ describe('observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const args = [];
-    const ContactViewModelCustom = (model) => {
+    const ContactViewModelCustom = function (model) {
       this.name = kb.observable(model, { key: 'name', read(key, arg1, arg2) { args.push(arg1); args.push(arg2); return model.get('name'); }, args: ['name', 1] });
       this.number = kb.observable(model, { key: 'number', read(key, arg) { args.push(arg); return model.get('number'); }, args: 'number' });
     };

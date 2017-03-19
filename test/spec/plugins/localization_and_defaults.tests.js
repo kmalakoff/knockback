@@ -33,7 +33,7 @@ class LocaleManager {
     if (!culture_map) return '';
 
     let string = Object.prototype.hasOwnProperty.call(culture_map, string_id) ? culture_map[string_id] : '';
-    if (arguments.length === 1) return string;
+    if (string_id !== undefined) return string;
 
     const iterable = Array.prototype.slice.call(arguments, 1);
     for (let index = 0, l = iterable.length; index < l; index++) {
@@ -155,7 +155,7 @@ describe('localized-observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
-    const ContactViewModelGreeting = (model) => {
+    const ContactViewModelGreeting = function (model) {
       this.hello = kb.observable(model, { key: 'hello_greeting', localizer: kb.LocalizedStringLocalizer });
       this.goodbye = kb.observable(model, { key: 'goodbye_greeting', localizer: kb.LocalizedStringLocalizer });
       return this;
@@ -214,7 +214,7 @@ describe('localized-observable', () => {
   it('Date and time with jquery.globalize', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelDate = (model) => {
+    const ContactViewModelDate = function (model) {
       this.date = kb.observable(model, { key: 'date', localizer: kb.LongDateLocalizer }, this);
       return this;
     };
@@ -265,7 +265,7 @@ describe('localized-observable', () => {
     kb.locale_manager.setLocale('en');
     assert.equal(locale_manager_greeting(), 'Goodbye', 'en: Goodbye');
 
-    const ContactViewModelGreeting = (model) => {
+    const ContactViewModelGreeting = function (model) {
       this.greeting_key = ko.observable('hello_greeting');
       this.greeting = kb.observable(model, { key: this.greeting_key, localizer: kb.LocalizedStringLocalizer });
     };
@@ -285,7 +285,7 @@ describe('localized-observable', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('2. internals test (Coffeescript inheritance)', () => {
+  it('2. internals test (class inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -293,9 +293,7 @@ describe('localized-observable', () => {
       constructor(model) {
         super(model, { internals: ['email', 'date'] });
         this.email = (value) => {
-          if (arguments.length) {
-            return this._email(value);
-          }
+          if (value !== undefined) return this._email(value);
           return !this._email() ? 'your.name@yourplace.com' : this._email();
         };
         this.date = new kb.LongDateLocalizer(this._date);
@@ -367,9 +365,7 @@ describe('localized-observable', () => {
       constructor(model) {
         kb.ViewModel.prototype.constructor.call(this, model, { internals: ['email', 'date'] });
         this.email = (value) => {
-          if (arguments.length) {
-            return this._email(value);
-          }
+          if (value !== undefined) return this._email(value);
           return !this._email() ? 'your.name@yourplace.com' : this._email();
         };
         this.date = new kb.LongDateLocalizer(this._date);
@@ -938,7 +934,7 @@ describe('defaults', () => {
     });
   }
 
-  it('3. internals test (Coffeescript inheritance)', () => {
+  it('3. internals test (class inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 

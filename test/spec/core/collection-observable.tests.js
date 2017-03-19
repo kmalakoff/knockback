@@ -82,10 +82,7 @@ describe('collection-observable', () => {
     assert.equal(collection.length, 0, 'no models');
     assert.equal(view_model.count(), 0, 'no count');
 
-    debugger;
-    try {
-      collection.add(new Contact({ id: 'b1', name: 'Ringo', number: '555-555-5556' }));
-    } catch (err) { console.trace(err); debugger; }
+    collection.add(new Contact({ id: 'b1', name: 'Ringo', number: '555-555-5556' }));
     collection.add(new Contact({ id: 'b2', name: 'George', number: '555-555-5555' }));
     assert.equal(collection.length, 2, '2 models');
     assert.equal(view_model.count(), 2, '2 count');
@@ -107,7 +104,6 @@ describe('collection-observable', () => {
   });
 
   it('4. Basic Usage: no view models', () => {
-    debugger;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();

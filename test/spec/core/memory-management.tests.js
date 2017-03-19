@@ -99,12 +99,12 @@ describe('knockback.js memory management', () => {
   });
 
   it('Releasing with nodes', () => {
-    let model;
     if (!$) return;
 
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model = kb.viewModel(model = new kb.Model({ name: 'Bob' }));
+    const model = new kb.Model({ name: 'Bob' });
+    const view_model = kb.viewModel(model);
     const collection_observable = kb.collectionObservable(new kb.Collection([new kb.Model({ name: 'Fred' }), new kb.Model({ name: 'Mary' })]));
 
     const $vm_el = $('<div id="vm" data-bind="text: name"></div>');

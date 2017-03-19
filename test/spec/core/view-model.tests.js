@@ -175,7 +175,7 @@ describe('view-model', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('5. reference counting and custom __destroy (Coffeescript inheritance)', () => {
+  it('5. reference counting and custom __destroy (class inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {

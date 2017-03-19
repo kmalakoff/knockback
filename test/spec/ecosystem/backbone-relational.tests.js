@@ -4,7 +4,7 @@ let assert = root.assert; try { assert = assert || (r ? require('chai').assert :
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, Backbone, ko } = kb;
-if (Backbone && !Backbone.Relational) try { !r || require('backbone-relational'); } catch (e) { /**/ }
+if (Backbone && !Backbone.Relational && r) try { require('backbone-relational'); } catch (e) { /**/ }
 
 describe('Knockback.js with Backbone-Relational.js', () => {
   it('TEST DEPENDENCY MISSING', () => {
@@ -1048,7 +1048,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
   // https://github.com/kmalakoff/knockback/issues/122
   it('14. Issue 122', () => {
-    let model;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const Model2 = Backbone.RelationalModel.extend({});
@@ -1059,11 +1058,12 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         super(model, { requires: ['nested'], options });
         this.removeNested = () => model.get('nested').destroy();
         this.addNested = () => model.set({ nested: new Model2() });
-        this.hasNested = ko.computed(() => { if (this.nested()) this.nested().model(); });
+        this.hasNested = ko.computed(() => this.nested() ? !!this.nested().model() : false);
       }
     }
 
-    const view_model = new ViewModel(model = new Model1());
+    const model = new Model1();
+    const view_model = new ViewModel(model);
     assert.ok(!view_model.hasNested(), 'not have a nested');
     view_model.addNested();
     assert.ok(!!model.get('nested'), 'added a nested');
