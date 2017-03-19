@@ -343,7 +343,7 @@ describe('view-model', () => {
       return model.set({ date: new Date(birthdate.valueOf()) }); // restore birthdate
     };
 
-    const validateGenericViewModel = function(view_model, name, birthdate) {
+    const validateGenericViewModel = function (view_model, name, birthdate) {
       assert.equal(view_model.name(), name, `${name}: Name matches`);
       return assert.equal(view_model.date().valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };

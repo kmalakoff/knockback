@@ -849,7 +849,7 @@ describe('Knockback.js with BackboneORM', () => {
       return this;
     };
     class BandMemberViewModel extends kb.ViewModel {
-      constructor(model, options) {
+      constructor(/* model, options */) {
         super(...arguments);
         this.type = ko.observable('band_member');
       }

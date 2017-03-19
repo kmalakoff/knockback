@@ -14,7 +14,7 @@ const ListModel = Backbone.RelationalModel.extend({
 });
 
 ModelViewModel = kb.ViewModel.extend({
-  constructor(model) {
+  constructor(/* model */) {
     kb.ViewModel.prototype.constructor.apply(this, arguments);
     this.cancel = function () { this.model().destroy(); };
   },

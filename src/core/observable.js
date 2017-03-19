@@ -75,7 +75,7 @@ kb.Observable = class Observable {
           _.each(args, arg => ko.utils.unwrapObservable(arg));
 
           const ew = kb.utils.wrappedEventWatcher(this);
-          !ew || ew.emitter(model || null)
+          !ew || ew.emitter(model || null);
 
           if (this.read) {
             this.update(this.read.apply(this._vm, args));

@@ -11,11 +11,11 @@ let kb;
 const { _, ko } = (kb = require('../core/kb'));
 
 kb.Observable.prototype.setToDefault = () => { if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault(); };
-kb.ViewModel.prototype.setToDefault = () => { 
+kb.ViewModel.prototype.setToDefault = () => {
   for (const vm_key in this.__kb.vm_keys) {
     const value = this[vm_key];
     if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
-  } 
+  }
 };
 
 // @example

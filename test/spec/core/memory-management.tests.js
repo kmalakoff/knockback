@@ -32,7 +32,7 @@ describe('knockback.js memory management', () => {
     }
     release() {
       --this.ref_count;
-      if (this.ref_count < 0) { throw 'ref count is corrupt'; }
+      if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
       if (!this.ref_count) {
         this.is_destroyed = true;
         this.__destroy();
@@ -154,7 +154,7 @@ describe('knockback.js memory management', () => {
       }
       release() {
         --this.ref_count;
-        if (this.ref_count < 0) { throw 'ref count is corrupt'; }
+        if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
         if (!this.ref_count) {
           this.is_destroyed = true;
           this.__destroy();

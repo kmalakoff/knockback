@@ -91,10 +91,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
     kb.release(house_view_model);
 
-    for (const name in model_stats) {
-      const stats = model_stats[name];
+    _.each(model_stats, (stats) => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
@@ -485,20 +484,22 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     class BestFriendViewModel extends kb.ViewModel {}
     class PersonViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'friends.models': FriendViewModel,
-          best_friend: BestFriendViewModel,
-          occupies: HouseViewModel,
-        },
-          options });
+        super(model, {
+          factories: {
+            'friends.models': FriendViewModel,
+            best_friend: BestFriendViewModel,
+            occupies: HouseViewModel,
+          },
+          options,
+        });
       }
     }
     class HouseViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'occupants.models': PersonViewModel,
-        },
-          options });
+        super(model, {
+          factories: { 'occupants.models': PersonViewModel },
+          options,
+        });
       }
     }
 
@@ -548,12 +549,14 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     class BestFriendViewModel extends kb.ViewModel {}
     class PersonViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'friends.models': FriendViewModel,
-          best_friend: BestFriendViewModel,
-          occupies: HouseViewModel,
-        },
-          options });
+        super(model, {
+          factories: {
+            'friends.models': FriendViewModel,
+            best_friend: BestFriendViewModel,
+            occupies: HouseViewModel,
+          },
+          options,
+        });
       }
     }
     class HouseViewModel extends kb.ViewModel {
@@ -755,6 +758,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       name: 'George',
       friends: ['person-10-1', 'person-10-2', 'person-10-4'],
     });
+
     const john = new Person({
       id: 'person-10-1',
       name: 'John',
@@ -762,12 +766,14 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       best_friend: george,
     });
     george.set({ best_friend: john });
+
     const paul = new Person({
       id: 'person-10-2',
       name: 'Paul',
       friends: ['person-10-1', 'person-10-3', 'person-10-4'],
       best_friend: george,
     });
+
     const ringo = new Person({
       id: 'person-10-4',
       name: 'Ringo',
@@ -785,7 +791,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       return this;
     };
     class BandMemberViewModel extends kb.ViewModel {
-      constructor(model, options) {
+      constructor(/* model, options */) {
         super(...arguments);
         this.type = ko.observable('band_member');
       }
@@ -799,6 +805,11 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       },
     });
 
+    const validateFriend = (vm, name) => {
+      assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
+      return assert.equal(vm.name(), name, `friend name matches for ${name}`);
+    };
+
     const validateFriends = function (co, names) {
       _.each(names, (name) => {
         let found = false;
@@ -811,14 +822,12 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         assert.ok(found, `${name} was found`);
       });
     };
-    var validateFriend = (vm, name) => {
-      assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
-      return assert.equal(vm.name(), name, `friend name matches for ${name}`);
-    };
+
     const validateBestFriend = (vm, name) => {
       assert.equal(vm.type(), 'best_friend', `best friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `best friend name matches for ${name}`);
     };
+
     const validateBandMember = (vm, name) => {
       assert.equal(vm.type(), 'band_member', `band member type matches for ${name}`);
       assert.ok(vm instanceof BandMemberViewModel, `band member type matches for ${name}`);
@@ -945,7 +954,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         switch (parameter.get('Type')) {
           case 0: return new StringParameterViewModel(parameter, options);
           case 1: return new BooleanParameterViewModel(parameter, options);
-          default: throw 'Invalid parameter type attribute.';
+          default: throw new Error('Invalid parameter type attribute.');
         }
       },
     };

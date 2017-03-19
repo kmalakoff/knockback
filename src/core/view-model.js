@@ -200,7 +200,7 @@ class ViewModel {
       if (this.__kb.keys || !model) return; // only use the keys provided
       for (key in model.attributes) { createObservable(this, model, key, this.__kb.create_options); }
       if (kb.settings.orm && kb.settings.orm.keys) {
-        _.each(kb.settings.orm.keys, (key) => createObservable(this, model, key, this.__kb.create_options));
+        _.each(kb.settings.orm.keys, key => createObservable(this, model, key, this.__kb.create_options));
       }
     } else if (_.isArray(keys)) {
       _.map(keys, key => createObservable(this, model, key, this.__kb.create_options));
