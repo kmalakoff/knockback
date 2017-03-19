@@ -1,7 +1,8 @@
+const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
-let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, Backbone, ko } = kb;
 if (!Backbone.Associations) try { require('backbone-associations'); } catch (e) { /**/ }
 

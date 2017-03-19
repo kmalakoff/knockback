@@ -127,7 +127,7 @@ kb.Inject = class Inject {
   // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
   // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
   static injectViewModels(el) {
-    if (!el) return;
+    el = el || root.document;
 
     // find all of the app elements
     const results = [];
@@ -188,7 +188,7 @@ if (root && (typeof root.document !== 'undefined')) {
   // use simple ready check
   const onReady = () => {
     if (root.document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
-    kb.injectViewModels(root.document); // the document is loaded
+    kb.injectViewModels(); // the document is loaded
   };
   onReady();
 }

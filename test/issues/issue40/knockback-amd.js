@@ -220,7 +220,7 @@
         if (obj && obj.__kb && obj.__kb.hasOwnProperty(key)) {
           return obj.__kb[key];
         }
-        return void 0;
+        return undefined;
       }
       obj || throwUnexpected(this, `no obj for wrapping ${key}`);
       obj.__kb || (obj.__kb = {});
@@ -1092,7 +1092,7 @@
         new_type = kb.utils.valueType(new_value);
         if (!this.__kb_value || (this.__kb_value.__kb_destroyed || (this.__kb_value.__kb_null && new_value))) {
           this.__kb_value = null;
-          this.value_type = void 0;
+          this.value_type = undefined;
         }
         value = this.__kb_value;
         if (_.isUndefined(this.value_type) || (this.value_type !== new_type && new_type !== KB_TYPE_UNKNOWN)) {
@@ -1393,7 +1393,7 @@
         options = collapseOptions(options);
         this.sort_attribute = options.sort_attribute;
         this.sorted_index = options.sorted_index;
-        this.filters = _.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : void 0;
+        this.filters = _.isArray(options.filters) ? options.filters : options.filters ? [options.filters] : undefined;
         create_options = this.create_options = {
           store: kb.Store.useOptionsOrCreate(options, collection, observable),
         };

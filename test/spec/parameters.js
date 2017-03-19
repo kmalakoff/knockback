@@ -1,5 +1,6 @@
+const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 
 const exports = { LocaleManager: require('./lib/locale_manager') };
 

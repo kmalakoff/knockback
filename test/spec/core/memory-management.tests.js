@@ -1,7 +1,8 @@
+const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
-let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, ko } = kb;
 const { $ } = root;
 
@@ -75,7 +76,7 @@ describe('knockback.js memory management', () => {
   it('Basic view model properties', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const nested_view_model = kb.viewModel(new kb.Model({ name: 'name1' }), { name: {} }, this);
+    const nested_view_model = kb.viewModel(new kb.Model({ name: 'name1' }), { name: {} });
     const ViewModel = function () {
       this.prop1 = ko.observable();
       this.prop2 = ko.observable(['test', 1, null, kb.viewModel(new kb.Model({ name: 'name1' }))]);

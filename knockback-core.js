@@ -2016,7 +2016,7 @@ kb.Inject = function () {
   }, {
     key: 'injectViewModels',
     value: function injectViewModels(el) {
-      if (!el) return;
+      el = el || root.document;
 
       // find all of the app elements
       var results = [];
@@ -2091,7 +2091,7 @@ if (root && typeof root.document !== 'undefined') {
   // use simple ready check
   var onReady = function onReady() {
     if (root.document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
-    kb.injectViewModels(root.document); // the document is loaded
+    kb.injectViewModels(); // the document is loaded
   };
   onReady();
 }
