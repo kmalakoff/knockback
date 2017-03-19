@@ -80,7 +80,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="app"><span data-bind="visible: app"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Solo: app was injected');
     assert.ok(view_model instanceof root.app, 'ViewModel Solo: view_model type app');
     assert.equal(view_model.app, true, 'ViewModel Solo: app is true');
@@ -94,7 +94,7 @@ describe('inject', () => {
 </div>`)[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     const view_model1 = injected[1].view_model;
     assert.equal(injected[0].el, inject_el.children[0], 'ViewModel Solo: app was injected');
     assert.ok(view_model instanceof root.app, 'ViewModel Solo: view_model type app');
@@ -108,7 +108,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="create: appCreate"><span data-bind="visible: app_create"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'Create: app was injected');
     assert.ok(!(view_model instanceof root.appCreate), 'Create: view_model not type appCreate');
     assert.ok(_.isObject(view_model), 'Create: view_model is basic type');
@@ -119,7 +119,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="view_model: app"><span data-bind="visible: app"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Property: app was injected');
     assert.ok(view_model instanceof root.app, 'ViewModel Property: view_model type app');
     assert.equal(view_model.app, true, 'ViewModel Property: hello is true');
@@ -129,7 +129,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="view_model: app, create: appCreate"><span data-bind="visible: app"></span><span data-bind="visible: app_create"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'Create: app was injected');
     assert.ok(!(view_model instanceof root.appCreate), 'Create: view_model not type appCreate');
     assert.ok(_.isObject(view_model), 'Create: view_model is basic type');
@@ -142,7 +142,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="create: appCreate, view_model: app"><span data-bind="visible: app"></span><span data-bind="visible: app_create"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'Create: app was injected');
     assert.ok(!(view_model instanceof root.appCreate), 'Create: view_model not type appCreate');
     assert.ok(_.isObject(view_model), 'Create: view_model is basic type');
@@ -155,7 +155,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="hello: true"><span data-bind="visible: hello"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Object: app was injected');
     assert.equal(view_model.hello, true, 'ViewModel Object: hello is true');
     ko.removeNode(inject_el);
@@ -171,7 +171,7 @@ describe('inject', () => {
 </div>`)[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Object: app was injected');
     assert.ok((view_model instanceof SuperClass), 'Mix: is SuperClass');
     assert.equal(view_model.super_class, true, 'Mix: has super_class');
@@ -191,7 +191,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'Properties + Callbacks: app was injected');
     assert.equal(view_model.hello, true, 'Properties + Callbacks: view model was injected');
     assert.ok(before_was_called, 'Properties + Callbacks: before_was_called was called');
@@ -206,7 +206,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="create: appCreate, hello: true, beforeBinding: beforeBinding, afterBinding: afterBinding"><span data-bind="visible: app_create"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'Create + Callbacks: app was injected');
     assert.ok(!(view_model instanceof root.appCreate), 'Create: view_model not type appCreate');
     assert.ok(_.isObject(view_model), 'Create: view_model is basic type');
@@ -219,7 +219,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="view_model: appCallbacks, hello: true"><span data-bind="visible: app"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Property + Callbacks: app was injected');
     assert.ok((view_model instanceof root.appCallbacks), 'Create: view_model type appCallbacks');
     assert.equal(view_model.app, true, 'ViewModel Property + Callbacks: view model was injected');
@@ -235,7 +235,7 @@ describe('inject', () => {
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
-    ({ view_model } = injected[0]);
+    view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Object + Callbacks: app was injected');
     assert.equal(view_model.hello, true, 'ViewModel Object + Callbacks: view model was injected');
     assert.ok(before_was_called, 'ViewModel Object + Callbacks: before_was_called was called');

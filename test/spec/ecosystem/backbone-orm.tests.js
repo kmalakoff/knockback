@@ -4,7 +4,7 @@ let assert = root.assert; try { assert = assert || (r ? require('chai').assert :
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, Backbone, ko } = kb;
-let BackboneORM; try { BackboneORM = root.BackboneORM || require('backbone-orm'); } catch (e) { /**/ }
+let BackboneORM = root.BackboneORM; try { BackboneORM = BackboneORM || (r ? require('backbone-orm') : undefined); } catch (e) { /**/ }
 const { Queue } = BackboneORM;
 
 describe('Knockback.js with BackboneORM', () => {
@@ -101,7 +101,6 @@ describe('Knockback.js with BackboneORM', () => {
       assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', () => {
@@ -199,10 +198,9 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(places_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  it('3. Model with recursive HasMany relations: Person with users who are people', () => {
+  it('3. Model with recursive HasMany relations: Person with users who are people', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -238,7 +236,7 @@ describe('Knockback.js with BackboneORM', () => {
       (model => queue.defer(callback => model.fetchRelated(callback)))(model);
     });
     return queue.await((err) => {
-      if (err) { return done(err); }
+      if (err) return done(err);
 
       const model_stats = {};
       model_stats.george = { model: george, event_stats: kb.Statistics.eventsStats(george) };
@@ -279,7 +277,7 @@ describe('Knockback.js with BackboneORM', () => {
         assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
       }
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-  
+      done();
     });
   });
 
@@ -325,7 +323,7 @@ describe('Knockback.js with BackboneORM', () => {
   });
 
   // TODO: add tests and support for idAttribute
-  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', () => {
+  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) => {
     class Book extends Backbone.Model {
       static initClass() {
         this.prototype.model_name = 'Book';
@@ -385,7 +383,7 @@ describe('Knockback.js with BackboneORM', () => {
       (model => queue.defer(callback => model.fetchRelated(callback)))(model);
     });
     return queue.await((err) => {
-      if (err) { return done(err); }
+      if (err) return done(err);
 
       const BookViewModel = kb.ViewModel.extend({
         constructor(model) {
@@ -430,7 +428,7 @@ describe('Knockback.js with BackboneORM', () => {
     });
   });
 
-  it('6. Inferring observable types: from the start', () => {
+  it('6. Inferring observable types: from the start', (done) => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-6-1', name: 'Daddy', friends: ['person-6-2'] });
@@ -446,7 +444,7 @@ describe('Knockback.js with BackboneORM', () => {
       (model => queue.defer(callback => model.fetchRelated(callback)))(model);
     });
     return queue.await((err) => {
-      if (err) { return done(err); }
+      if (err) return done(err);
 
       const view_model_person1 = kb.viewModel(person1);
       const view_model_house1 = kb.viewModel(house);
@@ -466,7 +464,7 @@ describe('Knockback.js with BackboneORM', () => {
       kb.release(view_model_house1);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-  
+      done(err);
     });
   });
 

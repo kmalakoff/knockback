@@ -60,9 +60,9 @@ const testBrowsers = async () => {
 // gulp.task('test-node', testNode);
 gulp.task('test-node', ['build'], testNode);
 
-gulp.task('test-browsers', testBrowsers);
+// gulp.task('test-browsers', testBrowsers);
 // gulp.task('test-browsers', ['build'], testBrowsers);
-// gulp.task('test-browsers', ['minify'], testBrowsers);
+gulp.task('test-browsers', ['minify'], testBrowsers);
 
 gulp.task('test', ['minify'], async () => {
   await testNode();

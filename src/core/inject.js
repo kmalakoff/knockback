@@ -126,9 +126,7 @@ kb.Inject = class Inject {
   // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered. Also, used with the data-bind `'inject'` custom binding.
   // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
   // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-  static injectViewModels(el) {
-    el = el || root.document;
-
+  static injectViewModels(el = root.document) {
     // find all of the app elements
     const results = [];
     const findElements = (el) => {

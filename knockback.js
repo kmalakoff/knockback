@@ -2015,8 +2015,8 @@ kb.Inject = function () {
 
   }, {
     key: 'injectViewModels',
-    value: function injectViewModels(el) {
-      el = el || root.document;
+    value: function injectViewModels() {
+      var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
 
       // find all of the app elements
       var results = [];
