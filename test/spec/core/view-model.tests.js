@@ -1,20 +1,17 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
+const { $ } = root;
 
 describe('view-model', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-  const $ = typeof window !== 'undefined' ? window.$ : undefined;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
@@ -29,7 +26,7 @@ describe('view-model', () => {
     }
   }
 
-  it('1. Standard use case: read and write', (done) => {
+  it('1. Standard use case: read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new Contact({ name: 'Ringo', number: '555-555-5556' });
@@ -53,10 +50,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('2. Using Coffeescript classes', (done) => {
+  it('2. Using Coffeescript classes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelCustom extends kb.ViewModel {
@@ -87,10 +84,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('3. Using simple Javascript classes', (done) => {
+  it('3. Using simple Javascript classes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModelCustom = function (model) {
@@ -130,10 +127,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('4. requires', (done) => {
+  it('4. requires', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {
@@ -178,10 +175,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('5. reference counting and custom __destroy (Coffeescript inheritance)', (done) => {
+  it('5. reference counting and custom __destroy (Coffeescript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {
@@ -227,10 +224,10 @@ describe('view-model', () => {
     assert.throw((() => view_model.release()), Error, 'ref count is corrupt');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it.skip('6. reference counting and custom __destroy (Javascript inheritance)', (done) => {
+  it.skip('6. reference counting and custom __destroy (Javascript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModelFullName = kb.ViewModel.extend({
@@ -275,10 +272,10 @@ describe('view-model', () => {
     assert.throw((() => view_model.release()), Error, 'ref count is corrupt');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('7. Nested custom view models', (done) => {
+  it('7. Nested custom view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelDate extends kb.ViewModel {
@@ -385,10 +382,10 @@ describe('view-model', () => {
     kb.release(nested_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('8a. Changing attribute types', (done) => {
+  it('8a. Changing attribute types', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ reused: null });
@@ -411,10 +408,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('8b. Changing attribute types', (done) => {
+  it('8b. Changing attribute types', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ reused: null });
@@ -444,10 +441,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('9. Shared Options', (done) => {
+  it('9. Shared Options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const model1 = new kb.Model({ id: 1, name: 'Bob' });
     const model2 = new kb.Model({ id: 1, name: 'Bob' });
@@ -463,10 +460,10 @@ describe('view-model', () => {
     kb.release([view_model1, view_model2, view_model3]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('10. Options', (done) => {
+  it('10. Options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // keys - array
@@ -532,10 +529,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('11. array attributes', (done) => {
+  it('11. array attributes', () => {
     const model = new kb.Model({
       text: ['heading.get these rewards'],
       widget: ['sign_up', 'rewards'],
@@ -557,10 +554,10 @@ describe('view-model', () => {
     assert.ok(_.isEqual(view_model.text(), ['heading.get these rewards']), 'text observable matches');
     assert.ok(_.isEqual(view_model.widget(), ['sign_up', 'rewards']), 'widget observable matches');
     assert.ok(_.isEqual(view_model.model_data().reward.top_rewards.properties, ['title', 'description', 'num_points']), 'model_data observable matches');
-    return done();
+
   });
 
-  it('12. model change is observable', (done) => {
+  it('12. model change is observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const model = new kb.Model({ id: 1, name: 'Bob' });
 
@@ -575,10 +572,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('13. model replacement', (done) => {
+  it('13. model replacement', () => {
     kb.statistics = new kb.Statistics();
     const model_opts = {
       attributes: {
@@ -606,11 +603,11 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('14. model replacement with select', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
+  it('14. model replacement with select', () => {
+    if (!$) return;
 
     kb.statistics = new kb.Statistics();
 
@@ -658,11 +655,11 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('16. model replacement with input', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
+  it('16. model replacement with input', () => {
+    if (!$) return;
 
     kb.statistics = new kb.Statistics();
 
@@ -706,11 +703,11 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('17. model replacement with multiple selects and weird backbone bug', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
+  it('17. model replacement with multiple selects and weird backbone bug', () => {
+    if (!$) return;
 
     kb.statistics = new kb.Statistics();
 
@@ -772,10 +769,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('18. can merge unique options', (done) => {
+  it('18. can merge unique options', () => {
     const options = {
       internals: ['internal1'],
       keys: ['key1'],
@@ -796,10 +793,10 @@ describe('view-model', () => {
     assert.deepEqual(collapsed_options.keys, ['key1', 'key2']);
     assert.deepEqual(_.keys(collapsed_options.factories), ['models', 'collection.models']);
     assert.deepEqual(collapsed_options.excludes, ['exclude2', 'exclude3']);
-    return done();
+
   });
 
-  it('19. can merge non-unique options', (done) => {
+  it('19. can merge non-unique options', () => {
     const factoryOverride = function () {};
     const factory = function () {};
 
@@ -825,10 +822,10 @@ describe('view-model', () => {
     assert.equal(collapsed_options.factories.models, factoryOverride, 'selected overidden factory');
     assert.notEqual(collapsed_options.factories.models, factory, 'did not select original factory');
     assert.deepEqual(collapsed_options.excludes, ['exclude1']);
-    return done();
+
   });
 
-  it('20. can merge keys as object', (done) => {
+  it('20. can merge keys as object', () => {
     let options = {
       keys: { name: { key: 'name' } },
       options: {
@@ -878,10 +875,10 @@ describe('view-model', () => {
 
     collapsed_options = kb.utils.collapseOptions(options);
     assert.deepEqual(collapsed_options.keys, { name: { key: 'name' }, thing: { key: 'thing' } });
-    return done();
+
   });
 
-  it('21. view model changes do not cause dependencies inside ko.computed', (done) => {
+  it('21. view model changes do not cause dependencies inside ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = new TestViewModel(new kb.Model({ id: 1, name: 'Initial' }));
@@ -942,10 +939,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('22. statics and static defaults keyword', (done) => {
+  it('22. statics and static defaults keyword', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = kb.viewModel(
@@ -974,14 +971,14 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('23. Issue 94', (done) => {
+  it('23. Issue 94', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ECOSYSTEM
-    if (kb.Parse) return done();
+    if (kb.Parse) return;
 
     const Child = kb.Model.extend();
 
@@ -1021,11 +1018,11 @@ describe('view-model', () => {
     kb.release(parent_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/82
-  it('24. Issue 82 - createObservables', (done) => {
+  it('24. Issue 82 - createObservables', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const children = new kb.Collection([
@@ -1049,11 +1046,11 @@ describe('view-model', () => {
     kb.release(vm);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/121
-  it('25. Issue 121', (done) => {
+  it('25. Issue 121', () => {
     let model1;
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -1068,10 +1065,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('can update an unshared null', (done) => {
+  it('can update an unshared null', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = kb.viewModel(null);
@@ -1082,10 +1079,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('cannot update a shared null', (done) => {
+  it('cannot update a shared null', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.configure({ deep_retain: true });
 
@@ -1111,10 +1108,10 @@ describe('view-model', () => {
     kb.configure({ deep_retain: false });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('cannot update a shared view model', (done) => {
+  it('cannot update a shared view model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class CustomViewModel extends kb.ViewModel {}
@@ -1141,11 +1138,11 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/134
-  it('handles url attributes', (done) => {
+  it('handles url attributes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = kb.viewModel(new kb.Model({ url: '/some_url' }));
@@ -1154,11 +1151,11 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/73
-  return it('handles attribute named model', (done) => {
+  return it('handles attribute named model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ model: 'car' });
@@ -1169,6 +1166,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 });

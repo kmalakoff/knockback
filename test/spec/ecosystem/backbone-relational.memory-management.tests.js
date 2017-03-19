@@ -1,29 +1,18 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, Backbone, ko } = kb;
+if (!Backbone.Relational) try { require('backbone-relational'); } catch (e) { /**/ }
 
 describe('Knockback.js with Backbone-Relational.js', () => {
-  // after -> delete root.Person
-
-  // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Person;
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, Backbone, ko } = kb;
-  if (!(Backbone != null ? Backbone.Relational : undefined)) {
-    if (typeof require === 'function') {
-      require('backbone-relational');
-    }
-  }
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Backbone.Relational, 'Backbone.Relational');
     kb.configure({ orm: 'backbone-relational' });
-    return done();
   });
 
   if (!(Backbone != null ? Backbone.Relational : undefined)) return;
@@ -31,13 +20,13 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     Backbone.Relational.store.addModelScope(root);
   }
 
-  root.Person = (Person = Backbone.RelationalModel.extend({
+  const Person = root.Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany,
       key: 'friends',
       relatedModel: 'Person',
     }],
-  }));
+  });
 
   // ref counted view model
   class RefCountableViewModel {
@@ -97,7 +86,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   }
   SimpleViewModel.initClass();
 
-  it('kb.CollectionObservable with recursive view models', (done) => {
+  it('kb.CollectionObservable with recursive view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -152,10 +141,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.CollectionObservable with recursive view models and external store', (done) => {
+  it('kb.CollectionObservable with recursive view models and external store', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -230,7 +219,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   return it('CLEANUP', () => kb.configure({ orm: 'default' }));

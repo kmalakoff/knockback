@@ -936,7 +936,7 @@ let requirejs,
                 // If the manager is for a plugin managed resource,
                 // ask the plugin to load it now.
         if (this.shim) {
-          makeRequire(this, true)(this.shim.deps || [], bind(this, function () {
+          makeRequire(this, true)(this.shim.deps || [], bind(this, () => {
             return map.prefix ? this.callPlugin() : this.load();
           }));
         } else {

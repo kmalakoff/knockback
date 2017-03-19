@@ -311,7 +311,7 @@ var kb = function () {
     value: function releaseOnNodeRemove(view_model, node) {
       view_model || kb._throwUnexpected(this, 'missing view model');
       node || kb._throwUnexpected(this, 'missing node');
-      return ko.utils.domNodeDisposal.addDisposeCallback(node, function () {
+      return ko.utils.domNodeDisposal.addDisposeCallback(node, () => {
         return kb.release(view_model);
       });
     }
@@ -20139,7 +20139,7 @@ var ko_subscribable_fn = {
         event = event || defaultEvent;
         var boundCallback = callbackTarget ? callback.bind(callbackTarget) : callback;
 
-        var subscription = new ko.subscription(self, boundCallback, function () {
+        var subscription = new ko.subscription(self, boundCallback, () => {
             ko.utils.arrayRemoveItem(self._subscriptions[event], subscription);
             if (self.afterSubscriptionRemove)
                 self.afterSubscriptionRemove(event);
@@ -23437,7 +23437,7 @@ ko.bindingHandlers['options'].optionValueDomDataKey = ko.utils.domData.nextKey()
 ko.bindingHandlers['selectedOptions'] = {
     'after': ['options', 'foreach'],
     'init': function (element, valueAccessor, allBindings) {
-        ko.utils.registerEventHandler(element, "change", function () {
+        ko.utils.registerEventHandler(element, "change", () => {
             var value = valueAccessor(), valueToWrite = [];
             ko.utils.arrayForEach(element.getElementsByTagName("option"), function(node) {
                 if (node.selected)
@@ -23736,8 +23736,8 @@ ko.bindingHandlers['value'] = {
         var ieAutoCompleteHackNeeded = ko.utils.ieVersion && element.tagName.toLowerCase() == "input" && element.type == "text"
                                        && element.autocomplete != "off" && (!element.form || element.form.autocomplete != "off");
         if (ieAutoCompleteHackNeeded && ko.utils.arrayIndexOf(eventsToCatch, "propertychange") == -1) {
-            ko.utils.registerEventHandler(element, "propertychange", function () { propertyChangedFired = true });
-            ko.utils.registerEventHandler(element, "focus", function () { propertyChangedFired = false });
+            ko.utils.registerEventHandler(element, "propertychange", () => { propertyChangedFired = true });
+            ko.utils.registerEventHandler(element, "focus", () => { propertyChangedFired = false });
             ko.utils.registerEventHandler(element, "blur", function() {
                 if (propertyChangedFired) {
                     valueUpdateHandler();
@@ -23936,7 +23936,7 @@ ko.templateRewriting = (function () {
         },
 
         memoizeBindingAttributeSyntax: function (htmlString, templateEngine) {
-            return htmlString.replace(memoizeDataBindingAttributeSyntaxRegex, function () {
+            return htmlString.replace(memoizeDataBindingAttributeSyntaxRegex, () => {
                 return constructMemoizedTagReplacement(/* dataBindAttributeValue: */ arguments[4], /* tagToRetain: */ arguments[1], /* nodeName: */ arguments[2], templateEngine);
             }).replace(memoizeVirtualContainerBindingSyntaxRegex, function() {
                 return constructMemoizedTagReplacement(/* dataBindAttributeValue: */ arguments[1], /* tagToRetain: */ "<!-- ko -->", /* nodeName: */ "#comment", templateEngine);

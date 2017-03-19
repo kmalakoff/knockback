@@ -1,26 +1,23 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
 
 describe('formatted-observable', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
   const Contacts = kb.Collection.extend({ model: Contact });
 
-  it('Various scenarios', (done) => {
+  it('Various scenarios', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelCustom extends kb.ViewModel {
@@ -124,10 +121,10 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('4. Using Coffeescript classes', (done) => {
+  it('4. Using Coffeescript classes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelCustom extends kb.ViewModel {
@@ -169,10 +166,10 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('6. requires', (done) => {
+  it('6. requires', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {
@@ -200,10 +197,10 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.formattedObservable', (done) => {
+  it('kb.formattedObservable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {
@@ -229,10 +226,10 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  return it('kb.observableFormatted', (done) => {
+  return it('kb.observableFormatted', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {
@@ -258,6 +255,6 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 });

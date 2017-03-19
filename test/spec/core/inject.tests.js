@@ -1,20 +1,19 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
+const { $ } = root;
 
 describe('inject', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko, $ } = kb;
   if (!$) return; // no jquery
 
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   root.kb = kb;
@@ -55,7 +54,7 @@ describe('inject', () => {
     }
   };
 
-  it('1. kb-inject', (done) => {
+  it('1. kb-inject', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // no attributes
@@ -243,10 +242,9 @@ describe('inject', () => {
     ko.removeNode(inject_el);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('2. data-bind inject recusive', (done) => {
+  it('2. data-bind inject recusive', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const previous = kb.RECUSIVE_AUTO_INJECT; kb.RECUSIVE_AUTO_INJECT = true;
@@ -280,10 +278,9 @@ describe('inject', () => {
     kb.RECUSIVE_AUTO_INJECT = previous;
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  return it('3. data-bind inject', (done) => {
+  return it('3. data-bind inject', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // properties
@@ -361,6 +358,5 @@ describe('inject', () => {
     ko.removeNode(inject_el);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 });

@@ -1,27 +1,24 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
 
 describe('money-patches', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
   const Contacts = kb.Collection.extend({ model: Contact });
 
   // # https://github.com/kmalakoff/knockback/issues/124
-  it('fixes memory management for extend on kb.observable', (done) => {
-    if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) return done();
+  it('fixes memory management for extend on kb.observable', () => {
+    if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new Contact({ name: 'Bob' });
@@ -37,13 +34,12 @@ describe('money-patches', () => {
     assert.ok(!!kb.wasReleased(extended_observable), 'observable released');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // # https://github.com/kmalakoff/knockback/issues/124
-  it('fixes memory management for extend on kb.CollectionObservable', (done) => {
+  it('fixes memory management for extend on kb.CollectionObservable', () => {
     let collection;
-    if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) return done();
+    if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     ko.extenders.lazyArray = function (target, timeout) {
@@ -77,11 +73,10 @@ describe('money-patches', () => {
 
     delete ko.extenders.lazyArray;
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // https://github.com/kmalakoff/knockback/issues/127
-  return it('extend monkey patch does not cause arrays to destroy', (done) => {
+  return it('extend monkey patch does not cause arrays to destroy', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ViewModel {
@@ -103,7 +98,6 @@ describe('money-patches', () => {
     assert.ok(!view_model.totalNumberOfItems);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 });
 

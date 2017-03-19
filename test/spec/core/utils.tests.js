@@ -1,22 +1,20 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
+const { $ } = root;
 
 describe('knockback_core utils', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
-  it('kb.utils.wrappedObservable', (done) => {
+  it('kb.utils.wrappedObservable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const observable = ko.observable();
@@ -25,10 +23,9 @@ describe('knockback_core utils', () => {
     assert.equal(kb.utils.wrappedObservable(instance), observable, 'observable was wrapped'); // get
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('kb.utils.wrappedModel', (done) => {
+  it('kb.utils.wrappedModel', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ name: 'Bob' });
@@ -39,10 +36,9 @@ describe('knockback_core utils', () => {
     assert.equal(kb.utils.wrappedModel(instance), model, 'model was wrapped'); // get
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('kb.utils.wrappedStore', (done) => {
+  it('kb.utils.wrappedStore', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection_observable = kb.collectionObservable(new kb.Collection());
@@ -67,10 +63,9 @@ describe('knockback_core utils', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('kb.utils.valueType', (done) => {
+  it('kb.utils.valueType', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const co = kb.collectionObservable(new kb.Collection());
@@ -95,10 +90,9 @@ describe('knockback_core utils', () => {
     kb.release(view_model); // clean up
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('kb.utils.path', (done) => {
+  it('kb.utils.path', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     assert.equal(kb.utils.pathJoin(null, 'key'), 'key', 'key path joined');
@@ -114,11 +108,10 @@ describe('knockback_core utils', () => {
     assert.equal(kb.utils.optionsPathJoin({ path: 'bob.harry.' }, 'key').path, 'bob.harry.key', 'bob.harry.key path joined');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // https://github.com/kmalakoff/knockback/issues/103
-  it('kb.release handling type changes', (done) => {
+  it('kb.release handling type changes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model();
@@ -128,11 +121,11 @@ describe('knockback_core utils', () => {
     kb.release(observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/101
-  return it('kb.release releases all events', (done) => {
+  return it('kb.release releases all events', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ id: 1, name: 'Zebra', age: 22, genus: 'Equus' });
@@ -145,6 +138,5 @@ describe('knockback_core utils', () => {
 
     assert.ok(kb.Statistics.eventsStats(model).count === 0, `All events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 });

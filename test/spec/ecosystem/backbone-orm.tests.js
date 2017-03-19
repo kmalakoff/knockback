@@ -1,15 +1,13 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, Backbone, ko } = kb;
+let BackboneORM; try { BackboneORM = root.BackboneORM || require('backbone-orm'); } catch (e) { /**/ }
+const { Queue } = BackboneORM;
 
 describe('Knockback.js with BackboneORM', () => {
-  // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, Backbone, ko } = kb;
-  const { Queue } = root.BackboneORM || (root.BackboneORM = typeof require === 'function' ? require('backbone-orm') : undefined);
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!Backbone, 'Backbone');
@@ -17,7 +15,6 @@ describe('Knockback.js with BackboneORM', () => {
     assert.ok(!!kb, 'kb');
     assert.ok(!!BackboneORM, 'BackboneORM');
     kb.configure({ orm: 'backbone-orm' }); kb.configure({ orm: 'default' });
-    return done();
   });
 
   BackboneORM.configure({ model_cache: { enabled: true, max: 100 } });
@@ -50,7 +47,7 @@ describe('Knockback.js with BackboneORM', () => {
   }
   Building.initClass();
 
-  it('1. Model with HasMany relations: A house with multiple people living in it', (done) => {
+  it('1. Model with HasMany relations: A house with multiple people living in it', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -103,10 +100,10 @@ describe('Knockback.js with BackboneORM', () => {
       assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', (done) => {
+  it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', () => {
     let occupant_observable,
       occupant_observable2;
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -201,10 +198,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(places_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('3. Model with recursive HasMany relations: Person with users who are people', (done) => {
+  it('3. Model with recursive HasMany relations: Person with users who are people', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -281,11 +278,11 @@ describe('Knockback.js with BackboneORM', () => {
         assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
       }
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      return done();
+  
     });
   });
 
-  it('4. After view model create, add models', (done) => {
+  it('4. After view model create, add models', () => {
     class Occupant extends Backbone.Model {
       static initClass() {
         this.prototype.model_name = 'Person';
@@ -323,11 +320,11 @@ describe('Knockback.js with BackboneORM', () => {
     assert.equal(view_model.occupants().length, 2, 'two occupants');
     assert.equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship');
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
-    return done();
+
   });
 
   // TODO: add tests and support for idAttribute
-  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) => {
+  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', () => {
     class Book extends Backbone.Model {
       static initClass() {
         this.prototype.model_name = 'Book';
@@ -428,11 +425,11 @@ describe('Knockback.js with BackboneORM', () => {
           assert.equal(authored_book.editMode(), true, 'edit mode set');
         });
       });
-      return done();
+  
     });
   });
 
-  it('6. Inferring observable types: from the start', (done) => {
+  it('6. Inferring observable types: from the start', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-6-1', name: 'Daddy', friends: ['person-6-2'] });
@@ -468,11 +465,11 @@ describe('Knockback.js with BackboneORM', () => {
       kb.release(view_model_house1);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      return done();
+  
     });
   });
 
-  it('7a. Inferring observable types: late binding', (done) => {
+  it('7a. Inferring observable types: late binding', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-7-1', name: 'Daddy' });
@@ -505,10 +502,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('7b. Inferring observable types: late binding (attribute setting)', (done) => {
+  it('7b. Inferring observable types: late binding (attribute setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-7b-1', name: 'Daddy' });
@@ -542,10 +539,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('8a. Customizing observable types: from the start', (done) => {
+  it('8a. Customizing observable types: from the start', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -606,10 +603,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('8b. Customizing observable types: from the start (attribute setting)', (done) => {
+  it('8b. Customizing observable types: from the start (attribute setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -674,10 +671,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('9a. Customizing observable types: late binding', (done) => {
+  it('9a. Customizing observable types: late binding', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -745,10 +742,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('9b. Customizing observable types: late binding (atrributes setting)', (done) => {
+  it('9b. Customizing observable types: late binding (atrributes setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -817,10 +814,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('10. Nested custom view models', (done) => {
+  it('10. Nested custom view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -918,10 +915,10 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('11. Minimum factory tree for shared dependent models', (done) => {
+  it('11. Minimum factory tree for shared dependent models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -990,7 +987,7 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   return it('CLEANUP', () => kb.configure({ orm: 'default' }));

@@ -311,7 +311,7 @@ var kb = function () {
     value: function releaseOnNodeRemove(view_model, node) {
       view_model || kb._throwUnexpected(this, 'missing view model');
       node || kb._throwUnexpected(this, 'missing node');
-      return ko.utils.domNodeDisposal.addDisposeCallback(node, function () {
+      return ko.utils.domNodeDisposal.addDisposeCallback(node, () => {
         return kb.release(view_model);
       });
     }

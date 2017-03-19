@@ -1,11 +1,9 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
 
-let kb = typeof window !== 'undefined' ? root.kb : undefined;
-try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-const { _, ko } = kb;
-if (kb.Backbone) { kb.Backbone.ModelRef || (typeof require === 'function' ? require('backbone-modelref') : undefined); }
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, Backbone, ko } = kb;
+if (!Backbone.ModelRef) try { require('backbone-modelref'); } catch (e) { /**/ }
 
 let Globalize = root.Globalize;
 if (!Globalize) {
@@ -121,14 +119,13 @@ kb.ShortDateLocalizer = class ShortDateLocalizer extends kb.LocalizedObservable 
 // ##############################
 
 describe('localized-observable', () => {
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Globalize, 'Globalize');
-    return done();
   });
 
   const locale_manager = new LocaleManager('en', {
@@ -152,7 +149,7 @@ describe('localized-observable', () => {
     },
   });
 
-  it('Localized greeting', (done) => {
+  it('Localized greeting', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -194,7 +191,7 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // NOTE: dependency on globalize and knockback-defaults
@@ -213,7 +210,7 @@ describe('localized-observable', () => {
     }
   }
 
-  it('Date and time with jquery.globalize', (done) => {
+  it('Date and time with jquery.globalize', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModelDate = function (model) {
@@ -248,10 +245,10 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('Localization with a changing key', (done) => {
+  it('Localization with a changing key', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // directly with the locale manager
@@ -286,10 +283,10 @@ describe('localized-observable', () => {
     assert.equal(view_model.greeting(), 'Goodbye', 'en: Goodbye');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('2. internals test (Coffeescript inheritance)', (done) => {
+  it('2. internals test (Coffeescript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -361,10 +358,10 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it.skip('3. internals test (Javascript inheritance)', (done) => {
+  it.skip('3. internals test (Javascript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -438,10 +435,10 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('7. Using kb.localizedObservable', (done) => {
+  it('7. Using kb.localizedObservable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -497,10 +494,10 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('7. Using kb.localizedObservable', (done) => {
+  it('7. Using kb.localizedObservable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -556,10 +553,10 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('10. Nested custom view models', (done) => {
+  it('10. Nested custom view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -673,10 +670,10 @@ describe('localized-observable', () => {
     kb.release(nested_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('12. Prior kb.Observables functionality', (done) => {
+  it('12. Prior kb.Observables functionality', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -736,10 +733,10 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  return it('13. Bulk mode (array of keys)', (done) => {
+  return it('13. Bulk mode (array of keys)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -771,19 +768,19 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 });
 
 describe('defaults', () => {
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Globalize, 'Globalize');
-    return done();
+
   });
 
   const locale_manager = new LocaleManager('en', {
@@ -793,7 +790,7 @@ describe('defaults', () => {
   });
 
   if (kb.Backbone) {
-    it.skip('1. Standard use case: just enough to get the picture', (done) => {
+    it.skip('1. Standard use case: just enough to get the picture', () => {
       kb.statistics = new kb.Statistics(); // turn on stats
       kb.locale_manager = locale_manager;
 
@@ -870,10 +867,10 @@ describe('defaults', () => {
       kb.release(view_model);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      return done();
+  
     });
 
-    it('2. Standard use case with kb.ViewModels', (done) => {
+    it('2. Standard use case with kb.ViewModels', () => {
       kb.statistics = new kb.Statistics(); // turn on stats
       kb.locale_manager = locale_manager;
 
@@ -948,11 +945,11 @@ describe('defaults', () => {
       kb.release(view_model);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      return done();
+  
     });
   }
 
-  it('3. internals test (Coffeescript inheritance)', (done) => {
+  it('3. internals test (Coffeescript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -1021,11 +1018,11 @@ describe('defaults', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/114
-  return it('4. 0 should not behave as null', (done) => {
+  return it('4. 0 should not behave as null', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new Contact();
@@ -1046,6 +1043,6 @@ describe('defaults', () => {
     assert.equal(casecond(), 'Open');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 });

@@ -1,24 +1,21 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
+const { $ } = root;
 
 describe('knockback_core', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-  const $ = typeof window !== 'undefined' ? window.$ : undefined;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
-  it('kb.renderTemplate', (done) => {
-    if (!$ || !(typeof window !== 'undefined' ? window.document : undefined)) return done();
+  it('kb.renderTemplate', () => {
+    if (!$) return;
 
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -51,10 +48,9 @@ describe('knockback_core', () => {
     assert.ok(!view_model.was_called, 'afterRender was not called');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  return it('kb.ignore', (done) => {
+  return it('kb.ignore', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     let counter = 0;
@@ -85,6 +81,5 @@ describe('knockback_core', () => {
     kb.ignore(((arg1, arg2) => { assert.equal(arg1, 1); return assert.equal(arg2, 2); }), null, [1, 2]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 });

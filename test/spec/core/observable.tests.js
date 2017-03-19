@@ -1,25 +1,22 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
 
 describe('observable', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
   const Contacts = kb.Collection.extend({ model: Contact });
 
-  it('1. Standard use case: direct attributes with read and write', (done) => {
+  it('1. Standard use case: direct attributes with read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModel = function (model) {
@@ -51,10 +48,9 @@ describe('observable', () => {
 
     assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('2. Standard use case: direct attributes with custom read and write', (done) => {
+  it('2. Standard use case: direct attributes with custom read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModelCustom = function (model) {
@@ -89,10 +85,9 @@ describe('observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('3. Read args', (done) => {
+  it('3. Read args', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const args = [];
@@ -106,10 +101,9 @@ describe('observable', () => {
     assert.ok(_.isEqual(args, ['name', 1, 'number']) || _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']), `got the args: ${args.join(', ')}`); // TODO: reduce number of calls on old Backbone?
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('4. Standard use case: ko.computed', (done) => {
+  it('4. Standard use case: ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModel = function (model) {
@@ -137,10 +131,9 @@ describe('observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('5. Inferring observable types: the easy way', (done) => {
+  it('5. Inferring observable types: the easy way', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ChildrenCollection extends kb.CollectionObservable {
@@ -213,10 +206,9 @@ describe('observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('6. Inferring observable types: the hard way', (done) => {
+  it('6. Inferring observable types: the hard way', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ChildrenCollection extends kb.CollectionObservable {
@@ -283,10 +275,9 @@ describe('observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('7. model change is observable', (done) => {
+  it('7. model change is observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const model = new kb.Model({ id: 1, name: 'Bob' });
 
@@ -301,10 +292,9 @@ describe('observable', () => {
     kb.release(observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('8. view model changes do not cause dependencies inside ko.computed', (done) => {
+  it('8. view model changes do not cause dependencies inside ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ id: 1, name: 'Initial' });
@@ -330,10 +320,9 @@ describe('observable', () => {
     kb.release(observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('9. this is bound', (done) => {
+  it('9. this is bound', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ number: 33 });
@@ -352,11 +341,10 @@ describe('observable', () => {
     assert.equal(view_model.formatted_number(), `#: ${view_model.number()}`);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // https://github.com/kmalakoff/knockback/issues/108
-  return it('10. should be able to change models', (done) => {
+  return it('10. should be able to change models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const values = [];
@@ -383,6 +371,5 @@ describe('observable', () => {
     assert.deepEqual(values, ['m1_2', 'm2', 'm2_2']);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 });

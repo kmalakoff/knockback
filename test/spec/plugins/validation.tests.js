@@ -1,24 +1,20 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
+const { $ } = root;
 
 describe('validation', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-
-  const { _, ko } = kb;
-  const $ = root ? root.$ : undefined;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
-  it('kb.valueValidator', (done) => {
+  it('kb.valueValidator', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model =
@@ -50,11 +46,11 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.inputValidator', (done) => {
-    if (!$ || !root.document) return done();
+  it('kb.inputValidator', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -93,11 +89,11 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.inputValidator with custom validators', (done) => {
-    if (!$ || !root.document) return done();
+  it('kb.inputValidator with custom validators', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -148,11 +144,11 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.inputValidator with validation_options', (done) => {
-    if (!$ || !root.document) return done();
+  it('kb.inputValidator with validation_options', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -218,11 +214,11 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.formValidator with name', (done) => {
-    if (!$ || !root.document) return done();
+  it('kb.formValidator with name', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -292,11 +288,11 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.formValidator no name with validation_options', (done) => {
-    if (!$ || !root.document) return done();
+  it('kb.formValidator no name with validation_options', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -373,11 +369,11 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('kb.formValidator with inject and disable', (done) => {
-    if (!$ || !root.document) return done();
+  it('kb.formValidator with inject and disable', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -463,11 +459,11 @@ describe('validation', () => {
     ko.removeNode(inject_el);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  return it('kb.inputValidator without required', (done) => {
-    if (!$ || !root.document) return done();
+  return it('kb.inputValidator without required', () => {
+    if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -503,6 +499,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 });

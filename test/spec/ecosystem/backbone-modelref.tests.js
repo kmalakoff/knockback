@@ -1,23 +1,17 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, Backbone, ko } = kb;
+if (!Backbone.ModelRef) try { require('backbone-modelref'); } catch (e) { /**/ }
 
 describe('Knockback.js with Backbone.ModelRef.js', () => {
-  // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, Backbone, ko } = kb;
-  if (root.Backbone != null) {
-    root.Backbone.ModelRef || (root.Backbone.ModelRef = typeof require === 'function' ? require('backbone-modelref') : undefined);
-  }
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!Backbone.ModelRef, 'Backbone.ModelRef');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   if (!(root.Backbone != null ? root.Backbone.ModelRef : undefined)) return;
@@ -25,7 +19,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
   const Contacts = kb.Collection.extend({ model: Contact });
 
-  it('Standard use case: just enough to get the picture', (done) => {
+  it('Standard use case: just enough to get the picture', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModel = function (model) {
@@ -78,10 +72,10 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('Standard use case with kb.ViewModels', (done) => {
+  it('Standard use case with kb.ViewModels', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModel extends kb.ViewModel {
@@ -132,7 +126,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   return it('CLEANUP', () => delete Backbone.ModeRef);

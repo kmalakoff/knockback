@@ -1,22 +1,19 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
 
 describe('triggered-observable', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
-  it('1. Standard use case: simple events notifications', (done) => {
+  it('1. Standard use case: simple events notifications', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const model = new kb.Model();
     model.setLocale = () => model.trigger('change', model);
@@ -47,10 +44,10 @@ describe('triggered-observable', () => {
     assert.equal(trigger_count, 3, '3: no change');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  return it('2. Standard use case: simple events notifications (kb.observableTriggered)', (done) => {
+  return it('2. Standard use case: simple events notifications (kb.observableTriggered)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const model = new kb.Model();
     model.setLocale = () => model.trigger('change', model);
@@ -81,6 +78,6 @@ describe('triggered-observable', () => {
     assert.equal(trigger_count, 3, '3: no change');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 });

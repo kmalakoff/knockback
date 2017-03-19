@@ -1,30 +1,18 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, Backbone, ko } = kb;
+if (!Backbone.Relational) try { require('backbone-relational'); } catch (e) { /**/ }
 
 describe('Knockback.js with Backbone-Relational.js', () => {
-  // after -> delete root.Person; delete root.Building
-
-  // import Underscore (or Lo-Dash with precedence), Backbone, Knockout, and Knockback
-  let Building,
-    Person;
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, Backbone, ko } = kb;
-  if (!(Backbone != null ? Backbone.Relational : undefined)) {
-    if (typeof require === 'function') {
-      require('backbone-relational');
-    }
-  }
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Backbone.Relational, 'Backbone.Relational');
     kb.configure({ orm: 'backbone-relational' });
-    return done();
   });
 
   if (!(Backbone != null ? Backbone.Relational : undefined)) return;
@@ -33,7 +21,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     Backbone.Relational.store.addModelScope(root);
   }
 
-  root.Person = (Person = Backbone.RelationalModel.extend({
+  const Person = root.Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany,
       key: 'friends',
@@ -47,9 +35,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         key: 'best_friends_with_me',
       },
     }],
-  }));
+  });
 
-  root.Building = (Building = Backbone.RelationalModel.extend({
+  const Building = root.Building = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany,
       key: 'occupants',
@@ -59,9 +47,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         key: 'occupies',
       },
     }],
-  }));
+  });
 
-  it('1. Model with HasMany relations: A house with multiple people living in it', (done) => {
+  it('1. Model with HasMany relations: A house with multiple people living in it', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -107,10 +95,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', (done) => {
+  it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', () => {
     let occupant_observable,
       occupant_observable2;
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -205,10 +193,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(places_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('3. Model with recursive HasMany relations: Person with users who are people', (done) => {
+  it('3. Model with recursive HasMany relations: Person with users who are people', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -274,10 +262,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('4. After view model create, add models', (done) => {
+  it('4. After view model create, add models', () => {
     const Occupant = Backbone.RelationalModel.extend({});
 
     const House = Backbone.RelationalModel.extend({
@@ -309,10 +297,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     assert.equal(view_model.occupants().length, 2, 'two occupants');
     assert.equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship');
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
-    return done();
+
   });
 
-  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) => {
+  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', () => {
     const Book = Backbone.RelationalModel.extend({
       defaults: {
         name: 'untitled',
@@ -391,10 +379,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         assert.equal(authored_book.editMode(), true, 'edit mode set');
       });
     });
-    return done();
+
   });
 
-  it('6. Inferring observable types: from the start', (done) => {
+  it('6. Inferring observable types: from the start', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-6-1', name: 'Daddy' });
@@ -420,10 +408,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('7a. Inferring observable types: late binding', (done) => {
+  it('7a. Inferring observable types: late binding', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-7-1', name: 'Daddy' });
@@ -457,10 +445,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('7b. Inferring observable types: late binding (attribute setting)', (done) => {
+  it('7b. Inferring observable types: late binding (attribute setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const person1 = new Person({ id: 'person-7b-1', name: 'Daddy' });
@@ -494,10 +482,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('8a. Customizing observable types: from the start', (done) => {
+  it('8a. Customizing observable types: from the start', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -558,10 +546,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('8b. Customizing observable types: from the start (attribute setting)', (done) => {
+  it('8b. Customizing observable types: from the start (attribute setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -623,10 +611,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('9a. Customizing observable types: late binding', (done) => {
+  it('9a. Customizing observable types: late binding', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -695,10 +683,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('9b. Customizing observable types: late binding (atrributes setting)', (done) => {
+  it('9b. Customizing observable types: late binding (atrributes setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -767,10 +755,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('10. Nested custom view models', (done) => {
+  it('10. Nested custom view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -865,10 +853,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('11. Minimum factory tree for shared dependent models', (done) => {
+  it('11. Minimum factory tree for shared dependent models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({
@@ -937,11 +925,11 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
   // https://github.com/kmalakoff/knockback/issues/96
-  it('12. Issue 96', (done) => {
+  it('12. Issue 96', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const Parameter = Backbone.RelationalModel.extend({ idAttribute: 'ParameterName' });
@@ -1016,7 +1004,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     // LEGACY
     if (!filter_group_model.get('Filters').models[0].get('Parameter')) {
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      return done();
+  
     }
 
     const filter_group = new FilterGroupViewModel(filter_group_model);
@@ -1032,11 +1020,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(filter_group);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // https://github.com/kmalakoff/knockback/issues/113
-  it('13. Issue 113', (done) => {
+  it('13. Issue 113', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const SubModel = Backbone.RelationalModel.extend({});
@@ -1071,11 +1058,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(co);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // https://github.com/kmalakoff/knockback/issues/122
-  it('14. Issue 122', (done) => {
+  it('14. Issue 122', () => {
     let model;
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -1103,7 +1089,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
   // TODO: re-enable when fixed: https://github.com/PaulUithol/Backbone-relational/issues/485

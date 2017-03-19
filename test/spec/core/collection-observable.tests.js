@@ -1,19 +1,16 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-const assert = root.assert || (typeof require === 'function' ? require('chai').assert : undefined);
+let assert; try { assert = root.assert || require('chai').assert; } catch (e) { /**/ }
+
+let kb; try { kb = root.kb || require('knockback'); } catch (e) { kb = require('../../../knockback'); }
+const { _, ko } = kb;
 
 describe('collection-observable', () => {
-  let kb = typeof window !== 'undefined' ? root.kb : undefined;
-  try { if (!kb) { kb = typeof require === 'function' ? require('knockback') : undefined; } } catch (error) { /**/ }
-  try { if (!kb) { kb = typeof require === 'function' ? require('../../../knockback') : undefined; } } catch (error1) { /**/ }
-  const { _, ko } = kb;
-
-  it('TEST DEPENDENCY MISSING', (done) => {
+  it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!kb.Model, 'kb.Model');
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
-    return done();
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
@@ -41,7 +38,7 @@ describe('collection-observable', () => {
     }
   }
 
-  it('2. Basic Usage: collection observable with ko.computed', (done) => {
+  it('2. Basic Usage: collection observable with ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -70,10 +67,9 @@ describe('collection-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('3. Basic Usage: collection observable with ko.computed', (done) => {
+  it('3. Basic Usage: collection observable with ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -104,10 +100,9 @@ describe('collection-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('4. Basic Usage: no view models', (done) => {
+  it('4. Basic Usage: no view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -146,11 +141,10 @@ describe('collection-observable', () => {
     // clean up
     kb.release(collection_observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null
   });
 
-  it('5. Basic Usage: no sorting and no callbacks', (done) => {
+  it('5. Basic Usage: no sorting and no callbacks', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -192,10 +186,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('6. Collection sync sorting with sort_attribute', (done) => {
+  it('6. Collection sync sorting with sort_attribute', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -240,10 +233,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('7. Collection sync sorting with comparator', (done) => {
+  it('7. Collection sync sorting with comparator', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const sortNumber = function (model_a, model_b) {
@@ -296,10 +288,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('8. Collection sorting with callbacks', (done) => {
+  it('8. Collection sorting with callbacks', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     kb.NameSortedContacts = kb.Collection.extend({
@@ -348,10 +339,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('9. Collection sync dynamically changing the sorting function', (done) => {
+  it('9. Collection sync dynamically changing the sorting function', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -410,10 +400,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('10. Nested custom view models', (done) => {
+  it('10. Nested custom view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelDate extends kb.ViewModel {
@@ -518,10 +507,9 @@ describe('collection-observable', () => {
     kb.release(nested_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('11. Shared Options', (done) => {
+  it('11. Shared Options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const collection = new kb.Collection({ id: 1, name: 'Bob' });
 
@@ -535,10 +523,9 @@ describe('collection-observable', () => {
     kb.release([collection_observable1, collection_observable2, collection_observable3]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('12. Filters option', (done) => {
+  it('12. Filters option', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 
@@ -574,10 +561,9 @@ describe('collection-observable', () => {
     kb.release([collection_observable1, collection_observable2, collection_observable3, collection_observable4, collection_observable5, collection_observable6, collection_observable7, observable1]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('13. Setting view models', (done) => {
+  it('13. Setting view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 
@@ -612,10 +598,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('14. collection change is observable', (done) => {
+  it('14. collection change is observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 
@@ -631,10 +616,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('15. collection is generated if not passed (no options)', (done) => {
+  it('15. collection is generated if not passed (no options)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection_observable = kb.collectionObservable();
@@ -651,10 +635,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('16. collection is generated if not passed (options)', (done) => {
+  it('16. collection is generated if not passed (options)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection_observable = kb.collectionObservable({ view_model: ContactViewModel });
@@ -671,10 +654,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('17. collection changes do not cause dependencies inside ko.computed', (done) => {
+  it('17. collection changes do not cause dependencies inside ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection_observable = kb.collectionObservable({ view_model: TestViewModel });
@@ -729,10 +711,10 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
+
   });
 
-  it('18. Test auto-generate collections', (done) => {
+  it('18. Test auto-generate collections', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const models = ([1, 2, 3, 4].map(id => new Contact({ id })));
@@ -750,10 +732,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('19. Test auto-generate collections with model array', (done) => {
+  it('19. Test auto-generate collections with model array', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const models = ([1, 2, 3, 4].map(id => new Contact({ id })));
@@ -769,11 +750,10 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('20. push and unshift', (done) => {
-    if (kb.Backbone && (kb.Backbone.VERSION[0] !== '1')) return done();
+  it('20. push and unshift', () => {
+    if (kb.Backbone && (kb.Backbone.VERSION[0] !== '1')) return;
 
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -815,10 +795,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('21. Auto compact for collections', (done) => {
+  it('21. Auto compact for collections', () => {
     let id;
     kb.statistics = new kb.Statistics(); // turn on stats
 
@@ -868,10 +847,9 @@ describe('collection-observable', () => {
       assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
     });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('22. reduced form for view models', (done) => {
+  it('22. reduced form for view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class PersonViewModel extends kb.ViewModel {}
@@ -889,10 +867,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('23. reduced form for view models with options', (done) => {
+  it('23. reduced form for view models with options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class PersonViewModel extends kb.ViewModel {}
@@ -912,10 +889,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('24. expanded form for collection, view models with options', (done) => {
+  it('24. expanded form for collection, view models with options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class PersonViewModel extends kb.ViewModel {}
@@ -935,10 +911,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  it('24. expanded form for collection, view models with many options', (done) => {
+  it('24. expanded form for collection, view models with many options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class PersonViewModel extends kb.ViewModel {}
@@ -958,10 +933,9 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 
-  return it('25. Test auto-generate collections (kb.observableCollection)', (done) => {
+  return it('25. Test auto-generate collections (kb.observableCollection)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const models = ([1, 2, 3, 4].map(id => new Contact({ id })));
@@ -979,6 +953,5 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-    return done();
   });
 });
