@@ -96,7 +96,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', () => {
@@ -194,7 +193,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(places_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('3. Model with recursive HasMany relations: Person with users who are people', () => {
@@ -263,7 +261,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('4. After view model create, add models', () => {
@@ -298,7 +295,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     assert.equal(view_model.occupants().length, 2, 'two occupants');
     assert.equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship');
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
-
   });
 
   it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', () => {
@@ -380,7 +376,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         assert.equal(authored_book.editMode(), true, 'edit mode set');
       });
     });
-
   });
 
   it('6. Inferring observable types: from the start', () => {
@@ -409,7 +404,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7a. Inferring observable types: late binding', () => {
@@ -446,7 +440,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7b. Inferring observable types: late binding (attribute setting)', () => {
@@ -483,7 +476,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8a. Customizing observable types: from the start', () => {
@@ -547,7 +539,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8b. Customizing observable types: from the start (attribute setting)', () => {
@@ -612,7 +603,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9a. Customizing observable types: late binding', () => {
@@ -684,7 +674,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9b. Customizing observable types: late binding (atrributes setting)', () => {
@@ -756,7 +745,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('10. Nested custom view models', () => {
@@ -823,15 +811,15 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         assert.ok(found, `${name} was found`);
       });
     };
-    var validateFriend = function (vm, name) {
+    var validateFriend = (vm, name) => {
       assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `friend name matches for ${name}`);
     };
-    const validateBestFriend = function (vm, name) {
+    const validateBestFriend = (vm, name) => {
       assert.equal(vm.type(), 'best_friend', `best friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `best friend name matches for ${name}`);
     };
-    const validateBandMember = function (vm, name) {
+    const validateBandMember = (vm, name) => {
       assert.equal(vm.type(), 'band_member', `band member type matches for ${name}`);
       assert.ok(vm instanceof BandMemberViewModel, `band member type matches for ${name}`);
       return assert.equal(vm.name(), name, `band member name matches for ${name}`);
@@ -854,7 +842,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('11. Minimum factory tree for shared dependent models', () => {
@@ -926,7 +913,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/96
@@ -1005,7 +991,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     // LEGACY
     if (!filter_group_model.get('Filters').models[0].get('Parameter')) {
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-  
     }
 
     const filter_group = new FilterGroupViewModel(filter_group_model);
@@ -1074,7 +1059,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         super(model, { requires: ['nested'], options });
         this.removeNested = () => model.get('nested').destroy();
         this.addNested = () => model.set({ nested: new Model2() });
-        this.hasNested = ko.computed(() => !!__guard__(this.nested(), x => x.model()));
+        this.hasNested = ko.computed(() => { if (this.nested()) this.nested().model(); });
       }
     }
 
@@ -1116,9 +1101,5 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   //   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   //   done()
 
-  return it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: 'default' }));
 });
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}

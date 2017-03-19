@@ -73,7 +73,6 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('Standard use case with kb.ViewModels', () => {
@@ -127,8 +126,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('CLEANUP', () => delete Backbone.ModeRef);
+  it('CLEANUP', () => delete Backbone.ModeRef);
 });

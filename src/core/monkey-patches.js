@@ -11,7 +11,7 @@ const kb = require('./kb');
 const { ko } = kb;
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
-if (__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) {
+if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
   const _extend = ko.subscribable.fn.extend;
   ko.subscribable.fn.extend = function () {
     const target = _extend.apply(this, arguments);
@@ -19,17 +19,12 @@ if (__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.e
     // release the extended observable
     if ((target !== this) && kb.isReleaseable(this)) {
       const _dispose = target.dispose;
-      target.dispose = function () {
-        if (_dispose != null) {
-          _dispose.apply(target, arguments);
-        } return kb.release(this);
-      }.bind(this);
+      target.dispose = () => {
+        if (_dispose != null) _dispose.apply(target, arguments);
+        return kb.release(this);
+      };
     }
 
     return target;
   };
-}
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
 }

@@ -287,7 +287,7 @@ class CollectionObservable {
   viewModelByModel(model) {
     if (this.models_only) return null;
     const id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
-    return _.find(kb.peek(kb.utils.wrappedObservable(this)), test => __guard__(test != null ? test.__kb : undefined, x => x.object) ? (test.__kb.object[id_attribute] === model[id_attribute]) : false);
+    return _.find(kb.peek(kb.utils.wrappedObservable(this)), test => test && test.__kb && (test.__kb.object[id_attribute] === model[id_attribute]));
   }
 
   // Will return true unless created with models_only option.
@@ -500,7 +500,3 @@ module.exports = CollectionObservable;
 // factory function
 kb.collectionObservable = function (collection, view_model, options) { return new kb.CollectionObservable(arguments); };
 kb.observableCollection = kb.collectionObservable;
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}

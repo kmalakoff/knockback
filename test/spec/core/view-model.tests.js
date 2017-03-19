@@ -51,7 +51,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('2. Using classes', () => {
@@ -85,13 +84,12 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('3. Using simple Javascript classes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelCustom = function (model) {
+    const ContactViewModelCustom = (model) => {
       const view_model = kb.viewModel(model);
       view_model.formatted_name = kb.observable(model, { key: 'name', read() { return `First: ${model.get('name')}`; } });
       view_model.formatted_number = kb.observable(model, {
@@ -128,7 +126,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('4. requires', () => {
@@ -176,7 +173,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('5. reference counting and custom __destroy (Coffeescript inheritance)', () => {
@@ -225,7 +221,6 @@ describe('view-model', () => {
     assert.throw((() => view_model.release()), Error, 'ref count is corrupt');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it.skip('6. reference counting and custom __destroy (Javascript inheritance)', () => {
@@ -273,7 +268,6 @@ describe('view-model', () => {
     assert.throw((() => view_model.release()), Error, 'ref count is corrupt');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7. Nested custom view models', () => {
@@ -349,12 +343,12 @@ describe('view-model', () => {
       return model.set({ date: new Date(birthdate.valueOf()) }); // restore birthdate
     };
 
-    const validateGenericViewModel = function (view_model, name, birthdate) {
+    const validateGenericViewModel = function(view_model, name, birthdate) {
       assert.equal(view_model.name(), name, `${name}: Name matches`);
       return assert.equal(view_model.date().valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
 
-    const validateModel = function (model, name, birthdate) {
+    const validateModel = (model, name, birthdate) => {
       assert.equal(model.get('name'), name, `${name}: Name matches`);
       return assert.equal(model.get('date').valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
@@ -383,7 +377,6 @@ describe('view-model', () => {
     kb.release(nested_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8a. Changing attribute types', () => {
@@ -409,7 +402,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8b. Changing attribute types', () => {
@@ -442,7 +434,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9. Shared Options', () => {
@@ -461,7 +452,6 @@ describe('view-model', () => {
     kb.release([view_model1, view_model2, view_model3]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('10. Options', () => {
@@ -530,7 +520,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('11. array attributes', () => {
@@ -555,7 +544,6 @@ describe('view-model', () => {
     assert.ok(_.isEqual(view_model.text(), ['heading.get these rewards']), 'text observable matches');
     assert.ok(_.isEqual(view_model.widget(), ['sign_up', 'rewards']), 'widget observable matches');
     assert.ok(_.isEqual(view_model.model_data().reward.top_rewards.properties, ['title', 'description', 'num_points']), 'model_data observable matches');
-
   });
 
   it('12. model change is observable', () => {
@@ -573,7 +561,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('13. model replacement', () => {
@@ -604,7 +591,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('14. model replacement with select', () => {
@@ -656,7 +642,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('16. model replacement with input', () => {
@@ -704,7 +689,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('17. model replacement with multiple selects and weird backbone bug', () => {
@@ -770,7 +754,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('18. can merge unique options', () => {
@@ -794,7 +777,6 @@ describe('view-model', () => {
     assert.deepEqual(collapsed_options.keys, ['key1', 'key2']);
     assert.deepEqual(_.keys(collapsed_options.factories), ['models', 'collection.models']);
     assert.deepEqual(collapsed_options.excludes, ['exclude2', 'exclude3']);
-
   });
 
   it('19. can merge non-unique options', () => {
@@ -823,7 +805,6 @@ describe('view-model', () => {
     assert.equal(collapsed_options.factories.models, factoryOverride, 'selected overidden factory');
     assert.notEqual(collapsed_options.factories.models, factory, 'did not select original factory');
     assert.deepEqual(collapsed_options.excludes, ['exclude1']);
-
   });
 
   it('20. can merge keys as object', () => {
@@ -876,7 +857,6 @@ describe('view-model', () => {
 
     collapsed_options = kb.utils.collapseOptions(options);
     assert.deepEqual(collapsed_options.keys, { name: { key: 'name' }, thing: { key: 'thing' } });
-
   });
 
   it('21. view model changes do not cause dependencies inside ko.computed', () => {
@@ -940,7 +920,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('22. statics and static defaults keyword', () => {
@@ -972,7 +951,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('23. Issue 94', () => {
@@ -1019,7 +997,6 @@ describe('view-model', () => {
     kb.release(parent_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/82
@@ -1033,7 +1010,7 @@ describe('view-model', () => {
 
     const parent = new kb.Model({ name: 'Bob', children });
 
-    const subFactory = function (model) {
+    const subFactory = (model) => {
       const subVm = new kb.ViewModel(model);
       subVm.cid = ko.computed(() => model.cid);
       return subVm;
@@ -1047,7 +1024,6 @@ describe('view-model', () => {
     kb.release(vm);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/121
@@ -1066,7 +1042,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('can update an unshared null', () => {
@@ -1080,7 +1055,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('cannot update a shared null', () => {
@@ -1109,7 +1083,6 @@ describe('view-model', () => {
     kb.configure({ deep_retain: false });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('cannot update a shared view model', () => {
@@ -1139,7 +1112,6 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/134
@@ -1152,11 +1124,10 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/73
-  return it('handles attribute named model', () => {
+  it('handles attribute named model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ model: 'car' });
@@ -1167,6 +1138,5 @@ describe('view-model', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });

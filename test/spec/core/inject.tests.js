@@ -281,7 +281,7 @@ describe('inject', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  return it('3. data-bind inject', () => {
+  it('3. data-bind inject', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // properties

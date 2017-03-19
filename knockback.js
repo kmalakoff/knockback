@@ -1198,9 +1198,7 @@ var CollectionObservable = function () {
       if (this.models_only) return null;
       var id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
       return _.find(kb.peek(kb.utils.wrappedObservable(this)), function (test) {
-        return __guard__(test != null ? test.__kb : undefined, function (x) {
-          return x.object;
-        }) ? test.__kb.object[id_attribute] === model[id_attribute] : false;
+        return test && test.__kb && test.__kb.object[id_attribute] === model[id_attribute];
       });
     }
 
@@ -1471,10 +1469,6 @@ kb.collectionObservable = function (collection, view_model, options) {
   return new kb.CollectionObservable(arguments);
 };
 kb.observableCollection = kb.collectionObservable;
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
-}
 
 /***/ }),
 /* 6 */
@@ -2118,29 +2112,25 @@ var ko = kb.ko;
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
 
-if (__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, function (x) {
-  return x.extend;
-})) {
+if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
   var _extend = ko.subscribable.fn.extend;
   ko.subscribable.fn.extend = function () {
+    var _arguments = arguments,
+        _this = this;
+
     var target = _extend.apply(this, arguments);
 
     // release the extended observable
     if (target !== this && kb.isReleaseable(this)) {
       var _dispose = target.dispose;
       target.dispose = function () {
-        if (_dispose != null) {
-          _dispose.apply(target, arguments);
-        }return kb.release(this);
-      }.bind(this);
+        if (_dispose != null) _dispose.apply(target, _arguments);
+        return kb.release(_this);
+      };
     }
 
     return target;
   };
-}
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
 }
 
 /***/ }),
@@ -2221,8 +2211,6 @@ kb.Observable = function () {
     if (_vm == null) {
       _vm = {};
     }this._vm = _vm;return kb.ignore(function () {
-      var _model = void 0,
-          args = void 0;
       key_or_info || kb._throwMissing(_this, 'key_or_info');
       _this.key = key_or_info.key || key_or_info;
       _.map(KEYS_INFO, function (key) {
@@ -2241,20 +2229,20 @@ kb.Observable = function () {
       _this._model = ko.observable();
       var observable = kb.utils.wrappedObservable(_this, ko.computed({
         read: function read() {
-          _model = _this._model();
-          args = [_this.key].concat(_this.args || []);
+          var model = _this._model();
+          var args = [_this.key].concat(_this.args || []);
           _.each(args, function (arg) {
             return ko.utils.unwrapObservable(arg);
           });
 
-          __guard__(kb.utils.wrappedEventWatcher(_this), function (x) {
-            return x.emitter(_model || null);
-          }); // update the event watcher
+          var ew = kb.utils.wrappedEventWatcher(_this);
+          !ew || ew.emitter(model || null);
+
           if (_this.read) {
             _this.update(_this.read.apply(_this._vm, args));
-          } else if (!_.isUndefined(_model)) {
+          } else if (!_.isUndefined(model)) {
             kb.ignore(function () {
-              return _this.update(kb.getValue(_model, kb.peek(_this.key), _this.args));
+              return _this.update(kb.getValue(model, kb.peek(_this.key), _this.args));
             });
           }
           return _this._value.value();
@@ -2263,12 +2251,12 @@ kb.Observable = function () {
         write: function write(new_value) {
           return kb.ignore(function () {
             var unwrapped_new_value = kb.utils.unwrapModels(new_value); // unwrap for set (knockout may pass view models which are required for the observable but not the model)
-            _model = kb.peek(_this._model);
+            var model = kb.peek(_this._model);
             if (_this.write) {
               _this.write.call(_this._vm, unwrapped_new_value);
-              new_value = kb.getValue(_model, kb.peek(_this.key), _this.args);
-            } else if (_model) {
-              kb.setValue(_model, kb.peek(_this.key), unwrapped_new_value);
+              new_value = kb.getValue(model, kb.peek(_this.key), _this.args);
+            } else if (model) {
+              kb.setValue(model, kb.peek(_this.key), unwrapped_new_value);
             }
             return _this.update(new_value);
           });
@@ -2381,10 +2369,6 @@ kb.Observable = function () {
 kb.observable = function (model, key, options, view_model) {
   return new kb.Observable(model, key, options, view_model);
 };
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
-}
 
 /***/ }),
 /* 12 */
@@ -2992,10 +2976,6 @@ var Store = function () {
 Store.initClass();
 kb.Store = Store;
 module.exports = Store;
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined;
-}
 
 /***/ }),
 /* 14 */
@@ -3631,14 +3611,10 @@ var ViewModel = function () {
         for (key in model.attributes) {
           createObservable(this, model, key, this.__kb.create_options);
         }
-        if (rel_keys = __guardMethod__(kb.settings.orm, 'keys', function (o) {
-          return o.keys(model);
-        })) {
-          (function () {
-            return rel_keys.map(function (key) {
-              return createObservable(_this3, model, key, _this3.__kb.create_options);
-            });
-          })();
+        if (kb.settings.orm && kb.settings.orm.keys) {
+          _.each(kb.settings.orm.keys, function (key) {
+            return createObservable(_this3, model, key, _this3.__kb.create_options);
+          });
         }
       } else if (_.isArray(keys)) {
         _.map(keys, function (key) {
@@ -3649,11 +3625,7 @@ var ViewModel = function () {
           var vm_key;
           var mapping_info = keys[key];
           if (vm_key = assignViewModelKey(this, key)) {
-            if (!_.isString(mapping_info)) {
-              if (!mapping_info.key) {
-                mapping_info.key = vm_key;
-              }
-            }
+            if (!_.isString(mapping_info) && !mapping_info.key) mapping_info.key = vm_key;
             this[vm_key] = this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this);
           }
         }
@@ -3672,12 +3644,6 @@ module.exports = ViewModel;
 kb.viewModel = function (model, options, view_model) {
   return new kb.ViewModel(arguments);
 };
-function __guardMethod__(obj, methodName, transform) {
-  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
-    return transform(obj, methodName);
-  }
-  return undefined;
-}
 
 /***/ }),
 /* 16 */
@@ -4937,15 +4903,12 @@ var _kb = kb = __webpack_require__(0),
     ko = _kb.ko;
 
 kb.Observable.prototype.setToDefault = function () {
-  __guardMethod__(this.__kb_value, 'setToDefault', function (o) {
-    return o.setToDefault();
-  });
+  if (undefined.__kb_value && undefined.__kb_value.setToDefault) undefined.__kb_value.setToDefault();
 };
 kb.ViewModel.prototype.setToDefault = function () {
-  for (var vm_key in this.__kb.vm_keys) {
-    __guardMethod__(this[vm_key], 'setToDefault', function (o) {
-      return o.setToDefault();
-    });return;
+  for (var vm_key in undefined.__kb.vm_keys) {
+    var value = undefined[vm_key];
+    if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
   }
 };
 
@@ -4975,12 +4938,6 @@ kb.utils.setToDefault = function (obj) {
   }
   return obj;
 };
-function __guardMethod__(obj, methodName, transform) {
-  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
-    return transform(obj, methodName);
-  }
-  return undefined;
-}
 
 /***/ }),
 /* 27 */

@@ -142,7 +142,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.CollectionObservable with recursive view models and external store', () => {
@@ -220,8 +219,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: 'default' }));
 });

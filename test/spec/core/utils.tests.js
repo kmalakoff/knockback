@@ -122,11 +122,10 @@ describe('knockback_core utils', () => {
     kb.release(observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/101
-  return it('kb.release releases all events', () => {
+  it('kb.release releases all events', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ id: 1, name: 'Zebra', age: 22, genus: 'Equus' });

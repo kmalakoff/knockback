@@ -47,7 +47,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.inputValidator', () => {
@@ -90,7 +89,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.inputValidator with custom validators', () => {
@@ -145,7 +143,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.inputValidator with validation_options', () => {
@@ -215,7 +212,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.formValidator with name', () => {
@@ -289,7 +285,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.formValidator no name with validation_options', () => {
@@ -370,7 +365,6 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.formValidator with inject and disable', () => {
@@ -460,10 +454,9 @@ describe('validation', () => {
     ko.removeNode(inject_el);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('kb.inputValidator without required', () => {
+  it('kb.inputValidator without required', () => {
     if (!$ || !root.document) return;
     if (!root.kb) { root.kb = kb; } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -500,6 +493,5 @@ describe('validation', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });

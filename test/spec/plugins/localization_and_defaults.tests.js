@@ -4,7 +4,7 @@ let assert = root.assert; try { assert = assert || (r ? require('chai').assert :
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, Backbone, ko } = kb;
-if (Backbone && !Backbone.ModelRef) try { !r || require('backbone-modelref'); } catch (e) { /**/ }
+if (Backbone && !Backbone.ModelRef && r) try { require('backbone-modelref'); } catch (e) { /**/ }
 
 let Globalize = root.Globalize;
 if (!Globalize) {
@@ -27,14 +27,18 @@ class LocaleManager {
     if (locale_identifier) { this.setLocale(locale_identifier); }
   }
 
-  get(string_id, parameters) {
+  get(string_id) {
     let culture_map;
-    if (this.locale_identifier) { culture_map = this.translations_by_locale[this.locale_identifier]; }
-    if (!culture_map) { return ''; }
+    if (this.locale_identifier) culture_map = this.translations_by_locale[this.locale_identifier];
+    if (!culture_map) return '';
+
     let string = Object.prototype.hasOwnProperty.call(culture_map, string_id) ? culture_map[string_id] : '';
-    if (arguments === 1) { return string; }
+    if (arguments.length === 1) return string;
+
     const iterable = Array.prototype.slice.call(arguments, 1);
-    for (let index = 0; index < iterable.length; index++) { const arg = iterable[index]; string = string.replace(`{${index}}`, arg); }
+    for (let index = 0, l = iterable.length; index < l; index++) {
+      string = string.replace(`{${index}}`, iterable[index]);
+    }
     return string;
   }
 
@@ -43,22 +47,19 @@ class LocaleManager {
   setLocale(locale_identifier) {
     this.locale_identifier = locale_identifier;
     this.trigger('change', this);
+
     const object = this.translations_by_locale[this.locale_identifier] || {};
-    for (const key in object) { const value = object[key]; this.trigger(`change:${key}`, value); }
+    _.each(_.keys(object), key => this.trigger(`change:${key}`, object[key]));
   }
 
-  getLocales() {
-    const locales = [];
-    for (const string_id in this.translations_by_locale) { const value = this.translations_by_locale[string_id]; locales.push(string_id); }
-    return locales;
-  }
+  getLocales() { return _.keys(this.translations_by_locale); }
 }
 LocaleManager.initClass();
 
 class LocalizedString {
   constructor(string_id) {
     this.string_id = string_id;
-    if (!kb.locale_manager) { throw 'missing kb.locale_manager'; }
+    if (!kb.locale_manager) { throw new Error('missing kb.locale_manager'); }
     this.string = kb.locale_manager.get(this.string_id);
   }
 }
@@ -66,15 +67,15 @@ class LocalizedString {
 const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
 const Contacts = kb.Collection.extend({ model: Contact });
 
-class LocalizedStringLocalizer extends kb.LocalizedObservable {
-  constructor(value, options, view_model) {
-    super(...arguments);
-    return kb.utils.wrappedObservable(this);
-  }
-  read(value) {
-    return (value.string_id) ? kb.locale_manager.get(value.string_id) : '';
-  }
-}
+// class LocalizedStringLocalizer extends kb.LocalizedObservable {
+//   constructor(/* value, options, view_model */) {
+//     super(...arguments);
+//     return kb.utils.wrappedObservable(this);
+//   }
+//   read(value) {
+//     return (value.string_id) ? kb.locale_manager.get(value.string_id) : '';
+//   }
+// }
 
 kb.LocalizedStringLocalizer = class LocalizedStringLocalizer extends kb.LocalizedObservable {
   read(value) {
@@ -84,7 +85,7 @@ kb.LocalizedStringLocalizer = class LocalizedStringLocalizer extends kb.Localize
 
 // NOTE: dependency on globalize
 kb.LongDateLocalizer = class LongDateLocalizer extends kb.LocalizedObservable {
-  constructor(value, options, view_model) {
+  constructor(/* value, options, view_model */) {
     return super(...arguments); // return the observable instead of this
   }
   read(value) {
@@ -101,7 +102,7 @@ kb.LongDateLocalizer = class LongDateLocalizer extends kb.LocalizedObservable {
 // kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 // NOTE: dependency on globalize - notice the alternative formulation with extend
 kb.ShortDateLocalizer = class ShortDateLocalizer extends kb.LocalizedObservable {
-  constructor(value, options, view_model) {
+  constructor(/* value, options, view_model */) {
     // kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
     // return kb.utils.wrappedObservable(this);
     return super(...arguments); // return the observable instead of this
@@ -154,7 +155,7 @@ describe('localized-observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
-    const ContactViewModelGreeting = function (model) {
+    const ContactViewModelGreeting = (model) => {
       this.hello = kb.observable(model, { key: 'hello_greeting', localizer: kb.LocalizedStringLocalizer });
       this.goodbye = kb.observable(model, { key: 'goodbye_greeting', localizer: kb.LocalizedStringLocalizer });
       return this;
@@ -192,29 +193,28 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  // NOTE: dependency on globalize and knockback-defaults
-  class LongDateLocalizer extends kb.LocalizedObservable {
-    constructor(value, options, view_model) {
-      super(...arguments);
-      return kb.utils.wrappedObservable(this);
-    }
-    read(value) {
-      return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale());
-    }
-    write(localized_string, value, observable) {
-      const new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale());
-      if (!(new_value && _.isDate(new_value))) { return observable.setToDefault(); } // reset if invalid
-      return value.setTime(new_value.valueOf());
-    }
-  }
+  // // NOTE: dependency on globalize and knockback-defaults
+  // class LongDateLocalizer extends kb.LocalizedObservable {
+  //   constructor(/* value, options, view_model */) {
+  //     super(...arguments);
+  //     return kb.utils.wrappedObservable(this);
+  //   }
+  //   read(value) {
+  //     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale());
+  //   }
+  //   write(localized_string, value, observable) {
+  //     const new_value = Globalize.parseDate(localized_string, 'dd MMMM yyyy', kb.locale_manager.getLocale());
+  //     if (!(new_value && _.isDate(new_value))) { return observable.setToDefault(); } // reset if invalid
+  //     return value.setTime(new_value.valueOf());
+  //   }
+  // }
 
   it('Date and time with jquery.globalize', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelDate = function (model) {
+    const ContactViewModelDate = (model) => {
       this.date = kb.observable(model, { key: 'date', localizer: kb.LongDateLocalizer }, this);
       return this;
     };
@@ -246,7 +246,6 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('Localization with a changing key', () => {
@@ -266,7 +265,7 @@ describe('localized-observable', () => {
     kb.locale_manager.setLocale('en');
     assert.equal(locale_manager_greeting(), 'Goodbye', 'en: Goodbye');
 
-    const ContactViewModelGreeting = function (model) {
+    const ContactViewModelGreeting = (model) => {
       this.greeting_key = ko.observable('hello_greeting');
       this.greeting = kb.observable(model, { key: this.greeting_key, localizer: kb.LocalizedStringLocalizer });
     };
@@ -284,7 +283,6 @@ describe('localized-observable', () => {
     assert.equal(view_model.greeting(), 'Goodbye', 'en: Goodbye');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('2. internals test (Coffeescript inheritance)', () => {
@@ -294,12 +292,12 @@ describe('localized-observable', () => {
     class ContactViewModel extends kb.ViewModel {
       constructor(model) {
         super(model, { internals: ['email', 'date'] });
-        this.email = function (value) {
+        this.email = (value) => {
           if (arguments.length) {
             return this._email(value);
           }
           return !this._email() ? 'your.name@yourplace.com' : this._email();
-        }.bind(this);
+        };
         this.date = new kb.LongDateLocalizer(this._date);
       }
     }
@@ -359,7 +357,6 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it.skip('3. internals test (Javascript inheritance)', () => {
@@ -369,12 +366,12 @@ describe('localized-observable', () => {
     const ContactViewModel = kb.ViewModel.extend({
       constructor(model) {
         kb.ViewModel.prototype.constructor.call(this, model, { internals: ['email', 'date'] });
-        this.email = function (value) {
+        this.email = (value) => {
           if (arguments.length) {
             return this._email(value);
           }
           return !this._email() ? 'your.name@yourplace.com' : this._email();
-        }.bind(this);
+        };
         this.date = new kb.LongDateLocalizer(this._date);
       },
     });
@@ -436,7 +433,6 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7. Using kb.localizedObservable', () => {
@@ -495,7 +491,6 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7. Using kb.localizedObservable', () => {
@@ -554,7 +549,6 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('10. Nested custom view models', () => {
@@ -603,7 +597,7 @@ describe('localized-observable', () => {
       },
     });
 
-    const validateContactViewModel = function (view_model, name, birthdate) {
+    const validateContactViewModel = (view_model, name, birthdate) => {
       const model = kb.utils.wrappedModel(view_model);
       assert.equal(view_model.name(), name, `${name}: Name matches`);
 
@@ -637,12 +631,12 @@ describe('localized-observable', () => {
       return model.set({ date: new Date(birthdate.valueOf()) }); // restore birthdate
     };
 
-    const validateGenericViewModel = function (view_model, name, birthdate) {
+    const validateGenericViewModel = (view_model, name, birthdate) => {
       assert.equal(view_model.name(), name, `${name}: Name matches`);
       return assert.equal(view_model.date().valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
 
-    const validateModel = function (model, name, birthdate) {
+    const validateModel = (model, name, birthdate) => {
       assert.equal(model.get('name'), name, `${name}: Name matches`);
       return assert.equal(model.get('date').valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
@@ -671,7 +665,6 @@ describe('localized-observable', () => {
     kb.release(nested_view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('12. Prior kb.Observables functionality', () => {
@@ -734,10 +727,9 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('13. Bulk mode (array of keys)', () => {
+  it('13. Bulk mode (array of keys)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -769,7 +761,6 @@ describe('localized-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });
 
@@ -781,7 +772,6 @@ describe('defaults', () => {
     assert.ok(!!kb.Collection, 'kb.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Globalize, 'Globalize');
-
   });
 
   const locale_manager = new LocaleManager('en', {
@@ -868,7 +858,6 @@ describe('defaults', () => {
       kb.release(view_model);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-  
     });
 
     it('2. Standard use case with kb.ViewModels', () => {
@@ -946,7 +935,6 @@ describe('defaults', () => {
       kb.release(view_model);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-  
     });
   }
 
@@ -1019,11 +1007,10 @@ describe('defaults', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // https://github.com/kmalakoff/knockback/issues/114
-  return it('4. 0 should not behave as null', () => {
+  it('4. 0 should not behave as null', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new Contact();
@@ -1044,6 +1031,5 @@ describe('defaults', () => {
     assert.equal(casecond(), 'Open');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });

@@ -51,7 +51,7 @@ describe('knockback_core', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  return it('kb.ignore', () => {
+  it('kb.ignore', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     let counter = 0;

@@ -936,9 +936,7 @@ let requirejs,
                 // If the manager is for a plugin managed resource,
                 // ask the plugin to load it now.
         if (this.shim) {
-          makeRequire(this, true)(this.shim.deps || [], bind(this, () => {
-            return map.prefix ? this.callPlugin() : this.load();
-          }));
+          makeRequire(this, true)(this.shim.deps || [], bind(this, () => map.prefix ? this.callPlugin() : this.load()));
         } else {
                     // Regular dependency.
           return map.prefix ? this.callPlugin() : this.load();
@@ -1086,7 +1084,7 @@ let requirejs,
                                                       false,
                                                       true);
             on(normalizedMap,
-                            'defined', bind(this, function (value) {
+                            'defined', bind(this, (value) => {
                               this.init([], () => value, null, {
                                 enabled: true,
                                 ignore: true,
@@ -1105,7 +1103,7 @@ let requirejs,
             return;
           }
 
-          load = bind(this, function (value) {
+          load = bind(this, (value) => {
             this.init([], () => value, null, {
               enabled: true,
             });

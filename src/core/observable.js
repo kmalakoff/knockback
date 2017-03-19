@@ -57,8 +57,6 @@ kb.Observable = class Observable {
   // @note the constructor does not return 'this' but a ko.observable
   constructor(model, key_or_info, options, _vm) {
     if (_vm == null) { _vm = {}; } this._vm = _vm; return kb.ignore(() => {
-      let _model,
-        args;
       key_or_info || kb._throwMissing(this, 'key_or_info');
       this.key = key_or_info.key || key_or_info;
       _.map(KEYS_INFO, (key) => { if (key_or_info[key]) { this[key] = key_or_info[key]; } });
@@ -67,36 +65,37 @@ kb.Observable = class Observable {
       const { event_watcher } = create_options;
       delete create_options.event_watcher;
 
-    // set up basics
+      // set up basics
       this._value = new TypedValue(create_options);
       this._model = ko.observable();
       let observable = kb.utils.wrappedObservable(this, ko.computed({
         read: () => {
-          _model = this._model();
-          args = [this.key].concat(this.args || []);
+          const model = this._model();
+          const args = [this.key].concat(this.args || []);
           _.each(args, arg => ko.utils.unwrapObservable(arg));
 
-          __guard__(kb.utils.wrappedEventWatcher(this), x => x.emitter(_model || null)); // update the event watcher
+          const ew = kb.utils.wrappedEventWatcher(this);
+          !ew || ew.emitter(model || null)
+
           if (this.read) {
             this.update(this.read.apply(this._vm, args));
-          } else if (!_.isUndefined(_model)) {
-            kb.ignore(() => this.update(kb.getValue(_model, kb.peek(this.key), this.args)));
+          } else if (!_.isUndefined(model)) {
+            kb.ignore(() => this.update(kb.getValue(model, kb.peek(this.key), this.args)));
           }
           return this._value.value();
         },
 
         write: new_value => kb.ignore(() => {
           const unwrapped_new_value = kb.utils.unwrapModels(new_value); // unwrap for set (knockout may pass view models which are required for the observable but not the model)
-          _model = kb.peek(this._model);
+          const model = kb.peek(this._model);
           if (this.write) {
             this.write.call(this._vm, unwrapped_new_value);
-            new_value = kb.getValue(_model, kb.peek(this.key), this.args);
-          } else if (_model) {
-            kb.setValue(_model, kb.peek(this.key), unwrapped_new_value);
+            new_value = kb.getValue(model, kb.peek(this.key), this.args);
+          } else if (model) {
+            kb.setValue(model, kb.peek(this.key), unwrapped_new_value);
           }
           return this.update(new_value);
-        },
-      ),
+        }),
 
         owner: this._vm,
       }));
@@ -112,16 +111,16 @@ kb.Observable = class Observable {
       }
       delete create_options.factories;
 
-    // publish public interface on the observable and return instead of this
+      // publish public interface on the observable and return instead of this
       kb.publishMethods(observable, this, KEYS_PUBLISH);
 
-    // use external model observable or create
+      // use external model observable or create
       observable.model = (this.model = ko.computed({
         read: () => ko.utils.unwrapObservable(this._model),
         write: new_model => kb.ignore(() => {
           if (this.__kb_released || (kb.peek(this._model) === new_model)) return; // destroyed or no change
 
-        // update references
+          // update references
           const new_value = kb.getValue(new_model, kb.peek(this.key), this.args);
           this._model(new_model);
           if (!new_model) {
@@ -171,7 +170,3 @@ kb.Observable = class Observable {
 };
 
 kb.observable = (model, key, options, view_model) => new kb.Observable(model, key, options, view_model);
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}

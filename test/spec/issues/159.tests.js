@@ -16,13 +16,13 @@ describe('issue 159', () => {
     assert.ok(!!kb, 'kb');
   });
 
-  return it('has no issue', () => {
+  it('has no issue', () => {
     if (!$) return;
 
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ViewModel {
-      afterRender() { return this.was_called = true; }
+      afterRender() { this.was_called = true; }
     }
 
     // test without options override
@@ -41,6 +41,5 @@ describe('issue 159', () => {
     assert.ok(view_model.was_called, 'afterRender was called');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });

@@ -826,7 +826,7 @@
         }
       };
 
-      ModelWatcher.prototype._onModelLoaded = function (model) {
+      ModelWatcher.prototype._onModelLoaded = (model) => {
         let callbacks,
           event_name,
           info,
@@ -855,7 +855,7 @@
         return this;
       };
 
-      ModelWatcher.prototype._onModelUnloaded = function (model) {
+      ModelWatcher.prototype._onModelUnloaded = (model) => {
         let callbacks,
           event_name,
           info,
@@ -891,7 +891,7 @@
           if (!relation) {
             return;
           }
-          info.relFn = function (model) {
+          info.relFn = (model) => {
             !kb.statistics || addStatisticsEvent(model, `${event_name} (relational)`, info);
             return info.update();
           };
@@ -1544,7 +1544,7 @@
         return this.sortedIndex(sorted_index, sort_attribute, options);
       };
 
-      CollectionObservable.prototype.viewModelByModel = function (model) {
+      CollectionObservable.prototype.viewModelByModel = (model) => {
         let id_attribute;
         if (this.models_only) {
           return null;
@@ -1597,7 +1597,7 @@
         }
       };
 
-      CollectionObservable.prototype._onModelRemove = function (model) {
+      CollectionObservable.prototype._onModelRemove = (model) => {
         let observable,
           view_model;
         view_model = this.models_only ? model : this.viewModelByModel(model);
@@ -1611,7 +1611,7 @@
         return this.trigger('remove', view_model, observable);
       };
 
-      CollectionObservable.prototype._onModelChange = function (model) {
+      CollectionObservable.prototype._onModelChange = (model) => {
         if (this._modelIsFiltered(model)) {
           return this._onModelRemove(model);
         }
@@ -1620,7 +1620,7 @@
         }
       };
 
-      CollectionObservable.prototype._onModelResort = function (model) {
+      CollectionObservable.prototype._onModelResort = (model) => {
         let collection,
           new_index,
           observable,
@@ -1769,7 +1769,7 @@
         return this.create_options.store.findOrCreate(model, this.create_options);
       };
 
-      CollectionObservable.prototype._modelIsFiltered = function (model) {
+      CollectionObservable.prototype._modelIsFiltered = (model) => {
         let filter,
           _i,
           _len,
@@ -2069,7 +2069,7 @@
         return observable(current_value);
       };
 
-      LocalizedObservable.prototype.observedValue = function (value) {
+      LocalizedObservable.prototype.observedValue = (value) => {
         if (arguments.length === 0) {
           return this.value;
         }

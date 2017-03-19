@@ -96,7 +96,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === 0, `All model events cleared (${name}). Expected: 1. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('2. Collection with models with Many relations: Multiple houses with multiple people living in them', () => {
@@ -193,7 +192,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(places_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('3. Model with recursive Many relations: Person with users who are people', () => {
@@ -270,7 +268,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     }
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('4. After view model create, add models', () => {
@@ -305,7 +302,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(view_model.occupants().length, 2, 'two occupants');
     assert.equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship');
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
-
   });
 
   // # it '5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) ->
@@ -405,7 +401,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7a. Inferring observable types: late binding', () => {
@@ -441,7 +436,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7b. Inferring observable types: late binding (attribute setting)', () => {
@@ -478,7 +472,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8a. Customizing observable types: from the start', () => {
@@ -542,7 +535,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // TODO: put back when test why running both Backbone.Relational and this together fail
@@ -608,7 +600,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9a. Customizing observable types: late binding', () => {
@@ -679,7 +670,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9b. Customizing observable types: late binding (atrributes setting)', () => {
@@ -751,7 +741,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('10. Nested custom view models', () => {
@@ -825,15 +814,15 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
         assert.ok(found, `${name} was found`);
       });
     };
-    var validateFriend = function (vm, name) {
+    var validateFriend = (vm, name) => {
       assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `friend name matches for ${name}`);
     };
-    const validateBestFriend = function (vm, name) {
+    const validateBestFriend = (vm, name) => {
       assert.equal(vm.type(), 'best_friend', `best friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `best friend name matches for ${name}`);
     };
-    const validateBandMember = function (vm, name) {
+    const validateBandMember = (vm, name) => {
       assert.equal(vm.type(), 'band_member', `band member type matches for ${name}`);
       assert.ok(vm instanceof BandMemberViewModel, `band member type matches for ${name}`);
       return assert.equal(vm.name(), name, `band member name matches for ${name}`);
@@ -856,7 +845,6 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   // TODO: put back when test why running both Backbone.Relational and this together fail
@@ -929,9 +917,8 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: 'default' }));
 });
 

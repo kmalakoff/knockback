@@ -268,7 +268,7 @@ describe('knockback.js memory management', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  return it('kb.release destructiveness', () => {
+  it('kb.release destructiveness', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const array = ['Hello', 'Friend'];

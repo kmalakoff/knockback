@@ -282,7 +282,3 @@ class Store {
 Store.initClass();
 kb.Store = Store;
 module.exports = Store;
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}

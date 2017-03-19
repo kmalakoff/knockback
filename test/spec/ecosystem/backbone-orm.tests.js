@@ -319,7 +319,6 @@ describe('Knockback.js with BackboneORM', () => {
     assert.equal(view_model.occupants().length, 2, 'two occupants');
     assert.equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship');
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
-
   });
 
   // TODO: add tests and support for idAttribute
@@ -424,7 +423,6 @@ describe('Knockback.js with BackboneORM', () => {
           assert.equal(authored_book.editMode(), true, 'edit mode set');
         });
       });
-  
     });
   });
 
@@ -501,7 +499,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('7b. Inferring observable types: late binding (attribute setting)', () => {
@@ -538,7 +535,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8a. Customizing observable types: from the start', () => {
@@ -602,7 +598,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('8b. Customizing observable types: from the start (attribute setting)', () => {
@@ -670,7 +665,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9a. Customizing observable types: late binding', () => {
@@ -741,7 +735,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('9b. Customizing observable types: late binding (atrributes setting)', () => {
@@ -813,7 +806,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(view_model_house1);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('10. Nested custom view models', () => {
@@ -883,15 +875,15 @@ describe('Knockback.js with BackboneORM', () => {
         assert.ok(found, `${name} was found`);
       });
     };
-    var validateFriend = function (vm, name) {
+    var validateFriend = (vm, name) => {
       assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `friend name matches for ${name}`);
     };
-    const validateBestFriend = function (vm, name) {
+    const validateBestFriend = (vm, name) => {
       assert.equal(vm.type(), 'best_friend', `best friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `best friend name matches for ${name}`);
     };
-    const validateBandMember = function (vm, name) {
+    const validateBandMember = (vm, name) => {
       assert.equal(vm.type(), 'band_member', `band member type matches for ${name}`);
       assert.ok(vm instanceof BandMemberViewModel, `band member type matches for ${name}`);
       return assert.equal(vm.name(), name, `band member name matches for ${name}`);
@@ -914,7 +906,6 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('11. Minimum factory tree for shared dependent models', () => {
@@ -986,8 +977,7 @@ describe('Knockback.js with BackboneORM', () => {
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: 'default' }));
 });

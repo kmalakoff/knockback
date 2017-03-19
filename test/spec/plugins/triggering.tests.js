@@ -45,10 +45,9 @@ describe('triggered-observable', () => {
     assert.equal(trigger_count, 3, '3: no change');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('2. Standard use case: simple events notifications (kb.observableTriggered)', () => {
+  it('2. Standard use case: simple events notifications (kb.observableTriggered)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const model = new kb.Model();
     model.setLocale = () => model.trigger('change', model);
@@ -79,6 +78,5 @@ describe('triggered-observable', () => {
     assert.equal(trigger_count, 3, '3: no change');
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });

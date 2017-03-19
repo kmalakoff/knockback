@@ -54,7 +54,7 @@ describe('observable', () => {
   it('2. Standard use case: direct attributes with custom read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelCustom = function (model) {
+    const ContactViewModelCustom = (model) => {
       this.name = kb.observable(model, { key: 'name', read() { return `First: ${model.get('name')}`; } });
       this.number = kb.observable(model, {
         key: 'number',
@@ -92,7 +92,7 @@ describe('observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const args = [];
-    const ContactViewModelCustom = function (model) {
+    const ContactViewModelCustom = (model) => {
       this.name = kb.observable(model, { key: 'name', read(key, arg1, arg2) { args.push(arg1); args.push(arg2); return model.get('name'); }, args: ['name', 1] });
       this.number = kb.observable(model, { key: 'number', read(key, arg) { args.push(arg); return model.get('number'); }, args: 'number' });
     };
@@ -218,7 +218,7 @@ describe('observable', () => {
       }
     }
 
-    var InferringViewModel = function (model, options) {
+    const InferringViewModel = function (model, options) {
       this._auto = kb.viewModel(model, { keys: ['name', 'parent', 'children'], options }, this);
       this.maybe_null_name = kb.observable(model, 'maybe_null_name');
       this.maybe_null_parent = kb.observable(model, 'maybe_null_parent', { factories: InferringViewModel, options: this._auto.shareOptions() }); // use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
@@ -345,7 +345,7 @@ describe('observable', () => {
   });
 
   // https://github.com/kmalakoff/knockback/issues/108
-  return it('10. should be able to change models', () => {
+  it('10. should be able to change models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const values = [];

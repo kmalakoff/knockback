@@ -199,8 +199,8 @@ class ViewModel {
       let rel_keys;
       if (this.__kb.keys || !model) return; // only use the keys provided
       for (key in model.attributes) { createObservable(this, model, key, this.__kb.create_options); }
-      if (rel_keys = __guardMethod__(kb.settings.orm, 'keys', o => o.keys(model))) {
-        ((() => rel_keys.map(key => createObservable(this, model, key, this.__kb.create_options)))());
+      if (kb.settings.orm && kb.settings.orm.keys) {
+        _.each(kb.settings.orm.keys, (key) => createObservable(this, model, key, this.__kb.create_options));
       }
     } else if (_.isArray(keys)) {
       _.map(keys, key => createObservable(this, model, key, this.__kb.create_options));
@@ -209,7 +209,7 @@ class ViewModel {
         var vm_key;
         const mapping_info = keys[key];
         if ((vm_key = assignViewModelKey(this, key))) {
-          if (!_.isString(mapping_info)) { if (!mapping_info.key) { mapping_info.key = vm_key; } }
+          if (!_.isString(mapping_info) && !mapping_info.key) mapping_info.key = vm_key;
           this[vm_key] = (this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this));
         }
       }
@@ -222,9 +222,3 @@ module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
 kb.viewModel = function (model, options, view_model) { return new kb.ViewModel(arguments); };
-function __guardMethod__(obj, methodName, transform) {
-  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
-    return transform(obj, methodName);
-  }
-  return undefined;
-}

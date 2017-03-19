@@ -16,7 +16,6 @@ describe('formatted-observable', () => {
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-  const Contacts = kb.Collection.extend({ model: Contact });
 
   it('Various scenarios', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -122,7 +121,6 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('4. Using classes', () => {
@@ -167,7 +165,6 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('6. requires', () => {
@@ -198,7 +195,6 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('kb.formattedObservable', () => {
@@ -227,10 +223,9 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
-  return it('kb.observableFormatted', () => {
+  it('kb.observableFormatted', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ContactViewModelFullName extends kb.ViewModel {
@@ -256,6 +251,5 @@ describe('formatted-observable', () => {
     kb.release(view_model);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 });

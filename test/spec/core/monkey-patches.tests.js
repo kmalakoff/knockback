@@ -19,7 +19,7 @@ describe('money-patches', () => {
 
   // # https://github.com/kmalakoff/knockback/issues/124
   it('fixes memory management for extend on kb.observable', () => {
-    if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) return;
+    if (!ko.subscribable && !ko.subscribable.fn && !ko.subscribable.fn.extend) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new Contact({ name: 'Bob' });
@@ -39,8 +39,7 @@ describe('money-patches', () => {
 
   // # https://github.com/kmalakoff/knockback/issues/124
   it('fixes memory management for extend on kb.CollectionObservable', () => {
-    let collection;
-    if (!__guard__(ko.subscribable != null ? ko.subscribable.fn : undefined, x => x.extend)) return;
+    if (!ko.subscribable && !ko.subscribable.fn && !ko.subscribable.fn.extend) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     ko.extenders.lazyArray = function (target, timeout) {
@@ -61,7 +60,8 @@ describe('money-patches', () => {
       });
     };
 
-    const collection_observable = kb.collectionObservable(collection = new Contacts([{ name: 'Bob' }]));
+    const collection = new Contacts([{ name: 'Bob' }]);
+    const collection_observable = kb.collectionObservable(collection);
     assert.ok(!kb.wasReleased(collection_observable), 'collection_observable not released');
 
     const extended_collection_observable = collection_observable.extend({ lazyArray: 10 });
@@ -77,7 +77,7 @@ describe('money-patches', () => {
   });
 
   // https://github.com/kmalakoff/knockback/issues/127
-  return it('extend monkey patch does not cause arrays to destroy', () => {
+  it('extend monkey patch does not cause arrays to destroy', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class ViewModel {
@@ -101,7 +101,3 @@ describe('money-patches', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 });
-
-function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
-}

@@ -82,7 +82,10 @@ describe('collection-observable', () => {
     assert.equal(collection.length, 0, 'no models');
     assert.equal(view_model.count(), 0, 'no count');
 
-    collection.add(new Contact({ id: 'b1', name: 'Ringo', number: '555-555-5556' }));
+    debugger;
+    try {
+      collection.add(new Contact({ id: 'b1', name: 'Ringo', number: '555-555-5556' }));
+    } catch (err) { console.trace(err); debugger; }
     collection.add(new Contact({ id: 'b2', name: 'George', number: '555-555-5555' }));
     assert.equal(collection.length, 2, '2 models');
     assert.equal(view_model.count(), 2, '2 count');
@@ -104,6 +107,7 @@ describe('collection-observable', () => {
   });
 
   it('4. Basic Usage: no view models', () => {
+    debugger;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -142,7 +146,7 @@ describe('collection-observable', () => {
     // clean up
     kb.release(collection_observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
   it('5. Basic Usage: no sorting and no callbacks', () => {
@@ -438,7 +442,7 @@ describe('collection-observable', () => {
       minor_duo6: kb.collectionObservable(minor_duo, { factories: { models: { create(model, options) { return model.get('name') === 'George' ? new ContactViewModelDate(model, options) : kb.viewModel(model, options); } } } }), // mixed
     };
 
-    const validateContactViewModel = function (view_model, name, birthdate) {
+    const validateContactViewModel = (view_model, name, birthdate) => {
       const model = kb.utils.wrappedModel(view_model);
       assert.equal(view_model.name(), name, `${name}: Name matches`);
 
@@ -467,12 +471,12 @@ describe('collection-observable', () => {
       return model.set({ date: new Date(birthdate.valueOf()) }); // restore birthdate
     };
 
-    const validateGenericViewModel = function (view_model, name, birthdate) {
+    const validateGenericViewModel = (view_model, name, birthdate) => {
       assert.equal(view_model.name(), name, `${name}: Name matches`);
       return assert.equal(view_model.date().valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
 
-    const validateModel = function (model, name, birthdate) {
+    const validateModel = (model, name, birthdate) => {
       assert.equal(model.get('name'), name, `${name}: Name matches`);
       return assert.equal(model.get('date').valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
@@ -712,7 +716,6 @@ describe('collection-observable', () => {
     kb.release(collection_observable);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-
   });
 
   it('18. Test auto-generate collections', () => {
@@ -936,7 +939,7 @@ describe('collection-observable', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  return it('25. Test auto-generate collections (kb.observableCollection)', () => {
+  it('25. Test auto-generate collections (kb.observableCollection)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const models = ([1, 2, 3, 4].map(id => new Contact({ id })));

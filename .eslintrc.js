@@ -15,6 +15,8 @@ module.exports = {
     'no-nested-ternary': 'off',
     'import/no-extraneous-dependencies': 'off',
     'no-plusplus': 'off',
+    'class-methods-use-this': 'off',
+    'no-bitwise': 'off',
 
     'camelcase': 'off',
   }

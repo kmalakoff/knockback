@@ -26,7 +26,7 @@ kb.valid = {
 // Convention is that if they end in Fn then returns a function pointer based on parameters passed.
 kb.hasChangedFn = function (model) {
   let m = null; let attributes = null;
-  return function () {
+  return () => {
     let current_model;
     if (m !== (current_model = ko.utils.unwrapObservable(model))) { // change in model
       m = current_model;

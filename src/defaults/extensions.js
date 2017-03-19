@@ -10,8 +10,13 @@
 let kb;
 const { _, ko } = (kb = require('../core/kb'));
 
-kb.Observable.prototype.setToDefault = function () { __guardMethod__(this.__kb_value, 'setToDefault', o => o.setToDefault()); };
-kb.ViewModel.prototype.setToDefault = function () { for (const vm_key in this.__kb.vm_keys) { __guardMethod__(this[vm_key], 'setToDefault', o => o.setToDefault()); return; } };
+kb.Observable.prototype.setToDefault = () => { if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault(); };
+kb.ViewModel.prototype.setToDefault = () => { 
+  for (const vm_key in this.__kb.vm_keys) {
+    const value = this[vm_key];
+    if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
+  } 
+};
 
 // @example
 //   var model = new Backbone.Model({name: 'Bob'});
@@ -37,9 +42,3 @@ kb.utils.setToDefault = function (obj) {
   }
   return obj;
 };
-function __guardMethod__(obj, methodName, transform) {
-  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
-    return transform(obj, methodName);
-  }
-  return undefined;
-}
