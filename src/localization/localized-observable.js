@@ -76,9 +76,8 @@ class LocalizedObservable {
   // @option options [Function] onChange a notification that gets called when the locale changes. Signature: function(localized_string, value, observable)
   // @return [ko.observable] the constructor does not return 'this' but a ko.observable
   // @note the constructor does not return 'this' but a ko.observable
-  constructor(value1, options, vm) { // @vm is view_model
-    let value;
-    this.value = value1;
+  constructor(value, options, vm) { // @vm is view_model
+    this.value = value;
     this.vm = vm;
     if (!options) { options = {}; } if (!this.vm) { this.vm = {}; }
     this.read || kb._throwMissing(this, 'read');
@@ -90,20 +89,21 @@ class LocalizedObservable {
     this.__kb._onChange = options.onChange;
 
     // internal state
-    if (this.value) { value = ko.utils.unwrapObservable(this.value); }
-    this.vo = ko.observable(!value ? null : this.read(value, null));
+    const currentValue = this.value ? ko.utils.unwrapObservable(this.value) : null;
+    this.vo = ko.observable(!currentValue ? null : this.read(currentValue, null));
+
     let observable = kb.utils.wrappedObservable(this, ko.computed({
       read: () => {
-        if (this.value) { ko.utils.unwrapObservable(this.value); }
+        if (this.value) ko.utils.unwrapObservable(this.value);
         this.vo(); // create a depdenency
         return this.read(ko.utils.unwrapObservable(this.value));
       },
 
-      write: (value) => {
+      write: (x) => {
         this.write || kb._throwUnexpected(this, 'writing to read-only');
-        this.write(value, ko.utils.unwrapObservable(this.value));
-        this.vo(value);
-        if (this.__kb._onChange) { return this.__kb._onChange(value); }
+        this.write(x, ko.utils.unwrapObservable(this.value));
+        this.vo(x);
+        return this.__kb._onChange ? this.__kb._onChange(x) : undefined;
       },
 
       owner: this.vm,
@@ -116,7 +116,7 @@ class LocalizedObservable {
     kb.locale_manager.bind('change', this.__kb._onLocaleChange);
 
     // wrap ourselves with a default value
-    if (options.hasOwnProperty('default')) { observable = kb.DefaultObservable && ko.defaultObservable(observable, options.default); }
+    if (Object.prototype.hasOwnProperty.call(options, 'default')) { observable = kb.DefaultObservable && ko.defaultObservable(observable, options.default); }
 
     return observable;
   }
@@ -133,14 +133,15 @@ class LocalizedObservable {
   resetToCurrent() {
     const observable = kb.utils.wrappedObservable(this);
     const current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
-    if (observable() === current_value) return;
+    if (observable() === current_value) return undefined;
     return observable(current_value);
   }
 
   // Dual purpose set/get
   observedValue(value) {
-    if (arguments.length === 0) { return this.value; }
+    if (arguments.length === 0) return this.value;
     this.value = value; this._onLocaleChange();
+    return undefined;
   }
 
   // ###################################################
@@ -151,7 +152,8 @@ class LocalizedObservable {
   _onLocaleChange() {
     const value = this.read(ko.utils.unwrapObservable(this.value));
     this.vo(value);
-    if (this.__kb._onChange) { return this.__kb._onChange(value); }
+    if (this.__kb._onChange) return this.__kb._onChange(value);
+    return undefined;
   }
 }
 LocalizedObservable.initClass();

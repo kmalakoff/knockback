@@ -14,14 +14,10 @@ const { _, ko } = kb;
 require('./validators');
 
 // internal helper
-const callOrGet = function (value) {
+const callOrGet = function (value, ...args) {
   value = ko.utils.unwrapObservable(value);
-  return typeof (value) === 'function' ? value(...Array.prototype.slice.call(arguments, 1)) : value;
+  return (typeof value === 'function') ? value(...args) : value;
 };
-// const callOrGet = function (value, ...args) {
-//   value = ko.utils.unwrapObservable(value);
-//   return typeof value === 'function' ? value(...args) : value;
-// };
 
 // Helpers for validating forms, inputs, and values.
 // @example A Named Form
@@ -140,53 +136,44 @@ module.exports = Validation;
 // ############################
 // Aliases
 // ############################
-kb.valueValidator = (value, bindings, validation_options = {}) => {
-  if (!validation_options || (typeof (validation_options) === 'function')) validation_options = {};
+kb.valueValidator = (value, bindings, validation_options = {}) => ko.computed(() => {
+  const results = { $error_count: 0 };
+  const current_value = ko.utils.unwrapObservable(value);
 
-  return ko.computed(() => {
-    const results = { $error_count: 0 };
-    const current_value = ko.utils.unwrapObservable(value);
+  let disabled;
+  if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
+  if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
 
-    let disabled;
-    if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
-    if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
+  let priorities = validation_options.priorities || [];
+  if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
 
-    let priorities = validation_options.priorities || [];
-    if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
+  // then add the rest
+  let active_index = priorities.length + 1;
+  _.each(bindings, (validator, identifier) => {
+    results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
+    if (results[identifier]) {
+      results.$error_count++;
 
-    // then add the rest
-    let active_index = priorities.length + 1;
+      // check priorities
+      let identifier_index;
+      (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
 
-    _.each(bindings, (validator, identifier) => {
-      results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
-      if (results[identifier]) {
-        results.$error_count++;
-
-        // check priorities
-        let identifier_index = _.indexOf(priorities, identifier);
-        if (!~identifier_index) identifier_index = priorities.length;
-
-        if (results.$active_error && (identifier_index < active_index)) {
-          results.$active_error = identifier;
-          active_index = identifier_index;
-        } else if (!results.$active_error) {
-          results.$active_error = identifier;
-          active_index = identifier_index;
-        }
+      if (results.$active_error && (identifier_index < active_index)) {
+        results.$active_error = identifier; active_index = identifier_index;
+      } else {
+        results.$active_error || ((results.$active_error = identifier), (active_index = identifier_index));
       }
-    });
-
-    // add the inverse and ensure a boolean
-    results.$enabled = !disabled;
-    results.$disable = !!disabled;
-    results.$valid = results.$error_count === 0;
-    return results;
+    }
   });
-};
+
+  // add the inverse and ensure a boolean
+  results.$enabled = !disabled;
+  results.$disable = !!disabled;
+  results.$valid = results.$error_count === 0;
+  return results;
+});
 
 kb.inputValidator = (view_model, el, validation_options = {}) => {
-  if (!validation_options || (typeof (validation_options) === 'function')) validation_options = {};
-
   const validators = kb.valid;
   let input_name = el.getAttribute('name');
   if (input_name && !_.isString(input_name)) { input_name = null; }
@@ -236,7 +223,7 @@ kb.formValidator = (view_model, el) => {
     const name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
     const validator = kb.inputValidator(view_model, input_el, validation_options);
-    if (validator) validators.push(results[name] = validator);
+    !validator || validators.push(results[name] = validator);
   });
 
   // collect stats, error count and valid

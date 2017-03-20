@@ -76,7 +76,8 @@ kb.parseFormattedString = function (string, format) {
 class FormattedObservable {
   // Used to create a new kb.FormattedObservable.
   //
-  // @param [String|ko.observable] format the format string. Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
+  // @param [String|ko.observable] format the format string.
+  // Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
   // @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
   // @return [ko.observable] the constructor does not return 'this' but a ko.observable
   // @note the constructor does not return 'this' but a ko.observable

@@ -31,10 +31,11 @@ kb.utils.setToDefault = function (obj) {
   if (!obj) return undefined;
 
   // observable
-  if (ko.isObservable(obj)) { if (typeof obj.setToDefault === 'function') obj.setToDefault(); }
+  if (ko.isObservable(obj)) {
+    if (typeof obj.setToDefault === 'function') obj.setToDefault();
 
   // view model
-  else if (_.isObject(obj)) {
+  } else if (_.isObject(obj)) {
     _.each(obj, (value, key) => {
       if (value && (ko.isObservable(value) || (typeof (value) !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) this.setToDefault(value);
     });

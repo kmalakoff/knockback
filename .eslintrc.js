@@ -22,6 +22,8 @@ module.exports = {
     'no-new': 'off',
     'func-names': 'off',
     'no-param-reassign': 'off',
+    'no-unused-expressions': 'off',
+    'no-new-func': 'off',
 
     'camelcase': 'off',
   }
