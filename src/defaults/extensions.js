@@ -28,14 +28,10 @@ kb.ViewModel.prototype.setToDefault = function () {
 //   }; // view_model.wrapped name: Bob
 //   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
 kb.utils.setToDefault = function (obj) {
-  if (!obj) return;
+  if (!obj) return undefined;
 
   // observable
-  if (ko.isObservable(obj)) {
-    if (typeof obj.setToDefault === 'function') {
-      obj.setToDefault();
-    }
-  }
+  if (ko.isObservable(obj)) { if (typeof obj.setToDefault === 'function') obj.setToDefault(); }
 
   // view model
   else if (_.isObject(obj)) {

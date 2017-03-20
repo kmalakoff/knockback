@@ -1,6 +1,7 @@
 module.exports = {
   extends: 'airbnb-base',
   plugins: ['import'],
+  parser: 'babel-eslint',
   env: {
     browser: true,
     es6: true,
@@ -20,6 +21,7 @@ module.exports = {
     'no-use-before-define': 'off',
     'no-new': 'off',
     'func-names': 'off',
+    'no-param-reassign': 'off',
 
     'camelcase': 'off',
   }

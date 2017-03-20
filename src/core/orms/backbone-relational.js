@@ -8,6 +8,7 @@
 */
 
 const kb = require('../kb');
+
 const { _, Backbone } = kb;
 
 let RelationalModel = null; // lazy bind so this file can be loaded before relational library
@@ -28,7 +29,7 @@ module.exports = class BackboneRelational {
     if (!type) return null;
 
     const relFn = function (model) {
-      !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });
+      if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });
       return update();
     };
 

@@ -8,6 +8,7 @@
 */
 
 const kb = require('../core/kb');
+
 const { _, ko } = kb;
 require('./extensions');
 
@@ -17,8 +18,7 @@ const KEYS_PUBLISH = ['destroy', 'setToDefault'];
 //
 // @example Provide a observable with observable and/or non observable default argument in the form of:
 //   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
-module.exports = kb.DefaultObservable = class DefaultObservable {
-
+class DefaultObservable {
   // Used to create a new kb.DefaultObservable.
   //
   // @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
@@ -48,7 +48,9 @@ module.exports = kb.DefaultObservable = class DefaultObservable {
   // Forces the observable to take the default value.
   // @note Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
   setToDefault() { return kb.utils.wrappedObservable(this)(this.dv); }
-};
+}
+kb.DefaultObservable = DefaultObservable;
+module.exports = DefaultObservable;
 
-kb.defaultObservable = (target, default_value) => new kb.DefaultObservable(target, default_value);
+kb.defaultObservable = (...args) => new kb.DefaultObservable(...args);
 kb.observableDefault = kb.defaultObservable;

@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+
 module.exports = kb;
 
 kb.configure = require('./configure');

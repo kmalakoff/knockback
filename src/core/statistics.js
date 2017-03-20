@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+
 const { _ } = kb;
 
 // kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
@@ -105,14 +106,18 @@ module.exports = kb.Statistics = class Statistics {
     const events = obj._events || obj._callbacks || {};
     const keys = key ? [key] : _.keys(events);
 
-    _.map(keys, (key) => {
+    _.each(keys, (key) => {
       let node = events[key];
       if (node) {
         if (_.isArray(node)) {
           stats[key] = _.compact(node).length;
         } else {
           stats[key] = 0; const { tail } = node;
-          while ((node = node.next) !== tail) { stats[key]++; }
+          node = node.next;
+          while (node !== tail) {
+            stats[key]++;
+            node = node.next;
+          }
         }
         stats.count += stats[key];
       }

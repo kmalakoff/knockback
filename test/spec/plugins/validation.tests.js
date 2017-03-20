@@ -22,10 +22,10 @@ describe('validation', () => {
       { value: ko.observable() };
 
     const validator = kb.valueValidator(view_model.value, { required: kb.valid.required, url: kb.valid.url });
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(validator().url, 'url is invalid');
@@ -61,10 +61,10 @@ describe('validation', () => {
     ko.applyBindings(view_model, el);
 
     const validator = view_model.$name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(validator().url, 'url is invalid');
@@ -104,10 +104,10 @@ describe('validation', () => {
     ko.applyBindings(view_model, el);
 
     const validator = view_model.$name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(validator().url, 'url is invalid');
@@ -157,10 +157,10 @@ describe('validation', () => {
     ko.applyBindings(view_model, el);
 
     let validator = view_model.$name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'obs: has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'obs: has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'obs: has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'obs: has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(!validator().required, 'obs: required is valid');
     assert.ok(!validator().url, 'obs: url is valid');
@@ -198,10 +198,10 @@ describe('validation', () => {
     ko.applyBindings(view_model, el);
 
     validator = view_model.$name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'fn: has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'fn: has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'fn: has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'fn: has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(!validator().required, 'fn: required is valid');
     assert.ok(!validator().url, 'fn: url is valid');
@@ -240,10 +240,10 @@ describe('validation', () => {
 
     // check name
     let validator = view_model.$my_form.name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(!Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok(!('url' in validator()), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(!validator().$valid, 'validator not valid');
@@ -257,10 +257,10 @@ describe('validation', () => {
     assert.ok(!validator().$active_error, 'active error does not exist');
 
     validator = view_model.$my_form.site;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(validator().url, 'url is invalid');
@@ -314,10 +314,10 @@ describe('validation', () => {
 
     // check name
     let validator = view_model.$name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(!Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok(!('url' in validator()), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     // disabled
     assert.ok(!validator().required, 'required is valid');
@@ -337,10 +337,10 @@ describe('validation', () => {
     assert.ok(!validator().$active_error, 'active error does not exist');
 
     validator = view_model.$site;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(validator().url, 'url is invalid');
@@ -402,10 +402,10 @@ describe('validation', () => {
 
     // check name
     let validator = view_model.$my_form.name;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(!Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok(!('url' in validator()), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     // disabled
     assert.ok(!validator().required, 'required is valid');
@@ -426,10 +426,10 @@ describe('validation', () => {
     assert.ok(!validator().$active_error, 'no active error');
 
     validator = view_model.$my_form.site;
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'required'), 'has required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok('required' in validator(), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().required, 'required is invalid');
     assert.ok(validator().url, 'url is invalid');

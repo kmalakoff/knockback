@@ -108,9 +108,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
+var ko = __webpack_require__(30);
+
 var _ = null;
 var Backbone = null;
-var ko = __webpack_require__(30);
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -520,6 +521,7 @@ module.exports = g;
 
 
 var kb = __webpack_require__(0);
+
 var _ = kb._;
 
 
@@ -583,6 +585,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -2348,6 +2351,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -2427,8 +2431,10 @@ var CollectionObservable = function () {
     // @option options [Boolean] auto_compact flag used to compact memory used by the collection observable when large changes occur, eg. resetting the collection.
     // @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
     // @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
-    // @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
-    // @option options [Function] comparator a function that is used to sort an object. Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
+    // @option options [Object] factories a map of dot-deliminated paths;
+    // for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
+    // @option options [Function] comparator a function that is used to sort an object.
+    // Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
     // @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
     // @option options [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
     // @option options [String] path the path to the value (used to create related observables from the factory).
@@ -2440,8 +2446,10 @@ var CollectionObservable = function () {
 
   }]);
 
-  function CollectionObservable(collection, view_model, options) {
+  function CollectionObservable(collection, view_model) {
     var _this = this;
+
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     _classCallCheck(this, CollectionObservable);
 
@@ -2452,7 +2460,6 @@ var CollectionObservable = function () {
       collection = args[0] instanceof kb.Collection ? args.shift() : _.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection();
       if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
-      options = {};
       _.each(args, function (arg) {
         return kb.assign(options, arg);
       });
@@ -2495,14 +2502,14 @@ var CollectionObservable = function () {
 
       // start the processing
       _this._collection = ko.observable(collection);
-      observable.collection = _this.collection = ko.computed({
+      _this.collection = ko.computed({
         read: function read() {
           return _this._collection();
         },
         write: function write(new_collection) {
           return kb.ignore(function () {
             var previous_collection = void 0;
-            if ((previous_collection = _this._collection()) === new_collection) return; // no change
+            if ((previous_collection = _this._collection()) === new_collection) return undefined; // no change
 
             // @create_options.store.reuse(@, new_collection) # not meant to be shared
             kb.utils.wrappedObject(observable, new_collection);
@@ -2522,58 +2529,45 @@ var CollectionObservable = function () {
           });
         }
       });
-      if (collection) {
-        collection.bind('all', _this._onCollectionChange);
-      } // bind now
+      observable.collection = _this.collection;
+      if (collection) collection.bind('all', _this._onCollectionChange); // bind now
 
       // observable that will re-trigger when sort or filters or collection changes
       _this._mapper = ko.computed(function () {
-        var filter = void 0,
-            models = void 0,
-            view_models = void 0;
         var comparator = _this._comparator(); // create dependency
         var filters = _this._filters(); // create dependency
-        if (filters) {
-          (function () {
-            return filters.map(function (filter) {
-              return ko.utils.unwrapObservable(filter);
-            });
-          })();
-        } // create a dependency
+        if (filters) _.each(filters, function (filter) {
+          return ko.utils.unwrapObservable(filter);
+        }); // create a dependency
         var current_collection = _this._collection(); // create dependency
         if (_this.in_edit) return; // we are doing the editing
 
         // no models
         observable = kb.utils.wrappedObservable(_this);
-        var previous_view_models = kb.peek(observable);
-        if (current_collection) {
-          models = current_collection.models;
-        }
-        if (!models || current_collection.models.length === 0) {
-          view_models = [];
+        // const previous_view_models = kb.peek(observable);
 
-          // process filters, sorting, etc
-        } else {
-          // apply filters
-          models = _.filter(models, function (model) {
-            return !filters.length || _this._selectModel(model);
-          });
+        var models = void 0;
+        if (current_collection) models = current_collection.models;
 
-          // apply sorting
-          if (comparator) {
-            view_models = _.map(models, function (model) {
+        var view_models = void 0;
+        if (!models || current_collection.models.length === 0) view_models = [];
+        // process filters, sorting, etc
+        else {
+            // apply filters
+            models = _.filter(models, function (model) {
+              return !filters.length || _this._selectModel(model);
+            });
+
+            // apply sorting
+            if (comparator) view_models = _.map(models, function (model) {
               return _this._createViewModel(model);
             }).sort(comparator);
-
             // no sorting
-          } else if (_this.models_only) {
-            view_models = filters.length ? models : models.slice(); // clone the array if it wasn't filtered
-          } else {
-            view_models = _.map(models, function (model) {
-              return _this._createViewModel(model);
-            });
+            else if (_this.models_only) view_models = filters.length ? models : models.slice(); // clone the array if it wasn't filtered
+              else view_models = _.map(models, function (model) {
+                  return _this._createViewModel(model);
+                });
           }
-        }
 
         // update the observable array for this collection observable
         _this.in_edit++;
@@ -2588,7 +2582,7 @@ var CollectionObservable = function () {
       // start subscribing
       observable.subscribe(_.bind(_this._onObservableArrayChange, _this));
 
-      !kb.statistics || kb.statistics.register('CollectionObservable', _this); // collect memory management statistics
+      if (kb.statistics) kb.statistics.register('CollectionObservable', _this); // collect memory management statistics
 
       return observable;
     });
@@ -2608,14 +2602,14 @@ var CollectionObservable = function () {
         collection.unbind('all', this._onCollectionChange);
         var array = kb.peek(observable);array.splice(0, array.length); // clear the view models or models
       }
-      this.collection.dispose();this._collection = observable.collection = this.collection = null;
+      this.collection.dispose();this.collection = null;this._collection = null;observable.collection = null;
       this._mapper.dispose();this._mapper = null;
       kb.release(this._filters);this._filters = null;
       this._comparator(null);this._comparator = null;
       this.create_options = null;
       observable.collection = null;kb.utils.wrappedDestroy(this);
 
-      return !kb.statistics || kb.statistics.unregister('CollectionObservable', this); // collect memory management statistics
+      if (kb.statistics) kb.statistics.unregister('CollectionObservable', this); // collect memory management statistics
     }
 
     // Get the options for a new collection that can be used for sharing view models.
@@ -2849,57 +2843,63 @@ var _initialiseProps = function _initialiseProps() {
 
   this._onCollectionChange = function (event, arg) {
     return kb.ignore(function () {
-      var comparator = void 0,
-          view_model = void 0;
       if (_this3.in_edit || kb.wasReleased(_this3)) return; // we are doing the editing or have been released
 
       switch (event) {
         case 'reset':
-          if (_this3.auto_compact) {
-            _this3.compact();
-          } else {
-            _this3._collection.notifySubscribers(_this3._collection());
+          {
+            _this3.auto_compact ? _this3.compact() : _this3._collection.notifySubscribers(_this3._collection());
+            break;
           }
-          break;
+
         case 'sort':case 'resort':
-          _this3._collection.notifySubscribers(_this3._collection());
-          break;
+          {
+            _this3._collection.notifySubscribers(_this3._collection());
+            break;
+          }
 
         case 'new':case 'add':
-          if (!_this3._selectModel(arg)) return; // filtered
+          {
+            if (!_this3._selectModel(arg)) return; // filtered
 
-          var observable = kb.utils.wrappedObservable(_this3);
-          var collection = _this3._collection();
-          if (collection.indexOf(arg) === -1) return; // the model may have been removed before we got a chance to add it
-          if (view_model = _this3.viewModelByModel(arg)) return; // it may have already been added by a change event
-          _this3.in_edit++;
-          if (comparator = _this3._comparator()) {
-            observable().push(_this3._createViewModel(arg));
-            observable.sort(comparator);
-          } else {
-            observable.splice(collection.indexOf(arg), 0, _this3._createViewModel(arg));
+            var observable = kb.utils.wrappedObservable(_this3);
+            var collection = _this3._collection();
+            if (collection.indexOf(arg) === -1) return; // the model may have been removed before we got a chance to add it
+            var view_model = _this3.viewModelByModel(arg);
+            if (view_model) return; // it may have already been added by a change event
+            _this3.in_edit++;
+            var comparator = _this3._comparator();
+            if (comparator) {
+              observable().push(_this3._createViewModel(arg));
+              observable.sort(comparator);
+            } else {
+              observable.splice(collection.indexOf(arg), 0, _this3._createViewModel(arg));
+            }
+            _this3.in_edit--;
+            break;
           }
-          _this3.in_edit--;
-          break;
 
         case 'remove':case 'destroy':
-          _this3._onModelRemove(arg);break;
-        case 'change':
-          // filtered, remove
-          if (!_this3._selectModel(arg)) {
-            return _this3._onModelRemove(arg);
+          {
+            _this3._onModelRemove(arg);
+            break;
           }
 
-          view_model = _this3.models_only ? arg : _this3.viewModelByModel(arg);
-          if (!view_model) {
-            return _this3._onCollectionChange('add', arg);
-          } // add new
-          if (!(comparator = _this3._comparator())) return;
+        case 'change':
+          {
+            // filtered, remove
+            if (!_this3._selectModel(arg)) return _this3._onModelRemove(arg);
 
-          _this3.in_edit++;
-          kb.utils.wrappedObservable(_this3).sort(comparator);
-          _this3.in_edit--;
-          break;
+            var _view_model = _this3.models_only ? arg : _this3.viewModelByModel(arg);
+            if (!_view_model) return _this3._onCollectionChange('add', arg); // add new
+            var _comparator2 = _this3._comparator();
+            if (!_comparator2) return;
+
+            _this3.in_edit++;
+            kb.utils.wrappedObservable(_this3).sort(_comparator2);
+            _this3.in_edit--;
+            break;
+          }
       }
     });
   };
@@ -2960,8 +2960,12 @@ kb.CollectionObservable = CollectionObservable;
 module.exports = CollectionObservable;
 
 // factory function
-kb.collectionObservable = function (collection, view_model, options) {
-  return new kb.CollectionObservable(arguments);
+kb.collectionObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.CollectionObservable, [null].concat(args)))();
 };
 kb.observableCollection = kb.collectionObservable;
 
@@ -2986,6 +2990,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -3155,7 +3160,7 @@ kb.EventWatcher = function () {
       _.each(event_names, function (event_name) {
         if (!event_name) return; // extra spaces
 
-        var callbacks = _this2.__kb.callbacks[event_name];;
+        var callbacks = _this2.__kb.callbacks[event_name];
         if (!callbacks) {
           callbacks = _this2.__kb.callbacks[event_name] = {
             model: null,
@@ -3164,7 +3169,7 @@ kb.EventWatcher = function () {
               _.each(callbacks.list, function (info) {
                 if (!info.update) return;
                 if (model && info.key && model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
-                !kb.statistics || kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
+                if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
                 info.update();
               }); // trigger update
             }
@@ -3233,6 +3238,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._;
 
 // Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
@@ -3288,10 +3294,11 @@ kb.Factory = function () {
   }, {
     key: 'addPathMappings',
     value: function addPathMappings(factories, owner_path) {
-      for (var path in factories) {
-        var create_info = factories[path];
-        this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
-      }
+      var _this = this;
+
+      _.each(factories, function (create_info, path) {
+        _this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
+      });
     }
   }, {
     key: 'hasPathMappings',
@@ -3342,6 +3349,7 @@ kb.Factory = function () {
 */
 
 var kb = __webpack_require__(0);
+
 module.exports = kb;
 
 kb.configure = __webpack_require__(2);
@@ -3372,6 +3380,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -3603,6 +3612,7 @@ if (root && typeof root.document !== 'undefined') {
 */
 
 var kb = __webpack_require__(0);
+
 var ko = kb.ko;
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
@@ -3648,11 +3658,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
+var TypedValue = __webpack_require__(3);
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
-var TypedValue = __webpack_require__(3);
 
 var KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 var KEYS_INFO = ['args', 'read', 'write'];
@@ -3850,10 +3861,8 @@ kb.Observable = function () {
   }, {
     key: 'update',
     value: function update(new_value) {
-      if (this.__kb_released) return; // destroyed, nothing to do
-      if (!arguments.length) {
-        new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
-      }
+      if (this.__kb_released) return undefined; // destroyed, nothing to do
+      if (!arguments.length) new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
       return this._value.update(new_value);
     }
   }]);
@@ -3861,8 +3870,12 @@ kb.Observable = function () {
   return Observable;
 }();
 
-kb.observable = function (model, key, options, view_model) {
-  return new kb.Observable(model, key, options, view_model);
+kb.observable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.Observable, [null].concat(args)))();
 };
 
 /***/ }),
@@ -3886,6 +3899,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._;
 
 // kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
@@ -4018,7 +4032,7 @@ module.exports = kb.Statistics = function () {
       var events = obj._events || obj._callbacks || {};
       var keys = key ? [key] : _.keys(events);
 
-      _.map(keys, function (key) {
+      _.each(keys, function (key) {
         var node = events[key];
         if (node) {
           if (_.isArray(node)) {
@@ -4027,8 +4041,10 @@ module.exports = kb.Statistics = function () {
             stats[key] = 0;var _node = node,
                 tail = _node.tail;
 
-            while ((node = node.next) !== tail) {
+            node = node.next;
+            while (node !== tail) {
               stats[key]++;
+              node = node.next;
             }
           }
           stats.count += stats[key];
@@ -4062,6 +4078,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -4493,6 +4510,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -4866,6 +4884,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -5052,7 +5071,7 @@ var ViewModel = function () {
       !_this.__kb.statics || createStaticObservables(_this, model);
       _this.createObservables(model, _this.__kb.keys);
 
-      !kb.statistics || kb.statistics.register('ViewModel', _this); // collect memory management statistics
+      if (kb.statistics) kb.statistics.register('ViewModel', _this); // collect memory management statistics
       return _this;
     });
   }
@@ -5076,11 +5095,11 @@ var ViewModel = function () {
           return result;
         })();
       } // clear the external references
-      this.__kb.view_model = this.__kb.create_options = null;
+      this.__kb.view_model = null;this.__kb.create_options = null;
       kb.releaseKeys(this);
       kb.utils.wrappedDestroy(this);
 
-      return !kb.statistics || kb.statistics.unregister('ViewModel', this); // collect memory management statistics
+      if (kb.statistics) kb.statistics.unregister('ViewModel', this); // collect memory management statistics
     }
 
     // Get the options for a new view model that can be used for sharing view models.
@@ -5135,8 +5154,12 @@ kb.ViewModel = ViewModel;
 module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
-kb.viewModel = function (model, options, view_model) {
-  return new kb.ViewModel(arguments);
+kb.viewModel = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.ViewModel, [null].concat(args)))();
 };
 
 /***/ }),
@@ -5160,6 +5183,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     ko = kb.ko;
 
@@ -5171,8 +5195,8 @@ var KEYS_PUBLISH = ['destroy', 'setToDefault'];
 //
 // @example Provide a observable with observable and/or non observable default argument in the form of:
 //   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
-module.exports = kb.DefaultObservable = function () {
 
+var DefaultObservable = function () {
   // Used to create a new kb.DefaultObservable.
   //
   // @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
@@ -5225,8 +5249,15 @@ module.exports = kb.DefaultObservable = function () {
   return DefaultObservable;
 }();
 
-kb.defaultObservable = function (target, default_value) {
-  return new kb.DefaultObservable(target, default_value);
+kb.DefaultObservable = DefaultObservable;
+module.exports = DefaultObservable;
+
+kb.defaultObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.DefaultObservable, [null].concat(args)))();
 };
 kb.observableDefault = kb.defaultObservable;
 
@@ -5256,34 +5287,32 @@ var _ = kb._,
     ko = kb.ko;
 
 
-var arraySlice = Array.prototype.slice;
-
 kb.toFormattedString = function (format) {
   var result = format.slice();
-  var args = arraySlice.call(arguments, 1);
-  for (var index in args) {
-    var arg = args[index];
+
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  _.each(args, function (arg, index) {
     var value = ko.utils.unwrapObservable(arg);
-    if (_.isUndefined(value) || _.isNull(value)) {
-      value = '';
-    }
+    if (_.isUndefined(value) || _.isNull(value)) value = '';
 
     var parameter_index = format.indexOf('{' + index + '}');
-    while (parameter_index >= 0) {
+    while (~parameter_index) {
       result = result.replace('{' + index + '}', value);
       parameter_index = format.indexOf('{' + index + '}', parameter_index + 1);
     }
-  }
+  });
   return result;
 };
 
 kb.parseFormattedString = function (string, format) {
-  var parameter_index = void 0;
   var regex_string = format.slice();var index = 0;var parameter_count = 0;var positions = {};
   while (regex_string.search('\\{' + index + '\\}') >= 0) {
     // store the positions of the replacements
-    parameter_index = format.indexOf('{' + index + '}');
-    while (parameter_index >= 0) {
+    var parameter_index = format.indexOf('{' + index + '}');
+    while (~parameter_index) {
       regex_string = regex_string.replace('{' + index + '}', '(.*)');
       positions[parameter_index] = index;parameter_count++;
       parameter_index = format.indexOf('{' + index + '}', parameter_index + 1);
@@ -5307,18 +5336,17 @@ kb.parseFormattedString = function (string, format) {
   }
 
   // sort the matches since the parameters could be requested unordered
-  var sorted_positions = _.sortBy(_.keys(positions), function (parameter_index, format_index) {
-    return parseInt(parameter_index, 10);
+  var sorted_positions = _.sortBy(_.keys(positions), function (parameter_index) {
+    return +parameter_index;
   });
   var format_indices_to_matched_indices = {};
-  for (var match_index in sorted_positions) {
+  _.each(sorted_positions, function (parameter_index, match_index) {
     parameter_index = sorted_positions[match_index];
     index = positions[parameter_index];
-    if (format_indices_to_matched_indices.hasOwnProperty(index)) {
-      continue;
+    if (!(index in format_indices_to_matched_indices)) {
+      format_indices_to_matched_indices[index] = match_index;
     }
-    format_indices_to_matched_indices[index] = match_index;
-  }
+  });
 
   var results = [];index = 0;
   while (index < count) {
@@ -5332,19 +5360,45 @@ kb.parseFormattedString = function (string, format) {
 //
 // @example change the formatted name whenever a model's name attribute changes
 //   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
-module.exports = kb.FormattedObservable = function () {
 
+var FormattedObservable = function () {
   // Used to create a new kb.FormattedObservable.
   //
   // @param [String|ko.observable] format the format string. Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
   // @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
   // @return [ko.observable] the constructor does not return 'this' but a ko.observable
   // @note the constructor does not return 'this' but a ko.observable
-  function FormattedObservable(format, args) {
+  // constructor(format, args) {
+  //   // being called by the factory function
+  //   const observable_args = _.isArray(args) ? args : Array.prototype.slice.call(arguments, 1);
+  //   const observable = kb.utils.wrappedObservable(this, ko.computed({
+  //     read() {
+  //       args = [ko.utils.unwrapObservable(format)];
+  //       _.each(observable_args, arg => args.push(ko.utils.unwrapObservable(arg)));
+  //       return kb.toFormattedString.apply(null, args);
+  //     },
+  //     write(value) {
+  //       const matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+  //       const max_count = Math.min(observable_args.length, matches.length); let index = 0;
+  //       while (index < max_count) {
+  //         observable_args[index](matches[index]);
+  //         index++;
+  //       }
+  //     },
+  //   }));
+
+  //   return observable;
+  // }
+
+  function FormattedObservable(format) {
+    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
     _classCallCheck(this, FormattedObservable);
 
     // being called by the factory function
-    var observable_args = _.isArray(args) ? args : arraySlice.call(arguments, 1);
+    var observable_args = _.isArray(args[0]) ? args[0] : args;
     var observable = kb.utils.wrappedObservable(this, ko.computed({
       read: function read() {
         args = [ko.utils.unwrapObservable(format)];
@@ -5380,8 +5434,15 @@ module.exports = kb.FormattedObservable = function () {
   return FormattedObservable;
 }();
 
-kb.formattedObservable = function (format, args) {
-  return new kb.FormattedObservable(format, arraySlice.call(arguments, 1));
+kb.FormattedObservable = FormattedObservable;
+module.exports = FormattedObservable;
+
+kb.formattedObservable = function () {
+  for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    args[_key3] = arguments[_key3];
+  }
+
+  return new (Function.prototype.bind.apply(kb.FormattedObservable, [null].concat(args)))();
 };
 kb.observableFormatted = kb.formattedObservable;
 
@@ -5607,8 +5668,12 @@ kb.LocalizedObservable = LocalizedObservable;
 module.exports = LocalizedObservable;
 
 // factory function
-kb.localizedObservable = function (value, options, view_model) {
-  return new kb.LocalizedObservable(value, options, view_model);
+kb.localizedObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.LocalizedObservable, [null].concat(args)))();
 };
 kb.observableLocalized = kb.localizedObservable;
 
@@ -5658,7 +5723,8 @@ var KEYS_PUBLISH = ['destroy'];
 //   emitter.set(name: 'bob');       # trigger_count: 1
 //   emitter.set(name: 'george');    # trigger_count: 2
 //   emitter.set(last: 'smith');     # trigger_count: 3
-module.exports = kb.TriggeredObservable = function () {
+
+var TriggeredObservable = function () {
 
   // Used to create a new kb.Observable.
   //
@@ -5713,12 +5779,10 @@ module.exports = kb.TriggeredObservable = function () {
     key: 'emitter',
     value: function emitter(new_emitter) {
       // get or no change
-      if (arguments.length === 0 || this.ee === new_emitter) {
-        return this.ee;
-      }
-      if (this.ee = new_emitter) {
-        return this.update();
-      }
+      if (arguments.length === 0 || this.ee === new_emitter) return this.ee;
+      this.ee = new_emitter;
+      if (this.ee) return this.update();
+      return undefined;
     }
 
     // ###################################################
@@ -5729,19 +5793,25 @@ module.exports = kb.TriggeredObservable = function () {
   }, {
     key: 'update',
     value: function update() {
-      if (!this.ee) return; // do not trigger if there is no emitter
-      if (this.vo() !== this.ee) {
-        return this.vo(this.ee);
-      }return this.vo.valueHasMutated(); // manually trigger the dependable
+      if (!this.ee) return undefined; // do not trigger if there is no emitter
+      if (this.vo() !== this.ee) return this.vo(this.ee);
+      return this.vo.valueHasMutated(); // manually trigger the dependable
     }
   }]);
 
   return TriggeredObservable;
 }();
 
+kb.TriggeredObservable = TriggeredObservable;
+module.exports = TriggeredObservable;
+
 // factory function
-kb.triggeredObservable = function (emitter, event_selector) {
-  return new kb.TriggeredObservable(emitter, event_selector);
+kb.triggeredObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.TriggeredObservable, [null].concat(args)))();
 };
 kb.observableTriggered = kb.triggeredObservable;
 
@@ -5753,8 +5823,6 @@ kb.observableTriggered = kb.triggeredObservable;
 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 /*
   knockback.js 1.2.2
@@ -5776,7 +5844,12 @@ __webpack_require__(27);
 // internal helper
 var callOrGet = function callOrGet(value) {
   value = ko.utils.unwrapObservable(value);
-  return typeof value === 'function' ? value.apply(undefined, _toConsumableArray(Array.prototype.slice.call(arguments, 1))) : value;
+
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  return typeof value === 'function' ? value.apply(undefined, args) : value;
 };
 
 // Helpers for validating forms, inputs, and values.
@@ -5837,7 +5910,8 @@ var callOrGet = function callOrGet(value) {
 //
 // @method .formValidator(view_model, el)
 //   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
-//   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled. Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
+//   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
+//    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
 //   @note Called using `kb.formValidator` (not  kb.Validation.formValidator)
 //   @return [Object] an Object with all of the validators and generated helpers
 //   @example Binding a form by name using Knockback inject.
@@ -5888,34 +5962,38 @@ var callOrGet = function callOrGet(value) {
 //   Used to combine conditions.
 //   @note Called using `kb.untilFalseFn` (not  kb.Validation.untilFalseFn)
 //   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
-module.exports = kb.Validation = function Validation() {
+
+var Validation = function Validation() {
   _classCallCheck(this, Validation);
 };
+
+kb.Validation = Validation;
+module.exports = Validation;
 
 // ############################
 // Aliases
 // ############################
-kb.valueValidator = function (value, bindings, validation_options) {
-  if (validation_options == null) {
-    validation_options = {};
-  }
-  validation_options && !(typeof validation_options === 'function') || (validation_options = {});
+kb.valueValidator = function (value, bindings) {
+  var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  if (validation_options && !(typeof validation_options === 'function')) validation_options = {};
+
   return ko.computed(function () {
-    var disabled = void 0;
     var results = { $error_count: 0 };
     var current_value = ko.utils.unwrapObservable(value);
-    !('disable' in validation_options) || (disabled = callOrGet(validation_options.disable));
-    !('enable' in validation_options) || (disabled = !callOrGet(validation_options.enable));
+
+    var disabled = void 0;
+    if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
+    if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
     var priorities = validation_options.priorities || [];
     _.isArray(priorities) || (priorities = [priorities]); // ensure priorities is an array
 
     // then add the rest
     var active_index = priorities.length + 1;
-    for (var identifier in bindings) {
-      var validator = bindings[identifier];
+    _.each(bindings, function (validator, identifier) {
       results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
       if (results[identifier]) {
-        var identifier_index;
+        var identifier_index = void 0;
         results.$error_count++;
 
         // check priorities
@@ -5926,7 +6004,7 @@ kb.valueValidator = function (value, bindings, validation_options) {
           results.$active_error || (results.$active_error = identifier, active_index = identifier_index);
         }
       }
-    }
+    });
 
     // add the inverse and ensure a boolean
     results.$enabled = !disabled;
@@ -5936,11 +6014,10 @@ kb.valueValidator = function (value, bindings, validation_options) {
   });
 };
 
-kb.inputValidator = function (view_model, el, validation_options) {
-  if (validation_options == null) {
-    validation_options = {};
-  }
-  validation_options && !(typeof validation_options === 'function') || (validation_options = {});
+kb.inputValidator = function (view_model, el) {
+  var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  if (validation_options && !(typeof validation_options === 'function')) validation_options = {};
   var validators = kb.valid;
   var input_name = el.getAttribute('name');
   if (input_name && !_.isString(input_name)) {
@@ -5994,7 +6071,7 @@ kb.formValidator = function (view_model, el) {
     var name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
     var validator = kb.inputValidator(view_model, input_el, validation_options);
-    !validator || validators.push(results[name] = validator);
+    if (validator) validators.push(results[name] = validator);
   });
 
   // collect stats, error count and valid
@@ -6043,6 +6120,7 @@ kb.formValidator = function (view_model, el) {
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._;
 
 // @nodoc
@@ -6137,30 +6215,30 @@ module.exports = function (options) {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _unwrapModels = void 0;
+var kb = __webpack_require__(0);
 
-var _require = __webpack_require__(0),
-    _ = _require._;
+var _ = kb._;
 
 // @nodoc
 
-
-module.exports = _unwrapModels = function unwrapModels(obj) {
+var unwrapModels = function unwrapModels(obj) {
   if (!obj) return obj;
   if (obj.__kb) return obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj;
   if (_.isArray(obj)) return _.map(obj, function (test) {
-    return _unwrapModels(test);
+    return unwrapModels(test);
   });
   if (_.isObject(obj) && obj.constructor === {}.constructor) {
     // a simple object
     var result = {};
-    for (var key in obj) {
-      result[key] = _unwrapModels(obj[key]);
-    }return result;
+    _.each(obj, function (value, key) {
+      result[key] = unwrapModels(value);
+    });
+    return result;
   }
 
   return obj;
 };
+module.exports = unwrapModels;
 
 /***/ }),
 /* 23 */
@@ -6238,6 +6316,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     Backbone = kb.Backbone;
 
@@ -6304,6 +6383,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
+
 var _ = kb._,
     Backbone = kb.Backbone;
 
@@ -6338,7 +6418,7 @@ module.exports = function () {
       if (!type) return null;
 
       var relFn = function relFn(model) {
-        !kb.statistics || kb.statistics.addModelEvent({ name: 'update (relational)', model: model, key: key, path: path });
+        if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: model, key: key, path: path });
         return update();
       };
 
@@ -6405,13 +6485,11 @@ kb.ViewModel.prototype.setToDefault = function () {
 kb.utils.setToDefault = function (obj) {
   var _this = this;
 
-  if (!obj) return;
+  if (!obj) return undefined;
 
   // observable
   if (ko.isObservable(obj)) {
-    if (typeof obj.setToDefault === 'function') {
-      obj.setToDefault();
-    }
+    if (typeof obj.setToDefault === 'function') obj.setToDefault();
   }
 
   // view model

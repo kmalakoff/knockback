@@ -8,6 +8,7 @@
 */
 
 const kb = require('../kb');
+
 const { _, Backbone } = kb;
 
 let AssociatedModel = null; // lazy bind so this file can be loaded before relational library

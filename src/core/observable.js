@@ -7,9 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-const { _, ko } = kb;
 const TypedValue = require('./typed-value');
+const kb = require('./kb');
+
+const { _, ko } = kb;
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 const KEYS_INFO = ['args', 'read', 'write'];
@@ -163,10 +164,10 @@ kb.Observable = class Observable {
   // ###################################################
   // @nodoc
   update(new_value) {
-    if (this.__kb_released) return; // destroyed, nothing to do
-    if (!arguments.length) { new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key)); }
+    if (this.__kb_released) return undefined; // destroyed, nothing to do
+    if (!arguments.length) new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
     return this._value.update(new_value);
   }
 };
 
-kb.observable = (model, key, options, view_model) => new kb.Observable(model, key, options, view_model);
+kb.observable = (...args) => new kb.Observable(...args);

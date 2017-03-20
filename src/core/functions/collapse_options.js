@@ -8,6 +8,7 @@
 */
 
 const kb = require('../kb');
+
 const { _ } = kb;
 
 // @nodoc

@@ -7,19 +7,21 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let unwrapModels;
-const { _ } = require('../kb');
+const kb = require('../kb');
+
+const { _ } = kb;
 
 // @nodoc
-module.exports = (unwrapModels = function (obj) {
+const unwrapModels = function (obj) {
   if (!obj) return obj;
   if (obj.__kb) return (obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj);
   if (_.isArray(obj)) return _.map(obj, test => unwrapModels(test));
   if (_.isObject(obj) && (obj.constructor === {}.constructor)) { // a simple object
     const result = {};
-    for (const key in obj) result[key] = unwrapModels(obj[key]);
+    _.each(obj, (value, key) => { result[key] = unwrapModels(value); });
     return result;
   }
 
   return obj;
-});
+};
+module.exports = unwrapModels;

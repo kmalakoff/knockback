@@ -1,4 +1,5 @@
 const kb = require('./kb');
+
 const { _ } = kb;
 
 const ALL_ORMS = {

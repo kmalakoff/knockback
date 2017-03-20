@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+
 const { _, ko } = kb;
 
 // @nodoc
@@ -162,7 +163,7 @@ class ViewModel {
       !this.__kb.statics || createStaticObservables(this, model);
       this.createObservables(model, this.__kb.keys);
 
-      !kb.statistics || kb.statistics.register('ViewModel', this);     // collect memory management statistics
+      if (kb.statistics) kb.statistics.register('ViewModel', this);     // collect memory management statistics
       return this;
     },
   );
@@ -181,11 +182,11 @@ class ViewModel {
         return result;
       })());
     } // clear the external references
-    this.__kb.view_model = (this.__kb.create_options = null);
+    this.__kb.view_model = null; this.__kb.create_options = null;
     kb.releaseKeys(this);
     kb.utils.wrappedDestroy(this);
 
-    return !kb.statistics || kb.statistics.unregister('ViewModel', this);     // collect memory management statistics
+    if (kb.statistics) kb.statistics.unregister('ViewModel', this);     // collect memory management statistics
   }
 
   // Get the options for a new view model that can be used for sharing view models.
@@ -220,4 +221,4 @@ kb.ViewModel = ViewModel;
 module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
-kb.viewModel = function (model, options, view_model) { return new kb.ViewModel(arguments); };
+kb.viewModel = (...args) => new kb.ViewModel(...args);

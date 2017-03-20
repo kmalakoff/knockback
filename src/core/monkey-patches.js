@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+
 const { ko } = kb;
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464

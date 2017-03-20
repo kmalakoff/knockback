@@ -31,7 +31,7 @@ const KEYS_PUBLISH = ['destroy'];
 //   emitter.set(name: 'bob');       # trigger_count: 1
 //   emitter.set(name: 'george');    # trigger_count: 2
 //   emitter.set(last: 'smith');     # trigger_count: 3
-module.exports = kb.TriggeredObservable = class TriggeredObservable {
+class TriggeredObservable {
 
   // Used to create a new kb.Observable.
   //
@@ -71,8 +71,10 @@ module.exports = kb.TriggeredObservable = class TriggeredObservable {
   //   @param [Model|ModelRef|Collection] new_emitter the emitter whose events will be bound (can be null)
   emitter(new_emitter) {
     // get or no change
-    if ((arguments.length === 0) || (this.ee === new_emitter)) { return this.ee; }
-    if (this.ee = new_emitter) { return this.update(); }
+    if ((arguments.length === 0) || (this.ee === new_emitter)) return this.ee;
+    this.ee = new_emitter;
+    if (this.ee) return this.update();
+    return undefined;
   }
 
   // ###################################################
@@ -80,11 +82,14 @@ module.exports = kb.TriggeredObservable = class TriggeredObservable {
   // ###################################################
   // @nodoc
   update() {
-    if (!this.ee) return; // do not trigger if there is no emitter
-    if (this.vo() !== this.ee) { return this.vo(this.ee); } return this.vo.valueHasMutated();  // manually trigger the dependable
+    if (!this.ee) return undefined; // do not trigger if there is no emitter
+    if (this.vo() !== this.ee) return this.vo(this.ee);
+    return this.vo.valueHasMutated();  // manually trigger the dependable
   }
-};
+}
+kb.TriggeredObservable = TriggeredObservable;
+module.exports = TriggeredObservable;
 
 // factory function
-kb.triggeredObservable = (emitter, event_selector) => new kb.TriggeredObservable(emitter, event_selector);
+kb.triggeredObservable = (...args) => new kb.TriggeredObservable(...args);
 kb.observableTriggered = kb.triggeredObservable;

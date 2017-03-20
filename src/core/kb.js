@@ -9,9 +9,10 @@
 
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
+const ko = require('knockout');
+
 let _ = null;
 let Backbone = null;
-const ko = require('knockout');
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 

@@ -159,5 +159,5 @@ kb.LocalizedObservable = LocalizedObservable;
 module.exports = LocalizedObservable;
 
 // factory function
-kb.localizedObservable = (value, options, view_model) => new kb.LocalizedObservable(value, options, view_model);
+kb.localizedObservable = (...args) => new kb.LocalizedObservable(...args);
 kb.observableLocalized = kb.localizedObservable;

@@ -11,35 +11,30 @@ const kb = require('../core/kb');
 
 const { _, ko } = kb;
 
-const arraySlice = Array.prototype.slice;
-
-kb.toFormattedString = function (format) {
+kb.toFormattedString = function (format, ...args) {
   let result = format.slice();
-  const args = arraySlice.call(arguments, 1);
-  for (const index in args) {
-    const arg = args[index];
+  _.each(args, (arg, index) => {
     let value = ko.utils.unwrapObservable(arg);
-    if (_.isUndefined(value) || _.isNull(value)) { value = ''; }
+    if (_.isUndefined(value) || _.isNull(value)) value = '';
 
-    let parameter_index = format.indexOf(`\{${index}\}`);
-    while (parameter_index >= 0) {
+    let parameter_index = format.indexOf(`{${index}}`);
+    while (~parameter_index) {
       result = result.replace(`{${index}}`, value);
-      parameter_index = format.indexOf(`\{${index}\}`, parameter_index + 1);
+      parameter_index = format.indexOf(`{${index}}`, parameter_index + 1);
     }
-  }
+  });
   return result;
 };
 
 kb.parseFormattedString = function (string, format) {
-  let parameter_index;
   let regex_string = format.slice(); let index = 0; let parameter_count = 0; const positions = {};
   while (regex_string.search(`\\{${index}\\}`) >= 0) {
     // store the positions of the replacements
-    parameter_index = format.indexOf(`\{${index}\}`);
-    while (parameter_index >= 0) {
-      regex_string = regex_string.replace(`\{${index}\}`, '(.*)');
+    let parameter_index = format.indexOf(`{${index}}`);
+    while (~parameter_index) {
+      regex_string = regex_string.replace(`{${index}}`, '(.*)');
       positions[parameter_index] = index; parameter_count++;
-      parameter_index = format.indexOf(`\{${index}\}`, parameter_index + 1);
+      parameter_index = format.indexOf(`{${index}}`, parameter_index + 1);
     }
     index++;
   }
@@ -56,14 +51,15 @@ kb.parseFormattedString = function (string, format) {
   }
 
   // sort the matches since the parameters could be requested unordered
-  const sorted_positions = _.sortBy(_.keys(positions), (parameter_index, format_index) => parseInt(parameter_index, 10));
+  const sorted_positions = _.sortBy(_.keys(positions), parameter_index => +parameter_index);
   const format_indices_to_matched_indices = {};
-  for (const match_index in sorted_positions) {
+  _.each(sorted_positions, (parameter_index, match_index) => {
     parameter_index = sorted_positions[match_index];
     index = positions[parameter_index];
-    if (format_indices_to_matched_indices.hasOwnProperty(index)) { continue; }
-    format_indices_to_matched_indices[index] = match_index;
-  }
+    if (!(index in format_indices_to_matched_indices)) {
+      format_indices_to_matched_indices[index] = match_index;
+    }
+  });
 
   const results = []; index = 0;
   while (index < count) {
@@ -77,17 +73,16 @@ kb.parseFormattedString = function (string, format) {
 //
 // @example change the formatted name whenever a model's name attribute changes
 //   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
-module.exports = kb.FormattedObservable = class FormattedObservable {
-
+class FormattedObservable {
   // Used to create a new kb.FormattedObservable.
   //
   // @param [String|ko.observable] format the format string. Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
   // @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
   // @return [ko.observable] the constructor does not return 'this' but a ko.observable
   // @note the constructor does not return 'this' but a ko.observable
-  constructor(format, args) {
+  constructor(format, ...args) {
     // being called by the factory function
-    const observable_args = _.isArray(args) ? args : arraySlice.call(arguments, 1);
+    const observable_args = _.isArray(args[0]) ? args[0] : args;
     const observable = kb.utils.wrappedObservable(this, ko.computed({
       read() {
         args = [ko.utils.unwrapObservable(format)];
@@ -110,7 +105,9 @@ module.exports = kb.FormattedObservable = class FormattedObservable {
   // Required clean up function to break cycles, release view models, etc.
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy() { return kb.utils.wrappedDestroy(this); }
-};
+}
+kb.FormattedObservable = FormattedObservable;
+module.exports = FormattedObservable;
 
-kb.formattedObservable = function (format, args) { return new kb.FormattedObservable(format, arraySlice.call(arguments, 1)); };
+kb.formattedObservable = (...args) => new kb.FormattedObservable(...args);
 kb.observableFormatted = kb.formattedObservable;

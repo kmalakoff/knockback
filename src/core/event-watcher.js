@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+
 const { _, ko } = kb;
 
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
@@ -99,19 +100,19 @@ kb.EventWatcher = class EventWatcher {
     const event_names = callback_info.event_selector ? callback_info.event_selector.split(' ') : ['change'];
     const model = this.ee;
 
-    _.each(event_names, event_name => {
+    _.each(event_names, (event_name) => {
       if (!event_name) return; // extra spaces
 
-      let callbacks = this.__kb.callbacks[event_name];;
+      let callbacks = this.__kb.callbacks[event_name];
       if (!callbacks) {
         callbacks = (this.__kb.callbacks[event_name] = {
           model: null,
           list: [],
           fn: (model) => {
-            _.each(callbacks.list, info => {
+            _.each(callbacks.list, (info) => {
               if (!info.update) return;
               if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) return; // key doesn't match
-              !kb.statistics || kb.statistics.addModelEvent({ name: event_name, model, key: info.key, path: info.path });
+              if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model, key: info.key, path: info.path });
               info.update();
             }); // trigger update
           },
@@ -146,7 +147,7 @@ kb.EventWatcher = class EventWatcher {
       if (callbacks.model && (callbacks.model !== model)) { this._unbindCallbacks(event_name, callbacks, true); }
 
       if (!callbacks.model) { ((callbacks.model = model), model.bind(event_name, callbacks.fn)); }
-      _.each(callbacks.list, info => {
+      _.each(callbacks.list, (info) => {
         if (!info.unbind_fn) { info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined; }
         (info.emitter ? info.emitter(model) : undefined);
       });
@@ -167,7 +168,7 @@ kb.EventWatcher = class EventWatcher {
       callbacks.model = null;
     }
 
-    _.each(callbacks.list, info => {
+    _.each(callbacks.list, (info) => {
       if (info.unbind_fn) { (info.unbind_fn(), (info.unbind_fn = null)); }
       if (info.emitter && !skip_emitter && !kb.wasReleased(info.obj)) { info.emitter(null); }
     });

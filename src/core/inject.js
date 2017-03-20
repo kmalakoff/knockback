@@ -10,6 +10,7 @@
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 const kb = require('./kb');
+
 const { _, ko } = kb;
 
 kb.RECUSIVE_AUTO_INJECT = true;

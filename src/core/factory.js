@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+
 const { _ } = kb;
 
 // Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
@@ -48,10 +49,7 @@ kb.Factory = class Factory {
   addPathMapping(path, create_info) { return this.paths[path] = create_info; }
 
   addPathMappings(factories, owner_path) {
-    for (const path in factories) {
-      const create_info = factories[path];
-      this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
-    }
+    _.each(factories, (create_info, path) => { this.paths[kb.utils.pathJoin(owner_path, path)] = create_info; });
   }
 
   hasPathMappings(factories, owner_path) {

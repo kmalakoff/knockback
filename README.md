@@ -20,14 +20,14 @@ Knockback.js provides Knockout.js magic for Backbone.js Models and Collections.
 ###### The HTML:
 
 ```html
-<label>First Name: </label><input data-bind="value: first_name, valueUpdate: 'keyup'" />
-<label>Last Name: </label><input data-bind="value: last_name, valueUpdate: 'keyup'" />
+<label>First Name: </label><input data-bind="value: firstName, valueUpdate: 'keyup'" />
+<label>Last Name: </label><input data-bind="value: lastName, valueUpdate: 'keyup'" />
 ```
 
 ###### And...engage:
 
-```coffeescript
-model = new Backbone.Model({first_name: 'Bob', last_name: 'Smith'})
+```javascript
+const model = new Backbone.Model({firstName: 'Bob', lastName: 'Smith'})
 ko.applyBindings(kb.viewModel(model))
 ```
 
@@ -38,47 +38,32 @@ When you type in the input boxes, the values are properly transferred bi-directi
 
 ###### The View Model:
 
-**Javascript**
-
 ```javascript
-var ContactViewModel = kb.ViewModel.extend({
-  constructor: function(model) {
-    kb.ViewModel.prototype.constructor.call(this, model);
-
-    this.full_name = ko.computed(function() {
-      return this.first_name() + " " + this.last_name();
-    }, this);
-});
-
-```
-
-**or Coffeescript**
-
-```coffeescript
-class ContactViewModel extends kb.ViewModel
-  constructor: (model) ->
-    super model
-
-    @full_name = ko.computed => "#{@first_name()} #{@last_name()}"
+class ContactViewModel extends kb.ViewModel {
+  constructor: (model) {
+    super(model);
+    this.fullName = ko.computed(() => `${this.firstName()} ${this.lastName()}`);
+  }
+}
 ```
 
 ###### The HTML:
 
 ```html
-<h1 data-bind="text: 'Hello ' + full_name()"></h1>
-<label>First Name: </label><input data-bind="value: first_name, valueUpdate: 'keyup'" />
-<label>Last Name: </label><input data-bind="value: last_name, valueUpdate: 'keyup'" />
+<h1 data-bind="text: 'Hello ' + fullName()"></h1>
+<label>First Name: </label><input data-bind="value: firstName, valueUpdate: 'keyup'" />
+<label>Last Name: </label><input data-bind="value: lastName, valueUpdate: 'keyup'" />
 ```
 
 ###### And...engage:
 
-```coffeescript
-model = new Backbone.Model({first_name: 'Bob', last_name: 'Smith'})
-view_model = new ContactViewModel(model)
-ko.applyBindings(view_model)
+```javascript
+const model = new Backbone.Model({firstName: 'Bob', lastName: 'Smith'});
+const viewModel = new ContactViewModel(model);
+ko.applyBindings(viewModel);
 
-# ... do stuff then clean up
-kb.release(view_model)
+// ... do stuff then clean up
+kb.release(viewModel);
 ```
 
 Now, the greeting updates as you type!

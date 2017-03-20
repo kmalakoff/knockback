@@ -245,9 +245,9 @@ describe('collection-observable', () => {
 
       if (parts_a.length !== parts_b.length) { return (parts_a.length - parts_b.length); }
       for (const index in parts_b) {
-        var delta;
         const part = parts_b[index];
-        if ((delta = parts_a[index] - parseInt(part, 10)) !== 0) { return delta; }
+        const delta = parts_a[index] - +part;
+        if (delta !== 0) return delta;
       }
       return 0;
     };
