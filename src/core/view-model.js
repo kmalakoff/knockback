@@ -9,7 +9,6 @@
 
 const kb = require('./kb');
 const { _, ko } = kb;
-const extend = require('./functions/extend');
 
 // @nodoc
 const assignViewModelKey = function (vm, key) {
@@ -102,7 +101,7 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
 class ViewModel {
   static initClass() {
     // @nodoc
-    ViewModel.extend = extend;
+    ViewModel.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 

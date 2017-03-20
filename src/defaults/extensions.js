@@ -10,12 +10,14 @@
 let kb;
 const { _, ko } = (kb = require('../core/kb'));
 
-kb.Observable.prototype.setToDefault = () => { if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault(); };
-kb.ViewModel.prototype.setToDefault = () => {
-  for (const vm_key in this.__kb.vm_keys) {
-    const value = this[vm_key];
+kb.Observable.prototype.setToDefault = function () {
+  if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
+};
+
+kb.ViewModel.prototype.setToDefault = function () {
+  _.each(this.__kb.vm_keys, (value) => {
     if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
-  }
+  });
 };
 
 // @example
@@ -33,12 +35,12 @@ kb.utils.setToDefault = function (obj) {
       obj.setToDefault();
     }
 
+  }
   // view model
-  } else if (_.isObject(obj)) {
-    for (const key in obj) {
-      const value = obj[key];
-      if (value && (ko.isObservable(value) || (typeof (value) !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) { this.setToDefault(value); }
-    }
+  else if (_.isObject(obj)) {
+    _.each(obj, (value, key) => {
+      if (value && (ko.isObservable(value) || (typeof (value) !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) this.setToDefault(value);
+    });
   }
   return obj;
 };

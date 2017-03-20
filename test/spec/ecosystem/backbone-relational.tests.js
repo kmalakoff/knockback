@@ -296,7 +296,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
   });
 
-  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', () => {
+  it('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', () => {
     const Book = Backbone.RelationalModel.extend({
       defaults: {
         name: 'untitled',

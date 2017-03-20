@@ -357,7 +357,7 @@ describe('localized-observable', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it.skip('3. internals test (Javascript inheritance)', () => {
+  it('3. internals test (Javascript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     kb.locale_manager = locale_manager;
 
@@ -777,7 +777,7 @@ describe('defaults', () => {
   });
 
   if (kb.Backbone) {
-    it.skip('1. Standard use case: just enough to get the picture', () => {
+    it('1. Standard use case: just enough to get the picture', () => {
       kb.statistics = new kb.Statistics(); // turn on stats
       kb.locale_manager = locale_manager;
 

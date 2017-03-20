@@ -9,7 +9,6 @@
 
 let kb;
 const { _, ko } = (kb = require('../core/kb'));
-const extend = require('../core/functions/extend');
 
 const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
@@ -64,7 +63,7 @@ if (!kb.locale_manager) { kb.locale_manager = undefined; }
 //     });
 class LocalizedObservable {
   static initClass() {
-    LocalizedObservable.extend = extend;
+    LocalizedObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 

@@ -322,7 +322,7 @@ describe('Knockback.js with BackboneORM', () => {
   });
 
   // TODO: add tests and support for idAttribute
-  it.skip('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) => {
+  it('5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) => {
     class Book extends Backbone.Model {
       static initClass() {
         this.prototype.model_name = 'Book';
@@ -423,6 +423,7 @@ describe('Knockback.js with BackboneORM', () => {
           assert.equal(authored_book.editMode(), true, 'edit mode set');
         });
       });
+      done();
     });
   });
 

@@ -9,7 +9,6 @@
 
 const kb = require('./kb');
 const { _, ko } = kb;
-const extend = require('./functions/extend');
 
 const COMPARE_EQUAL = 0;
 const COMPARE_ASCENDING = -1;
@@ -61,7 +60,7 @@ kb.compare = function (value_a, value_b) {
 class CollectionObservable {
   static initClass() {
     // @nodoc
-    CollectionObservable.extend = extend;
+    CollectionObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 

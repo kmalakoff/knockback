@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 25);
+/******/ 	return __webpack_require__(__webpack_require__.s = 24);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -110,7 +110,7 @@ var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined
 
 var _ = null;
 var Backbone = null;
-var ko = __webpack_require__(24);
+var ko = __webpack_require__(23);
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -471,8 +471,8 @@ if (root.Parse) {
   Backbone = kb.Parse = root.Parse;
   _ = kb._ = root.Parse._;
 } else {
-  Backbone = kb.Backbone = __webpack_require__(22);
-  _ = kb._ = __webpack_require__(5);
+  Backbone = kb.Backbone = __webpack_require__(21);
+  _ = kb._ = __webpack_require__(4);
 }
 kb.ko = ko;
 
@@ -526,8 +526,8 @@ var _ = kb._;
 var ALL_ORMS = {
   default: null,
   'backbone-orm': null,
-  'backbone-associations': __webpack_require__(20),
-  'backbone-relational': __webpack_require__(21)
+  'backbone-associations': __webpack_require__(19),
+  'backbone-relational': __webpack_require__(20)
 };
 
 // @nodoc
@@ -774,65 +774,6 @@ module.exports = function () {
 
 /***/ }),
 /* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/* ###
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-### */
-
-var kb = __webpack_require__(0);
-var _ = kb._;
-
-// Helper function to correctly set up the prototype chain for subclasses.
-// Similar to 'goog.inherits', but uses a hash of prototype properties and
-// class properties to be extended.
-
-function inherits(parent, protoProps, staticProps) {
-  var child = void 0;
-
-  // The constructor function for the new subclass is either defined by you
-  // (the "constructor" property in your 'extend' definition), or defaulted
-  // by us to simply call the parent constructor.
-  if (protoProps && _.has(protoProps, 'constructor')) {
-    child = protoProps.constructor;
-  } else {
-    child = function child() {
-      return parent.apply(this, arguments);
-    };
-  }
-
-  // Add static properties to the constructor function, if supplied.
-  kb.assign(child, parent, staticProps);
-
-  // Set the prototype chain to inherit from 'parent', without calling
-  // parent's constructor function and add the prototype properties.
-  child.prototype = _.create(parent.prototype, protoProps);
-  child.prototype.constructor = child;
-
-  // Set a convenience property in case the parent's prototype is needed
-  // later.
-  child.__super__ = parent.prototype;
-
-  return child;
-}
-
-// The self-propagating extend function that BacLCone classes use.
-module.exports = function extend(protoProps, classProps) {
-  var child = inherits(this, protoProps, classProps);
-  child.extend = this.extend;
-  return child;
-};
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -2387,7 +2328,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscor
 
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2410,7 +2351,6 @@ var kb = __webpack_require__(0);
 var _ = kb._,
     ko = kb.ko;
 
-var extend = __webpack_require__(4);
 
 var COMPARE_EQUAL = 0;
 var COMPARE_ASCENDING = -1;
@@ -2469,7 +2409,7 @@ var CollectionObservable = function () {
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      CollectionObservable.extend = extend;
+      CollectionObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -3026,7 +2966,7 @@ kb.collectionObservable = function (collection, view_model, options) {
 kb.observableCollection = kb.collectionObservable;
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3273,7 +3213,7 @@ kb.emitterObservable = function (emitter, observable) {
 };
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3386,7 +3326,7 @@ kb.Factory = function () {
 }();
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3410,7 +3350,7 @@ kb.configure = __webpack_require__(2);
 kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3647,7 +3587,7 @@ if (root && typeof root.document !== 'undefined') {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3689,7 +3629,7 @@ if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
 }
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3926,7 +3866,7 @@ kb.observable = function (model, key, options, view_model) {
 };
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4102,7 +4042,7 @@ module.exports = kb.Statistics = function () {
 }();
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4533,7 +4473,7 @@ kb.Store = Store;
 module.exports = Store;
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4571,7 +4511,7 @@ var utils = function () {
     key: 'initClass',
     value: function initClass() {
       // Clean up function that releases all of the wrapped values on an owner.
-      this.wrappedDestroy = __webpack_require__(19);
+      this.wrappedDestroy = __webpack_require__(18);
 
       // Helper to merge options including ViewmModel options like `keys` and `factories`
       //
@@ -4579,10 +4519,10 @@ var utils = function () {
       //
       // @example
       //   kb.utils.collapseOptions(options);
-      this.collapseOptions = __webpack_require__(17);
+      this.collapseOptions = __webpack_require__(16);
 
       // used for attribute setting to ensure all model attributes have their underlying models
-      this.unwrapModels = __webpack_require__(18);
+      this.unwrapModels = __webpack_require__(17);
     }
 
     // @nodoc
@@ -4906,7 +4846,7 @@ utils.initClass();
 kb.utils = utils;
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4929,9 +4869,8 @@ var kb = __webpack_require__(0);
 var _ = kb._,
     ko = kb.ko;
 
-var extend = __webpack_require__(4);
-
 // @nodoc
+
 var assignViewModelKey = function assignViewModelKey(vm, key) {
   var vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? '_' + key : key;
   if (vm.__kb.view_model.hasOwnProperty(vm_key)) return; // already exists, skip
@@ -5025,7 +4964,7 @@ var ViewModel = function () {
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      ViewModel.extend = extend;
+      ViewModel.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -5201,7 +5140,7 @@ kb.viewModel = function (model, options, view_model) {
 };
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5296,7 +5235,7 @@ module.exports = function (options) {
 };
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5337,7 +5276,7 @@ module.exports = _unwrapModels = function unwrapModels(obj) {
 };
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5392,7 +5331,7 @@ var wrappedDestroy = function wrappedDestroy(obj) {
 module.exports = wrappedDestroy;
 
 /***/ }),
-/* 20 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5458,7 +5397,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 21 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5539,7 +5478,7 @@ module.exports = function () {
 }();
 
 /***/ }),
-/* 22 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Backbone.js 1.3.3
@@ -5558,7 +5497,7 @@ module.exports = function () {
 
   // Set up Backbone appropriately for the environment. Start with AMD.
   if (true) {
-    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(5), __webpack_require__(23), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4), __webpack_require__(22), exports], __WEBPACK_AMD_DEFINE_RESULT__ = function(_, $, exports) {
       // Export global even in AMD case in case this script is loaded with
       // others that may still expect a global Backbone.
       root.Backbone = factory(root, exports, _, $);
@@ -7467,7 +7406,7 @@ module.exports = function () {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 23 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -17718,7 +17657,7 @@ return jQuery;
 
 
 /***/ }),
-/* 24 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -23661,23 +23600,23 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 
 
 /***/ }),
-/* 25 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(6);
+__webpack_require__(5);
 __webpack_require__(2);
+__webpack_require__(6);
 __webpack_require__(7);
-__webpack_require__(8);
-__webpack_require__(10);
+__webpack_require__(9);
 __webpack_require__(0);
+__webpack_require__(10);
 __webpack_require__(11);
 __webpack_require__(12);
 __webpack_require__(13);
-__webpack_require__(14);
 __webpack_require__(3);
+__webpack_require__(14);
 __webpack_require__(15);
-__webpack_require__(16);
-module.exports = __webpack_require__(9);
+module.exports = __webpack_require__(8);
 
 
 /***/ })

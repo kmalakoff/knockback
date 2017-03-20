@@ -223,7 +223,7 @@ describe('view-model', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it.skip('6. reference counting and custom __destroy (Javascript inheritance)', () => {
+  it('6. reference counting and custom __destroy (Javascript inheritance)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const ContactViewModelFullName = kb.ViewModel.extend({
