@@ -14,10 +14,14 @@ const { _, ko } = kb;
 require('./validators');
 
 // internal helper
-const callOrGet = function (value, ...args) {
+const callOrGet = function (value) {
   value = ko.utils.unwrapObservable(value);
-  return typeof value === 'function' ? value(...args) : value;
+  return typeof (value) === 'function' ? value(...Array.prototype.slice.call(arguments, 1)) : value;
 };
+// const callOrGet = function (value, ...args) {
+//   value = ko.utils.unwrapObservable(value);
+//   return typeof value === 'function' ? value(...args) : value;
+// };
 
 // Helpers for validating forms, inputs, and values.
 // @example A Named Form
@@ -137,7 +141,7 @@ module.exports = Validation;
 // Aliases
 // ############################
 kb.valueValidator = (value, bindings, validation_options = {}) => {
-  if (validation_options && !(typeof (validation_options) === 'function')) validation_options = {};
+  if (!validation_options || (typeof (validation_options) === 'function')) validation_options = {};
 
   return ko.computed(() => {
     const results = { $error_count: 0 };
@@ -146,6 +150,7 @@ kb.valueValidator = (value, bindings, validation_options = {}) => {
     let disabled;
     if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
     if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
+
     let priorities = validation_options.priorities || [];
     if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
 
@@ -180,7 +185,8 @@ kb.valueValidator = (value, bindings, validation_options = {}) => {
 };
 
 kb.inputValidator = (view_model, el, validation_options = {}) => {
-  if (validation_options && !(typeof (validation_options) === 'function')) validation_options = {};
+  if (!validation_options || (typeof (validation_options) === 'function')) validation_options = {};
+
   const validators = kb.valid;
   let input_name = el.getAttribute('name');
   if (input_name && !_.isString(input_name)) { input_name = null; }

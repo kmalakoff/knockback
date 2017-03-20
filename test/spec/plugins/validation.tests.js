@@ -468,10 +468,10 @@ describe('validation', () => {
     ko.applyBindings(view_model, el);
 
     const validator = view_model.$name;
-    assert.ok(!Object.prototype.hasOwnProperty.call(validator(), 'required'), 'does not have required');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), 'url'), 'has url');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$valid'), 'has $valid');
-    assert.ok(Object.prototype.hasOwnProperty.call(validator(), '$error_count'), 'has $error_count');
+    assert.ok(!('required' in validator()), 'has required');
+    assert.ok('url' in validator(), 'has url');
+    assert.ok('$valid' in validator(), 'has $valid');
+    assert.ok('$error_count' in validator(), 'has $error_count');
 
     assert.ok(validator().url, 'url is invalid');
     assert.ok(!validator().$valid, 'validator not valid');

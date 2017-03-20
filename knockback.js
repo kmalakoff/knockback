@@ -4247,6 +4247,8 @@ kb.observableTriggered = kb.triggeredObservable;
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -4267,13 +4269,12 @@ __webpack_require__(26);
 // internal helper
 var callOrGet = function callOrGet(value) {
   value = ko.utils.unwrapObservable(value);
-
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  return typeof value === 'function' ? value.apply(undefined, args) : value;
+  return typeof value === 'function' ? value.apply(undefined, _toConsumableArray(Array.prototype.slice.call(arguments, 1))) : value;
 };
+// const callOrGet = function (value, ...args) {
+//   value = ko.utils.unwrapObservable(value);
+//   return typeof value === 'function' ? value(...args) : value;
+// };
 
 // Helpers for validating forms, inputs, and values.
 // @example A Named Form
@@ -4399,7 +4400,7 @@ module.exports = Validation;
 kb.valueValidator = function (value, bindings) {
   var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  if (validation_options && !(typeof validation_options === 'function')) validation_options = {};
+  if (!validation_options || typeof validation_options === 'function') validation_options = {};
 
   return ko.computed(function () {
     var results = { $error_count: 0 };
@@ -4408,6 +4409,7 @@ kb.valueValidator = function (value, bindings) {
     var disabled = void 0;
     if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
     if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
+
     var priorities = validation_options.priorities || [];
     if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
 
@@ -4444,7 +4446,8 @@ kb.valueValidator = function (value, bindings) {
 kb.inputValidator = function (view_model, el) {
   var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  if (validation_options && !(typeof validation_options === 'function')) validation_options = {};
+  if (!validation_options || typeof validation_options === 'function') validation_options = {};
+
   var validators = kb.valid;
   var input_name = el.getAttribute('name');
   if (input_name && !_.isString(input_name)) {
