@@ -281,7 +281,7 @@ class CollectionObservable {
   // Reverse lookup for a view model by model. If created with models_only option, will return null.
   viewModelByModel(model) {
     if (this.models_only) return null;
-    const id_attribute = model.hasOwnProperty(model.idAttribute) ? model.idAttribute : 'cid';
+    const id_attribute = Object.prototype.hasOwnProperty.call(model, model.idAttribute) ? model.idAttribute : 'cid';
     return _.find(kb.peek(kb.utils.wrappedObservable(this)), test => test && test.__kb && (test.__kb.object[id_attribute] === model[id_attribute]));
   }
 
@@ -334,7 +334,7 @@ class CollectionObservable {
 
     // set up the default create function
     if (!factory.creatorForPath(null, absolute_models_path)) {
-      if (options.hasOwnProperty('models_only')) {
+      if (Object.prototype.hasOwnProperty.call(options, 'models_only')) {
         if (options.models_only) {
           factory.addPathMapping(absolute_models_path, { models_only: true });
         } else {

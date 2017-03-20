@@ -96,7 +96,7 @@ module.exports = kb.Statistics = class Statistics {
 
   // @nodoc
   registeredTracker(key) {
-    if (this.registered_tracker.hasOwnProperty(key)) { return this.registered_tracker[key]; }
+    if (Object.prototype.hasOwnProperty.call(this.registered_tracker, key)) { return this.registered_tracker[key]; }
     const type_tracker = []; this.registered_tracker[key] = type_tracker;
     return type_tracker;
   }

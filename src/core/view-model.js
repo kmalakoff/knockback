@@ -14,33 +14,34 @@ const { _, ko } = kb;
 // @nodoc
 const assignViewModelKey = function (vm, key) {
   const vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? `_${key}` : key;
-  if (vm.__kb.view_model.hasOwnProperty(vm_key)) return; // already exists, skip
+  if (Object.prototype.hasOwnProperty.call(vm.__kb.view_model, vm_key)) return undefined; // already exists, skip
   vm.__kb.view_model[vm_key] = null;
   return vm_key;
 };
 
 // @nodoc
 const createObservable = function (vm, model, key, create_options) {
-  let vm_key;
-  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) return;
-  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return;
-  if (!(vm_key = assignViewModelKey(vm, key))) return;
-  return vm[vm_key] = (vm.__kb.view_model[vm_key] = kb.observable(model, key, create_options, vm));
+  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) return undefined;
+  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return undefined;
+  const vm_key = assignViewModelKey(vm, key);
+  if (!vm_key) return undefined;
+  const observable = kb.observable(model, key, create_options, vm); vm.__kb.view_model[vm_key] = observable; vm[vm_key] = observable;
+  return observable;
 };
 
 // @nodoc
 const createStaticObservables = function (vm, model) {
   _.each(vm.__kb.statics, (key) => {
-    let vm_key;
-    if ((vm_key = assignViewModelKey(vm, key))) {
-      if (model.has(vm_key)) {
-        vm[vm_key] = (vm.__kb.view_model[vm_key] = model.get(vm_key));
-      } else if (vm.__kb.static_defaults && vm_key in vm.__kb.static_defaults) {
-        vm[vm_key] = (vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key]);
-      } else {
-        delete vm.__kb.view_model[vm_key];
-      }
-    }
+    const vm_key = assignViewModelKey(vm, key);
+    if (!vm_key) return;
+
+    if (model.has(vm_key)) {
+      vm.__kb.view_model[vm_key] = model.get(vm_key);
+      vm[vm_key] = vm.__kb.view_model[vm_key];
+    } else if (vm.__kb.static_defaults && Object.prototype.hasOwnProperty.call(vm.__kb.static_defaults, vm_key)) {
+      vm.__kb.view_model[vm_key] = vm.__kb.static_defaults[vm_key];
+      vm[vm_key] = vm.__kb.view_model[vm_key];
+    } else delete vm.__kb.view_model[vm_key];
   });
 };
 
@@ -123,15 +124,17 @@ class ViewModel {
   // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   // @return [ko.observable] the constructor returns 'this'
   // @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-  constructor(model, options = {}, view_model) {
-    const args = Array.prototype.slice.call(_.isArguments(model) ? model : arguments);
+  constructor(...args) {
     return kb.ignore(() => {
-      !(model = args.shift()) || kb.isModel(model) || kb._throwUnexpected(this, 'not a model');
-      if (_.isArray(args[0])) { args[0] = { keys: args[0] }; }
+      let model = args.shift();
+      !model || kb.isModel(model) || kb._throwUnexpected(this, 'not a model');
+
+      if (_.isArray(args[0])) args[0] = { keys: args[0] };
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
-      options = {};
+
+      let options = {};
       _.each(args, (arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
-      _.each(KEYS_OPTIONS, (key) => { if (options.hasOwnProperty(key)) { this.__kb[key] = options[key]; } });
+      _.each(KEYS_OPTIONS, (key) => { if (Object.prototype.hasOwnProperty.call(options, key)) this.__kb[key] = options[key]; });
 
       // always use a store to ensure recursive view models are handled correctly
       kb.Store.useOptionsOrCreate(options, model, this);
@@ -144,7 +147,7 @@ class ViewModel {
       this.model = ko.computed({
         read: () => ko.utils.unwrapObservable(_model),
         write: new_model => kb.ignore(() => {
-          if ((kb.utils.wrappedObject(this) === new_model) || kb.wasReleased(this) || !event_watcher) return;
+          if ((kb.utils.wrappedObject(this) === new_model) || kb.wasReleased(this) || !event_watcher) return undefined;
 
           this.__kb.store.reuse(this, kb.utils.resolveModel(new_model));
           event_watcher.emitter(new_model); _model(event_watcher.ee);

@@ -14,7 +14,7 @@ const { _ } = kb;
 // @nodoc
 const unwrapModels = function (obj) {
   if (!obj) return obj;
-  if (obj.__kb) return (obj.__kb.hasOwnProperty('object') ? obj.__kb.object : obj);
+  if (obj.__kb) return (Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj);
   if (_.isArray(obj)) return _.map(obj, test => unwrapModels(test));
   if (_.isObject(obj) && (obj.constructor === {}.constructor)) { // a simple object
     const result = {};

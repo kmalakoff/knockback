@@ -136,7 +136,7 @@ kb.Observable = class Observable {
       this._value.rawValue() || this._value.update(); // wasn't loaded so create
 
       if (kb.LocalizedObservable && key_or_info.localizer) { observable = new key_or_info.localizer(observable); } // wrap ourselves with a localizer
-      if (kb.DefaultObservable && key_or_info.hasOwnProperty('default')) { observable = kb.defaultObservable(observable, key_or_info.default); } // wrap ourselves with a default value
+      if (kb.DefaultObservable && Object.prototype.hasOwnProperty.call(key_or_info, 'default')) { observable = kb.defaultObservable(observable, key_or_info.default); } // wrap ourselves with a default value
 
       return observable;
     },

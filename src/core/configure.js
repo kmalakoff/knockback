@@ -28,7 +28,7 @@ module.exports = function (options) {
       case 'orm':
         // set by name
         if (_.isString(value)) {
-          if (!ALL_ORMS.hasOwnProperty(value)) {
+          if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, value)) {
             console.log(`Knockback configure: could not find orm: ${value}. Available: ${_.keys(ALL_ORMS).join(', ')}`);
             continue;
           }

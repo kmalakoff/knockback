@@ -34,7 +34,7 @@ class utils {
   }
 
   // @nodoc
-  static get(obj, key, default_value) { return !obj.__kb || !obj.__kb.hasOwnProperty(key) ? default_value : obj.__kb[key]; }
+  static get(obj, key, default_value) { return !obj.__kb || !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key]; }
 
   // @nodoc
   static set(obj, key, value) { return ((obj.__kb || (obj.__kb = {})))[key] = value; }
@@ -42,12 +42,12 @@ class utils {
   // @nodoc
   static orSet(obj, key, value) {
     if (!obj.__kb) obj.__kb = {};
-    if (!obj.__kb.hasOwnProperty(key)) obj.__kb[key] = value;
+    if (!Object.prototype.hasOwnProperty.call(obj.__kb, key)) obj.__kb[key] = value;
     return obj.__kb[key];
   }
 
   // @nodoc
-  static has(obj, key) { return obj.__kb && obj.__kb.hasOwnProperty(key); }
+  static has(obj, key) { return obj.__kb && Object.prototype.hasOwnProperty.call(obj.__kb, key); }
 
   // Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'. Relevant for:
   //
