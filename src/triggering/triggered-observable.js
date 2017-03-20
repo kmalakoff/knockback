@@ -7,8 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _, ko } = (kb = require('../core/kb'));
+const kb = require('../core/kb');
+
+const { _, ko } = kb;
 
 const KEYS_PUBLISH = ['destroy'];
 

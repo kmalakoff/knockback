@@ -7,8 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _, ko } = (kb = require('../core/kb'));
+const kb = require('../core/kb');
+
+const { _, ko } = kb;
 
 kb.Observable.prototype.setToDefault = function () {
   if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
@@ -35,11 +36,13 @@ kb.utils.setToDefault = function (obj) {
       obj.setToDefault();
     }
   }
+
   // view model
   else if (_.isObject(obj)) {
     _.each(obj, (value, key) => {
       if (value && (ko.isObservable(value) || (typeof (value) !== 'function')) && ((key[0] !== '_') || key.search('__kb'))) this.setToDefault(value);
     });
   }
+
   return obj;
 };

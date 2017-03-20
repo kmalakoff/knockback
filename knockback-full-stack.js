@@ -5159,11 +5159,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
-
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var kb = __webpack_require__(0);
+var _ = kb._,
+    ko = kb.ko;
 
 __webpack_require__(26);
 
@@ -5252,11 +5250,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
+var kb = __webpack_require__(0);
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var _ = kb._,
+    ko = kb.ko;
+
 
 var arraySlice = Array.prototype.slice;
 
@@ -5407,11 +5405,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
+var kb = __webpack_require__(0);
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var _ = kb._,
+    ko = kb.ko;
+
 
 var KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
@@ -5634,11 +5632,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
+var kb = __webpack_require__(0);
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var _ = kb._,
+    ko = kb.ko;
+
 
 var KEYS_PUBLISH = ['destroy'];
 
@@ -5767,11 +5765,11 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
+var kb = __webpack_require__(0);
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var _ = kb._,
+    ko = kb.ko;
+
 
 __webpack_require__(27);
 
@@ -5939,34 +5937,35 @@ kb.valueValidator = function (value, bindings, validation_options) {
 };
 
 kb.inputValidator = function (view_model, el, validation_options) {
-  var _options;
-
-  var bindings = void 0,
-      input_name = void 0,
-      type = void 0;
   if (validation_options == null) {
     validation_options = {};
   }
   validation_options && !(typeof validation_options === 'function') || (validation_options = {});
   var validators = kb.valid;
-  if ((input_name = el.getAttribute('name')) && !_.isString(input_name)) {
+  var input_name = el.getAttribute('name');
+  if (input_name && !_.isString(input_name)) {
     input_name = null;
   }
 
   // only set up form elements with a value bindings
-  if (!(bindings = el.getAttribute('data-bind'))) return null;
+  var bindings = el.getAttribute('data-bind');
+  if (!bindings) return null;
   var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
   if (!(options && options.value)) return null;
-  !options.validation_options || (_.defaults(options.validation_options, validation_options), (_options = options, validation_options = _options.validation_options, _options));
+  if (options.validation_options) {
+    _.defaults(options.validation_options, validation_options);
+    validation_options = options.validation_options;
+  }
 
   // collect the types to identifier
+  var type = el.getAttribute('type');
   bindings = {};
-  !validators[type = el.getAttribute('type')] || (bindings[type] = validators[type]);
+  !validators[type] || (bindings[type] = validators[type]);
   !el.hasAttribute('required') || (bindings.required = validators.required);
   if (options.validations) {
-    for (var identifier in options.validations) {
-      var validator = options.validations[identifier];bindings[identifier] = validator;
-    }
+    _.each(options.validations, function (validator, identifier) {
+      bindings[identifier] = validator;
+    });
   }
   var result = kb.valueValidator(options.value, bindings, validation_options);
 
@@ -5976,30 +5975,25 @@ kb.inputValidator = function (view_model, el, validation_options) {
 };
 
 kb.formValidator = function (view_model, el) {
-  var bindings = void 0,
-      form_name = void 0,
-      validation_options = void 0,
-      validator = void 0;
   var results = {};
   var validators = [];
-  if ((form_name = el.getAttribute('name')) && !_.isString(form_name)) {
-    form_name = null;
-  }
+  var form_name = el.getAttribute('name');
+  if (form_name && !_.isString(form_name)) form_name = null;
 
-  if (bindings = el.getAttribute('data-bind')) {
+  var bindings = el.getAttribute('data-bind');
+  var validation_options = void 0;
+  if (bindings) {
     var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
     validation_options = options.validation_options;
   }
-  if (!validation_options) {
-    validation_options = {};
-  }
+  if (!validation_options) validation_options = {};
   validation_options.no_attach = !!form_name;
 
   // build up the results
   _.each(el.getElementsByTagName('input'), function (input_el) {
     var name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
-    validator = kb.inputValidator(view_model, input_el, validation_options);
+    var validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
   });
 
@@ -6028,9 +6022,7 @@ kb.formValidator = function (view_model, el) {
   });
 
   // if there is a name, add to the view_model with $scoping
-  if (form_name) {
-    view_model['$' + form_name] = results;
-  }
+  if (form_name) view_model['$' + form_name] = results;
   return results;
 };
 
@@ -6388,11 +6380,11 @@ module.exports = function () {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
+var kb = __webpack_require__(0);
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var _ = kb._,
+    ko = kb.ko;
+
 
 kb.Observable.prototype.setToDefault = function () {
   if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
@@ -6421,12 +6413,14 @@ kb.utils.setToDefault = function (obj) {
       obj.setToDefault();
     }
   }
+
   // view model
   else if (_.isObject(obj)) {
       _.each(obj, function (value, key) {
         if (value && (ko.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
       });
     }
+
   return obj;
 };
 
@@ -6446,18 +6440,16 @@ kb.utils.setToDefault = function (obj) {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = void 0;
+var kb = __webpack_require__(0);
 
-var _kb = kb = __webpack_require__(0),
-    _ = _kb._,
-    ko = _kb.ko;
+var _ = kb._,
+    ko = kb.ko;
 
 // Regular expressions from Angular.js: https://github.com/angular/angular.js
 
-
-var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
 var EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
-var NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
+var NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
 // A validator should return true if there are errors (similar to the binding check in HTML, eg. $name().required).
 kb.valid = {
@@ -6479,8 +6471,8 @@ kb.valid = {
 kb.hasChangedFn = function (model) {
   var m = null;var attributes = null;
   return function () {
-    var current_model = void 0;
-    if (m !== (current_model = ko.utils.unwrapObservable(model))) {
+    var current_model = ko.utils.unwrapObservable(model);
+    if (m !== current_model) {
       // change in model
       m = current_model;
       attributes = m ? m.toJSON() : null;
@@ -6509,36 +6501,28 @@ kb.uniqueValueFn = function (model, key, collection) {
 
 kb.untilTrueFn = function (stand_in, fn, model) {
   var was_true = false;
-  if (model && ko.isObservable(model)) {
-    model.subscribe(function () {
-      return was_true = false;
-    });
-  } // reset if the model changes
+  if (model && ko.isObservable(model)) model.subscribe(function () {
+    was_true = false;
+  }); // reset if the model changes
   return function (value) {
-    var f = void 0,
-        result = void 0;
-    if (!(f = ko.utils.unwrapObservable(fn))) {
-      return ko.utils.unwrapObservable(stand_in);
-    }
-    was_true |= !!(result = f(ko.utils.unwrapObservable(value)));
+    var f = ko.utils.unwrapObservable(fn);
+    if (!f) return ko.utils.unwrapObservable(stand_in);
+    var result = f(ko.utils.unwrapObservable(value));
+    was_true |= !!result;
     return was_true ? result : ko.utils.unwrapObservable(stand_in);
   };
 };
 
 kb.untilFalseFn = function (stand_in, fn, model) {
   var was_false = false;
-  if (model && ko.isObservable(model)) {
-    model.subscribe(function () {
-      return was_false = false;
-    });
-  } // reset if the model changes
+  if (model && ko.isObservable(model)) model.subscribe(function () {
+    was_false = false;
+  }); // reset if the model changes
   return function (value) {
-    var f = void 0,
-        result = void 0;
-    if (!(f = ko.utils.unwrapObservable(fn))) {
-      return ko.utils.unwrapObservable(stand_in);
-    }
-    was_false |= !(result = f(ko.utils.unwrapObservable(value)));
+    var f = ko.utils.unwrapObservable(fn);
+    if (!f) return ko.utils.unwrapObservable(stand_in);
+    var result = f(ko.utils.unwrapObservable(value));
+    was_false |= !result;
     return was_false ? result : ko.utils.unwrapObservable(stand_in);
   };
 };

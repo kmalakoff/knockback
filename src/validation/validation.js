@@ -7,8 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-let kb;
-const { _, ko } = (kb = require('../core/kb'));
+const kb = require('../core/kb');
+
+const { _, ko } = kb;
 
 require('./validators');
 
@@ -172,26 +173,29 @@ kb.valueValidator = (value, bindings, validation_options) => {
 };
 
 kb.inputValidator = (view_model, el, validation_options) => {
-  let bindings,
-    input_name,
-    type;
   if (validation_options == null) { validation_options = {}; }
   (validation_options && !(typeof (validation_options) === 'function')) || (validation_options = {});
   const validators = kb.valid;
-  if ((input_name = el.getAttribute('name')) && !_.isString(input_name)) { input_name = null; }
+  let input_name = el.getAttribute('name');
+  if (input_name && !_.isString(input_name)) { input_name = null; }
 
   // only set up form elements with a value bindings
-  if (!(bindings = el.getAttribute('data-bind'))) return null;
+  let bindings = el.getAttribute('data-bind');
+  if (!bindings) return null;
   const options = (new Function('sc', `with(sc[0]) { return { ${bindings} } }`))([view_model]);
   if (!(options && options.value)) return null;
-  (!options.validation_options) || (_.defaults(options.validation_options, validation_options), ({ validation_options } = options));
+  if (options.validation_options) {
+    _.defaults(options.validation_options, validation_options);
+    validation_options = options.validation_options;
+  }
 
   // collect the types to identifier
+  const type = el.getAttribute('type');
   bindings = {};
-  (!validators[(type = el.getAttribute('type'))]) || (bindings[type] = validators[type]);
+  (!validators[type]) || (bindings[type] = validators[type]);
   !el.hasAttribute('required') || (bindings.required = validators.required);
   if (options.validations) {
-    for (const identifier in options.validations) { const validator = options.validations[identifier]; bindings[identifier] = validator; }
+    _.each(options.validations, (validator, identifier) => { bindings[identifier] = validator; });
   }
   const result = kb.valueValidator(options.value, bindings, validation_options);
 
@@ -201,26 +205,25 @@ kb.inputValidator = (view_model, el, validation_options) => {
 };
 
 kb.formValidator = (view_model, el) => {
-  let bindings,
-    form_name,
-    validation_options,
-    validator;
   const results = {};
   const validators = [];
-  if ((form_name = el.getAttribute('name')) && !_.isString(form_name)) { form_name = null; }
+  let form_name = el.getAttribute('name');
+  if (form_name && !_.isString(form_name)) form_name = null;
 
-  if (bindings = el.getAttribute('data-bind')) {
+  const bindings = el.getAttribute('data-bind');
+  let validation_options;
+  if (bindings) {
     const options = (new Function('sc', `with(sc[0]) { return { ${bindings} } }`))([view_model]);
-    ({ validation_options } = options);
+    validation_options = options.validation_options;
   }
-  if (!validation_options) { validation_options = {}; }
+  if (!validation_options) validation_options = {};
   validation_options.no_attach = !!form_name;
 
   // build up the results
   _.each(el.getElementsByTagName('input'), (input_el) => {
     const name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
-    validator = kb.inputValidator(view_model, input_el, validation_options);
+    const validator = kb.inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
   });
 
@@ -241,6 +244,6 @@ kb.formValidator = (view_model, el) => {
   results.$disabled = ko.computed(() => !results.$enabled());
 
   // if there is a name, add to the view_model with $scoping
-  if (form_name) { view_model[`$${form_name}`] = results; }
+  if (form_name) view_model[`$${form_name}`] = results;
   return results;
 };
