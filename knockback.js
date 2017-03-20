@@ -3813,28 +3813,6 @@ var FormattedObservable = function () {
   // @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
   // @return [ko.observable] the constructor does not return 'this' but a ko.observable
   // @note the constructor does not return 'this' but a ko.observable
-  // constructor(format, args) {
-  //   // being called by the factory function
-  //   const observable_args = _.isArray(args) ? args : Array.prototype.slice.call(arguments, 1);
-  //   const observable = kb.utils.wrappedObservable(this, ko.computed({
-  //     read() {
-  //       args = [ko.utils.unwrapObservable(format)];
-  //       _.each(observable_args, arg => args.push(ko.utils.unwrapObservable(arg)));
-  //       return kb.toFormattedString.apply(null, args);
-  //     },
-  //     write(value) {
-  //       const matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
-  //       const max_count = Math.min(observable_args.length, matches.length); let index = 0;
-  //       while (index < max_count) {
-  //         observable_args[index](matches[index]);
-  //         index++;
-  //       }
-  //     },
-  //   }));
-
-  //   return observable;
-  // }
-
   function FormattedObservable(format) {
     for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
       args[_key2 - 1] = arguments[_key2];
@@ -4431,22 +4409,26 @@ kb.valueValidator = function (value, bindings) {
     if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
     if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
     var priorities = validation_options.priorities || [];
-    _.isArray(priorities) || (priorities = [priorities]); // ensure priorities is an array
+    if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
 
     // then add the rest
     var active_index = priorities.length + 1;
+
     _.each(bindings, function (validator, identifier) {
       results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
       if (results[identifier]) {
-        var identifier_index = void 0;
         results.$error_count++;
 
         // check priorities
-        (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
+        var identifier_index = _.indexOf(priorities, identifier);
+        if (!~identifier_index) identifier_index = priorities.length;
+
         if (results.$active_error && identifier_index < active_index) {
-          results.$active_error = identifier;active_index = identifier_index;
-        } else {
-          results.$active_error || (results.$active_error = identifier, active_index = identifier_index);
+          results.$active_error = identifier;
+          active_index = identifier_index;
+        } else if (!results.$active_error) {
+          results.$active_error = identifier;
+          active_index = identifier_index;
         }
       }
     });

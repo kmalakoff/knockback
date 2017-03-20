@@ -147,22 +147,26 @@ kb.valueValidator = (value, bindings, validation_options = {}) => {
     if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
     if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
     let priorities = validation_options.priorities || [];
-    _.isArray(priorities) || (priorities = [priorities]); // ensure priorities is an array
+    if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
 
     // then add the rest
     let active_index = priorities.length + 1;
+
     _.each(bindings, (validator, identifier) => {
       results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
       if (results[identifier]) {
-        let identifier_index;
         results.$error_count++;
 
         // check priorities
-        (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
+        let identifier_index = _.indexOf(priorities, identifier);
+        if (!~identifier_index) identifier_index = priorities.length;
+
         if (results.$active_error && (identifier_index < active_index)) {
-          results.$active_error = identifier; active_index = identifier_index;
-        } else {
-          results.$active_error || ((results.$active_error = identifier), (active_index = identifier_index));
+          results.$active_error = identifier;
+          active_index = identifier_index;
+        } else if (!results.$active_error) {
+          results.$active_error = identifier;
+          active_index = identifier_index;
         }
       }
     });
