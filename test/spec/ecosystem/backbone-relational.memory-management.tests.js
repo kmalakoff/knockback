@@ -21,11 +21,11 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     Backbone.Relational.store.addModelScope(root);
   }
 
-  const Person = root.Person = Backbone.RelationalModel.extend({
+  root.Person = Backbone.RelationalModel.extend({
     relations: [{
       type: Backbone.HasMany,
       key: 'friends',
-      relatedModel: 'Person',
+      relatedModel: 'root.Person',
     }],
   });
 
@@ -90,25 +90,25 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   it('kb.CollectionObservable with recursive view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const john = new Person({
-      id: 'person-1-1',
+    const john = new root.Person({
+      id: 'root.Person-1-1',
       name: 'John',
-      friends: ['person-1-2', 'person-1-3', 'person-1-4'],
+      friends: ['root.Person-1-2', 'root.Person-1-3', 'root.Person-1-4'],
     });
-    const paul = new Person({
-      id: 'person-1-2',
+    const paul = new root.Person({
+      id: 'root.Person-1-2',
       name: 'Paul',
-      friends: ['person-1-1', 'person-1-3', 'person-1-4'],
+      friends: ['root.Person-1-1', 'root.Person-1-3', 'root.Person-1-4'],
     });
-    const george = new Person({
-      id: 'person-1-3',
+    const george = new root.Person({
+      id: 'root.Person-1-3',
       name: 'George',
-      friends: ['person-1-1', 'person-1-2', 'person-1-4'],
+      friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-4'],
     });
-    const ringo = new Person({
-      id: 'person-1-4',
+    const ringo = new root.Person({
+      id: 'root.Person-1-4',
       name: 'Ringo',
-      friends: ['person-1-1', 'person-1-2', 'person-1-3'],
+      friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-3'],
     });
 
     const band = new kb.Collection([john, paul, george, ringo]);
@@ -147,25 +147,25 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   it('kb.CollectionObservable with recursive view models and external store', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const john = new Person({
-      id: 'person-2-1',
+    const john = new root.Person({
+      id: 'root.Person-2-1',
       name: 'John',
-      friends: ['person-2-2', 'person-2-3', 'person-2-4'],
+      friends: ['root.Person-2-2', 'root.Person-2-3', 'root.Person-2-4'],
     });
-    const paul = new Person({
-      id: 'person-2-2',
+    const paul = new root.Person({
+      id: 'root.Person-2-2',
       name: 'Paul',
-      friends: ['person-2-1', 'person-2-3', 'person-2-4'],
+      friends: ['root.Person-2-1', 'root.Person-2-3', 'root.Person-2-4'],
     });
-    const george = new Person({
-      id: 'person-2-3',
+    const george = new root.Person({
+      id: 'root.Person-2-3',
       name: 'George',
-      friends: ['person-2-1', 'person-2-2', 'person-2-4'],
+      friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-4'],
     });
-    const ringo = new Person({
-      id: 'person-2-4',
+    const ringo = new root.Person({
+      id: 'root.Person-2-4',
       name: 'Ringo',
-      friends: ['person-2-1', 'person-2-2', 'person-2-3'],
+      friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-3'],
     });
 
     const band = new kb.Collection([john, paul, george, ringo]);

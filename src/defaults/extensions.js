@@ -34,7 +34,6 @@ kb.utils.setToDefault = function (obj) {
     if (typeof obj.setToDefault === 'function') {
       obj.setToDefault();
     }
-
   }
   // view model
   else if (_.isObject(obj)) {

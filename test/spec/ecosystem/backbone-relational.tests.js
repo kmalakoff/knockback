@@ -83,9 +83,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
       // nested check
       assert.equal(occupant_observable.occupies().occupants().length, 2, 'Excepted occupant count');
-      _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-        assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable2.name()), 'Expected name');
-        assert.equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location');
+      _.each(occupant_observable.occupies().occupants(), (x) => {
+        assert.ok(~_.indexOf(['John', 'Paul'], x.name()), 'Expected name');
+        assert.equal(x.occupies().location(), 'in the middle of the street', 'Expected location');
       });
     });
 
@@ -98,23 +98,24 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   });
 
   it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', () => {
-    let occupant_observable,
-      occupant_observable2;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
       id: 'person-2-1',
       name: 'John',
     });
-    const paul = new Person({
+
+    new Person({
       id: 'person-2-2',
       name: 'Paul',
     });
-    const george = new Person({
+
+    new Person({
       id: 'person-2-3',
       name: 'George',
     });
-    const ringo = new Person({
+
+    new Person({
       id: 'person-2-4',
       name: 'Ringo',
     });
@@ -143,9 +144,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 4, 'Everyone is here');
-          _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-            assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
-            assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
+          _.each(occupant_observable.occupies().occupants(), (x) => {
+            assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], x.name()), 'Expected name');
+            assert.equal(x.occupies().location(), 'one side of the street', 'Expected location');
           });
         });
       } else {
@@ -167,9 +168,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 3, 'Almost everyone is here');
-          _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-            assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
-            assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
+          _.each(occupant_observable.occupies().occupants(), (x) => {
+            assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], x.name()), 'Expected name');
+            assert.equal(x.occupies().location(), 'one side of the street', 'Expected location');
           });
         });
       } else {
@@ -181,9 +182,9 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 1, 'In the studio');
-          _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-            assert.equal(occupant_observable2.name(), 'John', 'Expected name');
-            assert.equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location');
+          _.each(occupant_observable.occupies().occupants(), (x) => {
+            assert.equal(x.name(), 'John', 'Expected name');
+            assert.equal(x.occupies().location(), 'the other side of the street', 'Expected location');
           });
         });
       }
@@ -202,6 +203,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       name: 'George',
       friends: ['person-3-1', 'person-3-2', 'person-3-4'],
     });
+
     const john = new Person({
       id: 'person-3-1',
       name: 'John',
@@ -209,12 +211,14 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       best_friend: george,
     });
     george.set({ best_friend: john });
+
     const paul = new Person({
       id: 'person-3-2',
       name: 'Paul',
       friends: ['person-3-1', 'person-3-3', 'person-3-4'],
       best_friend: george,
     });
+
     const ringo = new Person({
       id: 'person-3-4',
       name: 'Ringo',
@@ -255,10 +259,10 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
     kb.release(george_view_model); george_view_model = null;
 
-    for (const name in model_stats) {
-      const stats = model_stats[name];
-      assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    _.each(model_stats, (stats) => {
+      const match = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
+      assert.ok(match, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+    });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
@@ -791,8 +795,8 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       return this;
     };
     class BandMemberViewModel extends kb.ViewModel {
-      constructor(/* model, options */) {
-        super(...arguments);
+      constructor(...args) {
+        super(...args);
         this.type = ko.observable('band_member');
       }
     }
@@ -892,12 +896,8 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
     class PersonCollection extends kb.CollectionObservable {
       constructor(collection, options) {
-        return super(collection, {
-          factories: {
-            models: PersonViewModel,
-          },
-          options,
-        });
+        super(collection, { factories: { models: PersonViewModel }, options });
+        return kb.utils.wrappedObservable(this);
       }
     }
 

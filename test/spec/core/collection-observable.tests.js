@@ -31,11 +31,11 @@ describe('collection-observable', () => {
   }
 
   class TestViewModel extends kb.ViewModel {
-    constructor() {
-      super(...arguments);
+    constructor(...args) {
+      super(...args);
       this.test = ko.observable('hello');
-      let value = this.test();
-      value = this.name();
+      this.test();
+      this.name();
     }
   }
 

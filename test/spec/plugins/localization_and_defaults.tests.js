@@ -27,7 +27,7 @@ class LocaleManager {
     if (locale_identifier) { this.setLocale(locale_identifier); }
   }
 
-  get(string_id) {
+  get(string_id, ...args) {
     let culture_map;
     if (this.locale_identifier) culture_map = this.translations_by_locale[this.locale_identifier];
     if (!culture_map) return '';
@@ -35,10 +35,7 @@ class LocaleManager {
     let string = Object.prototype.hasOwnProperty.call(culture_map, string_id) ? culture_map[string_id] : '';
     if (string_id !== undefined) return string;
 
-    const iterable = Array.prototype.slice.call(arguments, 1);
-    for (let index = 0, l = iterable.length; index < l; index++) {
-      string = string.replace(`{${index}}`, iterable[index]);
-    }
+    _.each(args, (value, index) => { string = string.replace(`{${index}}`, value); });
     return string;
   }
 
@@ -85,8 +82,9 @@ kb.LocalizedStringLocalizer = class LocalizedStringLocalizer extends kb.Localize
 
 // NOTE: dependency on globalize
 kb.LongDateLocalizer = class LongDateLocalizer extends kb.LocalizedObservable {
-  constructor(/* value, options, view_model */) {
-    return super(...arguments); // return the observable instead of this
+  constructor(...args) {
+    super(...args); // return the observable instead of this
+    return kb.utils.wrappedObservable(this);
   }
   read(value) {
     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale());
@@ -99,25 +97,23 @@ kb.LongDateLocalizer = class LongDateLocalizer extends kb.LocalizedObservable {
 };
 
 // // NOTE: dependency on globalize - notice the alternative formulation with extend
-// kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 // NOTE: dependency on globalize - notice the alternative formulation with extend
-kb.ShortDateLocalizer = class ShortDateLocalizer extends kb.LocalizedObservable {
-  constructor(/* value, options, view_model */) {
-    // kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-    // return kb.utils.wrappedObservable(this);
-    return super(...arguments); // return the observable instead of this
-  } // return the observable instead of this
+kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
+  constructor(...args) {
+    kb.LocalizedObservable.prototype.constructor.apply(this, args);
+    return kb.utils.wrappedObservable(this);
+  }, // return the observable instead of this
 
   read(value) {
     return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-  }
+  },
 
   write(localized_string, value) {
     const new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
     if (!(new_value && _.isDate(new_value))) { return kb.utils.wrappedObservable(this).resetToCurrent(); } // reset if invalid
     return value.setTime(new_value.valueOf());
-  }
-};
+  },
+});
 // ##############################
 
 describe('localized-observable', () => {

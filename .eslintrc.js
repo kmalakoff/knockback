@@ -17,6 +17,9 @@ module.exports = {
     'no-plusplus': 'off',
     'class-methods-use-this': 'off',
     'no-bitwise': 'off',
+    'no-use-before-define': 'off',
+    'no-new': 'off',
+    'func-names': 'off',
 
     'camelcase': 'off',
   }
