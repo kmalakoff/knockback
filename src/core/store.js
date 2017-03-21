@@ -188,14 +188,12 @@ class Store {
 
   // @nodoc
   _refCount(observable) {
-    let stores_references;
     if (observable.__kb_released) {
-      if (typeof console !== 'undefined' && console !== null) {
-        console.log('Observable already released');
-      }
+      (typeof console === 'undefined') || console.log('Observable already released');
       return 0;
     }
-    if (!(stores_references = kb.utils.get(observable, 'stores_references'))) return 1;
+    const stores_references = kb.utils.get(observable, 'stores_references')
+    if (!stores_references return 1;
     return _.reduce(stores_references, ((memo, store_references) => memo + store_references.ref_count), 0);
   }
 

@@ -332,7 +332,10 @@ var kb = function () {
     value: function renderTemplate(template, view_model) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      if (!root.document) return typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined;
+      if (!root.document) {
+        typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
+        return;
+      }
 
       var el = root.document.createElement('div');
       var observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
@@ -367,7 +370,10 @@ var kb = function () {
   }, {
     key: 'applyBindings',
     value: function applyBindings(view_model, node) {
-      if (!root.document) return typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined;
+      if (!root.document) {
+        typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
+        return;
+      }
 
       if (node.length) {
         // convert to a root element
@@ -535,42 +541,42 @@ var ALL_ORMS = {
 // @nodoc
 kb.settings = { orm: ALL_ORMS.default };
 for (var key in ALL_ORMS) {
-  var value = ALL_ORMS[key];
-  if (value && value.isAvailable()) {
-    kb.settings.orm = value;
-    break;
+  if (Object.prototype.hasOwnProperty.call(ALL_ORMS, key)) {
+    var value = ALL_ORMS[key];
+    if (value && value.isAvailable()) {
+      kb.settings.orm = value;
+      break;
+    }
   }
 }
 
 // @nodoc
-module.exports = function (options) {
-  if (options == null) {
-    options = {};
-  }
-  for (key in options) {
-    var _value = options[key];
+module.exports = function () {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  _.each(options, function (value, key) {
     switch (key) {
       case 'orm':
         // set by name
-        if (_.isString(_value)) {
-          if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, _value)) {
-            console.log('Knockback configure: could not find orm: ' + _value + '. Available: ' + _.keys(ALL_ORMS).join(', '));
-            continue;
+        if (_.isString(value)) {
+          if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, value)) {
+            typeof console === 'undefined' || console.log('Knockback configure: could not find orm: ' + value + '. Available: ' + _.keys(ALL_ORMS).join(', '));
+            return;
           }
 
-          var orm = ALL_ORMS[_value];
+          var orm = ALL_ORMS[value];
           if (orm && !orm.isAvailable()) {
-            console.log('Knockback configure: could not enable orm ' + _value + '. Make sure it is included before Knockback');
-            continue;
+            typeof console === 'undefined' || console.log('Knockback configure: could not enable orm ' + value + '. Make sure it is included before Knockback');
+            return;
           }
           kb.settings.orm = orm;
-        } else kb.settings.orm = _value;
+        } else kb.settings.orm = value;
         break;
 
       default:
-        kb.settings[key] = _value;break;
+        kb.settings[key] = value;break;
     }
-  }
+  });
 };
 
 /***/ }),
@@ -4325,9 +4331,7 @@ var Store = function () {
     value: function _refCount(observable) {
       var stores_references = void 0;
       if (observable.__kb_released) {
-        if (typeof console !== 'undefined' && console !== null) {
-          console.log('Observable already released');
-        }
+        typeof console === 'undefined' || console.log('Observable already released');
         return 0;
       }
       if (!(stores_references = kb.utils.get(observable, 'stores_references'))) return 1;

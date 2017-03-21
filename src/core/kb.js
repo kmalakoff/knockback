@@ -182,7 +182,10 @@ class kb {
   //   ...
   //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   static renderTemplate(template, view_model, options = {}) {
-    if (!root.document) return (typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined);
+    if (!root.document) {
+      (typeof console === 'undefined') || console.log('renderTemplate: document is undefined');
+      return;
+    }
 
     let el = root.document.createElement('div');
     const observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
@@ -208,7 +211,10 @@ class kb {
   //   ...
   //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
   static applyBindings(view_model, node) {
-    if (!root.document) return (typeof console !== 'undefined' ? console.log('renderTemplate: document is undefined') : undefined);
+    if (!root.document) {
+      (typeof console === 'undefined') || console.log('renderTemplate: document is undefined');
+      return;
+    }
 
     if (node.length) { // convert to a root element
       let children;
