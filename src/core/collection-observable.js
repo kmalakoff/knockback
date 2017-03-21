@@ -91,12 +91,14 @@ class CollectionObservable {
   // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   // @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
   // @note the constructor does not return 'this' but a ko.observableArray
-  constructor(collection, view_model, options = {}) {
-    const args = Array.prototype.slice.call(_.isArguments(collection) ? collection : arguments);
+  constructor(...args) {
     return kb.ignore(() => {
-      collection = args[0] instanceof kb.Collection ? args.shift() : (_.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection());
+      let collection = null;
+      if (args[0] instanceof kb.Collection) collection = args.shift();
+      else collection = _.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection();
       if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
+      let options = {};
       _.each(args, arg => kb.assign(options, arg));
 
       let observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
@@ -138,17 +140,17 @@ class CollectionObservable {
       this.collection = ko.computed({
         read: () => this._collection(),
         write: new_collection => kb.ignore(() => {
-          let previous_collection;
-          if ((previous_collection = this._collection()) === new_collection) return undefined; // no change
+          const previous_collection = this._collection();
+          if (previous_collection === new_collection) return undefined; // no change
 
           // @create_options.store.reuse(@, new_collection) # not meant to be shared
           kb.utils.wrappedObject(observable, new_collection);
 
           // clean up
-          if (previous_collection) { previous_collection.unbind('all', this._onCollectionChange); }
+          if (previous_collection) previous_collection.unbind('all', this._onCollectionChange);
 
           // store in _kb_collection so that a collection() function can be exposed on the observable and so the collection can be
-          if (new_collection) { new_collection.bind('all', this._onCollectionChange); }
+          if (new_collection) new_collection.bind('all', this._onCollectionChange);
 
           // update references (including notification)
           return this._collection(new_collection);
@@ -299,7 +301,7 @@ class CollectionObservable {
   compact() {
     return kb.ignore(() => {
       const observable = kb.utils.wrappedObservable(this);
-      if (!kb.utils.wrappedStoreIsOwned(observable)) return;
+      if (!kb.utils.wrappedStoreIsOwned(observable)) return undefined;
       kb.utils.wrappedStore(observable).clear();
       return this._collection.notifySubscribers(this._collection());
     },
@@ -312,12 +314,12 @@ class CollectionObservable {
 
   // @nodoc
   _shareOrCreateFactory(options) {
-    let factory;
     const absolute_models_path = kb.utils.pathJoin(options.path, 'models');
     const { factories } = options;
 
     // check the existing factory
-    if (factory = options.factory) {
+    let factory = options.factory;
+    if (factory) {
       // models matches, check additional paths
       const existing_creator = factory.creatorForPath(null, absolute_models_path);
       if (existing_creator && (!factories || (factories.models === existing_creator))) {
@@ -353,7 +355,7 @@ class CollectionObservable {
 
   // @nodoc
   _onCollectionChange = (event, arg) => kb.ignore(() => {
-    if (this.in_edit || kb.wasReleased(this)) return; // we are doing the editing or have been released
+    if (this.in_edit || kb.wasReleased(this)) return undefined; // we are doing the editing or have been released
 
     switch (event) {
       case 'reset': {
@@ -367,21 +369,19 @@ class CollectionObservable {
       }
 
       case 'new': case 'add': {
-        if (!this._selectModel(arg)) return; // filtered
+        if (!this._selectModel(arg)) return undefined; // filtered
 
         const observable = kb.utils.wrappedObservable(this);
         const collection = this._collection();
-        if (collection.indexOf(arg) === -1) return; // the model may have been removed before we got a chance to add it
+        if (!~collection.indexOf(arg)) return undefined; // the model may have been removed before we got a chance to add it
         const view_model = this.viewModelByModel(arg);
-        if (view_model) return; // it may have already been added by a change event
+        if (view_model) return undefined; // it may have already been added by a change event
         this.in_edit++;
         const comparator = this._comparator();
         if (comparator) {
           observable().push(this._createViewModel(arg));
           observable.sort(comparator);
-        } else {
-          observable.splice(collection.indexOf(arg), 0, this._createViewModel(arg));
-        }
+        } else observable.splice(collection.indexOf(arg), 0, this._createViewModel(arg));
         this.in_edit--;
         break;
       }
@@ -398,21 +398,23 @@ class CollectionObservable {
         const view_model = this.models_only ? arg : this.viewModelByModel(arg);
         if (!view_model) return this._onCollectionChange('add', arg); // add new
         const comparator = this._comparator();
-        if (!comparator) return;
+        if (!comparator) return undefined;
 
         this.in_edit++;
         kb.utils.wrappedObservable(this).sort(comparator);
         this.in_edit--;
         break;
       }
+      default: break;
     }
+    return undefined;
   },
   )
 
   // @nodoc
   _onModelRemove(model) {
     const view_model = this.models_only ? model : this.viewModelByModel(model); // either remove a view model or a model
-    if (!view_model) return;  // it may have already been removed
+    if (!view_model) return undefined;  // it may have already been removed
     const observable = kb.utils.wrappedObservable(this);
     this.in_edit++;
     observable.remove(view_model);
@@ -425,7 +427,8 @@ class CollectionObservable {
     if (this.in_edit) return; // we are doing the editing
 
     // validate input
-    (this.models_only && (!models_or_view_models.length || kb.isModel(models_or_view_models[0]))) || (!this.models_only && (!models_or_view_models.length || (_.isObject(models_or_view_models[0]) && !kb.isModel(models_or_view_models[0])))) || kb._throwUnexpected(this, 'incorrect type passed');
+    if (this.models_only && models_or_view_models.length && !kb.isModel(models_or_view_models[0])) kb._throwUnexpected(this, 'incorrect type passed');
+    if (!this.models_only && models_or_view_models.length && !(_.isObject(models_or_view_models[0]) || kb.isModel(models_or_view_models[0]))) kb._throwUnexpected(this, 'incorrect type passed');
 
     const observable = kb.utils.wrappedObservable(this);
     const collection = kb.peek(this._collection);
@@ -443,7 +446,6 @@ class CollectionObservable {
       !has_filters || (view_models = []); // check for filtering of ViewModels
       models = [];
       _.each(models_or_view_models, (view_model) => {
-        let current_view_model;
         const model = kb.utils.wrappedObject(view_model);
         if (has_filters) {
           if (!this._selectModel(model)) return; // filtered so skip
@@ -451,9 +453,8 @@ class CollectionObservable {
         }
 
           // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
-        if (current_view_model = this.create_options.store.find(model, this.create_options.creator)) {
-          (current_view_model.constructor === view_model.constructor) || kb._throwUnexpected(this, 'replacing different type of view model');
-        }
+        const current_view_model = this.create_options.store.find(model, this.create_options.creator);
+        if (current_view_model && (current_view_model.constructor !== view_model.constructor)) kb._throwUnexpected(this, 'replacing different type of view model');
         this.create_options.store.retain(view_model, model, this.create_options.creator);
         models.push(model);
       });
