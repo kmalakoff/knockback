@@ -71,29 +71,29 @@ kb.Observable = class Observable {
       this._model = ko.observable();
       let observable = kb.utils.wrappedObservable(this, ko.computed({
         read: () => {
-          const model = this._model();
+          const m = this._model();
           const args = [this.key].concat(this.args || []);
           _.each(args, arg => ko.utils.unwrapObservable(arg));
 
           const ew = kb.utils.wrappedEventWatcher(this);
-          !ew || ew.emitter(model || null);
+          !ew || ew.emitter(m || null);
 
           if (this.read) {
             this.update(this.read.apply(this._vm, args));
-          } else if (!_.isUndefined(model)) {
-            kb.ignore(() => this.update(kb.getValue(model, kb.peek(this.key), this.args)));
+          } else if (!_.isUndefined(m)) {
+            kb.ignore(() => this.update(kb.getValue(m, kb.peek(this.key), this.args)));
           }
           return this._value.value();
         },
 
         write: new_value => kb.ignore(() => {
           const unwrapped_new_value = kb.utils.unwrapModels(new_value); // unwrap for set (knockout may pass view models which are required for the observable but not the model)
-          const model = kb.peek(this._model);
+          const m = kb.peek(this._model);
           if (this.write) {
             this.write.call(this._vm, unwrapped_new_value);
-            new_value = kb.getValue(model, kb.peek(this.key), this.args);
-          } else if (model) {
-            kb.setValue(model, kb.peek(this.key), unwrapped_new_value);
+            new_value = kb.getValue(m, kb.peek(this.key), this.args);
+          } else if (m) {
+            kb.setValue(m, kb.peek(this.key), unwrapped_new_value);
           }
           return this.update(new_value);
         }),
@@ -107,19 +107,17 @@ kb.Observable = class Observable {
       if (create_options.factories && ((typeof (create_options.factories) === 'function') || create_options.factories.create)) {
         create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory));
         create_options.factory.addPathMapping(create_options.path, create_options.factories);
-      } else {
-        create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
-      }
+      } else create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
       delete create_options.factories;
 
       // publish public interface on the observable and return instead of this
       kb.publishMethods(observable, this, KEYS_PUBLISH);
 
       // use external model observable or create
-      observable.model = (this.model = ko.computed({
+      this.model = ko.computed({
         read: () => ko.utils.unwrapObservable(this._model),
         write: new_model => kb.ignore(() => {
-          if (this.__kb_released || (kb.peek(this._model) === new_model)) return; // destroyed or no change
+          if (this.__kb_released || (kb.peek(this._model) === new_model)) return undefined; // destroyed or no change
 
           // update references
           const new_value = kb.getValue(new_model, kb.peek(this.key), this.args);
@@ -129,14 +127,24 @@ kb.Observable = class Observable {
           } else if (!_.isUndefined(new_value)) {
             return this.update(new_value);
           }
-        },
-      ),
-      }));
-      kb.EventWatcher.useOptionsOrCreate({ event_watcher }, model || null, this, { emitter: this.model, update: (() => kb.ignore(() => this.update())), key: this.key, path: create_options.path });
+          return undefined;
+        }),
+      });
+      observable.model = this.model;
+
+      kb.EventWatcher.useOptionsOrCreate({ event_watcher }, model || null, this, {
+        emitter: this.model,
+        update: (() => kb.ignore(() => this.update())),
+        key: this.key,
+        path: create_options.path,
+      });
       this._value.rawValue() || this._value.update(); // wasn't loaded so create
 
-      if (kb.LocalizedObservable && key_or_info.localizer) { observable = new key_or_info.localizer(observable); } // wrap ourselves with a localizer
-      if (kb.DefaultObservable && Object.prototype.hasOwnProperty.call(key_or_info, 'default')) { observable = kb.defaultObservable(observable, key_or_info.default); } // wrap ourselves with a default value
+      // wrap ourselves with a localizer
+      if (kb.LocalizedObservable && key_or_info.localizer) observable = new key_or_info.localizer(observable);
+
+      // wrap ourselves with a default value
+      if (kb.DefaultObservable && Object.prototype.hasOwnProperty.call(key_or_info, 'default')) observable = kb.defaultObservable(observable, key_or_info.default);
 
       return observable;
     },
@@ -149,7 +157,7 @@ kb.Observable = class Observable {
     const observable = kb.utils.wrappedObservable(this);
     this.__kb_released = true;
     this._value.destroy(); this._value = null;
-    this.model.dispose(); this.model = (observable.model = null);
+    this.model.dispose(); this.model = null; observable.model = null;
     return kb.utils.wrappedDestroy(this);
   }
 

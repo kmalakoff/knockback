@@ -11,7 +11,8 @@ const kb = require('./kb');
 
 const { _, ko } = kb;
 
-// Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
+// Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models,
+// to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 //
 // @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
 //   var co = kb.collectionObservable(new Backbone.Collection());
@@ -51,21 +52,19 @@ class Store {
     this.__kb_released = true;
     this.clear();
     const index = _.indexOf(kb.Store.instances, this);
-    if (~index) return kb.Store.instances.splice(index, 1);
+    if (~index) kb.Store.instances.splice(index, 1);
   }
 
   // Manually clear the store
   clear() {
-    let observable,
-      observable_records,
-      replaced_observables;
-    [observable_records, this.observable_records] = [this.observable_records, {}];
-    for (const creator_id in observable_records) {
-      const records = observable_records[creator_id];
-      for (const cid in records) { observable = records[cid]; this.release(observable, true); }
-    }
+    const observable_records = this.observable_records;
+    this.observable_records = {};
+    _.each(observable_records, (records) => {
+      _.each(records, observable => this.release(observable, true));
+    });
 
-    [replaced_observables, this.replaced_observables] = [this.replaced_observables, []];
+    const replaced_observables = this.replaced_observables;
+    this.replaced_observables = [];
     _.each(replaced_observables, (observable) => {
       if (!observable.__kb_released) this.release(observable, true);
     });
@@ -73,12 +72,11 @@ class Store {
 
   // Manually compact the store by searching for released view models
   compact() {
-    for (const creator_id in this.observable_records) {
-      const records = this.observable_records[creator_id];
-      for (const cid in records) {
-        if (records[cid].__kb_released) delete records[cid];
-      }
-    }
+    _.each(this.observable_records, (records) => {
+      _.each(records, (observable, cid) => {
+        if (observable.__kb_released) delete records[cid];
+      });
+    });
   }
 
   // Used to register a new view model with the store.
@@ -94,11 +92,11 @@ class Store {
   // @example retain an observable with the store
   //   store.retain(observable, obj, creator);
   retain(observable, obj, creator) {
-    let current_observable;
-    if (!this._canRegister(observable)) return;
+    if (!this._canRegister(observable)) return undefined;
     if (!creator) { creator = observable.constructor; } // default is to use the constructor
 
-    if (current_observable = this.find(obj, creator)) {
+    const current_observable = this.find(obj, creator);
+    if (current_observable) {
       if (current_observable === observable) { // already in this store
         this._getOrCreateStoreReferences(observable).ref_count++;
         return observable;
@@ -124,20 +122,21 @@ class Store {
   // @example register an observable with the store
   //   observable = store.retainOrCreate(value, {path: kb.utils.wrappedPath(observable), factory: kb.utils.wrappedFactory(observable)})
   retainOrCreate(obj, options, deep_retain) {
-    let creator,
-      observable;
-    if (!(creator = this._creator(obj, options))) { return kb.utils.createFromDefaultCreator(obj, options); }
-    if (creator.models_only) { return obj; }
-    if (observable = this.find(obj, creator)) { return (deep_retain && kb.settings.deep_retain ? this.retain(observable, obj, creator) : observable); }
+    const creator = this._creator(obj, options);
+    if (!creator) return kb.utils.createFromDefaultCreator(obj, options);
+    if (creator.models_only) return obj;
 
-    if (!_.isFunction(creator.create || creator)) { throw new Error(`Invalid factory for \"${options.path}\"`); }
+    let observable = this.find(obj, creator);
+    if (observable) {
+      return (deep_retain && kb.settings.deep_retain ? this.retain(observable, obj, creator) : observable);
+    }
+    if (!_.isFunction(creator.create || creator)) throw new Error(`Invalid factory for "${options.path}"`);
 
     observable = kb.ignore(() => {
       options = _.defaults({ store: this, creator }, options); // set our own creator so we can register ourselves above
       observable = creator.create ? creator.create(obj, options) : new creator(obj, options);
       return observable || ko.observable(null);
-    },
-    ); // default to null
+    }); // default to null
 
     this.retain(observable, obj, creator);
     return observable;

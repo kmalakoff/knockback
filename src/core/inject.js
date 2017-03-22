@@ -84,55 +84,52 @@ ko.bindingHandlers.inject = {
 kb.Inject = class Inject {
   // @private
   static inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-    const inject = function (data) {
-      if (_.isFunction(data)) {
-        view_model = new data(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
+    const doInject = function (value) {
+      if (_.isFunction(value)) {
+        view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
         kb.releaseOnNodeRemove(view_model, element);
       } else {
         // view_model constructor causes a scope change
-        if (data.view_model) {
+        if (value.view_model) {
           // specifying a view_model changes the scope so we need to bind a destroy
-          view_model = new data.view_model(view_model, element, value_accessor, all_bindings_accessor);
+          view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
           kb.releaseOnNodeRemove(view_model, element);
         }
 
         // resolve and merge in each key
-        for (const key in data) {
-          const value = data[key];
-          if (key === 'view_model') { continue; }
+        _.each(value, (item, key) => {
+          if (key === 'view_model') return;
 
           // create function
-          if (key === 'create') {
-            value(view_model, element, value_accessor, all_bindings_accessor);
+          if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
 
           // resolve nested with assign or not
-          } else if (_.isObject(value) && !_.isFunction(value)) {
-            const target = nested || (value && value.create) ? {} : view_model;
-            view_model[key] = kb.Inject.inject(value, target, element, value_accessor, all_bindings_accessor, true);
+          else if (_.isObject(item) && !_.isFunction(item)) {
+            const target = nested || (item && item.create) ? {} : view_model;
+            view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
 
           // simple set
-          } else {
-            view_model[key] = value;
-          }
-        }
+          } else view_model[key] = item;
+        });
       }
 
       return view_model;
     };
 
     // in recursive calls, we are already protected from propagating dependencies to the template
-    return nested ? inject(data) : kb.ignore(() => inject(data));
+    return nested ? doInject(data) : kb.ignore(() => doInject(data));
   }
 
-  // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered. Also, used with the data-bind `'inject'` custom binding.
+  // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
+  // Also, used with the data-bind `'inject'` custom binding.
   // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
   // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-  static injectViewModels(el = root.document) {
+  static injectViewModels(rootEl = root.document) {
     // find all of the app elements
     const results = [];
     const findElements = (el) => {
       if (!el.__kb_injected) { // already injected -> skip, but still process children in case they were added afterwards
-        const attr = _.find(el.attributes || [], attr => attr.name === 'kb-inject');
+        const attr = _.find(el.attributes || [], x => x.name === 'kb-inject');
         if (attr) {
           el.__kb_injected = true; // mark injected
           results.push({ el, view_model: {}, binding: attr.value });
@@ -140,7 +137,7 @@ kb.Inject = class Inject {
       }
       _.each(el.childNodes, child => findElements(child));
     };
-    findElements(el);
+    findElements(rootEl);
 
     // bind the view models
     _.each(results, (app) => {
@@ -170,9 +167,10 @@ kb.Inject = class Inject {
 
 // auto-inject recursively
 const _ko_applyBindings = ko.applyBindings;
-ko.applyBindings = function (context, element) {
-  const results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(element) : [];
-  if (!results.length) return _ko_applyBindings.apply(this, arguments);
+ko.applyBindings = function (...args) {
+  const el = args[1];
+  const results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
+  return results.length ? results : _ko_applyBindings.call(this, ...args);
 };
 
 // ############################
@@ -186,7 +184,10 @@ kb.injectViewModels = kb.Inject.injectViewModels;
 if (root && (typeof root.document !== 'undefined')) {
   // use simple ready check
   const onReady = () => {
-    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
+    if (root.document.readyState !== 'complete') {
+      setTimeout(onReady, 0); // keep waiting for the document to load
+      return;
+    }
     kb.injectViewModels(); // the document is loaded
   };
   onReady();

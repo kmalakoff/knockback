@@ -119,7 +119,9 @@ var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 //
 // @method .configure(options)
 //   Method to update Knockback global configuration.
-//   @param [Object] configuration options. 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational), 2) deep_retain - true to multiply retain view models in the store
+//   @param [Object] configuration options.
+// 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational)
+// 2) deep_retain - true to multiply retain view models in the store
 //
 // @method .collectionObservable(collection, options)
 //   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
@@ -140,19 +142,23 @@ var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 //   @return [ko.observable] the constructor returns 'this'
 //
 // @method .defaultObservable(target, default_value)
-//   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
+//   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options.
+//   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
 //   @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
 //   @param [Any] default_value the default value. Can be a value, string or ko.observable
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 //
 // @method .formattedObservable(format, arg1, arg2, etc)
-//   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
-//   @param [String|ko.observable] format the format string. Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
+//   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options.
+//   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
+//   @param [String|ko.observable] format the format string.
+//   Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
 //   @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 //
 // @method .localizedObservable(value, options, view_model)
-//   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
+//   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options.
+//   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
 //   @param [Data|ko.observable] value the value to localize
 //   @param [Object] options the create options
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
@@ -227,7 +233,10 @@ var kb = function () {
 
       if (depth > 0) return false; // max depth check for ViewModel inside of ViewModel
       for (var key in obj) {
-        var value = obj[key];if (key !== '__kb' && kb.isReleaseable(value, depth + 1)) return true;
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          var value = obj[key];
+          if (key !== '__kb' && kb.isReleaseable(value, depth + 1)) return true;
+        }
       }
       return false;
     }
@@ -293,13 +302,12 @@ var kb = function () {
   }, {
     key: 'releaseKeys',
     value: function releaseKeys(obj) {
-      for (var key in obj) {
-        var value = obj[key];
+      _.each(obj, function (value, key) {
         if (key !== '__kb' && kb.isReleaseable(value)) {
           obj[key] = null;
           kb.release(value);
         }
-      }
+      });
     }
 
     // Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
@@ -326,7 +334,8 @@ var kb = function () {
 
     // Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
     //
-    // NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options, afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
+    // NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options,
+    // afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
     //
     // @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
     //   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
@@ -340,28 +349,26 @@ var kb = function () {
 
       if (!root.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
-        return;
+        return undefined;
       }
 
       var el = root.document.createElement('div');
       var observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-      if (el.childNodes.length === 1) {
-        // do not return the template wrapper if possible
-        el = el.childNodes[0];
-      } else if (el.childNodes.length) {
+
+      // do not return the template wrapper if possible
+      if (el.childNodes.length === 1) el = el.childNodes[0];else if (el.childNodes.length) {
         for (var i = 0, end = el.childNodes.length, asc = end >= 0; asc ? i <= end : i >= end; asc ? i++ : i--) {
           // ensure the context is passed up to wrapper from a child
           try {
-            ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i]));break;
-          } catch (error) {}
+            ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i]));
+            break;
+          } catch (err) {/**/}
         }
       }
       kb.releaseOnNodeRemove(view_model, el);
       observable.dispose(); // we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
 
-      if (view_model.afterRender && !options.afterRender) {
-        view_model.afterRender(el);
-      } // call afterRender for custom setup unless provided in options (so doesn't get double called)
+      if (view_model.afterRender && !options.afterRender) view_model.afterRender(el); // call afterRender for custom setup unless provided in options (so doesn't get double called)
       return el;
     }
 
@@ -378,16 +385,13 @@ var kb = function () {
     value: function applyBindings(view_model, node) {
       if (!root.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
-        return;
+        return undefined;
       }
 
       if (node.length) {
         // convert to a root element
-        var children = void 0;
-        var _ref = [root.document.createElement('div'), node];
-        node = _ref[0];
-        children = _ref[1];
-
+        var children = node;
+        node = root.document.createElement('div');
         _.each(children, function (child) {
           return node.appendChild(child);
         });
@@ -399,7 +403,7 @@ var kb = function () {
   }, {
     key: 'getValue',
     value: function getValue(model, key, args) {
-      if (!model) return;
+      if (!model) return undefined;
       if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key]();
       if (!args) return model.get(key);
       return model.get.apply(model, _toConsumableArray(_.map([key].concat(args), function (value) {
@@ -410,7 +414,7 @@ var kb = function () {
     key: 'setValue',
     value: function setValue(model, key, value) {
       var attributes = void 0;
-      if (!model) return;
+      if (!model) return undefined;
       if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
       (attributes = {})[key] = value;
       return model.set(attributes);
@@ -424,7 +428,7 @@ var kb = function () {
   }, {
     key: '_throwMissing',
     value: function _throwMissing(instance, message) {
-      throw (_.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is missing';
+      throw new Error((_.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is missing');
     }
 
     // @nodoc
@@ -432,7 +436,7 @@ var kb = function () {
   }, {
     key: '_throwUnexpected',
     value: function _throwUnexpected(instance, message) {
-      throw (_.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is unexpected';
+      throw new Error((_.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is unexpected');
     }
 
     // @nodoc
@@ -481,11 +485,11 @@ kb.initClass();
 module.exports = kb;
 
 if (root.Parse) {
-  Backbone = kb.Parse = root.Parse;
-  _ = kb._ = root.Parse._;
+  kb.Parse = root.Parse;Backbone = kb.Parse;
+  kb._ = root.Parse._;_ = kb._;
 } else {
-  Backbone = kb.Backbone = __webpack_require__(28);
-  _ = kb._ = __webpack_require__(4);
+  kb.Backbone = __webpack_require__(28);Backbone = kb.Backbone;
+  kb._ = __webpack_require__(4);_ = kb._;
 }
 kb.ko = ko;
 
@@ -3469,66 +3473,61 @@ kb.Inject = function () {
 
     // @private
     value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-      var inject = function inject(data) {
-        if (_.isFunction(data)) {
-          view_model = new data(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
+      var doInject = function doInject(value) {
+        if (_.isFunction(value)) {
+          view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
           kb.releaseOnNodeRemove(view_model, element);
         } else {
           // view_model constructor causes a scope change
-          if (data.view_model) {
+          if (value.view_model) {
             // specifying a view_model changes the scope so we need to bind a destroy
-            view_model = new data.view_model(view_model, element, value_accessor, all_bindings_accessor);
+            view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
             kb.releaseOnNodeRemove(view_model, element);
           }
 
           // resolve and merge in each key
-          for (var key in data) {
-            var value = data[key];
-            if (key === 'view_model') {
-              continue;
-            }
+          _.each(value, function (item, key) {
+            if (key === 'view_model') return;
 
             // create function
-            if (key === 'create') {
-              value(view_model, element, value_accessor, all_bindings_accessor);
+            if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
 
-              // resolve nested with assign or not
-            } else if (_.isObject(value) && !_.isFunction(value)) {
-              var target = nested || value && value.create ? {} : view_model;
-              view_model[key] = kb.Inject.inject(value, target, element, value_accessor, all_bindings_accessor, true);
+            // resolve nested with assign or not
+            else if (_.isObject(item) && !_.isFunction(item)) {
+                var target = nested || item && item.create ? {} : view_model;
+                view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
 
-              // simple set
-            } else {
-              view_model[key] = value;
-            }
-          }
+                // simple set
+              } else view_model[key] = item;
+          });
         }
 
         return view_model;
       };
 
       // in recursive calls, we are already protected from propagating dependencies to the template
-      return nested ? inject(data) : kb.ignore(function () {
-        return inject(data);
+      return nested ? doInject(data) : kb.ignore(function () {
+        return doInject(data);
       });
     }
 
-    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered. Also, used with the data-bind `'inject'` custom binding.
+    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
+    // Also, used with the data-bind `'inject'` custom binding.
     // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
     // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
 
   }, {
     key: 'injectViewModels',
     value: function injectViewModels() {
-      var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
+      var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
 
       // find all of the app elements
       var results = [];
       var findElements = function findElements(el) {
         if (!el.__kb_injected) {
           // already injected -> skip, but still process children in case they were added afterwards
-          var attr = _.find(el.attributes || [], function (attr) {
-            return attr.name === 'kb-inject';
+          var attr = _.find(el.attributes || [], function (x) {
+            return x.name === 'kb-inject';
           });
           if (attr) {
             el.__kb_injected = true; // mark injected
@@ -3539,7 +3538,7 @@ kb.Inject = function () {
           return findElements(child);
         });
       };
-      findElements(el);
+      findElements(rootEl);
 
       // bind the view models
       _.each(results, function (app) {
@@ -3578,9 +3577,14 @@ kb.Inject = function () {
 
 // auto-inject recursively
 var _ko_applyBindings = ko.applyBindings;
-ko.applyBindings = function (context, element) {
-  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(element) : [];
-  if (!results.length) return _ko_applyBindings.apply(this, arguments);
+ko.applyBindings = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var el = args[1];
+  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
+  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [this].concat(args));
 };
 
 // ############################
@@ -3594,7 +3598,10 @@ kb.injectViewModels = kb.Inject.injectViewModels;
 if (root && typeof root.document !== 'undefined') {
   // use simple ready check
   var onReady = function onReady() {
-    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0); // keep waiting for the document to load
+    if (root.document.readyState !== 'complete') {
+      setTimeout(onReady, 0); // keep waiting for the document to load
+      return;
+    }
     kb.injectViewModels(); // the document is loaded
   };
   onReady();
@@ -3744,20 +3751,20 @@ kb.Observable = function () {
       _this._model = ko.observable();
       var observable = kb.utils.wrappedObservable(_this, ko.computed({
         read: function read() {
-          var model = _this._model();
+          var m = _this._model();
           var args = [_this.key].concat(_this.args || []);
           _.each(args, function (arg) {
             return ko.utils.unwrapObservable(arg);
           });
 
           var ew = kb.utils.wrappedEventWatcher(_this);
-          !ew || ew.emitter(model || null);
+          !ew || ew.emitter(m || null);
 
           if (_this.read) {
             _this.update(_this.read.apply(_this._vm, args));
-          } else if (!_.isUndefined(model)) {
+          } else if (!_.isUndefined(m)) {
             kb.ignore(function () {
-              return _this.update(kb.getValue(model, kb.peek(_this.key), _this.args));
+              return _this.update(kb.getValue(m, kb.peek(_this.key), _this.args));
             });
           }
           return _this._value.value();
@@ -3766,12 +3773,12 @@ kb.Observable = function () {
         write: function write(new_value) {
           return kb.ignore(function () {
             var unwrapped_new_value = kb.utils.unwrapModels(new_value); // unwrap for set (knockout may pass view models which are required for the observable but not the model)
-            var model = kb.peek(_this._model);
+            var m = kb.peek(_this._model);
             if (_this.write) {
               _this.write.call(_this._vm, unwrapped_new_value);
-              new_value = kb.getValue(model, kb.peek(_this.key), _this.args);
-            } else if (model) {
-              kb.setValue(model, kb.peek(_this.key), unwrapped_new_value);
+              new_value = kb.getValue(m, kb.peek(_this.key), _this.args);
+            } else if (m) {
+              kb.setValue(m, kb.peek(_this.key), unwrapped_new_value);
             }
             return _this.update(new_value);
           });
@@ -3786,22 +3793,20 @@ kb.Observable = function () {
       if (create_options.factories && (typeof create_options.factories === 'function' || create_options.factories.create)) {
         create_options.factory = kb.utils.wrappedFactory(observable, new kb.Factory(create_options.factory));
         create_options.factory.addPathMapping(create_options.path, create_options.factories);
-      } else {
-        create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
-      }
+      } else create_options.factory = kb.Factory.useOptionsOrCreate(create_options, observable, create_options.path);
       delete create_options.factories;
 
       // publish public interface on the observable and return instead of this
       kb.publishMethods(observable, _this, KEYS_PUBLISH);
 
       // use external model observable or create
-      observable.model = _this.model = ko.computed({
+      _this.model = ko.computed({
         read: function read() {
           return ko.utils.unwrapObservable(_this._model);
         },
         write: function write(new_model) {
           return kb.ignore(function () {
-            if (_this.__kb_released || kb.peek(_this._model) === new_model) return; // destroyed or no change
+            if (_this.__kb_released || kb.peek(_this._model) === new_model) return undefined; // destroyed or no change
 
             // update references
             var new_value = kb.getValue(new_model, kb.peek(_this.key), _this.args);
@@ -3811,22 +3816,29 @@ kb.Observable = function () {
             } else if (!_.isUndefined(new_value)) {
               return _this.update(new_value);
             }
+            return undefined;
           });
         }
       });
-      kb.EventWatcher.useOptionsOrCreate({ event_watcher: event_watcher }, model || null, _this, { emitter: _this.model, update: function update() {
+      observable.model = _this.model;
+
+      kb.EventWatcher.useOptionsOrCreate({ event_watcher: event_watcher }, model || null, _this, {
+        emitter: _this.model,
+        update: function update() {
           return kb.ignore(function () {
             return _this.update();
           });
-        }, key: _this.key, path: create_options.path });
+        },
+        key: _this.key,
+        path: create_options.path
+      });
       _this._value.rawValue() || _this._value.update(); // wasn't loaded so create
 
-      if (kb.LocalizedObservable && key_or_info.localizer) {
-        observable = new key_or_info.localizer(observable);
-      } // wrap ourselves with a localizer
-      if (kb.DefaultObservable && Object.prototype.hasOwnProperty.call(key_or_info, 'default')) {
-        observable = kb.defaultObservable(observable, key_or_info.default);
-      } // wrap ourselves with a default value
+      // wrap ourselves with a localizer
+      if (kb.LocalizedObservable && key_or_info.localizer) observable = new key_or_info.localizer(observable);
+
+      // wrap ourselves with a default value
+      if (kb.DefaultObservable && Object.prototype.hasOwnProperty.call(key_or_info, 'default')) observable = kb.defaultObservable(observable, key_or_info.default);
 
       return observable;
     });
@@ -3842,7 +3854,7 @@ kb.Observable = function () {
       var observable = kb.utils.wrappedObservable(this);
       this.__kb_released = true;
       this._value.destroy();this._value = null;
-      this.model.dispose();this.model = observable.model = null;
+      this.model.dispose();this.model = null;observable.model = null;
       return kb.utils.wrappedDestroy(this);
     }
 
@@ -3911,12 +3923,13 @@ var kb = __webpack_require__(0);
 
 var _ = kb._;
 
-// kb.Statistics is an optional components that is useful for measuring your application's performance. You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
+// kb.Statistics is an optional components that is useful for measuring your application's performance.
+// You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
 //
 // kb.Statistics is not included in `knockback.js` nor `knockback-core.js` so you need to manually include it from the `lib` directory.
 //
 
-module.exports = kb.Statistics = function () {
+var Statistics = function () {
   function Statistics() {
     _classCallCheck(this, Statistics);
 
@@ -3930,7 +3943,7 @@ module.exports = kb.Statistics = function () {
   _createClass(Statistics, [{
     key: 'clear',
     value: function clear() {
-      return this.model_events_tracker = [];
+      this.model_events_tracker = [];
     }
 
     // ##############################
@@ -3942,7 +3955,7 @@ module.exports = kb.Statistics = function () {
   }, {
     key: 'addModelEvent',
     value: function addModelEvent(event) {
-      return this.model_events_tracker.push(event);
+      this.model_events_tracker.push(event);
     }
 
     // A debug helper to summarize the registered events in human-readable form
@@ -3955,10 +3968,9 @@ module.exports = kb.Statistics = function () {
       var event_groups = _.groupBy(this.model_events_tracker, function (test) {
         return 'event name: \'' + test.name + '\', attribute name: \'' + test.key + '\'';
       });
-      for (var key in event_groups) {
-        var value = event_groups[key];
+      _.each(event_groups, function (value, key) {
         stats_string += '\n ' + key + ', count: ' + value.length;
-      }
+      });
       return stats_string;
     }
 
@@ -3971,7 +3983,7 @@ module.exports = kb.Statistics = function () {
   }, {
     key: 'register',
     value: function register(key, obj) {
-      return this.registeredTracker(key).push(obj);
+      this.registeredTracker(key).push(obj);
     }
 
     // Unregister an object by key
@@ -3983,7 +3995,7 @@ module.exports = kb.Statistics = function () {
       var index = _.indexOf(type_tracker, obj);
       if (!~index) {
         if (typeof console !== 'undefined') console.log('kb.Statistics: failed to unregister type: ' + key);
-        return;
+        return undefined;
       }
       return type_tracker.splice(index, 1);
     }
@@ -3994,11 +4006,11 @@ module.exports = kb.Statistics = function () {
     key: 'registeredCount',
     value: function registeredCount(type) {
       if (type) return this.registeredTracker(type).length;
+
       var count = 0;
-      for (type in this.registered_tracker[type]) {
-        var type_tracker = this.registered_tracker[type][type];
+      _.each(this.registered_tracker[type], function (type_tracker) {
         count += type_tracker.length;
-      }
+      });
       return count;
     }
 
@@ -4011,15 +4023,15 @@ module.exports = kb.Statistics = function () {
     key: 'registeredStatsString',
     value: function registeredStatsString(success_message) {
       var stats_string = '';
-      for (var type in this.registered_tracker) {
-        var type_tracker = this.registered_tracker[type];
-        if (!type_tracker.length) continue;
+      var written = false;
+      _.each(this.registered_tracker, function (type_tracker, type) {
+        if (!type_tracker.length) return;
         if (written) {
           stats_string += '\n ';
         }
         stats_string += (type || 'No Name') + ': ' + type_tracker.length;
-        var written = true;
-      }
+        written = true;
+      });
       return stats_string || success_message;
     }
 
@@ -4041,22 +4053,23 @@ module.exports = kb.Statistics = function () {
       var events = obj._events || obj._callbacks || {};
       var keys = key ? [key] : _.keys(events);
 
-      _.each(keys, function (key) {
-        var node = events[key];
+      _.each(keys, function (key_) {
+        var node = events[key_];
         if (node) {
           if (_.isArray(node)) {
-            stats[key] = _.compact(node).length;
+            stats[key_] = _.compact(node).length;
           } else {
-            stats[key] = 0;var _node = node,
+            var _node = node,
                 tail = _node.tail;
 
+            stats[key_] = 0;
             node = node.next;
             while (node !== tail) {
-              stats[key]++;
+              stats[key_]++;
               node = node.next;
             }
           }
-          stats.count += stats[key];
+          stats.count += stats[key_];
         }
       });
       return stats;
@@ -4065,6 +4078,9 @@ module.exports = kb.Statistics = function () {
 
   return Statistics;
 }();
+
+kb.Statistics = Statistics;
+module.exports = Statistics;
 
 /***/ }),
 /* 13 */
@@ -4091,7 +4107,8 @@ var kb = __webpack_require__(0);
 var _ = kb._,
     ko = kb.ko;
 
-// Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models, to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
+// Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models,
+// to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 //
 // @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
 //   var co = kb.collectionObservable(new Backbone.Collection());
@@ -4148,7 +4165,7 @@ var Store = function () {
       this.__kb_released = true;
       this.clear();
       var index = _.indexOf(kb.Store.instances, this);
-      if (~index) return kb.Store.instances.splice(index, 1);
+      if (~index) kb.Store.instances.splice(index, 1);
     }
 
     // Manually clear the store
@@ -4158,24 +4175,16 @@ var Store = function () {
     value: function clear() {
       var _this = this;
 
-      var observable = void 0,
-          observable_records = void 0,
-          replaced_observables = void 0;
-      var _ref = [this.observable_records, {}];
-      observable_records = _ref[0];
-      this.observable_records = _ref[1];
+      var observable_records = this.observable_records;
+      this.observable_records = {};
+      _.each(observable_records, function (records) {
+        _.each(records, function (observable) {
+          return _this.release(observable, true);
+        });
+      });
 
-      for (var creator_id in observable_records) {
-        var records = observable_records[creator_id];
-        for (var cid in records) {
-          observable = records[cid];this.release(observable, true);
-        }
-      }
-
-      var _ref2 = [this.replaced_observables, []];
-      replaced_observables = _ref2[0];
-      this.replaced_observables = _ref2[1];
-
+      var replaced_observables = this.replaced_observables;
+      this.replaced_observables = [];
       _.each(replaced_observables, function (observable) {
         if (!observable.__kb_released) _this.release(observable, true);
       });
@@ -4186,12 +4195,11 @@ var Store = function () {
   }, {
     key: 'compact',
     value: function compact() {
-      for (var creator_id in this.observable_records) {
-        var records = this.observable_records[creator_id];
-        for (var cid in records) {
-          if (records[cid].__kb_released) delete records[cid];
-        }
-      }
+      _.each(this.observable_records, function (records) {
+        _.each(records, function (observable, cid) {
+          if (observable.__kb_released) delete records[cid];
+        });
+      });
     }
 
     // Used to register a new view model with the store.
@@ -4210,13 +4218,13 @@ var Store = function () {
   }, {
     key: 'retain',
     value: function retain(observable, obj, creator) {
-      var current_observable = void 0;
-      if (!this._canRegister(observable)) return;
+      if (!this._canRegister(observable)) return undefined;
       if (!creator) {
         creator = observable.constructor;
       } // default is to use the constructor
 
-      if (current_observable = this.find(obj, creator)) {
+      var current_observable = this.find(obj, creator);
+      if (current_observable) {
         if (current_observable === observable) {
           // already in this store
           this._getOrCreateStoreReferences(observable).ref_count++;
@@ -4248,21 +4256,15 @@ var Store = function () {
     value: function retainOrCreate(obj, options, deep_retain) {
       var _this2 = this;
 
-      var creator = void 0,
-          observable = void 0;
-      if (!(creator = this._creator(obj, options))) {
-        return kb.utils.createFromDefaultCreator(obj, options);
-      }
-      if (creator.models_only) {
-        return obj;
-      }
-      if (observable = this.find(obj, creator)) {
+      var creator = this._creator(obj, options);
+      if (!creator) return kb.utils.createFromDefaultCreator(obj, options);
+      if (creator.models_only) return obj;
+
+      var observable = this.find(obj, creator);
+      if (observable) {
         return deep_retain && kb.settings.deep_retain ? this.retain(observable, obj, creator) : observable;
       }
-
-      if (!_.isFunction(creator.create || creator)) {
-        throw new Error('Invalid factory for "' + options.path + '"');
-      }
+      if (!_.isFunction(creator.create || creator)) throw new Error('Invalid factory for "' + options.path + '"');
 
       observable = kb.ignore(function () {
         options = _.defaults({ store: _this2, creator: creator }, options); // set our own creator so we can register ourselves above

@@ -20,7 +20,9 @@ const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 //
 // @method .configure(options)
 //   Method to update Knockback global configuration.
-//   @param [Object] configuration options. 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational), 2) deep_retain - true to multiply retain view models in the store
+//   @param [Object] configuration options.
+// 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational)
+// 2) deep_retain - true to multiply retain view models in the store
 //
 // @method .collectionObservable(collection, options)
 //   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
@@ -41,19 +43,23 @@ const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 //   @return [ko.observable] the constructor returns 'this'
 //
 // @method .defaultObservable(target, default_value)
-//   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
+//   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options.
+//   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
 //   @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
 //   @param [Any] default_value the default value. Can be a value, string or ko.observable
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 //
 // @method .formattedObservable(format, arg1, arg2, etc)
-//   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
-//   @param [String|ko.observable] format the format string. Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
+//   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options.
+//   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
+//   @param [String|ko.observable] format the format string.
+//   Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
 //   @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 //
 // @method .localizedObservable(value, options, view_model)
-//   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options. If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
+//   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options.
+//   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
 //   @param [Data|ko.observable] value the value to localize
 //   @param [Object] options the create options
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
@@ -108,7 +114,12 @@ class kb {
     }
 
     if (depth > 0) return false; // max depth check for ViewModel inside of ViewModel
-    for (const key in obj) { const value = obj[key]; if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) return true; }
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const value = obj[key];
+        if ((key !== '__kb') && kb.isReleaseable(value, depth + 1)) return true;
+      }
+    }
     return false;
   }
 
@@ -161,13 +172,12 @@ class kb {
 
   // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
   static releaseKeys(obj) {
-    for (const key in obj) {
-      const value = obj[key];
+    _.each(obj, (value, key) => {
       if ((key !== '__kb') && kb.isReleaseable(value)) {
         obj[key] = null;
         kb.release(value);
       }
-    }
+    });
   }
 
   // Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
@@ -189,7 +199,8 @@ class kb {
 
   // Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
   //
-  // NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options, afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
+  // NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options,
+  // afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
   //
   // @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
   //   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
@@ -198,22 +209,26 @@ class kb {
   static renderTemplate(template, view_model, options = {}) {
     if (!root.document) {
       (typeof console === 'undefined') || console.log('renderTemplate: document is undefined');
-      return;
+      return undefined;
     }
 
     let el = root.document.createElement('div');
     const observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
-    if (el.childNodes.length === 1) { // do not return the template wrapper if possible
-      el = el.childNodes[0];
-    } else if (el.childNodes.length) {
+
+    // do not return the template wrapper if possible
+    if (el.childNodes.length === 1) el = el.childNodes[0];
+    else if (el.childNodes.length) {
       for (let i = 0, end = el.childNodes.length, asc = end >= 0; asc ? i <= end : i >= end; asc ? i++ : i--) { // ensure the context is passed up to wrapper from a child
-        try { ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i])); break; } catch (error) {}
+        try {
+          ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i]));
+          break;
+        } catch (err) { /**/ }
       }
     }
     kb.releaseOnNodeRemove(view_model, el);
     observable.dispose(); // we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
 
-    if (view_model.afterRender && !options.afterRender) { view_model.afterRender(el); } // call afterRender for custom setup unless provided in options (so doesn't get double called)
+    if (view_model.afterRender && !options.afterRender) view_model.afterRender(el); // call afterRender for custom setup unless provided in options (so doesn't get double called)
     return el;
   }
 
@@ -227,12 +242,12 @@ class kb {
   static applyBindings(view_model, node) {
     if (!root.document) {
       (typeof console === 'undefined') || console.log('renderTemplate: document is undefined');
-      return;
+      return undefined;
     }
 
     if (node.length) { // convert to a root element
-      let children;
-      [node, children] = [root.document.createElement('div'), node];
+      const children = node;
+      node = root.document.createElement('div');
       _.each(children, child => node.appendChild(child));
     }
     ko.applyBindings(view_model, node);
@@ -241,7 +256,7 @@ class kb {
   }
 
   static getValue(model, key, args) {
-    if (!model) return;
+    if (!model) return undefined;
     if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key]();
     if (!args) return model.get(key);
     return model.get(..._.map([key].concat(args), value => kb.peek(value)));
@@ -249,7 +264,7 @@ class kb {
 
   static setValue(model, key, value) {
     let attributes;
-    if (!model) return;
+    if (!model) return undefined;
     if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
     (attributes = {})[key] = value;
     return model.set(attributes);
@@ -259,13 +274,19 @@ class kb {
   // INTERNAL HELPERS
   // ###################################
   // @nodoc
-  static _throwMissing(instance, message) { throw `${_.isString(instance) ? instance : instance.constructor.name}: ${message} is missing`; }
+  static _throwMissing(instance, message) {
+    throw new Error(`${_.isString(instance) ? instance : instance.constructor.name}: ${message} is missing`);
+  }
 
   // @nodoc
-  static _throwUnexpected(instance, message) { throw `${_.isString(instance) ? instance : instance.constructor.name}: ${message} is unexpected`; }
+  static _throwUnexpected(instance, message) {
+    throw new Error(`${_.isString(instance) ? instance : instance.constructor.name}: ${message} is unexpected`);
+  }
 
   // @nodoc
-  static publishMethods(observable, instance, methods) { _.each(methods, (fn) => { observable[fn] = kb._.bind(instance[fn], instance); }); }
+  static publishMethods(observable, instance, methods) {
+    _.each(methods, (fn) => { observable[fn] = kb._.bind(instance[fn], instance); });
+  }
 
   // @nodoc
   static peek(obs) {
@@ -284,11 +305,11 @@ kb.initClass();
 module.exports = kb;
 
 if (root.Parse) {
-  Backbone = (kb.Parse = root.Parse);
-  _ = (kb._ = root.Parse._);
+  kb.Parse = root.Parse; Backbone = kb.Parse;
+  kb._ = root.Parse._; _ = kb._;
 } else {
-  Backbone = (kb.Backbone = require('backbone'));
-  _ = (kb._ = require('underscore'));
+  kb.Backbone = require('backbone'); Backbone = kb.Backbone;
+  kb._ = require('underscore'); _ = kb._;
 }
 kb.ko = ko;
 
