@@ -2726,24 +2726,16 @@ var Store = function () {
   }, {
     key: 'reuse',
     value: function reuse(observable, obj) {
-      var current_obj = void 0,
-          current_observable = void 0;
-      if ((current_obj = kb.utils.wrappedObject(observable)) === obj) return;
-      if (!this._canRegister(observable)) {
-        throw new Error('Cannot reuse a simple observable');
-      }
-      if (this._refCount(observable) !== 1) {
-        throw new Error('Trying to change a shared view model. Ref count: ' + this._refCount(observable));
-      }
+      var current_obj = kb.utils.wrappedObject(observable);
+      if (current_obj === obj) return;
+      if (!this._canRegister(observable)) throw new Error('Cannot reuse a simple observable');
+      if (this._refCount(observable) !== 1) throw new Error('Trying to change a shared view model. Ref count: ' + this._refCount(observable));
 
       var creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
-      if (!_.isUndefined(current_obj)) {
-        current_observable = this.find(current_obj, creator);
-      }
+      var current_observable = void 0;
+      if (!_.isUndefined(current_obj)) current_observable = this.find(current_obj, creator);
       this.retain(observable, obj, creator);
-      if (current_observable) {
-        this.release(current_observable);
-      }
+      if (current_observable) this.release(current_observable);
     }
 
     // Release a reference to a a ViewModel in this store.
@@ -2751,18 +2743,19 @@ var Store = function () {
   }, {
     key: 'release',
     value: function release(observable, force) {
-      var store_references = void 0;
       if (!this._canRegister(observable)) return kb.release(observable); // just release
 
       // maybe be externally added
-      if (store_references = this._storeReferences(observable)) {
-        if (!force && --store_references.ref_count > 0) return; // do not release yet
+      var store_references = this._storeReferences(observable);
+      if (store_references) {
+        if (!force && --store_references.ref_count > 0) return undefined; // do not release yet
         this._clearStoreReferences(observable);
       }
 
       this._remove(observable);
-      if (observable.__kb_released) return;
+      if (observable.__kb_released) return undefined;
       if (force || this._refCount(observable) <= 1) return kb.release(observable); // allow for a single initial reference in another store
+      return undefined;
     }
 
     // @nodoc
@@ -2841,7 +2834,7 @@ var Store = function () {
       var _this3 = this;
 
       var stores_references = kb.utils.get(observable, 'stores_references');
-      if (!stores_references) return;
+      if (!stores_references) return undefined;
 
       return _.find(stores_references, function (ref) {
         return ref.store === _this3;
@@ -2857,8 +2850,8 @@ var Store = function () {
 
       var stores_references = kb.utils.orSet(observable, 'stores_references', []);
 
-      var ref = _.find(stores_references, function (ref) {
-        return ref.store === _this4;
+      var ref = _.find(stores_references, function (x) {
+        return x.store === _this4;
       });
       if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: function release() {
           return _this4.release(observable);
@@ -2896,12 +2889,13 @@ var Store = function () {
   }, {
     key: '_add',
     value: function _add(observable, obj, creator) {
-      var name = void 0;
-      if (!creator) {
-        creator = observable.constructor;
-      } // default is to use the constructor
+      if (!creator) creator = observable.constructor; // default is to use the constructor
       kb.utils.wrappedObject(observable, obj);kb.utils.wrappedCreator(observable, creator);
-      return (this.observable_records[name = this._creatorId(creator)] || (this.observable_records[name] = {}))[this._cid(obj)] = observable;
+
+      var name = this._creatorId(creator);
+      if (!this.observable_records[name]) this.observable_records[name] = {};
+      this.observable_records[name][this._cid(obj)] = observable;
+      return observable;
     }
 
     // @nodoc
@@ -2909,16 +2903,16 @@ var Store = function () {
   }, {
     key: '_remove',
     value: function _remove(observable) {
-      var current_observable = void 0,
-          obj = void 0;
       var creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
-      if (current_observable = this.find(obj = kb.utils.wrappedObject(observable), creator)) {
-        // already released
-        if (current_observable === observable) {
-          delete this.observable_records[this._creatorId(creator)][this._cid(obj)];
-        } // not already replaced
+      var obj = kb.utils.wrappedObject(observable);
+      var current_observable = this.find(obj, creator);
+
+      // already released
+      if (current_observable && current_observable === observable) {
+        delete this.observable_records[this._creatorId(creator)][this._cid(obj)]; // not already replaced
       }
-      kb.utils.wrappedObject(observable, null);return kb.utils.wrappedCreator(observable, null);
+      kb.utils.wrappedObject(observable, null);
+      return kb.utils.wrappedCreator(observable, null);
     }
 
     // @nodoc
@@ -2926,16 +2920,11 @@ var Store = function () {
   }, {
     key: '_creator',
     value: function _creator(obj, options) {
-      var creator = void 0;
-      if (options.creator) {
-        return options.creator;
-      }
-      if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) {
-        return creator;
-      }
-      if (kb.isModel(obj)) {
-        return kb.ViewModel;
-      }
+      if (options.creator) return options.creator;
+      var creator = kb.utils.inferCreator(obj, options.factory, options.path);
+      if (creator) return creator;
+      if (kb.isModel(obj)) return kb.ViewModel;
+      return undefined;
     }
   }]);
 

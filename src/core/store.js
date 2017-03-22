@@ -144,32 +144,33 @@ class Store {
 
   // @nodoc
   reuse(observable, obj) {
-    let current_obj,
-      current_observable;
-    if ((current_obj = kb.utils.wrappedObject(observable)) === obj) return;
-    if (!this._canRegister(observable)) { throw new Error('Cannot reuse a simple observable'); }
-    if (this._refCount(observable) !== 1) { throw new Error(`Trying to change a shared view model. Ref count: ${this._refCount(observable)}`); }
+    const current_obj = kb.utils.wrappedObject(observable);
+    if (current_obj === obj) return;
+    if (!this._canRegister(observable)) throw new Error('Cannot reuse a simple observable');
+    if (this._refCount(observable) !== 1) throw new Error(`Trying to change a shared view model. Ref count: ${this._refCount(observable)}`);
 
     const creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
-    if (!_.isUndefined(current_obj)) { current_observable = this.find(current_obj, creator); }
+    let current_observable;
+    if (!_.isUndefined(current_obj)) current_observable = this.find(current_obj, creator);
     this.retain(observable, obj, creator);
-    if (current_observable) { this.release(current_observable); }
+    if (current_observable) this.release(current_observable);
   }
 
   // Release a reference to a a ViewModel in this store.
   release(observable, force) {
-    let store_references;
     if (!this._canRegister(observable)) return kb.release(observable); // just release
 
     // maybe be externally added
-    if (store_references = this._storeReferences(observable)) {
-      if (!force && (--store_references.ref_count > 0)) return; // do not release yet
+    const store_references = this._storeReferences(observable);
+    if (store_references) {
+      if (!force && (--store_references.ref_count > 0)) return undefined; // do not release yet
       this._clearStoreReferences(observable);
     }
 
     this._remove(observable);
-    if (observable.__kb_released) return;
+    if (observable.__kb_released) return undefined;
     if (force || (this._refCount(observable) <= 1)) return kb.release(observable); // allow for a single initial reference in another store
+    return undefined;
   }
 
   // @nodoc
@@ -222,7 +223,7 @@ class Store {
   // @nodoc
   _storeReferences(observable) {
     const stores_references = kb.utils.get(observable, 'stores_references');
-    if (!stores_references) return;
+    if (!stores_references) return undefined;
 
     return _.find(stores_references, ref => ref.store === this);
   }
@@ -231,7 +232,7 @@ class Store {
   _getOrCreateStoreReferences(observable) {
     const stores_references = kb.utils.orSet(observable, 'stores_references', []);
 
-    let ref = _.find(stores_references, ref => ref.store === this);
+    let ref = _.find(stores_references, x => x.store === this);
     if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: () => this.release(observable) });
     return ref;
   }
@@ -255,29 +256,36 @@ class Store {
 
   // @nodoc
   _add(observable, obj, creator) {
-    let name;
-    if (!creator) { creator = observable.constructor; } // default is to use the constructor
+    if (!creator) creator = observable.constructor; // default is to use the constructor
     kb.utils.wrappedObject(observable, obj); kb.utils.wrappedCreator(observable, creator);
-    return (this.observable_records[name = this._creatorId(creator)] || (this.observable_records[name] = {}))[this._cid(obj)] = observable;
+
+    const name = this._creatorId(creator);
+    if (!this.observable_records[name]) this.observable_records[name] = {};
+    this.observable_records[name][this._cid(obj)] = observable;
+    return observable;
   }
 
   // @nodoc
   _remove(observable) {
-    let current_observable,
-      obj;
     const creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
-    if (current_observable = this.find((obj = kb.utils.wrappedObject(observable)), creator)) { // already released
-      if (current_observable === observable) { delete this.observable_records[this._creatorId(creator)][this._cid(obj)]; } // not already replaced
+    const obj = kb.utils.wrappedObject(observable);
+    const current_observable = this.find(obj, creator);
+
+    // already released
+    if (current_observable && (current_observable === observable)) {
+      delete this.observable_records[this._creatorId(creator)][this._cid(obj)]; // not already replaced
     }
-    kb.utils.wrappedObject(observable, null); return kb.utils.wrappedCreator(observable, null);
+    kb.utils.wrappedObject(observable, null);
+    return kb.utils.wrappedCreator(observable, null);
   }
 
   // @nodoc
   _creator(obj, options) {
-    let creator;
-    if (options.creator) { return options.creator; }
-    if (creator = kb.utils.inferCreator(obj, options.factory, options.path)) { return creator; }
-    if (kb.isModel(obj)) { return kb.ViewModel; }
+    if (options.creator) return options.creator;
+    const creator = kb.utils.inferCreator(obj, options.factory, options.path);
+    if (creator) return creator;
+    if (kb.isModel(obj)) return kb.ViewModel;
+    return undefined;
   }
 }
 Store.initClass();
