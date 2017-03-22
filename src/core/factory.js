@@ -43,7 +43,8 @@ kb.Factory = class Factory {
   }
 
   hasPath(path) {
-    return this.paths.hasOwnProperty(path) || (this.parent_factory != null ? this.parent_factory.hasPath(path) : undefined);
+    if (this.paths.hasOwnProperty(path) && this.parent_factory) return this.parent_factory.hasPath(path);
+    return undefined;
   }
 
   addPathMapping(path, create_info) { return this.paths[path] = create_info; }

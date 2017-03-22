@@ -189,11 +189,14 @@ var kb = function () {
       //
       // @example
       //   kb.ignore(fn);
-      this.ignore = (ko.dependencyDetection != null ? ko.dependencyDetection.ignore : undefined) || function (callback, callbackTarget, callbackArgs) {
-        var value = null;ko.computed(function () {
-          return value = callback.apply(callbackTarget, callbackArgs || []);
-        }).dispose();return value;
+      var _ignore = function _ignore(callback, callbackTarget, callbackArgs) {
+        var value = null;
+        ko.computed(function () {
+          value = callback.apply(callbackTarget, callbackArgs || []);
+        }).dispose();
+        return value;
       };
+      this.ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
     }
 
     // Checks if an object has been released.
@@ -242,32 +245,31 @@ var kb = function () {
   }, {
     key: 'release',
     value: function release(obj) {
-      var array = void 0,
-          index = void 0,
-          value = void 0;
       if (!kb.isReleaseable(obj)) return;
       obj.__kb_released = true; // mark as released
 
       // release array's items
       if (_.isArray(obj)) {
-        for (index in obj) {
-          value = obj[index];if (kb.isReleaseable(value)) {
-            obj[index] = null, kb.release(value);
+        _.each(obj, function (value, index) {
+          if (kb.isReleaseable(value)) {
+            obj[index] = null;kb.release(value);
           }
-        }
+        });
         return;
       }
 
       // observable or lifecycle managed
-      if (ko.isObservable(obj) && _.isArray(array = kb.peek(obj))) {
+      var array = kb.peek(obj);
+      if (ko.isObservable(obj) && _.isArray(array)) {
         if (obj.__kb_is_co || obj.__kb_is_o && obj.valueType() === kb.TYPE_COLLECTION) {
-          return typeof obj.destroy === 'function' ? obj.destroy() : undefined;
+          if (typeof obj.destroy === 'function') obj.destroy();
+          return;
         }
-        for (index in array) {
-          value = array[index];if (kb.isReleaseable(value)) {
-            array[index] = null, kb.release(value);
+        _.each(array, function (value, index) {
+          if (kb.isReleaseable(value)) {
+            array[index] = null;kb.release(value);
           }
-        }
+        });
         if (typeof obj.dispose === 'function') {
           obj.dispose();
         }
@@ -277,9 +279,13 @@ var kb = function () {
       // releaseable signature
       for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
         var method = LIFECYCLE_METHODS[i];
-        if (typeof obj[method] === 'function') return obj[method].call(obj);
+        if (typeof obj[method] === 'function') {
+          obj[method].call(obj);
+          return;
+        }
       }
-      if (!ko.isObservable(obj)) return this.releaseKeys(obj); // view model
+
+      if (!ko.isObservable(obj)) this.releaseKeys(obj); // view model
     }
 
     // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
@@ -3030,37 +3036,33 @@ kb.EventWatcher = function () {
 
     this._onModelLoaded = function (model) {
       _this.ee = model;
-      for (var event_name in _this.__kb.callbacks) {
-        // bind all events
-        var callbacks = _this.__kb.callbacks[event_name];
-        if (callbacks.model && callbacks.model !== model) {
-          _this._unbindCallbacks(event_name, callbacks, true);
+
+      _.each(_this.__kb.callbacks, function (callbacks, event_name) {
+        if (callbacks.model && callbacks.model !== model) _this._unbindCallbacks(event_name, callbacks, true);
+        if (!callbacks.model) {
+          callbacks.model = model;
+          model.bind(event_name, callbacks.fn);
         }
 
-        if (!callbacks.model) {
-          callbacks.model = model, model.bind(event_name, callbacks.fn);
-        }
         _.each(callbacks.list, function (info) {
-          if (!info.unbind_fn) {
-            info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined;
-          }
-          info.emitter ? info.emitter(model) : undefined;
+          if (!info.unbind_fn && kb.settings.orm) info.unbind_fn = kb.settings.orm.bind(model, info.key, info.update, info.path);
+          if (info.emitter) info.emitter(model);
         });
-      }
+      });
     };
 
     this._onModelUnloaded = function (model) {
       if (_this.ee !== model) return;
+
       _this.ee = null;
-      for (var event_name in _this.__kb.callbacks) {
-        var callbacks = _this.__kb.callbacks[event_name];_this._unbindCallbacks(event_name, callbacks);
-      } // unbind all events
+      _.each(_this.__kb.callbacks, function (callbacks, event_name) {
+        return _this._unbindCallbacks(event_name, callbacks);
+      });
     };
 
     this._unbindCallbacks = function (event_name, callbacks, skip_emitter) {
       if (callbacks.model) {
-        callbacks.model.unbind(event_name, callbacks.fn);
-        callbacks.model = null;
+        callbacks.model.unbind(event_name, callbacks.fn);callbacks.model = null;
       }
 
       _.each(callbacks.list, function (info) {
@@ -3161,34 +3163,37 @@ kb.EventWatcher = function () {
 
         var callbacks = _this2.__kb.callbacks[event_name];
         if (!callbacks) {
-          callbacks = _this2.__kb.callbacks[event_name] = {
+          _this2.__kb.callbacks[event_name] = {
             model: null,
             list: [],
             fn: function fn(model) {
               _.each(callbacks.list, function (info) {
-                if (!info.update) return;
+                if (info.update) return;
                 if (model && info.key && model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
                 if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
                 info.update();
               }); // trigger update
             }
           };
+          callbacks = _this2.__kb.callbacks[event_name];
         }
 
         var info = _.defaults({ obj: obj }, callback_info);
         callbacks.list.push(info); // store the callback information
-        if (model) return _this2._onModelLoaded(model);
+        if (model) _this2._onModelLoaded(model);
       });
+
       return this;
     }
   }, {
     key: 'releaseCallbacks',
     value: function releaseCallbacks(obj) {
-      var callbacks = void 0;
+      var _this3 = this;
+
       this.ee = null;
-      for (var event_name in this.__kb.callbacks) {
-        callbacks = this.__kb.callbacks[event_name];this._unbindCallbacks(event_name, callbacks, kb.wasReleased(obj));
-      } // unbind all events
+      _.each(this.__kb.callbacks, function (callbacks, event_name) {
+        return _this3._unbindCallbacks(event_name, callbacks, kb.wasReleased(obj));
+      });
       return delete this.__kb.callbacks;
     }
 
@@ -3283,7 +3288,8 @@ kb.Factory = function () {
   _createClass(Factory, [{
     key: 'hasPath',
     value: function hasPath(path) {
-      return this.paths.hasOwnProperty(path) || (this.parent_factory != null ? this.parent_factory.hasPath(path) : undefined);
+      if (this.paths.hasOwnProperty(path) && this.parent_factory) return this.parent_factory.hasPath(path);
+      return undefined;
     }
   }, {
     key: 'addPathMapping',
@@ -4329,12 +4335,12 @@ var Store = function () {
   }, {
     key: '_refCount',
     value: function _refCount(observable) {
-      var stores_references = void 0;
       if (observable.__kb_released) {
         typeof console === 'undefined' || console.log('Observable already released');
         return 0;
       }
-      if (!(stores_references = kb.utils.get(observable, 'stores_references'))) return 1;
+      var stores_references = kb.utils.get(observable, 'stores_references');
+      if (!stores_references) return 1;
       return _.reduce(stores_references, function (memo, store_references) {
         return memo + store_references.ref_count;
       }, 0);
@@ -4353,8 +4359,9 @@ var Store = function () {
   }, {
     key: '_cid',
     value: function _cid(obj) {
-      var cid = void 0;
-      return cid = obj ? obj.cid || (obj.cid = _.uniqueId('c')) : 'null';
+      if (!obj) return 'null';
+      if (!obj.cid) obj.cid = _.uniqueId('c');
+      return obj.cid;
     }
 
     // @nodoc
@@ -4367,10 +4374,12 @@ var Store = function () {
         create.__kb_cids = [];
       }
       for (var i = 0, l = create.__kb_cids.length; i < l; i++) {
-        var item = create.__kb_cids[i];
-        if (item.create === create) return item.cid;
+        var _item = create.__kb_cids[i];
+        if (_item.create === create) return _item.cid;
       }
-      create.__kb_cids.push(item = { create: create, cid: _.uniqueId('kb') });return item.cid;
+      var item = { create: create, cid: _.uniqueId('kb') };
+      create.__kb_cids.push(item);
+      return item.cid;
     }
 
     // @nodoc

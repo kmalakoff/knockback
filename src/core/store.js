@@ -192,8 +192,8 @@ class Store {
       (typeof console === 'undefined') || console.log('Observable already released');
       return 0;
     }
-    const stores_references = kb.utils.get(observable, 'stores_references')
-    if (!stores_references return 1;
+    const stores_references = kb.utils.get(observable, 'stores_references');
+    if (!stores_references) return 1;
     return _.reduce(stores_references, ((memo, store_references) => memo + store_references.ref_count), 0);
   }
 
@@ -202,8 +202,9 @@ class Store {
 
   // @nodoc
   _cid(obj) {
-    let cid;
-    return cid = obj ? obj.cid || (obj.cid = _.uniqueId('c')) : 'null';
+    if (!obj) return 'null';
+    if (!obj.cid) obj.cid = _.uniqueId('c');
+    return obj.cid;
   }
 
   // @nodoc
@@ -211,10 +212,12 @@ class Store {
     const create = creator.create || creator;
     if (!create.__kb_cids) { create.__kb_cids = []; }
     for (let i = 0, l = create.__kb_cids.length; i < l; i++) {
-      var item = create.__kb_cids[i];
+      const item = create.__kb_cids[i];
       if (item.create === create) return item.cid;
     }
-    create.__kb_cids.push(item = { create, cid: _.uniqueId('kb') }); return item.cid;
+    const item = { create, cid: _.uniqueId('kb') };
+    create.__kb_cids.push(item);
+    return item.cid;
   }
 
   // @nodoc

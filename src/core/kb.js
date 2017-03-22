@@ -83,7 +83,12 @@ class kb {
     //
     // @example
     //   kb.ignore(fn);
-    this.ignore = (ko.dependencyDetection != null ? ko.dependencyDetection.ignore : undefined) || function (callback, callbackTarget, callbackArgs) { let value = null; ko.computed(() => value = callback.apply(callbackTarget, callbackArgs || [])).dispose(); return value; };
+    const _ignore = (callback, callbackTarget, callbackArgs) => {
+      let value = null;
+      ko.computed(() => { value = callback.apply(callbackTarget, callbackArgs || []); }).dispose();
+      return value;
+    };
+    this.ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
   }
 
   // Checks if an object has been released.
@@ -117,22 +122,27 @@ class kb {
   //   var todos = kb.collectionObservable(collection);
   //   kb.release(todos); todos = null;
   static release(obj) {
-    let array,
-      index,
-      value;
     if (!kb.isReleaseable(obj)) return;
     obj.__kb_released = true; // mark as released
 
     // release array's items
     if (_.isArray(obj)) {
-      for (index in obj) { value = obj[index]; if (kb.isReleaseable(value)) { ((obj[index] = null), kb.release(value)); } }
+      _.each(obj, (value, index) => {
+        if (kb.isReleaseable(value)) { obj[index] = null; kb.release(value); }
+      });
       return;
     }
 
     // observable or lifecycle managed
-    if (ko.isObservable(obj) && _.isArray(array = kb.peek(obj))) {
-      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) { return (typeof obj.destroy === 'function' ? obj.destroy() : undefined); }
-      for (index in array) { value = array[index]; if (kb.isReleaseable(value)) { ((array[index] = null), kb.release(value)); } }
+    const array = kb.peek(obj);
+    if (ko.isObservable(obj) && _.isArray(array)) {
+      if (obj.__kb_is_co || (obj.__kb_is_o && (obj.valueType() === kb.TYPE_COLLECTION))) {
+        if (typeof obj.destroy === 'function') obj.destroy();
+        return;
+      }
+      _.each(array, (value, index) => {
+        if (kb.isReleaseable(value)) { array[index] = null; kb.release(value); }
+      });
       if (typeof (obj.dispose) === 'function') { obj.dispose(); }
       return;
     }
@@ -140,9 +150,13 @@ class kb {
     // releaseable signature
     for (let i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
       const method = LIFECYCLE_METHODS[i];
-      if (typeof (obj[method]) === 'function') return obj[method].call(obj);
+      if (typeof (obj[method]) === 'function') {
+        obj[method].call(obj);
+        return;
+      }
     }
-    if (!ko.isObservable(obj)) return this.releaseKeys(obj); // view model
+
+    if (!ko.isObservable(obj)) this.releaseKeys(obj); // view model
   }
 
   // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.

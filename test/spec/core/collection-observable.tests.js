@@ -564,7 +564,7 @@ describe('collection-observable', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('13. Setting view models', () => {
+  it.only('13. Setting view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
     const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 

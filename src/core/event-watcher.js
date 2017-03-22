@@ -105,31 +105,32 @@ kb.EventWatcher = class EventWatcher {
 
       let callbacks = this.__kb.callbacks[event_name];
       if (!callbacks) {
-        callbacks = (this.__kb.callbacks[event_name] = {
+        this.__kb.callbacks[event_name] = {
           model: null,
           list: [],
           fn: (model) => {
             _.each(callbacks.list, (info) => {
-              if (!info.update) return;
+              if (info.update) return;
               if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) return; // key doesn't match
               if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model, key: info.key, path: info.path });
               info.update();
             }); // trigger update
           },
-        });
+        };
+        callbacks = this.__kb.callbacks[event_name];
       }
 
       const info = _.defaults({ obj }, callback_info);
       callbacks.list.push(info); // store the callback information
-      if (model) return this._onModelLoaded(model);
+      if (model) this._onModelLoaded(model);
     });
+
     return this;
   }
 
   releaseCallbacks(obj) {
-    let callbacks;
     this.ee = null;
-    for (const event_name in this.__kb.callbacks) { callbacks = this.__kb.callbacks[event_name]; this._unbindCallbacks(event_name, callbacks, kb.wasReleased(obj)); } // unbind all events
+    _.each(this.__kb.callbacks, (callbacks, event_name) => this._unbindCallbacks(event_name, callbacks, kb.wasReleased(obj)));
     return delete this.__kb.callbacks;
   }
 
@@ -142,31 +143,32 @@ kb.EventWatcher = class EventWatcher {
   // NOTE: this is called by emitter so it may be used to clear a previous emitter without triggering an intermediate change
   _onModelLoaded = (model) => {
     this.ee = model;
-    for (const event_name in this.__kb.callbacks) { // bind all events
-      const callbacks = this.__kb.callbacks[event_name];
-      if (callbacks.model && (callbacks.model !== model)) { this._unbindCallbacks(event_name, callbacks, true); }
 
-      if (!callbacks.model) { ((callbacks.model = model), model.bind(event_name, callbacks.fn)); }
+    _.each(this.__kb.callbacks, (callbacks, event_name) => {
+      if (callbacks.model && (callbacks.model !== model)) this._unbindCallbacks(event_name, callbacks, true);
+      if (!callbacks.model) {
+        callbacks.model = model;
+        model.bind(event_name, callbacks.fn);
+      }
+
       _.each(callbacks.list, (info) => {
-        if (!info.unbind_fn) { info.unbind_fn = kb.settings.orm != null ? kb.settings.orm.bind(model, info.key, info.update, info.path) : undefined; }
-        (info.emitter ? info.emitter(model) : undefined);
+        if (!info.unbind_fn && kb.settings.orm) info.unbind_fn = kb.settings.orm.bind(model, info.key, info.update, info.path);
+        if (info.emitter) info.emitter(model);
       });
-    }
+    });
   }
 
   // @nodoc
   _onModelUnloaded = (model) => {
     if (this.ee !== model) return;
+
     this.ee = null;
-    for (const event_name in this.__kb.callbacks) { const callbacks = this.__kb.callbacks[event_name]; this._unbindCallbacks(event_name, callbacks); } // unbind all events
+    _.each(this.__kb.callbacks, (callbacks, event_name) => this._unbindCallbacks(event_name, callbacks));
   }
 
   // @nodoc
   _unbindCallbacks = (event_name, callbacks, skip_emitter) => {
-    if (callbacks.model) {
-      callbacks.model.unbind(event_name, callbacks.fn);
-      callbacks.model = null;
-    }
+    if (callbacks.model) { callbacks.model.unbind(event_name, callbacks.fn); callbacks.model = null; }
 
     _.each(callbacks.list, (info) => {
       if (info.unbind_fn) { (info.unbind_fn(), (info.unbind_fn = null)); }
