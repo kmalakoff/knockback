@@ -74,8 +74,8 @@
     "karma-spec-reporter": "*",
     "mocha": "*",
     "nuget": "*",
-    "requirejs": "^2.3.3",
-    "webpack": "*"
+    "requirejs": "*",
+    "webpack": "2.2.x"
   },
   "optionalDependencies": {
     "backbone-relational": "*",
