@@ -34,10 +34,17 @@ class utils {
   }
 
   // @nodoc
-  static get(obj, key, default_value) { return !obj.__kb || !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key]; }
+  static get(obj, key, default_value) {
+    if (!obj.__kb) return default_value;
+    return !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key];
+  }
 
   // @nodoc
-  static set(obj, key, value) { return ((obj.__kb || (obj.__kb = {})))[key] = value; }
+  static set(obj, key, value) {
+    if (!obj.__kb) obj.__kb = {};
+    obj.__kb[key] = value;
+    return value;
+  }
 
   // @nodoc
   static orSet(obj, key, value) {
@@ -97,7 +104,8 @@ class utils {
   static wrappedCreator(obj, value) { if (arguments.length === 1) { return kb.utils.get(obj, 'creator'); } return kb.utils.set(obj, 'creator', value); }
 
   // Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
-  // @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
+  // @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behavior
+  // for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
   //
   // @overload wrappedModel(view_model)
   //   Gets the model from a ViewModel

@@ -108,11 +108,11 @@ kb.EventWatcher = class EventWatcher {
         this.__kb.callbacks[event_name] = {
           model: null,
           list: [],
-          fn: (model) => {
+          fn: (m) => {
             _.each(callbacks.list, (info) => {
               if (!info.update) return;
-              if (model && info.key && (model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key)))) return; // key doesn't match
-              if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model, key: info.key, path: info.path });
+              if (m && info.key && (m.hasChanged && !m.hasChanged(ko.utils.unwrapObservable(info.key)))) return; // key doesn't match
+              if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model: m, key: info.key, path: info.path });
               info.update();
             }); // trigger update
           },

@@ -32,11 +32,10 @@ const _keyArrayToObject = function (value) {
   return result;
 };
 
-var _mergeOptions = function (result, options) {
+const _mergeOptions = function (result, options) {
   if (!options) return result;
 
-  for (const key in options) {
-    let value = options[key];
+  _.each(options, (value, key) => {
     switch (key) {
       case 'internals': case 'requires': case 'excludes': case 'statics': _mergeArray(result, key, value); break;
       case 'keys':
@@ -60,7 +59,7 @@ var _mergeOptions = function (result, options) {
       case 'options': break;
       default: result[key] = value; break;
     }
-  }
+  });
 
   return _mergeOptions(result, options.options);
 };

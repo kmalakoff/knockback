@@ -7,8 +7,6 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const { _ } = require('../kb');
-
 // @nodoc
 const wrappedDestroy = (obj) => {
   if (!obj.__kb) return;
@@ -18,7 +16,7 @@ const wrappedDestroy = (obj) => {
   obj.__kb = null; // clear now to break cycles
 
   if (__kb.observable) {
-    __kb.observable.destroy = __kb.observable.release = null;
+    __kb.observable.destroy = null; __kb.observable.release = null;
     wrappedDestroy(__kb.observable);
     __kb.observable = null;
   }
@@ -32,9 +30,10 @@ const wrappedDestroy = (obj) => {
   __kb.store = null;
 
   if (__kb.stores_references) {
-    let store_references;
-    while ((store_references = __kb.stores_references.pop())) {
-      if (!store_references.store.__kb_released) { store_references.store.release(obj); }
+    let store_references = __kb.stores_references.pop();
+    while (store_references) {
+      if (!store_references.store.__kb_released) store_references.store.release(obj);
+      store_references = __kb.stores_references.pop();
     }
   }
 };

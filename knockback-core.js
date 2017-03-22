@@ -1610,11 +1610,11 @@ kb.EventWatcher = function () {
           _this2.__kb.callbacks[event_name] = {
             model: null,
             list: [],
-            fn: function fn(model) {
+            fn: function fn(m) {
               _.each(callbacks.list, function (info) {
                 if (!info.update) return;
-                if (model && info.key && model.hasChanged && !model.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
-                if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model: model, key: info.key, path: info.path });
+                if (m && info.key && m.hasChanged && !m.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
+                if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model: m, key: info.key, path: info.path });
                 info.update();
               }); // trigger update
             }
@@ -1704,7 +1704,8 @@ kb.Factory = function () {
     // Used to either register yourself with the existing factory or to create a new factory.
     //
     // @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
-    // @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
+    // @option options [Object] factories a map of dot-deliminated paths;
+    // for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
     // @param [Instance] obj the instance that will own or register with the store
     // @param [String] owner_path the path to the owning object for turning relative scoping of the factories to absolute paths.
     value: function useOptionsOrCreate(options, obj, owner_path) {
@@ -1732,13 +1733,12 @@ kb.Factory = function () {
   _createClass(Factory, [{
     key: 'hasPath',
     value: function hasPath(path) {
-      if (this.paths.hasOwnProperty(path) && this.parent_factory) return this.parent_factory.hasPath(path);
-      return undefined;
+      return Object.prototype.hasOwnProperty.call(this.paths, path) && this.parent_factory ? this.parent_factory.hasPath(path) : false;
     }
   }, {
     key: 'addPathMapping',
     value: function addPathMapping(path, create_info) {
-      return this.paths[path] = create_info;
+      this.paths[path] = create_info;
     }
   }, {
     key: 'addPathMappings',
@@ -1754,9 +1754,11 @@ kb.Factory = function () {
     value: function hasPathMappings(factories, owner_path) {
       var all_exist = true;
       for (var path in factories) {
-        var creator = factories[path];
-        var existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path));
-        all_exist &= existing_creator && creator === existing_creator;
+        if (Object.prototype.hasOwnProperty.call(factories, path)) {
+          var creator = factories[path];
+          var existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path));
+          all_exist &= existing_creator && creator === existing_creator;
+        }
       }
       return all_exist;
     }
@@ -2069,16 +2071,19 @@ var ko = kb.ko;
 if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
   var _extend = ko.subscribable.fn.extend;
   ko.subscribable.fn.extend = function () {
-    var _arguments = arguments,
-        _this = this;
+    var _this = this;
 
-    var target = _extend.apply(this, arguments);
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var target = _extend.call(this, args);
 
     // release the extended observable
     if (target !== this && kb.isReleaseable(this)) {
       var _dispose = target.dispose;
       target.dispose = function () {
-        if (_dispose != null) _dispose.apply(target, _arguments);
+        if (_dispose != null) _dispose.apply(target, args);
         return kb.release(_this);
       };
     }
@@ -2998,7 +3003,8 @@ var utils = function () {
   }, {
     key: 'get',
     value: function get(obj, key, default_value) {
-      return !obj.__kb || !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key];
+      if (!obj.__kb) return default_value;
+      return !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key];
     }
 
     // @nodoc
@@ -3006,7 +3012,9 @@ var utils = function () {
   }, {
     key: 'set',
     value: function set(obj, key, value) {
-      return (obj.__kb || (obj.__kb = {}))[key] = value;
+      if (!obj.__kb) obj.__kb = {};
+      obj.__kb[key] = value;
+      return value;
     }
 
     // @nodoc
@@ -3096,7 +3104,8 @@ var utils = function () {
     }
 
     // Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
-    // @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
+    // @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behavior
+    // for sorting because it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
     //
     // @overload wrappedModel(view_model)
     //   Gets the model from a ViewModel
@@ -3659,8 +3668,7 @@ var _keyArrayToObject = function _keyArrayToObject(value) {
 var _mergeOptions = function _mergeOptions(result, options) {
   if (!options) return result;
 
-  for (var key in options) {
-    var value = options[key];
+  _.each(options, function (value, key) {
     switch (key) {
       case 'internals':case 'requires':case 'excludes':case 'statics':
         _mergeArray(result, key, value);break;
@@ -3698,7 +3706,7 @@ var _mergeOptions = function _mergeOptions(result, options) {
       default:
         result[key] = value;break;
     }
-  }
+  });
 
   return _mergeOptions(result, options.options);
 };
@@ -3765,12 +3773,7 @@ module.exports = unwrapModels;
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var _require = __webpack_require__(0),
-    _ = _require._;
-
 // @nodoc
-
-
 var wrappedDestroy = function wrappedDestroy(obj) {
   if (!obj.__kb) return;
   if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
@@ -3780,7 +3783,7 @@ var wrappedDestroy = function wrappedDestroy(obj) {
   obj.__kb = null; // clear now to break cycles
 
   if (__kb.observable) {
-    __kb.observable.destroy = __kb.observable.release = null;
+    __kb.observable.destroy = null;__kb.observable.release = null;
     wrappedDestroy(__kb.observable);
     __kb.observable = null;
   }
@@ -3794,11 +3797,10 @@ var wrappedDestroy = function wrappedDestroy(obj) {
   __kb.store = null;
 
   if (__kb.stores_references) {
-    var store_references = void 0;
-    while (store_references = __kb.stores_references.pop()) {
-      if (!store_references.store.__kb_released) {
-        store_references.store.release(obj);
-      }
+    var store_references = __kb.stores_references.pop();
+    while (store_references) {
+      if (!store_references.store.__kb_released) store_references.store.release(obj);
+      store_references = __kb.stores_references.pop();
     }
   }
 };
@@ -3926,8 +3928,8 @@ module.exports = function () {
       var type = this.relationType(model, key);
       if (!type) return null;
 
-      var relFn = function relFn(model) {
-        if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: model, key: key, path: path });
+      var relFn = function relFn(m) {
+        if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: m, key: key, path: path });
         return update();
       };
 

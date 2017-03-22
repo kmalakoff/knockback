@@ -22,7 +22,8 @@ kb.Factory = class Factory {
   // Used to either register yourself with the existing factory or to create a new factory.
   //
   // @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
-  // @option options [Object] factories a map of dot-deliminated paths; for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
+  // @option options [Object] factories a map of dot-deliminated paths;
+  // for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
   // @param [Instance] obj the instance that will own or register with the store
   // @param [String] owner_path the path to the owning object for turning relative scoping of the factories to absolute paths.
   static useOptionsOrCreate(options, obj, owner_path) {
@@ -42,23 +43,18 @@ kb.Factory = class Factory {
     if (parent_factory) this.parent_factory = parent_factory;
   }
 
-  hasPath(path) {
-    if (this.paths.hasOwnProperty(path) && this.parent_factory) return this.parent_factory.hasPath(path);
-    return undefined;
-  }
+  hasPath(path) { return (Object.prototype.hasOwnProperty.call(this.paths, path) && this.parent_factory) ? this.parent_factory.hasPath(path) : false; }
 
-  addPathMapping(path, create_info) { return this.paths[path] = create_info; }
-
-  addPathMappings(factories, owner_path) {
-    _.each(factories, (create_info, path) => { this.paths[kb.utils.pathJoin(owner_path, path)] = create_info; });
-  }
-
+  addPathMapping(path, create_info) { this.paths[path] = create_info; }
+  addPathMappings(factories, owner_path) { _.each(factories, (create_info, path) => { this.paths[kb.utils.pathJoin(owner_path, path)] = create_info; }); }
   hasPathMappings(factories, owner_path) {
     let all_exist = true;
     for (const path in factories) {
-      const creator = factories[path];
-      const existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path));
-      all_exist &= (existing_creator && (creator === existing_creator));
+      if (Object.prototype.hasOwnProperty.call(factories, path)) {
+        const creator = factories[path];
+        const existing_creator = this.creatorForPath(null, kb.utils.pathJoin(owner_path, path));
+        all_exist &= (existing_creator && (creator === existing_creator));
+      }
     }
     return all_exist;
   }

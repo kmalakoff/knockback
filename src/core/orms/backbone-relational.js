@@ -28,8 +28,8 @@ module.exports = class BackboneRelational {
     const type = this.relationType(model, key);
     if (!type) return null;
 
-    const relFn = function (model) {
-      if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model, key, path });
+    const relFn = function (m) {
+      if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: m, key, path });
       return update();
     };
 
