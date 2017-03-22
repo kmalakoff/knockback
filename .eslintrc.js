@@ -25,7 +25,7 @@ module.exports = {
     'no-unused-expressions': 'off',
     'no-new-func': 'off',
     'no-restricted-syntax': ['off', "BinaryExpression[operator='in']"],
-    'no-console': 'warn',
+    'no-console': 'off',
     'new-cap': 'off',
 
     'camelcase': 'off',

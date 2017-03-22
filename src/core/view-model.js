@@ -112,14 +112,17 @@ class ViewModel {
   // @param [Model|ModelRef] model the model to observe (can be null)
   // @param [Object] options the create options
   // @option options [Array|String] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
-  // @option options [Array|String] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model. Useful for binding Views that require specific observables to exist
+  // @option options [Array|String] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model.
+  // Useful for binding Views that require specific observables to exist
   // @option options [Array|String] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
-  // @option options [Object|Array|String] excludes if an array is supplied, excludes keys to exclude on the view model; for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
+  // @option options [Object|Array|String] excludes if an array is supplied, excludes keys to exclude on the view model;
+  // for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
   // @option options [Array] statics creates non-observable properties on your view model for Model attributes that do not need to be observed for changes.
   // @option options [Object] static_defaults provides default values for statics.
   // @option options [String] path the path to the value (used to create related observables from the factory).
   // @option options [kb.Store] store a store used to cache and share view models.
-  // @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions. Signature: `{'some.path': function(object, options)}`
+  // @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions.
+  // Signature: `{'some.path': function(object, options)}`
   // @option options [kb.Factory] factory a factory used to create view models.
   // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
   // @return [ko.observable] the constructor returns 'this'
@@ -155,10 +158,16 @@ class ViewModel {
         },
       ),
       });
-      var event_watcher = kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(model, this, { emitter: this._model, update: (() => kb.ignore(() => !(event_watcher != null ? event_watcher.ee : undefined) || this.createObservables(event_watcher != null ? event_watcher.ee : undefined))) }));
-      kb.utils.wrappedObject(this, (model = event_watcher.ee)); _model(event_watcher.ee);
 
-    // update the observables
+      const event_watcher = kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(model, this, {
+        emitter: this._model,
+        update: (() => kb.ignore(() => !(event_watcher && event_watcher.ee) || this.createObservables(event_watcher.ee))),
+      }));
+
+      model = event_watcher.ee;
+      kb.utils.wrappedObject(this, model); _model(event_watcher.ee);
+
+      // update the observables
       this.__kb.create_options = { store: kb.utils.wrappedStore(this), factory: kb.utils.wrappedFactory(this), path: this.__kb.path, event_watcher: kb.utils.wrappedEventWatcher(this) };
       !options.requires || this.createObservables(model, options.requires);
       !this.__kb.internals || this.createObservables(model, this.__kb.internals);
@@ -176,15 +185,9 @@ class ViewModel {
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy() {
     this.__kb_released = true;
-    if (this.__kb.view_model !== this) {
-      ((() => {
-        const result = [];
-        for (const vm_key in this.__kb.vm_keys) {
-          result.push(this.__kb.view_model[vm_key] = null);
-        }
-        return result;
-      })());
-    } // clear the external references
+    if (this.__kb.view_model !== this) { _.each(this.__kb.vm_keys, (key) => { this.__kb.view_model[key] = null; }); }
+
+    // clear the external references
     this.__kb.view_model = null; this.__kb.create_options = null;
     kb.releaseKeys(this);
     kb.utils.wrappedDestroy(this);
@@ -197,25 +200,27 @@ class ViewModel {
 
   // create observables manually
   createObservables(model, keys) {
-    let key;
     if (!keys) {
-      let rel_keys;
       if (this.__kb.keys || !model) return; // only use the keys provided
-      for (key in model.attributes) { createObservable(this, model, key, this.__kb.create_options); }
+      for (const key in model.attributes) {
+        if (Object.prototype.hasOwnProperty.call(model.attributes, key)) createObservable(this, model, key, this.__kb.create_options);
+      }
+
       if (kb.settings.orm && kb.settings.orm.keys) {
         _.each(kb.settings.orm.keys, key => createObservable(this, model, key, this.__kb.create_options));
       }
     } else if (_.isArray(keys)) {
       _.map(keys, key => createObservable(this, model, key, this.__kb.create_options));
     } else {
-      for (key in keys) {
-        var vm_key;
+      _.each(keys, (key) => {
         const mapping_info = keys[key];
-        if ((vm_key = assignViewModelKey(this, key))) {
+        const vm_key = assignViewModelKey(this, key);
+        if (vm_key) {
           if (!_.isString(mapping_info) && !mapping_info.key) mapping_info.key = vm_key;
-          this[vm_key] = (this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this));
+          this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this);
+          this[vm_key] = this.__kb.view_model[vm_key];
         }
-      }
+      });
     }
   }
 }
