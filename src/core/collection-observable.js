@@ -423,10 +423,9 @@ class CollectionObservable {
 
   // @nodoc
   _onObservableArrayChange = models_or_view_models => kb.ignore(() => {
-    let models;
     if (this.in_edit) return; // we are doing the editing
 
-    // validate input
+      // validate input
     if (this.models_only && models_or_view_models.length && !kb.isModel(models_or_view_models[0])) kb._throwUnexpected(this, 'incorrect type passed');
     if (!this.models_only && models_or_view_models.length && !(_.isObject(models_or_view_models[0]) || kb.isModel(models_or_view_models[0]))) kb._throwUnexpected(this, 'incorrect type passed');
 
@@ -437,11 +436,12 @@ class CollectionObservable {
 
     let view_models = models_or_view_models;
 
-    // set Models
+      // set Models
+    let models;
     if (this.models_only) {
       models = _.filter(models_or_view_models, model => !has_filters || this._selectModel(model));
 
-    // set ViewModels
+      // set ViewModels
     } else {
       !has_filters || (view_models = []); // check for filtering of ViewModels
       models = [];
@@ -452,7 +452,7 @@ class CollectionObservable {
           view_models.push(view_model);
         }
 
-          // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
+            // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
         const current_view_model = this.create_options.store.find(model, this.create_options.creator);
         if (current_view_model && (current_view_model.constructor !== view_model.constructor)) kb._throwUnexpected(this, 'replacing different type of view model');
         this.create_options.store.retain(view_model, model, this.create_options.creator);
@@ -460,13 +460,12 @@ class CollectionObservable {
       });
     }
 
-      // a change, update models
+        // a change, update models
     this.in_edit++;
     (models_or_view_models.length === view_models.length) || observable(view_models); // replace the ViewModels because they were filtered
     _.isEqual(collection.models, models) || collection.reset(models);
     this.in_edit--;
-  },
-  )
+  })
 
   // @nodoc
   _attributeComparator(sort_attribute) {
