@@ -36,10 +36,10 @@
   },
   "devDependencies": {
     "babel-core": "*",
-    "babel-eslint": "^7.1.1",
+    "babel-eslint": "*",
     "babel-loader": "*",
     "babel-plugin-transform-async-to-generator": "*",
-    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-plugin-transform-class-properties": "*",
     "babel-polyfill": "*",
     "babel-preset-es2015": "*",
     "babel-preset-stage-0": "^6.22.0",
@@ -75,7 +75,7 @@
     "mocha": "*",
     "nuget": "*",
     "requirejs": "*",
-    "webpack": "2.2.x"
+    "webpack": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "*",

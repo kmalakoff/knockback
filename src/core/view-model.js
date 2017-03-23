@@ -203,7 +203,9 @@ class ViewModel {
     if (!keys) {
       if (this.__kb.keys || !model) return; // only use the keys provided
       for (const key in model.attributes) {
-        if (Object.prototype.hasOwnProperty.call(model.attributes, key)) createObservable(this, model, key, this.__kb.create_options);
+        if (Object.prototype.hasOwnProperty.call(model.attributes, key)) {
+          createObservable(this, model, key, this.__kb.create_options);
+        }
       }
 
       if (kb.settings.orm && kb.settings.orm.keys) {
@@ -212,13 +214,12 @@ class ViewModel {
     } else if (_.isArray(keys)) {
       _.map(keys, key => createObservable(this, model, key, this.__kb.create_options));
     } else {
-      _.each(keys, (key) => {
-        const mapping_info = keys[key];
+      _.each(keys, (mapping_info, key) => {
         const vm_key = assignViewModelKey(this, key);
         if (vm_key) {
           if (!_.isString(mapping_info) && !mapping_info.key) mapping_info.key = vm_key;
-          this.__kb.view_model[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this);
-          this[vm_key] = this.__kb.view_model[vm_key];
+          this[vm_key] = kb.observable(model, mapping_info, this.__kb.create_options, this);
+          this.__kb.view_model[vm_key] = this[vm_key];
         }
       });
     }
