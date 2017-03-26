@@ -14,14 +14,15 @@ module.exports = kb;
 kb.configure = require('./configure');
 
 require('./monkey-patches');
-kb.Statistics = require('./statistics');
 kb.utils = require('./utils');
+kb.Statistics = require('./statistics');
 kb.Store = require('./store');
 kb.Factory = require('./factory');
 
 kb.CollectionObservable = require('./collection-observable');
 kb.Observable = require('./observable');
 kb.ViewModel = require('./view-model');
+require('./inject');
 
 // re-expose modules
 kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };

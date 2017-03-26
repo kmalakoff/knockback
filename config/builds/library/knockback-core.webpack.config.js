@@ -3,7 +3,7 @@ const path = require('path');
 const _ = require('lodash');
 
 module.exports = _.extend(_.clone(require('../../webpack/base-config')), {
-  entry: _.flattenDeep([require('../../files').src_core, './src/core/index.js']),
+  entry: './src/core/index.js',
   output: {
     library: 'kb',
     libraryTarget: 'umd2',

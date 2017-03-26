@@ -1,11 +1,3 @@
-/*
-  knockback-core.js 1.2.2
-  Copyright (c)  2011-2017 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("backbone"), require("underscore"), require("knockout"));
@@ -81,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -500,7 +492,7 @@ kb.Events = Backbone.Events;
 
 // Object.assign
 kb.assign = _.assign || _.extend;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
 /* 1 */
@@ -743,7 +735,6 @@ var EventWatcher = function () {
   return EventWatcher;
 }();
 
-;
 module.exports = EventWatcher;
 
 // factory function
@@ -753,6 +744,33 @@ kb.emitterObservable = function (emitter, observable) {
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1383,7 +1401,7 @@ kb.collectionObservable = function () {
 kb.observableCollection = kb.collectionObservable;
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1397,8 +1415,8 @@ var _ = kb._;
 var ALL_ORMS = {
   default: null,
   'backbone-orm': null,
-  'backbone-associations': __webpack_require__(18),
-  'backbone-relational': __webpack_require__(19)
+  'backbone-associations': __webpack_require__(17),
+  'backbone-relational': __webpack_require__(18)
 };
 
 // @nodoc
@@ -1443,7 +1461,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1559,11 +1577,251 @@ var Factory = function () {
   return Factory;
 }();
 
-;
 module.exports = Factory;
 
 /***/ }),
-/* 5 */
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
+
+var kb = __webpack_require__(0);
+
+var _ = kb._,
+    ko = kb.ko;
+
+
+kb.RECUSIVE_AUTO_INJECT = true;
+
+// custom Knockout `inject` binding
+ko.bindingHandlers.inject = {
+  init: function init(element, value_accessor, all_bindings_accessor, view_model) {
+    return kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+  }
+};
+
+// Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
+//
+// * `'view_model'` class used to create a new ViewModel instance
+// * `'create'` function used to manually add observables to a view model
+// * `'options'` to pass to ko.applyBindings
+// * `'afterBinding'` callback (can alternatively be in the options)
+// * `'beforeBinding'` callback (can alternatively be in the options)
+//
+// Each function/constructor gets called with the following signature `'function(view_model, element)'`.
+//
+// @example Bind your application automatically when the DOM is loaded.
+//   <div kb-inject><span data-bind="text: 'Hello World!'"></span></div>
+// @example Bind your application with properties.
+//   <div kb-inject="message: ko.observable('Hello World!')"><input data-bind="value: message"></input></div>
+// @example Bind your application creating a specific ViewModel instance when the DOM is loaded.
+//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
+//   var MyViewModel = function(view_model, el) {
+//     this.message = ko.observable('Hello World!');
+//   }
+// @example Bind your application using a function when the DOM is loaded (like Angular.js controllers).
+//   <div kb-inject="create: MyController"><input data-bind="value: message"></input></div>
+//   var MyController = function(view_model, el) {
+//     view_model.message = ko.observable('Hello World!');
+//   }
+// @example Bind your application with a specific ViewModel instance and a callback before and after the binding.
+//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
+//   var MyViewModel = function(view_model, el) {
+//     this.message = ko.observable('Hello World!');
+//     this.beforeBinding = function() {alert('before'); };
+//     this.afterBinding = function() {alert('after'); };
+//   }
+// @example Dynamically inject new properties into your ViewModel.
+//   <div kb-inject="MyViewModel">
+//     <div class="control-group" data-bind="inject: {site: ko.observable('http://your.url.com')}">
+//       <label>Website</label>
+//       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+//     </div>
+//   </div>
+//   var MyViewModel = function(view_model, el) {
+//     // site will be dynamically attached to this ViewModel
+//   }
+// @example Dynamically bind a form.
+//   <div kb-inject="MyViewModel">
+//      <form name="my_form" data-bind="inject: kb.formValidator">
+//        <div class="control-group">
+//         <label>Name</label>
+//         <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
+//       </div>
+//       <div class="control-group">
+//         <label>Website</label>
+//         <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+//       </div>
+//     </form>
+//   </div>
+//   var MyViewModel = kb.ViewModel.extend({
+//     constructor: ->
+//       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
+//       kb.ViewModel.prototype.constructor.call(this, model);
+//   });
+kb.Inject = function () {
+  function Inject() {
+    _classCallCheck(this, Inject);
+  }
+
+  _createClass(Inject, null, [{
+    key: 'inject',
+
+    // @private
+    value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
+      var doInject = function doInject(value) {
+        if (_.isFunction(value)) {
+          view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
+          kb.releaseOnNodeRemove(view_model, element);
+        } else {
+          // view_model constructor causes a scope change
+          if (value.view_model) {
+            // specifying a view_model changes the scope so we need to bind a destroy
+            view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
+            kb.releaseOnNodeRemove(view_model, element);
+          }
+
+          // resolve and merge in each key
+          _.each(value, function (item, key) {
+            if (key === 'view_model') return;
+
+            // create function
+            if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
+
+            // resolve nested with assign or not
+            else if (_.isObject(item) && !_.isFunction(item)) {
+                var target = nested || item && item.create ? {} : view_model;
+                view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
+
+                // simple set
+              } else view_model[key] = item;
+          });
+        }
+
+        return view_model;
+      };
+
+      // in recursive calls, we are already protected from propagating dependencies to the template
+      return nested ? doInject(data) : kb.ignore(function () {
+        return doInject(data);
+      });
+    }
+
+    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
+    // Also, used with the data-bind `'inject'` custom binding.
+    // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
+    // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
+
+  }, {
+    key: 'injectViewModels',
+    value: function injectViewModels() {
+      var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
+
+      // find all of the app elements
+      var results = [];
+      var findElements = function findElements(el) {
+        if (!el.__kb_injected) {
+          // already injected -> skip, but still process children in case they were added afterwards
+          var attr = _.find(el.attributes || [], function (x) {
+            return x.name === 'kb-inject';
+          });
+          if (attr) {
+            el.__kb_injected = true; // mark injected
+            results.push({ el: el, view_model: {}, binding: attr.value });
+          }
+        }
+        _.each(el.childNodes, function (child) {
+          return findElements(child);
+        });
+      };
+      findElements(rootEl);
+
+      // bind the view models
+      _.each(results, function (app) {
+        var options = {};
+        var afterBinding = null;
+        var beforeBinding = null;
+
+        // evaluate the app data
+        var expression = app.binding;
+        if (expression) {
+          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
+          var data = new Function('', 'return ( ' + expression + ' )')() || {};
+          if (data.options) {
+            options = data.options;delete data.options;
+          }
+          app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
+          afterBinding = app.view_model.afterBinding || options.afterBinding;
+          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
+        }
+
+        // auto-bind
+        if (beforeBinding) {
+          beforeBinding.call(app.view_model, app.view_model, app.el, options);
+        }
+        kb.applyBindings(app.view_model, app.el, options);
+        if (afterBinding) {
+          afterBinding.call(app.view_model, app.view_model, app.el, options);
+        }
+      });
+      return results;
+    }
+  }]);
+
+  return Inject;
+}();
+
+// auto-inject recursively
+var _ko_applyBindings = ko.applyBindings;
+ko.applyBindings = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var el = args[1];
+  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
+  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [this].concat(args));
+};
+
+// ############################
+// Aliases
+// ############################
+kb.injectViewModels = kb.Inject.injectViewModels;
+
+// ############################
+// Auto Inject results
+// ############################
+if (root && typeof root.document !== 'undefined') {
+  // use simple ready check
+  var onReady = function onReady() {
+    if (root.document.readyState !== 'complete') {
+      setTimeout(onReady, 0); // keep waiting for the document to load
+      return;
+    }
+    kb.injectViewModels(); // the document is loaded
+  };
+  onReady();
+}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1613,7 +1871,7 @@ if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
 }
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1633,7 +1891,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
-var TypedValue = __webpack_require__(9);
+var TypedValue = __webpack_require__(19);
 var EventWatcher = __webpack_require__(1);
 
 var _ = kb._,
@@ -1851,7 +2109,6 @@ var Observable = function () {
   return Observable;
 }();
 
-;
 module.exports = Observable;
 
 kb.observable = function () {
@@ -1863,7 +2120,7 @@ kb.observable = function () {
 };
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2045,7 +2302,7 @@ var Statistics = function () {
 module.exports = Statistics;
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2452,170 +2709,7 @@ Store.initClass();
 module.exports = Store;
 
 /***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
-
-// @nodoc
-
-var TypedValue = function () {
-  function TypedValue(create_options) {
-    _classCallCheck(this, TypedValue);
-
-    this.create_options = create_options;
-    this._vo = ko.observable(null); // create a value observable for the first dependency
-  }
-
-  _createClass(TypedValue, [{
-    key: 'destroy',
-    value: function destroy() {
-      this.__kb_released = true;
-      var previous_value = this.__kb_value;
-      if (previous_value) {
-        this.__kb_value = null;
-        if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
-          this.create_options.store.release(previous_value);
-        } else kb.release(previous_value);
-      }
-      this.create_options = null;
-    }
-  }, {
-    key: 'value',
-    value: function value() {
-      return ko.utils.unwrapObservable(this._vo());
-    }
-  }, {
-    key: 'rawValue',
-    value: function rawValue() {
-      return this.__kb_value;
-    }
-  }, {
-    key: 'valueType',
-    value: function valueType(model, key) {
-      var new_value = kb.getValue(model, key);
-      this.value_type || this._updateValueObservable(new_value); // create so we can check the type
-      return this.value_type;
-    }
-  }, {
-    key: 'update',
-    value: function update(new_value) {
-      if (this.__kb_released) return undefined; // destroyed, nothing to do
-
-      // determine the new type
-      new_value !== undefined || (new_value = null); // ensure null instead of undefined
-      var new_type = kb.utils.valueType(new_value);
-
-      if (this.__kb_value && this.__kb_value.__kb_released) {
-        this.__kb_value = undefined;this.value_type = undefined;
-      }
-      var value = this.__kb_value;
-
-      switch (this.value_type) {
-        case kb.TYPE_COLLECTION:
-          if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) return value(new_value);
-          if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
-            // use the provided CollectionObservable
-            if (new_value && new_value instanceof kb.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
-            return undefined;
-          }
-          break;
-
-        case kb.TYPE_MODEL:
-          if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
-            // use the provided ViewModel
-            if (new_value && !kb.isModel(new_value)) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
-            return undefined;
-          }
-          break;
-        default:
-          break;
-      }
-
-      if (this.value_type === new_type && !_.isUndefined(this.value_type)) {
-        if (kb.peek(value) !== new_value) return value(new_value);
-      } else if (kb.peek(value) !== new_value) return this._updateValueObservable(new_value);
-      return undefined;
-    }
-  }, {
-    key: '_updateValueObservable',
-    value: function _updateValueObservable(new_value, new_observable) {
-      var create_options = this.create_options;
-
-      var creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
-
-      // retain previous type
-      if (new_value === null && !creator) {
-        if (this.value_type === kb.TYPE_MODEL) creator = kb.ViewModel;else if (this.value_type === kb.TYPE_COLLECTION) creator = kb.CollectionObservable;
-      }
-      create_options.creator = creator;
-
-      var value_type = kb.TYPE_UNKNOWN;
-      var previous_value = this.__kb_value;
-      this.__kb_value = undefined;
-
-      var value = void 0;
-      if (new_observable) {
-        value = new_observable;
-        if (create_options.store) create_options.store.retain(new_observable, new_value, creator);
-
-        // found a creator
-      } else if (creator) {
-        // have the store, use it to create
-        if (create_options.store) value = create_options.store.retainOrCreate(new_value, create_options, true);
-
-        // create manually
-        else if (creator.models_only) {
-            value = new_value;value_type = kb.TYPE_SIMPLE;
-          } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
-
-        // create and cache the type
-      } else if (_.isArray(new_value)) {
-        value_type = kb.TYPE_ARRAY;value = ko.observableArray(new_value);
-      } else {
-        value_type = kb.TYPE_SIMPLE;value = ko.observable(new_value);
-      }
-
-      // determine the type
-      this.value_type = value_type;
-      if (value_type === kb.TYPE_UNKNOWN) {
-        // a view model, recognize view_models as non-observable
-        if (!ko.isObservable(value)) {
-          this.value_type = kb.TYPE_MODEL;kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
-        } else if (value.__kb_is_co) {
-          this.value_type = kb.TYPE_COLLECTION;kb.utils.wrappedObject(value, new_value);
-        } else if (!this.value_type) this.value_type = kb.TYPE_SIMPLE;
-      }
-
-      // release previous
-      if (previous_value) {
-        this.create_options.store ? this.create_options.store.release(previous_value) : kb.release(previous_value);
-      }
-
-      // store the value
-      this.__kb_value = value;
-      return this._vo(value);
-    }
-  }]);
-
-  return TypedValue;
-}();
-
-;
-module.exports = TypedValue;
-
-/***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2654,7 +2748,7 @@ var utils = function () {
     key: 'initClass',
     value: function initClass() {
       // Clean up function that releases all of the wrapped values on an owner.
-      this.wrappedDestroy = __webpack_require__(17);
+      this.wrappedDestroy = __webpack_require__(15);
 
       // Helper to merge options including ViewmModel options like `keys` and `factories`
       //
@@ -2662,10 +2756,10 @@ var utils = function () {
       //
       // @example
       //   kb.utils.collapseOptions(options);
-      this.collapseOptions = __webpack_require__(15);
+      this.collapseOptions = __webpack_require__(13);
 
       // used for attribute setting to ensure all model attributes have their underlying models
-      this.unwrapModels = __webpack_require__(16);
+      this.unwrapModels = __webpack_require__(14);
     }
 
     // @nodoc
@@ -2990,7 +3084,7 @@ utils.initClass();
 module.exports = utils;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3297,310 +3391,7 @@ kb.viewModel = function () {
 };
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
 /* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-module.exports = kb;
-
-kb.configure = __webpack_require__(3);
-
-__webpack_require__(5);
-kb.Statistics = __webpack_require__(7);
-kb.utils = __webpack_require__(10);
-kb.Store = __webpack_require__(8);
-kb.Factory = __webpack_require__(4);
-
-kb.CollectionObservable = __webpack_require__(2);
-kb.Observable = __webpack_require__(6);
-kb.ViewModel = __webpack_require__(11);
-
-// re-expose modules
-kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-kb.RECUSIVE_AUTO_INJECT = true;
-
-// custom Knockout `inject` binding
-ko.bindingHandlers.inject = {
-  init: function init(element, value_accessor, all_bindings_accessor, view_model) {
-    return kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
-  }
-};
-
-// Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
-//
-// * `'view_model'` class used to create a new ViewModel instance
-// * `'create'` function used to manually add observables to a view model
-// * `'options'` to pass to ko.applyBindings
-// * `'afterBinding'` callback (can alternatively be in the options)
-// * `'beforeBinding'` callback (can alternatively be in the options)
-//
-// Each function/constructor gets called with the following signature `'function(view_model, element)'`.
-//
-// @example Bind your application automatically when the DOM is loaded.
-//   <div kb-inject><span data-bind="text: 'Hello World!'"></span></div>
-// @example Bind your application with properties.
-//   <div kb-inject="message: ko.observable('Hello World!')"><input data-bind="value: message"></input></div>
-// @example Bind your application creating a specific ViewModel instance when the DOM is loaded.
-//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
-//   var MyViewModel = function(view_model, el) {
-//     this.message = ko.observable('Hello World!');
-//   }
-// @example Bind your application using a function when the DOM is loaded (like Angular.js controllers).
-//   <div kb-inject="create: MyController"><input data-bind="value: message"></input></div>
-//   var MyController = function(view_model, el) {
-//     view_model.message = ko.observable('Hello World!');
-//   }
-// @example Bind your application with a specific ViewModel instance and a callback before and after the binding.
-//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
-//   var MyViewModel = function(view_model, el) {
-//     this.message = ko.observable('Hello World!');
-//     this.beforeBinding = function() {alert('before'); };
-//     this.afterBinding = function() {alert('after'); };
-//   }
-// @example Dynamically inject new properties into your ViewModel.
-//   <div kb-inject="MyViewModel">
-//     <div class="control-group" data-bind="inject: {site: ko.observable('http://your.url.com')}">
-//       <label>Website</label>
-//       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
-//     </div>
-//   </div>
-//   var MyViewModel = function(view_model, el) {
-//     // site will be dynamically attached to this ViewModel
-//   }
-// @example Dynamically bind a form.
-//   <div kb-inject="MyViewModel">
-//      <form name="my_form" data-bind="inject: kb.formValidator">
-//        <div class="control-group">
-//         <label>Name</label>
-//         <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
-//       </div>
-//       <div class="control-group">
-//         <label>Website</label>
-//         <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
-//       </div>
-//     </form>
-//   </div>
-//   var MyViewModel = kb.ViewModel.extend({
-//     constructor: ->
-//       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
-//       kb.ViewModel.prototype.constructor.call(this, model);
-//   });
-kb.Inject = function () {
-  function Inject() {
-    _classCallCheck(this, Inject);
-  }
-
-  _createClass(Inject, null, [{
-    key: 'inject',
-
-    // @private
-    value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-      var doInject = function doInject(value) {
-        if (_.isFunction(value)) {
-          view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
-          kb.releaseOnNodeRemove(view_model, element);
-        } else {
-          // view_model constructor causes a scope change
-          if (value.view_model) {
-            // specifying a view_model changes the scope so we need to bind a destroy
-            view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
-            kb.releaseOnNodeRemove(view_model, element);
-          }
-
-          // resolve and merge in each key
-          _.each(value, function (item, key) {
-            if (key === 'view_model') return;
-
-            // create function
-            if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
-
-            // resolve nested with assign or not
-            else if (_.isObject(item) && !_.isFunction(item)) {
-                var target = nested || item && item.create ? {} : view_model;
-                view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
-
-                // simple set
-              } else view_model[key] = item;
-          });
-        }
-
-        return view_model;
-      };
-
-      // in recursive calls, we are already protected from propagating dependencies to the template
-      return nested ? doInject(data) : kb.ignore(function () {
-        return doInject(data);
-      });
-    }
-
-    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
-    // Also, used with the data-bind `'inject'` custom binding.
-    // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
-    // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-
-  }, {
-    key: 'injectViewModels',
-    value: function injectViewModels() {
-      var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
-
-      // find all of the app elements
-      var results = [];
-      var findElements = function findElements(el) {
-        if (!el.__kb_injected) {
-          // already injected -> skip, but still process children in case they were added afterwards
-          var attr = _.find(el.attributes || [], function (x) {
-            return x.name === 'kb-inject';
-          });
-          if (attr) {
-            el.__kb_injected = true; // mark injected
-            results.push({ el: el, view_model: {}, binding: attr.value });
-          }
-        }
-        _.each(el.childNodes, function (child) {
-          return findElements(child);
-        });
-      };
-      findElements(rootEl);
-
-      // bind the view models
-      _.each(results, function (app) {
-        var options = {};
-        var afterBinding = null;
-        var beforeBinding = null;
-
-        // evaluate the app data
-        var expression = app.binding;
-        if (expression) {
-          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
-          var data = new Function('', 'return ( ' + expression + ' )')() || {};
-          if (data.options) {
-            options = data.options;delete data.options;
-          }
-          app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
-          afterBinding = app.view_model.afterBinding || options.afterBinding;
-          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
-        }
-
-        // auto-bind
-        if (beforeBinding) {
-          beforeBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-        kb.applyBindings(app.view_model, app.el, options);
-        if (afterBinding) {
-          afterBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-      });
-      return results;
-    }
-  }]);
-
-  return Inject;
-}();
-
-// auto-inject recursively
-var _ko_applyBindings = ko.applyBindings;
-ko.applyBindings = function () {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var el = args[1];
-  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
-  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [this].concat(args));
-};
-
-// ############################
-// Aliases
-// ############################
-kb.injectViewModels = kb.Inject.injectViewModels;
-
-// ############################
-// Auto Inject results
-// ############################
-if (root && typeof root.document !== 'undefined') {
-  // use simple ready check
-  var onReady = function onReady() {
-    if (root.document.readyState !== 'complete') {
-      setTimeout(onReady, 0); // keep waiting for the document to load
-      return;
-    }
-    kb.injectViewModels(); // the document is loaded
-  };
-  onReady();
-}
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
-
-/***/ }),
-/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3695,7 +3486,7 @@ module.exports = function (options) {
 };
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3736,7 +3527,7 @@ var unwrapModels = function unwrapModels(obj) {
 module.exports = unwrapModels;
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3785,7 +3576,43 @@ var wrappedDestroy = function wrappedDestroy(obj) {
 module.exports = wrappedDestroy;
 
 /***/ }),
-/* 18 */
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(0);
+
+module.exports = kb;
+
+kb.configure = __webpack_require__(4);
+
+__webpack_require__(7);
+kb.utils = __webpack_require__(11);
+kb.Statistics = __webpack_require__(9);
+kb.Store = __webpack_require__(10);
+kb.Factory = __webpack_require__(5);
+
+kb.CollectionObservable = __webpack_require__(3);
+kb.Observable = __webpack_require__(8);
+kb.ViewModel = __webpack_require__(12);
+__webpack_require__(6);
+
+// re-expose modules
+kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3852,11 +3679,10 @@ var BackboneAssociations = function () {
   return BackboneAssociations;
 }();
 
-;
 module.exports = BackboneAssociations;
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3938,8 +3764,169 @@ var BackboneRelational = function () {
   return BackboneRelational;
 }();
 
-;
 module.exports = BackboneRelational;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var kb = __webpack_require__(0);
+
+var _ = kb._,
+    ko = kb.ko;
+
+// @nodoc
+
+var TypedValue = function () {
+  function TypedValue(create_options) {
+    _classCallCheck(this, TypedValue);
+
+    this.create_options = create_options;
+    this._vo = ko.observable(null); // create a value observable for the first dependency
+  }
+
+  _createClass(TypedValue, [{
+    key: 'destroy',
+    value: function destroy() {
+      this.__kb_released = true;
+      var previous_value = this.__kb_value;
+      if (previous_value) {
+        this.__kb_value = null;
+        if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
+          this.create_options.store.release(previous_value);
+        } else kb.release(previous_value);
+      }
+      this.create_options = null;
+    }
+  }, {
+    key: 'value',
+    value: function value() {
+      return ko.utils.unwrapObservable(this._vo());
+    }
+  }, {
+    key: 'rawValue',
+    value: function rawValue() {
+      return this.__kb_value;
+    }
+  }, {
+    key: 'valueType',
+    value: function valueType(model, key) {
+      var new_value = kb.getValue(model, key);
+      this.value_type || this._updateValueObservable(new_value); // create so we can check the type
+      return this.value_type;
+    }
+  }, {
+    key: 'update',
+    value: function update(new_value) {
+      if (this.__kb_released) return undefined; // destroyed, nothing to do
+
+      // determine the new type
+      new_value !== undefined || (new_value = null); // ensure null instead of undefined
+      var new_type = kb.utils.valueType(new_value);
+
+      if (this.__kb_value && this.__kb_value.__kb_released) {
+        this.__kb_value = undefined;this.value_type = undefined;
+      }
+      var value = this.__kb_value;
+
+      switch (this.value_type) {
+        case kb.TYPE_COLLECTION:
+          if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) return value(new_value);
+          if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
+            // use the provided CollectionObservable
+            if (new_value && new_value instanceof kb.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
+            return undefined;
+          }
+          break;
+
+        case kb.TYPE_MODEL:
+          if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
+            // use the provided ViewModel
+            if (new_value && !kb.isModel(new_value)) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
+            return undefined;
+          }
+          break;
+        default:
+          break;
+      }
+
+      if (this.value_type === new_type && !_.isUndefined(this.value_type)) {
+        if (kb.peek(value) !== new_value) return value(new_value);
+      } else if (kb.peek(value) !== new_value) return this._updateValueObservable(new_value);
+      return undefined;
+    }
+  }, {
+    key: '_updateValueObservable',
+    value: function _updateValueObservable(new_value, new_observable) {
+      var create_options = this.create_options;
+
+      var creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
+
+      // retain previous type
+      if (new_value === null && !creator) {
+        if (this.value_type === kb.TYPE_MODEL) creator = kb.ViewModel;else if (this.value_type === kb.TYPE_COLLECTION) creator = kb.CollectionObservable;
+      }
+      create_options.creator = creator;
+
+      var value_type = kb.TYPE_UNKNOWN;
+      var previous_value = this.__kb_value;
+      this.__kb_value = undefined;
+
+      var value = void 0;
+      if (new_observable) {
+        value = new_observable;
+        if (create_options.store) create_options.store.retain(new_observable, new_value, creator);
+
+        // found a creator
+      } else if (creator) {
+        // have the store, use it to create
+        if (create_options.store) value = create_options.store.retainOrCreate(new_value, create_options, true);
+
+        // create manually
+        else if (creator.models_only) {
+            value = new_value;value_type = kb.TYPE_SIMPLE;
+          } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
+
+        // create and cache the type
+      } else if (_.isArray(new_value)) {
+        value_type = kb.TYPE_ARRAY;value = ko.observableArray(new_value);
+      } else {
+        value_type = kb.TYPE_SIMPLE;value = ko.observable(new_value);
+      }
+
+      // determine the type
+      this.value_type = value_type;
+      if (value_type === kb.TYPE_UNKNOWN) {
+        // a view model, recognize view_models as non-observable
+        if (!ko.isObservable(value)) {
+          this.value_type = kb.TYPE_MODEL;kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
+        } else if (value.__kb_is_co) {
+          this.value_type = kb.TYPE_COLLECTION;kb.utils.wrappedObject(value, new_value);
+        } else if (!this.value_type) this.value_type = kb.TYPE_SIMPLE;
+      }
+
+      // release previous
+      if (previous_value) {
+        this.create_options.store ? this.create_options.store.release(previous_value) : kb.release(previous_value);
+      }
+
+      // store the value
+      this.__kb_value = value;
+      return this._vo(value);
+    }
+  }]);
+
+  return TypedValue;
+}();
+
+module.exports = TypedValue;
 
 /***/ }),
 /* 20 */
@@ -3958,26 +3945,6 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_21__;
 /***/ (function(module, exports) {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE_22__;
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(2);
-__webpack_require__(3);
-__webpack_require__(1);
-__webpack_require__(4);
-__webpack_require__(14);
-__webpack_require__(0);
-__webpack_require__(5);
-__webpack_require__(6);
-__webpack_require__(7);
-__webpack_require__(8);
-__webpack_require__(9);
-__webpack_require__(10);
-__webpack_require__(11);
-module.exports = __webpack_require__(13);
-
 
 /***/ })
 /******/ ]);

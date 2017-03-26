@@ -1,11 +1,3 @@
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2017 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("backbone"), require("underscore"), require("knockout"));
@@ -500,7 +492,7 @@ kb.Events = Backbone.Events;
 
 // Object.assign
 kb.assign = _.assign || _.extend;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
@@ -522,17 +514,18 @@ var kb = __webpack_require__(0);
 
 module.exports = kb;
 
-kb.configure = __webpack_require__(4);
+kb.configure = __webpack_require__(10);
 
-__webpack_require__(6);
-kb.Statistics = __webpack_require__(8);
-kb.utils = __webpack_require__(11);
-kb.Store = __webpack_require__(9);
-kb.Factory = __webpack_require__(5);
+__webpack_require__(16);
+kb.utils = __webpack_require__(23);
+kb.Statistics = __webpack_require__(20);
+kb.Store = __webpack_require__(21);
+kb.Factory = __webpack_require__(11);
 
-kb.CollectionObservable = __webpack_require__(3);
-kb.Observable = __webpack_require__(7);
-kb.ViewModel = __webpack_require__(12);
+kb.CollectionObservable = __webpack_require__(9);
+kb.Observable = __webpack_require__(17);
+kb.ViewModel = __webpack_require__(24);
+__webpack_require__(15);
 
 // re-expose modules
 kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };
@@ -778,7 +771,6 @@ var EventWatcher = function () {
   return EventWatcher;
 }();
 
-;
 module.exports = EventWatcher;
 
 // factory function
@@ -788,6 +780,944 @@ kb.emitterObservable = function (emitter, observable) {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(1);
+
+var _ = kb._,
+    ko = kb.ko;
+
+__webpack_require__(25);
+
+var KEYS_PUBLISH = ['destroy', 'setToDefault'];
+
+// Used to provide a default value when an observable is null, undefined, or the empty string.
+//
+// @example Provide a observable with observable and/or non observable default argument in the form of:
+//   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
+
+var DefaultObservable = function () {
+  // Used to create a new kb.DefaultObservable.
+  //
+  // @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
+  // @param [Any] default_value the default value. Can be a value, string or ko.observable
+  // @return [ko.observable] the constructor does not return 'this' but a ko.observable
+  // @note the constructor does not return 'this' but a ko.observable
+  function DefaultObservable(target_observable, dv) {
+    var _this = this;
+
+    _classCallCheck(this, DefaultObservable);
+
+    // @dv is default value
+    this.dv = dv;
+    var observable = kb.utils.wrappedObservable(this, ko.computed({
+      read: function read() {
+        var current_target = ko.utils.unwrapObservable(target_observable());
+        return _.isNull(current_target) || _.isUndefined(current_target) ? ko.utils.unwrapObservable(_this.dv) : current_target;
+      },
+      write: function write(value) {
+        return target_observable(value);
+      }
+    }));
+
+    // publish public interface on the observable and return instead of this
+    kb.publishMethods(observable, this, KEYS_PUBLISH);
+
+    return observable;
+  }
+
+  // Required clean up function to break cycles, release view models, etc.
+  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
+
+
+  _createClass(DefaultObservable, [{
+    key: 'destroy',
+    value: function destroy() {
+      return kb.utils.wrappedDestroy(this);
+    }
+
+    // Forces the observable to take the default value.
+    // @note Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
+
+  }, {
+    key: 'setToDefault',
+    value: function setToDefault() {
+      return kb.utils.wrappedObservable(this)(this.dv);
+    }
+  }]);
+
+  return DefaultObservable;
+}();
+
+kb.DefaultObservable = DefaultObservable;
+module.exports = DefaultObservable;
+
+kb.defaultObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.DefaultObservable, [null].concat(args)))();
+};
+kb.observableDefault = kb.defaultObservable;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(1);
+
+var _ = kb._,
+    ko = kb.ko;
+
+
+kb.toFormattedString = function (format) {
+  var result = format.slice();
+
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  _.each(args, function (arg, index) {
+    var value = ko.utils.unwrapObservable(arg);
+    if (_.isUndefined(value) || _.isNull(value)) value = '';
+
+    var parameter_index = format.indexOf('{' + index + '}');
+    while (~parameter_index) {
+      result = result.replace('{' + index + '}', value);
+      parameter_index = format.indexOf('{' + index + '}', parameter_index + 1);
+    }
+  });
+  return result;
+};
+
+kb.parseFormattedString = function (string, format) {
+  var regex_string = format.slice();var index = 0;var parameter_count = 0;var positions = {};
+  while (regex_string.search('\\{' + index + '\\}') >= 0) {
+    // store the positions of the replacements
+    var parameter_index = format.indexOf('{' + index + '}');
+    while (~parameter_index) {
+      regex_string = regex_string.replace('{' + index + '}', '(.*)');
+      positions[parameter_index] = index;parameter_count++;
+      parameter_index = format.indexOf('{' + index + '}', parameter_index + 1);
+    }
+    index++;
+  }
+  var count = index;
+
+  var regex = new RegExp(regex_string);
+  var matches = regex.exec(string);
+  if (matches) {
+    matches.shift();
+  }
+  // return fake empty data
+  if (!matches || matches.length !== parameter_count) {
+    var result = [];
+    while (count-- > 0) {
+      result.push('');
+    }
+    return result;
+  }
+
+  // sort the matches since the parameters could be requested unordered
+  var sorted_positions = _.sortBy(_.keys(positions), function (parameter_index) {
+    return +parameter_index;
+  });
+  var format_indices_to_matched_indices = {};
+  _.each(sorted_positions, function (parameter_index, match_index) {
+    parameter_index = sorted_positions[match_index];
+    index = positions[parameter_index];
+    if (!(index in format_indices_to_matched_indices)) {
+      format_indices_to_matched_indices[index] = match_index;
+    }
+  });
+
+  var results = [];index = 0;
+  while (index < count) {
+    results.push(matches[format_indices_to_matched_indices[index]]);
+    index++;
+  }
+  return results;
+};
+
+// Handles two-way formatted string convertions and will reformat a string when any argument changes. The format string can also be an observable.
+//
+// @example change the formatted name whenever a model's name attribute changes
+//   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
+
+var FormattedObservable = function () {
+  // Used to create a new kb.FormattedObservable.
+  //
+  // @param [String|ko.observable] format the format string.
+  // Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
+  // @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
+  // @return [ko.observable] the constructor does not return 'this' but a ko.observable
+  // @note the constructor does not return 'this' but a ko.observable
+  function FormattedObservable(format) {
+    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+      args[_key2 - 1] = arguments[_key2];
+    }
+
+    _classCallCheck(this, FormattedObservable);
+
+    // being called by the factory function
+    var observable_args = _.isArray(args[0]) ? args[0] : args;
+    var observable = kb.utils.wrappedObservable(this, ko.computed({
+      read: function read() {
+        args = [ko.utils.unwrapObservable(format)];
+        _.each(observable_args, function (arg) {
+          return args.push(ko.utils.unwrapObservable(arg));
+        });
+        return kb.toFormattedString.apply(null, args);
+      },
+      write: function write(value) {
+        var matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+        var max_count = Math.min(observable_args.length, matches.length);var index = 0;
+        while (index < max_count) {
+          observable_args[index](matches[index]);
+          index++;
+        }
+      }
+    }));
+
+    return observable;
+  }
+
+  // Required clean up function to break cycles, release view models, etc.
+  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
+
+
+  _createClass(FormattedObservable, [{
+    key: 'destroy',
+    value: function destroy() {
+      return kb.utils.wrappedDestroy(this);
+    }
+  }]);
+
+  return FormattedObservable;
+}();
+
+kb.FormattedObservable = FormattedObservable;
+module.exports = FormattedObservable;
+
+kb.formattedObservable = function () {
+  for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+    args[_key3] = arguments[_key3];
+  }
+
+  return new (Function.prototype.bind.apply(kb.FormattedObservable, [null].concat(args)))();
+};
+kb.observableFormatted = kb.formattedObservable;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(1);
+
+var _ = kb._,
+    ko = kb.ko;
+
+
+var KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
+
+// Locale Manager - if you are using localization, set this property.
+// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
+if (!kb.locale_manager) {
+  kb.locale_manager = undefined;
+}
+
+// @abstract You must provide the following two methods:
+//   * read: function(value, observable) called to get the value and each time the locale changes
+//   * write: function(localized_string, value, observable) called to set the value (optional)
+//
+// Base class for observing localized data that changes when the locale changes.
+//
+// @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
+//   kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
+//     constructor: function(value, options, view_model) {
+//       kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+//       return kb.utils.wrappedObservable(this);
+//     },
+//     read: function(value) {
+//       return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+//     },
+//     write: function(localized_string, value) {
+//       var new_value;
+//       new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
+//       if (!(new_value && _.isDate(new_value))) {
+//         return kb.utils.wrappedObservable(this).resetToCurrent();
+//       }
+//       return value.setTime(new_value.valueOf());
+//     }
+//   });
+//   var ViewModel = function(model) {
+//     this.localized_date = kb.observable(model, {
+//       key: 'date',
+//       'default': this.loading_message,
+//       localizer: ShortDateLocalizer
+//     }, this);
+//   };
+//   var view_model = new ViewModel(new Backbone.Model({date: new Date()}));
+//
+// @method .extend(prototype_properties, class_properties)
+//   Class method for JavaScript inheritance.
+//   @param [Object] prototype_properties the properties to add to the prototype
+//   @param [Object] class_properties the properties to add to the class
+//   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+//   @example
+//     var MyLocalizedObservable = kb.LocalizedObservable.extend({
+//        constructor: function(value, options, view_model) {
+//          // the constructor does not return 'this' but a ko.observable
+//          return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
+//        }
+//     });
+
+var LocalizedObservable = function () {
+  _createClass(LocalizedObservable, null, [{
+    key: 'initClass',
+    value: function initClass() {
+      LocalizedObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
+    }
+
+    // Used to create a new kb.LocalizedObservable. This an abstract class.
+    //
+    // @param [Data|ko.observable] value the value to localize
+    // @param [Object] options the create options
+    // @option options [Data|ko.observable] default a default value to present when the value is null, an empty string, etc.
+    // @option options [Function] onChange a notification that gets called when the locale changes. Signature: function(localized_string, value, observable)
+    // @return [ko.observable] the constructor does not return 'this' but a ko.observable
+    // @note the constructor does not return 'this' but a ko.observable
+
+  }]);
+
+  function LocalizedObservable(value, options, vm) {
+    var _this = this;
+
+    _classCallCheck(this, LocalizedObservable);
+
+    // @vm is view_model
+    this.value = value;
+    this.vm = vm;
+    if (!options) {
+      options = {};
+    }if (!this.vm) {
+      this.vm = {};
+    }
+    this.read || kb._throwMissing(this, 'read');
+    kb.locale_manager || kb._throwMissing(this, 'kb.locale_manager');
+
+    // bind callbacks
+    if (!this.__kb) {
+      this.__kb = {};
+    }
+    this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
+    this.__kb._onChange = options.onChange;
+
+    // internal state
+    var currentValue = this.value ? ko.utils.unwrapObservable(this.value) : null;
+    this.vo = ko.observable(!currentValue ? null : this.read(currentValue, null));
+
+    var observable = kb.utils.wrappedObservable(this, ko.computed({
+      read: function read() {
+        if (_this.value) ko.utils.unwrapObservable(_this.value);
+        _this.vo(); // create a depdenency
+        return _this.read(ko.utils.unwrapObservable(_this.value));
+      },
+
+      write: function write(x) {
+        _this.write || kb._throwUnexpected(_this, 'writing to read-only');
+        _this.write(x, ko.utils.unwrapObservable(_this.value));
+        _this.vo(x);
+        return _this.__kb._onChange ? _this.__kb._onChange(x) : undefined;
+      },
+
+      owner: this.vm
+    }));
+
+    // publish public interface on the observable and return instead of this
+    kb.publishMethods(observable, this, KEYS_PUBLISH);
+
+    // start
+    kb.locale_manager.bind('change', this.__kb._onLocaleChange);
+
+    // wrap ourselves with a default value
+    if (Object.prototype.hasOwnProperty.call(options, 'default')) {
+      observable = kb.DefaultObservable && ko.defaultObservable(observable, options.default);
+    }
+
+    return observable;
+  }
+
+  // Required clean up function to break cycles, release view models, etc.
+  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
+
+
+  _createClass(LocalizedObservable, [{
+    key: 'destroy',
+    value: function destroy() {
+      kb.locale_manager.unbind('change', this.__kb._onLocaleChange);
+      this.vm = null;
+      return kb.utils.wrappedDestroy(this);
+    }
+
+    // Used to reset the value if localization is not possible.
+
+  }, {
+    key: 'resetToCurrent',
+    value: function resetToCurrent() {
+      var observable = kb.utils.wrappedObservable(this);
+      var current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
+      if (observable() === current_value) return undefined;
+      return observable(current_value);
+    }
+
+    // Dual purpose set/get
+
+  }, {
+    key: 'observedValue',
+    value: function observedValue(value) {
+      if (arguments.length === 0) return this.value;
+      this.value = value;this._onLocaleChange();
+      return undefined;
+    }
+
+    // ###################################################
+    // Internal
+    // ###################################################
+
+    // @nodoc
+
+  }, {
+    key: '_onLocaleChange',
+    value: function _onLocaleChange() {
+      var value = this.read(ko.utils.unwrapObservable(this.value));
+      this.vo(value);
+      if (this.__kb._onChange) return this.__kb._onChange(value);
+      return undefined;
+    }
+  }]);
+
+  return LocalizedObservable;
+}();
+
+LocalizedObservable.initClass();
+kb.LocalizedObservable = LocalizedObservable;
+module.exports = LocalizedObservable;
+
+// factory function
+kb.localizedObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.LocalizedObservable, [null].concat(args)))();
+};
+kb.observableLocalized = kb.localizedObservable;
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(1);
+var EventWatcher = __webpack_require__(2);
+
+var _ = kb._,
+    ko = kb.ko;
+
+
+var KEYS_PUBLISH = ['destroy'];
+
+// Class for observing emitter events.
+//
+// @example create an observable whose subscriptions are notified with the change event is triggered.
+//   var triggered_observable = kb.triggeredObservable(name, 'change');
+//
+// @example How to watch a emitter for events.
+//   var trigger_count = 0;
+//   var emitter = new Backbone.Model();
+//   var view_emitter = {
+//     triggered_observable: kb.triggeredObservable(emitter, 'change')
+//   };
+//   view_emitter.counter = ko.computed(function() {
+//     view_emitter.triggered_observable() // add a dependency
+//     return trigger_count++
+//   });
+//   emitter.set(name: 'bob');       # trigger_count: 1
+//   emitter.set(name: 'george');    # trigger_count: 2
+//   emitter.set(last: 'smith');     # trigger_count: 3
+
+var TriggeredObservable = function () {
+
+  // Used to create a new kb.Observable.
+  //
+  // @param [Model] emitter the emitter to observe (can be null)
+  // @param [String] event_selector the event name to trigger Knockout subscriptions on.
+  // @return [ko.observable] the constructor does not return 'this' but a ko.observable
+  // @note the constructor does not return 'this' but a ko.observable
+  function TriggeredObservable(emitter, event_selector) {
+    var _this = this;
+
+    _classCallCheck(this, TriggeredObservable);
+
+    this.event_selector = event_selector;
+    emitter || kb._throwMissing(this, 'emitter');
+    this.event_selector || kb._throwMissing(this, 'event_selector');
+
+    // internal state
+    this.vo = ko.observable();
+    var observable = kb.utils.wrappedObservable(this, ko.computed(function () {
+      return _this.vo();
+    }));
+
+    // publish public interface on the observable and return instead of this
+    kb.publishMethods(observable, this, KEYS_PUBLISH);
+
+    // create emitter observable
+    kb.utils.wrappedEventWatcher(this, new EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
+
+    return observable;
+  }
+
+  // Required clean up function to break cycles, release view models, etc.
+  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
+
+
+  _createClass(TriggeredObservable, [{
+    key: 'destroy',
+    value: function destroy() {
+      return kb.utils.wrappedDestroy(this);
+    }
+
+    // Dual-purpose getter/setter for the observed emitter.
+    //
+    // @overload emitter()
+    //   Gets the emitter or emitter reference
+    //   @return [Model|ModelRef|Collection] the emitter whose events are being bound (can be null)
+    // @overload emitter(new_emitter)
+    //   Sets the emitter or emitter reference
+    //   @param [Model|ModelRef|Collection] new_emitter the emitter whose events will be bound (can be null)
+
+  }, {
+    key: 'emitter',
+    value: function emitter(new_emitter) {
+      // get or no change
+      if (arguments.length === 0 || this.ee === new_emitter) return this.ee;
+      this.ee = new_emitter;
+      if (this.ee) return this.update();
+      return undefined;
+    }
+
+    // ###################################################
+    // Internal
+    // ###################################################
+    // @nodoc
+
+  }, {
+    key: 'update',
+    value: function update() {
+      if (!this.ee) return undefined; // do not trigger if there is no emitter
+      if (this.vo() !== this.ee) return this.vo(this.ee);
+      return this.vo.valueHasMutated(); // manually trigger the dependable
+    }
+  }]);
+
+  return TriggeredObservable;
+}();
+
+kb.TriggeredObservable = TriggeredObservable;
+module.exports = TriggeredObservable;
+
+// factory function
+kb.triggeredObservable = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return new (Function.prototype.bind.apply(kb.TriggeredObservable, [null].concat(args)))();
+};
+kb.observableTriggered = kb.triggeredObservable;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(1);
+
+var _ = kb._,
+    ko = kb.ko;
+
+
+__webpack_require__(26);
+
+// internal helper
+var callOrGet = function callOrGet(value) {
+  value = ko.utils.unwrapObservable(value);
+
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  return typeof value === 'function' ? value.apply(undefined, args) : value;
+};
+
+// Helpers for validating forms, inputs, and values.
+// @example A Named Form
+//   <form name="myForm">
+//      <input name="input1", data-bind="value: input1" required>
+//      <input type="url" name="input2", data-bind="value: input2">
+//    </form>
+//   Because there is a form name, it will add the following property to your ViewModel (wrapped in an observable):
+//    $myForm: {
+//      input1: {required: boolean, valid: boolean, invalid: boolean},
+//      input2: {url: boolean, valid: boolean, invalid: boolean},
+//      valid: boolean,
+//      invalid: boolean
+//    }
+// @example A Unnamed Form
+//   <form>
+//     <input name="input1", data-bind="value: input1" required>
+//     <input type="url" name="input2", data-bind="value: input2">
+//   </form>
+//   Because there is not a form name, it will extend the following on your ViewModel (each wrapped separately in an observable):
+//   {
+//     $input1: {required: boolean, valid: boolean, invalid: boolean},
+//     $input2: {url: boolean, valid: boolean, invalid: boolean}
+//   }
+//
+// @method .valueValidator(value, bindings, validation_options={})
+//   Used to create an observable that wraps all of the validators for a value and also generates helpers for $valid, $error_count, $enabled, $disabled, and $active_error.
+//   @note Called using `kb.valueValidator` (not  kb.Validation.valueValidator)
+//   @param [Observable] value the value to validate
+//   @param [Object] bindings the named validators to use to validate the value
+//   @param [Object] validation_options the validation options
+//   @option validation_options [Boolean|Function] disable the test for disabling validations
+//   @option validation_options [Boolean|Function] enable the test for enabling validations
+//   @option validation_options [String|Array] priorities the priority order of the validators (used to set $active_error in the case of multiple being active simulateously)
+//   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
+//
+// @method .inputValidator(view_model, el, validation_options={})
+//   Used to create an observable that wraps all of the validators for an HTML input element using `kb.valueValidator`. See kb.valueValidator for shared options.
+//   In addition, you can add custom bindings by including a `validations` Object in your data-bind statement where each property has a function(value) that returns true if there are errors.
+//   It will automatically generate validators from the input for the following attributes:
+//   * type: for url, email, and number
+//   * required: must have a length or a value
+//   @note Called using `kb.inputValidator` (not  kb.Validation.inputValidator)
+//   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
+//   @example Binding an input using Knockback inject.
+//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>
+//     Adds the following to your ViewModel:
+//       $name: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
+//   @example Binding an input with custom validations using Knockback inject.
+//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {unique: nameTaken}" required>
+//     Adds the following to your ViewModel:
+//       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
+//   @example Binding an input with validation options using Knockback inject.
+//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: 'url'}" required>
+//     Adds the following to your ViewModel:
+//       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $enabled: Boolean, $disabled: Boolean, $active_error: String})
+//
+// @method .formValidator(view_model, el)
+//   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
+//   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
+//    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
+//   @note Called using `kb.formValidator` (not  kb.Validation.formValidator)
+//   @return [Object] an Object with all of the validators and generated helpers
+//   @example Binding a form by name using Knockback inject.
+//     <form name='my_form' data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
+//       <input type="text" name="name" data-bind="value: name" required>
+//       <input type="url" name="site" data-bind="value: site" required>
+//     </form>
+//     Adds the following to your ViewModel:
+//     $my_form: {
+//       name: kb.observable({required: Boolean, $valid: Boolean, $error_count: Number, $active_error: String}),
+//       site: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
+//     }
+//   @example Binding a form without a name using Knockback inject.
+//     <form data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
+//       <input type="text" name="name" data-bind="value: name" required>
+//       <input type="url" name="site" data-bind="value: site" required>
+//     </form>
+//     Extends your ViewModel with the following Object:
+//     {
+//       $name: kb.observable({required: Boolean, $valid: Boolean, $error_count: Number, $active_error: String}),
+//       $site: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
+//     }
+// @method .hasChangedFn(model)
+//   A validation helper that can be used to wait for a change before enabling validations.
+//   @note Called using `kb.hasChangedFn` (not  kb.Validation.hasChangedFn)
+//   @return [Function] Validator function bound with model
+//   @example Enabling validations after a change has been made to a model.
+//     <form class="form-horizontal" data-bind="inject: kb.formValidator, validation_options: {enable: kb.hasChangedFn(model)}">
+// @method .minLengthFn(length)
+//   A validator that will be invalid until the length of the value is below a minimum value.
+//   @note Called using `kb.minLengthFn` (not  kb.Validation.minLengthFn)
+//   @return [Function] Validator function bound with min length
+//   @example Validations will be invalid until the name is at least 4 characters long.
+//     <input type="text" name="name" data-bind="value: name, validations: {length: kb.minLengthFn(4)}">
+// @method .uniqueValueFn(model, key, collection)
+//   Checks for a unique attribute value by key in a collection
+//   @note Called using `kb.uniqueValueFn` (not  kb.Validation.uniqueValueFn)
+//   @return [Function] Validator function bound with model, attribute key, and collection
+//   @example Validations will be invalid until the name attribute is unique in the collection.
+//     <input type="text" name="name" data-bind="value: name, validations: {unique: kb.uniqueValueFn(model, 'name', some_collection)}">
+// @method .untilTrueFn(stand_in, fn, model)
+//   Used to combine conditions.
+//   @note Called using `kb.untilTrueFn` (not  kb.Validation.untilTrueFn)
+//   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
+//   @example Filter the minimum length test of name until it has be valid (that way, won't report invalid while typing in a new input).
+//     <input type="text" name="name" data-bind="value: name, validations: {length_filtered: kb.untilFalseFn(false, kb.minLengthFn(4), model)}">
+// @method .untilFalseFn(stand_in, fn, model)
+//   Used to combine conditions.
+//   @note Called using `kb.untilFalseFn` (not  kb.Validation.untilFalseFn)
+//   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
+
+var Validation = function Validation() {
+  _classCallCheck(this, Validation);
+};
+
+kb.Validation = Validation;
+module.exports = Validation;
+
+// ############################
+// Aliases
+// ############################
+kb.valueValidator = function (value, bindings) {
+  var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  return ko.computed(function () {
+    var results = { $error_count: 0 };
+    var current_value = ko.utils.unwrapObservable(value);
+
+    var disabled = void 0;
+    if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
+    if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
+
+    var priorities = validation_options.priorities || [];
+    if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
+
+    // then add the rest
+    var active_index = priorities.length + 1;
+    _.each(bindings, function (validator, identifier) {
+      results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
+      if (results[identifier]) {
+        results.$error_count++;
+
+        // check priorities
+        var identifier_index = void 0;
+        (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
+
+        if (results.$active_error && identifier_index < active_index) {
+          results.$active_error = identifier;active_index = identifier_index;
+        } else {
+          results.$active_error || (results.$active_error = identifier, active_index = identifier_index);
+        }
+      }
+    });
+
+    // add the inverse and ensure a boolean
+    results.$enabled = !disabled;
+    results.$disable = !!disabled;
+    results.$valid = results.$error_count === 0;
+    return results;
+  });
+};
+
+kb.inputValidator = function (view_model, el) {
+  var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var validators = kb.valid;
+  var input_name = el.getAttribute('name');
+  if (input_name && !_.isString(input_name)) {
+    input_name = null;
+  }
+
+  // only set up form elements with a value bindings
+  var bindings = el.getAttribute('data-bind');
+  if (!bindings) return null;
+  var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
+  if (!(options && options.value)) return null;
+  if (options.validation_options) {
+    _.defaults(options.validation_options, validation_options);
+    validation_options = options.validation_options;
+  }
+
+  // collect the types to identifier
+  var type = el.getAttribute('type');
+  bindings = {};
+  !validators[type] || (bindings[type] = validators[type]);
+  !el.hasAttribute('required') || (bindings.required = validators.required);
+  if (options.validations) {
+    _.each(options.validations, function (validator, identifier) {
+      bindings[identifier] = validator;
+    });
+  }
+  var result = kb.valueValidator(options.value, bindings, validation_options);
+
+  // if there is a name, add to the view_model with $scoping
+  !input_name && !validation_options.no_attach || (view_model['$' + input_name] = result);
+  return result;
+};
+
+kb.formValidator = function (view_model, el) {
+  var results = {};
+  var validators = [];
+  var form_name = el.getAttribute('name');
+  if (form_name && !_.isString(form_name)) form_name = null;
+
+  var bindings = el.getAttribute('data-bind');
+  var validation_options = void 0;
+  if (bindings) {
+    var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
+    validation_options = options.validation_options;
+  }
+  if (!validation_options) validation_options = {};
+  validation_options.no_attach = !!form_name;
+
+  // build up the results
+  _.each(el.getElementsByTagName('input'), function (input_el) {
+    var name = input_el.getAttribute('name');
+    if (!name) return; // need named inputs to set up an object
+    var validator = kb.inputValidator(view_model, input_el, validation_options);
+    !validator || validators.push(results[name] = validator);
+  });
+
+  // collect stats, error count and valid
+  results.$error_count = ko.computed(function () {
+    var error_count = 0;
+    _.each(validators, function (validator) {
+      error_count += validator().$error_count;
+    });
+    return error_count;
+  });
+  results.$valid = ko.computed(function () {
+    return results.$error_count() === 0;
+  });
+
+  // enabled and disabled
+  results.$enabled = ko.computed(function () {
+    var enabled = true;
+    _.each(validators, function (validator) {
+      enabled &= validator().$enabled;
+    });
+    return enabled;
+  });
+  results.$disabled = ko.computed(function () {
+    return !results.$enabled();
+  });
+
+  // if there is a name, add to the view_model with $scoping
+  if (form_name) view_model['$' + form_name] = results;
+  return results;
+};
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1418,7 +2348,7 @@ kb.collectionObservable = function () {
 kb.observableCollection = kb.collectionObservable;
 
 /***/ }),
-/* 4 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1432,8 +2362,8 @@ var _ = kb._;
 var ALL_ORMS = {
   default: null,
   'backbone-orm': null,
-  'backbone-associations': __webpack_require__(23),
-  'backbone-relational': __webpack_require__(24)
+  'backbone-associations': __webpack_require__(18),
+  'backbone-relational': __webpack_require__(19)
 };
 
 // @nodoc
@@ -1478,7 +2408,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 5 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1594,11 +2524,436 @@ var Factory = function () {
   return Factory;
 }();
 
-;
 module.exports = Factory;
 
 /***/ }),
-/* 6 */
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(0);
+
+var _ = kb._;
+
+// @nodoc
+
+var _mergeArray = function _mergeArray(result, key, value) {
+  if (!result[key]) result[key] = [];
+  if (!_.isArray(value)) value = [value];
+  result[key] = result[key].length ? _.union(result[key], value) : value;
+  return result;
+};
+
+// @nodoc
+var _mergeObject = function _mergeObject(result, key, value) {
+  if (!result[key]) result[key] = {};
+  return kb.assign(result[key], value);
+};
+
+// @nodoc
+var _keyArrayToObject = function _keyArrayToObject(value) {
+  var result = {};
+  _.each(value, function (item) {
+    result[item] = { key: item };
+  });
+  return result;
+};
+
+var _mergeOptions = function _mergeOptions(result, options) {
+  if (!options) return result;
+
+  _.each(options, function (value, key) {
+    switch (key) {
+      case 'internals':case 'requires':case 'excludes':case 'statics':
+        _mergeArray(result, key, value);break;
+      case 'keys':
+        // an object
+        if (_.isObject(value) && !_.isArray(value) || _.isObject(result[key]) && !_.isArray(result[key])) {
+          if (!_.isObject(value)) {
+            value = [value];
+          }
+          if (_.isArray(value)) {
+            value = _keyArrayToObject(value);
+          }
+          if (_.isArray(result[key])) {
+            result[key] = _keyArrayToObject(result[key]);
+          }
+          _mergeObject(result, key, value);
+
+          // an array
+        } else {
+          _mergeArray(result, key, value);
+        }
+        break;
+
+      case 'factories':
+        if (_.isFunction(value)) {
+          result[key] = value;
+        } else {
+          _mergeObject(result, key, value);
+        }
+        break;
+      case 'static_defaults':
+        _mergeObject(result, key, value);break;
+      case 'options':
+        break;
+      default:
+        result[key] = value;break;
+    }
+  });
+
+  return _mergeOptions(result, options.options);
+};
+
+// @nodoc
+module.exports = function (options) {
+  return _mergeOptions({}, options);
+};
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(0);
+
+var _ = kb._;
+
+// @nodoc
+
+var unwrapModels = function unwrapModels(obj) {
+  if (!obj) return obj;
+  if (obj.__kb) return Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj;
+  if (_.isArray(obj)) return _.map(obj, function (test) {
+    return unwrapModels(test);
+  });
+  if (_.isObject(obj) && obj.constructor === {}.constructor) {
+    // a simple object
+    var result = {};
+    _.each(obj, function (value, key) {
+      result[key] = unwrapModels(value);
+    });
+    return result;
+  }
+
+  return obj;
+};
+module.exports = unwrapModels;
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+// @nodoc
+var wrappedDestroy = function wrappedDestroy(obj) {
+  if (!obj.__kb) return;
+  if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
+
+  var __kb = obj.__kb;
+
+  obj.__kb = null; // clear now to break cycles
+
+  if (__kb.observable) {
+    __kb.observable.destroy = null;__kb.observable.release = null;
+    wrappedDestroy(__kb.observable);
+    __kb.observable = null;
+  }
+
+  __kb.factory = null;
+
+  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy(); // release the event_watcher
+  __kb.event_watcher = null;
+
+  if (__kb.store_is_owned) __kb.store.destroy(); // release the store
+  __kb.store = null;
+
+  if (__kb.stores_references) {
+    var store_references = __kb.stores_references.pop();
+    while (store_references) {
+      if (!store_references.store.__kb_released) store_references.store.release(obj);
+      store_references = __kb.stores_references.pop();
+    }
+  }
+};
+module.exports = wrappedDestroy;
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
+
+var kb = __webpack_require__(0);
+
+var _ = kb._,
+    ko = kb.ko;
+
+
+kb.RECUSIVE_AUTO_INJECT = true;
+
+// custom Knockout `inject` binding
+ko.bindingHandlers.inject = {
+  init: function init(element, value_accessor, all_bindings_accessor, view_model) {
+    return kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+  }
+};
+
+// Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
+//
+// * `'view_model'` class used to create a new ViewModel instance
+// * `'create'` function used to manually add observables to a view model
+// * `'options'` to pass to ko.applyBindings
+// * `'afterBinding'` callback (can alternatively be in the options)
+// * `'beforeBinding'` callback (can alternatively be in the options)
+//
+// Each function/constructor gets called with the following signature `'function(view_model, element)'`.
+//
+// @example Bind your application automatically when the DOM is loaded.
+//   <div kb-inject><span data-bind="text: 'Hello World!'"></span></div>
+// @example Bind your application with properties.
+//   <div kb-inject="message: ko.observable('Hello World!')"><input data-bind="value: message"></input></div>
+// @example Bind your application creating a specific ViewModel instance when the DOM is loaded.
+//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
+//   var MyViewModel = function(view_model, el) {
+//     this.message = ko.observable('Hello World!');
+//   }
+// @example Bind your application using a function when the DOM is loaded (like Angular.js controllers).
+//   <div kb-inject="create: MyController"><input data-bind="value: message"></input></div>
+//   var MyController = function(view_model, el) {
+//     view_model.message = ko.observable('Hello World!');
+//   }
+// @example Bind your application with a specific ViewModel instance and a callback before and after the binding.
+//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
+//   var MyViewModel = function(view_model, el) {
+//     this.message = ko.observable('Hello World!');
+//     this.beforeBinding = function() {alert('before'); };
+//     this.afterBinding = function() {alert('after'); };
+//   }
+// @example Dynamically inject new properties into your ViewModel.
+//   <div kb-inject="MyViewModel">
+//     <div class="control-group" data-bind="inject: {site: ko.observable('http://your.url.com')}">
+//       <label>Website</label>
+//       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+//     </div>
+//   </div>
+//   var MyViewModel = function(view_model, el) {
+//     // site will be dynamically attached to this ViewModel
+//   }
+// @example Dynamically bind a form.
+//   <div kb-inject="MyViewModel">
+//      <form name="my_form" data-bind="inject: kb.formValidator">
+//        <div class="control-group">
+//         <label>Name</label>
+//         <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
+//       </div>
+//       <div class="control-group">
+//         <label>Website</label>
+//         <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+//       </div>
+//     </form>
+//   </div>
+//   var MyViewModel = kb.ViewModel.extend({
+//     constructor: ->
+//       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
+//       kb.ViewModel.prototype.constructor.call(this, model);
+//   });
+kb.Inject = function () {
+  function Inject() {
+    _classCallCheck(this, Inject);
+  }
+
+  _createClass(Inject, null, [{
+    key: 'inject',
+
+    // @private
+    value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
+      var doInject = function doInject(value) {
+        if (_.isFunction(value)) {
+          view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
+          kb.releaseOnNodeRemove(view_model, element);
+        } else {
+          // view_model constructor causes a scope change
+          if (value.view_model) {
+            // specifying a view_model changes the scope so we need to bind a destroy
+            view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
+            kb.releaseOnNodeRemove(view_model, element);
+          }
+
+          // resolve and merge in each key
+          _.each(value, function (item, key) {
+            if (key === 'view_model') return;
+
+            // create function
+            if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
+
+            // resolve nested with assign or not
+            else if (_.isObject(item) && !_.isFunction(item)) {
+                var target = nested || item && item.create ? {} : view_model;
+                view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
+
+                // simple set
+              } else view_model[key] = item;
+          });
+        }
+
+        return view_model;
+      };
+
+      // in recursive calls, we are already protected from propagating dependencies to the template
+      return nested ? doInject(data) : kb.ignore(function () {
+        return doInject(data);
+      });
+    }
+
+    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
+    // Also, used with the data-bind `'inject'` custom binding.
+    // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
+    // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
+
+  }, {
+    key: 'injectViewModels',
+    value: function injectViewModels() {
+      var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
+
+      // find all of the app elements
+      var results = [];
+      var findElements = function findElements(el) {
+        if (!el.__kb_injected) {
+          // already injected -> skip, but still process children in case they were added afterwards
+          var attr = _.find(el.attributes || [], function (x) {
+            return x.name === 'kb-inject';
+          });
+          if (attr) {
+            el.__kb_injected = true; // mark injected
+            results.push({ el: el, view_model: {}, binding: attr.value });
+          }
+        }
+        _.each(el.childNodes, function (child) {
+          return findElements(child);
+        });
+      };
+      findElements(rootEl);
+
+      // bind the view models
+      _.each(results, function (app) {
+        var options = {};
+        var afterBinding = null;
+        var beforeBinding = null;
+
+        // evaluate the app data
+        var expression = app.binding;
+        if (expression) {
+          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
+          var data = new Function('', 'return ( ' + expression + ' )')() || {};
+          if (data.options) {
+            options = data.options;delete data.options;
+          }
+          app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
+          afterBinding = app.view_model.afterBinding || options.afterBinding;
+          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
+        }
+
+        // auto-bind
+        if (beforeBinding) {
+          beforeBinding.call(app.view_model, app.view_model, app.el, options);
+        }
+        kb.applyBindings(app.view_model, app.el, options);
+        if (afterBinding) {
+          afterBinding.call(app.view_model, app.view_model, app.el, options);
+        }
+      });
+      return results;
+    }
+  }]);
+
+  return Inject;
+}();
+
+// auto-inject recursively
+var _ko_applyBindings = ko.applyBindings;
+ko.applyBindings = function () {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  var el = args[1];
+  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
+  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [this].concat(args));
+};
+
+// ############################
+// Aliases
+// ############################
+kb.injectViewModels = kb.Inject.injectViewModels;
+
+// ############################
+// Auto Inject results
+// ############################
+if (root && typeof root.document !== 'undefined') {
+  // use simple ready check
+  var onReady = function onReady() {
+    if (root.document.readyState !== 'complete') {
+      setTimeout(onReady, 0); // keep waiting for the document to load
+      return;
+    }
+    kb.injectViewModels(); // the document is loaded
+  };
+  onReady();
+}
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1648,7 +3003,7 @@ if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
 }
 
 /***/ }),
-/* 7 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1668,7 +3023,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
-var TypedValue = __webpack_require__(10);
+var TypedValue = __webpack_require__(22);
 var EventWatcher = __webpack_require__(2);
 
 var _ = kb._,
@@ -1886,7 +3241,6 @@ var Observable = function () {
   return Observable;
 }();
 
-;
 module.exports = Observable;
 
 kb.observable = function () {
@@ -1898,7 +3252,162 @@ kb.observable = function () {
 };
 
 /***/ }),
-/* 8 */
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(0);
+
+var _ = kb._,
+    Backbone = kb.Backbone;
+
+
+var AssociatedModel = null; // lazy bind so this file can be loaded before relational library
+
+// @nodoc
+
+var BackboneAssociations = function () {
+  function BackboneAssociations() {
+    _classCallCheck(this, BackboneAssociations);
+  }
+
+  _createClass(BackboneAssociations, null, [{
+    key: 'isAvailable',
+    value: function isAvailable() {
+      return !!(AssociatedModel = Backbone ? Backbone.AssociatedModel : null);
+    }
+  }, {
+    key: 'keys',
+    value: function keys(model) {
+      if (!(model instanceof AssociatedModel)) return null;
+      return _.map(model.relations, function (test) {
+        return test.key;
+      });
+    }
+  }, {
+    key: 'relationType',
+    value: function relationType(model, key) {
+      if (!(model instanceof AssociatedModel)) return null;
+      var relation = _.find(model.relations, function (test) {
+        return test.key === key;
+      });
+      if (!relation) return null;
+      return relation.type === 'Many' ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
+    }
+  }, {
+    key: 'useFunction',
+    value: function useFunction() {
+      return false;
+    }
+  }]);
+
+  return BackboneAssociations;
+}();
+
+module.exports = BackboneAssociations;
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var kb = __webpack_require__(0);
+
+var _ = kb._,
+    Backbone = kb.Backbone;
+
+
+var RelationalModel = null; // lazy bind so this file can be loaded before relational library
+
+// @nodoc
+
+var BackboneRelational = function () {
+  function BackboneRelational() {
+    _classCallCheck(this, BackboneRelational);
+  }
+
+  _createClass(BackboneRelational, null, [{
+    key: 'isAvailable',
+    value: function isAvailable() {
+      return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null);
+    }
+  }, {
+    key: 'relationType',
+    value: function relationType(model, key) {
+      if (!(model instanceof RelationalModel)) return null;
+      var relation = _.find(model.getRelations(), function (test) {
+        return test.key === key;
+      });
+      if (!relation) return null;
+      return relation.collectionType || _.isArray(relation.keyContents) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
+    }
+  }, {
+    key: 'bind',
+    value: function bind(model, key, update, path) {
+      var type = this.relationType(model, key);
+      if (!type) return null;
+
+      var relFn = function relFn(m) {
+        if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: m, key: key, path: path });
+        return update();
+      };
+
+      // VERSIONING: pre Backbone-Relational 0.8.0
+      var events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
+      if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
+        return model.bind(event + ':' + key, relFn);
+      });else model.bind(events[0] + ':' + key, relFn);
+
+      return function () {
+        if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
+          return model.unbind(event + ':' + key, relFn);
+        });else model.unbind(events[0] + ':' + key, relFn);
+      };
+    }
+  }, {
+    key: 'useFunction',
+    value: function useFunction() {
+      return false;
+    }
+  }]);
+
+  return BackboneRelational;
+}();
+
+module.exports = BackboneRelational;
+
+/***/ }),
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2080,7 +3589,7 @@ var Statistics = function () {
 module.exports = Statistics;
 
 /***/ }),
-/* 9 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2487,7 +3996,7 @@ Store.initClass();
 module.exports = Store;
 
 /***/ }),
-/* 10 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2646,11 +4155,10 @@ var TypedValue = function () {
   return TypedValue;
 }();
 
-;
 module.exports = TypedValue;
 
 /***/ }),
-/* 11 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2689,7 +4197,7 @@ var utils = function () {
     key: 'initClass',
     value: function initClass() {
       // Clean up function that releases all of the wrapped values on an owner.
-      this.wrappedDestroy = __webpack_require__(22);
+      this.wrappedDestroy = __webpack_require__(14);
 
       // Helper to merge options including ViewmModel options like `keys` and `factories`
       //
@@ -2697,10 +4205,10 @@ var utils = function () {
       //
       // @example
       //   kb.utils.collapseOptions(options);
-      this.collapseOptions = __webpack_require__(20);
+      this.collapseOptions = __webpack_require__(12);
 
       // used for attribute setting to ensure all model attributes have their underlying models
-      this.unwrapModels = __webpack_require__(21);
+      this.unwrapModels = __webpack_require__(13);
     }
 
     // @nodoc
@@ -3025,7 +4533,7 @@ utils.initClass();
 module.exports = utils;
 
 /***/ }),
-/* 12 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3332,1527 +4840,6 @@ kb.viewModel = function () {
 };
 
 /***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-kb.RECUSIVE_AUTO_INJECT = true;
-
-// custom Knockout `inject` binding
-ko.bindingHandlers.inject = {
-  init: function init(element, value_accessor, all_bindings_accessor, view_model) {
-    return kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
-  }
-};
-
-// Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
-//
-// * `'view_model'` class used to create a new ViewModel instance
-// * `'create'` function used to manually add observables to a view model
-// * `'options'` to pass to ko.applyBindings
-// * `'afterBinding'` callback (can alternatively be in the options)
-// * `'beforeBinding'` callback (can alternatively be in the options)
-//
-// Each function/constructor gets called with the following signature `'function(view_model, element)'`.
-//
-// @example Bind your application automatically when the DOM is loaded.
-//   <div kb-inject><span data-bind="text: 'Hello World!'"></span></div>
-// @example Bind your application with properties.
-//   <div kb-inject="message: ko.observable('Hello World!')"><input data-bind="value: message"></input></div>
-// @example Bind your application creating a specific ViewModel instance when the DOM is loaded.
-//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
-//   var MyViewModel = function(view_model, el) {
-//     this.message = ko.observable('Hello World!');
-//   }
-// @example Bind your application using a function when the DOM is loaded (like Angular.js controllers).
-//   <div kb-inject="create: MyController"><input data-bind="value: message"></input></div>
-//   var MyController = function(view_model, el) {
-//     view_model.message = ko.observable('Hello World!');
-//   }
-// @example Bind your application with a specific ViewModel instance and a callback before and after the binding.
-//   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
-//   var MyViewModel = function(view_model, el) {
-//     this.message = ko.observable('Hello World!');
-//     this.beforeBinding = function() {alert('before'); };
-//     this.afterBinding = function() {alert('after'); };
-//   }
-// @example Dynamically inject new properties into your ViewModel.
-//   <div kb-inject="MyViewModel">
-//     <div class="control-group" data-bind="inject: {site: ko.observable('http://your.url.com')}">
-//       <label>Website</label>
-//       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
-//     </div>
-//   </div>
-//   var MyViewModel = function(view_model, el) {
-//     // site will be dynamically attached to this ViewModel
-//   }
-// @example Dynamically bind a form.
-//   <div kb-inject="MyViewModel">
-//      <form name="my_form" data-bind="inject: kb.formValidator">
-//        <div class="control-group">
-//         <label>Name</label>
-//         <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
-//       </div>
-//       <div class="control-group">
-//         <label>Website</label>
-//         <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
-//       </div>
-//     </form>
-//   </div>
-//   var MyViewModel = kb.ViewModel.extend({
-//     constructor: ->
-//       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
-//       kb.ViewModel.prototype.constructor.call(this, model);
-//   });
-kb.Inject = function () {
-  function Inject() {
-    _classCallCheck(this, Inject);
-  }
-
-  _createClass(Inject, null, [{
-    key: 'inject',
-
-    // @private
-    value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-      var doInject = function doInject(value) {
-        if (_.isFunction(value)) {
-          view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
-          kb.releaseOnNodeRemove(view_model, element);
-        } else {
-          // view_model constructor causes a scope change
-          if (value.view_model) {
-            // specifying a view_model changes the scope so we need to bind a destroy
-            view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
-            kb.releaseOnNodeRemove(view_model, element);
-          }
-
-          // resolve and merge in each key
-          _.each(value, function (item, key) {
-            if (key === 'view_model') return;
-
-            // create function
-            if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
-
-            // resolve nested with assign or not
-            else if (_.isObject(item) && !_.isFunction(item)) {
-                var target = nested || item && item.create ? {} : view_model;
-                view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
-
-                // simple set
-              } else view_model[key] = item;
-          });
-        }
-
-        return view_model;
-      };
-
-      // in recursive calls, we are already protected from propagating dependencies to the template
-      return nested ? doInject(data) : kb.ignore(function () {
-        return doInject(data);
-      });
-    }
-
-    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
-    // Also, used with the data-bind `'inject'` custom binding.
-    // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
-    // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-
-  }, {
-    key: 'injectViewModels',
-    value: function injectViewModels() {
-      var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
-
-      // find all of the app elements
-      var results = [];
-      var findElements = function findElements(el) {
-        if (!el.__kb_injected) {
-          // already injected -> skip, but still process children in case they were added afterwards
-          var attr = _.find(el.attributes || [], function (x) {
-            return x.name === 'kb-inject';
-          });
-          if (attr) {
-            el.__kb_injected = true; // mark injected
-            results.push({ el: el, view_model: {}, binding: attr.value });
-          }
-        }
-        _.each(el.childNodes, function (child) {
-          return findElements(child);
-        });
-      };
-      findElements(rootEl);
-
-      // bind the view models
-      _.each(results, function (app) {
-        var options = {};
-        var afterBinding = null;
-        var beforeBinding = null;
-
-        // evaluate the app data
-        var expression = app.binding;
-        if (expression) {
-          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
-          var data = new Function('', 'return ( ' + expression + ' )')() || {};
-          if (data.options) {
-            options = data.options;delete data.options;
-          }
-          app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
-          afterBinding = app.view_model.afterBinding || options.afterBinding;
-          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
-        }
-
-        // auto-bind
-        if (beforeBinding) {
-          beforeBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-        kb.applyBindings(app.view_model, app.el, options);
-        if (afterBinding) {
-          afterBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-      });
-      return results;
-    }
-  }]);
-
-  return Inject;
-}();
-
-// auto-inject recursively
-var _ko_applyBindings = ko.applyBindings;
-ko.applyBindings = function () {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  var el = args[1];
-  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
-  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [this].concat(args));
-};
-
-// ############################
-// Aliases
-// ############################
-kb.injectViewModels = kb.Inject.injectViewModels;
-
-// ############################
-// Auto Inject results
-// ############################
-if (root && typeof root.document !== 'undefined') {
-  // use simple ready check
-  var onReady = function onReady() {
-    if (root.document.readyState !== 'complete') {
-      setTimeout(onReady, 0); // keep waiting for the document to load
-      return;
-    }
-    kb.injectViewModels(); // the document is loaded
-  };
-  onReady();
-}
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13)))
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-__webpack_require__(25);
-
-var KEYS_PUBLISH = ['destroy', 'setToDefault'];
-
-// Used to provide a default value when an observable is null, undefined, or the empty string.
-//
-// @example Provide a observable with observable and/or non observable default argument in the form of:
-//   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
-
-var DefaultObservable = function () {
-  // Used to create a new kb.DefaultObservable.
-  //
-  // @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
-  // @param [Any] default_value the default value. Can be a value, string or ko.observable
-  // @return [ko.observable] the constructor does not return 'this' but a ko.observable
-  // @note the constructor does not return 'this' but a ko.observable
-  function DefaultObservable(target_observable, dv) {
-    var _this = this;
-
-    _classCallCheck(this, DefaultObservable);
-
-    // @dv is default value
-    this.dv = dv;
-    var observable = kb.utils.wrappedObservable(this, ko.computed({
-      read: function read() {
-        var current_target = ko.utils.unwrapObservable(target_observable());
-        return _.isNull(current_target) || _.isUndefined(current_target) ? ko.utils.unwrapObservable(_this.dv) : current_target;
-      },
-      write: function write(value) {
-        return target_observable(value);
-      }
-    }));
-
-    // publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, this, KEYS_PUBLISH);
-
-    return observable;
-  }
-
-  // Required clean up function to break cycles, release view models, etc.
-  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
-
-
-  _createClass(DefaultObservable, [{
-    key: 'destroy',
-    value: function destroy() {
-      return kb.utils.wrappedDestroy(this);
-    }
-
-    // Forces the observable to take the default value.
-    // @note Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
-
-  }, {
-    key: 'setToDefault',
-    value: function setToDefault() {
-      return kb.utils.wrappedObservable(this)(this.dv);
-    }
-  }]);
-
-  return DefaultObservable;
-}();
-
-kb.DefaultObservable = DefaultObservable;
-module.exports = DefaultObservable;
-
-kb.defaultObservable = function () {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  return new (Function.prototype.bind.apply(kb.DefaultObservable, [null].concat(args)))();
-};
-kb.observableDefault = kb.defaultObservable;
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-kb.toFormattedString = function (format) {
-  var result = format.slice();
-
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  _.each(args, function (arg, index) {
-    var value = ko.utils.unwrapObservable(arg);
-    if (_.isUndefined(value) || _.isNull(value)) value = '';
-
-    var parameter_index = format.indexOf('{' + index + '}');
-    while (~parameter_index) {
-      result = result.replace('{' + index + '}', value);
-      parameter_index = format.indexOf('{' + index + '}', parameter_index + 1);
-    }
-  });
-  return result;
-};
-
-kb.parseFormattedString = function (string, format) {
-  var regex_string = format.slice();var index = 0;var parameter_count = 0;var positions = {};
-  while (regex_string.search('\\{' + index + '\\}') >= 0) {
-    // store the positions of the replacements
-    var parameter_index = format.indexOf('{' + index + '}');
-    while (~parameter_index) {
-      regex_string = regex_string.replace('{' + index + '}', '(.*)');
-      positions[parameter_index] = index;parameter_count++;
-      parameter_index = format.indexOf('{' + index + '}', parameter_index + 1);
-    }
-    index++;
-  }
-  var count = index;
-
-  var regex = new RegExp(regex_string);
-  var matches = regex.exec(string);
-  if (matches) {
-    matches.shift();
-  }
-  // return fake empty data
-  if (!matches || matches.length !== parameter_count) {
-    var result = [];
-    while (count-- > 0) {
-      result.push('');
-    }
-    return result;
-  }
-
-  // sort the matches since the parameters could be requested unordered
-  var sorted_positions = _.sortBy(_.keys(positions), function (parameter_index) {
-    return +parameter_index;
-  });
-  var format_indices_to_matched_indices = {};
-  _.each(sorted_positions, function (parameter_index, match_index) {
-    parameter_index = sorted_positions[match_index];
-    index = positions[parameter_index];
-    if (!(index in format_indices_to_matched_indices)) {
-      format_indices_to_matched_indices[index] = match_index;
-    }
-  });
-
-  var results = [];index = 0;
-  while (index < count) {
-    results.push(matches[format_indices_to_matched_indices[index]]);
-    index++;
-  }
-  return results;
-};
-
-// Handles two-way formatted string convertions and will reformat a string when any argument changes. The format string can also be an observable.
-//
-// @example change the formatted name whenever a model's name attribute changes
-//   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
-
-var FormattedObservable = function () {
-  // Used to create a new kb.FormattedObservable.
-  //
-  // @param [String|ko.observable] format the format string.
-  // Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
-  // @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
-  // @return [ko.observable] the constructor does not return 'this' but a ko.observable
-  // @note the constructor does not return 'this' but a ko.observable
-  function FormattedObservable(format) {
-    for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      args[_key2 - 1] = arguments[_key2];
-    }
-
-    _classCallCheck(this, FormattedObservable);
-
-    // being called by the factory function
-    var observable_args = _.isArray(args[0]) ? args[0] : args;
-    var observable = kb.utils.wrappedObservable(this, ko.computed({
-      read: function read() {
-        args = [ko.utils.unwrapObservable(format)];
-        _.each(observable_args, function (arg) {
-          return args.push(ko.utils.unwrapObservable(arg));
-        });
-        return kb.toFormattedString.apply(null, args);
-      },
-      write: function write(value) {
-        var matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
-        var max_count = Math.min(observable_args.length, matches.length);var index = 0;
-        while (index < max_count) {
-          observable_args[index](matches[index]);
-          index++;
-        }
-      }
-    }));
-
-    return observable;
-  }
-
-  // Required clean up function to break cycles, release view models, etc.
-  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
-
-
-  _createClass(FormattedObservable, [{
-    key: 'destroy',
-    value: function destroy() {
-      return kb.utils.wrappedDestroy(this);
-    }
-  }]);
-
-  return FormattedObservable;
-}();
-
-kb.FormattedObservable = FormattedObservable;
-module.exports = FormattedObservable;
-
-kb.formattedObservable = function () {
-  for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
-    args[_key3] = arguments[_key3];
-  }
-
-  return new (Function.prototype.bind.apply(kb.FormattedObservable, [null].concat(args)))();
-};
-kb.observableFormatted = kb.formattedObservable;
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-var KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
-
-// Locale Manager - if you are using localization, set this property.
-// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-if (!kb.locale_manager) {
-  kb.locale_manager = undefined;
-}
-
-// @abstract You must provide the following two methods:
-//   * read: function(value, observable) called to get the value and each time the locale changes
-//   * write: function(localized_string, value, observable) called to set the value (optional)
-//
-// Base class for observing localized data that changes when the locale changes.
-//
-// @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
-//   kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
-//     constructor: function(value, options, view_model) {
-//       kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-//       return kb.utils.wrappedObservable(this);
-//     },
-//     read: function(value) {
-//       return Globalize.format(value, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-//     },
-//     write: function(localized_string, value) {
-//       var new_value;
-//       new_value = Globalize.parseDate(localized_string, Globalize.cultures[kb.locale_manager.getLocale()].calendars.standard.patterns.d, kb.locale_manager.getLocale());
-//       if (!(new_value && _.isDate(new_value))) {
-//         return kb.utils.wrappedObservable(this).resetToCurrent();
-//       }
-//       return value.setTime(new_value.valueOf());
-//     }
-//   });
-//   var ViewModel = function(model) {
-//     this.localized_date = kb.observable(model, {
-//       key: 'date',
-//       'default': this.loading_message,
-//       localizer: ShortDateLocalizer
-//     }, this);
-//   };
-//   var view_model = new ViewModel(new Backbone.Model({date: new Date()}));
-//
-// @method .extend(prototype_properties, class_properties)
-//   Class method for JavaScript inheritance.
-//   @param [Object] prototype_properties the properties to add to the prototype
-//   @param [Object] class_properties the properties to add to the class
-//   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-//   @example
-//     var MyLocalizedObservable = kb.LocalizedObservable.extend({
-//        constructor: function(value, options, view_model) {
-//          // the constructor does not return 'this' but a ko.observable
-//          return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
-//        }
-//     });
-
-var LocalizedObservable = function () {
-  _createClass(LocalizedObservable, null, [{
-    key: 'initClass',
-    value: function initClass() {
-      LocalizedObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
-      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
-    }
-
-    // Used to create a new kb.LocalizedObservable. This an abstract class.
-    //
-    // @param [Data|ko.observable] value the value to localize
-    // @param [Object] options the create options
-    // @option options [Data|ko.observable] default a default value to present when the value is null, an empty string, etc.
-    // @option options [Function] onChange a notification that gets called when the locale changes. Signature: function(localized_string, value, observable)
-    // @return [ko.observable] the constructor does not return 'this' but a ko.observable
-    // @note the constructor does not return 'this' but a ko.observable
-
-  }]);
-
-  function LocalizedObservable(value, options, vm) {
-    var _this = this;
-
-    _classCallCheck(this, LocalizedObservable);
-
-    // @vm is view_model
-    this.value = value;
-    this.vm = vm;
-    if (!options) {
-      options = {};
-    }if (!this.vm) {
-      this.vm = {};
-    }
-    this.read || kb._throwMissing(this, 'read');
-    kb.locale_manager || kb._throwMissing(this, 'kb.locale_manager');
-
-    // bind callbacks
-    if (!this.__kb) {
-      this.__kb = {};
-    }
-    this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
-    this.__kb._onChange = options.onChange;
-
-    // internal state
-    var currentValue = this.value ? ko.utils.unwrapObservable(this.value) : null;
-    this.vo = ko.observable(!currentValue ? null : this.read(currentValue, null));
-
-    var observable = kb.utils.wrappedObservable(this, ko.computed({
-      read: function read() {
-        if (_this.value) ko.utils.unwrapObservable(_this.value);
-        _this.vo(); // create a depdenency
-        return _this.read(ko.utils.unwrapObservable(_this.value));
-      },
-
-      write: function write(x) {
-        _this.write || kb._throwUnexpected(_this, 'writing to read-only');
-        _this.write(x, ko.utils.unwrapObservable(_this.value));
-        _this.vo(x);
-        return _this.__kb._onChange ? _this.__kb._onChange(x) : undefined;
-      },
-
-      owner: this.vm
-    }));
-
-    // publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, this, KEYS_PUBLISH);
-
-    // start
-    kb.locale_manager.bind('change', this.__kb._onLocaleChange);
-
-    // wrap ourselves with a default value
-    if (Object.prototype.hasOwnProperty.call(options, 'default')) {
-      observable = kb.DefaultObservable && ko.defaultObservable(observable, options.default);
-    }
-
-    return observable;
-  }
-
-  // Required clean up function to break cycles, release view models, etc.
-  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
-
-
-  _createClass(LocalizedObservable, [{
-    key: 'destroy',
-    value: function destroy() {
-      kb.locale_manager.unbind('change', this.__kb._onLocaleChange);
-      this.vm = null;
-      return kb.utils.wrappedDestroy(this);
-    }
-
-    // Used to reset the value if localization is not possible.
-
-  }, {
-    key: 'resetToCurrent',
-    value: function resetToCurrent() {
-      var observable = kb.utils.wrappedObservable(this);
-      var current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
-      if (observable() === current_value) return undefined;
-      return observable(current_value);
-    }
-
-    // Dual purpose set/get
-
-  }, {
-    key: 'observedValue',
-    value: function observedValue(value) {
-      if (arguments.length === 0) return this.value;
-      this.value = value;this._onLocaleChange();
-      return undefined;
-    }
-
-    // ###################################################
-    // Internal
-    // ###################################################
-
-    // @nodoc
-
-  }, {
-    key: '_onLocaleChange',
-    value: function _onLocaleChange() {
-      var value = this.read(ko.utils.unwrapObservable(this.value));
-      this.vo(value);
-      if (this.__kb._onChange) return this.__kb._onChange(value);
-      return undefined;
-    }
-  }]);
-
-  return LocalizedObservable;
-}();
-
-LocalizedObservable.initClass();
-kb.LocalizedObservable = LocalizedObservable;
-module.exports = LocalizedObservable;
-
-// factory function
-kb.localizedObservable = function () {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  return new (Function.prototype.bind.apply(kb.LocalizedObservable, [null].concat(args)))();
-};
-kb.observableLocalized = kb.localizedObservable;
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-var EventWatcher = __webpack_require__(2);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-var KEYS_PUBLISH = ['destroy'];
-
-// Class for observing emitter events.
-//
-// @example create an observable whose subscriptions are notified with the change event is triggered.
-//   var triggered_observable = kb.triggeredObservable(name, 'change');
-//
-// @example How to watch a emitter for events.
-//   var trigger_count = 0;
-//   var emitter = new Backbone.Model();
-//   var view_emitter = {
-//     triggered_observable: kb.triggeredObservable(emitter, 'change')
-//   };
-//   view_emitter.counter = ko.computed(function() {
-//     view_emitter.triggered_observable() // add a dependency
-//     return trigger_count++
-//   });
-//   emitter.set(name: 'bob');       # trigger_count: 1
-//   emitter.set(name: 'george');    # trigger_count: 2
-//   emitter.set(last: 'smith');     # trigger_count: 3
-
-var TriggeredObservable = function () {
-
-  // Used to create a new kb.Observable.
-  //
-  // @param [Model] emitter the emitter to observe (can be null)
-  // @param [String] event_selector the event name to trigger Knockout subscriptions on.
-  // @return [ko.observable] the constructor does not return 'this' but a ko.observable
-  // @note the constructor does not return 'this' but a ko.observable
-  function TriggeredObservable(emitter, event_selector) {
-    var _this = this;
-
-    _classCallCheck(this, TriggeredObservable);
-
-    this.event_selector = event_selector;
-    emitter || kb._throwMissing(this, 'emitter');
-    this.event_selector || kb._throwMissing(this, 'event_selector');
-
-    // internal state
-    this.vo = ko.observable();
-    var observable = kb.utils.wrappedObservable(this, ko.computed(function () {
-      return _this.vo();
-    }));
-
-    // publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, this, KEYS_PUBLISH);
-
-    // create emitter observable
-    kb.utils.wrappedEventWatcher(this, new EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
-
-    return observable;
-  }
-
-  // Required clean up function to break cycles, release view models, etc.
-  // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
-
-
-  _createClass(TriggeredObservable, [{
-    key: 'destroy',
-    value: function destroy() {
-      return kb.utils.wrappedDestroy(this);
-    }
-
-    // Dual-purpose getter/setter for the observed emitter.
-    //
-    // @overload emitter()
-    //   Gets the emitter or emitter reference
-    //   @return [Model|ModelRef|Collection] the emitter whose events are being bound (can be null)
-    // @overload emitter(new_emitter)
-    //   Sets the emitter or emitter reference
-    //   @param [Model|ModelRef|Collection] new_emitter the emitter whose events will be bound (can be null)
-
-  }, {
-    key: 'emitter',
-    value: function emitter(new_emitter) {
-      // get or no change
-      if (arguments.length === 0 || this.ee === new_emitter) return this.ee;
-      this.ee = new_emitter;
-      if (this.ee) return this.update();
-      return undefined;
-    }
-
-    // ###################################################
-    // Internal
-    // ###################################################
-    // @nodoc
-
-  }, {
-    key: 'update',
-    value: function update() {
-      if (!this.ee) return undefined; // do not trigger if there is no emitter
-      if (this.vo() !== this.ee) return this.vo(this.ee);
-      return this.vo.valueHasMutated(); // manually trigger the dependable
-    }
-  }]);
-
-  return TriggeredObservable;
-}();
-
-kb.TriggeredObservable = TriggeredObservable;
-module.exports = TriggeredObservable;
-
-// factory function
-kb.triggeredObservable = function () {
-  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-    args[_key] = arguments[_key];
-  }
-
-  return new (Function.prototype.bind.apply(kb.TriggeredObservable, [null].concat(args)))();
-};
-kb.observableTriggered = kb.triggeredObservable;
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-__webpack_require__(26);
-
-// internal helper
-var callOrGet = function callOrGet(value) {
-  value = ko.utils.unwrapObservable(value);
-
-  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    args[_key - 1] = arguments[_key];
-  }
-
-  return typeof value === 'function' ? value.apply(undefined, args) : value;
-};
-
-// Helpers for validating forms, inputs, and values.
-// @example A Named Form
-//   <form name="myForm">
-//      <input name="input1", data-bind="value: input1" required>
-//      <input type="url" name="input2", data-bind="value: input2">
-//    </form>
-//   Because there is a form name, it will add the following property to your ViewModel (wrapped in an observable):
-//    $myForm: {
-//      input1: {required: boolean, valid: boolean, invalid: boolean},
-//      input2: {url: boolean, valid: boolean, invalid: boolean},
-//      valid: boolean,
-//      invalid: boolean
-//    }
-// @example A Unnamed Form
-//   <form>
-//     <input name="input1", data-bind="value: input1" required>
-//     <input type="url" name="input2", data-bind="value: input2">
-//   </form>
-//   Because there is not a form name, it will extend the following on your ViewModel (each wrapped separately in an observable):
-//   {
-//     $input1: {required: boolean, valid: boolean, invalid: boolean},
-//     $input2: {url: boolean, valid: boolean, invalid: boolean}
-//   }
-//
-// @method .valueValidator(value, bindings, validation_options={})
-//   Used to create an observable that wraps all of the validators for a value and also generates helpers for $valid, $error_count, $enabled, $disabled, and $active_error.
-//   @note Called using `kb.valueValidator` (not  kb.Validation.valueValidator)
-//   @param [Observable] value the value to validate
-//   @param [Object] bindings the named validators to use to validate the value
-//   @param [Object] validation_options the validation options
-//   @option validation_options [Boolean|Function] disable the test for disabling validations
-//   @option validation_options [Boolean|Function] enable the test for enabling validations
-//   @option validation_options [String|Array] priorities the priority order of the validators (used to set $active_error in the case of multiple being active simulateously)
-//   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
-//
-// @method .inputValidator(view_model, el, validation_options={})
-//   Used to create an observable that wraps all of the validators for an HTML input element using `kb.valueValidator`. See kb.valueValidator for shared options.
-//   In addition, you can add custom bindings by including a `validations` Object in your data-bind statement where each property has a function(value) that returns true if there are errors.
-//   It will automatically generate validators from the input for the following attributes:
-//   * type: for url, email, and number
-//   * required: must have a length or a value
-//   @note Called using `kb.inputValidator` (not  kb.Validation.inputValidator)
-//   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
-//   @example Binding an input using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>
-//     Adds the following to your ViewModel:
-//       $name: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
-//   @example Binding an input with custom validations using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {unique: nameTaken}" required>
-//     Adds the following to your ViewModel:
-//       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
-//   @example Binding an input with validation options using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: 'url'}" required>
-//     Adds the following to your ViewModel:
-//       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $enabled: Boolean, $disabled: Boolean, $active_error: String})
-//
-// @method .formValidator(view_model, el)
-//   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
-//   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
-//    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
-//   @note Called using `kb.formValidator` (not  kb.Validation.formValidator)
-//   @return [Object] an Object with all of the validators and generated helpers
-//   @example Binding a form by name using Knockback inject.
-//     <form name='my_form' data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
-//       <input type="text" name="name" data-bind="value: name" required>
-//       <input type="url" name="site" data-bind="value: site" required>
-//     </form>
-//     Adds the following to your ViewModel:
-//     $my_form: {
-//       name: kb.observable({required: Boolean, $valid: Boolean, $error_count: Number, $active_error: String}),
-//       site: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
-//     }
-//   @example Binding a form without a name using Knockback inject.
-//     <form data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
-//       <input type="text" name="name" data-bind="value: name" required>
-//       <input type="url" name="site" data-bind="value: site" required>
-//     </form>
-//     Extends your ViewModel with the following Object:
-//     {
-//       $name: kb.observable({required: Boolean, $valid: Boolean, $error_count: Number, $active_error: String}),
-//       $site: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
-//     }
-// @method .hasChangedFn(model)
-//   A validation helper that can be used to wait for a change before enabling validations.
-//   @note Called using `kb.hasChangedFn` (not  kb.Validation.hasChangedFn)
-//   @return [Function] Validator function bound with model
-//   @example Enabling validations after a change has been made to a model.
-//     <form class="form-horizontal" data-bind="inject: kb.formValidator, validation_options: {enable: kb.hasChangedFn(model)}">
-// @method .minLengthFn(length)
-//   A validator that will be invalid until the length of the value is below a minimum value.
-//   @note Called using `kb.minLengthFn` (not  kb.Validation.minLengthFn)
-//   @return [Function] Validator function bound with min length
-//   @example Validations will be invalid until the name is at least 4 characters long.
-//     <input type="text" name="name" data-bind="value: name, validations: {length: kb.minLengthFn(4)}">
-// @method .uniqueValueFn(model, key, collection)
-//   Checks for a unique attribute value by key in a collection
-//   @note Called using `kb.uniqueValueFn` (not  kb.Validation.uniqueValueFn)
-//   @return [Function] Validator function bound with model, attribute key, and collection
-//   @example Validations will be invalid until the name attribute is unique in the collection.
-//     <input type="text" name="name" data-bind="value: name, validations: {unique: kb.uniqueValueFn(model, 'name', some_collection)}">
-// @method .untilTrueFn(stand_in, fn, model)
-//   Used to combine conditions.
-//   @note Called using `kb.untilTrueFn` (not  kb.Validation.untilTrueFn)
-//   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
-//   @example Filter the minimum length test of name until it has be valid (that way, won't report invalid while typing in a new input).
-//     <input type="text" name="name" data-bind="value: name, validations: {length_filtered: kb.untilFalseFn(false, kb.minLengthFn(4), model)}">
-// @method .untilFalseFn(stand_in, fn, model)
-//   Used to combine conditions.
-//   @note Called using `kb.untilFalseFn` (not  kb.Validation.untilFalseFn)
-//   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
-
-var Validation = function Validation() {
-  _classCallCheck(this, Validation);
-};
-
-kb.Validation = Validation;
-module.exports = Validation;
-
-// ############################
-// Aliases
-// ############################
-kb.valueValidator = function (value, bindings) {
-  var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  return ko.computed(function () {
-    var results = { $error_count: 0 };
-    var current_value = ko.utils.unwrapObservable(value);
-
-    var disabled = void 0;
-    if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
-    if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
-
-    var priorities = validation_options.priorities || [];
-    if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
-
-    // then add the rest
-    var active_index = priorities.length + 1;
-    _.each(bindings, function (validator, identifier) {
-      results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
-      if (results[identifier]) {
-        results.$error_count++;
-
-        // check priorities
-        var identifier_index = void 0;
-        (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
-
-        if (results.$active_error && identifier_index < active_index) {
-          results.$active_error = identifier;active_index = identifier_index;
-        } else {
-          results.$active_error || (results.$active_error = identifier, active_index = identifier_index);
-        }
-      }
-    });
-
-    // add the inverse and ensure a boolean
-    results.$enabled = !disabled;
-    results.$disable = !!disabled;
-    results.$valid = results.$error_count === 0;
-    return results;
-  });
-};
-
-kb.inputValidator = function (view_model, el) {
-  var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-  var validators = kb.valid;
-  var input_name = el.getAttribute('name');
-  if (input_name && !_.isString(input_name)) {
-    input_name = null;
-  }
-
-  // only set up form elements with a value bindings
-  var bindings = el.getAttribute('data-bind');
-  if (!bindings) return null;
-  var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
-  if (!(options && options.value)) return null;
-  if (options.validation_options) {
-    _.defaults(options.validation_options, validation_options);
-    validation_options = options.validation_options;
-  }
-
-  // collect the types to identifier
-  var type = el.getAttribute('type');
-  bindings = {};
-  !validators[type] || (bindings[type] = validators[type]);
-  !el.hasAttribute('required') || (bindings.required = validators.required);
-  if (options.validations) {
-    _.each(options.validations, function (validator, identifier) {
-      bindings[identifier] = validator;
-    });
-  }
-  var result = kb.valueValidator(options.value, bindings, validation_options);
-
-  // if there is a name, add to the view_model with $scoping
-  !input_name && !validation_options.no_attach || (view_model['$' + input_name] = result);
-  return result;
-};
-
-kb.formValidator = function (view_model, el) {
-  var results = {};
-  var validators = [];
-  var form_name = el.getAttribute('name');
-  if (form_name && !_.isString(form_name)) form_name = null;
-
-  var bindings = el.getAttribute('data-bind');
-  var validation_options = void 0;
-  if (bindings) {
-    var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
-    validation_options = options.validation_options;
-  }
-  if (!validation_options) validation_options = {};
-  validation_options.no_attach = !!form_name;
-
-  // build up the results
-  _.each(el.getElementsByTagName('input'), function (input_el) {
-    var name = input_el.getAttribute('name');
-    if (!name) return; // need named inputs to set up an object
-    var validator = kb.inputValidator(view_model, input_el, validation_options);
-    !validator || validators.push(results[name] = validator);
-  });
-
-  // collect stats, error count and valid
-  results.$error_count = ko.computed(function () {
-    var error_count = 0;
-    _.each(validators, function (validator) {
-      error_count += validator().$error_count;
-    });
-    return error_count;
-  });
-  results.$valid = ko.computed(function () {
-    return results.$error_count() === 0;
-  });
-
-  // enabled and disabled
-  results.$enabled = ko.computed(function () {
-    var enabled = true;
-    _.each(validators, function (validator) {
-      enabled &= validator().$enabled;
-    });
-    return enabled;
-  });
-  results.$disabled = ko.computed(function () {
-    return !results.$enabled();
-  });
-
-  // if there is a name, add to the view_model with $scoping
-  if (form_name) view_model['$' + form_name] = results;
-  return results;
-};
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._;
-
-// @nodoc
-
-var _mergeArray = function _mergeArray(result, key, value) {
-  if (!result[key]) result[key] = [];
-  if (!_.isArray(value)) value = [value];
-  result[key] = result[key].length ? _.union(result[key], value) : value;
-  return result;
-};
-
-// @nodoc
-var _mergeObject = function _mergeObject(result, key, value) {
-  if (!result[key]) result[key] = {};
-  return kb.assign(result[key], value);
-};
-
-// @nodoc
-var _keyArrayToObject = function _keyArrayToObject(value) {
-  var result = {};
-  _.each(value, function (item) {
-    result[item] = { key: item };
-  });
-  return result;
-};
-
-var _mergeOptions = function _mergeOptions(result, options) {
-  if (!options) return result;
-
-  _.each(options, function (value, key) {
-    switch (key) {
-      case 'internals':case 'requires':case 'excludes':case 'statics':
-        _mergeArray(result, key, value);break;
-      case 'keys':
-        // an object
-        if (_.isObject(value) && !_.isArray(value) || _.isObject(result[key]) && !_.isArray(result[key])) {
-          if (!_.isObject(value)) {
-            value = [value];
-          }
-          if (_.isArray(value)) {
-            value = _keyArrayToObject(value);
-          }
-          if (_.isArray(result[key])) {
-            result[key] = _keyArrayToObject(result[key]);
-          }
-          _mergeObject(result, key, value);
-
-          // an array
-        } else {
-          _mergeArray(result, key, value);
-        }
-        break;
-
-      case 'factories':
-        if (_.isFunction(value)) {
-          result[key] = value;
-        } else {
-          _mergeObject(result, key, value);
-        }
-        break;
-      case 'static_defaults':
-        _mergeObject(result, key, value);break;
-      case 'options':
-        break;
-      default:
-        result[key] = value;break;
-    }
-  });
-
-  return _mergeOptions(result, options.options);
-};
-
-// @nodoc
-module.exports = function (options) {
-  return _mergeOptions({}, options);
-};
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._;
-
-// @nodoc
-
-var unwrapModels = function unwrapModels(obj) {
-  if (!obj) return obj;
-  if (obj.__kb) return Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj;
-  if (_.isArray(obj)) return _.map(obj, function (test) {
-    return unwrapModels(test);
-  });
-  if (_.isObject(obj) && obj.constructor === {}.constructor) {
-    // a simple object
-    var result = {};
-    _.each(obj, function (value, key) {
-      result[key] = unwrapModels(value);
-    });
-    return result;
-  }
-
-  return obj;
-};
-module.exports = unwrapModels;
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-// @nodoc
-var wrappedDestroy = function wrappedDestroy(obj) {
-  if (!obj.__kb) return;
-  if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
-
-  var __kb = obj.__kb;
-
-  obj.__kb = null; // clear now to break cycles
-
-  if (__kb.observable) {
-    __kb.observable.destroy = null;__kb.observable.release = null;
-    wrappedDestroy(__kb.observable);
-    __kb.observable = null;
-  }
-
-  __kb.factory = null;
-
-  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy(); // release the event_watcher
-  __kb.event_watcher = null;
-
-  if (__kb.store_is_owned) __kb.store.destroy(); // release the store
-  __kb.store = null;
-
-  if (__kb.stores_references) {
-    var store_references = __kb.stores_references.pop();
-    while (store_references) {
-      if (!store_references.store.__kb_released) store_references.store.release(obj);
-      store_references = __kb.stores_references.pop();
-    }
-  }
-};
-module.exports = wrappedDestroy;
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    Backbone = kb.Backbone;
-
-
-var AssociatedModel = null; // lazy bind so this file can be loaded before relational library
-
-// @nodoc
-
-var BackboneAssociations = function () {
-  function BackboneAssociations() {
-    _classCallCheck(this, BackboneAssociations);
-  }
-
-  _createClass(BackboneAssociations, null, [{
-    key: 'isAvailable',
-    value: function isAvailable() {
-      return !!(AssociatedModel = Backbone ? Backbone.AssociatedModel : null);
-    }
-  }, {
-    key: 'keys',
-    value: function keys(model) {
-      if (!(model instanceof AssociatedModel)) return null;
-      return _.map(model.relations, function (test) {
-        return test.key;
-      });
-    }
-  }, {
-    key: 'relationType',
-    value: function relationType(model, key) {
-      if (!(model instanceof AssociatedModel)) return null;
-      var relation = _.find(model.relations, function (test) {
-        return test.key === key;
-      });
-      if (!relation) return null;
-      return relation.type === 'Many' ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
-    }
-  }, {
-    key: 'useFunction',
-    value: function useFunction() {
-      return false;
-    }
-  }]);
-
-  return BackboneAssociations;
-}();
-
-;
-module.exports = BackboneAssociations;
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    Backbone = kb.Backbone;
-
-
-var RelationalModel = null; // lazy bind so this file can be loaded before relational library
-
-// @nodoc
-
-var BackboneRelational = function () {
-  function BackboneRelational() {
-    _classCallCheck(this, BackboneRelational);
-  }
-
-  _createClass(BackboneRelational, null, [{
-    key: 'isAvailable',
-    value: function isAvailable() {
-      return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null);
-    }
-  }, {
-    key: 'relationType',
-    value: function relationType(model, key) {
-      if (!(model instanceof RelationalModel)) return null;
-      var relation = _.find(model.getRelations(), function (test) {
-        return test.key === key;
-      });
-      if (!relation) return null;
-      return relation.collectionType || _.isArray(relation.keyContents) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
-    }
-  }, {
-    key: 'bind',
-    value: function bind(model, key, update, path) {
-      var type = this.relationType(model, key);
-      if (!type) return null;
-
-      var relFn = function relFn(m) {
-        if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: m, key: key, path: path });
-        return update();
-      };
-
-      // VERSIONING: pre Backbone-Relational 0.8.0
-      var events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-      if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
-        return model.bind(event + ':' + key, relFn);
-      });else model.bind(events[0] + ':' + key, relFn);
-
-      return function () {
-        if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
-          return model.unbind(event + ':' + key, relFn);
-        });else model.unbind(events[0] + ':' + key, relFn);
-      };
-    }
-  }, {
-    key: 'useFunction',
-    value: function useFunction() {
-      return false;
-    }
-  }]);
-
-  return BackboneRelational;
-}();
-
-;
-module.exports = BackboneRelational;
-
-/***/ }),
 /* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -5034,24 +5021,11 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_29__;
 /* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(3);
 __webpack_require__(4);
-__webpack_require__(2);
 __webpack_require__(5);
-__webpack_require__(14);
-__webpack_require__(0);
 __webpack_require__(6);
 __webpack_require__(7);
 __webpack_require__(8);
-__webpack_require__(9);
-__webpack_require__(10);
-__webpack_require__(11);
-__webpack_require__(12);
-__webpack_require__(15);
-__webpack_require__(16);
-__webpack_require__(17);
-__webpack_require__(18);
-__webpack_require__(19);
 module.exports = __webpack_require__(1);
 
 

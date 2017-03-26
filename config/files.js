@@ -13,9 +13,7 @@ const PLUGIN_ENTRIES = {
 };
 
 module.exports = {
-  libraries: _.flattenDeep(_.map(_.filter(fs.readdirSync('./config/builds/library'), file => (path.extname(file) === '.js') && (file.indexOf('webpack.config.js') >= 0)), file => [file.replace('webpack.config.js', 'js'), file.replace('webpack.config.js', 'min.js')])),
-
-  src_core: _.map(_.filter(fs.readdirSync('./src/core'), file => (path.extname(file) === '.js') && (file !== 'index.js')), file => `./src/core/${file}`),
+  src_core: [],
   src_plugin: _.values(PLUGIN_ENTRIES),
 
   tests_core: readdirSyncRecursive(`${__dirname}/../test/spec/core`).filter(x => /\.tests.js$/.test(x)).map(x => `./test/spec/core/${x}`),

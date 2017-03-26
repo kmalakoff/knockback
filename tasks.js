@@ -1,9 +1,10 @@
 const path = require('path');
 const _ = require('lodash');
 const es = require('event-stream');
+const globby = require('globby');
+const webpack = require('webpack');
 
 const gulp = require('gulp');
-const webpack = require('gulp-webpack-config');
 const rename = require('gulp-rename');
 const uglify = require('gulp-uglify');
 const header = require('gulp-header');
@@ -32,10 +33,25 @@ const HEADER = (module.exports = `\
 `);
 const LIBRARY_FILES = require('./config/files').libraries;
 
-gulp.task('build', () => gulp.src('config/builds/library/**/*.webpack.config.js')
-    .pipe(webpack())
-    .pipe(header(HEADER, { pkg: require('./package.json') }))
-    .pipe(gulp.dest('.')));
+gulp.task('build', async () => {
+  const configPaths = await globby(path.join(__dirname, 'config/builds/library/**/*.webpack.config.js'));
+
+  for (const configPath of configPaths) {
+    await new Promise((resolve, reject) => {
+      const config = _.merge({ output: { path: __dirname } }, require(configPath));
+      webpack(config, (err, stats) => {
+        if (err) return reject(err);
+
+        console.log(stats.toString({}));
+        if (stats.compilation.errors.length) return reject(new Error(`Webpack had ${stats.compilation.errors.length} errors`));
+
+//     .pipe(header(HEADER, { pkg: require('./package.json') }))
+
+        return resolve();
+      });
+    });
+  }
+});
 
 gulp.task('minify', ['build'], () => gulp.src(['knockback.js', 'knockback-*.js', '!*.min.js'])
     .pipe(uglify())
