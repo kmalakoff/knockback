@@ -28,6 +28,7 @@ module.exports = {
     'no-console': 'off',
     'no-debugger': 'warn',
     'new-cap': 'off',
+    'no-undef': 'off',
 
     'camelcase': 'off',
   }

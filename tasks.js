@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const es = require('event-stream');
@@ -11,16 +12,6 @@ const header = require('gulp-header');
 const spawn = require('cross-spawn');
 const nuget = require('nuget');
 
-const nugetGulp = () => es.map((file, callback) =>
-  nuget.pack(file, (err, nupkgFile) => {
-    if (err) { return callback(err); }
-    return nuget.push(nupkgFile, (err) => {
-      if (err) return console.log(err);
-      return callback();
-    });
-  }),
-);
-
 const HEADER = (module.exports = `\
 /*
   <%= file.path.split('/').splice(-1)[0].replace('.min', '') %> <%= pkg.version %>
@@ -31,15 +22,12 @@ const HEADER = (module.exports = `\
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */\n\
 `);
-const LIBRARY_FILES = require('./config/files').libraries;
 
 gulp.task('build', async () => {
-  const BUILDS_DIR = path.join(__dirname, 'config/builds/library');
-  const configPaths = glob.sync('**/*.webpack.config.js', { cwd: BUILDS_DIR });
-
+  const configPaths = glob.sync('**/*.webpack.config.js', { cwd: path.join(__dirname, 'config/builds/library'), absolute: true });
   for (const configPath of configPaths) {
     await new Promise((resolve, reject) => {
-      const config = _.merge({ output: { path: __dirname } }, require(path.join(BUILDS_DIR, configPath)));
+      const config = _.merge({ output: { path: __dirname } }, require(configPath));
       webpack(config, (err, stats) => {
         if (err) return reject(err);
 
@@ -77,9 +65,9 @@ const testBrowsers = async () => {
 // gulp.task('test-node', testNode);
 gulp.task('test-node', ['build'], testNode);
 
-gulp.task('test-browsers', testBrowsers);
+// gulp.task('test-browsers', testBrowsers);
 // gulp.task('test-browsers', ['build'], testBrowsers);
-// gulp.task('test-browsers', ['minify'], testBrowsers);
+gulp.task('test-browsers', ['minify'], testBrowsers);
 
 gulp.task('test', ['minify'], async () => {
   await testNode();
@@ -87,6 +75,8 @@ gulp.task('test', ['minify'], async () => {
 });
 
 const copyLibraryFiles = async (destination, others) => {
+  const LIBRARY_FILES = _.flattenDeep(fs.readdirSync(path.join(__dirname, 'config', 'builds', 'library')).map(x => [x.replace('webpack.config.js', 'js'), x.replace('webpack.config.js', 'min.js')]))
+
   await new Promise((resolve, reject) =>
     gulp.src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
       .pipe(gulp.dest(file => path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
@@ -97,5 +87,14 @@ const copyLibraryFiles = async (destination, others) => {
 gulp.task('publish', ['minify'], async () => {
   await copyLibraryFiles('packages/npm', ['component.json', 'bower.json']);
   await copyLibraryFiles('packages/nuget/Content/Scripts', []);
-  await gulp.src('packages/nuget/*.nuspec').pipe(nugetGulp());
+  await gulp.src('packages/nuget/*.nuspec')
+    .pipe(es.map((file, callback) =>
+      nuget.pack(file, (err, nupkgFile) => {
+        if (err) { return callback(err); }
+        return nuget.push(nupkgFile, (err) => {
+          if (err) return console.log(err);
+          return callback();
+        });
+      })
+    ));
 });

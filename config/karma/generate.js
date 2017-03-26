@@ -1,13 +1,13 @@
 const fs = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
-const es = require('event-stream');
+const glob = require('glob');
+const webpack = require('webpack');
 
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 const wrapAMD = require('gulp-wrap-amd-infer');
-const webpack = require('gulp-webpack-config');
 const browserify = require('gulp-browserify');
 
 const TEST_GROUPS = require('../test_groups');
@@ -21,13 +21,20 @@ module.exports = async () => {
       .on('error', reject).on('end', resolve),
   );
 
-  // build webpack
-  await new Promise((resolve, reject) =>
-    gulp.src(['config/builds/test/**/*.webpack.config.js'], { read: false, buffer: false })
-      .pipe(webpack())
-      .pipe(gulp.dest('_temp/webpack'))
-      .on('error', reject).on('end', resolve),
-  );
+  const configPaths = glob.sync('**/*.webpack.config.js', { cwd: path.join(__dirname, '..', 'builds', 'test'), absolute: true });
+  for (const configPath of configPaths) {
+    await new Promise((resolve, reject) => {
+      const config = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '..', '_temp/webpack')) } }, require(configPath));
+      webpack(config, (err, stats) => {
+        console.log('HERE3');
+        if (err) return reject(err);
+
+        console.log(stats.toString({}));
+        if (stats.compilation.errors.length) return reject(new Error(`Webpack had ${stats.compilation.errors.length} errors`));
+        return resolve();
+      });
+    });
+  }
 
   // build test browserify
   for (const test of (TEST_GROUPS.browserify || [])) {
