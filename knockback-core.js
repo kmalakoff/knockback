@@ -3602,6 +3602,7 @@ kb.utils = __webpack_require__(11);
 kb.Statistics = __webpack_require__(9);
 kb.Store = __webpack_require__(10);
 kb.Factory = __webpack_require__(5);
+kb.EventWatcher = __webpack_require__(1);
 
 kb.CollectionObservable = __webpack_require__(3);
 kb.Observable = __webpack_require__(8);

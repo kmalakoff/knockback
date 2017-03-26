@@ -18,6 +18,7 @@ kb.utils = require('./utils');
 kb.Statistics = require('./statistics');
 kb.Store = require('./store');
 kb.Factory = require('./factory');
+kb.EventWatcher = require('./event-watcher');
 
 kb.CollectionObservable = require('./collection-observable');
 kb.Observable = require('./observable');

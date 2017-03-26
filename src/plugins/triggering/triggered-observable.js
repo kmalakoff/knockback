@@ -7,8 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../core');
-const EventWatcher = require('../core/event-watcher');
+const kb = require('../../core');
 
 const { _, ko } = kb;
 
@@ -53,7 +52,7 @@ class TriggeredObservable {
     kb.publishMethods(observable, this, KEYS_PUBLISH);
 
     // create emitter observable
-    kb.utils.wrappedEventWatcher(this, new EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
+    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
 
     return observable;
   }
@@ -88,9 +87,8 @@ class TriggeredObservable {
     return this.vo.valueHasMutated();  // manually trigger the dependable
   }
 }
-kb.TriggeredObservable = TriggeredObservable;
 module.exports = TriggeredObservable;
 
 // factory function
-kb.triggeredObservable = (...args) => new kb.TriggeredObservable(...args);
+kb.triggeredObservable = (...args) => new TriggeredObservable(...args);
 kb.observableTriggered = kb.triggeredObservable;

@@ -7,10 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../core');
+const kb = require('../../core');
 
 const { _, ko } = kb;
-require('./extensions');
 
 const KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
@@ -49,8 +48,7 @@ class DefaultObservable {
   // @note Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
   setToDefault() { return kb.utils.wrappedObservable(this)(this.dv); }
 }
-kb.DefaultObservable = DefaultObservable;
 module.exports = DefaultObservable;
 
-kb.defaultObservable = (...args) => new kb.DefaultObservable(...args);
+kb.defaultObservable = (...args) => new DefaultObservable(...args);
 kb.observableDefault = kb.defaultObservable;

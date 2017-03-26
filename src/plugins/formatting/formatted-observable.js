@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../core');
+const kb = require('../../core');
 
 const { _, ko } = kb;
 
@@ -107,8 +107,7 @@ class FormattedObservable {
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy() { return kb.utils.wrappedDestroy(this); }
 }
-kb.FormattedObservable = FormattedObservable;
 module.exports = FormattedObservable;
 
-kb.formattedObservable = (...args) => new kb.FormattedObservable(...args);
+kb.formattedObservable = (...args) => new FormattedObservable(...args);
 kb.observableFormatted = kb.formattedObservable;

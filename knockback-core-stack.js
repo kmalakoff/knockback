@@ -492,37 +492,10 @@ kb.Events = Backbone.Events;
 
 // Object.assign
 kb.assign = _.assign || _.extend;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -768,6 +741,33 @@ module.exports = EventWatcher;
 kb.emitterObservable = function (emitter, observable) {
   return new EventWatcher(emitter, observable);
 };
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ }),
 /* 3 */
@@ -3373,7 +3373,7 @@ if (root && typeof root.document !== 'undefined') {
   };
   onReady();
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
 /* 8 */
@@ -3447,7 +3447,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var kb = __webpack_require__(0);
 var TypedValue = __webpack_require__(20);
-var EventWatcher = __webpack_require__(2);
+var EventWatcher = __webpack_require__(1);
 
 var _ = kb._,
     ko = kb.ko;
@@ -4659,7 +4659,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 */
 
 var kb = __webpack_require__(0);
-var EventWatcher = __webpack_require__(2);
+var EventWatcher = __webpack_require__(1);
 
 var _ = kb._,
     ko = kb.ko;
@@ -5157,6 +5157,7 @@ kb.utils = __webpack_require__(12);
 kb.Statistics = __webpack_require__(10);
 kb.Store = __webpack_require__(11);
 kb.Factory = __webpack_require__(6);
+kb.EventWatcher = __webpack_require__(1);
 
 kb.CollectionObservable = __webpack_require__(4);
 kb.Observable = __webpack_require__(9);
@@ -7409,7 +7410,7 @@ module.exports = TypedValue;
   return Backbone;
 });
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
 /* 22 */

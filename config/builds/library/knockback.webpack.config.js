@@ -2,8 +2,10 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 
+const PLUGINS_DIR = path.resolve(path.join(__dirname, '..', '..', '..', 'src', 'plugins'));
+
 module.exports = _.extend(_.clone(require('../../webpack/base-config')), {
-  entry: _.flattenDeep([require('../../files').src_plugin, './src/core/index.js']),
+  entry: fs.readdirSync(PLUGINS_DIR).map(x => path.join(PLUGINS_DIR, x, 'index.js')).concat(['./src/core/index.js']),
   output: {
     library: 'kb',
     libraryTarget: 'umd2',

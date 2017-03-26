@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../core');
+const kb = require('../../core');
 
 const { _, ko } = kb;
 
@@ -157,9 +157,8 @@ class LocalizedObservable {
   }
 }
 LocalizedObservable.initClass();
-kb.LocalizedObservable = LocalizedObservable;
 module.exports = LocalizedObservable;
 
 // factory function
-kb.localizedObservable = (...args) => new kb.LocalizedObservable(...args);
+kb.localizedObservable = (...args) => new LocalizedObservable(...args);
 kb.observableLocalized = kb.localizedObservable;
