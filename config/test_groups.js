@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 const gutil = require('gulp-util');
+const glob = require('glob');
 
 const resolveModule = module_name => path.relative('.', require.resolve(module_name));
 
@@ -24,8 +25,6 @@ const REQUIRED_DEPENDENCIES = {
 };
 
 const LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize.culture.en-GB.js', './test/lib/globalize.culture.fr-FR.js'];
-
-const FILES = require('./files');
 
 const TEST_GROUPS = {};
 
@@ -104,8 +103,9 @@ TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach((test) => {
 // ##############################
 // Webpack
 // ##############################
+const WEBPACK_TESTS = glob.sync('**/*.tests.webpack.config.js', { cwd: path.join(__dirname, 'build', 'test'), absolute: true });
 TEST_GROUPS.webpack = [];
-FILES.tests_webpack.forEach((file) => {
+WEBPACK_TESTS.forEach((file) => {
   TEST_GROUPS.webpack.push({ name: `webpack_${file.replace('.js', '')}`, files: _.flattenDeep([(~file.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), file]) });
 });
 

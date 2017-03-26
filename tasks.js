@@ -1,7 +1,7 @@
 const path = require('path');
 const _ = require('lodash');
 const es = require('event-stream');
-const globby = require('globby');
+const glob = require('glob');
 const webpack = require('webpack');
 
 const gulp = require('gulp');
@@ -34,11 +34,12 @@ const HEADER = (module.exports = `\
 const LIBRARY_FILES = require('./config/files').libraries;
 
 gulp.task('build', async () => {
-  const configPaths = await globby(path.join(__dirname, 'config/builds/library/**/*.webpack.config.js'));
+  const BUILDS_DIR = path.join(__dirname, 'config/builds/library');
+  const configPaths = glob.sync('**/*.webpack.config.js', { cwd: BUILDS_DIR });
 
   for (const configPath of configPaths) {
     await new Promise((resolve, reject) => {
-      const config = _.merge({ output: { path: __dirname } }, require(configPath));
+      const config = _.merge({ output: { path: __dirname } }, require(path.join(BUILDS_DIR, configPath)));
       webpack(config, (err, stats) => {
         if (err) return reject(err);
 
@@ -76,9 +77,9 @@ const testBrowsers = async () => {
 // gulp.task('test-node', testNode);
 gulp.task('test-node', ['build'], testNode);
 
-// gulp.task('test-browsers', testBrowsers);
+gulp.task('test-browsers', testBrowsers);
 // gulp.task('test-browsers', ['build'], testBrowsers);
-gulp.task('test-browsers', ['minify'], testBrowsers);
+// gulp.task('test-browsers', ['minify'], testBrowsers);
 
 gulp.task('test', ['minify'], async () => {
   await testNode();
