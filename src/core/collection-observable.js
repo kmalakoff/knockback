@@ -99,7 +99,7 @@ class CollectionObservable {
       if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       let options = {};
-      _.each(args, arg => kb.assign(options, arg));
+      _.each(args, (arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
 
       let observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
       observable.__kb_is_co = true; // mark as a kb.CollectionObservable
@@ -169,7 +169,6 @@ class CollectionObservable {
 
         // no models
         observable = kb.utils.wrappedObservable(this);
-        // const previous_view_models = kb.peek(observable);
 
         let models;
         if (current_collection) models = current_collection.models;
@@ -205,8 +204,7 @@ class CollectionObservable {
       if (kb.statistics) kb.statistics.register('CollectionObservable', this);     // collect memory management statistics
 
       return observable;
-    },
-  );
+    });
   }
 
   // Required clean up function to break cycles, release view models, etc.
@@ -381,7 +379,10 @@ class CollectionObservable {
         if (comparator) {
           observable().push(this._createViewModel(arg));
           observable.sort(comparator);
-        } else observable.splice(collection.indexOf(arg), 0, this._createViewModel(arg));
+        } else {
+          const vm = this._createViewModel(arg);
+          observable.splice(collection.indexOf(arg), 0, vm);
+        }
         this.in_edit--;
         break;
       }
@@ -460,7 +461,7 @@ class CollectionObservable {
       });
     }
 
-        // a change, update models
+    // a change, update models
     this.in_edit++;
     (models_or_view_models.length === view_models.length) || observable(view_models); // replace the ViewModels because they were filtered
     _.isEqual(collection.models, models) || collection.reset(models);
@@ -478,7 +479,7 @@ class CollectionObservable {
 
   // @nodoc
   _createViewModel(model) {
-    if (this.models_only) { return model; }
+    if (this.models_only) return model;
     return this.create_options.store.retainOrCreate(model, this.create_options);
   }
 
@@ -494,9 +495,8 @@ class CollectionObservable {
   }
 }
 CollectionObservable.initClass();
-kb.CollectionObservable = CollectionObservable;
 module.exports = CollectionObservable;
 
 // factory function
-kb.collectionObservable = (...args) => new kb.CollectionObservable(...args);
+kb.collectionObservable = (...args) => new CollectionObservable(...args);
 kb.observableCollection = kb.collectionObservable;

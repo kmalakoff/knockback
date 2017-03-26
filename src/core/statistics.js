@@ -116,5 +116,4 @@ class Statistics {
     return stats;
   }
 }
-kb.Statistics = Statistics;
 module.exports = Statistics;

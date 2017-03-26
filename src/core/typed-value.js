@@ -3,7 +3,7 @@ const kb = require('./kb');
 const { _, ko } = kb;
 
 // @nodoc
-module.exports = class TypedValue {
+class TypedValue {
   constructor(create_options) {
     this.create_options = create_options;
     this._vo = ko.observable(null); // create a value observable for the first dependency
@@ -122,4 +122,5 @@ module.exports = class TypedValue {
     this.__kb_value = value;
     return this._vo(value);
   }
-};
+}
+module.exports = TypedValue;

@@ -7,7 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../core/kb');
+const kb = require('../core');
 
 const { _, ko } = kb;
 require('./extensions');

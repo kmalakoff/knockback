@@ -7,8 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const TypedValue = require('./typed-value');
 const kb = require('./kb');
+const TypedValue = require('./typed-value');
+const EventWatcher = require('./event-watcher');
 
 const { _, ko } = kb;
 
@@ -38,7 +39,7 @@ const KEYS_INFO = ['args', 'read', 'write'];
 //     var the_model = observable.model(); // get
 //     observable.model(new Backbone.Model({name: 'fred'})); // set
 //
-kb.Observable = class Observable {
+class Observable {
 
   // Used to create a new kb.Observable.
   //
@@ -132,7 +133,7 @@ kb.Observable = class Observable {
       });
       observable.model = this.model;
 
-      kb.EventWatcher.useOptionsOrCreate({ event_watcher }, model || null, this, {
+      EventWatcher.useOptionsOrCreate({ event_watcher }, model || null, this, {
         emitter: this.model,
         update: (() => kb.ignore(() => this.update())),
         key: this.key,
@@ -176,6 +177,7 @@ kb.Observable = class Observable {
     if (!arguments.length) new_value = kb.getValue(kb.peek(this._model), kb.peek(this.key));
     return this._value.update(new_value);
   }
-};
+}
+module.exports = Observable;
 
-kb.observable = (...args) => new kb.Observable(...args);
+kb.observable = (...args) => new Observable(...args);

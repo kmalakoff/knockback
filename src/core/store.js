@@ -289,5 +289,4 @@ class Store {
   }
 }
 Store.initClass();
-kb.Store = Store;
 module.exports = Store;

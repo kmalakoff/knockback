@@ -34,10 +34,15 @@ class utils {
   }
 
   // @nodoc
-  static get(obj, key, default_value) { return !obj.__kb || !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key]; }
+  static get(obj, key, default_value) {
+    return (!obj.__kb || !Object.prototype.hasOwnProperty.call(obj.__kb, key)) ? default_value : obj.__kb[key];
+  }
 
   // @nodoc
-  static set(obj, key, value) { if (!obj.__kb) obj.__kb = {}; obj.__kb[key] = value; return value; }
+  static set(obj, key, value) {
+    (obj.__kb || (obj.__kb = {}))[key] = value;
+    return value;
+  }
 
   // @nodoc
   static orSet(obj, key, value) {
@@ -74,7 +79,10 @@ class utils {
   //       return kb.utils.wrappedObservable(this);
   //     }
   //   });
-  static wrappedObservable(obj, value) { if (arguments.length === 1) { return kb.utils.get(obj, 'observable'); } return kb.utils.set(obj, 'observable', value); }
+  static wrappedObservable(obj, value) {
+    if (arguments.length === 1) return kb.utils.get(obj, 'observable');
+    return kb.utils.set(obj, 'observable', value);
+  }
 
   // Dual-purpose getter/setter for retrieving and storing the Model or Collection on an owner.
   // @note this is almost the same as {kb.utils.wrappedModel} except that if the Model doesn't exist, it returns null.
@@ -147,16 +155,16 @@ class utils {
   //   @param [kb.Factory] factory the factory
   static wrappedFactory(obj, value) { if (arguments.length === 1) { return kb.utils.get(obj, 'factory'); } return kb.utils.set(obj, 'factory', value); }
 
-  // Dual-purpose getter/setter for retrieving and storing a kb.EventWatcher on an owner.
+  // Dual-purpose getter/setter for retrieving and storing a EventWatcher on an owner.
   //
   // @overload wrappedEventWatcher(obj)
   //   Gets the event_watcher from an object
   //   @param [Any] obj the owner
-  //   @return [kb.EventWatcher] the event_watcher
+  //   @return [EventWatcher] the event_watcher
   // @overload wrappedEventWatcher(obj, event_watcher)
   //   Sets the event_watcher on an object
   //   @param [Any] obj the owner
-  //   @param [kb.EventWatcher] event_watcher the event_watcher
+  //   @param [EventWatcher] event_watcher the event_watcher
   static wrappedEventWatcher(obj, value) { if (arguments.length === 1) { return kb.utils.get(obj, 'event_watcher'); } return kb.utils.set(obj, 'event_watcher', value); }
 
   // @private
@@ -223,4 +231,4 @@ class utils {
   static resolveModel(model) { if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) { return model.model(); } return model; }
 }
 utils.initClass();
-kb.utils = utils;
+module.exports = utils;

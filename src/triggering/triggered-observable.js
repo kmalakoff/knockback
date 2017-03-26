@@ -7,7 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../core/kb');
+const kb = require('../core');
+const EventWatcher = require('../core/event-watcher');
 
 const { _, ko } = kb;
 
@@ -52,7 +53,7 @@ class TriggeredObservable {
     kb.publishMethods(observable, this, KEYS_PUBLISH);
 
     // create emitter observable
-    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
+    kb.utils.wrappedEventWatcher(this, new EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
 
     return observable;
   }

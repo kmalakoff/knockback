@@ -15,13 +15,13 @@ const { ko } = kb;
 if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
   const _extend = ko.subscribable.fn.extend;
   ko.subscribable.fn.extend = function (...args) {
-    const target = _extend.call(this, args);
+    const target = _extend.apply(this, args);
 
     // release the extended observable
     if ((target !== this) && kb.isReleaseable(this)) {
       const _dispose = target.dispose;
-      target.dispose = () => {
-        if (_dispose != null) _dispose.apply(target, args);
+      target.dispose = (...args2) => {
+        !_dispose || _dispose.apply(target, args2);
         return kb.release(this);
       };
     }

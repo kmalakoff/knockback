@@ -8,6 +8,7 @@
 */
 
 const kb = require('./kb');
+const EventWatcher = require('./event-watcher');
 
 const { _, ko } = kb;
 
@@ -159,7 +160,7 @@ class ViewModel {
       ),
       });
 
-      const event_watcher = kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(model, this, {
+      const event_watcher = kb.utils.wrappedEventWatcher(this, new EventWatcher(model, this, {
         emitter: this._model,
         update: (() => kb.ignore(() => !(event_watcher && event_watcher.ee) || this.createObservables(event_watcher.ee))),
       }));
@@ -226,8 +227,7 @@ class ViewModel {
   }
 }
 ViewModel.initClass();
-kb.ViewModel = ViewModel;
 module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
-kb.viewModel = (...args) => new kb.ViewModel(...args);
+kb.viewModel = (...args) => new ViewModel(...args);

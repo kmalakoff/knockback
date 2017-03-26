@@ -14,7 +14,7 @@ const { _, Backbone } = kb;
 let AssociatedModel = null; // lazy bind so this file can be loaded before relational library
 
 // @nodoc
-module.exports = class BackboneAssociations {
+class BackboneAssociations {
   static isAvailable() { return !!(AssociatedModel = Backbone ? Backbone.AssociatedModel : null); }
 
   static keys(model) {
@@ -30,4 +30,5 @@ module.exports = class BackboneAssociations {
   }
 
   static useFunction() { return false; }
-};
+}
+module.exports = BackboneAssociations;

@@ -14,7 +14,7 @@ const { _, Backbone } = kb;
 let RelationalModel = null; // lazy bind so this file can be loaded before relational library
 
 // @nodoc
-module.exports = class BackboneRelational {
+class BackboneRelational {
   static isAvailable() { return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null); }
 
   static relationType(model, key) {
@@ -45,4 +45,5 @@ module.exports = class BackboneRelational {
   }
 
   static useFunction() { return false; }
-};
+}
+module.exports = BackboneRelational;

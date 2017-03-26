@@ -17,8 +17,7 @@ const { _ } = kb;
 //   var factory = new kb.Factory();
 //   factory.addPathMapping('bob.the.builder', kb.ViewModel);
 //   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
-kb.Factory = class Factory {
-
+class Factory {
   // Used to either register yourself with the existing factory or to create a new factory.
   //
   // @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
@@ -71,4 +70,5 @@ kb.Factory = class Factory {
     if (this.parent_factory) return this.parent_factory.creatorForPath(obj, path);
     return null;
   }
-};
+}
+module.exports = Factory;

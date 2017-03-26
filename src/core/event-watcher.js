@@ -13,7 +13,7 @@ const { _, ko } = kb;
 
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 //
-kb.EventWatcher = class EventWatcher {
+class EventWatcher {
 
   // Used to either register yourself with the existing emitter watcher or to create a new one.
   //
@@ -31,7 +31,7 @@ kb.EventWatcher = class EventWatcher {
       return kb.utils.wrappedEventWatcher(obj, options.event_watcher).registerCallbacks(obj, callback_options);
     }
     kb.utils.wrappedEventWatcherIsOwned(obj, true);
-    return kb.utils.wrappedEventWatcher(obj, new kb.EventWatcher(emitter)).registerCallbacks(obj, callback_options);
+    return kb.utils.wrappedEventWatcher(obj, new EventWatcher(emitter)).registerCallbacks(obj, callback_options);
   }
 
   constructor(emitter, obj, callback_options) {
@@ -174,7 +174,8 @@ kb.EventWatcher = class EventWatcher {
       if (info.emitter && !skip_emitter && !kb.wasReleased(info.obj)) { info.emitter(null); }
     });
   }
-};
+}
+module.exports = EventWatcher;
 
 // factory function
-kb.emitterObservable = (emitter, observable) => new kb.EventWatcher(emitter, observable);
+kb.emitterObservable = (emitter, observable) => new EventWatcher(emitter, observable);

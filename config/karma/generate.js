@@ -14,6 +14,7 @@ const TEST_GROUPS = require('../test_groups');
 
 module.exports = async () => {
   // install knockback
+  fs.removeSync('node_modules/knockback', true);
   await new Promise((resolve, reject) =>
     gulp.src(['./knockback.js', './package.json'])
       .pipe(gulp.dest('node_modules/knockback'))
