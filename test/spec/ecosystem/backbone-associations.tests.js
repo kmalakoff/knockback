@@ -3,10 +3,11 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
+
 const { _, Backbone, ko } = kb;
 if (Backbone && !Backbone.Associations && r) try { require('backbone-associations'); } catch (e) { /**/ }
 
-describe.skip('Knockback.js with Backbone-Associations.js', () => {
+describe('Knockback.js with Backbone-Associations.js', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
@@ -19,7 +20,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
   if (!(Backbone != null ? Backbone.Associations : undefined)) return;
   Backbone.Associations.scopes.push(root);
 
-  const Person = root.Person = Backbone.AssociatedModel.extend({
+  root.Person = Backbone.AssociatedModel.extend({
     relations: [{
       type: Backbone.Many,
       key: 'friends',
@@ -28,20 +29,22 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
       type: Backbone.One,
       key: 'best_friend',
       relatedModel: 'Person',
-      // reverseRelation:
-      //   type: Backbone.Many
-      //   key: 'best_friends_with_me'
+      // reverseRelation: {
+      //   type: Backbone.Many,
+      //   key: 'best_friends_with_me',
+      // },
     }],
   });
 
-  const Building = root.Building = Backbone.AssociatedModel.extend({
+  root.Building = Backbone.AssociatedModel.extend({
     relations: [{
       type: Backbone.Many,
       key: 'occupants',
       relatedModel: 'Person',
-      // reverseRelation:
-      //   type: Backbone.One
-      //   key: 'occupies'
+      // reverseRelation: {
+      //   type: Backbone.One,
+      //   key: 'occupies',
+      // }
     }],
   });
 
@@ -538,7 +541,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
   });
 
   // TODO: put back when test why running both Backbone.Relational and this together fail
-  it.skip('8b. Customizing observable types: from the start (attribute setting)', () => {
+  it('8b. Customizing observable types: from the start (attribute setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
@@ -609,12 +612,14 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     class BestFriendViewModel extends kb.ViewModel {}
     class PersonViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'friends.models': FriendViewModel,
-          best_friend: BestFriendViewModel,
-          // 'occupies': HouseViewModel
-        },
-          options });
+        super(model, {
+          factories: {
+            'friends.models': FriendViewModel,
+            best_friend: BestFriendViewModel,
+            // 'occupies': HouseViewModel
+          },
+          options,
+        });
       }
     }
     class HouseViewModel extends kb.ViewModel {
@@ -672,19 +677,21 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('9b. Customizing observable types: late binding (atrributes setting)', () => {
+  it('9b. Customizing observable types: late binding (attributes setting)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     class FriendViewModel extends kb.ViewModel {}
     class BestFriendViewModel extends kb.ViewModel {}
     class PersonViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'friends.models': FriendViewModel,
-          best_friend: BestFriendViewModel,
-          // 'occupies': HouseViewModel
-        },
-          options });
+        super(model, {
+          factories: {
+            'friends.models': FriendViewModel,
+            best_friend: BestFriendViewModel,
+            // 'occupies': HouseViewModel
+          },
+          options,
+        });
       }
     }
     class HouseViewModel extends kb.ViewModel {
@@ -848,7 +855,7 @@ describe.skip('Knockback.js with Backbone-Associations.js', () => {
   });
 
   // TODO: put back when test why running both Backbone.Relational and this together fail
-  it.skip('11. Minimum factory tree for shared dependent models', () => {
+  it('11. Minimum factory tree for shared dependent models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const george = new Person({

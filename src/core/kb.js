@@ -257,7 +257,6 @@ class kb {
 
   static getValue(model, key, args) {
     if (!model) return undefined;
-    if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key]();
     if (!args) return model.get(key);
     return model.get(..._.map([key].concat(args), value => kb.peek(value)));
   }
@@ -265,7 +264,6 @@ class kb {
   static setValue(model, key, value) {
     let attributes;
     if (!model) return undefined;
-    if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
     (attributes = {})[key] = value;
     return model.set(attributes);
   }

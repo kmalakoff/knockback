@@ -24,7 +24,7 @@ class BackboneRelational {
     return (relation.collectionType || _.isArray(relation.keyContents)) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
   }
 
-  static bind(model, key, update, path) {
+  static customBind(model, key, update, path) {
     const type = this.relationType(model, key);
     if (!type) return null;
 
@@ -43,7 +43,5 @@ class BackboneRelational {
       else model.unbind(`${events[0]}:${key}`, relFn);
     };
   }
-
-  static useFunction() { return false; }
 }
 module.exports = BackboneRelational;

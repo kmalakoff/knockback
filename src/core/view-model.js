@@ -26,7 +26,8 @@ const createObservable = function (vm, model, key, create_options) {
   if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return undefined;
   const vm_key = assignViewModelKey(vm, key);
   if (!vm_key) return undefined;
-  const observable = kb.observable(model, key, create_options, vm); vm.__kb.view_model[vm_key] = observable; vm[vm_key] = observable;
+  const observable = kb.observable(model, key, create_options, vm);
+  vm.__kb.view_model[vm_key] = observable; vm[vm_key] = observable;
   return observable;
 };
 
@@ -210,7 +211,7 @@ class ViewModel {
       }
 
       if (kb.settings.orm && kb.settings.orm.keys) {
-        _.each(kb.settings.orm.keys, key => createObservable(this, model, key, this.__kb.create_options));
+        _.each(kb.settings.orm.keys(model), (key) => { createObservable(this, model, key, this.__kb.create_options); });
       }
     } else if (_.isArray(keys)) {
       _.map(keys, key => createObservable(this, model, key, this.__kb.create_options));

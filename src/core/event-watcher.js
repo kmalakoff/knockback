@@ -152,7 +152,9 @@ class EventWatcher {
       }
 
       _.each(callbacks.list, (info) => {
-        if (!info.unbind_fn && kb.settings.orm) info.unbind_fn = kb.settings.orm.bind(model, info.key, info.update, info.path);
+        if (!info.unbind_fn && kb.settings.orm && kb.settings.orm.customBind) {
+          info.unbind_fn = kb.settings.orm.customBind(model, info.key, info.update, info.path);
+        }
         if (info.emitter) info.emitter(model);
       });
     });

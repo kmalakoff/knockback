@@ -33,7 +33,7 @@ class Factory {
 
     // create a new factory
     const factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
-    if (options.factories) { factory.addPathMappings(options.factories, owner_path); }
+    if (options.factories) factory.addPathMappings(options.factories, owner_path);
     return factory;
   }
 

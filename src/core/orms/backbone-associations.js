@@ -19,16 +19,14 @@ class BackboneAssociations {
 
   static keys(model) {
     if (!(model instanceof AssociatedModel)) return null;
-    return _.map(model.relations, test => test.key);
+    return _.map(model.relations, x => x.key);
   }
 
   static relationType(model, key) {
     if (!(model instanceof AssociatedModel)) return null;
-    const relation = _.find(model.relations, test => test.key === key);
+    const relation = _.find(model.relations, x => x.key === key);
     if (!relation) return null;
     return (relation.type === 'Many') ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
   }
-
-  static useFunction() { return false; }
 }
 module.exports = BackboneAssociations;

@@ -396,7 +396,6 @@ var kb = function () {
     key: 'getValue',
     value: function getValue(model, key, args) {
       if (!model) return undefined;
-      if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key]();
       if (!args) return model.get(key);
       return model.get.apply(model, _toConsumableArray(_.map([key].concat(args), function (value) {
         return kb.peek(value);
@@ -407,7 +406,6 @@ var kb = function () {
     value: function setValue(model, key, value) {
       var attributes = void 0;
       if (!model) return undefined;
-      if (_.isFunction(model[key]) && (kb.settings.orm != null ? kb.settings.orm.useFunction(model, key) : undefined)) return model[key](value);
       (attributes = {})[key] = value;
       return model.set(attributes);
     }
@@ -565,7 +563,9 @@ var EventWatcher = function () {
         }
 
         _.each(callbacks.list, function (info) {
-          if (!info.unbind_fn && kb.settings.orm) info.unbind_fn = kb.settings.orm.bind(model, info.key, info.update, info.path);
+          if (!info.unbind_fn && kb.settings.orm && kb.settings.orm.customBind) {
+            info.unbind_fn = kb.settings.orm.customBind(model, info.key, info.update, info.path);
+          }
           if (info.emitter) info.emitter(model);
         });
       });
@@ -3065,9 +3065,7 @@ var Factory = function () {
 
       // create a new factory
       var factory = kb.utils.wrappedFactory(obj, new kb.Factory(options.factory));
-      if (options.factories) {
-        factory.addPathMappings(options.factories, owner_path);
-      }
+      if (options.factories) factory.addPathMappings(options.factories, owner_path);
       return factory;
     }
   }]);
@@ -4679,7 +4677,8 @@ var createObservable = function createObservable(vm, model, key, create_options)
   if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return undefined;
   var vm_key = assignViewModelKey(vm, key);
   if (!vm_key) return undefined;
-  var observable = kb.observable(model, key, create_options, vm);vm.__kb.view_model[vm_key] = observable;vm[vm_key] = observable;
+  var observable = kb.observable(model, key, create_options, vm);
+  vm.__kb.view_model[vm_key] = observable;vm[vm_key] = observable;
   return observable;
 };
 
@@ -4909,8 +4908,8 @@ var ViewModel = function () {
         }
 
         if (kb.settings.orm && kb.settings.orm.keys) {
-          _.each(kb.settings.orm.keys, function (key) {
-            return createObservable(_this3, model, key, _this3.__kb.create_options);
+          _.each(kb.settings.orm.keys(model), function (key) {
+            createObservable(_this3, model, key, _this3.__kb.create_options);
           });
         }
       } else if (_.isArray(keys)) {
@@ -5211,24 +5210,19 @@ var BackboneAssociations = function () {
     key: 'keys',
     value: function keys(model) {
       if (!(model instanceof AssociatedModel)) return null;
-      return _.map(model.relations, function (test) {
-        return test.key;
+      return _.map(model.relations, function (x) {
+        return x.key;
       });
     }
   }, {
     key: 'relationType',
     value: function relationType(model, key) {
       if (!(model instanceof AssociatedModel)) return null;
-      var relation = _.find(model.relations, function (test) {
-        return test.key === key;
+      var relation = _.find(model.relations, function (x) {
+        return x.key === key;
       });
       if (!relation) return null;
       return relation.type === 'Many' ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
-    }
-  }, {
-    key: 'useFunction',
-    value: function useFunction() {
-      return false;
     }
   }]);
 
@@ -5288,8 +5282,8 @@ var BackboneRelational = function () {
       return relation.collectionType || _.isArray(relation.keyContents) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
     }
   }, {
-    key: 'bind',
-    value: function bind(model, key, update, path) {
+    key: 'customBind',
+    value: function customBind(model, key, update, path) {
       var type = this.relationType(model, key);
       if (!type) return null;
 
@@ -5309,11 +5303,6 @@ var BackboneRelational = function () {
           return model.unbind(event + ':' + key, relFn);
         });else model.unbind(events[0] + ':' + key, relFn);
       };
-    }
-  }, {
-    key: 'useFunction',
-    value: function useFunction() {
-      return false;
     }
   }]);
 
