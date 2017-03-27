@@ -29,6 +29,7 @@ module.exports = {
     'no-debugger': 'warn',
     'new-cap': 'off',
     'no-undef': 'off',
+    'no-await-in-loop': 'off',
 
     'camelcase': 'off',
   }

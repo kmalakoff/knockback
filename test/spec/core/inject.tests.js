@@ -18,22 +18,22 @@ describe('inject', () => {
   });
 
   root.kb = kb;
-  root.appCreate = view_model => view_model.app_create = true;
+  root.appCreate = (view_model) => { view_model.app_create = true; };
 
-  root.app = function (view_model) {
+  root.app = function () {
     this.app = true;
     kb.statistics.register('app', this);
     this.destroy = () => kb.statistics.unregister('app', this);
     return this; // return self
   };
 
-  root.appCallbacks = function (view_model) {
+  root.appCallbacks = function () {
     this.app = true;
     kb.statistics.register('app', this);
     this.destroy = () => kb.statistics.unregister('app', this);
 
-    this.beforeBinding = () => this.before_was_called = true;
-    this.afterBinding = () => this.after_was_called = true;
+    this.beforeBinding = () => { this.before_was_called = true; };
+    this.afterBinding = () => { this.after_was_called = true; };
 
     return this; // return self
   };
@@ -49,8 +49,8 @@ describe('inject', () => {
   };
 
   root.SubClass = class SubClass extends SuperClass {
-    constructor() {
-      super(...arguments);
+    constructor(...args) {
+      super(...args);
       this.sub_class = true;
     }
   };
@@ -95,7 +95,6 @@ describe('inject', () => {
     $('body').append(inject_el);
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
-    const view_model1 = injected[1].view_model;
     assert.equal(injected[0].el, inject_el.children[0], 'ViewModel Solo: app was injected');
     assert.ok(view_model instanceof root.app, 'ViewModel Solo: view_model type app');
     assert.equal(view_model.app, true, 'ViewModel Solo: app is true');
@@ -186,8 +185,8 @@ describe('inject', () => {
     // Properties with callbacks
     let before_was_called = false;
     let after_was_called = false;
-    root.beforeBinding = view_model => before_was_called = view_model.hello;
-    root.afterBinding = view_model => after_was_called = view_model.hello;
+    root.beforeBinding = (x) => { before_was_called = x.hello; };
+    root.afterBinding = (x) => { after_was_called = x.hello; };
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
@@ -201,8 +200,8 @@ describe('inject', () => {
     // Create function with callbacks
     before_was_called = false;
     after_was_called = false;
-    root.beforeBinding = view_model => before_was_called = view_model.hello;
-    root.afterBinding = view_model => after_was_called = view_model.hello;
+    root.beforeBinding = (x) => { before_was_called = x.hello; };
+    root.afterBinding = (x) => { after_was_called = x.hello; };
     inject_el = $('<div kb-inject="create: appCreate, hello: true, beforeBinding: beforeBinding, afterBinding: afterBinding"><span data-bind="visible: app_create"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
@@ -230,8 +229,9 @@ describe('inject', () => {
     // ViewModel Object with callbacks
     before_was_called = false;
     after_was_called = false;
-    root.beforeBinding = view_model => before_was_called = view_model.hello;
-    root.afterBinding = view_model => after_was_called = view_model.hello;
+    root.beforeBinding = (x) => { before_was_called = x.hello; };
+    root.afterBinding = (x) => { after_was_called = x.hello; };
+
     inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
@@ -306,7 +306,7 @@ describe('inject', () => {
     ko.removeNode(inject_el);
 
     // Function
-    root.testFunction = view_model => view_model.hello = true;
+    root.testFunction = (x) => { x.hello = true; };
     inject_el = $('<div data-bind="inject: {embedded: testFunction}"><span data-bind="click: embedded.testFunction"></span></div>')[0];
     view_model = {};
     kb.applyBindings(view_model, inject_el);

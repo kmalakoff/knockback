@@ -1,5 +1,3 @@
-const fs = require('fs');
-const path = require('path');
 const _ = require('lodash');
 
 module.exports = _.extend(_.clone(require('../../webpack/base-config')), {

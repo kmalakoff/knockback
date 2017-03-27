@@ -134,7 +134,7 @@ describe('collection-observable', () => {
     assert.ok(!view_model, 'no view model found since the collection observable is not wrapping models in view models');
 
     let model_count = 0;
-    _.each(collection_observable(), model => model_count++);
+    _.each(collection_observable(), () => model_count++);
     assert.equal(model_count, 1, 'one model');
 
     assert.ok(collection_observable.collection() === collection, 'collections match');
@@ -178,7 +178,7 @@ describe('collection-observable', () => {
     assert.equal(kb.utils.wrappedModel(view_model).get('name'), 'Ringo', 'Ringo is left');
 
     let view_model_count = 0;
-    _.each(collection_observable(), view_model => view_model_count++);
+    _.each(collection_observable(), () => view_model_count++);
     assert.equal(view_model_count, 1, 'one view model');
 
     assert.ok(collection_observable.collection() === collection, 'collections match');
@@ -245,9 +245,11 @@ describe('collection-observable', () => {
 
       if (parts_a.length !== parts_b.length) { return (parts_a.length - parts_b.length); }
       for (const index in parts_b) {
-        const part = parts_b[index];
-        const delta = parts_a[index] - +part;
-        if (delta !== 0) return delta;
+        if (Object.prototype.hasOwnProperty.call(parts_b, index)) {
+          const part = parts_b[index];
+          const delta = parts_a[index] - +part;
+          if (delta !== 0) return delta;
+        }
       }
       return 0;
     };
@@ -429,13 +431,19 @@ describe('collection-observable', () => {
       major_duo3: kb.collectionObservable(major_duo, { view_model: kb.ViewModel }),
       major_duo4: kb.collectionObservable(major_duo, { view_model: ContactViewModelDate }),
       major_duo5: kb.collectionObservable(major_duo, { create(model, options) { return new ContactViewModelDate(model, options); } }),
-      major_duo6: kb.collectionObservable(major_duo, { create(model, options) { return model.get('name') === 'John' ? new ContactViewModelDate(model, options) : kb.viewModel(model, options); } }), // mixed
+      major_duo6: kb.collectionObservable(major_duo, { create(model, options) {
+        return model.get('name') === 'John' ? new ContactViewModelDate(model, options) : kb.viewModel(model, options);
+      } }), // mixed
       minor_duo1: kb.collectionObservable(minor_duo, { factories: {} }),
       minor_duo2: kb.collectionObservable(minor_duo, { factories: { models: { models_only: true } } }),
       minor_duo3: kb.collectionObservable(minor_duo, { factories: { models: kb.ViewModel } }),
       minor_duo4: kb.collectionObservable(minor_duo, { factories: { models: { view_model: ContactViewModelDate } } }),
-      minor_duo5: kb.collectionObservable(minor_duo, { factories: { models: { create(model, options) { return new ContactViewModelDate(model, options); } } } }),
-      minor_duo6: kb.collectionObservable(minor_duo, { factories: { models: { create(model, options) { return model.get('name') === 'George' ? new ContactViewModelDate(model, options) : kb.viewModel(model, options); } } } }), // mixed
+      minor_duo5: kb.collectionObservable(minor_duo, { factories: { models: { create(model, options) {
+        return new ContactViewModelDate(model, options);
+      } } } }),
+      minor_duo6: kb.collectionObservable(minor_duo, { factories: { models: { create(model, options) {
+        return model.get('name') === 'George' ? new ContactViewModelDate(model, options) : kb.viewModel(model, options);
+      } } } }), // mixed
     };
 
     const validateContactViewModel = (view_model, name, birthdate) => {
@@ -693,13 +701,21 @@ describe('collection-observable', () => {
       return observable_count++;
     });
 
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(count_reset, 1, 'count_reset'); assert.equal(count_add, 1, 'count_add'); assert.equal(count_remove, 1, 'count_remove'); assert.equal(observable_count, 1, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(count_reset, 1, 'count_reset');
+    assert.equal(count_add, 1, 'count_add');
+    assert.equal(count_remove, 1, 'count_remove');
+    assert.equal(observable_count, 1, 'observable_count');
 
     collection_observable([new TestViewModel(new kb.Model({ id: 10, name: 'Manual' }))]); // should not depend
     collection.reset([{ id: 20, name: 'Reset1' }, { id: 21, name: 'Reset2' }]); // should not depend
     collection.add([{ id: 30, name: 'Add1' }, { id: 31, name: 'Add2' }]); // should not depend
     collection.remove(collection.at(0));
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(count_reset, 1, 'count_reset'); assert.equal(count_add, 1, 'count_add'); assert.equal(count_remove, 1, 'count_remove'); assert.equal(observable_count, 6, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(count_reset, 1, 'count_reset');
+    assert.equal(count_add, 1, 'count_add');
+    assert.equal(count_remove, 1, 'count_remove');
+    assert.equal(observable_count, 6, 'observable_count');
 
     const view_model = collection_observable()[0];
     const model = view_model.model();
@@ -707,7 +723,11 @@ describe('collection-observable', () => {
     assert.equal(view_model.name(), 'Bob2');
     view_model.test('world');
     assert.equal(view_model.test(), 'world');
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(count_reset, 1, 'count_reset'); assert.equal(count_add, 1, 'count_add'); assert.equal(count_remove, 1, 'count_remove'); assert.equal(observable_count, 6, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(count_reset, 1, 'count_reset');
+    assert.equal(count_add, 1, 'count_add');
+    assert.equal(count_remove, 1, 'count_remove');
+    assert.equal(observable_count, 6, 'observable_count');
 
     kb.release(collection_observable);
 

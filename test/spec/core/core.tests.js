@@ -25,7 +25,7 @@ describe('knockback_core', () => {
         this.name = ko.observable('Bob');
       }
       afterRender() {
-        return this.was_called = true;
+        this.was_called = true;
       }
     }
 
@@ -44,7 +44,7 @@ describe('knockback_core', () => {
     assert.ok(!view_model.was_called, 'afterRender not called yet');
     el = $('<script type="text/x-jquery-tmpl" id="the_template2"><div data-bind="text: name"></div></script>');
     $('body').append(el);
-    kb.renderTemplate('the_template2', view_model, { afterRender() { return was_called = true; } });
+    kb.renderTemplate('the_template2', view_model, { afterRender() { was_called = true; } });
     assert.ok(was_called, 'afterRender (options) was called');
     assert.ok(!view_model.was_called, 'afterRender was not called');
 
@@ -58,12 +58,12 @@ describe('knockback_core', () => {
     let counter_ignore = 0;
 
     const name = ko.observable('Bob');
-    const counter_computed = ko.computed(() => {
+    ko.computed(() => {
       name();
       return ++counter;
     });
 
-    const counter_computed_ignore = ko.computed(() => {
+    ko.computed(() => {
       const value = kb.ignore(() => {
         name();
         return ++counter_ignore;
@@ -79,7 +79,7 @@ describe('knockback_core', () => {
     assert.equal(counter_ignore, 1);
 
     // ignore with arguments
-    kb.ignore(((arg1, arg2) => { assert.equal(arg1, 1); return assert.equal(arg2, 2); }), null, [1, 2]);
+    kb.ignore(((arg1, arg2) => { assert.equal(arg1, 1); assert.equal(arg2, 2); }), null, [1, 2]);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });

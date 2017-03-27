@@ -49,7 +49,6 @@ describe('Knockback.js with Backbone-Associations.js', () => {
   });
 
   it('1. Model with Many relations: A house with multiple people living in it', () => {
-    let stats;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -89,20 +88,18 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     kb.release(house_view_model);
 
-    for (var name in model_stats) {
-      stats = model_stats[name];
-      assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    _.each(model_stats, (stats) => {
+      const statsCountCheck = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
+      assert.ok(statsCountCheck, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+    });
     our_house.set({ occupants: [] });
-    for (name in model_stats) {
-      stats = model_stats[name];
+    _.each(model_stats, (stats, name) => {
       assert.ok(kb.Statistics.eventsStats(stats.model).count === 0, `All model events cleared (${name}). Expected: 1. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
   it('2. Collection with models with Many relations: Multiple houses with multiple people living in them', () => {
-    let occupant_observable;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -266,10 +263,10 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     // assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
     kb.release(george_view_model); george_view_model = null;
 
-    for (const name in model_stats) {
-      const stats = model_stats[name];
-      assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    _.each(model_stats, (stats) => {
+      const statsCountCheck = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
+      assert.ok(statsCountCheck, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+    });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
@@ -306,77 +303,6 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(view_model.occupants()[0].name(), 'Bob', 'Bob is in the view model relationship');
     assert.equal(view_model.occupants()[1].name(), 'Fred', 'Fred is in the view model relationship');
   });
-
-  // # it '5. bug fix for relational models https://github.com/kmalakoff/knockback/issues/34', (done) ->
-  // #   Book = Backbone.AssociatedModel.extend({
-  // #     defaults:
-  // #       name: 'untitled'
-  // #     idAttribute: '_id'
-  // #   })
-  // #   Author = Backbone.AssociatedModel.extend({
-  // #     defaults:
-  // #       name: 'untitled'
-  // #     idAttribute: '_id'
-  // #     relations:[{
-  // #       type: 'Many'
-  // #       key: 'books'
-  // #       relatedModel: Book
-  // #       includeInJSON: '_id'
-  // #       reverseRelation:
-  // #         key: 'author'
-  // #         includeInJSON: '_id'
-  // #     }]
-  // #   })
-  // #   BookStore = Backbone.AssociatedModel.extend({
-  // #     relations:[{
-  // #       type: 'Many'
-  // #       key: 'books'
-  // #       relatedModel: Book
-  // #     },{
-  // #       type: 'Many'
-  // #       key: 'authors'
-  // #       relatedModel: Author
-  // #     }]
-  // #   })
-
-  // #   bs = new BookStore({
-  // #     books:[{_id:"b1", name: "Book One", author: "a1"}, {_id:"b2", name: "Book Two", author: "a1"}],
-  // #     authors:[{name: 'fred', _id: "a1"}, {name: 'ted', _id: "a2"}]
-  // #   })
-
-  // #   BookViewModel = kb.ViewModel.extend({
-  // #     constructor: (model) ->
-  // #       kb.ViewModel.prototype.constructor.apply(this, arguments)
-  // #       this.editMode = ko.observable()
-
-  // #       @edit = =>
-  // #         model._save = model.toJSON()
-  // #         @editMode(true)
-
-  // #       @confirm = =>
-  // #         model._save = null
-  // #         @editMode(false)
-
-  // #       @cancel = =>
-  // #         model.set(model._save)
-  // #         @editMode(false)
-  // #       @
-  // #   })
-
-  // #   view_model = {
-  // #     books: kb.collectionObservable(bs.get('books'), {
-  // #       factories:
-  // #         models: BookViewModel
-  // #         'models.author.books.models': BookViewModel
-  // #     })
-  // #   }
-
-  // #   for book in view_model.books()
-  // #     author = book.author()
-  // #     for authored_book in author.books()
-  // #       authored_book.editMode(true)
-  // #       assert.equal(authored_book.editMode(), true, 'edit mode set')
-  // #   done()
 
   it('6. Inferring observable types: from the start', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -795,8 +721,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       return this;
     };
     class BandMemberViewModel extends kb.ViewModel {
-      constructor(/* model, options */) {
-        super(...arguments);
+      constructor(...args /* model, options */) {
+        super(...args);
         this.type = ko.observable('band_member');
       }
     }
@@ -804,7 +730,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const collection_observable = kb.collectionObservable(new kb.Collection([john, paul, george, ringo]), {
       factories: {
         models: BandMemberViewModel,
-        'models.best_friend': { create(model, options) { return model ? new BestFriendViewModel(model) : null; } },
+        'models.best_friend': { create(model) { return model ? new BestFriendViewModel(model) : null; } },
         'models.friends.models': FriendViewModel,
       },
     });
@@ -821,7 +747,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
         assert.ok(found, `${name} was found`);
       });
     };
-    var validateFriend = (vm, name) => {
+    const validateFriend = (vm, name) => {
       assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `friend name matches for ${name}`);
     };
@@ -894,12 +820,13 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     class PersonCollection extends kb.CollectionObservable {
       constructor(collection, options) {
-        return super(collection, {
+        super(collection, {
           factories: {
             models: PersonViewModel,
           },
           options,
         });
+        return kb.utils.wrappedObservable(this);
       }
     }
 

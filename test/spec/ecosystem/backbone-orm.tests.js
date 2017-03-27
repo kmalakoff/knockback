@@ -89,10 +89,10 @@ describe('Knockback.js with BackboneORM', () => {
 
     kb.release(house_view_model);
 
-    for (const name in model_stats) {
-      const stats = model_stats[name];
-      assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-    }
+    _.each(model_stats, (stats) => {
+      const statsCountCheck = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
+      assert.ok(statsCountCheck, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+    });
     our_house.set({ occupants: [] });
     _.each([john, paul], (model) => {
       assert.ok(kb.Statistics.eventsStats(model).count === 2, `All model events cleared. Expected: 2. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
@@ -104,8 +104,6 @@ describe('Knockback.js with BackboneORM', () => {
   });
 
   it('2. Collection with models with HasMany relations: Multiple houses with multiple people living in them', () => {
-    let occupant_observable,
-      occupant_observable2;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new Person({
@@ -149,9 +147,9 @@ describe('Knockback.js with BackboneORM', () => {
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 4, 'Everyone is here');
-          _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-            assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
-            assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
+          _.each(occupant_observable.occupies().occupants(), (x) => {
+            assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], x.name()), 'Expected name');
+            assert.equal(x.occupies().location(), 'one side of the street', 'Expected location');
           });
         });
       } else {
@@ -173,9 +171,9 @@ describe('Knockback.js with BackboneORM', () => {
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 3, 'Almost everyone is here');
-          _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-            assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name');
-            assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location');
+          _.each(occupant_observable.occupies().occupants(), (x) => {
+            assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], x.name()), 'Expected name');
+            assert.equal(x.occupies().location(), 'one side of the street', 'Expected location');
           });
         });
       } else {
@@ -187,9 +185,9 @@ describe('Knockback.js with BackboneORM', () => {
 
           // nested check
           assert.equal(occupant_observable.occupies().occupants().length, 1, 'In the studio');
-          _.each(occupant_observable.occupies().occupants(), (occupant_observable2) => {
-            assert.equal(occupant_observable2.name(), 'John', 'Expected name');
-            assert.equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location');
+          _.each(occupant_observable.occupies().occupants(), (x) => {
+            assert.equal(x.name(), 'John', 'Expected name');
+            assert.equal(x.occupies().location(), 'the other side of the street', 'Expected location');
           });
         });
       }
@@ -229,12 +227,8 @@ describe('Knockback.js with BackboneORM', () => {
 
     const models = [george, john, paul, ringo];
     const queue = new Queue(1);
-    _.each(models, (model) => {
-      (model => queue.defer(callback => model.save(callback)))(model);
-    });
-    _.each(models, (model) => {
-      (model => queue.defer(callback => model.fetchRelated(callback)))(model);
-    });
+    _.each(models, model => queue.defer(callback => model.save(callback)));
+    _.each(models, model => queue.defer(callback => model.fetchRelated(callback)));
     return queue.await((err) => {
       if (err) return done(err);
 
@@ -272,12 +266,12 @@ describe('Knockback.js with BackboneORM', () => {
       assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name');
       kb.release(george_view_model); george_view_model = null;
 
-      for (const name in model_stats) {
-        const stats = model_stats[name];
-        assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
-      }
+      _.each(model_stats, (stats) => {
+        const statsCountCheck = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
+        assert.ok(statsCountCheck, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+      });
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      done();
+      return done();
     });
   });
 
@@ -375,18 +369,14 @@ describe('Knockback.js with BackboneORM', () => {
     });
 
     const queue = new Queue(1);
-    _.each(bs.get('authors').models, (model) => {
-      (model => queue.defer(callback => model.save(callback)))(model);
-    });
-    _.each(bs.get('books').models, (model) => {
-      (model => queue.defer(callback => model.fetchRelated(callback)))(model);
-    });
+    _.each(bs.get('authors').models, model => queue.defer(callback => model.save(callback)));
+    _.each(bs.get('books').models, model => queue.defer(callback => model.fetchRelated(callback)));
     return queue.await((err) => {
       if (err) return done(err);
 
       const BookViewModel = kb.ViewModel.extend({
-        constructor(model) {
-          kb.ViewModel.prototype.constructor.apply(this, arguments);
+        constructor(...args) {
+          kb.ViewModel.prototype.constructor.apply(this, args);
           this.editMode = ko.observable();
 
           this.edit = () => {
@@ -423,7 +413,7 @@ describe('Knockback.js with BackboneORM', () => {
           assert.equal(authored_book.editMode(), true, 'edit mode set');
         });
       });
-      done();
+      return done();
     });
   });
 
@@ -436,12 +426,8 @@ describe('Knockback.js with BackboneORM', () => {
 
     const models = [person1, person2];
     const queue = new Queue(1);
-    _.each(models, (model) => {
-      (model => queue.defer(callback => model.save(callback)))(model);
-    });
-    _.each(models, (model) => {
-      (model => queue.defer(callback => model.fetchRelated(callback)))(model);
-    });
+    _.each(models, model => queue.defer(callback => model.save(callback)));
+    _.each(models, model => queue.defer(callback => model.fetchRelated(callback)));
     return queue.await((err) => {
       if (err) return done(err);
 
@@ -463,7 +449,7 @@ describe('Knockback.js with BackboneORM', () => {
       kb.release(view_model_house1);
 
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
-      done(err);
+      return done(err);
     });
   });
 
@@ -850,8 +836,8 @@ describe('Knockback.js with BackboneORM', () => {
       return this;
     };
     class BandMemberViewModel extends kb.ViewModel {
-      constructor(/* model, options */) {
-        super(...arguments);
+      constructor(...args /* model, options */) {
+        super(...args);
         this.type = ko.observable('band_member');
       }
     }
@@ -859,7 +845,7 @@ describe('Knockback.js with BackboneORM', () => {
     const collection_observable = kb.collectionObservable(new kb.Collection([john, paul, george, ringo]), {
       factories: {
         models: BandMemberViewModel,
-        'models.best_friend': { create(model, options) { return model ? new BestFriendViewModel(model) : null; } },
+        'models.best_friend': { create(model) { return model ? new BestFriendViewModel(model) : null; } },
         'models.friends.models': FriendViewModel,
       },
     });
@@ -876,7 +862,7 @@ describe('Knockback.js with BackboneORM', () => {
         assert.ok(found, `${name} was found`);
       });
     };
-    var validateFriend = (vm, name) => {
+    const validateFriend = (vm, name) => {
       assert.equal(vm.type(), 'friend', `friend type matches for ${name}`);
       return assert.equal(vm.name(), name, `friend name matches for ${name}`);
     };
@@ -948,12 +934,13 @@ describe('Knockback.js with BackboneORM', () => {
 
     class PersonCollection extends kb.CollectionObservable {
       constructor(collection, options) {
-        return super(collection, {
+        super(collection, {
           factories: {
             models: PersonViewModel,
           },
           options,
         });
+        return kb.utils.wrappedObservable(this);
       }
     }
 

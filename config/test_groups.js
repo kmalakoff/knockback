@@ -1,7 +1,5 @@
-const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
-const gutil = require('gulp-util');
 const glob = require('glob');
 
 const resolveModule = module_name => path.relative('.', require.resolve(module_name));
@@ -32,30 +30,41 @@ const TEST_GROUPS = {};
 // Full Library
 // ##############################
 TEST_GROUPS.browser_globals = [];
-for (const library_name in KNOCKBACK) {
-  const library_files = KNOCKBACK[library_name];
+_.each(KNOCKBACK, (library_files, library_name) => {
   if (~library_name.indexOf('browser_globals') && !~library_name.indexOf('stack')) {
-    for (const dep_name in REQUIRED_DEPENDENCIES) {
-      const dep_files = REQUIRED_DEPENDENCIES[dep_name];
+    _.each(REQUIRED_DEPENDENCIES, (dep_files, dep_name) => {
       if (~dep_name.indexOf('backbone')) { // Backbone
-        TEST_GROUPS.browser_globals.push({ name: `${dep_name}_${library_name}`, files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, resolveModule('backbone-modelref'), './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js', './test/spec/issues/**/*.tests.js']) });
+        TEST_GROUPS.browser_globals.push({
+          name: `${dep_name}_${library_name}`,
+          files: _.flattenDeep([
+            dep_files,
+            library_files,
+            LOCALIZATION_DEPENCIES,
+            resolveModule('backbone-modelref'),
+            './test/spec/core/**/*.tests.js',
+            './test/spec/plugins/**/*.tests.js',
+            './test/spec/issues/**/*.tests.js',
+          ]),
+        });
       } else { // Parse
-        TEST_GROUPS.browser_globals.push({ name: `${dep_name}_${library_name}`, files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js']) });
+        TEST_GROUPS.browser_globals.push({
+          name: `${dep_name}_${library_name}`,
+          files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js']),
+        });
       }
-    }
+    });
   }
-}
+});
 
 // ##############################
 // Core Library
 // ##############################
 TEST_GROUPS.core = [];
-for (var test_name in KNOCKBACK) {
-  const library_files = KNOCKBACK[test_name];
+_.each(KNOCKBACK, (library_files, test_name) => {
   if (~test_name.indexOf('core') && !~test_name.indexOf('stack')) {
     TEST_GROUPS.core.push({ name: `core_${test_name}`, files: _.flattenDeep([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.js']) });
   }
-}
+});
 
 // ##############################
 // ORM
@@ -67,19 +76,17 @@ const ORM_TESTS = {
 };
 
 TEST_GROUPS.orm = [];
-const object = _.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest');
-for (const dep_name in object) {
-  const dep_files = object[dep_name];
-  for (test_name in ORM_TESTS) {
-    const test_files = ORM_TESTS[test_name];
+_.each(_.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest'), (dep_files, dep_name) => {
+  _.each(ORM_TESTS, (test_files, test_name) => {
     TEST_GROUPS.orm.push({ name: `${dep_name}_${test_name}`, files: _.flattenDeep([dep_files, test_files]) });
-  }
-}
+  });
+});
 
 // ##############################
 // AMD
 // ##############################
 const AMD_OPTIONS = require('./amd/gulp-options');
+
 TEST_GROUPS.amd = [];
 TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach((test) => {
   if (!~test.name.indexOf('_min') && !~test.name.indexOf('legacy_') && !~test.name.indexOf('parse_')) {
@@ -113,11 +120,13 @@ WEBPACK_TESTS.forEach((file) => {
 // Browserify
 // ##############################
 TEST_GROUPS.browserify = [];
-const object1 = require('./browserify/tests');
-for (test_name in object1) {
-  const test_info = object1[test_name];
-  TEST_GROUPS.browserify.push({ name: `browserify_${test_name}`, files: _.flattenDeep([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]), build: { destination: test_info.output, options: test_info.options, files: test_info.files } });
-}
+_.each(require('./browserify/tests'), (test_info, test_name) => {
+  TEST_GROUPS.browserify.push({
+    name: `browserify_${test_name}`,
+    files: _.flattenDeep([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]),
+    build: { destination: test_info.output, options: test_info.options, files: test_info.files },
+  });
+});
 
 // TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)};
 // TEST_GROUPS = {amd: TEST_GROUPS.amd.slice(0, 1)};

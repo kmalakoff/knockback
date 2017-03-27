@@ -107,7 +107,8 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     kb.release(house_view_model);
 
     _.each(model_stats, (stats) => {
-      assert.ok(kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+      const statsCount = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
+      assert.ok(statsCount, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
     });
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
@@ -343,8 +344,8 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     });
 
     const BookViewModel = kb.ViewModel.extend({
-      constructor(model) {
-        kb.ViewModel.prototype.constructor.apply(this, arguments);
+      constructor(...args) {
+        kb.ViewModel.prototype.constructor.apply(this, args);
         this.editMode = ko.observable();
 
         this.edit = () => {
@@ -806,7 +807,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     const collection_observable = kb.collectionObservable(new kb.Collection([john, paul, george, ringo]), {
       factories: {
         models: BandMemberViewModel,
-        'models.best_friend': { create(model, options) { return model ? new BestFriendViewModel(model) : null; } },
+        'models.best_friend': { create: model => (model && new BestFriendViewModel(model)) || null },
         'models.friends.models': FriendViewModel,
       },
     });
@@ -1025,7 +1026,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
 
     const SubModel = Backbone.RelationalModel.extend({});
     const SubCollection = Backbone.Collection.extend({ model: SubModel });
-    const subCol = new SubCollection([{ id: 1, name: 'aaron' }, { id: 2, name: 'bruce' }]);
+    new SubCollection([{ id: 1, name: 'aaron' }, { id: 2, name: 'bruce' }]);
     const Model = Backbone.RelationalModel.extend({
       relations: [{
         type: Backbone.HasOne,
@@ -1069,7 +1070,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
         super(model, { requires: ['nested'], options });
         this.removeNested = () => model.get('nested').destroy();
         this.addNested = () => model.set({ nested: new Model2() });
-        this.hasNested = ko.computed(() => this.nested() ? !!this.nested().model() : false);
+        this.hasNested = ko.computed(() => this.nested() && !!this.nested().model());
       }
     }
 

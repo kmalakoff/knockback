@@ -4,7 +4,6 @@ let assert = root.assert; try { assert = assert || (r ? require('chai').assert :
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, ko } = kb;
-const { $ } = root;
 
 describe('knockback_core utils', () => {
   it('TEST DEPENDENCY MISSING', () => {

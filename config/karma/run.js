@@ -1,5 +1,4 @@
 const fs = require('fs-extra');
-const path = require('path');
 const _ = require('lodash');
 const { Server } = require('karma');
 const generate = require('./generate');
@@ -17,18 +16,20 @@ module.exports = async () => {
     await generate();
 
     for (const name in TEST_GROUPS) {
-      for (const test of TEST_GROUPS[name]) {
-        console.log(`RUNNING TESTS: ${name} ${test.name}`);
-        console.log(`${JSON.stringify(test.files)}`);
-        const karma_config = (name === 'amd') ? KARMA_CONFIG_AMD : KARMA_CONFIG_BASE;
-        await new Promise((resolve, reject) => {
-          new Server(
-            _.defaults({ files: test.files }, karma_config),
-            (result) => {
-              console.log(`DONE TESTS: ${name} ${test.name}. Return value: ${result}`);
-              result ? reject(new Error(`Tests failed: ${result}`)) : resolve();
-            }).start();
-        });
+      if (!Object.prototype.hasOwnProperty.call(TEST_GROUPS, name)) {
+        for (const test of TEST_GROUPS[name]) {
+          console.log(`RUNNING TESTS: ${name} ${test.name}`);
+          console.log(`${JSON.stringify(test.files)}`);
+          const karma_config = (name === 'amd') ? KARMA_CONFIG_AMD : KARMA_CONFIG_BASE;
+          await new Promise((resolve, reject) => {
+            new Server(
+              _.defaults({ files: test.files }, karma_config),
+              (result) => {
+                console.log(`DONE TESTS: ${name} ${test.name}. Return value: ${result}`);
+                result ? reject(new Error(`Tests failed: ${result}`)) : resolve();
+              }).start();
+          });
+        }
       }
     }
 

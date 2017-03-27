@@ -163,7 +163,7 @@ describe('knockback.js memory management', () => {
       }
 
       __destroy() {
-        kb.release(this.prop); return this.prop = null;
+        kb.release(this.prop); this.prop = null;
       }
     }
 

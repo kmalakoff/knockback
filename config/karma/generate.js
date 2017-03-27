@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
-const glob = require('glob');
+const requireGlob = require('require-glob');
 const webpack = require('webpack');
 
 const gulp = require('gulp');
@@ -21,11 +21,11 @@ module.exports = async () => {
       .on('error', reject).on('end', resolve),
   );
 
-  const configPaths = glob.sync('**/*.webpack.config.js', { cwd: path.join(__dirname, '..', 'builds', 'test'), absolute: true });
-  for (const configPath of configPaths) {
+  const configs = await requireGlob('**/*.webpack.config.js', { cwd: path.join(__dirname, '..', 'builds', 'test'), absolute: true });
+  for (const config of configs) {
     await new Promise((resolve, reject) => {
-      const config = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '..', '_temp/webpack')) } }, require(configPath));
-      webpack(config, (err, stats) => {
+      const configWithPath = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '..', '_temp/webpack')) } }, config);
+      webpack(configWithPath, (err, stats) => {
         console.log('HERE3');
         if (err) return reject(err);
 
@@ -44,7 +44,8 @@ module.exports = async () => {
         .pipe(concat(path.basename(test.build.destination)))
         .pipe(browserify(test.build.options))
         .pipe(gulp.dest(path.dirname(test.build.destination)))
-        .on('error', reject).on('end', resolve),
+        .on('error', reject)
+        .on('end', resolve),
     );
   }
 
@@ -55,7 +56,8 @@ module.exports = async () => {
         .pipe(babel({ presets: ['es2015'] }))
         .pipe(wrapAMD(test.build.options))
         .pipe(gulp.dest(test.build.destination))
-        .on('error', reject).on('end', resolve),
+        .on('error', reject)
+        .on('end', resolve),
     );
   }
 

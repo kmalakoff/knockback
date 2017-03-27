@@ -1,5 +1,3 @@
-const path = require('path');
-
 module.exports = {
   full: {
     output: './_temp/browserify/knockback.tests.js',

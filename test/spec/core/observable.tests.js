@@ -15,7 +15,6 @@ describe('observable', () => {
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-  const Contacts = kb.Collection.extend({ model: Contact });
 
   it('1. Standard use case: direct attributes with read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -98,8 +97,8 @@ describe('observable', () => {
     };
 
     const model = new Contact({ name: 'Ringo', number: '555-555-5556' });
-    const view_model = new ContactViewModelCustom(model);
-    assert.ok(_.isEqual(args, ['name', 1, 'number']) || _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']), `got the args: ${args.join(', ')}`); // TODO: reduce number of calls on old Backbone?
+    new ContactViewModelCustom(model);
+    assert.ok(_.isEqual(args, ['name', 1, 'number']) || _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']), `got the args: ${args.join(', ')}`);
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
@@ -139,7 +138,8 @@ describe('observable', () => {
 
     class ChildrenCollection extends kb.CollectionObservable {
       constructor(collection, options) {
-        return super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
+        super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
+        return kb.utils.wrappedObservable(this);
       }
     }
 
@@ -214,15 +214,20 @@ describe('observable', () => {
 
     class ChildrenCollection extends kb.CollectionObservable {
       constructor(collection, options) {
-        return super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
+        super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
+        return kb.utils.wrappedObservable(this);
       }
     }
 
     const InferringViewModel = function (model, options) {
       this._auto = kb.viewModel(model, { keys: ['name', 'parent', 'children'], options }, this);
       this.maybe_null_name = kb.observable(model, 'maybe_null_name');
-      this.maybe_null_parent = kb.observable(model, 'maybe_null_parent', { factories: InferringViewModel, options: this._auto.shareOptions() }); // use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
-      this.maybe_null_children = kb.observable(model, 'maybe_null_children', { factories: ChildrenCollection, options: this._auto.shareOptions() }); // use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+
+      // use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+      this.maybe_null_parent = kb.observable(model, 'maybe_null_parent', { factories: InferringViewModel, options: this._auto.shareOptions() });
+
+      // use shareOptions to share view models (avoid infinite loops trying to resolve relationships)
+      this.maybe_null_children = kb.observable(model, 'maybe_null_children', { factories: ChildrenCollection, options: this._auto.shareOptions() });
     };
 
     const parent = new kb.Model({ id: _.uniqueId(), name: 'Daddy' });
@@ -328,9 +333,9 @@ describe('observable', () => {
 
     const model = new kb.Model({ number: 33 });
 
-    const ViewModel = function (model) {
-      this.number = kb.observable(model, 'number');
-      this.formatted_number = kb.observable(model, {
+    const ViewModel = function (m) {
+      this.number = kb.observable(m, 'number');
+      this.formatted_number = kb.observable(m, {
         key: 'number',
         read() { return `#: ${this.number()}`; },
         write(value) { return this.number(value.substring(3)); },

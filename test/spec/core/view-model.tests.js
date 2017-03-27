@@ -16,14 +16,13 @@ describe('view-model', () => {
   });
 
   const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-  const Contacts = kb.Collection.extend({ model: Contact });
 
   class TestViewModel extends kb.ViewModel {
-    constructor() {
-      super(...arguments);
+    constructor(...args) {
+      super(...args);
       this.test = ko.observable('hello');
-      let value = this.test();
-      value = this.name();
+      this.test();
+      this.name();
     }
   }
 
@@ -152,9 +151,9 @@ describe('view-model', () => {
     kb.release(view_model);
 
     class ContactViewModelFullName2 extends kb.ViewModel {
-      constructor(model) {
+      constructor(m) {
         super(model, { requires: 'first' });
-        this.last = kb.observable(model, 'last');
+        this.last = kb.observable(m, 'last');
         this.full_name = ko.computed(() => `Last: ${this.last()}, First: ${this.first()}`);
       }
     }
@@ -196,7 +195,7 @@ describe('view-model', () => {
         if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
         if (this.ref_count) return;
         this.is_destroyed = true;
-        return this.super_destroy();
+        this.super_destroy();
       }
     }
 
@@ -408,9 +407,11 @@ describe('view-model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new kb.Model({ reused: null });
-    var view_model = kb.viewModel(model, { factories: {
+    const view_model = kb.viewModel(model, { factories: {
       reused: { create(obj, options) {
-        if (kb.isCollection(obj) || ((obj === null) && (kb.utils.valueType(view_model != null ? view_model.reused : undefined) === kb.TYPE_COLLECTION))) { return kb.collectionObservable(obj, options); }
+        if (kb.isCollection(obj) || (!obj && (kb.utils.valueType(view_model ? view_model.reused : undefined) === kb.TYPE_COLLECTION))) {
+          return kb.collectionObservable(obj, options);
+        }
         return kb.viewModel(obj, options);
       },
       },
@@ -901,21 +902,36 @@ describe('view-model', () => {
       return observable_count++;
     });
 
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(count_set_existing, 1, 'count_set_existing'); assert.equal(count_set_new, 1, 'count_set_new'); assert.equal(count_set_model, 1, 'count_set_model'); assert.equal(count_set_collection, 1, 'count_set_collection'); assert.equal(observable_count, 1, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(count_set_existing, 1, 'count_set_existing');
+    assert.equal(count_set_new, 1, 'count_set_new');
+    assert.equal(count_set_model, 1, 'count_set_model');
+    assert.equal(count_set_collection, 1, 'count_set_collection');
+    assert.equal(observable_count, 1, 'observable_count');
 
     view_model.model(new kb.Model({ id: 10, name: 'Manual' }));
     model.set({ name: 'Existing' });
     model.set({ new_attribute: 'New' });
     model.set({ model: new kb.Model({ name: 'NestedModel' }) });
     model.set({ collection: new kb.Collection([{ name: 'NestedModel' }]) });
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(count_set_existing, 1, 'count_set_existing'); assert.equal(count_set_new, 1, 'count_set_new'); assert.equal(count_set_model, 1, 'count_set_model'); assert.equal(count_set_collection, 1, 'count_set_collection'); assert.equal(observable_count, 2, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(count_set_existing, 1, 'count_set_existing');
+    assert.equal(count_set_new, 1, 'count_set_new');
+    assert.equal(count_set_model, 1, 'count_set_model');
+    assert.equal(count_set_collection, 1, 'count_set_collection');
+    assert.equal(observable_count, 2, 'observable_count');
 
     model = view_model.model();
     model.set({ name: 'Bob2' });
     assert.equal(view_model.name(), 'Bob2');
     view_model.test('world');
     assert.equal(view_model.test(), 'world');
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(count_set_existing, 1, 'count_set_existing'); assert.equal(count_set_new, 1, 'count_set_new'); assert.equal(count_set_model, 1, 'count_set_model'); assert.equal(count_set_collection, 1, 'count_set_collection'); assert.equal(observable_count, 2, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(count_set_existing, 1, 'count_set_existing');
+    assert.equal(count_set_new, 1, 'count_set_new');
+    assert.equal(count_set_model, 1, 'count_set_model');
+    assert.equal(count_set_collection, 1, 'count_set_collection');
+    assert.equal(observable_count, 2, 'observable_count');
 
     kb.release(view_model);
 
