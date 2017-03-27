@@ -30,6 +30,7 @@ module.exports = {
     'new-cap': 'off',
     'no-undef': 'off',
     'no-await-in-loop': 'off',
+    'import/no-dynamic-require': 'off',
 
     'camelcase': 'off',
   }

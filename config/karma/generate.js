@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const _ = require('lodash');
-const requireGlob = require('require-glob');
+const glob = require('glob');
 const webpack = require('webpack');
 
 const gulp = require('gulp');
@@ -21,11 +21,11 @@ module.exports = async () => {
       .on('error', reject).on('end', resolve),
   );
 
-  const configs = await requireGlob('**/*.webpack.config.js', { cwd: path.join(__dirname, '..', 'builds', 'test'), absolute: true });
-  for (const config of configs) {
+  const configPaths = glob.sync('**/*.webpack.config.js', { cwd: path.join(__dirname, '..', 'builds', 'test'), absolute: true });
+  for (const configPath of configPaths) {
     await new Promise((resolve, reject) => {
-      const configWithPath = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '..', '_temp/webpack')) } }, config);
-      webpack(configWithPath, (err, stats) => {
+      const config = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '..', '_temp/webpack')) } }, require(configPath));
+      webpack(config, (err, stats) => {
         console.log('HERE3');
         if (err) return reject(err);
 

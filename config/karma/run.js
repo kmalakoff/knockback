@@ -16,7 +16,7 @@ module.exports = async () => {
     await generate();
 
     for (const name in TEST_GROUPS) {
-      if (!Object.prototype.hasOwnProperty.call(TEST_GROUPS, name)) {
+      if (Object.prototype.hasOwnProperty.call(TEST_GROUPS, name)) {
         for (const test of TEST_GROUPS[name]) {
           console.log(`RUNNING TESTS: ${name} ${test.name}`);
           console.log(`${JSON.stringify(test.files)}`);
