@@ -53,7 +53,7 @@ export default class TypedValue {
         if ((this.value_type === kb.TYPE_COLLECTION) && (new_type === kb.TYPE_ARRAY)) return value(new_value);
         if ((new_type === kb.TYPE_COLLECTION) || _.isNull(new_value)) {
           // use the provided CollectionObservable
-          if (new_value && new_value instanceof kb.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
+          if (new_value && new_value instanceof Backbone.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);
           else if (kb.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
           return undefined;
         }
@@ -83,7 +83,7 @@ export default class TypedValue {
     // retain previous type
     if ((new_value === null) && !creator) {
       if (this.value_type === kb.TYPE_MODEL) creator = kb.ViewModel;
-      else if (this.value_type === kb.TYPE_COLLECTION) creator = kb.CollectionObservable;
+      else if (this.value_type === kb.TYPE_COLLECTION) creator = Backbone.CollectionObservable;
     }
     create_options.creator = creator;
 

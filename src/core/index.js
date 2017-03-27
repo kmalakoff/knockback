@@ -11,31 +11,39 @@ import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
+import './monkey-patches';
 import kb from './kb';
-import CollectionObservable from './collection-observable';
-import Observable from './observable';
-import ViewModel from './view-model';
-import configure from './configure';
-import utils from './utils';
-import Statistics from './statistics';
+import CollectionObservable, { collectionObservable, compare } from './collection-observable';
+import configure, { settings } from './configure';
 import EventWatcher from './event-watcher';
-import Store from './store';
 import Factory from './factory';
-import './inject';
+import { RECUSIVE_AUTO_INJECT, injectViewModels } from './inject';
+import Observable, { observable } from './observable';
+import Statistics from './statistics';
+import Store from './store';
+import utils from './utils';
+import ViewModel, { viewModel } from './view-model';
 
 const api = {
   _,
   Backbone,
   ko,
   CollectionObservable,
-  Observable,
-  ViewModel,
+  collectionObservable,
+  compare,
   configure,
-  utils,
-  Statistics,
+  settings,
   EventWatcher,
-  Store,
   Factory,
+  RECUSIVE_AUTO_INJECT,
+  injectViewModels,
+  Observable,
+  observable,
+  Statistics,
+  Store,
+  utils,
+  ViewModel,
+  viewModel,
 };
 kb.assign(kb, api);
 

@@ -113,6 +113,8 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+__webpack_require__(20);
+
 var _kb = __webpack_require__(4);
 
 var _kb2 = _interopRequireDefault(_kb);
@@ -121,65 +123,71 @@ var _collectionObservable = __webpack_require__(12);
 
 var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
 
-var _observable = __webpack_require__(20);
-
-var _observable2 = _interopRequireDefault(_observable);
-
-var _viewModel = __webpack_require__(27);
-
-var _viewModel2 = _interopRequireDefault(_viewModel);
-
 var _configure = __webpack_require__(13);
 
 var _configure2 = _interopRequireDefault(_configure);
-
-var _utils = __webpack_require__(26);
-
-var _utils2 = _interopRequireDefault(_utils);
-
-var _statistics = __webpack_require__(23);
-
-var _statistics2 = _interopRequireDefault(_statistics);
 
 var _eventWatcher = __webpack_require__(5);
 
 var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
 
-var _store = __webpack_require__(24);
-
-var _store2 = _interopRequireDefault(_store);
-
 var _factory = __webpack_require__(14);
 
 var _factory2 = _interopRequireDefault(_factory);
 
-__webpack_require__(18);
+var _inject = __webpack_require__(18);
+
+var _observable = __webpack_require__(21);
+
+var _observable2 = _interopRequireDefault(_observable);
+
+var _statistics = __webpack_require__(24);
+
+var _statistics2 = _interopRequireDefault(_statistics);
+
+var _store = __webpack_require__(25);
+
+var _store2 = _interopRequireDefault(_store);
+
+var _utils = __webpack_require__(26);
+
+var _utils2 = _interopRequireDefault(_utils);
+
+var _viewModel = __webpack_require__(27);
+
+var _viewModel2 = _interopRequireDefault(_viewModel);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
 
 var api = {
   _: _underscore2.default,
   Backbone: _backbone2.default,
   ko: _knockout2.default,
   CollectionObservable: _collectionObservable2.default,
-  Observable: _observable2.default,
-  ViewModel: _viewModel2.default,
+  collectionObservable: _collectionObservable.collectionObservable,
+  compare: _collectionObservable.compare,
   configure: _configure2.default,
-  utils: _utils2.default,
-  Statistics: _statistics2.default,
+  settings: _configure.settings,
   EventWatcher: _eventWatcher2.default,
+  Factory: _factory2.default,
+  RECUSIVE_AUTO_INJECT: _inject.RECUSIVE_AUTO_INJECT,
+  injectViewModels: _inject.injectViewModels,
+  Observable: _observable2.default,
+  observable: _observable.observable,
+  Statistics: _statistics2.default,
   Store: _store2.default,
-  Factory: _factory2.default
-};
+  utils: _utils2.default,
+  ViewModel: _viewModel2.default,
+  viewModel: _viewModel.viewModel
+}; /*
+     knockback.js 1.2.2
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
+
 _kb2.default.assign(_kb2.default, api);
 
 module.exports = _kb2.default;
@@ -216,8 +224,6 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-__webpack_require__(19);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -237,7 +243,7 @@ var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 // 2) deep_retain - true to multiply retain view models in the store
 //
 // @method .collectionObservable(collection, options)
-//   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
+//   Factory to create a new Backbone.CollectionObservable. See {Backbone.CollectionObservable#constructor} for information on options
 //   @param [Collection] collection the collection to observe (can be null)
 //   @param [Object] options the create options
 //   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
@@ -299,7 +305,7 @@ var kb = function () {
       kb.TYPE_ARRAY = 2;
       // Stored value type is a Model -> observable type: ViewModel
       kb.TYPE_MODEL = 3;
-      // Stored value type is a Collection -> observable type: kb.CollectionObservable
+      // Stored value type is a Collection -> observable type: Backbone.CollectionObservable
       kb.TYPE_COLLECTION = 4;
 
       // cache local reference to underscore
@@ -575,7 +581,7 @@ var kb = function () {
   }, {
     key: 'isModel',
     value: function isModel(obj) {
-      return obj && (obj instanceof kb.Model || typeof obj.get === 'function' && typeof obj.bind === 'function');
+      return obj && (obj instanceof _backbone2.default.Model || typeof obj.get === 'function' && typeof obj.bind === 'function');
     }
 
     // @nodoc
@@ -583,7 +589,7 @@ var kb = function () {
   }, {
     key: 'isCollection',
     value: function isCollection(obj) {
-      return obj && obj instanceof kb.Collection;
+      return obj && obj instanceof _backbone2.default.Collection;
     }
   }]);
 
@@ -907,14 +913,19 @@ var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_core2.default.DefaultObservable = _defaultObservable2.default; /*
-                                                                  knockback.js 1.2.2
-                                                                  Copyright (c)  2011-2016 Kevin Malakoff.
-                                                                  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                                                                  Source: https://github.com/kmalakoff/knockback
-                                                                  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                                                                  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                                                                */
+var api = {
+  DefaultObservable: _defaultObservable2.default,
+  defaultObservable: _defaultObservable.defaultObservable
+}; /*
+     knockback.js 1.2.2
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
+
+_core2.default.assign(_core2.default, api);
 
 exports.default = _core2.default;
 
@@ -948,7 +959,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-_core2.default.FormattedObservable = _formattedObservable2.default;
+var api = {
+  FormattedObservable: _formattedObservable2.default,
+  formattedObservable: _formattedObservable.formattedObservable
+};
+_core2.default.assign(_core2.default, api);
+
 exports.default = _core2.default;
 
 /***/ }),
@@ -972,6 +988,8 @@ var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// Locale Manager - if you are using localization, set this property.
+// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -980,6 +998,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
+
+var api = {
+  locale_manager: undefined,
+  LocalizedObservable: _localizedObservable2.default,
+  localizedObservable: _localizedObservable.localizedObservable
+};
+_core2.default.assign(_core2.default, api);
 
 _core2.default.LocalizedObservable = _localizedObservable2.default;
 exports.default = _core2.default;
@@ -1014,7 +1039,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-_core2.default.TriggeredObservable = _triggeredObservable2.default;
+var api = {
+  TriggeredObservable: _triggeredObservable2.default,
+  triggeredObservable: _triggeredObservable.triggeredObservable
+};
+_core2.default.assign(_core2.default, api);
+
 exports.default = _core2.default;
 
 /***/ }),
@@ -1032,28 +1062,32 @@ var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _validators = __webpack_require__(34);
-
-var validators = _interopRequireWildcard(_validators);
-
 var _validation = __webpack_require__(33);
 
-var validation = _interopRequireWildcard(_validation);
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+var _validators = __webpack_require__(34);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-_core2.default.assign(_core2.default, validators); /*
-                                                     knockback.js 1.2.2
-                                                     Copyright (c)  2011-2016 Kevin Malakoff.
-                                                     License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                                                     Source: https://github.com/kmalakoff/knockback
-                                                     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                                                     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                                                   */
+var api = {
+  valueValidator: _validation.valueValidator,
+  inputValidator: _validation.inputValidator,
+  formValidator: _validation.formValidator,
+  hasChangedFn: _validators.hasChangedFn,
+  minLengthFn: _validators.minLengthFn,
+  uniqueValueFn: _validators.uniqueValueFn,
+  untilTrueFn: _validators.untilTrueFn,
+  untilFalseFn: _validators.untilFalseFn
+}; /*
+     knockback.js 1.2.2
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
 
-_core2.default.assign(_core2.default, validation);
+_core2.default.assign(_core2.default, api);
+
 exports.default = _core2.default;
 
 /***/ }),
@@ -1077,10 +1111,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-var _kb = __webpack_require__(4);
-
-var _kb2 = _interopRequireDefault(_kb);
-
 var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
@@ -1088,6 +1118,14 @@ var _underscore2 = _interopRequireDefault(_underscore);
 var _backbone = __webpack_require__(2);
 
 var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1121,7 +1159,7 @@ var compare = exports.compare = function compare(value_a, value_b) {
 //   };
 //
 // @example How to access and change the observed collection.
-//    var todos = new kb.CollectionObservable(new kb.Collection([{name: 'name1'}, {name: 'name2'}]);
+//    var todos = new Backbone.CollectionObservable(new Backbone.Collection([{name: 'name1'}, {name: 'name2'}]);
 //    var current_collection = todos.collection(); // get
 //    todos.collection(new Backbone.Collection([{name: 'name3'}, {name: 'name4'}])); // set
 //
@@ -1131,10 +1169,10 @@ var compare = exports.compare = function compare(value_a, value_b) {
 //   @param [Object] class_properties the properties to add to the class
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observableArray
 //   @example
-//     var MyCollectionObservable = kb.CollectionObservable.extend({
+//     var MyCollectionObservable = Backbone.CollectionObservable.extend({
 //        constructor: function(collection, options) {
 //          // the constructor does not return 'this' but a ko.observableArray
-//          return kb.CollectionObservable.prototype.constructor.call(this, collection, {
+//          return Backbone.CollectionObservable.prototype.constructor.call(this, collection, {
 //            view_model: MyViewModel,
 //            options: options
 //        });
@@ -1154,7 +1192,7 @@ var CollectionObservable = function () {
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
-    // Used to create a new kb.CollectionObservable.
+    // Used to create a new Backbone.CollectionObservable.
     //
     // When the observable is updated, the following Backbone.Events are triggered:
     //
@@ -1310,7 +1348,7 @@ var CollectionObservable = function () {
 
     return _kb2.default.ignore(function () {
       var collection = null;
-      if (args[0] instanceof _kb2.default.Collection) collection = args.shift();else collection = _underscore2.default.isArray(args[0]) ? new _kb2.default.Collection(args.shift()) : new _kb2.default.Collection();
+      if (args[0] instanceof _backbone2.default.Collection) collection = args.shift();else collection = _underscore2.default.isArray(args[0]) ? new _backbone2.default.Collection(args.shift()) : new _backbone2.default.Collection();
       if (_underscore2.default.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       var options = {};
@@ -1318,8 +1356,8 @@ var CollectionObservable = function () {
         _kb2.default.assign(options, arg);options = _kb2.default.utils.collapseOptions(options);
       });
 
-      var observable = _kb2.default.utils.wrappedObservable(_this, ko.observableArray([]));
-      observable.__kb_is_co = true; // mark as a kb.CollectionObservable
+      var observable = _kb2.default.utils.wrappedObservable(_this, _knockout2.default.observableArray([]));
+      observable.__kb_is_co = true; // mark as a Backbone.CollectionObservable
       _this.in_edit = 0;
 
       // bind callbacks
@@ -1331,9 +1369,9 @@ var CollectionObservable = function () {
         _this.auto_compact = true;
       }
 
-      if (options.sort_attribute) _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));else _this._comparator = ko.observable(options.comparator);
+      if (options.sort_attribute) _this._comparator = _knockout2.default.observable(_this._attributeComparator(options.sort_attribute));else _this._comparator = _knockout2.default.observable(options.comparator);
 
-      if (options.filters) _this._filters = ko.observableArray(_underscore2.default.isArray(options.filters) ? options.filters : [options.filters]);else _this._filters = ko.observableArray([]);
+      if (options.filters) _this._filters = _knockout2.default.observableArray(_underscore2.default.isArray(options.filters) ? options.filters : [options.filters]);else _this._filters = _knockout2.default.observableArray([]);
 
       // create options
       _this.create_options = { store: _kb2.default.Store.useOptionsOrCreate(options, collection, observable) };
@@ -1355,8 +1393,8 @@ var CollectionObservable = function () {
       _kb2.default.publishMethods(observable, _this, KEYS_PUBLISH);
 
       // start the processing
-      _this._collection = ko.observable(collection);
-      _this.collection = ko.computed({
+      _this._collection = _knockout2.default.observable(collection);
+      _this.collection = _knockout2.default.computed({
         read: function read() {
           return _this._collection();
         },
@@ -1383,11 +1421,11 @@ var CollectionObservable = function () {
       if (collection) collection.bind('all', _this._onCollectionChange); // bind now
 
       // observable that will re-trigger when sort or filters or collection changes
-      _this._mapper = ko.computed(function () {
+      _this._mapper = _knockout2.default.computed(function () {
         var comparator = _this._comparator(); // create dependency
         var filters = _this._filters(); // create dependency
         if (filters) _underscore2.default.each(filters, function (filter) {
-          return ko.utils.unwrapObservable(filter);
+          return _knockout2.default.utils.unwrapObservable(filter);
         }); // create a dependency
         var current_collection = _this._collection(); // create dependency
         if (_this.in_edit) return; // we are doing the editing
@@ -1493,7 +1531,7 @@ var CollectionObservable = function () {
       return this._filters([]);
     }
 
-    // Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
+    // Setter for the sorted index function for auto-sorting the ViewModels or Models in a Backbone.CollectionObservable.
     //
     // @param [Function] comparator a function that returns an index where to insert the model. Signature: function(models, model)
     // @param [Function] comparator a function that is used to sort an object. Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
@@ -1512,12 +1550,12 @@ var CollectionObservable = function () {
       return this._comparator(_comparator);
     }
 
-    // Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
+    // Setter for the sort attribute name for auto-sorting the ViewModels or Models in a Backbone.CollectionObservable.
     //
     // @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
     //
     // @example
-    //    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
+    //    var todos = new Backbone.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
     //    // in order of Zanadu then Alex
     //    todos.sortAttribute('name');
     //    // in order of Alex then Zanadu
@@ -1543,9 +1581,9 @@ var CollectionObservable = function () {
     // Will return true unless created with models_only option.
     //
     // @example
-    //   var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
+    //   var todos1 = new Backbone.CollectionObservable(new Backbone.Collection(), {models_only: true});
     //   todos1.hasViewModels();     // false
-    //   var todos2 = new kb.CollectionObservable(new Backbone.Collection());
+    //   var todos2 = new Backbone.CollectionObservable(new Backbone.Collection());
     //   todos2.hasViewModels();     // true
 
   }, {
@@ -1646,7 +1684,7 @@ var CollectionObservable = function () {
     // @nodoc
     value: function _attributeComparator(sort_attribute) {
       var modelAttributeCompare = function modelAttributeCompare(model_a, model_b) {
-        var attribute_name = ko.utils.unwrapObservable(sort_attribute);
+        var attribute_name = _knockout2.default.utils.unwrapObservable(sort_attribute);
         return compare(model_a.get(attribute_name), model_b.get(attribute_name));
       };
       return this.models_only ? modelAttributeCompare : function (model_a, model_b) {
@@ -1714,11 +1752,11 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backboneAssociations = __webpack_require__(21);
+var _backboneAssociations = __webpack_require__(22);
 
 var _backboneAssociations2 = _interopRequireDefault(_backboneAssociations);
 
-var _backboneRelational = __webpack_require__(22);
+var _backboneRelational = __webpack_require__(23);
 
 var _backboneRelational2 = _interopRequireDefault(_backboneRelational);
 
@@ -1903,13 +1941,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _kb = __webpack_require__(4);
-
-var _kb2 = _interopRequireDefault(_kb);
-
 var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2302,11 +2340,9 @@ _knockout2.default.applyBindings = function () {
 if (root && typeof root.document !== 'undefined') {
   // use simple ready check
   var onReady = function onReady() {
-    if (root.document.readyState !== 'complete') {
-      setTimeout(onReady, 0); // keep waiting for the document to load
-      return;
-    }
-    injectViewModels(); // the document is loaded
+    // keep waiting for the document to load
+    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0);
+    return injectViewModels(); // the document is loaded
   };
   onReady();
 }
@@ -2314,6 +2350,183 @@ if (root && typeof root.document !== 'undefined') {
 
 /***/ }),
 /* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// @nodoc
+var TypedValue = function () {
+  function TypedValue(create_options) {
+    _classCallCheck(this, TypedValue);
+
+    this.create_options = create_options;
+    this._vo = _knockout2.default.observable(null); // create a value observable for the first dependency
+  }
+
+  _createClass(TypedValue, [{
+    key: 'destroy',
+    value: function destroy() {
+      this.__kb_released = true;
+      var previous_value = this.__kb_value;
+      if (previous_value) {
+        this.__kb_value = null;
+        if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
+          this.create_options.store.release(previous_value);
+        } else kb.release(previous_value);
+      }
+      this.create_options = null;
+    }
+  }, {
+    key: 'value',
+    value: function value() {
+      return _knockout2.default.utils.unwrapObservable(this._vo());
+    }
+  }, {
+    key: 'rawValue',
+    value: function rawValue() {
+      return this.__kb_value;
+    }
+  }, {
+    key: 'valueType',
+    value: function valueType(model, key) {
+      var new_value = kb.getValue(model, key);
+      this.value_type || this._updateValueObservable(new_value); // create so we can check the type
+      return this.value_type;
+    }
+  }, {
+    key: 'update',
+    value: function update(new_value) {
+      if (this.__kb_released) return undefined; // destroyed, nothing to do
+
+      // determine the new type
+      new_value !== undefined || (new_value = null); // ensure null instead of undefined
+      var new_type = kb.utils.valueType(new_value);
+
+      if (this.__kb_value && this.__kb_value.__kb_released) {
+        this.__kb_value = undefined;this.value_type = undefined;
+      }
+      var value = this.__kb_value;
+
+      switch (this.value_type) {
+        case kb.TYPE_COLLECTION:
+          if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) return value(new_value);
+          if (new_type === kb.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
+            // use the provided CollectionObservable
+            if (new_value && new_value instanceof Backbone.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
+            return undefined;
+          }
+          break;
+
+        case kb.TYPE_MODEL:
+          if (new_type === kb.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
+            // use the provided ViewModel
+            if (new_value && !kb.isModel(new_value)) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
+            return undefined;
+          }
+          break;
+        default:
+          break;
+      }
+
+      if (this.value_type === new_type && !_underscore2.default.isUndefined(this.value_type)) {
+        if (kb.peek(value) !== new_value) return value(new_value);
+      } else if (kb.peek(value) !== new_value) return this._updateValueObservable(new_value);
+      return undefined;
+    }
+  }, {
+    key: '_updateValueObservable',
+    value: function _updateValueObservable(new_value, new_observable) {
+      var create_options = this.create_options;
+
+      var creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
+
+      // retain previous type
+      if (new_value === null && !creator) {
+        if (this.value_type === kb.TYPE_MODEL) creator = kb.ViewModel;else if (this.value_type === kb.TYPE_COLLECTION) creator = Backbone.CollectionObservable;
+      }
+      create_options.creator = creator;
+
+      var value_type = kb.TYPE_UNKNOWN;
+      var previous_value = this.__kb_value;
+      this.__kb_value = undefined;
+
+      var value = void 0;
+      if (new_observable) {
+        value = new_observable;
+        if (create_options.store) create_options.store.retain(new_observable, new_value, creator);
+
+        // found a creator
+      } else if (creator) {
+        // have the store, use it to create
+        if (create_options.store) value = create_options.store.retainOrCreate(new_value, create_options, true);
+
+        // create manually
+        else if (creator.models_only) {
+            value = new_value;value_type = kb.TYPE_SIMPLE;
+          } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
+
+        // create and cache the type
+      } else if (_underscore2.default.isArray(new_value)) {
+        value_type = kb.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
+      } else {
+        value_type = kb.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
+      }
+
+      // determine the type
+      this.value_type = value_type;
+      if (value_type === kb.TYPE_UNKNOWN) {
+        // a view model, recognize view_models as non-observable
+        if (!_knockout2.default.isObservable(value)) {
+          this.value_type = kb.TYPE_MODEL;kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
+        } else if (value.__kb_is_co) {
+          this.value_type = kb.TYPE_COLLECTION;kb.utils.wrappedObject(value, new_value);
+        } else if (!this.value_type) this.value_type = kb.TYPE_SIMPLE;
+      }
+
+      // release previous
+      if (previous_value) {
+        this.create_options.store ? this.create_options.store.release(previous_value) : kb.release(previous_value);
+      }
+
+      // store the value
+      this.__kb_value = value;
+      return this._vo(value);
+    }
+  }]);
+
+  return TypedValue;
+}();
+
+exports.default = TypedValue;
+
+/***/ }),
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2362,7 +2575,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
   */
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2390,7 +2603,7 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _typedValue = __webpack_require__(25);
+var _typedValue = __webpack_require__(19);
 
 var _typedValue2 = _interopRequireDefault(_typedValue);
 
@@ -2580,7 +2793,8 @@ var Observable = function () {
       return kb.utils.wrappedDestroy(this);
     }
 
-    // @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Collection, it will hold a CollectionObservable.
+    // @return [Backbone.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable.
+    // For example, if your attribute is a Collection, it will hold a CollectionObservable.
 
   }, {
     key: 'value',
@@ -2623,7 +2837,7 @@ var observable = exports.observable = function observable() {
 };
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2642,10 +2856,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-var _kb = __webpack_require__(4);
-
-var _kb2 = _interopRequireDefault(_kb);
-
 var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
@@ -2653,6 +2863,10 @@ var _underscore2 = _interopRequireDefault(_underscore);
 var _backbone = __webpack_require__(2);
 
 var _backbone2 = _interopRequireDefault(_backbone);
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2698,7 +2912,7 @@ var BackboneAssociations = function () {
 exports.default = BackboneAssociations;
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2717,10 +2931,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-var _kb = __webpack_require__(4);
-
-var _kb2 = _interopRequireDefault(_kb);
-
 var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
@@ -2728,6 +2938,10 @@ var _underscore2 = _interopRequireDefault(_underscore);
 var _backbone = __webpack_require__(2);
 
 var _backbone2 = _interopRequireDefault(_backbone);
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2788,7 +3002,7 @@ var BackboneRelational = function () {
 exports.default = BackboneRelational;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2973,7 +3187,7 @@ var Statistics = function () {
 exports.default = Statistics;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3000,12 +3214,16 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models,
-// to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
+// to reduce memory usage, and to share view models between Backbone.CollectionObservables (for example, when using Knockout.js selectedOptions).
 //
 // @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
 //   var co = kb.collectionObservable(new Backbone.Collection());
@@ -3032,9 +3250,9 @@ var Store = function () {
     key: 'useOptionsOrCreate',
     value: function useOptionsOrCreate(options, obj, observable) {
       if (!options.store) {
-        kb.utils.wrappedStoreIsOwned(observable, true);
+        _kb2.default.utils.wrappedStoreIsOwned(observable, true);
       }
-      var store = kb.utils.wrappedStore(observable, options.store || new kb.Store());
+      var store = _kb2.default.utils.wrappedStore(observable, options.store || new _kb2.default.Store());
       store.retain(observable, obj, options.creator);
       return store;
     }
@@ -3048,7 +3266,7 @@ var Store = function () {
 
     this.observable_records = {};
     this.replaced_observables = [];
-    kb.Store.instances.push(this);
+    _kb2.default.Store.instances.push(this);
   }
 
   // Required clean up function to break cycles, release view models, etc.
@@ -3060,8 +3278,8 @@ var Store = function () {
     value: function destroy() {
       this.__kb_released = true;
       this.clear();
-      var index = _underscore2.default.indexOf(kb.Store.instances, this);
-      if (~index) kb.Store.instances.splice(index, 1);
+      var index = _underscore2.default.indexOf(_kb2.default.Store.instances, this);
+      if (~index) _kb2.default.Store.instances.splice(index, 1);
     }
 
     // Manually clear the store
@@ -3153,16 +3371,16 @@ var Store = function () {
       var _this2 = this;
 
       var creator = this._creator(obj, options);
-      if (!creator) return kb.utils.createFromDefaultCreator(obj, options);
+      if (!creator) return _kb2.default.utils.createFromDefaultCreator(obj, options);
       if (creator.models_only) return obj;
 
       var observable = this.find(obj, creator);
       if (observable) {
-        return deep_retain && kb.settings.deep_retain ? this.retain(observable, obj, creator) : observable;
+        return deep_retain && _kb2.default.settings.deep_retain ? this.retain(observable, obj, creator) : observable;
       }
       if (!_underscore2.default.isFunction(creator.create || creator)) throw new Error('Invalid factory for "' + options.path + '"');
 
-      observable = kb.ignore(function () {
+      observable = _kb2.default.ignore(function () {
         options = _underscore2.default.defaults({ store: _this2, creator: creator }, options); // set our own creator so we can register ourselves above
         observable = creator.create ? creator.create(obj, options) : new creator(obj, options);
         return observable || _knockout2.default.observable(null);
@@ -3177,12 +3395,12 @@ var Store = function () {
   }, {
     key: 'reuse',
     value: function reuse(observable, obj) {
-      var current_obj = kb.utils.wrappedObject(observable);
+      var current_obj = _kb2.default.utils.wrappedObject(observable);
       if (current_obj === obj) return;
       if (!this._canRegister(observable)) throw new Error('Cannot reuse a simple observable');
       if (this._refCount(observable) !== 1) throw new Error('Trying to change a shared view model. Ref count: ' + this._refCount(observable));
 
-      var creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
+      var creator = _kb2.default.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
       var current_observable = void 0;
       if (!_underscore2.default.isUndefined(current_obj)) current_observable = this.find(current_obj, creator);
       this.retain(observable, obj, creator);
@@ -3194,7 +3412,7 @@ var Store = function () {
   }, {
     key: 'release',
     value: function release(observable, force) {
-      if (!this._canRegister(observable)) return kb.release(observable); // just release
+      if (!this._canRegister(observable)) return _kb2.default.release(observable); // just release
 
       // maybe be externally added
       var store_references = this._storeReferences(observable);
@@ -3205,7 +3423,7 @@ var Store = function () {
 
       this._remove(observable);
       if (observable.__kb_released) return undefined;
-      if (force || this._refCount(observable) <= 1) return kb.release(observable); // allow for a single initial reference in another store
+      if (force || this._refCount(observable) <= 1) return _kb2.default.release(observable); // allow for a single initial reference in another store
       return undefined;
     }
 
@@ -3234,7 +3452,7 @@ var Store = function () {
         typeof console === 'undefined' || console.log('Observable already released');
         return 0;
       }
-      var stores_references = kb.utils.get(observable, 'stores_references');
+      var stores_references = _kb2.default.utils.get(observable, 'stores_references');
       if (!stores_references) return 1;
       return _underscore2.default.reduce(stores_references, function (memo, store_references) {
         return memo + store_references.ref_count;
@@ -3247,7 +3465,7 @@ var Store = function () {
     key: '_canRegister',
     value: function _canRegister(observable) {
       return observable && !_knockout2.default.isObservable(observable) && !observable.__kb_is_co;
-    } // only register view models not basic ko.observables nor kb.CollectionObservables
+    } // only register view models not basic ko.observables nor Backbone.CollectionObservables
 
     // @nodoc
 
@@ -3284,7 +3502,7 @@ var Store = function () {
     value: function _storeReferences(observable) {
       var _this3 = this;
 
-      var stores_references = kb.utils.get(observable, 'stores_references');
+      var stores_references = _kb2.default.utils.get(observable, 'stores_references');
       if (!stores_references) return undefined;
 
       return _underscore2.default.find(stores_references, function (ref) {
@@ -3299,7 +3517,7 @@ var Store = function () {
     value: function _getOrCreateStoreReferences(observable) {
       var _this4 = this;
 
-      var stores_references = kb.utils.orSet(observable, 'stores_references', []);
+      var stores_references = _kb2.default.utils.orSet(observable, 'stores_references', []);
 
       var ref = _underscore2.default.find(stores_references, function (x) {
         return x.store === _this4;
@@ -3315,7 +3533,7 @@ var Store = function () {
   }, {
     key: '_clearStoreReferences',
     value: function _clearStoreReferences(observable) {
-      var stores_references = kb.utils.orSet(observable, 'stores_references', []);
+      var stores_references = _kb2.default.utils.orSet(observable, 'stores_references', []);
       if (!stores_references) return;
 
       for (var i = 0, l = observable.__kb.stores_references.length; i < l; i++) {
@@ -3341,7 +3559,7 @@ var Store = function () {
     key: '_add',
     value: function _add(observable, obj, creator) {
       if (!creator) creator = observable.constructor; // default is to use the constructor
-      kb.utils.wrappedObject(observable, obj);kb.utils.wrappedCreator(observable, creator);
+      _kb2.default.utils.wrappedObject(observable, obj);_kb2.default.utils.wrappedCreator(observable, creator);
 
       var name = this._creatorId(creator);
       if (!this.observable_records[name]) this.observable_records[name] = {};
@@ -3354,16 +3572,16 @@ var Store = function () {
   }, {
     key: '_remove',
     value: function _remove(observable) {
-      var creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
-      var obj = kb.utils.wrappedObject(observable);
+      var creator = _kb2.default.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
+      var obj = _kb2.default.utils.wrappedObject(observable);
       var current_observable = this.find(obj, creator);
 
       // already released
       if (current_observable && current_observable === observable) {
         delete this.observable_records[this._creatorId(creator)][this._cid(obj)]; // not already replaced
       }
-      kb.utils.wrappedObject(observable, null);
-      return kb.utils.wrappedCreator(observable, null);
+      _kb2.default.utils.wrappedObject(observable, null);
+      return _kb2.default.utils.wrappedCreator(observable, null);
     }
 
     // @nodoc
@@ -3372,9 +3590,9 @@ var Store = function () {
     key: '_creator',
     value: function _creator(obj, options) {
       if (options.creator) return options.creator;
-      var creator = kb.utils.inferCreator(obj, options.factory, options.path);
+      var creator = _kb2.default.utils.inferCreator(obj, options.factory, options.path);
       if (creator) return creator;
-      if (kb.isModel(obj)) return kb.ViewModel;
+      if (_kb2.default.isModel(obj)) return _kb2.default.ViewModel;
       return undefined;
     }
   }]);
@@ -3385,183 +3603,6 @@ var Store = function () {
 exports.default = Store;
 
 Store.initClass();
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
-
-var _underscore = __webpack_require__(0);
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _knockout = __webpack_require__(1);
-
-var _knockout2 = _interopRequireDefault(_knockout);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-// @nodoc
-var TypedValue = function () {
-  function TypedValue(create_options) {
-    _classCallCheck(this, TypedValue);
-
-    this.create_options = create_options;
-    this._vo = _knockout2.default.observable(null); // create a value observable for the first dependency
-  }
-
-  _createClass(TypedValue, [{
-    key: 'destroy',
-    value: function destroy() {
-      this.__kb_released = true;
-      var previous_value = this.__kb_value;
-      if (previous_value) {
-        this.__kb_value = null;
-        if (this.create_options.store && kb.utils.wrappedCreator(previous_value)) {
-          this.create_options.store.release(previous_value);
-        } else kb.release(previous_value);
-      }
-      this.create_options = null;
-    }
-  }, {
-    key: 'value',
-    value: function value() {
-      return _knockout2.default.utils.unwrapObservable(this._vo());
-    }
-  }, {
-    key: 'rawValue',
-    value: function rawValue() {
-      return this.__kb_value;
-    }
-  }, {
-    key: 'valueType',
-    value: function valueType(model, key) {
-      var new_value = kb.getValue(model, key);
-      this.value_type || this._updateValueObservable(new_value); // create so we can check the type
-      return this.value_type;
-    }
-  }, {
-    key: 'update',
-    value: function update(new_value) {
-      if (this.__kb_released) return undefined; // destroyed, nothing to do
-
-      // determine the new type
-      new_value !== undefined || (new_value = null); // ensure null instead of undefined
-      var new_type = kb.utils.valueType(new_value);
-
-      if (this.__kb_value && this.__kb_value.__kb_released) {
-        this.__kb_value = undefined;this.value_type = undefined;
-      }
-      var value = this.__kb_value;
-
-      switch (this.value_type) {
-        case kb.TYPE_COLLECTION:
-          if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) return value(new_value);
-          if (new_type === kb.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
-            // use the provided CollectionObservable
-            if (new_value && new_value instanceof kb.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
-            return undefined;
-          }
-          break;
-
-        case kb.TYPE_MODEL:
-          if (new_type === kb.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
-            // use the provided ViewModel
-            if (new_value && !kb.isModel(new_value)) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
-            return undefined;
-          }
-          break;
-        default:
-          break;
-      }
-
-      if (this.value_type === new_type && !_underscore2.default.isUndefined(this.value_type)) {
-        if (kb.peek(value) !== new_value) return value(new_value);
-      } else if (kb.peek(value) !== new_value) return this._updateValueObservable(new_value);
-      return undefined;
-    }
-  }, {
-    key: '_updateValueObservable',
-    value: function _updateValueObservable(new_value, new_observable) {
-      var create_options = this.create_options;
-
-      var creator = kb.utils.inferCreator(new_value, create_options.factory, create_options.path);
-
-      // retain previous type
-      if (new_value === null && !creator) {
-        if (this.value_type === kb.TYPE_MODEL) creator = kb.ViewModel;else if (this.value_type === kb.TYPE_COLLECTION) creator = kb.CollectionObservable;
-      }
-      create_options.creator = creator;
-
-      var value_type = kb.TYPE_UNKNOWN;
-      var previous_value = this.__kb_value;
-      this.__kb_value = undefined;
-
-      var value = void 0;
-      if (new_observable) {
-        value = new_observable;
-        if (create_options.store) create_options.store.retain(new_observable, new_value, creator);
-
-        // found a creator
-      } else if (creator) {
-        // have the store, use it to create
-        if (create_options.store) value = create_options.store.retainOrCreate(new_value, create_options, true);
-
-        // create manually
-        else if (creator.models_only) {
-            value = new_value;value_type = kb.TYPE_SIMPLE;
-          } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
-
-        // create and cache the type
-      } else if (_underscore2.default.isArray(new_value)) {
-        value_type = kb.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
-      } else {
-        value_type = kb.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
-      }
-
-      // determine the type
-      this.value_type = value_type;
-      if (value_type === kb.TYPE_UNKNOWN) {
-        // a view model, recognize view_models as non-observable
-        if (!_knockout2.default.isObservable(value)) {
-          this.value_type = kb.TYPE_MODEL;kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
-        } else if (value.__kb_is_co) {
-          this.value_type = kb.TYPE_COLLECTION;kb.utils.wrappedObject(value, new_value);
-        } else if (!this.value_type) this.value_type = kb.TYPE_SIMPLE;
-      }
-
-      // release previous
-      if (previous_value) {
-        this.create_options.store ? this.create_options.store.release(previous_value) : kb.release(previous_value);
-      }
-
-      // store the value
-      this.__kb_value = value;
-      return this._vo(value);
-    }
-  }]);
-
-  return TypedValue;
-}();
-
-exports.default = TypedValue;
 
 /***/ }),
 /* 26 */
@@ -3595,6 +3636,18 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _wrappedDestroy = __webpack_require__(17);
+
+var _wrappedDestroy2 = _interopRequireDefault(_wrappedDestroy);
+
+var _collapseOptions = __webpack_require__(15);
+
+var _collapseOptions2 = _interopRequireDefault(_collapseOptions);
+
+var _unwrapModels = __webpack_require__(16);
+
+var _unwrapModels2 = _interopRequireDefault(_unwrapModels);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -3610,32 +3663,28 @@ var utils = function () {
   }
 
   _createClass(utils, null, [{
-    key: 'initClass',
-    value: function initClass() {
-      // Clean up function that releases all of the wrapped values on an owner.
-      this.wrappedDestroy = __webpack_require__(17);
+    key: 'get',
 
-      // Helper to merge options including ViewmModel options like `keys` and `factories`
-      //
-      // @param [Object] obj the object to test
-      //
-      // @example
-      //   kb.utils.collapseOptions(options);
-      this.collapseOptions = __webpack_require__(15);
-
-      // used for attribute setting to ensure all model attributes have their underlying models
-      this.unwrapModels = __webpack_require__(16);
-    }
 
     // @nodoc
 
-  }, {
-    key: 'get',
+
+    // Helper to merge options including ViewmModel options like `keys` and `factories`
+    //
+    // @param [Object] obj the object to test
+    //
+    // @example
+    //   kb.utils.collapseOptions(options);
     value: function get(obj, key, default_value) {
       return !obj.__kb || !Object.prototype.hasOwnProperty.call(obj.__kb, key) ? default_value : obj.__kb[key];
     }
 
     // @nodoc
+
+
+    // used for attribute setting to ensure all model attributes have their underlying models
+
+    // Clean up function that releases all of the wrapped values on an owner.
 
   }, {
     key: 'set',
@@ -3664,7 +3713,7 @@ var utils = function () {
 
     // Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'. Relevant for:
     //
-    //   * [kb.CollectionObservable]('classes/kb/CollectionObservable.html')
+    //   * [Backbone.CollectionObservable]('classes/kb/CollectionObservable.html')
     //   * [kb.Observable]('classes/kb/Observable.html')
     //   * [kb.DefaultObservable]('classes/kb/DefaultObservable.html')
     //   * [kb.FormattedObservable]('classes/kb/FormattedObservable.html')
@@ -3700,11 +3749,11 @@ var utils = function () {
     //
     // @overload wrappedObject(obj)
     //   Gets the observable from an object
-    //   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
+    //   @param [Object|kb.ViewModel|Backbone.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
     //   @return [Model|Collection] the model/collection
     // @overload wrappedObject(obj, value)
     //   Sets the observable on an object
-    //   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
+    //   @param [Object|kb.ViewModel|Backbone.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
     //   @param [Model|Collection] value the model/collection
     //
     // @example
@@ -3731,7 +3780,7 @@ var utils = function () {
 
     // Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
     // @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because
-    // it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
+    // it you can iterate over a Backbone.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
     //
     // @overload wrappedModel(view_model)
     //   Gets the model from a ViewModel
@@ -3851,10 +3900,10 @@ var utils = function () {
       if (observable.__kb_is_o) {
         return observable.valueType();
       }
-      if (observable.__kb_is_co || observable instanceof kb.Collection) {
+      if (observable.__kb_is_co || observable instanceof _backbone2.default.Collection) {
         return kb.TYPE_COLLECTION;
       }
-      if (observable instanceof kb.ViewModel || observable instanceof kb.Model) {
+      if (observable instanceof kb.ViewModel || observable instanceof _backbone2.default.Model) {
         return kb.TYPE_MODEL;
       }
       if (_underscore2.default.isArray(observable)) {
@@ -3905,11 +3954,11 @@ var utils = function () {
 
       // try fallbacks
       if (!value) return null;
-      if (value instanceof kb.Model) {
+      if (value instanceof _backbone2.default.Model) {
         return kb.ViewModel;
       }
-      if (value instanceof kb.Collection) {
-        return kb.CollectionObservable;
+      if (value instanceof _backbone2.default.Collection) {
+        return _backbone2.default.CollectionObservable;
       }
       return null;
     }
@@ -3945,9 +3994,10 @@ var utils = function () {
   return utils;
 }();
 
+utils.wrappedDestroy = _wrappedDestroy2.default;
+utils.collapseOptions = _collapseOptions2.default;
+utils.unwrapModels = _unwrapModels2.default;
 exports.default = utils;
-
-utils.initClass();
 
 /***/ }),
 /* 27 */
@@ -3970,10 +4020,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-var _kb = __webpack_require__(4);
-
-var _kb2 = _interopRequireDefault(_kb);
-
 var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
@@ -3985,6 +4031,10 @@ var _backbone2 = _interopRequireDefault(_backbone);
 var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
 
 var _eventWatcher = __webpack_require__(5);
 
@@ -4135,6 +4185,7 @@ var ViewModel = function () {
         _this.__kb = {};
       }_this.__kb.view_model = args.length > 1 ? args.pop() : _this;
 
+      debugger;
       var options = {};
       _underscore2.default.each(args, function (arg) {
         _kb2.default.assign(options, arg);options = _kb2.default.utils.collapseOptions(options);
@@ -4650,10 +4701,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
-
-// Locale Manager - if you are using localization, set this property.
-// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-if (!_core2.default.locale_manager) _core2.default.locale_manager = undefined;
 
 // @abstract You must provide the following two methods:
 //   * read: function(value, observable) called to get the value and each time the locale changes

@@ -10,7 +10,7 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
-import TypedValue from './typed-value';
+import TypedValue from './lib/typed-value';
 import EventWatcher from './event-watcher';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
@@ -162,7 +162,8 @@ export default class Observable {
     return kb.utils.wrappedDestroy(this);
   }
 
-  // @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable. For example, if your attribute is a Collection, it will hold a CollectionObservable.
+  // @return [Backbone.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable.
+  // For example, if your attribute is a Collection, it will hold a CollectionObservable.
   value() { return this._value.rawValue(); }
 
   // @return [kb.TYPE_UNKNOWN|kb.TYPE_SIMPLE|kb.TYPE_ARRAY|kb.TYPE_MODEL|kb.TYPE_COLLECTION] provides the type of the wrapped value.

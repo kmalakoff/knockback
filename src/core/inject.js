@@ -176,11 +176,9 @@ ko.applyBindings = (...args) => {
 if (root && (typeof root.document !== 'undefined')) {
   // use simple ready check
   const onReady = () => {
-    if (root.document.readyState !== 'complete') {
-      setTimeout(onReady, 0); // keep waiting for the document to load
-      return;
-    }
-    injectViewModels(); // the document is loaded
+    // keep waiting for the document to load
+    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0);
+    return injectViewModels(); // the document is loaded
   };
   onReady();
 }

@@ -15,10 +15,6 @@ import kb from '../../core';
 
 const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
-// Locale Manager - if you are using localization, set this property.
-// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-if (!kb.locale_manager) kb.locale_manager = undefined;
-
 // @abstract You must provide the following two methods:
 //   * read: function(value, observable) called to get the value and each time the locale changes
 //   * write: function(localized_string, value, observable) called to set the value (optional)

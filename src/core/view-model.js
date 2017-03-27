@@ -7,11 +7,11 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-import kb from './kb';
 import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
+import kb from './kb';
 import EventWatcher from './event-watcher';
 
 // @nodoc
@@ -139,6 +139,7 @@ export default class ViewModel {
       if (_.isArray(args[0])) args[0] = { keys: args[0] };
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
 
+      debugger;
       let options = {};
       _.each(args, (arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
       _.each(KEYS_OPTIONS, (key) => { if (Object.prototype.hasOwnProperty.call(options, key)) this.__kb[key] = options[key]; });

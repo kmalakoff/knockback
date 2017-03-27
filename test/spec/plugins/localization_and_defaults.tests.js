@@ -19,7 +19,7 @@ if (!Globalize) {
 // ##############################
 class LocaleManager {
   static initClass() {
-    kb.assign(this.prototype, kb.Events);
+    kb.assign(LocaleManager.prototype, Backbone.Events);
   }
 
   constructor(locale_identifier, translations_by_locale) {
@@ -116,7 +116,7 @@ kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 });
 // ##############################
 
-describe('localized-observable', () => {
+describe.only('localized-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');

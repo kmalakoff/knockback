@@ -7,8 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-import kb from '../kb';
 import _ from 'underscore';
+
+import kb from '../kb';
 
 // @nodoc
 const _mergeArray = function (result, key, value) {

@@ -8,7 +8,12 @@
 */
 
 import kb from '../../core';
-import FormattedObservable from './formatted-observable';
+import FormattedObservable, { formattedObservable } from './formatted-observable';
 
-kb.FormattedObservable = FormattedObservable;
+const api = {
+  FormattedObservable,
+  formattedObservable,
+};
+kb.assign(kb, api);
+
 export default kb;

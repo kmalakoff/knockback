@@ -8,9 +8,19 @@
 */
 
 import kb from '../../core';
-import * as validators from './validators';
-import * as validation from './validation';
+import { valueValidator, inputValidator, formValidator } from './validation';
+import { hasChangedFn, minLengthFn, uniqueValueFn, untilTrueFn, untilFalseFn } from './validators';
 
-kb.assign(kb, validators);
-kb.assign(kb, validation);
+const api = {
+  valueValidator,
+  inputValidator,
+  formValidator,
+  hasChangedFn,
+  minLengthFn,
+  uniqueValueFn,
+  untilTrueFn,
+  untilFalseFn,
+};
+kb.assign(kb, api);
+
 export default kb;

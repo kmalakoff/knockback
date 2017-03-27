@@ -7,9 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-import kb from '../kb';
 import _ from 'underscore';
 import Backbone from 'backbone';
+
+import kb from '../kb';
 
 let RelationalModel = null; // lazy bind so this file can be loaded before relational library
 

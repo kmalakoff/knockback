@@ -8,7 +8,12 @@
 */
 
 import kb from '../../core';
-import TriggeredObservable from './triggered-observable';
+import TriggeredObservable, { triggeredObservable } from './triggered-observable';
 
-kb.TriggeredObservable = TriggeredObservable;
+const api = {
+  TriggeredObservable,
+  triggeredObservable,
+};
+kb.assign(kb, api);
+
 export default kb;

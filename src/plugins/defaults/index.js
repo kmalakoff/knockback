@@ -9,7 +9,12 @@
 
 import kb from '../../core';
 import './extensions';
-import DefaultObservable from './default-observable';
+import DefaultObservable, { defaultObservable } from './default-observable';
 
-kb.DefaultObservable = DefaultObservable;
+const api = {
+  DefaultObservable,
+  defaultObservable,
+};
+kb.assign(kb, api);
+
 export default kb;

@@ -11,27 +11,29 @@ import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
+import wrappedDestroy from './functions/wrapped-destroy';
+import collapseOptions from './functions/collapse-options';
+import unwrapModels from './functions/unwrap-models';
+
 // ###################################################
 // Public API
 // ###################################################
 
 // Library of general-purpose utilities
 export default class utils {
-  static initClass() {
-    // Clean up function that releases all of the wrapped values on an owner.
-    this.wrappedDestroy = require('./functions/wrapped-destroy');
+  // Clean up function that releases all of the wrapped values on an owner.
+  static wrappedDestroy = wrappedDestroy;
 
-    // Helper to merge options including ViewmModel options like `keys` and `factories`
-    //
-    // @param [Object] obj the object to test
-    //
-    // @example
-    //   kb.utils.collapseOptions(options);
-    this.collapseOptions = require('./functions/collapse-options');
+  // Helper to merge options including ViewmModel options like `keys` and `factories`
+  //
+  // @param [Object] obj the object to test
+  //
+  // @example
+  //   kb.utils.collapseOptions(options);
+  static collapseOptions = collapseOptions;
 
-    // used for attribute setting to ensure all model attributes have their underlying models
-    this.unwrapModels = require('./functions/unwrap-models');
-  }
+  // used for attribute setting to ensure all model attributes have their underlying models
+  static unwrapModels = unwrapModels;
 
   // @nodoc
   static get(obj, key, default_value) {
@@ -56,7 +58,7 @@ export default class utils {
 
   // Dual-purpose getter/setter for retrieving and storing the observable on an instance that returns a ko.observable instead of 'this'. Relevant for:
   //
-  //   * [kb.CollectionObservable]('classes/kb/CollectionObservable.html')
+  //   * [Backbone.CollectionObservable]('classes/kb/CollectionObservable.html')
   //   * [kb.Observable]('classes/kb/Observable.html')
   //   * [kb.DefaultObservable]('classes/kb/DefaultObservable.html')
   //   * [kb.FormattedObservable]('classes/kb/FormattedObservable.html')
@@ -89,11 +91,11 @@ export default class utils {
   //
   // @overload wrappedObject(obj)
   //   Gets the observable from an object
-  //   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
+  //   @param [Object|kb.ViewModel|Backbone.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
   //   @return [Model|Collection] the model/collection
   // @overload wrappedObject(obj, value)
   //   Sets the observable on an object
-  //   @param [Object|kb.ViewModel|kb.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the kb.Model or kb.Collection.
+  //   @param [Object|kb.ViewModel|Backbone.CollectionObservable] obj owner the ViewModel/CollectionObservable owning the Backbone.Model or Backbone.Collection.
   //   @param [Model|Collection] value the model/collection
   //
   // @example
@@ -106,7 +108,7 @@ export default class utils {
 
   // Dual-purpose getter/setter for retrieving and storing the Model on a ViewModel.
   // @note this is almost the same as {kb.utils.wrappedObject} except that if the Model doesn't exist, it returns the ViewModel itself (which is useful behaviour for sorting because
-  // it you can iterate over a kb.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
+  // it you can iterate over a Backbone.CollectionObservable's ko.ObservableArray whether it holds ViewModels or Models with the models_only option).
   //
   // @overload wrappedModel(view_model)
   //   Gets the model from a ViewModel
@@ -181,8 +183,8 @@ export default class utils {
   static valueType(observable) {
     if (!observable) { return kb.TYPE_UNKNOWN; }
     if (observable.__kb_is_o) { return observable.valueType(); }
-    if (observable.__kb_is_co || (observable instanceof kb.Collection)) { return kb.TYPE_COLLECTION; }
-    if ((observable instanceof kb.ViewModel) || (observable instanceof kb.Model)) { return kb.TYPE_MODEL; }
+    if (observable.__kb_is_co || (observable instanceof Backbone.Collection)) { return kb.TYPE_COLLECTION; }
+    if ((observable instanceof kb.ViewModel) || (observable instanceof Backbone.Model)) { return kb.TYPE_MODEL; }
     if (_.isArray(observable)) { return kb.TYPE_ARRAY; }
     return kb.TYPE_SIMPLE;
   }
@@ -214,8 +216,8 @@ export default class utils {
 
     // try fallbacks
     if (!value) return null;
-    if (value instanceof kb.Model) { return kb.ViewModel; }
-    if (value instanceof kb.Collection) { return kb.CollectionObservable; }
+    if (value instanceof Backbone.Model) { return kb.ViewModel; }
+    if (value instanceof Backbone.Collection) { return Backbone.CollectionObservable; }
     return null;
   }
 
@@ -230,4 +232,3 @@ export default class utils {
   // @nodoc
   static resolveModel(model) { if (model && Backbone && Backbone.ModelRef && model instanceof Backbone.ModelRef) { return model.model(); } return model; }
 }
-utils.initClass();

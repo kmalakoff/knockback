@@ -40,7 +40,6 @@ describe.only('collection-observable', () => {
   }
 
   it('2. Basic Usage: collection observable with ko.computed', () => {
-    debugger;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();

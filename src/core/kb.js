@@ -11,8 +11,6 @@ import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
-import './monkey-patches';
-
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
@@ -26,7 +24,7 @@ const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 // 2) deep_retain - true to multiply retain view models in the store
 //
 // @method .collectionObservable(collection, options)
-//   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
+//   Factory to create a new Backbone.CollectionObservable. See {Backbone.CollectionObservable#constructor} for information on options
 //   @param [Collection] collection the collection to observe (can be null)
 //   @param [Object] options the create options
 //   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
@@ -81,7 +79,7 @@ export default class kb {
     kb.TYPE_ARRAY = 2;
     // Stored value type is a Model -> observable type: ViewModel
     kb.TYPE_MODEL = 3;
-    // Stored value type is a Collection -> observable type: kb.CollectionObservable
+    // Stored value type is a Collection -> observable type: Backbone.CollectionObservable
     kb.TYPE_COLLECTION = 4;
 
     // cache local reference to underscore
@@ -293,9 +291,9 @@ export default class kb {
   }
 
   // @nodoc
-  static isModel(obj) { return obj && ((obj instanceof kb.Model) || ((typeof (obj.get) === 'function') && (typeof (obj.bind) === 'function'))); }
+  static isModel(obj) { return obj && ((obj instanceof Backbone.Model) || ((typeof (obj.get) === 'function') && (typeof (obj.bind) === 'function'))); }
 
   // @nodoc
-  static isCollection(obj) { return obj && (obj instanceof kb.Collection); }
+  static isCollection(obj) { return obj && (obj instanceof Backbone.Collection); }
 }
 kb.initClass();
