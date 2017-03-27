@@ -7,6 +7,53 @@ const { _, Backbone, ko } = kb;
 if (Backbone && !Backbone.Relational && r) try { require('backbone-relational'); } catch (e) { /**/ }
 
 describe('Knockback.js with Backbone-Relational.js', () => {
+  beforeEach(() => {
+    if (!(Backbone != null ? Backbone.Relational : undefined)) return;
+    !Backbone.Relational || Backbone.Relational.store.reset();
+    if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
+
+    root.Person = Backbone.RelationalModel.extend({
+      relations: [{
+        type: Backbone.HasMany,
+        key: 'friends',
+        relatedModel: 'Person',
+      }, {
+        type: Backbone.HasOne,
+        key: 'best_friend',
+        relatedModel: 'Person',
+        reverseRelation: {
+          type: Backbone.HasMany,
+          key: 'best_friends_with_me',
+        },
+      }],
+    });
+
+    root.Building = Backbone.RelationalModel.extend({
+      relations: [{
+        type: Backbone.HasMany,
+        key: 'occupants',
+        relatedModel: 'Person',
+        reverseRelation: {
+          type: Backbone.HasOne,
+          key: 'occupies',
+        },
+      }],
+    });
+
+    root.Occupant = Backbone.RelationalModel.extend({});
+
+    root.House = Backbone.RelationalModel.extend({
+      relations: [{
+        type: Backbone.HasMany,
+        key: 'occupants',
+        relatedModel: 'Occupant',
+        reverseRelation: {
+          key: 'livesIn',
+        },
+      }],
+    });
+  });
+
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
@@ -17,38 +64,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   });
 
   if (!(Backbone != null ? Backbone.Relational : undefined)) return;
-  kb.configure({ orm: 'backbone-relational' });
-  Backbone.Relational.store = new Backbone.Store(); if (typeof Backbone.Relational.store.addModelScope === 'function') {
-    Backbone.Relational.store.addModelScope(root);
-  }
-
-  const Person = root.Person = Backbone.RelationalModel.extend({
-    relations: [{
-      type: Backbone.HasMany,
-      key: 'friends',
-      relatedModel: 'Person',
-    }, {
-      type: Backbone.HasOne,
-      key: 'best_friend',
-      relatedModel: 'Person',
-      reverseRelation: {
-        type: Backbone.HasMany,
-        key: 'best_friends_with_me',
-      },
-    }],
-  });
-
-  const Building = root.Building = Backbone.RelationalModel.extend({
-    relations: [{
-      type: Backbone.HasMany,
-      key: 'occupants',
-      relatedModel: 'Person',
-      reverseRelation: {
-        type: Backbone.HasOne,
-        key: 'occupies',
-      },
-    }],
-  });
 
   it('1. Model with HasMany relations: A house with multiple people living in it', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -267,19 +282,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   });
 
   it('4. After view model create, add models', () => {
-    const Occupant = Backbone.RelationalModel.extend({});
-
-    const House = Backbone.RelationalModel.extend({
-      relations: [{
-        type: Backbone.HasMany,
-        key: 'occupants',
-        relatedModel: Occupant,
-        reverseRelation: {
-          key: 'livesIn',
-        },
-      }],
-    });
-
     const bob = new Occupant({ id: 'person-1', name: 'Bob' });
     const fred = new Occupant({ id: 'person-2', name: 'Fred' });
 

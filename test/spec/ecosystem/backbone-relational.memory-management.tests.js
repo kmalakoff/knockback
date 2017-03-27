@@ -6,7 +6,21 @@ let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } cat
 const { _, Backbone, ko } = kb;
 if (Backbone && !Backbone.Relational && r) try { require('backbone-relational'); } catch (e) { /**/ }
 
-describe('Knockback.js with Backbone-Relational.js', () => {
+describe('Knockback.js with Backbone-Relational.js (memory)', () => {
+  beforeEach(() => {
+    if (!(Backbone != null ? Backbone.Relational : undefined)) return;
+    !Backbone.Relational || Backbone.Relational.store.reset();
+    if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
+
+    root.Person = Backbone.RelationalModel.extend({
+      relations: [{
+        type: Backbone.HasMany,
+        key: 'friends',
+        relatedModel: 'Person',
+      }],
+    });
+  });
+
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
@@ -17,17 +31,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   });
 
   if (!(Backbone != null ? Backbone.Relational : undefined)) return;
-  Backbone.Relational.store = new Backbone.Store(); if (typeof Backbone.Relational.store.addModelScope === 'function') {
-    Backbone.Relational.store.addModelScope(root);
-  }
-
-  root.Person = Backbone.RelationalModel.extend({
-    relations: [{
-      type: Backbone.HasMany,
-      key: 'friends',
-      relatedModel: 'root.Person',
-    }],
-  });
 
   // ref counted view model
   class RefCountableViewModel {

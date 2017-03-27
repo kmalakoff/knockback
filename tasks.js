@@ -50,7 +50,7 @@ gulp.task('minify', ['build'], () => gulp.src(['knockback.js', 'knockback-*.js',
 
 const testNode = () => new Promise((resolve, reject) => {
   console.log('Running Node tests');
-  const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'dot', '--recursive']);
+  const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'spec', '--recursive']);
   res.stdout.pipe(process.stdout);
   res.stderr.pipe(process.stderr);
   res.on('close', resolve);
