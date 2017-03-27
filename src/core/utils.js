@@ -7,19 +7,19 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import Backbone from 'backbone';
+import ko from 'knockout';
 
 // ###################################################
 // Public API
 // ###################################################
 
 // Library of general-purpose utilities
-class utils {
+export default class utils {
   static initClass() {
     // Clean up function that releases all of the wrapped values on an owner.
-    this.wrappedDestroy = require('./functions/wrapped_destroy');
+    this.wrappedDestroy = require('./functions/wrapped-destroy');
 
     // Helper to merge options including ViewmModel options like `keys` and `factories`
     //
@@ -27,10 +27,10 @@ class utils {
     //
     // @example
     //   kb.utils.collapseOptions(options);
-    this.collapseOptions = require('./functions/collapse_options');
+    this.collapseOptions = require('./functions/collapse-options');
 
     // used for attribute setting to ensure all model attributes have their underlying models
-    this.unwrapModels = require('./functions/unwrap_models');
+    this.unwrapModels = require('./functions/unwrap-models');
   }
 
   // @nodoc
@@ -228,7 +228,6 @@ class utils {
   }
 
   // @nodoc
-  static resolveModel(model) { if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) { return model.model(); } return model; }
+  static resolveModel(model) { if (model && Backbone && Backbone.ModelRef && model instanceof Backbone.ModelRef) { return model.model(); } return model; }
 }
 utils.initClass();
-module.exports = utils;

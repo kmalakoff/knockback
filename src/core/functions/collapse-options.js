@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../kb');
-
-const { _ } = kb;
+import kb from '../kb';
+import _ from 'underscore';
 
 // @nodoc
 const _mergeArray = function (result, key, value) {
@@ -47,13 +46,12 @@ const _mergeOptions = function (result, options) {
           _mergeObject(result, key, value);
 
         // an array
-        } else {
-          _mergeArray(result, key, value);
-        }
+        } else _mergeArray(result, key, value);
         break;
 
       case 'factories':
-        if (_.isFunction(value)) { result[key] = value; } else { _mergeObject(result, key, value); }
+        if (_.isFunction(value)) result[key] = value;
+        else _mergeObject(result, key, value);
         break;
       case 'static_defaults': _mergeObject(result, key, value); break;
       case 'options': break;
@@ -65,4 +63,4 @@ const _mergeOptions = function (result, options) {
 };
 
 // @nodoc
-module.exports = options => _mergeOptions({}, options);
+export default options => _mergeOptions({}, options);

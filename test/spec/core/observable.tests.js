@@ -3,18 +3,18 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 
 describe('observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
-  const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+  const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
 
   it('1. Standard use case: direct attributes with read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -136,7 +136,7 @@ describe('observable', () => {
   it('5. Inferring observable types: the easy way', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    class ChildrenCollection extends kb.CollectionObservable {
+    class ChildrenCollection extends Backbone.CollectionObservable {
       constructor(collection, options) {
         super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
         return kb.utils.wrappedObservable(this);
@@ -156,10 +156,10 @@ describe('observable', () => {
       }
     }
 
-    const parent = new kb.Model({ id: _.uniqueId(), name: 'Daddy' });
-    const children_child = new kb.Model({ id: _.uniqueId(), name: 'Baby' });
-    const children = new kb.Collection([{ id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child]) }]);
-    const model = new kb.Model({ id: _.uniqueId() });
+    const parent = new Backbone.Model({ id: _.uniqueId(), name: 'Daddy' });
+    const children_child = new Backbone.Model({ id: _.uniqueId(), name: 'Baby' });
+    const children = new Backbone.Collection([{ id: _.uniqueId(), name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child]) }]);
+    const model = new Backbone.Model({ id: _.uniqueId() });
 
     const view_model = new InferringViewModel(model);
     assert.equal(view_model.name(), null, 'inferred name as simple null');
@@ -212,7 +212,7 @@ describe('observable', () => {
   it('6. Inferring observable types: the hard way', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    class ChildrenCollection extends kb.CollectionObservable {
+    class ChildrenCollection extends Backbone.CollectionObservable {
       constructor(collection, options) {
         super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
         return kb.utils.wrappedObservable(this);
@@ -230,10 +230,10 @@ describe('observable', () => {
       this.maybe_null_children = kb.observable(model, 'maybe_null_children', { factories: ChildrenCollection, options: this._auto.shareOptions() });
     };
 
-    const parent = new kb.Model({ id: _.uniqueId(), name: 'Daddy' });
-    const children_child = new kb.Model({ id: _.uniqueId(), name: 'Baby' });
-    const children = new kb.Collection([{ id: _.uniqueId(), name: 'Bob', children: new kb.Collection([children_child]), maybe_null_children: new kb.Collection([children_child]) }]);
-    const model = new kb.Model({ id: _.uniqueId() });
+    const parent = new Backbone.Model({ id: _.uniqueId(), name: 'Daddy' });
+    const children_child = new Backbone.Model({ id: _.uniqueId(), name: 'Baby' });
+    const children = new Backbone.Collection([{ id: _.uniqueId(), name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child]) }]);
+    const model = new Backbone.Model({ id: _.uniqueId() });
 
     const view_model = new InferringViewModel(model);
     assert.equal(view_model.name(), null, 'inferred name as simple null');
@@ -285,7 +285,7 @@ describe('observable', () => {
 
   it('7. model change is observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const model = new kb.Model({ id: 1, name: 'Bob' });
+    const model = new Backbone.Model({ id: 1, name: 'Bob' });
 
     const observable = kb.observable(model, 'name');
 
@@ -303,7 +303,7 @@ describe('observable', () => {
   it('8. view model changes do not cause dependencies inside ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ id: 1, name: 'Initial' });
+    const model = new Backbone.Model({ id: 1, name: 'Initial' });
     const observable = kb.observable(model, 'name');
 
     let count_manual = 0;
@@ -331,7 +331,7 @@ describe('observable', () => {
   it('9. this is bound', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ number: 33 });
+    const model = new Backbone.Model({ number: 33 });
 
     const ViewModel = function (m) {
       this.number = kb.observable(m, 'number');
@@ -355,8 +355,8 @@ describe('observable', () => {
 
     const values = [];
 
-    const m1 = new kb.Model({ n: 'm1' });
-    const m2 = new kb.Model({ n: 'm2' });
+    const m1 = new Backbone.Model({ n: 'm1' });
+    const m2 = new Backbone.Model({ n: 'm2' });
     const o = kb.observable(m1, 'n');
 
     o.subscribe(nv => values.push(nv));

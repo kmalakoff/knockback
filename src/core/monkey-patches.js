@@ -7,9 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-
-const { ko } = kb;
+import ko from 'knockout';
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
 if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {

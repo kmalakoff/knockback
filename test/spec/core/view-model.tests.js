@@ -3,19 +3,19 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 const { $ } = root;
 
 describe('view-model', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
-  const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+  const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
 
   class TestViewModel extends kb.ViewModel {
     constructor(...args) {
@@ -137,7 +137,7 @@ describe('view-model', () => {
       }
     }
 
-    let model = new kb.Model();
+    let model = new Backbone.Model();
     let view_model = new ContactViewModelFullName(model);
     assert.equal(view_model.full_name(), 'Last: null, First: null', 'full name is good');
 
@@ -158,7 +158,7 @@ describe('view-model', () => {
       }
     }
 
-    model = new kb.Model();
+    model = new Backbone.Model();
     view_model = new ContactViewModelFullName2(model);
     assert.equal(view_model.full_name(), 'Last: null, First: null', 'full name is good');
 
@@ -199,7 +199,7 @@ describe('view-model', () => {
       }
     }
 
-    const model = new kb.Model({ first: 'Hello' });
+    const model = new Backbone.Model({ first: 'Hello' });
     const view_model = new ContactViewModelFullName(model);
 
     assert.equal(view_model.first(), 'Hello', 'Hello exists');
@@ -246,7 +246,7 @@ describe('view-model', () => {
       },
     });
 
-    const model = new kb.Model({ first: 'Hello' });
+    const model = new Backbone.Model({ first: 'Hello' });
     const view_model = new ContactViewModelFullName(model);
 
     assert.equal(view_model.first(), 'Hello', 'Hello exists');
@@ -286,9 +286,9 @@ describe('view-model', () => {
     const george = new Contact({ name: 'George', date: new Date(george_birthdate.valueOf()) });
     const ringo_birthdate = new Date(1940, 7, 7);
     const ringo = new Contact({ name: 'Ringo', date: new Date(ringo_birthdate.valueOf()) });
-    const major_duo = new kb.Collection([john, paul]);
-    const minor_duo = new kb.Collection([george, ringo]);
-    const nested_model = new kb.Model({
+    const major_duo = new Backbone.Collection([john, paul]);
+    const minor_duo = new Backbone.Collection([george, ringo]);
+    const nested_model = new Backbone.Model({
       john,
       paul,
       george,
@@ -381,17 +381,17 @@ describe('view-model', () => {
   it('8a. Changing attribute types', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ reused: null });
+    const model = new Backbone.Model({ reused: null });
     const view_model = kb.viewModel(model);
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_SIMPLE, 'reused is kb.TYPE_SIMPLE');
 
-    model.set({ reused: new kb.Model() });
+    model.set({ reused: new Backbone.Model() });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL');
 
     model.set({ reused: null });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is retains type of kb.TYPE_MODEL');
 
-    model.set({ reused: new kb.Collection() });
+    model.set({ reused: new Backbone.Collection() });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION');
 
     model.set({ reused: null });
@@ -406,7 +406,7 @@ describe('view-model', () => {
   it('8b. Changing attribute types', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ reused: null });
+    const model = new Backbone.Model({ reused: null });
     const view_model = kb.viewModel(model, { factories: {
       reused: { create(obj, options) {
         if (kb.isCollection(obj) || (!obj && (kb.utils.valueType(view_model ? view_model.reused : undefined) === kb.TYPE_COLLECTION))) {
@@ -419,13 +419,13 @@ describe('view-model', () => {
     });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL');
 
-    model.set({ reused: new kb.Model() });
+    model.set({ reused: new Backbone.Model() });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL');
 
     model.set({ reused: null });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused retains type of kb.TYPE_MODEL');
 
-    model.set({ reused: new kb.Collection() });
+    model.set({ reused: new Backbone.Collection() });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_COLLECTION, 'reused is kb.TYPE_COLLECTION');
 
     model.set({ reused: null });
@@ -439,9 +439,9 @@ describe('view-model', () => {
 
   it('9. Shared Options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const model1 = new kb.Model({ id: 1, name: 'Bob' });
-    const model2 = new kb.Model({ id: 1, name: 'Bob' });
-    const model3 = new kb.Model({ id: 1, name: 'Bob' });
+    const model1 = new Backbone.Model({ id: 1, name: 'Bob' });
+    const model2 = new Backbone.Model({ id: 1, name: 'Bob' });
+    const model3 = new Backbone.Model({ id: 1, name: 'Bob' });
 
     const view_model1 = kb.viewModel(model1);
     const view_model2 = kb.viewModel(model2);
@@ -459,63 +459,63 @@ describe('view-model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // keys - array
-    let view_model = kb.viewModel(new kb.Model({ name: 'Bob' }), { keys: ['name', 'date'] });
+    let view_model = kb.viewModel(new Backbone.Model({ name: 'Bob' }), { keys: ['name', 'date'] });
     assert.equal(view_model.name(), 'Bob', 'keys: Bob');
     assert.ok(view_model.date, 'keys: date');
     assert.equal(view_model.date(), null, 'keys: date fn');
     kb.release(view_model);
 
     // keys - no array
-    view_model = kb.viewModel(new kb.Model({ name: 'Bob' }), { keys: 'date' });
+    view_model = kb.viewModel(new Backbone.Model({ name: 'Bob' }), { keys: 'date' });
     assert.ok(view_model.date, 'keys: date');
     assert.equal(view_model.date(), null, 'keys: date fn');
     kb.release(view_model);
 
     // keys - object
-    view_model = kb.viewModel(new kb.Model({ name: 'Bob' }), { keys: { name: {}, date: {} } });
+    view_model = kb.viewModel(new Backbone.Model({ name: 'Bob' }), { keys: { name: {}, date: {} } });
     assert.equal(view_model.name(), 'Bob', 'keys: Bob');
     assert.ok(view_model.date, 'keys: date');
     assert.equal(view_model.date(), null, 'keys: date fn');
     kb.release(view_model);
 
     // excludes
-    view_model = kb.viewModel(new kb.Model({ name: 'Bob', date: new Date() }), { excludes: ['date'] });
+    view_model = kb.viewModel(new Backbone.Model({ name: 'Bob', date: new Date() }), { excludes: ['date'] });
     assert.equal(view_model.name(), 'Bob', 'excludes: Bob');
     assert.ok(!view_model.date, 'excludes: date');
     kb.release(view_model);
 
     // excludes - no array
-    view_model = kb.viewModel(new kb.Model({ name: 'Bob', date: new Date() }), { excludes: 'date' });
+    view_model = kb.viewModel(new Backbone.Model({ name: 'Bob', date: new Date() }), { excludes: 'date' });
     assert.equal(view_model.name(), 'Bob', 'excludes: Bob');
     assert.ok(!view_model.date, 'excludes: date');
     kb.release(view_model);
 
     // requires
-    view_model = kb.viewModel(new kb.Model(), { requires: ['name'] });
+    view_model = kb.viewModel(new Backbone.Model(), { requires: ['name'] });
     assert.equal(view_model.name(), null, 'requires: name');
     assert.ok(!view_model.date, 'requires: date');
     kb.release(view_model);
 
     // requires - no array
-    view_model = kb.viewModel(new kb.Model(), { requires: 'name' });
+    view_model = kb.viewModel(new Backbone.Model(), { requires: 'name' });
     assert.equal(view_model.name(), null, 'requires: name');
     assert.ok(!view_model.date, 'requires: date');
     kb.release(view_model);
 
     // internals
-    view_model = kb.viewModel(new kb.Model(), { internals: ['name'] });
+    view_model = kb.viewModel(new Backbone.Model(), { internals: ['name'] });
     assert.equal(view_model._name(), null, 'internals: name');
     assert.ok(!view_model.date, 'internals: date');
     kb.release(view_model);
 
     // internals - no array
-    view_model = kb.viewModel(new kb.Model(), { internals: 'name' });
+    view_model = kb.viewModel(new Backbone.Model(), { internals: 'name' });
     assert.equal(view_model._name(), null, 'internals: name');
     assert.ok(!view_model.date, 'internals: date');
     kb.release(view_model);
 
     // mappings
-    view_model = kb.viewModel(new kb.Model(), { mappings: { name: {} } });
+    view_model = kb.viewModel(new Backbone.Model(), { mappings: { name: {} } });
     assert.equal(view_model.name(), null, 'mappings: name');
     assert.ok(!view_model.date, 'mappings: date');
     kb.release(view_model);
@@ -524,7 +524,7 @@ describe('view-model', () => {
   });
 
   it('11. array attributes', () => {
-    const model = new kb.Model({
+    const model = new Backbone.Model({
       text: ['heading.get these rewards'],
       widget: ['sign_up', 'rewards'],
       model_data: {
@@ -549,7 +549,7 @@ describe('view-model', () => {
 
   it('12. model change is observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const model = new kb.Model({ id: 1, name: 'Bob' });
+    const model = new Backbone.Model({ id: 1, name: 'Bob' });
 
     const view_model = kb.viewModel(model);
 
@@ -575,7 +575,7 @@ describe('view-model', () => {
       },
     };
 
-    const Model = kb.Parse ? kb.Model.extend('Model', model_opts) : kb.Model.extend(model_opts);
+    const Model = Backbone.Model.extend(model_opts);
 
     const model1 = new Model();
     const view_model = kb.viewModel(model1);
@@ -608,7 +608,7 @@ describe('view-model', () => {
       },
     };
 
-    const Model = kb.Parse ? kb.Model.extend('Model', model_opts) : kb.Model.extend(model_opts);
+    const Model = Backbone.Model.extend(model_opts);
 
     const model1 = new Model();
     const view_model = kb.viewModel(model1);
@@ -659,7 +659,7 @@ describe('view-model', () => {
       },
     };
 
-    const Model = kb.Parse ? kb.Model.extend('Model', model_opts) : kb.Model.extend(model_opts);
+    const Model = Backbone.Model.extend(model_opts);
 
     const model1 = new Model();
     const view_model = kb.viewModel(model1);
@@ -707,7 +707,7 @@ describe('view-model', () => {
       defaults: default_attrs,
     };
 
-    const Model = kb.Parse ? kb.Model.extend('Model', model_opts) : kb.Model.extend(model_opts);
+    const Model = Backbone.Model.extend(model_opts);
 
     const model1 = new Model();
     const view_model = kb.viewModel(model1);
@@ -863,12 +863,12 @@ describe('view-model', () => {
   it('21. view model changes do not cause dependencies inside ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model = new TestViewModel(new kb.Model({ id: 1, name: 'Initial' }));
+    const view_model = new TestViewModel(new Backbone.Model({ id: 1, name: 'Initial' }));
     let model = view_model.model();
 
     let count_manual = 0;
     ko.computed(() => {
-      view_model.model(new kb.Model({ id: 10, name: 'Manual' })); // should not depend
+      view_model.model(new Backbone.Model({ id: 10, name: 'Manual' })); // should not depend
       return count_manual++;
     });
 
@@ -886,13 +886,13 @@ describe('view-model', () => {
 
     let count_set_model = 0;
     ko.computed(() => {
-      model.set({ model: new kb.Model({ name: 'NestedModel' }) }); // should not depend
+      model.set({ model: new Backbone.Model({ name: 'NestedModel' }) }); // should not depend
       return count_set_model++;
     });
 
     let count_set_collection = 0;
     ko.computed(() => {
-      model.set({ collection: new kb.Collection([{ name: 'NestedModel' }]) }); // should not depend
+      model.set({ collection: new Backbone.Collection([{ name: 'NestedModel' }]) }); // should not depend
       return count_set_collection++;
     });
 
@@ -909,11 +909,11 @@ describe('view-model', () => {
     assert.equal(count_set_collection, 1, 'count_set_collection');
     assert.equal(observable_count, 1, 'observable_count');
 
-    view_model.model(new kb.Model({ id: 10, name: 'Manual' }));
+    view_model.model(new Backbone.Model({ id: 10, name: 'Manual' }));
     model.set({ name: 'Existing' });
     model.set({ new_attribute: 'New' });
-    model.set({ model: new kb.Model({ name: 'NestedModel' }) });
-    model.set({ collection: new kb.Collection([{ name: 'NestedModel' }]) });
+    model.set({ model: new Backbone.Model({ name: 'NestedModel' }) });
+    model.set({ collection: new Backbone.Collection([{ name: 'NestedModel' }]) });
     assert.equal(count_manual, 1, 'count_manual');
     assert.equal(count_set_existing, 1, 'count_set_existing');
     assert.equal(count_set_new, 1, 'count_set_new');
@@ -942,7 +942,7 @@ describe('view-model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = kb.viewModel(
-      new kb.Model({ id: 1, name: 'Initial', date: new Date() }),
+      new Backbone.Model({ id: 1, name: 'Initial', date: new Date() }),
       { statics: ['name', 'author', 'description', 'tags'], static_defaults: { author: '(none)', description: null } },
     );
 
@@ -972,15 +972,12 @@ describe('view-model', () => {
   it('23. Issue 94', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    // ECOSYSTEM
-    if (kb.Parse) return;
+    const Child = Backbone.Model.extend();
 
-    const Child = kb.Model.extend();
-
-    const Parent = kb.Model.extend({
+    const Parent = Backbone.Model.extend({
       defaults: {
         child: new Child({ name: 'SingleChild' }),
-        children: new kb.Collection([new Child({ name: 'Child1' }), new Child({ name: 'Child2' })], { model: Child }),
+        children: new Backbone.Collection([new Child({ name: 'Child1' }), new Child({ name: 'Child2' })], { model: Child }),
       },
     });
 
@@ -1019,12 +1016,12 @@ describe('view-model', () => {
   it('24. Issue 82 - createObservables', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const children = new kb.Collection([
-      new kb.Model({ name: 'Charles' }),
-      new kb.Model({ name: 'Eve' }),
+    const children = new Backbone.Collection([
+      new Backbone.Model({ name: 'Charles' }),
+      new Backbone.Model({ name: 'Eve' }),
     ]);
 
-    const parent = new kb.Model({ name: 'Bob', children });
+    const parent = new Backbone.Model({ name: 'Bob', children });
 
     const subFactory = (model) => {
       const subVm = new kb.ViewModel(model);
@@ -1047,7 +1044,7 @@ describe('view-model', () => {
     let model1;
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model = kb.viewModel(model1 = new kb.Model());
+    const view_model = kb.viewModel(model1 = new Backbone.Model());
     model1.set({ propB: 'val2' });
     assert.equal(view_model.propB(), 'val2');
 
@@ -1065,7 +1062,7 @@ describe('view-model', () => {
 
     const view_model = kb.viewModel(null);
     assert.ok(!view_model.name);
-    view_model.model(new kb.Model({ name: 'Bob' }));
+    view_model.model(new Backbone.Model({ name: 'Bob' }));
     assert.equal(view_model.name(), 'Bob');
 
     kb.release(view_model);
@@ -1079,19 +1076,19 @@ describe('view-model', () => {
 
     class CustomViewModel extends kb.ViewModel {}
 
-    const view_model = kb.viewModel(new kb.Model({ model1: null, model2: null }), { factories: { model1: CustomViewModel, model2: CustomViewModel } });
+    const view_model = kb.viewModel(new Backbone.Model({ model1: null, model2: null }), { factories: { model1: CustomViewModel, model2: CustomViewModel } });
     assert.ok(view_model.model1);
     assert.equal(view_model.model1().model(), null, 'model1 is null');
     assert.ok(view_model.model2);
     assert.equal(view_model.model2().model(), null, 'model2 is null');
 
     // cannot change a shared model
-    assert.throw((() => view_model.model1().model(new kb.Model({ name: 'Bob' }))), 'Trying to change a shared view model. Ref count: 3');
+    assert.throw((() => view_model.model1().model(new Backbone.Model({ name: 'Bob' }))), 'Trying to change a shared view model. Ref count: 3');
     assert.equal(view_model.model1().model(), null, 'model1 is still null');
     assert.ok(!view_model.model1().name, 'name has not been added to the shared view model');
 
     // can set the view model
-    view_model.model1(new CustomViewModel(new kb.Model({ name: 'Bob' })));
+    view_model.model1(new CustomViewModel(new Backbone.Model({ name: 'Bob' })));
     assert(!!view_model.model1().model);
     assert.equal(view_model.model1().name(), 'Bob', 'name has been added to the new view model');
 
@@ -1106,8 +1103,8 @@ describe('view-model', () => {
 
     class CustomViewModel extends kb.ViewModel {}
 
-    const model = new kb.Model({ name: 'Fred' });
-    const view_model = kb.viewModel(new kb.Model({ model1: model, model2: model }), { factories: { model1: CustomViewModel, model2: CustomViewModel } });
+    const model = new Backbone.Model({ name: 'Fred' });
+    const view_model = kb.viewModel(new Backbone.Model({ model1: model, model2: model }), { factories: { model1: CustomViewModel, model2: CustomViewModel } });
     assert.ok(view_model.model1);
     assert.equal(view_model.model1().model(), model, 'model1 is model');
     assert.equal(view_model.model1().name(), 'Fred', 'name is Fred');
@@ -1116,12 +1113,12 @@ describe('view-model', () => {
     assert.equal(view_model.model2().name(), 'Fred', 'name is Fred');
 
     // cannot change a shared model
-    assert.throw((() => view_model.model1().model(new kb.Model({ name: 'Bob' }))), 'Trying to change a shared view model. Ref count: 2');
+    assert.throw((() => view_model.model1().model(new Backbone.Model({ name: 'Bob' }))), 'Trying to change a shared view model. Ref count: 2');
     assert.equal(view_model.model1().model(), model, 'model1 is still model');
     assert.equal(view_model.model1().name(), 'Fred', 'name has not been changed');
 
     // can set the view model
-    view_model.model1(new CustomViewModel(new kb.Model({ name: 'Bob' })));
+    view_model.model1(new CustomViewModel(new Backbone.Model({ name: 'Bob' })));
     assert(!!view_model.model1().model);
     assert.equal(view_model.model1().name(), 'Bob', 'name has been changed on the new view model');
 
@@ -1134,7 +1131,7 @@ describe('view-model', () => {
   it('handles url attributes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model = kb.viewModel(new kb.Model({ url: '/some_url' }));
+    const view_model = kb.viewModel(new Backbone.Model({ url: '/some_url' }));
     assert.equal(view_model.url(), '/some_url');
 
     kb.release(view_model);
@@ -1146,7 +1143,7 @@ describe('view-model', () => {
   it('handles attribute named model', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ model: 'car' });
+    const model = new Backbone.Model({ model: 'car' });
     const view_model = kb.viewModel(model, { internals: ['model'] });
     assert.equal(view_model._model(), 'car');
     assert.equal(view_model.model(), model);

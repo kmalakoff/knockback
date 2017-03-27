@@ -10,8 +10,8 @@ describe('validation', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
@@ -374,7 +374,7 @@ describe('validation', () => {
 
     root.MyViewModel = kb.ViewModel.extend({
       constructor() {
-        const model = new kb.Model({ name: '', site: '' });
+        const model = new Backbone.Model({ name: '', site: '' });
         kb.ViewModel.prototype.constructor.call(this, model);
       },
     });

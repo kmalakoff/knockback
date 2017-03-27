@@ -7,12 +7,13 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
+import _ from 'underscore';
+import Backbone from 'backbone';
+import ko from 'knockout';
+
+import './monkey-patches';
+
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-
-const ko = require('knockout');
-
-let _ = null;
-let Backbone = null;
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -63,38 +64,36 @@ const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 //   @param [Data|ko.observable] value the value to localize
 //   @param [Object] options the create options
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-class kb {
+export default class kb {
   static initClass() {
     // Knockback library semantic version
-    this.VERSION = '1.2.2';
+    kb.VERSION = '1.2.2';
 
     // ###################################
     // OBSERVABLE STORAGE TYPES
     // ###################################
 
     // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
-    this.TYPE_UNKNOWN = 0;
+    kb.TYPE_UNKNOWN = 0;
     // Stored value type is simple like a String or Number -> observable type: ko.observable
-    this.TYPE_SIMPLE = 1;
+    kb.TYPE_SIMPLE = 1;
     // Stored value type is an Array -> observable type: ko.observableArray
-    this.TYPE_ARRAY = 2;
+    kb.TYPE_ARRAY = 2;
     // Stored value type is a Model -> observable type: ViewModel
-    this.TYPE_MODEL = 3;
+    kb.TYPE_MODEL = 3;
     // Stored value type is a Collection -> observable type: kb.CollectionObservable
-    this.TYPE_COLLECTION = 4;
+    kb.TYPE_COLLECTION = 4;
 
-    // Helper to ignore dependencies in a function
-    //
-    // @param [Object] obj the object to test
-    //
-    // @example
-    //   kb.ignore(fn);
+    // cache local reference to underscore
+    kb.assign = _.assign || _.extend;
+
+    // cache local reference to Knockout
     const _ignore = (callback, callbackTarget, callbackArgs) => {
       let value = null;
       ko.computed(() => { value = callback.apply(callbackTarget, callbackArgs || []); }).dispose();
       return value;
     };
-    this.ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
+    kb.ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
   }
 
   // Checks if an object has been released.
@@ -300,21 +299,3 @@ class kb {
   static isCollection(obj) { return obj && (obj instanceof kb.Collection); }
 }
 kb.initClass();
-module.exports = kb;
-
-if (root.Parse) {
-  kb.Parse = root.Parse; Backbone = kb.Parse;
-  kb._ = root.Parse._; _ = kb._;
-} else {
-  kb.Backbone = require('backbone'); Backbone = kb.Backbone;
-  kb._ = require('underscore'); _ = kb._;
-}
-kb.ko = ko;
-
-// cache local references
-kb.Collection = Backbone.Collection;
-kb.Model = Backbone.Object || Backbone.Model;
-kb.Events = Backbone.Events;
-
-// Object.assign
-kb.assign = _.assign || _.extend;

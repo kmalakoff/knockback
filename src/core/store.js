@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import ko from 'knockout';
 
 // Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models,
 // to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
@@ -19,7 +18,7 @@ const { _, ko } = kb;
 //   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 //     store: kb.utils.wrappedStore(co)
 //   });
-class Store {
+export default class Store {
   static initClass() {
     // @nodoc
     Store.instances = [];
@@ -289,4 +288,3 @@ class Store {
   }
 }
 Store.initClass();
-module.exports = Store;

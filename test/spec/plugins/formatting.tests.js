@@ -3,19 +3,19 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 
 describe('formatted-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!kb, 'kb');
   });
 
-  const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+  const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
 
   it('Various scenarios', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -177,7 +177,7 @@ describe('formatted-observable', () => {
       }
     }
 
-    const model = new kb.Model();
+    const model = new Backbone.Model();
     const view_model = new ContactViewModelFullName(model);
     assert.equal(view_model.full_name(), 'Last: , First: ', 'full name is good');
 
@@ -207,7 +207,7 @@ describe('formatted-observable', () => {
       }
     }
 
-    const model = new kb.Model({ first: 'Ringo', last: 'Starr' });
+    const model = new Backbone.Model({ first: 'Ringo', last: 'Starr' });
     const view_model = new ContactViewModelFullName(model);
     assert.equal(view_model.full_name(), 'Last: Starr, First: Ringo', 'full name is good');
 
@@ -235,7 +235,7 @@ describe('formatted-observable', () => {
       }
     }
 
-    const model = new kb.Model({ first: 'Ringo', last: 'Starr' });
+    const model = new Backbone.Model({ first: 'Ringo', last: 'Starr' });
     const view_model = new ContactViewModelFullName(model);
     assert.equal(view_model.full_name(), 'Last: Starr, First: Ringo', 'full name is good');
 

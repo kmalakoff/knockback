@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("backbone"), require("underscore"), require("knockout"));
+		module.exports = factory(require("underscore"), require("knockout"), require("backbone"));
 	else if(typeof define === 'function' && define.amd)
-		define(["backbone", "underscore", "knockout"], factory);
+		define(["underscore", "knockout", "backbone"], factory);
 	else if(typeof exports === 'object')
-		exports["kb"] = factory(require("backbone"), require("underscore"), require("knockout"));
+		exports["kb"] = factory(require("underscore"), require("knockout"), require("backbone"));
 	else
-		root["kb"] = factory(root["Backbone"], root["_"], root["ko"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_32__, __WEBPACK_EXTERNAL_MODULE_33__, __WEBPACK_EXTERNAL_MODULE_34__) {
+		root["kb"] = factory(root["_"], root["ko"], root["Backbone"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -78,16 +78,84 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+var _underscore = __webpack_require__(0);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _collectionObservable = __webpack_require__(12);
+
+var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
+
+var _observable = __webpack_require__(20);
+
+var _observable2 = _interopRequireDefault(_observable);
+
+var _viewModel = __webpack_require__(27);
+
+var _viewModel2 = _interopRequireDefault(_viewModel);
+
+var _configure = __webpack_require__(13);
+
+var _configure2 = _interopRequireDefault(_configure);
+
+var _utils = __webpack_require__(26);
+
+var _utils2 = _interopRequireDefault(_utils);
+
+var _statistics = __webpack_require__(23);
+
+var _statistics2 = _interopRequireDefault(_statistics);
+
+var _eventWatcher = __webpack_require__(5);
+
+var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
+
+var _store = __webpack_require__(24);
+
+var _store2 = _interopRequireDefault(_store);
+
+var _factory = __webpack_require__(14);
+
+var _factory2 = _interopRequireDefault(_factory);
+
+__webpack_require__(18);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
   knockback.js 1.2.2
@@ -98,12 +166,65 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
+var api = {
+  _: _underscore2.default,
+  Backbone: _backbone2.default,
+  ko: _knockout2.default,
+  CollectionObservable: _collectionObservable2.default,
+  Observable: _observable2.default,
+  ViewModel: _viewModel2.default,
+  configure: _configure2.default,
+  utils: _utils2.default,
+  Statistics: _statistics2.default,
+  EventWatcher: _eventWatcher2.default,
+  Store: _store2.default,
+  Factory: _factory2.default
+};
+_kb2.default.assign(_kb2.default, api);
+
+module.exports = _kb2.default;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+__webpack_require__(19);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
-
-var ko = __webpack_require__(34);
-
-var _ = null;
-var Backbone = null;
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -164,37 +285,35 @@ var kb = function () {
     key: 'initClass',
     value: function initClass() {
       // Knockback library semantic version
-      this.VERSION = '1.2.2';
+      kb.VERSION = '1.2.2';
 
       // ###################################
       // OBSERVABLE STORAGE TYPES
       // ###################################
 
       // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
-      this.TYPE_UNKNOWN = 0;
+      kb.TYPE_UNKNOWN = 0;
       // Stored value type is simple like a String or Number -> observable type: ko.observable
-      this.TYPE_SIMPLE = 1;
+      kb.TYPE_SIMPLE = 1;
       // Stored value type is an Array -> observable type: ko.observableArray
-      this.TYPE_ARRAY = 2;
+      kb.TYPE_ARRAY = 2;
       // Stored value type is a Model -> observable type: ViewModel
-      this.TYPE_MODEL = 3;
+      kb.TYPE_MODEL = 3;
       // Stored value type is a Collection -> observable type: kb.CollectionObservable
-      this.TYPE_COLLECTION = 4;
+      kb.TYPE_COLLECTION = 4;
 
-      // Helper to ignore dependencies in a function
-      //
-      // @param [Object] obj the object to test
-      //
-      // @example
-      //   kb.ignore(fn);
+      // cache local reference to underscore
+      kb.assign = _underscore2.default.assign || _underscore2.default.extend;
+
+      // cache local reference to Knockout
       var _ignore = function _ignore(callback, callbackTarget, callbackArgs) {
         var value = null;
-        ko.computed(function () {
+        _knockout2.default.computed(function () {
           value = callback.apply(callbackTarget, callbackArgs || []);
         }).dispose();
         return value;
       };
-      this.ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
+      kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.dependencyDetection.ignore ? _knockout2.default.dependencyDetection.ignore : _ignore;
     }
 
     // Checks if an object has been released.
@@ -216,7 +335,7 @@ var kb = function () {
         depth = 0;
       }
       if (!obj || obj !== Object(obj) || obj.__kb_released) return false; // must be an object and not already released
-      if (ko.isObservable(obj) || obj instanceof kb.ViewModel) return true; // a known type that is releasable
+      if (_knockout2.default.isObservable(obj) || obj instanceof kb.ViewModel) return true; // a known type that is releasable
       if (typeof obj === 'function' || kb.isModel(obj) || kb.isCollection(obj)) return false; // a known type that is not releaseable
       for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
         var method = LIFECYCLE_METHODS[i];
@@ -250,8 +369,8 @@ var kb = function () {
       obj.__kb_released = true; // mark as released
 
       // release array's items
-      if (_.isArray(obj)) {
-        _.each(obj, function (value, index) {
+      if (_underscore2.default.isArray(obj)) {
+        _underscore2.default.each(obj, function (value, index) {
           if (kb.isReleaseable(value)) {
             obj[index] = null;kb.release(value);
           }
@@ -261,12 +380,12 @@ var kb = function () {
 
       // observable or lifecycle managed
       var array = kb.peek(obj);
-      if (ko.isObservable(obj) && _.isArray(array)) {
+      if (_knockout2.default.isObservable(obj) && _underscore2.default.isArray(array)) {
         if (obj.__kb_is_co || obj.__kb_is_o && obj.valueType() === kb.TYPE_COLLECTION) {
           if (typeof obj.destroy === 'function') obj.destroy();
           return;
         }
-        _.each(array, function (value, index) {
+        _underscore2.default.each(array, function (value, index) {
           if (kb.isReleaseable(value)) {
             array[index] = null;kb.release(value);
           }
@@ -286,7 +405,7 @@ var kb = function () {
         }
       }
 
-      if (!ko.isObservable(obj)) this.releaseKeys(obj); // view model
+      if (!_knockout2.default.isObservable(obj)) this.releaseKeys(obj); // view model
     }
 
     // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
@@ -294,7 +413,7 @@ var kb = function () {
   }, {
     key: 'releaseKeys',
     value: function releaseKeys(obj) {
-      _.each(obj, function (value, key) {
+      _underscore2.default.each(obj, function (value, key) {
         if (key !== '__kb' && kb.isReleaseable(value)) {
           obj[key] = null;
           kb.release(value);
@@ -319,7 +438,7 @@ var kb = function () {
     value: function releaseOnNodeRemove(view_model, node) {
       view_model || kb._throwUnexpected(this, 'missing view model');
       node || kb._throwUnexpected(this, 'missing node');
-      return ko.utils.domNodeDisposal.addDisposeCallback(node, function () {
+      return _knockout2.default.utils.domNodeDisposal.addDisposeCallback(node, function () {
         return kb.release(view_model);
       });
     }
@@ -345,14 +464,14 @@ var kb = function () {
       }
 
       var el = root.document.createElement('div');
-      var observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
+      var observable = _knockout2.default.renderTemplate(template, view_model, options, el, 'replaceChildren');
 
       // do not return the template wrapper if possible
       if (el.childNodes.length === 1) el = el.childNodes[0];else if (el.childNodes.length) {
         for (var i = 0, end = el.childNodes.length, asc = end >= 0; asc ? i <= end : i >= end; asc ? i++ : i--) {
           // ensure the context is passed up to wrapper from a child
           try {
-            ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i]));
+            _knockout2.default.storedBindingContextForNode(el, _knockout2.default.contextFor(el.childNodes[i]));
             break;
           } catch (err) {/**/}
         }
@@ -384,11 +503,11 @@ var kb = function () {
         // convert to a root element
         var children = node;
         node = root.document.createElement('div');
-        _.each(children, function (child) {
+        _underscore2.default.each(children, function (child) {
           return node.appendChild(child);
         });
       }
-      ko.applyBindings(view_model, node);
+      _knockout2.default.applyBindings(view_model, node);
       kb.releaseOnNodeRemove(view_model, node);
       return node;
     }
@@ -397,7 +516,7 @@ var kb = function () {
     value: function getValue(model, key, args) {
       if (!model) return undefined;
       if (!args) return model.get(key);
-      return model.get.apply(model, _toConsumableArray(_.map([key].concat(args), function (value) {
+      return model.get.apply(model, _toConsumableArray(_underscore2.default.map([key].concat(args), function (value) {
         return kb.peek(value);
       })));
     }
@@ -418,7 +537,7 @@ var kb = function () {
   }, {
     key: '_throwMissing',
     value: function _throwMissing(instance, message) {
-      throw new Error((_.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is missing');
+      throw new Error((_underscore2.default.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is missing');
     }
 
     // @nodoc
@@ -426,7 +545,7 @@ var kb = function () {
   }, {
     key: '_throwUnexpected',
     value: function _throwUnexpected(instance, message) {
-      throw new Error((_.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is unexpected');
+      throw new Error((_underscore2.default.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is unexpected');
     }
 
     // @nodoc
@@ -434,7 +553,7 @@ var kb = function () {
   }, {
     key: 'publishMethods',
     value: function publishMethods(observable, instance, methods) {
-      _.each(methods, function (fn) {
+      _underscore2.default.each(methods, function (fn) {
         observable[fn] = kb._.bind(instance[fn], instance);
       });
     }
@@ -444,7 +563,7 @@ var kb = function () {
   }, {
     key: 'peek',
     value: function peek(obs) {
-      if (!ko.isObservable(obs)) return obs;
+      if (!_knockout2.default.isObservable(obs)) return obs;
       if (obs.peek) return obs.peek();
       return kb.ignore(function () {
         return obs();
@@ -471,92 +590,50 @@ var kb = function () {
   return kb;
 }();
 
+exports.default = kb;
+
 kb.initClass();
-module.exports = kb;
-
-if (root.Parse) {
-  kb.Parse = root.Parse;Backbone = kb.Parse;
-  kb._ = root.Parse._;_ = kb._;
-} else {
-  kb.Backbone = __webpack_require__(32);Backbone = kb.Backbone;
-  kb._ = __webpack_require__(33);_ = kb._;
-}
-kb.ko = ko;
-
-// cache local references
-kb.Collection = Backbone.Collection;
-kb.Model = Backbone.Object || Backbone.Model;
-kb.Events = Backbone.Events;
-
-// Object.assign
-kb.assign = _.assign || _.extend;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 1 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.emitterObservable = undefined;
 
-var kb = __webpack_require__(0);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
 
-module.exports = kb;
+var _underscore = __webpack_require__(0);
 
-kb.configure = __webpack_require__(10);
+var _underscore2 = _interopRequireDefault(_underscore);
 
-__webpack_require__(16);
-kb.utils = __webpack_require__(23);
-kb.Statistics = __webpack_require__(20);
-kb.Store = __webpack_require__(21);
-kb.Factory = __webpack_require__(11);
-kb.EventWatcher = __webpack_require__(2);
+var _backbone = __webpack_require__(2);
 
-kb.CollectionObservable = __webpack_require__(9);
-kb.Observable = __webpack_require__(17);
-kb.ViewModel = __webpack_require__(24);
-__webpack_require__(15);
+var _backbone2 = _interopRequireDefault(_backbone);
 
-// re-expose modules
-kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };
+var _knockout = __webpack_require__(1);
 
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
+var _knockout2 = _interopRequireDefault(_knockout);
 
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
-
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 //
-
 var EventWatcher = function () {
   _createClass(EventWatcher, null, [{
     key: 'useOptionsOrCreate',
@@ -592,14 +669,14 @@ var EventWatcher = function () {
     this._onModelLoaded = function (model) {
       _this.ee = model;
 
-      _.each(_this.__kb.callbacks, function (callbacks, event_name) {
+      _underscore2.default.each(_this.__kb.callbacks, function (callbacks, event_name) {
         if (callbacks.model && callbacks.model !== model) _this._unbindCallbacks(event_name, callbacks, true);
         if (!callbacks.model) {
           callbacks.model = model;
           model.bind(event_name, callbacks.fn);
         }
 
-        _.each(callbacks.list, function (info) {
+        _underscore2.default.each(callbacks.list, function (info) {
           if (!info.unbind_fn && kb.settings.orm && kb.settings.orm.customBind) {
             info.unbind_fn = kb.settings.orm.customBind(model, info.key, info.update, info.path);
           }
@@ -611,7 +688,7 @@ var EventWatcher = function () {
     this._onModelUnloaded = function (model) {
       if (_this.ee !== model) return;
       _this.ee = null;
-      _.each(_this.__kb.callbacks, function (callbacks, event_name) {
+      _underscore2.default.each(_this.__kb.callbacks, function (callbacks, event_name) {
         return _this._unbindCallbacks(event_name, callbacks);
       });
     };
@@ -621,7 +698,7 @@ var EventWatcher = function () {
         callbacks.model.unbind(event_name, callbacks.fn);callbacks.model = null;
       }
 
-      _.each(callbacks.list, function (info) {
+      _underscore2.default.each(callbacks.list, function (info) {
         if (info.unbind_fn) {
           info.unbind_fn(), info.unbind_fn = null;
         }
@@ -675,7 +752,7 @@ var EventWatcher = function () {
       }
 
       // set up current
-      if (kb.Backbone && kb.Backbone.ModelRef && new_emitter instanceof kb.Backbone.ModelRef) {
+      if (_backbone2.default && _backbone2.default.ModelRef && new_emitter instanceof _backbone2.default.ModelRef) {
         this.model_ref = new_emitter;this.model_ref.retain();
         this.model_ref.bind('loaded', this._onModelLoaded);
         this.model_ref.bind('unloaded', this._onModelUnloaded);
@@ -714,7 +791,7 @@ var EventWatcher = function () {
       var event_names = callback_info.event_selector ? callback_info.event_selector.split(' ') : ['change'];
       var model = this.ee;
 
-      _.each(event_names, function (event_name) {
+      _underscore2.default.each(event_names, function (event_name) {
         if (!event_name) return; // extra spaces
 
         var callbacks = _this2.__kb.callbacks[event_name];
@@ -723,9 +800,9 @@ var EventWatcher = function () {
             model: null,
             list: [],
             fn: function fn(m) {
-              _.each(callbacks.list, function (info) {
+              _underscore2.default.each(callbacks.list, function (info) {
                 if (!info.update) return;
-                if (m && info.key && m.hasChanged && !m.hasChanged(ko.utils.unwrapObservable(info.key))) return; // key doesn't match
+                if (m && info.key && m.hasChanged && !m.hasChanged(_knockout2.default.utils.unwrapObservable(info.key))) return; // key doesn't match
                 if (kb.statistics) kb.statistics.addModelEvent({ name: event_name, model: m, key: info.key, path: info.path });
                 info.update();
               }); // trigger update
@@ -734,7 +811,7 @@ var EventWatcher = function () {
           callbacks = _this2.__kb.callbacks[event_name];
         }
 
-        var info = _.defaults({ obj: obj }, callback_info);
+        var info = _underscore2.default.defaults({ obj: obj }, callback_info);
         callbacks.list.push(info); // store the callback information
         if (model) _this2._onModelLoaded(model);
       });
@@ -747,7 +824,7 @@ var EventWatcher = function () {
       var _this3 = this;
 
       this.ee = null;
-      _.each(this.__kb.callbacks, function (callbacks, event_name) {
+      _underscore2.default.each(this.__kb.callbacks, function (callbacks, event_name) {
         return _this3._unbindCallbacks(event_name, callbacks, kb.wasReleased(obj));
       });
       return delete this.__kb.callbacks;
@@ -772,15 +849,16 @@ var EventWatcher = function () {
   return EventWatcher;
 }();
 
-module.exports = EventWatcher;
-
 // factory function
-kb.emitterObservable = function (emitter, observable) {
+
+
+exports.default = EventWatcher;
+var emitterObservable = exports.emitterObservable = function emitterObservable(emitter, observable) {
   return new EventWatcher(emitter, observable);
 };
 
 /***/ }),
-/* 3 */
+/* 6 */
 /***/ (function(module, exports) {
 
 var g;
@@ -807,93 +885,38 @@ module.exports = g;
 
 
 /***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-module.exports = kb;
-
-__webpack_require__(26);
-kb.DefaultObservable = __webpack_require__(25);
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-module.exports = kb;
-
-kb.FormattedObservable = __webpack_require__(27);
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-module.exports = kb;
-
-kb.LocalizedObservable = __webpack_require__(28);
-
-/***/ }),
 /* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var kb = __webpack_require__(1);
+var _core = __webpack_require__(3);
 
-module.exports = kb;
+var _core2 = _interopRequireDefault(_core);
 
-kb.TriggeredObservable = __webpack_require__(29);
+__webpack_require__(29);
+
+var _defaultObservable = __webpack_require__(28);
+
+var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_core2.default.DefaultObservable = _defaultObservable2.default; /*
+                                                                  knockback.js 1.2.2
+                                                                  Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                  Source: https://github.com/kmalakoff/knockback
+                                                                  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                */
+
+exports.default = _core2.default;
 
 /***/ }),
 /* 8 */
@@ -902,6 +925,20 @@ kb.TriggeredObservable = __webpack_require__(29);
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _formattedObservable = __webpack_require__(30);
+
+var _formattedObservable2 = _interopRequireDefault(_formattedObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -911,12 +948,8 @@ kb.TriggeredObservable = __webpack_require__(29);
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = __webpack_require__(1);
-
-module.exports = kb;
-
-__webpack_require__(31);
-__webpack_require__(30);
+_core2.default.FormattedObservable = _formattedObservable2.default;
+exports.default = _core2.default;
 
 /***/ }),
 /* 9 */
@@ -925,9 +958,19 @@ __webpack_require__(30);
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _localizedObservable = __webpack_require__(31);
+
+var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
   knockback.js 1.2.2
@@ -938,11 +981,117 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = __webpack_require__(0);
+_core2.default.LocalizedObservable = _localizedObservable2.default;
+exports.default = _core2.default;
 
-var _ = kb._,
-    ko = kb.ko;
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _triggeredObservable = __webpack_require__(32);
+
+var _triggeredObservable2 = _interopRequireDefault(_triggeredObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+_core2.default.TriggeredObservable = _triggeredObservable2.default;
+exports.default = _core2.default;
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _validators = __webpack_require__(34);
+
+var validators = _interopRequireWildcard(_validators);
+
+var _validation = __webpack_require__(33);
+
+var validation = _interopRequireWildcard(_validation);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_core2.default.assign(_core2.default, validators); /*
+                                                     knockback.js 1.2.2
+                                                     Copyright (c)  2011-2016 Kevin Malakoff.
+                                                     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                     Source: https://github.com/kmalakoff/knockback
+                                                     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                   */
+
+_core2.default.assign(_core2.default, validation);
+exports.default = _core2.default;
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.collectionObservable = exports.compare = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var COMPARE_EQUAL = 0;
 var COMPARE_ASCENDING = -1;
@@ -950,12 +1099,12 @@ var COMPARE_DESCENDING = 1;
 
 var KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'];
 
-kb.compare = function (value_a, value_b) {
+var compare = exports.compare = function compare(value_a, value_b) {
   // String compare
-  if (_.isString(value_a)) {
+  if (_underscore2.default.isString(value_a)) {
     return value_a.localeCompare('' + value_b);
   }
-  if (_.isString(value_b)) {
+  if (_underscore2.default.isString(value_b)) {
     return value_b.localeCompare('' + value_a);
   }
 
@@ -1001,7 +1150,7 @@ var CollectionObservable = function () {
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      CollectionObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+      CollectionObservable.extend = _backbone2.default.Model.extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -1044,8 +1193,8 @@ var CollectionObservable = function () {
     _classCallCheck(this, CollectionObservable);
 
     this._onCollectionChange = function (event, arg) {
-      return kb.ignore(function () {
-        if (_this.in_edit || kb.wasReleased(_this)) return undefined; // we are doing the editing or have been released
+      return _kb2.default.ignore(function () {
+        if (_this.in_edit || _kb2.default.wasReleased(_this)) return undefined; // we are doing the editing or have been released
 
         switch (event) {
           case 'reset':
@@ -1064,7 +1213,7 @@ var CollectionObservable = function () {
             {
               if (!_this._selectModel(arg)) return undefined; // filtered
 
-              var observable = kb.utils.wrappedObservable(_this);
+              var observable = _kb2.default.utils.wrappedObservable(_this);
               var collection = _this._collection();
               if (!~collection.indexOf(arg)) return undefined; // the model may have been removed before we got a chance to add it
               var view_model = _this.viewModelByModel(arg);
@@ -1099,7 +1248,7 @@ var CollectionObservable = function () {
               if (!_comparator2) return undefined;
 
               _this.in_edit++;
-              kb.utils.wrappedObservable(_this).sort(_comparator2);
+              _kb2.default.utils.wrappedObservable(_this).sort(_comparator2);
               _this.in_edit--;
               break;
             }
@@ -1111,16 +1260,16 @@ var CollectionObservable = function () {
     };
 
     this._onObservableArrayChange = function (models_or_view_models) {
-      return kb.ignore(function () {
+      return _kb2.default.ignore(function () {
         if (_this.in_edit) return; // we are doing the editing
 
         // validate input
-        if (_this.models_only && models_or_view_models.length && !kb.isModel(models_or_view_models[0])) kb._throwUnexpected(_this, 'incorrect type passed');
-        if (!_this.models_only && models_or_view_models.length && !(_.isObject(models_or_view_models[0]) || kb.isModel(models_or_view_models[0]))) kb._throwUnexpected(_this, 'incorrect type passed');
+        if (_this.models_only && models_or_view_models.length && !_kb2.default.isModel(models_or_view_models[0])) _kb2.default._throwUnexpected(_this, 'incorrect type passed');
+        if (!_this.models_only && models_or_view_models.length && !(_underscore2.default.isObject(models_or_view_models[0]) || _kb2.default.isModel(models_or_view_models[0]))) _kb2.default._throwUnexpected(_this, 'incorrect type passed');
 
-        var observable = kb.utils.wrappedObservable(_this);
-        var collection = kb.peek(_this._collection);
-        var has_filters = kb.peek(_this._filters).length;
+        var observable = _kb2.default.utils.wrappedObservable(_this);
+        var collection = _kb2.default.peek(_this._collection);
+        var has_filters = _kb2.default.peek(_this._filters).length;
         if (!collection) return; // no collection or we are updating ourselves
 
         var view_models = models_or_view_models;
@@ -1128,7 +1277,7 @@ var CollectionObservable = function () {
         // set Models
         var models = void 0;
         if (_this.models_only) {
-          models = _.filter(models_or_view_models, function (model) {
+          models = _underscore2.default.filter(models_or_view_models, function (model) {
             return !has_filters || _this._selectModel(model);
           });
 
@@ -1136,8 +1285,8 @@ var CollectionObservable = function () {
         } else {
           !has_filters || (view_models = []); // check for filtering of ViewModels
           models = [];
-          _.each(models_or_view_models, function (view_model) {
-            var model = kb.utils.wrappedObject(view_model);
+          _underscore2.default.each(models_or_view_models, function (view_model) {
+            var model = _kb2.default.utils.wrappedObject(view_model);
             if (has_filters) {
               if (!_this._selectModel(model)) return; // filtered so skip
               view_models.push(view_model);
@@ -1145,7 +1294,7 @@ var CollectionObservable = function () {
 
             // check for view models being different (will occur if a ko select selectedOptions is bound to this collection observable) -> update our store
             var current_view_model = _this.create_options.store.find(model, _this.create_options.creator);
-            if (current_view_model && current_view_model.constructor !== view_model.constructor) kb._throwUnexpected(_this, 'replacing different type of view model');
+            if (current_view_model && current_view_model.constructor !== view_model.constructor) _kb2.default._throwUnexpected(_this, 'replacing different type of view model');
             _this.create_options.store.retain(view_model, model, _this.create_options.creator);
             models.push(model);
           });
@@ -1154,22 +1303,22 @@ var CollectionObservable = function () {
         // a change, update models
         _this.in_edit++;
         models_or_view_models.length === view_models.length || observable(view_models); // replace the ViewModels because they were filtered
-        _.isEqual(collection.models, models) || collection.reset(models);
+        _underscore2.default.isEqual(collection.models, models) || collection.reset(models);
         _this.in_edit--;
       });
     };
 
-    return kb.ignore(function () {
+    return _kb2.default.ignore(function () {
       var collection = null;
-      if (args[0] instanceof kb.Collection) collection = args.shift();else collection = _.isArray(args[0]) ? new kb.Collection(args.shift()) : new kb.Collection();
-      if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
+      if (args[0] instanceof _kb2.default.Collection) collection = args.shift();else collection = _underscore2.default.isArray(args[0]) ? new _kb2.default.Collection(args.shift()) : new _kb2.default.Collection();
+      if (_underscore2.default.isFunction(args[0])) args[0] = { view_model: args[0] };
 
       var options = {};
-      _.each(args, function (arg) {
-        kb.assign(options, arg);options = kb.utils.collapseOptions(options);
+      _underscore2.default.each(args, function (arg) {
+        _kb2.default.assign(options, arg);options = _kb2.default.utils.collapseOptions(options);
       });
 
-      var observable = kb.utils.wrappedObservable(_this, ko.observableArray([]));
+      var observable = _kb2.default.utils.wrappedObservable(_this, ko.observableArray([]));
       observable.__kb_is_co = true; // mark as a kb.CollectionObservable
       _this.in_edit = 0;
 
@@ -1177,24 +1326,24 @@ var CollectionObservable = function () {
       if (!_this.__kb) _this.__kb = {};
 
       // options
-      options = kb.utils.collapseOptions(options);
+      options = _kb2.default.utils.collapseOptions(options);
       if (options.auto_compact) {
         _this.auto_compact = true;
       }
 
       if (options.sort_attribute) _this._comparator = ko.observable(_this._attributeComparator(options.sort_attribute));else _this._comparator = ko.observable(options.comparator);
 
-      if (options.filters) _this._filters = ko.observableArray(_.isArray(options.filters) ? options.filters : [options.filters]);else _this._filters = ko.observableArray([]);
+      if (options.filters) _this._filters = ko.observableArray(_underscore2.default.isArray(options.filters) ? options.filters : [options.filters]);else _this._filters = ko.observableArray([]);
 
       // create options
-      _this.create_options = { store: kb.Store.useOptionsOrCreate(options, collection, observable) };
+      _this.create_options = { store: _kb2.default.Store.useOptionsOrCreate(options, collection, observable) };
       var create_options = _this.create_options;
-      kb.utils.wrappedObject(observable, collection);
+      _kb2.default.utils.wrappedObject(observable, collection);
 
       // view model factory create factories
       _this.path = options.path;
-      create_options.factory = kb.utils.wrappedFactory(observable, _this._shareOrCreateFactory(options));
-      create_options.path = kb.utils.pathJoin(options.path, 'models');
+      create_options.factory = _kb2.default.utils.wrappedFactory(observable, _this._shareOrCreateFactory(options));
+      create_options.path = _kb2.default.utils.pathJoin(options.path, 'models');
 
       // check for models only
       create_options.creator = create_options.factory.creatorForPath(null, create_options.path);
@@ -1203,7 +1352,7 @@ var CollectionObservable = function () {
       }
 
       // publish public interface on the observable and return instead of this
-      kb.publishMethods(observable, _this, KEYS_PUBLISH);
+      _kb2.default.publishMethods(observable, _this, KEYS_PUBLISH);
 
       // start the processing
       _this._collection = ko.observable(collection);
@@ -1212,12 +1361,12 @@ var CollectionObservable = function () {
           return _this._collection();
         },
         write: function write(new_collection) {
-          return kb.ignore(function () {
+          return _kb2.default.ignore(function () {
             var previous_collection = _this._collection();
             if (previous_collection === new_collection) return undefined; // no change
 
             // @create_options.store.reuse(@, new_collection) # not meant to be shared
-            kb.utils.wrappedObject(observable, new_collection);
+            _kb2.default.utils.wrappedObject(observable, new_collection);
 
             // clean up
             if (previous_collection) previous_collection.unbind('all', _this._onCollectionChange);
@@ -1237,14 +1386,14 @@ var CollectionObservable = function () {
       _this._mapper = ko.computed(function () {
         var comparator = _this._comparator(); // create dependency
         var filters = _this._filters(); // create dependency
-        if (filters) _.each(filters, function (filter) {
+        if (filters) _underscore2.default.each(filters, function (filter) {
           return ko.utils.unwrapObservable(filter);
         }); // create a dependency
         var current_collection = _this._collection(); // create dependency
         if (_this.in_edit) return; // we are doing the editing
 
         // no models
-        observable = kb.utils.wrappedObservable(_this);
+        observable = _kb2.default.utils.wrappedObservable(_this);
 
         var models = void 0;
         if (current_collection) models = current_collection.models;
@@ -1254,17 +1403,17 @@ var CollectionObservable = function () {
         // process filters, sorting, etc
         else {
             // apply filters
-            models = _.filter(models, function (model) {
+            models = _underscore2.default.filter(models, function (model) {
               return !filters.length || _this._selectModel(model);
             });
 
             // apply sorting
-            if (comparator) view_models = _.map(models, function (model) {
+            if (comparator) view_models = _underscore2.default.map(models, function (model) {
               return _this._createViewModel(model);
             }).sort(comparator);
             // no sorting
             else if (_this.models_only) view_models = filters.length ? models : models.slice(); // clone the array if it wasn't filtered
-              else view_models = _.map(models, function (model) {
+              else view_models = _underscore2.default.map(models, function (model) {
                   return _this._createViewModel(model);
                 });
           }
@@ -1280,9 +1429,9 @@ var CollectionObservable = function () {
       });
 
       // start subscribing
-      observable.subscribe(_.bind(_this._onObservableArrayChange, _this));
+      observable.subscribe(_underscore2.default.bind(_this._onObservableArrayChange, _this));
 
-      if (kb.statistics) kb.statistics.register('CollectionObservable', _this); // collect memory management statistics
+      if (_kb2.default.statistics) _kb2.default.statistics.register('CollectionObservable', _this); // collect memory management statistics
 
       return observable;
     });
@@ -1296,20 +1445,20 @@ var CollectionObservable = function () {
     key: 'destroy',
     value: function destroy() {
       this.__kb_released = true;
-      var observable = kb.utils.wrappedObservable(this);
-      var collection = kb.peek(this._collection);kb.utils.wrappedObject(observable, null);
+      var observable = _kb2.default.utils.wrappedObservable(this);
+      var collection = _kb2.default.peek(this._collection);_kb2.default.utils.wrappedObject(observable, null);
       if (collection) {
         collection.unbind('all', this._onCollectionChange);
-        var array = kb.peek(observable);array.splice(0, array.length); // clear the view models or models
+        var array = _kb2.default.peek(observable);array.splice(0, array.length); // clear the view models or models
       }
       this.collection.dispose();this.collection = null;this._collection = null;observable.collection = null;
       this._mapper.dispose();this._mapper = null;
-      kb.release(this._filters);this._filters = null;
+      _kb2.default.release(this._filters);this._filters = null;
       this._comparator(null);this._comparator = null;
       this.create_options = null;
-      observable.collection = null;kb.utils.wrappedDestroy(this);
+      observable.collection = null;_kb2.default.utils.wrappedDestroy(this);
 
-      if (kb.statistics) kb.statistics.unregister('CollectionObservable', this); // collect memory management statistics
+      if (_kb2.default.statistics) _kb2.default.statistics.unregister('CollectionObservable', this); // collect memory management statistics
     }
 
     // Get the options for a new collection that can be used for sharing view models.
@@ -1323,8 +1472,8 @@ var CollectionObservable = function () {
   }, {
     key: 'shareOptions',
     value: function shareOptions() {
-      var observable = kb.utils.wrappedObservable(this);
-      return { store: kb.utils.wrappedStore(observable), factory: kb.utils.wrappedFactory(observable) };
+      var observable = _kb2.default.utils.wrappedObservable(this);
+      return { store: _kb2.default.utils.wrappedStore(observable), factory: _kb2.default.utils.wrappedFactory(observable) };
     }
 
     // Setter for the filters array for excluding models in the collection observable.
@@ -1339,7 +1488,7 @@ var CollectionObservable = function () {
     key: 'filters',
     value: function filters(_filters) {
       if (_filters) {
-        return this._filters(_.isArray(_filters) ? _filters : [_filters]);
+        return this._filters(_underscore2.default.isArray(_filters) ? _filters : [_filters]);
       }
       return this._filters([]);
     }
@@ -1386,7 +1535,7 @@ var CollectionObservable = function () {
     value: function viewModelByModel(model) {
       if (this.models_only) return null;
       var id_attribute = Object.prototype.hasOwnProperty.call(model, model.idAttribute) ? model.idAttribute : 'cid';
-      return _.find(kb.peek(kb.utils.wrappedObservable(this)), function (test) {
+      return _underscore2.default.find(_kb2.default.peek(_kb2.default.utils.wrappedObservable(this)), function (test) {
         return test && test.__kb && test.__kb.object[id_attribute] === model[id_attribute];
       });
     }
@@ -1413,10 +1562,10 @@ var CollectionObservable = function () {
     value: function compact() {
       var _this2 = this;
 
-      return kb.ignore(function () {
-        var observable = kb.utils.wrappedObservable(_this2);
-        if (!kb.utils.wrappedStoreIsOwned(observable)) return undefined;
-        kb.utils.wrappedStore(observable).clear();
+      return _kb2.default.ignore(function () {
+        var observable = _kb2.default.utils.wrappedObservable(_this2);
+        if (!_kb2.default.utils.wrappedStoreIsOwned(observable)) return undefined;
+        _kb2.default.utils.wrappedStore(observable).clear();
         return _this2._collection.notifySubscribers(_this2._collection());
       });
     }
@@ -1430,7 +1579,7 @@ var CollectionObservable = function () {
   }, {
     key: '_shareOrCreateFactory',
     value: function _shareOrCreateFactory(options) {
-      var absolute_models_path = kb.utils.pathJoin(options.path, 'models');
+      var absolute_models_path = _kb2.default.utils.pathJoin(options.path, 'models');
       var factories = options.factories;
 
       // check the existing factory
@@ -1448,7 +1597,7 @@ var CollectionObservable = function () {
       }
 
       // need to create a new factory
-      factory = new kb.Factory(options.factory);
+      factory = new _kb2.default.Factory(options.factory);
       if (factories) {
         factory.addPathMappings(factories, options.path);
       }
@@ -1459,14 +1608,14 @@ var CollectionObservable = function () {
           if (options.models_only) {
             factory.addPathMapping(absolute_models_path, { models_only: true });
           } else {
-            factory.addPathMapping(absolute_models_path, kb.ViewModel);
+            factory.addPathMapping(absolute_models_path, _kb2.default.ViewModel);
           }
         } else if (options.view_model) {
           factory.addPathMapping(absolute_models_path, options.view_model);
         } else if (options.create) {
           factory.addPathMapping(absolute_models_path, { create: options.create });
         } else {
-          factory.addPathMapping(absolute_models_path, kb.ViewModel);
+          factory.addPathMapping(absolute_models_path, _kb2.default.ViewModel);
         }
       }
       return factory;
@@ -1482,7 +1631,7 @@ var CollectionObservable = function () {
     value: function _onModelRemove(model) {
       var view_model = this.models_only ? model : this.viewModelByModel(model); // either remove a view model or a model
       if (!view_model) return undefined; // it may have already been removed
-      var observable = kb.utils.wrappedObservable(this);
+      var observable = _kb2.default.utils.wrappedObservable(this);
       this.in_edit++;
       observable.remove(view_model);
       return this.in_edit--;
@@ -1498,10 +1647,10 @@ var CollectionObservable = function () {
     value: function _attributeComparator(sort_attribute) {
       var modelAttributeCompare = function modelAttributeCompare(model_a, model_b) {
         var attribute_name = ko.utils.unwrapObservable(sort_attribute);
-        return kb.compare(model_a.get(attribute_name), model_b.get(attribute_name));
+        return compare(model_a.get(attribute_name), model_b.get(attribute_name));
       };
       return this.models_only ? modelAttributeCompare : function (model_a, model_b) {
-        return modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b));
+        return modelAttributeCompare(_kb2.default.utils.wrappedModel(model_a), _kb2.default.utils.wrappedModel(model_b));
       };
     }
 
@@ -1519,13 +1668,13 @@ var CollectionObservable = function () {
   }, {
     key: '_selectModel',
     value: function _selectModel(model) {
-      var filters = kb.peek(this._filters);
+      var filters = _kb2.default.peek(this._filters);
       for (var i = 0, l = filters.length; i < l; i++) {
         var filter = filters[i];
-        filter = kb.peek(filter);
-        if (_.isFunction(filter)) {
+        filter = _kb2.default.peek(filter);
+        if (_underscore2.default.isFunction(filter)) {
           if (!filter(model)) return false;
-        } else if (_.isArray(filter)) {
+        } else if (_underscore2.default.isArray(filter)) {
           if (!~filter.indexOf(model.id)) return false;
         } else if (model.id !== filter) return false;
       }
@@ -1536,61 +1685,75 @@ var CollectionObservable = function () {
   return CollectionObservable;
 }();
 
+exports.default = CollectionObservable;
+
 CollectionObservable.initClass();
-module.exports = CollectionObservable;
 
 // factory function
-kb.collectionObservable = function () {
+var collectionObservable = exports.collectionObservable = function collectionObservable() {
   for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     args[_key2] = arguments[_key2];
   }
 
   return new (Function.prototype.bind.apply(CollectionObservable, [null].concat(args)))();
 };
-kb.observableCollection = kb.collectionObservable;
 
 /***/ }),
-/* 10 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var kb = __webpack_require__(0);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.configure = exports.settings = undefined;
 
-var _ = kb._;
+var _underscore = __webpack_require__(0);
 
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backboneAssociations = __webpack_require__(21);
+
+var _backboneAssociations2 = _interopRequireDefault(_backboneAssociations);
+
+var _backboneRelational = __webpack_require__(22);
+
+var _backboneRelational2 = _interopRequireDefault(_backboneRelational);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var ALL_ORMS = {
   default: null,
   'backbone-orm': null,
-  'backbone-associations': __webpack_require__(18),
-  'backbone-relational': __webpack_require__(19)
+  'backbone-associations': _backboneAssociations2.default,
+  'backbone-relational': _backboneRelational2.default
 };
 
 // @nodoc
-kb.settings = { orm: ALL_ORMS.default };
+var settings = exports.settings = { orm: ALL_ORMS.default };
 for (var key in ALL_ORMS) {
   if (Object.prototype.hasOwnProperty.call(ALL_ORMS, key)) {
     var value = ALL_ORMS[key];
     if (value && value.isAvailable()) {
-      kb.settings.orm = value;
+      settings.orm = value;
       break;
     }
   }
 }
 
 // @nodoc
-module.exports = function () {
+var configure = exports.configure = function configure() {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-  _.each(options, function (value, key) {
+  _underscore2.default.each(options, function (value, key) {
     switch (key) {
       case 'orm':
         // set by name
-        if (_.isString(value)) {
+        if (_underscore2.default.isString(value)) {
           if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, value)) {
-            typeof console === 'undefined' || console.log('Knockback configure: could not find orm: ' + value + '. Available: ' + _.keys(ALL_ORMS).join(', '));
+            typeof console === 'undefined' || console.log('Knockback configure: could not find orm: ' + value + '. Available: ' + _underscore2.default.keys(ALL_ORMS).join(', '));
             return;
           }
 
@@ -1599,39 +1762,43 @@ module.exports = function () {
             typeof console === 'undefined' || console.log('Knockback configure: could not enable orm ' + value + '. Make sure it is included before Knockback');
             return;
           }
-          kb.settings.orm = orm;
-        } else kb.settings.orm = value;
+          settings.orm = orm;
+        } else settings.orm = value;
         break;
 
       default:
-        kb.settings[key] = value;break;
+        settings[key] = value;break;
     }
   });
 };
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._;
 
 // Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 //
@@ -1639,7 +1806,6 @@ var _ = kb._;
 //   var factory = new kb.Factory();
 //   factory.addPathMapping('bob.the.builder', kb.ViewModel);
 //   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
-
 var Factory = function () {
   _createClass(Factory, null, [{
     key: 'useOptionsOrCreate',
@@ -1686,7 +1852,7 @@ var Factory = function () {
     value: function addPathMappings(factories, owner_path) {
       var _this = this;
 
-      _.each(factories, function (create_info, path) {
+      _underscore2.default.each(factories, function (create_info, path) {
         _this.paths[kb.utils.pathJoin(owner_path, path)] = create_info;
       });
     }
@@ -1724,15 +1890,30 @@ var Factory = function () {
   return Factory;
 }();
 
-module.exports = Factory;
+exports.default = Factory;
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// @nodoc
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -1742,29 +1923,23 @@ module.exports = Factory;
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = __webpack_require__(0);
-
-var _ = kb._;
-
-// @nodoc
-
 var _mergeArray = function _mergeArray(result, key, value) {
   if (!result[key]) result[key] = [];
-  if (!_.isArray(value)) value = [value];
-  result[key] = result[key].length ? _.union(result[key], value) : value;
+  if (!_underscore2.default.isArray(value)) value = [value];
+  result[key] = result[key].length ? _underscore2.default.union(result[key], value) : value;
   return result;
 };
 
 // @nodoc
 var _mergeObject = function _mergeObject(result, key, value) {
   if (!result[key]) result[key] = {};
-  return kb.assign(result[key], value);
+  return _kb2.default.assign(result[key], value);
 };
 
 // @nodoc
 var _keyArrayToObject = function _keyArrayToObject(value) {
   var result = {};
-  _.each(value, function (item) {
+  _underscore2.default.each(value, function (item) {
     result[item] = { key: item };
   });
   return result;
@@ -1773,36 +1948,30 @@ var _keyArrayToObject = function _keyArrayToObject(value) {
 var _mergeOptions = function _mergeOptions(result, options) {
   if (!options) return result;
 
-  _.each(options, function (value, key) {
+  _underscore2.default.each(options, function (value, key) {
     switch (key) {
       case 'internals':case 'requires':case 'excludes':case 'statics':
         _mergeArray(result, key, value);break;
       case 'keys':
         // an object
-        if (_.isObject(value) && !_.isArray(value) || _.isObject(result[key]) && !_.isArray(result[key])) {
-          if (!_.isObject(value)) {
+        if (_underscore2.default.isObject(value) && !_underscore2.default.isArray(value) || _underscore2.default.isObject(result[key]) && !_underscore2.default.isArray(result[key])) {
+          if (!_underscore2.default.isObject(value)) {
             value = [value];
           }
-          if (_.isArray(value)) {
+          if (_underscore2.default.isArray(value)) {
             value = _keyArrayToObject(value);
           }
-          if (_.isArray(result[key])) {
+          if (_underscore2.default.isArray(result[key])) {
             result[key] = _keyArrayToObject(result[key]);
           }
           _mergeObject(result, key, value);
 
           // an array
-        } else {
-          _mergeArray(result, key, value);
-        }
+        } else _mergeArray(result, key, value);
         break;
 
       case 'factories':
-        if (_.isFunction(value)) {
-          result[key] = value;
-        } else {
-          _mergeObject(result, key, value);
-        }
+        if (_underscore2.default.isFunction(value)) result[key] = value;else _mergeObject(result, key, value);
         break;
       case 'static_defaults':
         _mergeObject(result, key, value);break;
@@ -1817,57 +1986,64 @@ var _mergeOptions = function _mergeOptions(result, options) {
 };
 
 // @nodoc
-module.exports = function (options) {
+
+exports.default = function (options) {
   return _mergeOptions({}, options);
 };
 
 /***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var kb = __webpack_require__(0);
+var _underscore = __webpack_require__(0);
 
-var _ = kb._;
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // @nodoc
-
-var unwrapModels = function unwrapModels(obj) {
+exports.default = function (obj) {
   if (!obj) return obj;
   if (obj.__kb) return Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj;
-  if (_.isArray(obj)) return _.map(obj, function (test) {
+  if (_underscore2.default.isArray(obj)) return _underscore2.default.map(obj, function (test) {
     return unwrapModels(test);
   });
-  if (_.isObject(obj) && obj.constructor === {}.constructor) {
+  if (_underscore2.default.isObject(obj) && obj.constructor === {}.constructor) {
     // a simple object
     var result = {};
-    _.each(obj, function (value, key) {
+    _underscore2.default.each(obj, function (value, key) {
       result[key] = unwrapModels(value);
     });
     return result;
   }
 
   return obj;
-};
-module.exports = unwrapModels;
+}; /*
+     knockback.js 1.2.2
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 /*
   knockback.js 1.2.2
@@ -1879,7 +2055,7 @@ module.exports = unwrapModels;
 */
 
 // @nodoc
-var wrappedDestroy = function wrappedDestroy(obj) {
+exports.default = function (obj) {
   if (!obj.__kb) return;
   if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
 
@@ -1889,16 +2065,16 @@ var wrappedDestroy = function wrappedDestroy(obj) {
 
   if (__kb.observable) {
     __kb.observable.destroy = null;__kb.observable.release = null;
-    wrappedDestroy(__kb.observable);
-    __kb.observable = null;
+    wrappedDestroy(__kb.observable);__kb.observable = null;
   }
-
   __kb.factory = null;
 
-  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy(); // release the event_watcher
+  // release the event_watcher
+  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy();
   __kb.event_watcher = null;
 
-  if (__kb.store_is_owned) __kb.store.destroy(); // release the store
+  // release the store
+  if (__kb.store_is_owned) __kb.store.destroy();
   __kb.store = null;
 
   if (__kb.stores_references) {
@@ -1909,18 +2085,28 @@ var wrappedDestroy = function wrappedDestroy(obj) {
     }
   }
 };
-module.exports = wrappedDestroy;
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.injectViewModels = exports.RECUSIVE_AUTO_INJECT = undefined;
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /*
   knockback.js 1.2.2
@@ -1933,18 +2119,51 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-kb.RECUSIVE_AUTO_INJECT = true;
+var RECUSIVE_AUTO_INJECT = exports.RECUSIVE_AUTO_INJECT = true;
 
 // custom Knockout `inject` binding
-ko.bindingHandlers.inject = {
+var inject = function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
+  var doInject = function doInject(value) {
+    if (_underscore2.default.isFunction(value)) {
+      view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
+      kb.releaseOnNodeRemove(view_model, element);
+    } else {
+      // view_model constructor causes a scope change
+      if (value.view_model) {
+        // specifying a view_model changes the scope so we need to bind a destroy
+        view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
+        kb.releaseOnNodeRemove(view_model, element);
+      }
+
+      // resolve and merge in each key
+      _underscore2.default.each(value, function (item, key) {
+        if (key === 'view_model') return;
+
+        // create function
+        if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
+
+        // resolve nested with assign or not
+        else if (_underscore2.default.isObject(item) && !_underscore2.default.isFunction(item)) {
+            var target = nested || item && item.create ? {} : view_model;
+            view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
+
+            // simple set
+          } else view_model[key] = item;
+      });
+    }
+
+    return view_model;
+  };
+
+  // in recursive calls, we are already protected from propagating dependencies to the template
+  return nested ? doInject(data) : kb.ignore(function () {
+    return doInject(data);
+  });
+};
+
+_knockout2.default.bindingHandlers.inject = {
   init: function init(element, value_accessor, all_bindings_accessor, view_model) {
-    return kb.Inject.inject(ko.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+    return inject(_knockout2.default.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
   }
 };
 
@@ -2007,134 +2226,75 @@ ko.bindingHandlers.inject = {
 //       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
 //       kb.ViewModel.prototype.constructor.call(this, model);
 //   });
-kb.Inject = function () {
-  function Inject() {
-    _classCallCheck(this, Inject);
+
+var doBind = function doBind(app) {
+  var options = {};
+  var afterBinding = null;
+  var beforeBinding = null;
+
+  // evaluate the app data
+  var expression = app.binding;
+  if (expression) {
+    !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
+    var data = new Function('', 'return ( ' + expression + ' )')() || {};
+    if (data.options) {
+      options = data.options;delete data.options;
+    }
+    app.view_model = inject(data, app.view_model, app.el, null, null, true);
+    afterBinding = app.view_model.afterBinding || options.afterBinding;
+    beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
   }
 
-  _createClass(Inject, null, [{
-    key: 'inject',
+  // auto-bind
+  if (beforeBinding) {
+    beforeBinding.call(app.view_model, app.view_model, app.el, options);
+  }
+  kb.applyBindings(app.view_model, app.el, options);
+  if (afterBinding) {
+    afterBinding.call(app.view_model, app.view_model, app.el, options);
+  }
+};
 
-    // @private
-    value: function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-      var doInject = function doInject(value) {
-        if (_.isFunction(value)) {
-          view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
-          kb.releaseOnNodeRemove(view_model, element);
-        } else {
-          // view_model constructor causes a scope change
-          if (value.view_model) {
-            // specifying a view_model changes the scope so we need to bind a destroy
-            view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
-            kb.releaseOnNodeRemove(view_model, element);
-          }
+// Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
+// Also, used with the data-bind `'inject'` custom binding.
+// @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
+// @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
+var injectViewModels = exports.injectViewModels = function injectViewModels() {
+  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
 
-          // resolve and merge in each key
-          _.each(value, function (item, key) {
-            if (key === 'view_model') return;
-
-            // create function
-            if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
-
-            // resolve nested with assign or not
-            else if (_.isObject(item) && !_.isFunction(item)) {
-                var target = nested || item && item.create ? {} : view_model;
-                view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
-
-                // simple set
-              } else view_model[key] = item;
-          });
-        }
-
-        return view_model;
-      };
-
-      // in recursive calls, we are already protected from propagating dependencies to the template
-      return nested ? doInject(data) : kb.ignore(function () {
-        return doInject(data);
-      });
+  var results = [];
+  if (!el.__kb_injected) {
+    // already injected -> skip, but still process children in case they were added afterwards
+    var attr = _underscore2.default.find(el.attributes || [], function (x) {
+      return x.name === 'kb-inject';
+    });
+    if (attr) {
+      el.__kb_injected = true; // mark injected
+      var app = { el: el, view_model: {}, binding: attr.value };
+      doBind(app);
+      results.push(app);
     }
-
-    // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
-    // Also, used with the data-bind `'inject'` custom binding.
-    // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
-    // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-
-  }, {
-    key: 'injectViewModels',
-    value: function injectViewModels() {
-      var rootEl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
-
-      // find all of the app elements
-      var results = [];
-      var findElements = function findElements(el) {
-        if (!el.__kb_injected) {
-          // already injected -> skip, but still process children in case they were added afterwards
-          var attr = _.find(el.attributes || [], function (x) {
-            return x.name === 'kb-inject';
-          });
-          if (attr) {
-            el.__kb_injected = true; // mark injected
-            results.push({ el: el, view_model: {}, binding: attr.value });
-          }
-        }
-        _.each(el.childNodes, function (child) {
-          return findElements(child);
-        });
-      };
-      findElements(rootEl);
-
-      // bind the view models
-      _.each(results, function (app) {
-        var options = {};
-        var afterBinding = null;
-        var beforeBinding = null;
-
-        // evaluate the app data
-        var expression = app.binding;
-        if (expression) {
-          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
-          var data = new Function('', 'return ( ' + expression + ' )')() || {};
-          if (data.options) {
-            options = data.options;delete data.options;
-          }
-          app.view_model = kb.Inject.inject(data, app.view_model, app.el, null, null, true);
-          afterBinding = app.view_model.afterBinding || options.afterBinding;
-          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
-        }
-
-        // auto-bind
-        if (beforeBinding) {
-          beforeBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-        kb.applyBindings(app.view_model, app.el, options);
-        if (afterBinding) {
-          afterBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-      });
-      return results;
-    }
-  }]);
-
-  return Inject;
-}();
+  }
+  _underscore2.default.each(el.childNodes, function (child) {
+    var childResults = injectViewModels(child);
+    if (childResults.length) _underscore2.default.each(childResults, function (x) {
+      return results.push(x);
+    });
+  });
+  return results;
+};
 
 // auto-inject recursively
-var _ko_applyBindings = ko.applyBindings;
-ko.applyBindings = function () {
+var _ko_applyBindings = _knockout2.default.applyBindings;
+_knockout2.default.applyBindings = function () {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
 
   var el = args[1];
-  var results = kb.RECUSIVE_AUTO_INJECT ? kb.injectViewModels(el) : [];
-  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [this].concat(args));
+  var results = kb.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
+  return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [undefined].concat(args));
 };
-
-// ############################
-// Aliases
-// ############################
-kb.injectViewModels = kb.Inject.injectViewModels;
 
 // ############################
 // Auto Inject results
@@ -2146,37 +2306,29 @@ if (root && typeof root.document !== 'undefined') {
       setTimeout(onReady, 0); // keep waiting for the document to load
       return;
     }
-    kb.injectViewModels(); // the document is loaded
+    injectViewModels(); // the document is loaded
   };
   onReady();
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
+var _knockout = __webpack_require__(1);
 
-var kb = __webpack_require__(0);
+var _knockout2 = _interopRequireDefault(_knockout);
 
-var ko = kb.ko;
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
-
-if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
-  var _extend = ko.subscribable.fn.extend;
-  ko.subscribable.fn.extend = function () {
+if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _knockout2.default.subscribable.fn.extend) {
+  var _extend = _knockout2.default.subscribable.fn.extend;
+  _knockout2.default.subscribable.fn.extend = function () {
     var _this = this;
 
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
@@ -2200,35 +2352,55 @@ if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {
 
     return target;
   };
-}
+} /*
+    knockback.js 1.2.2
+    Copyright (c)  2011-2016 Kevin Malakoff.
+    License: MIT (http://www.opensource.org/licenses/mit-license.php)
+    Source: https://github.com/kmalakoff/knockback
+    Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+  */
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.observable = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+var _typedValue = __webpack_require__(25);
+
+var _typedValue2 = _interopRequireDefault(_typedValue);
+
+var _eventWatcher = __webpack_require__(5);
+
+var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-var TypedValue = __webpack_require__(22);
-var EventWatcher = __webpack_require__(2);
-
-var _ = kb._,
-    ko = kb.ko;
-
 
 var KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 var KEYS_INFO = ['args', 'read', 'write'];
@@ -2285,7 +2457,7 @@ var Observable = function () {
     }this._vm = _vm;return kb.ignore(function () {
       key_or_info || kb._throwMissing(_this, 'key_or_info');
       _this.key = key_or_info.key || key_or_info;
-      _.map(KEYS_INFO, function (key) {
+      _underscore2.default.map(KEYS_INFO, function (key) {
         if (key_or_info[key]) {
           _this[key] = key_or_info[key];
         }
@@ -2297,14 +2469,14 @@ var Observable = function () {
       delete create_options.event_watcher;
 
       // set up basics
-      _this._value = new TypedValue(create_options);
-      _this._model = ko.observable();
-      var observable = kb.utils.wrappedObservable(_this, ko.computed({
+      _this._value = new _typedValue2.default(create_options);
+      _this._model = _knockout2.default.observable();
+      var observable = kb.utils.wrappedObservable(_this, _knockout2.default.computed({
         read: function read() {
           var m = _this._model();
           var args = [_this.key].concat(_this.args || []);
-          _.each(args, function (arg) {
-            return ko.utils.unwrapObservable(arg);
+          _underscore2.default.each(args, function (arg) {
+            return _knockout2.default.utils.unwrapObservable(arg);
           });
 
           var ew = kb.utils.wrappedEventWatcher(_this);
@@ -2312,7 +2484,7 @@ var Observable = function () {
 
           if (_this.read) {
             _this.update(_this.read.apply(_this._vm, args));
-          } else if (!_.isUndefined(m)) {
+          } else if (!_underscore2.default.isUndefined(m)) {
             kb.ignore(function () {
               return _this.update(kb.getValue(m, kb.peek(_this.key), _this.args));
             });
@@ -2350,9 +2522,9 @@ var Observable = function () {
       kb.publishMethods(observable, _this, KEYS_PUBLISH);
 
       // use external model observable or create
-      _this.model = ko.computed({
+      _this.model = _knockout2.default.computed({
         read: function read() {
-          return ko.utils.unwrapObservable(_this._model);
+          return _knockout2.default.utils.unwrapObservable(_this._model);
         },
         write: function write(new_model) {
           return kb.ignore(function () {
@@ -2363,7 +2535,7 @@ var Observable = function () {
             _this._model(new_model);
             if (!new_model) {
               return _this.update(null);
-            } else if (!_.isUndefined(new_value)) {
+            } else if (!_underscore2.default.isUndefined(new_value)) {
               return _this.update(new_value);
             }
             return undefined;
@@ -2372,7 +2544,7 @@ var Observable = function () {
       });
       observable.model = _this.model;
 
-      EventWatcher.useOptionsOrCreate({ event_watcher: event_watcher }, model || null, _this, {
+      _eventWatcher2.default.useOptionsOrCreate({ event_watcher: event_watcher }, model || null, _this, {
         emitter: _this.model,
         update: function update() {
           return kb.ignore(function () {
@@ -2441,9 +2613,8 @@ var Observable = function () {
   return Observable;
 }();
 
-module.exports = Observable;
-
-kb.observable = function () {
+exports.default = Observable;
+var observable = exports.observable = function observable() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
@@ -2452,30 +2623,40 @@ kb.observable = function () {
 };
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    Backbone = kb.Backbone;
-
 
 var AssociatedModel = null; // lazy bind so this file can be loaded before relational library
 
@@ -2489,13 +2670,13 @@ var BackboneAssociations = function () {
   _createClass(BackboneAssociations, null, [{
     key: 'isAvailable',
     value: function isAvailable() {
-      return !!(AssociatedModel = Backbone ? Backbone.AssociatedModel : null);
+      return !!(AssociatedModel = _backbone2.default ? _backbone2.default.AssociatedModel : null);
     }
   }, {
     key: 'keys',
     value: function keys(model) {
       if (!(model instanceof AssociatedModel)) return null;
-      return _.map(model.relations, function (x) {
+      return _underscore2.default.map(model.relations, function (x) {
         return x.key;
       });
     }
@@ -2503,44 +2684,54 @@ var BackboneAssociations = function () {
     key: 'relationType',
     value: function relationType(model, key) {
       if (!(model instanceof AssociatedModel)) return null;
-      var relation = _.find(model.relations, function (x) {
+      var relation = _underscore2.default.find(model.relations, function (x) {
         return x.key === key;
       });
       if (!relation) return null;
-      return relation.type === 'Many' ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
+      return relation.type === 'Many' ? _kb2.default.TYPE_COLLECTION : _kb2.default.TYPE_MODEL;
     }
   }]);
 
   return BackboneAssociations;
 }();
 
-module.exports = BackboneAssociations;
+exports.default = BackboneAssociations;
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    Backbone = kb.Backbone;
-
 
 var RelationalModel = null; // lazy bind so this file can be loaded before relational library
 
@@ -2554,17 +2745,17 @@ var BackboneRelational = function () {
   _createClass(BackboneRelational, null, [{
     key: 'isAvailable',
     value: function isAvailable() {
-      return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null);
+      return !!(RelationalModel = _backbone2.default ? _backbone2.default.RelationalModel : null);
     }
   }, {
     key: 'relationType',
     value: function relationType(model, key) {
       if (!(model instanceof RelationalModel)) return null;
-      var relation = _.find(model.getRelations(), function (test) {
+      var relation = _underscore2.default.find(model.getRelations(), function (test) {
         return test.key === key;
       });
       if (!relation) return null;
-      return relation.collectionType || _.isArray(relation.keyContents) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
+      return relation.collectionType || _underscore2.default.isArray(relation.keyContents) ? _kb2.default.TYPE_COLLECTION : _kb2.default.TYPE_MODEL;
     }
   }, {
     key: 'customBind',
@@ -2573,18 +2764,18 @@ var BackboneRelational = function () {
       if (!type) return null;
 
       var relFn = function relFn(m) {
-        if (kb.statistics) kb.statistics.addModelEvent({ name: 'update (relational)', model: m, key: key, path: path });
+        if (_kb2.default.statistics) _kb2.default.statistics.addModelEvent({ name: 'update (relational)', model: m, key: key, path: path });
         return update();
       };
 
       // VERSIONING: pre Backbone-Relational 0.8.0
-      var events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
-      if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
+      var events = _backbone2.default.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
+      if (type === _kb2.default.TYPE_COLLECTION) _underscore2.default.each(events, function (event) {
         return model.bind(event + ':' + key, relFn);
       });else model.bind(events[0] + ':' + key, relFn);
 
       return function () {
-        if (type === kb.TYPE_COLLECTION) _.each(events, function (event) {
+        if (type === _kb2.default.TYPE_COLLECTION) _underscore2.default.each(events, function (event) {
           return model.unbind(event + ':' + key, relFn);
         });else model.unbind(events[0] + ':' + key, relFn);
       };
@@ -2594,38 +2785,41 @@ var BackboneRelational = function () {
   return BackboneRelational;
 }();
 
-module.exports = BackboneRelational;
+exports.default = BackboneRelational;
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._;
 
 // kb.Statistics is an optional components that is useful for measuring your application's performance.
 // You can record all of the Backbone.Events that have triggered ko.observable subscription updates and the memory footprint (instance count-only) of your ViewModels and collection observables.
 //
 // kb.Statistics is not included in `knockback.js` nor `knockback-core.js` so you need to manually include it from the `lib` directory.
 //
-
 var Statistics = function () {
   function Statistics() {
     _classCallCheck(this, Statistics);
@@ -2662,10 +2856,10 @@ var Statistics = function () {
     value: function modelEventsStatsString() {
       var stats_string = '';
       stats_string += 'Total Count: ' + this.model_events_tracker.length;
-      var event_groups = _.groupBy(this.model_events_tracker, function (test) {
+      var event_groups = _underscore2.default.groupBy(this.model_events_tracker, function (test) {
         return 'event name: \'' + test.name + '\', attribute name: \'' + test.key + '\'';
       });
-      _.each(event_groups, function (value, key) {
+      _underscore2.default.each(event_groups, function (value, key) {
         stats_string += '\n ' + key + ', count: ' + value.length;
       });
       return stats_string;
@@ -2689,7 +2883,7 @@ var Statistics = function () {
     key: 'unregister',
     value: function unregister(key, obj) {
       var type_tracker = this.registeredTracker(key);
-      var index = _.indexOf(type_tracker, obj);
+      var index = _underscore2.default.indexOf(type_tracker, obj);
       if (!~index) {
         if (typeof console !== 'undefined') console.log('kb.Statistics: failed to unregister type: ' + key);
         return undefined;
@@ -2705,7 +2899,7 @@ var Statistics = function () {
       if (type) return this.registeredTracker(type).length;
 
       var count = 0;
-      _.each(this.registered_tracker[type], function (type_tracker) {
+      _underscore2.default.each(this.registered_tracker[type], function (type_tracker) {
         count += type_tracker.length;
       });
       return count;
@@ -2721,7 +2915,7 @@ var Statistics = function () {
     value: function registeredStatsString(success_message) {
       var stats_string = '';
       var written = false;
-      _.each(this.registered_tracker, function (type_tracker, type) {
+      _underscore2.default.each(this.registered_tracker, function (type_tracker, type) {
         if (!type_tracker.length) return;
         if (written) {
           stats_string += '\n ';
@@ -2748,13 +2942,13 @@ var Statistics = function () {
     value: function eventsStats(obj, key) {
       var stats = { count: 0 };
       var events = obj._events || obj._callbacks || {};
-      var keys = key ? [key] : _.keys(events);
+      var keys = key ? [key] : _underscore2.default.keys(events);
 
-      _.each(keys, function (key_) {
+      _underscore2.default.each(keys, function (key_) {
         var node = events[key_];
         if (node) {
-          if (_.isArray(node)) {
-            stats[key_] = _.compact(node).length;
+          if (_underscore2.default.isArray(node)) {
+            stats[key_] = _underscore2.default.compact(node).length;
           } else {
             var _node = node,
                 tail = _node.tail;
@@ -2776,32 +2970,39 @@ var Statistics = function () {
   return Statistics;
 }();
 
-module.exports = Statistics;
+exports.default = Statistics;
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
 
 // Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models,
 // to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
@@ -2811,7 +3012,6 @@ var _ = kb._,
 //   var co_selected_options = kb.collectionObservable(new Backbone.Collection(), {
 //     store: kb.utils.wrappedStore(co)
 //   });
-
 var Store = function () {
   _createClass(Store, null, [{
     key: 'initClass',
@@ -2860,7 +3060,7 @@ var Store = function () {
     value: function destroy() {
       this.__kb_released = true;
       this.clear();
-      var index = _.indexOf(kb.Store.instances, this);
+      var index = _underscore2.default.indexOf(kb.Store.instances, this);
       if (~index) kb.Store.instances.splice(index, 1);
     }
 
@@ -2873,15 +3073,15 @@ var Store = function () {
 
       var observable_records = this.observable_records;
       this.observable_records = {};
-      _.each(observable_records, function (records) {
-        _.each(records, function (observable) {
+      _underscore2.default.each(observable_records, function (records) {
+        _underscore2.default.each(records, function (observable) {
           return _this.release(observable, true);
         });
       });
 
       var replaced_observables = this.replaced_observables;
       this.replaced_observables = [];
-      _.each(replaced_observables, function (observable) {
+      _underscore2.default.each(replaced_observables, function (observable) {
         if (!observable.__kb_released) _this.release(observable, true);
       });
     }
@@ -2891,8 +3091,8 @@ var Store = function () {
   }, {
     key: 'compact',
     value: function compact() {
-      _.each(this.observable_records, function (records) {
-        _.each(records, function (observable, cid) {
+      _underscore2.default.each(this.observable_records, function (records) {
+        _underscore2.default.each(records, function (observable, cid) {
           if (observable.__kb_released) delete records[cid];
         });
       });
@@ -2960,12 +3160,12 @@ var Store = function () {
       if (observable) {
         return deep_retain && kb.settings.deep_retain ? this.retain(observable, obj, creator) : observable;
       }
-      if (!_.isFunction(creator.create || creator)) throw new Error('Invalid factory for "' + options.path + '"');
+      if (!_underscore2.default.isFunction(creator.create || creator)) throw new Error('Invalid factory for "' + options.path + '"');
 
       observable = kb.ignore(function () {
-        options = _.defaults({ store: _this2, creator: creator }, options); // set our own creator so we can register ourselves above
+        options = _underscore2.default.defaults({ store: _this2, creator: creator }, options); // set our own creator so we can register ourselves above
         observable = creator.create ? creator.create(obj, options) : new creator(obj, options);
-        return observable || ko.observable(null);
+        return observable || _knockout2.default.observable(null);
       }); // default to null
 
       this.retain(observable, obj, creator);
@@ -2984,7 +3184,7 @@ var Store = function () {
 
       var creator = kb.utils.wrappedCreator(observable) || observable.constructor; // default is to use the constructor
       var current_observable = void 0;
-      if (!_.isUndefined(current_obj)) current_observable = this.find(current_obj, creator);
+      if (!_underscore2.default.isUndefined(current_obj)) current_observable = this.find(current_obj, creator);
       this.retain(observable, obj, creator);
       if (current_observable) this.release(current_observable);
     }
@@ -3036,7 +3236,7 @@ var Store = function () {
       }
       var stores_references = kb.utils.get(observable, 'stores_references');
       if (!stores_references) return 1;
-      return _.reduce(stores_references, function (memo, store_references) {
+      return _underscore2.default.reduce(stores_references, function (memo, store_references) {
         return memo + store_references.ref_count;
       }, 0);
     }
@@ -3046,7 +3246,7 @@ var Store = function () {
   }, {
     key: '_canRegister',
     value: function _canRegister(observable) {
-      return observable && !ko.isObservable(observable) && !observable.__kb_is_co;
+      return observable && !_knockout2.default.isObservable(observable) && !observable.__kb_is_co;
     } // only register view models not basic ko.observables nor kb.CollectionObservables
 
     // @nodoc
@@ -3055,7 +3255,7 @@ var Store = function () {
     key: '_cid',
     value: function _cid(obj) {
       if (!obj) return 'null';
-      if (!obj.cid) obj.cid = _.uniqueId('c');
+      if (!obj.cid) obj.cid = _underscore2.default.uniqueId('c');
       return obj.cid;
     }
 
@@ -3072,7 +3272,7 @@ var Store = function () {
         var _item = create.__kb_cids[i];
         if (_item.create === create) return _item.cid;
       }
-      var item = { create: create, cid: _.uniqueId('kb') };
+      var item = { create: create, cid: _underscore2.default.uniqueId('kb') };
       create.__kb_cids.push(item);
       return item.cid;
     }
@@ -3087,7 +3287,7 @@ var Store = function () {
       var stores_references = kb.utils.get(observable, 'stores_references');
       if (!stores_references) return undefined;
 
-      return _.find(stores_references, function (ref) {
+      return _underscore2.default.find(stores_references, function (ref) {
         return ref.store === _this3;
       });
     }
@@ -3101,7 +3301,7 @@ var Store = function () {
 
       var stores_references = kb.utils.orSet(observable, 'stores_references', []);
 
-      var ref = _.find(stores_references, function (x) {
+      var ref = _underscore2.default.find(stores_references, function (x) {
         return x.store === _this4;
       });
       if (!ref) stores_references.push(ref = { store: this, ref_count: 0, release: function release() {
@@ -3182,33 +3382,49 @@ var Store = function () {
   return Store;
 }();
 
+exports.default = Store;
+
 Store.initClass();
-module.exports = Store;
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
-
 // @nodoc
-
 var TypedValue = function () {
   function TypedValue(create_options) {
     _classCallCheck(this, TypedValue);
 
     this.create_options = create_options;
-    this._vo = ko.observable(null); // create a value observable for the first dependency
+    this._vo = _knockout2.default.observable(null); // create a value observable for the first dependency
   }
 
   _createClass(TypedValue, [{
@@ -3227,7 +3443,7 @@ var TypedValue = function () {
   }, {
     key: 'value',
     value: function value() {
-      return ko.utils.unwrapObservable(this._vo());
+      return _knockout2.default.utils.unwrapObservable(this._vo());
     }
   }, {
     key: 'rawValue',
@@ -3258,7 +3474,7 @@ var TypedValue = function () {
       switch (this.value_type) {
         case kb.TYPE_COLLECTION:
           if (this.value_type === kb.TYPE_COLLECTION && new_type === kb.TYPE_ARRAY) return value(new_value);
-          if (new_type === kb.TYPE_COLLECTION || _.isNull(new_value)) {
+          if (new_type === kb.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
             // use the provided CollectionObservable
             if (new_value && new_value instanceof kb.CollectionObservable) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
             return undefined;
@@ -3266,7 +3482,7 @@ var TypedValue = function () {
           break;
 
         case kb.TYPE_MODEL:
-          if (new_type === kb.TYPE_MODEL || _.isNull(new_value)) {
+          if (new_type === kb.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
             // use the provided ViewModel
             if (new_value && !kb.isModel(new_value)) this._updateValueObservable(kb.utils.wrappedObject(new_value), new_value);else if (kb.utils.wrappedObject(value) !== kb.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
             return undefined;
@@ -3276,7 +3492,7 @@ var TypedValue = function () {
           break;
       }
 
-      if (this.value_type === new_type && !_.isUndefined(this.value_type)) {
+      if (this.value_type === new_type && !_underscore2.default.isUndefined(this.value_type)) {
         if (kb.peek(value) !== new_value) return value(new_value);
       } else if (kb.peek(value) !== new_value) return this._updateValueObservable(new_value);
       return undefined;
@@ -3314,17 +3530,17 @@ var TypedValue = function () {
           } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
 
         // create and cache the type
-      } else if (_.isArray(new_value)) {
-        value_type = kb.TYPE_ARRAY;value = ko.observableArray(new_value);
+      } else if (_underscore2.default.isArray(new_value)) {
+        value_type = kb.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
       } else {
-        value_type = kb.TYPE_SIMPLE;value = ko.observable(new_value);
+        value_type = kb.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
       }
 
       // determine the type
       this.value_type = value_type;
       if (value_type === kb.TYPE_UNKNOWN) {
         // a view model, recognize view_models as non-observable
-        if (!ko.isObservable(value)) {
+        if (!_knockout2.default.isObservable(value)) {
           this.value_type = kb.TYPE_MODEL;kb.utils.wrappedObject(value, kb.utils.resolveModel(new_value));
         } else if (value.__kb_is_co) {
           this.value_type = kb.TYPE_COLLECTION;kb.utils.wrappedObject(value, new_value);
@@ -3345,39 +3561,49 @@ var TypedValue = function () {
   return TypedValue;
 }();
 
-module.exports = TypedValue;
+exports.default = TypedValue;
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-
-var _ = kb._,
-    ko = kb.ko;
 
 // ###################################################
 // Public API
 // ###################################################
 
 // Library of general-purpose utilities
-
 var utils = function () {
   function utils() {
     _classCallCheck(this, utils);
@@ -3387,7 +3613,7 @@ var utils = function () {
     key: 'initClass',
     value: function initClass() {
       // Clean up function that releases all of the wrapped values on an owner.
-      this.wrappedDestroy = __webpack_require__(14);
+      this.wrappedDestroy = __webpack_require__(17);
 
       // Helper to merge options including ViewmModel options like `keys` and `factories`
       //
@@ -3395,10 +3621,10 @@ var utils = function () {
       //
       // @example
       //   kb.utils.collapseOptions(options);
-      this.collapseOptions = __webpack_require__(12);
+      this.collapseOptions = __webpack_require__(15);
 
       // used for attribute setting to ensure all model attributes have their underlying models
-      this.unwrapModels = __webpack_require__(13);
+      this.unwrapModels = __webpack_require__(16);
     }
 
     // @nodoc
@@ -3521,7 +3747,7 @@ var utils = function () {
     value: function wrappedModel(obj, value) {
       if (arguments.length !== 1) return kb.utils.set(obj, 'object', value);
       value = kb.utils.get(obj, 'object');
-      return _.isUndefined(value) ? obj : value;
+      return _underscore2.default.isUndefined(value) ? obj : value;
     }
 
     // Dual-purpose getter/setter for retrieving and storing a kb.Store on an owner.
@@ -3631,7 +3857,7 @@ var utils = function () {
       if (observable instanceof kb.ViewModel || observable instanceof kb.Model) {
         return kb.TYPE_MODEL;
       }
-      if (_.isArray(observable)) {
+      if (_underscore2.default.isArray(observable)) {
         return kb.TYPE_ARRAY;
       }
       return kb.TYPE_SIMPLE;
@@ -3664,7 +3890,7 @@ var utils = function () {
   }, {
     key: 'optionsPathJoin',
     value: function optionsPathJoin(options, path) {
-      return _.defaults({ path: this.pathJoin(options.path, path) }, options);
+      return _underscore2.default.defaults({ path: this.pathJoin(options.path, path) }, options);
     }
 
     // Helper to find the creator constructor or function from a factory or ORM solution
@@ -3699,10 +3925,10 @@ var utils = function () {
       if (kb.isCollection(obj)) {
         return kb.collectionObservable(obj, options);
       }
-      if (_.isArray(obj)) {
-        return ko.observableArray(obj);
+      if (_underscore2.default.isArray(obj)) {
+        return _knockout2.default.observableArray(obj);
       }
-      return ko.observable(obj);
+      return _knockout2.default.observable(obj);
     }
 
     // @nodoc
@@ -3710,7 +3936,7 @@ var utils = function () {
   }, {
     key: 'resolveModel',
     value: function resolveModel(model) {
-      if (model && kb.Backbone && kb.Backbone.ModelRef && model instanceof kb.Backbone.ModelRef) {
+      if (model && _backbone2.default && _backbone2.default.ModelRef && model instanceof _backbone2.default.ModelRef) {
         return model.model();
       }return model;
     }
@@ -3719,39 +3945,58 @@ var utils = function () {
   return utils;
 }();
 
+exports.default = utils;
+
 utils.initClass();
-module.exports = utils;
 
 /***/ }),
-/* 24 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.viewModel = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _kb = __webpack_require__(4);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+var _eventWatcher = __webpack_require__(5);
+
+var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(0);
-var EventWatcher = __webpack_require__(2);
-
-var _ = kb._,
-    ko = kb.ko;
-
 // @nodoc
-
 var assignViewModelKey = function assignViewModelKey(vm, key) {
-  var vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? '_' + key : key;
+  var vm_key = vm.__kb.internals && ~_underscore2.default.indexOf(vm.__kb.internals, key) ? '_' + key : key;
   if (Object.prototype.hasOwnProperty.call(vm.__kb.view_model, vm_key)) return undefined; // already exists, skip
   vm.__kb.view_model[vm_key] = null;
   return vm_key;
@@ -3759,18 +4004,18 @@ var assignViewModelKey = function assignViewModelKey(vm, key) {
 
 // @nodoc
 var createObservable = function createObservable(vm, model, key, create_options) {
-  if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) return undefined;
-  if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return undefined;
+  if (vm.__kb.excludes && ~_underscore2.default.indexOf(vm.__kb.excludes, key)) return undefined;
+  if (vm.__kb.statics && ~_underscore2.default.indexOf(vm.__kb.statics, key)) return undefined;
   var vm_key = assignViewModelKey(vm, key);
   if (!vm_key) return undefined;
-  var observable = kb.observable(model, key, create_options, vm);
+  var observable = _kb2.default.observable(model, key, create_options, vm);
   vm.__kb.view_model[vm_key] = observable;vm[vm_key] = observable;
   return observable;
 };
 
 // @nodoc
 var createStaticObservables = function createStaticObservables(vm, model) {
-  _.each(vm.__kb.statics, function (key) {
+  _underscore2.default.each(vm.__kb.statics, function (key) {
     var vm_key = assignViewModelKey(vm, key);
     if (!vm_key) return;
 
@@ -3845,7 +4090,7 @@ var ViewModel = function () {
     key: 'initClass',
     value: function initClass() {
       // @nodoc
-      ViewModel.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+      ViewModel.extend = _backbone2.default.Model.extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -3881,67 +4126,67 @@ var ViewModel = function () {
 
     _classCallCheck(this, ViewModel);
 
-    return kb.ignore(function () {
+    return _kb2.default.ignore(function () {
       var model = args.shift();
-      !model || kb.isModel(model) || kb._throwUnexpected(_this, 'not a model');
+      !model || _kb2.default.isModel(model) || _kb2.default._throwUnexpected(_this, 'not a model');
 
-      if (_.isArray(args[0])) args[0] = { keys: args[0] };
+      if (_underscore2.default.isArray(args[0])) args[0] = { keys: args[0] };
       if (!_this.__kb) {
         _this.__kb = {};
       }_this.__kb.view_model = args.length > 1 ? args.pop() : _this;
 
       var options = {};
-      _.each(args, function (arg) {
-        kb.assign(options, arg);options = kb.utils.collapseOptions(options);
+      _underscore2.default.each(args, function (arg) {
+        _kb2.default.assign(options, arg);options = _kb2.default.utils.collapseOptions(options);
       });
-      _.each(KEYS_OPTIONS, function (key) {
+      _underscore2.default.each(KEYS_OPTIONS, function (key) {
         if (Object.prototype.hasOwnProperty.call(options, key)) _this.__kb[key] = options[key];
       });
 
       // always use a store to ensure recursive view models are handled correctly
-      kb.Store.useOptionsOrCreate(options, model, _this);
+      _kb2.default.Store.useOptionsOrCreate(options, model, _this);
 
       // view model factory
       _this.__kb.path = options.path;
-      kb.Factory.useOptionsOrCreate(options, _this, options.path);
+      _kb2.default.Factory.useOptionsOrCreate(options, _this, options.path);
 
-      var _model = kb.utils.set(_this, '_model', ko.observable());
-      _this.model = ko.computed({
+      var _model = _kb2.default.utils.set(_this, '_model', _knockout2.default.observable());
+      _this.model = _knockout2.default.computed({
         read: function read() {
-          return ko.utils.unwrapObservable(_model);
+          return _knockout2.default.utils.unwrapObservable(_model);
         },
         write: function write(new_model) {
-          return kb.ignore(function () {
-            if (kb.utils.wrappedObject(_this) === new_model || kb.wasReleased(_this) || !event_watcher) return undefined;
+          return _kb2.default.ignore(function () {
+            if (_kb2.default.utils.wrappedObject(_this) === new_model || _kb2.default.wasReleased(_this) || !event_watcher) return undefined;
 
-            _this.__kb.store.reuse(_this, kb.utils.resolveModel(new_model));
+            _this.__kb.store.reuse(_this, _kb2.default.utils.resolveModel(new_model));
             event_watcher.emitter(new_model);_model(event_watcher.ee);
             return !event_watcher.ee || _this.createObservables(event_watcher.ee);
           });
         }
       });
 
-      var event_watcher = kb.utils.wrappedEventWatcher(_this, new EventWatcher(model, _this, {
+      var event_watcher = _kb2.default.utils.wrappedEventWatcher(_this, new _eventWatcher2.default(model, _this, {
         emitter: _this._model,
         update: function update() {
-          return kb.ignore(function () {
+          return _kb2.default.ignore(function () {
             return !(event_watcher && event_watcher.ee) || _this.createObservables(event_watcher.ee);
           });
         }
       }));
 
       model = event_watcher.ee;
-      kb.utils.wrappedObject(_this, model);_model(event_watcher.ee);
+      _kb2.default.utils.wrappedObject(_this, model);_model(event_watcher.ee);
 
       // update the observables
-      _this.__kb.create_options = { store: kb.utils.wrappedStore(_this), factory: kb.utils.wrappedFactory(_this), path: _this.__kb.path, event_watcher: kb.utils.wrappedEventWatcher(_this) };
+      _this.__kb.create_options = { store: _kb2.default.utils.wrappedStore(_this), factory: _kb2.default.utils.wrappedFactory(_this), path: _this.__kb.path, event_watcher: _kb2.default.utils.wrappedEventWatcher(_this) };
       !options.requires || _this.createObservables(model, options.requires);
       !_this.__kb.internals || _this.createObservables(model, _this.__kb.internals);
       !options.mappings || _this.createObservables(model, options.mappings);
       !_this.__kb.statics || createStaticObservables(_this, model);
       _this.createObservables(model, _this.__kb.keys);
 
-      if (kb.statistics) kb.statistics.register('ViewModel', _this); // collect memory management statistics
+      if (_kb2.default.statistics) _kb2.default.statistics.register('ViewModel', _this); // collect memory management statistics
       return _this;
     });
   }
@@ -3957,17 +4202,17 @@ var ViewModel = function () {
 
       this.__kb_released = true;
       if (this.__kb.view_model !== this) {
-        _.each(this.__kb.vm_keys, function (key) {
+        _underscore2.default.each(this.__kb.vm_keys, function (key) {
           _this2.__kb.view_model[key] = null;
         });
       }
 
       // clear the external references
       this.__kb.view_model = null;this.__kb.create_options = null;
-      kb.releaseKeys(this);
-      kb.utils.wrappedDestroy(this);
+      _kb2.default.releaseKeys(this);
+      _kb2.default.utils.wrappedDestroy(this);
 
-      if (kb.statistics) kb.statistics.unregister('ViewModel', this); // collect memory management statistics
+      if (_kb2.default.statistics) _kb2.default.statistics.unregister('ViewModel', this); // collect memory management statistics
     }
 
     // Get the options for a new view model that can be used for sharing view models.
@@ -3975,7 +4220,7 @@ var ViewModel = function () {
   }, {
     key: 'shareOptions',
     value: function shareOptions() {
-      return { store: kb.utils.wrappedStore(this), factory: kb.utils.wrappedFactory(this) };
+      return { store: _kb2.default.utils.wrappedStore(this), factory: _kb2.default.utils.wrappedFactory(this) };
     }
 
     // create observables manually
@@ -3993,21 +4238,21 @@ var ViewModel = function () {
           }
         }
 
-        if (kb.settings.orm && kb.settings.orm.keys) {
-          _.each(kb.settings.orm.keys(model), function (key) {
+        if (_kb2.default.settings.orm && _kb2.default.settings.orm.keys) {
+          _underscore2.default.each(_kb2.default.settings.orm.keys(model), function (key) {
             createObservable(_this3, model, key, _this3.__kb.create_options);
           });
         }
-      } else if (_.isArray(keys)) {
-        _.map(keys, function (key) {
+      } else if (_underscore2.default.isArray(keys)) {
+        _underscore2.default.map(keys, function (key) {
           return createObservable(_this3, model, key, _this3.__kb.create_options);
         });
       } else {
-        _.each(keys, function (mapping_info, key) {
+        _underscore2.default.each(keys, function (mapping_info, key) {
           var vm_key = assignViewModelKey(_this3, key);
           if (vm_key) {
-            if (!_.isString(mapping_info) && !mapping_info.key) mapping_info.key = vm_key;
-            _this3[vm_key] = kb.observable(model, mapping_info, _this3.__kb.create_options, _this3);
+            if (!_underscore2.default.isString(mapping_info) && !mapping_info.key) mapping_info.key = vm_key;
+            _this3[vm_key] = _kb2.default.observable(model, mapping_info, _this3.__kb.create_options, _this3);
             _this3.__kb.view_model[vm_key] = _this3[vm_key];
           }
         });
@@ -4018,11 +4263,12 @@ var ViewModel = function () {
   return ViewModel;
 }();
 
+exports.default = ViewModel;
+
 ViewModel.initClass();
-module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
-kb.viewModel = function () {
+var viewModel = exports.viewModel = function viewModel() {
   for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     args[_key2] = arguments[_key2];
   }
@@ -4031,30 +4277,37 @@ kb.viewModel = function () {
 };
 
 /***/ }),
-/* 25 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.defaultObservable = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
 
 var KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
@@ -4077,10 +4330,10 @@ var DefaultObservable = function () {
 
     // @dv is default value
     this.dv = dv;
-    var observable = kb.utils.wrappedObservable(this, ko.computed({
+    var observable = kb.utils.wrappedObservable(this, _knockout2.default.computed({
       read: function read() {
-        var current_target = ko.utils.unwrapObservable(target_observable());
-        return _.isNull(current_target) || _.isUndefined(current_target) ? ko.utils.unwrapObservable(_this.dv) : current_target;
+        var current_target = _knockout2.default.utils.unwrapObservable(target_observable());
+        return _underscore2.default.isNull(current_target) || _underscore2.default.isUndefined(current_target) ? _knockout2.default.utils.unwrapObservable(_this.dv) : current_target;
       },
       write: function write(value) {
         return target_observable(value);
@@ -4116,45 +4369,49 @@ var DefaultObservable = function () {
   return DefaultObservable;
 }();
 
-module.exports = DefaultObservable;
-
-kb.defaultObservable = function () {
+exports.default = DefaultObservable;
+var defaultObservable = exports.defaultObservable = function defaultObservable() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
 
   return new (Function.prototype.bind.apply(DefaultObservable, [null].concat(args)))();
 };
-kb.observableDefault = kb.defaultObservable;
 
 /***/ }),
-/* 26 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
+var _underscore = __webpack_require__(0);
 
-var kb = __webpack_require__(1);
+var _underscore2 = _interopRequireDefault(_underscore);
 
-var _ = kb._,
-    ko = kb.ko;
+var _knockout = __webpack_require__(1);
 
+var _knockout2 = _interopRequireDefault(_knockout);
 
-kb.Observable.prototype.setToDefault = function () {
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_core2.default.Observable.prototype.setToDefault = function () {
   if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
-};
+}; /*
+     knockback.js 1.2.2
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
 
-kb.ViewModel.prototype.setToDefault = function () {
-  _.each(this.__kb.vm_keys, function (value) {
+_core2.default.ViewModel.prototype.setToDefault = function () {
+  _underscore2.default.each(this.__kb.vm_keys, function (value) {
     if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
   });
 };
@@ -4165,19 +4422,19 @@ kb.ViewModel.prototype.setToDefault = function () {
 //     wrapped_name: kb.defaultWrapper(kb.observable(model, 'name'), '(no name)')
 //   }; // view_model.wrapped name: Bob
 //   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
-kb.utils.setToDefault = function (obj) {
+_core2.default.utils.setToDefault = function (obj) {
   var _this = this;
 
   if (!obj) return undefined;
 
   // observable
-  if (ko.isObservable(obj)) {
+  if (_knockout2.default.isObservable(obj)) {
     if (typeof obj.setToDefault === 'function') obj.setToDefault();
 
     // view model
-  } else if (_.isObject(obj)) {
-    _.each(obj, function (value, key) {
-      if (value && (ko.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
+  } else if (_underscore2.default.isObject(obj)) {
+    _underscore2.default.each(obj, function (value, key) {
+      if (value && (_knockout2.default.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
     });
   }
 
@@ -4185,41 +4442,47 @@ kb.utils.setToDefault = function (obj) {
 };
 
 /***/ }),
-/* 27 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formattedObservable = exports.parseFormattedString = exports.toFormattedString = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-
-kb.toFormattedString = function (format) {
-  var result = format.slice();
-
+var toFormattedString = exports.toFormattedString = function toFormattedString(format) {
   for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     args[_key - 1] = arguments[_key];
   }
 
-  _.each(args, function (arg, index) {
-    var value = ko.utils.unwrapObservable(arg);
-    if (_.isUndefined(value) || _.isNull(value)) value = '';
+  var result = format.slice();
+  _underscore2.default.each(args, function (arg, index) {
+    var value = _knockout2.default.utils.unwrapObservable(arg);
+    if (_underscore2.default.isUndefined(value) || _underscore2.default.isNull(value)) value = '';
 
     var parameter_index = format.indexOf('{' + index + '}');
     while (~parameter_index) {
@@ -4230,7 +4493,7 @@ kb.toFormattedString = function (format) {
   return result;
 };
 
-kb.parseFormattedString = function (string, format) {
+var parseFormattedString = exports.parseFormattedString = function parseFormattedString(string, format) {
   var regex_string = format.slice();var index = 0;var parameter_count = 0;var positions = {};
   while (regex_string.search('\\{' + index + '\\}') >= 0) {
     // store the positions of the replacements
@@ -4259,11 +4522,11 @@ kb.parseFormattedString = function (string, format) {
   }
 
   // sort the matches since the parameters could be requested unordered
-  var sorted_positions = _.sortBy(_.keys(positions), function (parameter_index) {
+  var sorted_positions = _underscore2.default.sortBy(_underscore2.default.keys(positions), function (parameter_index) {
     return +parameter_index;
   });
   var format_indices_to_matched_indices = {};
-  _.each(sorted_positions, function (parameter_index, match_index) {
+  _underscore2.default.each(sorted_positions, function (parameter_index, match_index) {
     parameter_index = sorted_positions[match_index];
     index = positions[parameter_index];
     if (!(index in format_indices_to_matched_indices)) {
@@ -4300,17 +4563,17 @@ var FormattedObservable = function () {
     _classCallCheck(this, FormattedObservable);
 
     // being called by the factory function
-    var observable_args = _.isArray(args[0]) ? args[0] : args;
-    var observable = kb.utils.wrappedObservable(this, ko.computed({
+    var observable_args = _underscore2.default.isArray(args[0]) ? args[0] : args;
+    var observable = kb.utils.wrappedObservable(this, _knockout2.default.computed({
       read: function read() {
-        args = [ko.utils.unwrapObservable(format)];
-        _.each(observable_args, function (arg) {
-          return args.push(ko.utils.unwrapObservable(arg));
+        args = [_knockout2.default.utils.unwrapObservable(format)];
+        _underscore2.default.each(observable_args, function (arg) {
+          return args.push(_knockout2.default.utils.unwrapObservable(arg));
         });
         return kb.toFormattedString.apply(null, args);
       },
       write: function write(value) {
-        var matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+        var matches = kb.parseFormattedString(value, _knockout2.default.utils.unwrapObservable(format));
         var max_count = Math.min(observable_args.length, matches.length);var index = 0;
         while (index < max_count) {
           observable_args[index](matches[index]);
@@ -4336,50 +4599,61 @@ var FormattedObservable = function () {
   return FormattedObservable;
 }();
 
-module.exports = FormattedObservable;
-
-kb.formattedObservable = function () {
+exports.default = FormattedObservable;
+var formattedObservable = exports.formattedObservable = function formattedObservable() {
   for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
     args[_key3] = arguments[_key3];
   }
 
   return new (Function.prototype.bind.apply(FormattedObservable, [null].concat(args)))();
 };
-kb.observableFormatted = kb.formattedObservable;
 
 /***/ }),
-/* 28 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.localizedObservable = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(2);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
 
 var KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
 // Locale Manager - if you are using localization, set this property.
 // It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-if (!kb.locale_manager) {
-  kb.locale_manager = undefined;
-}
+if (!_core2.default.locale_manager) _core2.default.locale_manager = undefined;
 
 // @abstract You must provide the following two methods:
 //   * read: function(value, observable) called to get the value and each time the locale changes
@@ -4431,7 +4705,7 @@ var LocalizedObservable = function () {
   _createClass(LocalizedObservable, null, [{
     key: 'initClass',
     value: function initClass() {
-      LocalizedObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+      LocalizedObservable.extend = _backbone2.default.Model.extend;
       // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
     }
 
@@ -4459,30 +4733,30 @@ var LocalizedObservable = function () {
     }if (!this.vm) {
       this.vm = {};
     }
-    this.read || kb._throwMissing(this, 'read');
-    kb.locale_manager || kb._throwMissing(this, 'kb.locale_manager');
+    this.read || _core2.default._throwMissing(this, 'read');
+    _core2.default.locale_manager || _core2.default._throwMissing(this, 'kb.locale_manager');
 
     // bind callbacks
     if (!this.__kb) {
       this.__kb = {};
     }
-    this.__kb._onLocaleChange = _.bind(this._onLocaleChange, this);
+    this.__kb._onLocaleChange = _underscore2.default.bind(this._onLocaleChange, this);
     this.__kb._onChange = options.onChange;
 
     // internal state
-    var currentValue = this.value ? ko.utils.unwrapObservable(this.value) : null;
-    this.vo = ko.observable(!currentValue ? null : this.read(currentValue, null));
+    var currentValue = this.value ? _knockout2.default.utils.unwrapObservable(this.value) : null;
+    this.vo = _knockout2.default.observable(!currentValue ? null : this.read(currentValue, null));
 
-    var observable = kb.utils.wrappedObservable(this, ko.computed({
+    var observable = _core2.default.utils.wrappedObservable(this, _knockout2.default.computed({
       read: function read() {
-        if (_this.value) ko.utils.unwrapObservable(_this.value);
+        if (_this.value) _knockout2.default.utils.unwrapObservable(_this.value);
         _this.vo(); // create a depdenency
-        return _this.read(ko.utils.unwrapObservable(_this.value));
+        return _this.read(_knockout2.default.utils.unwrapObservable(_this.value));
       },
 
       write: function write(x) {
-        _this.write || kb._throwUnexpected(_this, 'writing to read-only');
-        _this.write(x, ko.utils.unwrapObservable(_this.value));
+        _this.write || _core2.default._throwUnexpected(_this, 'writing to read-only');
+        _this.write(x, _knockout2.default.utils.unwrapObservable(_this.value));
         _this.vo(x);
         return _this.__kb._onChange ? _this.__kb._onChange(x) : undefined;
       },
@@ -4491,14 +4765,14 @@ var LocalizedObservable = function () {
     }));
 
     // publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, this, KEYS_PUBLISH);
+    _core2.default.publishMethods(observable, this, KEYS_PUBLISH);
 
     // start
-    kb.locale_manager.bind('change', this.__kb._onLocaleChange);
+    _core2.default.locale_manager.bind('change', this.__kb._onLocaleChange);
 
     // wrap ourselves with a default value
     if (Object.prototype.hasOwnProperty.call(options, 'default')) {
-      observable = kb.DefaultObservable && ko.defaultObservable(observable, options.default);
+      observable = _core2.default.DefaultObservable && _knockout2.default.defaultObservable(observable, options.default);
     }
 
     return observable;
@@ -4511,9 +4785,9 @@ var LocalizedObservable = function () {
   _createClass(LocalizedObservable, [{
     key: 'destroy',
     value: function destroy() {
-      kb.locale_manager.unbind('change', this.__kb._onLocaleChange);
+      _core2.default.locale_manager.unbind('change', this.__kb._onLocaleChange);
       this.vm = null;
-      return kb.utils.wrappedDestroy(this);
+      return _core2.default.utils.wrappedDestroy(this);
     }
 
     // Used to reset the value if localization is not possible.
@@ -4521,8 +4795,8 @@ var LocalizedObservable = function () {
   }, {
     key: 'resetToCurrent',
     value: function resetToCurrent() {
-      var observable = kb.utils.wrappedObservable(this);
-      var current_value = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
+      var observable = _core2.default.utils.wrappedObservable(this);
+      var current_value = this.value ? this.read(_knockout2.default.utils.unwrapObservable(this.value)) : null;
       if (observable() === current_value) return undefined;
       return observable(current_value);
     }
@@ -4546,7 +4820,7 @@ var LocalizedObservable = function () {
   }, {
     key: '_onLocaleChange',
     value: function _onLocaleChange() {
-      var value = this.read(ko.utils.unwrapObservable(this.value));
+      var value = this.read(_knockout2.default.utils.unwrapObservable(this.value));
       this.vo(value);
       if (this.__kb._onChange) return this.__kb._onChange(value);
       return undefined;
@@ -4556,44 +4830,51 @@ var LocalizedObservable = function () {
   return LocalizedObservable;
 }();
 
+exports.default = LocalizedObservable;
+
 LocalizedObservable.initClass();
-module.exports = LocalizedObservable;
 
 // factory function
-kb.localizedObservable = function () {
+var localizedObservable = exports.localizedObservable = function localizedObservable() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
 
   return new (Function.prototype.bind.apply(LocalizedObservable, [null].concat(args)))();
 };
-kb.observableLocalized = kb.localizedObservable;
 
 /***/ }),
-/* 29 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.triggeredObservable = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       knockback.js 1.2.2
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Copyright (c)  2011-2016 Kevin Malakoff.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Source: https://github.com/kmalakoff/knockback
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     */
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-/*
-  knockback.js 1.2.2
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
 
 var KEYS_PUBLISH = ['destroy'];
 
@@ -4634,8 +4915,8 @@ var TriggeredObservable = function () {
     this.event_selector || kb._throwMissing(this, 'event_selector');
 
     // internal state
-    this.vo = ko.observable();
-    var observable = kb.utils.wrappedObservable(this, ko.computed(function () {
+    this.vo = _knockout2.default.observable();
+    var observable = kb.utils.wrappedObservable(this, _knockout2.default.computed(function () {
       return _this.vo();
     }));
 
@@ -4643,7 +4924,7 @@ var TriggeredObservable = function () {
     kb.publishMethods(observable, this, KEYS_PUBLISH);
 
     // create emitter observable
-    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, { emitter: _.bind(this.emitter, this), update: _.bind(this.update, this), event_selector: this.event_selector }));
+    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, { emitter: _underscore2.default.bind(this.emitter, this), update: _underscore2.default.bind(this.update, this), event_selector: this.event_selector }));
 
     return observable;
   }
@@ -4694,27 +4975,41 @@ var TriggeredObservable = function () {
   return TriggeredObservable;
 }();
 
-module.exports = TriggeredObservable;
-
 // factory function
-kb.triggeredObservable = function () {
+
+
+exports.default = TriggeredObservable;
+var triggeredObservable = exports.triggeredObservable = function triggeredObservable() {
   for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
   }
 
   return new (Function.prototype.bind.apply(TriggeredObservable, [null].concat(args)))();
 };
-kb.observableTriggered = kb.triggeredObservable;
 
 /***/ }),
-/* 30 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.formValidator = exports.inputValidator = exports.valueValidator = undefined;
 
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// internal helper
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -4724,15 +5019,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-// internal helper
-
 var callOrGet = function callOrGet(value) {
-  value = ko.utils.unwrapObservable(value);
+  value = _knockout2.default.utils.unwrapObservable(value);
 
   for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     args[_key - 1] = arguments[_key];
@@ -4767,7 +5055,7 @@ var callOrGet = function callOrGet(value) {
 //
 // @method .valueValidator(value, bindings, validation_options={})
 //   Used to create an observable that wraps all of the validators for a value and also generates helpers for $valid, $error_count, $enabled, $disabled, and $active_error.
-//   @note Called using `kb.valueValidator` (not  kb.Validation.valueValidator)
+//   @note Called using `kb.valueValidator` (not  kb.valueValidator)
 //   @param [Observable] value the value to validate
 //   @param [Object] bindings the named validators to use to validate the value
 //   @param [Object] validation_options the validation options
@@ -4782,7 +5070,7 @@ var callOrGet = function callOrGet(value) {
 //   It will automatically generate validators from the input for the following attributes:
 //   * type: for url, email, and number
 //   * required: must have a length or a value
-//   @note Called using `kb.inputValidator` (not  kb.Validation.inputValidator)
+//   @note Called using `kb.inputValidator` (not  kb.inputValidator)
 //   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
 //   @example Binding an input using Knockback inject.
 //     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>
@@ -4801,7 +5089,7 @@ var callOrGet = function callOrGet(value) {
 //   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
 //   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
 //    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
-//   @note Called using `kb.formValidator` (not  kb.Validation.formValidator)
+//   @note Called using `kb.formValidator` (not  kb.formValidator)
 //   @return [Object] an Object with all of the validators and generated helpers
 //   @example Binding a form by name using Knockback inject.
 //     <form name='my_form' data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
@@ -4825,66 +5113,59 @@ var callOrGet = function callOrGet(value) {
 //     }
 // @method .hasChangedFn(model)
 //   A validation helper that can be used to wait for a change before enabling validations.
-//   @note Called using `kb.hasChangedFn` (not  kb.Validation.hasChangedFn)
+//   @note Called using `kb.hasChangedFn` (not  kb.hasChangedFn)
 //   @return [Function] Validator function bound with model
 //   @example Enabling validations after a change has been made to a model.
 //     <form class="form-horizontal" data-bind="inject: kb.formValidator, validation_options: {enable: kb.hasChangedFn(model)}">
 // @method .minLengthFn(length)
 //   A validator that will be invalid until the length of the value is below a minimum value.
-//   @note Called using `kb.minLengthFn` (not  kb.Validation.minLengthFn)
+//   @note Called using `kb.minLengthFn` (not  kb.minLengthFn)
 //   @return [Function] Validator function bound with min length
 //   @example Validations will be invalid until the name is at least 4 characters long.
 //     <input type="text" name="name" data-bind="value: name, validations: {length: kb.minLengthFn(4)}">
 // @method .uniqueValueFn(model, key, collection)
 //   Checks for a unique attribute value by key in a collection
-//   @note Called using `kb.uniqueValueFn` (not  kb.Validation.uniqueValueFn)
+//   @note Called using `kb.uniqueValueFn` (not  kb.uniqueValueFn)
 //   @return [Function] Validator function bound with model, attribute key, and collection
 //   @example Validations will be invalid until the name attribute is unique in the collection.
 //     <input type="text" name="name" data-bind="value: name, validations: {unique: kb.uniqueValueFn(model, 'name', some_collection)}">
 // @method .untilTrueFn(stand_in, fn, model)
 //   Used to combine conditions.
-//   @note Called using `kb.untilTrueFn` (not  kb.Validation.untilTrueFn)
+//   @note Called using `kb.untilTrueFn` (not  kb.untilTrueFn)
 //   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
 //   @example Filter the minimum length test of name until it has be valid (that way, won't report invalid while typing in a new input).
 //     <input type="text" name="name" data-bind="value: name, validations: {length_filtered: kb.untilFalseFn(false, kb.minLengthFn(4), model)}">
 // @method .untilFalseFn(stand_in, fn, model)
 //   Used to combine conditions.
-//   @note Called using `kb.untilFalseFn` (not  kb.Validation.untilFalseFn)
+//   @note Called using `kb.untilFalseFn` (not  kb.untilFalseFn)
 //   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
-
-var Validation = function Validation() {
-  _classCallCheck(this, Validation);
-};
-
-kb.Validation = Validation;
-module.exports = Validation;
 
 // ############################
 // Aliases
 // ############################
-kb.valueValidator = function (value, bindings) {
+var valueValidator = exports.valueValidator = function valueValidator(value, bindings) {
   var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  return ko.computed(function () {
+  return _knockout2.default.computed(function () {
     var results = { $error_count: 0 };
-    var current_value = ko.utils.unwrapObservable(value);
+    var current_value = _knockout2.default.utils.unwrapObservable(value);
 
     var disabled = void 0;
     if ('disable' in validation_options) disabled = callOrGet(validation_options.disable);
     if ('enable' in validation_options) disabled = !callOrGet(validation_options.enable);
 
     var priorities = validation_options.priorities || [];
-    if (!_.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
+    if (!_underscore2.default.isArray(priorities)) priorities = [priorities]; // ensure priorities is an array
 
     // then add the rest
     var active_index = priorities.length + 1;
-    _.each(bindings, function (validator, identifier) {
+    _underscore2.default.each(bindings, function (validator, identifier) {
       results[identifier] = !disabled && callOrGet(validator, current_value); // update validity
       if (results[identifier]) {
         results.$error_count++;
 
         // check priorities
         var identifier_index = void 0;
-        (identifier_index = _.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
+        (identifier_index = _underscore2.default.indexOf(priorities, identifier) >= 0) || (identifier_index = priorities.length);
 
         if (results.$active_error && identifier_index < active_index) {
           results.$active_error = identifier;active_index = identifier_index;
@@ -4902,12 +5183,12 @@ kb.valueValidator = function (value, bindings) {
   });
 };
 
-kb.inputValidator = function (view_model, el) {
+var inputValidator = exports.inputValidator = function inputValidator(view_model, el) {
   var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
   var validators = kb.valid;
   var input_name = el.getAttribute('name');
-  if (input_name && !_.isString(input_name)) {
+  if (input_name && !_underscore2.default.isString(input_name)) {
     input_name = null;
   }
 
@@ -4917,7 +5198,7 @@ kb.inputValidator = function (view_model, el) {
   var options = new Function('sc', 'with(sc[0]) { return { ' + bindings + ' } }')([view_model]);
   if (!(options && options.value)) return null;
   if (options.validation_options) {
-    _.defaults(options.validation_options, validation_options);
+    _underscore2.default.defaults(options.validation_options, validation_options);
     validation_options = options.validation_options;
   }
 
@@ -4927,7 +5208,7 @@ kb.inputValidator = function (view_model, el) {
   !validators[type] || (bindings[type] = validators[type]);
   !el.hasAttribute('required') || (bindings.required = validators.required);
   if (options.validations) {
-    _.each(options.validations, function (validator, identifier) {
+    _underscore2.default.each(options.validations, function (validator, identifier) {
       bindings[identifier] = validator;
     });
   }
@@ -4938,11 +5219,11 @@ kb.inputValidator = function (view_model, el) {
   return result;
 };
 
-kb.formValidator = function (view_model, el) {
+var formValidator = exports.formValidator = function formValidator(view_model, el) {
   var results = {};
   var validators = [];
   var form_name = el.getAttribute('name');
-  if (form_name && !_.isString(form_name)) form_name = null;
+  if (form_name && !_underscore2.default.isString(form_name)) form_name = null;
 
   var bindings = el.getAttribute('data-bind');
   var validation_options = void 0;
@@ -4954,7 +5235,7 @@ kb.formValidator = function (view_model, el) {
   validation_options.no_attach = !!form_name;
 
   // build up the results
-  _.each(el.getElementsByTagName('input'), function (input_el) {
+  _underscore2.default.each(el.getElementsByTagName('input'), function (input_el) {
     var name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
     var validator = kb.inputValidator(view_model, input_el, validation_options);
@@ -4962,26 +5243,26 @@ kb.formValidator = function (view_model, el) {
   });
 
   // collect stats, error count and valid
-  results.$error_count = ko.computed(function () {
+  results.$error_count = _knockout2.default.computed(function () {
     var error_count = 0;
-    _.each(validators, function (validator) {
+    _underscore2.default.each(validators, function (validator) {
       error_count += validator().$error_count;
     });
     return error_count;
   });
-  results.$valid = ko.computed(function () {
+  results.$valid = _knockout2.default.computed(function () {
     return results.$error_count() === 0;
   });
 
   // enabled and disabled
-  results.$enabled = ko.computed(function () {
+  results.$enabled = _knockout2.default.computed(function () {
     var enabled = true;
-    _.each(validators, function (validator) {
+    _underscore2.default.each(validators, function (validator) {
       enabled &= validator().$enabled;
     });
     return enabled;
   });
-  results.$disabled = ko.computed(function () {
+  results.$disabled = _knockout2.default.computed(function () {
     return !results.$enabled();
   });
 
@@ -4991,12 +5272,28 @@ kb.formValidator = function (view_model, el) {
 };
 
 /***/ }),
-/* 31 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.untilFalseFn = exports.untilTrueFn = exports.uniqueValueFn = exports.minLengthFn = exports.hasChangedFn = exports.valid = undefined;
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(1);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Regular expressions from Angular.js: https://github.com/angular/angular.js
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -5006,19 +5303,12 @@ kb.formValidator = function (view_model, el) {
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var kb = __webpack_require__(1);
-
-var _ = kb._,
-    ko = kb.ko;
-
-// Regular expressions from Angular.js: https://github.com/angular/angular.js
-
 var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
 var EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
 var NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
 // A validator should return true if there are errors (similar to the binding check in HTML, eg. $name().required).
-kb.valid = {
+var valid = exports.valid = {
   required: function required(value) {
     return !value;
   },
@@ -5034,10 +5324,10 @@ kb.valid = {
 };
 
 // Convention is that if they end in Fn then returns a function pointer based on parameters passed.
-kb.hasChangedFn = function (model) {
+var hasChangedFn = exports.hasChangedFn = function hasChangedFn(model) {
   var m = null;var attributes = null;
   return function () {
-    var current_model = ko.utils.unwrapObservable(model);
+    var current_model = _knockout2.default.utils.unwrapObservable(model);
     if (m !== current_model) {
       // change in model
       m = current_model;
@@ -5045,82 +5335,64 @@ kb.hasChangedFn = function (model) {
       return false;
     }
     if (!(m && attributes)) return false;
-    return !_.isEqual(m.toJSON(), attributes);
+    return !_underscore2.default.isEqual(m.toJSON(), attributes);
   };
 };
 
-kb.minLengthFn = function (length) {
+var minLengthFn = exports.minLengthFn = function minLengthFn(length) {
   return function (value) {
     return !value || value.length < length;
   };
 };
 
-kb.uniqueValueFn = function (model, key, collection) {
+var uniqueValueFn = exports.uniqueValueFn = function uniqueValueFn(model, key, collection) {
   return function (value) {
-    var m = ko.utils.unwrapObservable(model);var k = ko.utils.unwrapObservable(key);var c = ko.utils.unwrapObservable(collection);
+    var m = _knockout2.default.utils.unwrapObservable(model);var k = _knockout2.default.utils.unwrapObservable(key);var c = _knockout2.default.utils.unwrapObservable(collection);
     if (!(m && k && c)) return false;
-    return !!_.find(c.models, function (test) {
+    return !!_underscore2.default.find(c.models, function (test) {
       return test !== m && test.get(k) === value;
     });
   };
 };
 
-kb.untilTrueFn = function (stand_in, fn, model) {
+var untilTrueFn = exports.untilTrueFn = function untilTrueFn(stand_in, fn, model) {
   var was_true = false;
-  if (model && ko.isObservable(model)) model.subscribe(function () {
+  if (model && _knockout2.default.isObservable(model)) model.subscribe(function () {
     was_true = false;
   }); // reset if the model changes
   return function (value) {
-    var f = ko.utils.unwrapObservable(fn);
-    if (!f) return ko.utils.unwrapObservable(stand_in);
-    var result = f(ko.utils.unwrapObservable(value));
+    var f = _knockout2.default.utils.unwrapObservable(fn);
+    if (!f) return _knockout2.default.utils.unwrapObservable(stand_in);
+    var result = f(_knockout2.default.utils.unwrapObservable(value));
     was_true |= !!result;
-    return was_true ? result : ko.utils.unwrapObservable(stand_in);
+    return was_true ? result : _knockout2.default.utils.unwrapObservable(stand_in);
   };
 };
 
-kb.untilFalseFn = function (stand_in, fn, model) {
+var untilFalseFn = exports.untilFalseFn = function untilFalseFn(stand_in, fn, model) {
   var was_false = false;
-  if (model && ko.isObservable(model)) model.subscribe(function () {
+  if (model && _knockout2.default.isObservable(model)) model.subscribe(function () {
     was_false = false;
   }); // reset if the model changes
   return function (value) {
-    var f = ko.utils.unwrapObservable(fn);
-    if (!f) return ko.utils.unwrapObservable(stand_in);
-    var result = f(ko.utils.unwrapObservable(value));
+    var f = _knockout2.default.utils.unwrapObservable(fn);
+    if (!f) return _knockout2.default.utils.unwrapObservable(stand_in);
+    var result = f(_knockout2.default.utils.unwrapObservable(value));
     was_false |= !result;
-    return was_false ? result : ko.utils.unwrapObservable(stand_in);
+    return was_false ? result : _knockout2.default.utils.unwrapObservable(stand_in);
   };
 };
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_32__;
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_33__;
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_34__;
 
 /***/ }),
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(4);
-__webpack_require__(5);
-__webpack_require__(6);
 __webpack_require__(7);
 __webpack_require__(8);
-module.exports = __webpack_require__(1);
+__webpack_require__(9);
+__webpack_require__(10);
+__webpack_require__(11);
+module.exports = __webpack_require__(3);
 
 
 /***/ })

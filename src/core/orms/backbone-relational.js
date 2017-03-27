@@ -7,14 +7,14 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../kb');
-
-const { _, Backbone } = kb;
+import kb from '../kb';
+import _ from 'underscore';
+import Backbone from 'backbone';
 
 let RelationalModel = null; // lazy bind so this file can be loaded before relational library
 
 // @nodoc
-class BackboneRelational {
+export default class BackboneRelational {
   static isAvailable() { return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null); }
 
   static relationType(model, key) {
@@ -34,7 +34,7 @@ class BackboneRelational {
     };
 
     // VERSIONING: pre Backbone-Relational 0.8.0
-    const events = kb.Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
+    const events = Backbone.Relation.prototype.sanitizeOptions ? ['update', 'add', 'remove'] : ['change', 'add', 'remove'];
     if (type === kb.TYPE_COLLECTION) _.each(events, event => model.bind(`${event}:${key}`, relFn));
     else model.bind(`${events[0]}:${key}`, relFn);
 
@@ -44,4 +44,3 @@ class BackboneRelational {
     };
   }
 }
-module.exports = BackboneRelational;

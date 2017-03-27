@@ -7,12 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../kb');
-
-const { _ } = kb;
+import _ from 'underscore';
 
 // @nodoc
-const unwrapModels = function (obj) {
+export default (obj) => {
   if (!obj) return obj;
   if (obj.__kb) return (Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj);
   if (_.isArray(obj)) return _.map(obj, test => unwrapModels(test));
@@ -24,4 +22,3 @@ const unwrapModels = function (obj) {
 
   return obj;
 };
-module.exports = unwrapModels;

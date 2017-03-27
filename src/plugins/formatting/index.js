@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import kb from '../../core';
+import FormattedObservable from './formatted-observable';
 
-module.exports = kb;
-
-kb.FormattedObservable = require('./formatted-observable');
+kb.FormattedObservable = FormattedObservable;
+export default kb;

@@ -1,5 +1,8 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 2.0.0
+* Drop support for Parse since itthe Backbone compatibility has been discontinued
+
 ## 1.2.2
 * Release of 1.2.2 due to failed release
 

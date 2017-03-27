@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import kb from '../../core';
+import LocalizedObservable from './localized-observable';
 
-module.exports = kb;
-
-kb.LocalizedObservable = require('./localized-observable');
+kb.LocalizedObservable = LocalizedObservable;
+export default kb;

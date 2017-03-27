@@ -7,9 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import _ from 'underscore';
+import ko from 'knockout';
 
-const { _, ko } = kb;
+import kb from '../../core';
 
 kb.Observable.prototype.setToDefault = function () {
   if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();

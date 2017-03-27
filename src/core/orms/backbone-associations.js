@@ -7,14 +7,14 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../kb');
-
-const { _, Backbone } = kb;
+import kb from '../kb';
+import _ from 'underscore';
+import Backbone from 'backbone';
 
 let AssociatedModel = null; // lazy bind so this file can be loaded before relational library
 
 // @nodoc
-class BackboneAssociations {
+export default class BackboneAssociations {
   static isAvailable() { return !!(AssociatedModel = Backbone ? Backbone.AssociatedModel : null); }
 
   static keys(model) {
@@ -29,4 +29,3 @@ class BackboneAssociations {
     return (relation.type === 'Many') ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;
   }
 }
-module.exports = BackboneAssociations;

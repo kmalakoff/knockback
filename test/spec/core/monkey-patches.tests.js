@@ -3,19 +3,19 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 
 describe('money-patches', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
-  const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-  const Contacts = kb.Collection.extend({ model: Contact });
+  const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+  const Contacts = Backbone.Collection.extend({ model: Contact });
 
   // # https://github.com/kmalakoff/knockback/issues/124
   it('fixes memory management for extend on kb.observable', () => {
@@ -38,7 +38,7 @@ describe('money-patches', () => {
   });
 
   // # https://github.com/kmalakoff/knockback/issues/124
-  it('fixes memory management for extend on kb.CollectionObservable', () => {
+  it('fixes memory management for extend on Backbone.CollectionObservable', () => {
     if (!ko.subscribable && !ko.subscribable.fn && !ko.subscribable.fn.extend) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 

@@ -135,7 +135,7 @@ describe('Knockback.js with BackboneORM', () => {
     });
 
     // check the set up state
-    const places = new kb.Collection([abbey_flats, abbey_studios]);
+    const places = new Backbone.Collection([abbey_flats, abbey_studios]);
     const places_observable = kb.collectionObservable(places, { view_model: kb.ViewModel });
     _.each(places_observable(), (place_view_model) => {
       if (place_view_model.id() === 'house-2-1') {
@@ -550,7 +550,7 @@ describe('Knockback.js with BackboneORM', () => {
 
     const person1 = new Person({ id: 'person-8-1', name: 'Daddy' });
     const person2 = new Person({ id: 'person-8-2', name: 'Mommy' });
-    const family = new kb.Collection([person1, person2]);
+    const family = new Backbone.Collection([person1, person2]);
     const house = new Building({ id: 'house-8-1', name: 'Home Sweet Home', occupants: [person1, person2] });
     person1.get('friends').add(person2);
     person2.set({ best_friend: person1 });
@@ -616,7 +616,7 @@ describe('Knockback.js with BackboneORM', () => {
     const models = [person1, person2];
     _.each(models, (model) => { model.save(() => {}); });
 
-    const family = new kb.Collection([person1, person2]);
+    const family = new Backbone.Collection([person1, person2]);
     const house = new Building({ id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()] });
     house.set({ occupants: [person1.toJSON(), person2.toJSON()] });
     const friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({ friends });
@@ -680,7 +680,7 @@ describe('Knockback.js with BackboneORM', () => {
 
     const person1 = new Person({ id: 'person-9-1', name: 'Daddy' });
     const person2 = new Person({ id: 'person-9-2', name: 'Mommy' });
-    const family = new kb.Collection([person1, person2]);
+    const family = new Backbone.Collection([person1, person2]);
     const house = new Building({ id: 'house-9-1', name: 'Home Sweet Home' });
 
     const view_model_person1 = new PersonViewModel(person1);
@@ -750,7 +750,7 @@ describe('Knockback.js with BackboneORM', () => {
 
     const person1 = new Person({ id: 'person-9b-1', name: 'Daddy' });
     const person2 = new Person({ id: 'person-9b-2', name: 'Mommy' });
-    const family = new kb.Collection([person1, person2]);
+    const family = new Backbone.Collection([person1, person2]);
     const house = new Building({ id: 'house-9b-1', name: 'Home Sweet Home' });
 
     const view_model_person1 = new PersonViewModel(person1);
@@ -842,7 +842,7 @@ describe('Knockback.js with BackboneORM', () => {
       }
     }
 
-    const collection_observable = kb.collectionObservable(new kb.Collection([john, paul, george, ringo]), {
+    const collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
       factories: {
         models: BandMemberViewModel,
         'models.best_friend': { create(model) { return model ? new BestFriendViewModel(model) : null; } },
@@ -932,7 +932,7 @@ describe('Knockback.js with BackboneORM', () => {
       }
     }
 
-    class PersonCollection extends kb.CollectionObservable {
+    class PersonCollection extends Backbone.CollectionObservable {
       constructor(collection, options) {
         super(collection, {
           factories: {
@@ -944,8 +944,8 @@ describe('Knockback.js with BackboneORM', () => {
       }
     }
 
-    const collection_observable1 = new PersonCollection(new kb.Collection([george, john, paul, ringo]));
-    const collection_observable2 = new PersonCollection(new kb.Collection([george, john, paul, ringo]), collection_observable1.shareOptions());
+    const collection_observable1 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]));
+    const collection_observable2 = new PersonCollection(new Backbone.Collection([george, john, paul, ringo]), collection_observable1.shareOptions());
 
     assert.equal(collection_observable1.__kb.factory, collection_observable2.__kb.factory, 'the factory should be shared');
 

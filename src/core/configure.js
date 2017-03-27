@@ -1,28 +1,28 @@
-const kb = require('./kb');
-
-const { _ } = kb;
+import _ from 'underscore';
+import BackboneAssociations from './orms/backbone-associations';
+import BackboneRelational from './orms/backbone-relational';
 
 const ALL_ORMS = {
   default: null,
   'backbone-orm': null,
-  'backbone-associations': require('./orms/backbone-associations'),
-  'backbone-relational': require('./orms/backbone-relational'),
+  'backbone-associations': BackboneAssociations,
+  'backbone-relational': BackboneRelational,
 };
 
 // @nodoc
-kb.settings = { orm: ALL_ORMS.default };
+export const settings = { orm: ALL_ORMS.default };
 for (const key in ALL_ORMS) {
   if (Object.prototype.hasOwnProperty.call(ALL_ORMS, key)) {
     const value = ALL_ORMS[key];
     if (value && value.isAvailable()) {
-      kb.settings.orm = value;
+      settings.orm = value;
       break;
     }
   }
 }
 
 // @nodoc
-module.exports = function (options = {}) {
+export const configure = (options = {}) => {
   _.each(options, (value, key) => {
     switch (key) {
       case 'orm':
@@ -38,11 +38,11 @@ module.exports = function (options = {}) {
             (typeof console === 'undefined') || console.log(`Knockback configure: could not enable orm ${value}. Make sure it is included before Knockback`);
             return;
           }
-          kb.settings.orm = orm;
-        } else kb.settings.orm = value;
+          settings.orm = orm;
+        } else settings.orm = value;
         break;
 
-      default: kb.settings[key] = value; break;
+      default: settings[key] = value; break;
     }
   });
 };

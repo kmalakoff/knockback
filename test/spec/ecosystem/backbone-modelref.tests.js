@@ -17,8 +17,8 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
 
   if (!(root.Backbone != null ? root.Backbone.ModelRef : undefined)) return;
 
-  const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-  const Contacts = kb.Collection.extend({ model: Contact });
+  const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+  const Contacts = Backbone.Collection.extend({ model: Contact });
 
   it('Standard use case: just enough to get the picture', () => {
     kb.statistics = new kb.Statistics(); // turn on stats

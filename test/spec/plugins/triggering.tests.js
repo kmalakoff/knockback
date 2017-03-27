@@ -9,14 +9,14 @@ describe('triggered-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
   it('1. Standard use case: simple events notifications', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const model = new kb.Model();
+    const model = new Backbone.Model();
     model.setLocale = () => model.trigger('change', model);
 
     let trigger_count = 0;
@@ -49,7 +49,7 @@ describe('triggered-observable', () => {
 
   it('2. Standard use case: simple events notifications (kb.observableTriggered)', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const model = new kb.Model();
+    const model = new Backbone.Model();
     model.setLocale = () => model.trigger('change', model);
 
     let trigger_count = 0;

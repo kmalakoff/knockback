@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import ko from 'knockout';
 
 const KEYS_PUBLISH = ['destroy'];
 
@@ -31,7 +30,7 @@ const KEYS_PUBLISH = ['destroy'];
 //   emitter.set(name: 'bob');       # trigger_count: 1
 //   emitter.set(name: 'george');    # trigger_count: 2
 //   emitter.set(last: 'smith');     # trigger_count: 3
-class TriggeredObservable {
+export default class TriggeredObservable {
 
   // Used to create a new kb.Observable.
   //
@@ -87,8 +86,6 @@ class TriggeredObservable {
     return this.vo.valueHasMutated();  // manually trigger the dependable
   }
 }
-module.exports = TriggeredObservable;
 
 // factory function
-kb.triggeredObservable = (...args) => new TriggeredObservable(...args);
-kb.observableTriggered = kb.triggeredObservable;
+export const triggeredObservable = (...args) => new TriggeredObservable(...args);

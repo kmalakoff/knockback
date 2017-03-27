@@ -368,7 +368,7 @@
           relation = _.find(owner.getRelations(), test => test.key === key);
           if (relation) {
             if (relation.collectionType || _.isArray(relation.keyContents)) {
-              return kb.CollectionObservable;
+              return Backbone.CollectionObservable;
             }
             return kb.ViewModel;
           }
@@ -380,7 +380,7 @@
           return kb.ViewModel;
         }
         if (value instanceof Backbone.Collection) {
-          return kb.CollectionObservable;
+          return Backbone.CollectionObservable;
         }
         return null;
       };
@@ -663,7 +663,7 @@
       });
     };
 
-    kb.ModelWatcher = (function () {
+    Backbone.ModelWatcher = (function () {
       ModelWatcher.useOptionsOrCreate = function (options, model, obj, callback_options) {
         if (options.model_watcher) {
           if (!(options.model_watcher.model() === model || (options.model_watcher.model_ref === model))) {
@@ -672,7 +672,7 @@
           return kb.utils.wrappedModelWatcher(obj, options.model_watcher).registerCallbacks(obj, callback_options);
         }
         kb.utils.wrappedModelWatcherIsOwned(obj, true);
-        return kb.utils.wrappedModelWatcher(obj, new kb.ModelWatcher(model)).registerCallbacks(obj, callback_options);
+        return kb.utils.wrappedModelWatcher(obj, new Backbone.ModelWatcher(model)).registerCallbacks(obj, callback_options);
       };
 
       function ModelWatcher(model, obj, callback_options) {
@@ -924,7 +924,7 @@
     }());
 
     kb.modelObservable = function (model, observable) {
-      return new kb.ModelWatcher(model, observable);
+      return new Backbone.ModelWatcher(model, observable);
     };
 
   /*
@@ -1034,7 +1034,7 @@
         observable.value = _.bind(this.value, this);
         observable.valueType = _.bind(this.valueType, this);
         observable.destroy = _.bind(this.destroy, this);
-        kb.ModelWatcher.useOptionsOrCreate({
+        Backbone.ModelWatcher.useOptionsOrCreate({
           model_watcher,
         }, model, this, {
           model: _.bind(this.model, this),
@@ -1213,7 +1213,7 @@
         kb.Store.useOptionsOrCreate(options, model, this);
         this.__kb.path = options.path;
         kb.Factory.useOptionsOrCreate(options, this, options.path);
-        model_watcher = kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
+        model_watcher = kb.utils.wrappedModelWatcher(this, new Backbone.ModelWatcher(model, this, {
           model: _.bind(this.model, this),
         }));
         if (options.requires && _.isArray(options.requires)) {
@@ -1376,7 +1376,7 @@
   */
 
 
-    kb.CollectionObservable = (function () {
+    Backbone.CollectionObservable = (function () {
       CollectionObservable.extend = Backbone.Model.extend;
 
       function CollectionObservable(collection, options) {
@@ -1790,10 +1790,10 @@
       return CollectionObservable;
     }());
 
-    __extends(kb.CollectionObservable.prototype, Backbone.Events);
+    __extends(Backbone.CollectionObservable.prototype, Backbone.Events);
 
     kb.collectionObservable = function (collection, options) {
-      return new kb.CollectionObservable(collection, options);
+      return new Backbone.CollectionObservable(collection, options);
     };
 
     kb.sortedIndexWrapAttr = kb.siwa = function (attribute_name, wrapper_constructor) {
@@ -2113,7 +2113,7 @@
         this.vo = ko.observable();
         observable = kb.utils.wrappedObservable(this, ko.dependentObservable(() => _this.vo()));
         observable.destroy = _.bind(this.destroy, this);
-        kb.utils.wrappedModelWatcher(this, new kb.ModelWatcher(model, this, {
+        kb.utils.wrappedModelWatcher(this, new Backbone.ModelWatcher(model, this, {
           model: _.bind(this.model, this),
           update: _.bind(this.update, this),
           event_name: this.event_name,

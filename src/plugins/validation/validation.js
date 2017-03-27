@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import ko from 'knockout';
 
 // internal helper
 const callOrGet = function (value, ...args) {
@@ -43,7 +42,7 @@ const callOrGet = function (value, ...args) {
 //
 // @method .valueValidator(value, bindings, validation_options={})
 //   Used to create an observable that wraps all of the validators for a value and also generates helpers for $valid, $error_count, $enabled, $disabled, and $active_error.
-//   @note Called using `kb.valueValidator` (not  kb.Validation.valueValidator)
+//   @note Called using `kb.valueValidator` (not  kb.valueValidator)
 //   @param [Observable] value the value to validate
 //   @param [Object] bindings the named validators to use to validate the value
 //   @param [Object] validation_options the validation options
@@ -58,7 +57,7 @@ const callOrGet = function (value, ...args) {
 //   It will automatically generate validators from the input for the following attributes:
 //   * type: for url, email, and number
 //   * required: must have a length or a value
-//   @note Called using `kb.inputValidator` (not  kb.Validation.inputValidator)
+//   @note Called using `kb.inputValidator` (not  kb.inputValidator)
 //   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
 //   @example Binding an input using Knockback inject.
 //     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>
@@ -77,7 +76,7 @@ const callOrGet = function (value, ...args) {
 //   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
 //   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
 //    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
-//   @note Called using `kb.formValidator` (not  kb.Validation.formValidator)
+//   @note Called using `kb.formValidator` (not  kb.formValidator)
 //   @return [Object] an Object with all of the validators and generated helpers
 //   @example Binding a form by name using Knockback inject.
 //     <form name='my_form' data-bind="inject: kb.formValidator, validation_options: {priorities: ['required', 'url']}">
@@ -101,40 +100,37 @@ const callOrGet = function (value, ...args) {
 //     }
 // @method .hasChangedFn(model)
 //   A validation helper that can be used to wait for a change before enabling validations.
-//   @note Called using `kb.hasChangedFn` (not  kb.Validation.hasChangedFn)
+//   @note Called using `kb.hasChangedFn` (not  kb.hasChangedFn)
 //   @return [Function] Validator function bound with model
 //   @example Enabling validations after a change has been made to a model.
 //     <form class="form-horizontal" data-bind="inject: kb.formValidator, validation_options: {enable: kb.hasChangedFn(model)}">
 // @method .minLengthFn(length)
 //   A validator that will be invalid until the length of the value is below a minimum value.
-//   @note Called using `kb.minLengthFn` (not  kb.Validation.minLengthFn)
+//   @note Called using `kb.minLengthFn` (not  kb.minLengthFn)
 //   @return [Function] Validator function bound with min length
 //   @example Validations will be invalid until the name is at least 4 characters long.
 //     <input type="text" name="name" data-bind="value: name, validations: {length: kb.minLengthFn(4)}">
 // @method .uniqueValueFn(model, key, collection)
 //   Checks for a unique attribute value by key in a collection
-//   @note Called using `kb.uniqueValueFn` (not  kb.Validation.uniqueValueFn)
+//   @note Called using `kb.uniqueValueFn` (not  kb.uniqueValueFn)
 //   @return [Function] Validator function bound with model, attribute key, and collection
 //   @example Validations will be invalid until the name attribute is unique in the collection.
 //     <input type="text" name="name" data-bind="value: name, validations: {unique: kb.uniqueValueFn(model, 'name', some_collection)}">
 // @method .untilTrueFn(stand_in, fn, model)
 //   Used to combine conditions.
-//   @note Called using `kb.untilTrueFn` (not  kb.Validation.untilTrueFn)
+//   @note Called using `kb.untilTrueFn` (not  kb.untilTrueFn)
 //   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
 //   @example Filter the minimum length test of name until it has be valid (that way, won't report invalid while typing in a new input).
 //     <input type="text" name="name" data-bind="value: name, validations: {length_filtered: kb.untilFalseFn(false, kb.minLengthFn(4), model)}">
 // @method .untilFalseFn(stand_in, fn, model)
 //   Used to combine conditions.
-//   @note Called using `kb.untilFalseFn` (not  kb.Validation.untilFalseFn)
+//   @note Called using `kb.untilFalseFn` (not  kb.untilFalseFn)
 //   @return [Function] Validator function bound with stand_in value before condition is met, validator function, and optionally model (will reset if the model changes).
-class Validation {}
-kb.Validation = Validation;
-module.exports = Validation;
 
 // ############################
 // Aliases
 // ############################
-kb.valueValidator = (value, bindings, validation_options = {}) => ko.computed(() => {
+export const valueValidator = (value, bindings, validation_options = {}) => ko.computed(() => {
   const results = { $error_count: 0 };
   const current_value = ko.utils.unwrapObservable(value);
 
@@ -171,7 +167,7 @@ kb.valueValidator = (value, bindings, validation_options = {}) => ko.computed(()
   return results;
 });
 
-kb.inputValidator = (view_model, el, validation_options = {}) => {
+export const inputValidator = (view_model, el, validation_options = {}) => {
   const validators = kb.valid;
   let input_name = el.getAttribute('name');
   if (input_name && !_.isString(input_name)) { input_name = null; }
@@ -201,7 +197,7 @@ kb.inputValidator = (view_model, el, validation_options = {}) => {
   return result;
 };
 
-kb.formValidator = (view_model, el) => {
+export const formValidator = (view_model, el) => {
   const results = {};
   const validators = [];
   let form_name = el.getAttribute('name');

@@ -7,13 +7,15 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-const EventWatcher = require('./event-watcher');
+import kb from './kb';
+import _ from 'underscore';
+import Backbone from 'backbone';
+import ko from 'knockout';
 
-const { _, ko } = kb;
+import EventWatcher from './event-watcher';
 
 // @nodoc
-const assignViewModelKey = function (vm, key) {
+const assignViewModelKey = (vm, key) => {
   const vm_key = vm.__kb.internals && ~_.indexOf(vm.__kb.internals, key) ? `_${key}` : key;
   if (Object.prototype.hasOwnProperty.call(vm.__kb.view_model, vm_key)) return undefined; // already exists, skip
   vm.__kb.view_model[vm_key] = null;
@@ -21,7 +23,7 @@ const assignViewModelKey = function (vm, key) {
 };
 
 // @nodoc
-const createObservable = function (vm, model, key, create_options) {
+const createObservable = (vm, model, key, create_options) => {
   if (vm.__kb.excludes && ~_.indexOf(vm.__kb.excludes, key)) return undefined;
   if (vm.__kb.statics && ~_.indexOf(vm.__kb.statics, key)) return undefined;
   const vm_key = assignViewModelKey(vm, key);
@@ -32,7 +34,7 @@ const createObservable = function (vm, model, key, create_options) {
 };
 
 // @nodoc
-const createStaticObservables = function (vm, model) {
+const createStaticObservables = (vm, model) => {
   _.each(vm.__kb.statics, (key) => {
     const vm_key = assignViewModelKey(vm, key);
     if (!vm_key) return;
@@ -102,10 +104,10 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
 //     var the_model = view_model.model(); // get
 //     view_model.model(new Backbone.Model({name: 'fred'})); // set
 //
-class ViewModel {
+export default class ViewModel {
   static initClass() {
     // @nodoc
-    ViewModel.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+    ViewModel.extend = Backbone.Model.extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
@@ -228,7 +230,6 @@ class ViewModel {
   }
 }
 ViewModel.initClass();
-module.exports = ViewModel;
 
 // Factory function to create a kb.ViewModel.
-kb.viewModel = (...args) => new ViewModel(...args);
+export const viewModel = (...args) => new ViewModel(...args);

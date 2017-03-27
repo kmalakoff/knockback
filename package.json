@@ -60,6 +60,7 @@
     "gulp-uglify": "*",
     "gulp-webpack-config": "*",
     "gulp-wrap-amd-infer": "*",
+    "jquery": "*",
     "jsdom": "*",
     "karma": "*",
     "karma-babel-preprocessor": "*",
@@ -73,6 +74,7 @@
     "karma-safari-launcher": "*",
     "karma-spec-reporter": "*",
     "mocha": "*",
+    "moment": "*",
     "nuget": "*",
     "requirejs": "*",
     "webpack": "*"
@@ -83,16 +85,6 @@
     "backbone.localstorage": "*",
     "lodash": "*",
     "backbone-orm": "*",
-    "jquery": "*",
-    "moment": "*",
-    "backbone-associations": "*",
-    "parse": "1.5.x"
-  },
-  "jam": {
-    "dependencies": {
-      "underscore": ">=1.1.7",
-      "backbone": ">=0.5.1",
-      "knockout": ">=2.2.1"
-    }
+    "backbone-associations": "*"
   }
 }

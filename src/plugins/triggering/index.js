@@ -7,8 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import kb from '../../core';
+import TriggeredObservable from './triggered-observable';
 
-module.exports = kb;
-
-kb.TriggeredObservable = require('./triggered-observable');
+kb.TriggeredObservable = TriggeredObservable;
+export default kb;

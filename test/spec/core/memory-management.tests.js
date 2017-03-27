@@ -10,8 +10,8 @@ describe('knockback.js memory management', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
@@ -76,23 +76,23 @@ describe('knockback.js memory management', () => {
   it('Basic view model properties', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const nested_view_model = kb.viewModel(new kb.Model({ name: 'name1' }), { name: {} });
+    const nested_view_model = kb.viewModel(new Backbone.Model({ name: 'name1' }), { name: {} });
     const ViewModel = function () {
       this.prop1 = ko.observable();
-      this.prop2 = ko.observable(['test', 1, null, kb.viewModel(new kb.Model({ name: 'name1' }))]);
-      this.prop3 = ko.observableArray(['test', 1, null, kb.viewModel(new kb.Model({ name: 'name1' }))]);
+      this.prop2 = ko.observable(['test', 1, null, kb.viewModel(new Backbone.Model({ name: 'name1' }))]);
+      this.prop3 = ko.observableArray(['test', 1, null, kb.viewModel(new Backbone.Model({ name: 'name1' }))]);
       this.prop4 = ko.computed(() => true);
-      this.prop5 = kb.observable(new kb.Model({ name: 'name1' }), 'name');
+      this.prop5 = kb.observable(new Backbone.Model({ name: 'name1' }), 'name');
       this.prop6 = nested_view_model;
-      this.prop7 = kb.collectionObservable(new kb.Collection(), { models_only: true });
-      this.prop8 = kb.viewModel(new kb.Model({ name: 'name1' }));
-      this.prop9 = kb.collectionObservable(new kb.Collection());
+      this.prop7 = kb.collectionObservable(new Backbone.Collection(), { models_only: true });
+      this.prop8 = kb.viewModel(new Backbone.Model({ name: 'name1' }));
+      this.prop9 = kb.collectionObservable(new Backbone.Collection());
     };
     const view_model = new ViewModel();
     kb.release(view_model);
 
     for (let index = 1; index <= 9; index++) { assert.ok(!view_model[`prop${index}`], `Property released: prop${index}`); }
-    assert.ok(!view_model.name, 'Property released: view_model.name'); // kb.viewModel(new kb.Model({name: 'name1'}), 'name', this)
+    assert.ok(!view_model.name, 'Property released: view_model.name'); // kb.viewModel(new Backbone.Model({name: 'name1'}), 'name', this)
     assert.ok(!nested_view_model.name, 'Property released: nested_view_model.name'); // nested_view_model
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
@@ -103,9 +103,9 @@ describe('knockback.js memory management', () => {
 
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ name: 'Bob' });
+    const model = new Backbone.Model({ name: 'Bob' });
     const view_model = kb.viewModel(model);
-    const collection_observable = kb.collectionObservable(new kb.Collection([new kb.Model({ name: 'Fred' }), new kb.Model({ name: 'Mary' })]));
+    const collection_observable = kb.collectionObservable(new Backbone.Collection([new Backbone.Model({ name: 'Fred' }), new Backbone.Model({ name: 'Mary' })]));
 
     const $vm_el = $('<div id="vm" data-bind="text: name"></div>');
     const $co_el = $('<div id="co" data-bind="foreach: co"><div data-bind="text: name"></div></div>');
@@ -142,7 +142,7 @@ describe('knockback.js memory management', () => {
 
     class RefViewModel {
       constructor() {
-        this.prop = kb.observable(new kb.Model({ name: 'name1' }), 'name');
+        this.prop = kb.observable(new Backbone.Model({ name: 'name1' }), 'name');
         // reference counting
         this.ref_count = 1;
       }
@@ -180,12 +180,12 @@ describe('knockback.js memory management', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('kb.CollectionObservable', () => {
+  it('Backbone.CollectionObservable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ref counted view model
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(new kb.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: RefCountableViewModel });
+    let collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: RefCountableViewModel });
     assert.equal(RefCountableViewModel.view_models.length, 2, 'Created: 2');
 
     const instance = collection_observable()[0].retain();
@@ -196,7 +196,7 @@ describe('knockback.js memory management', () => {
 
     // destroyable view model
     DestroyableViewModel.view_models = [];
-    collection_observable = kb.collectionObservable(new kb.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel });
+    collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel });
     assert.equal(DestroyableViewModel.view_models.length, 2, 'Created: 2');
 
     kb.release(collection_observable);
@@ -204,7 +204,7 @@ describe('knockback.js memory management', () => {
 
     // simple view model
     SimpleViewModel.view_models = [];
-    collection_observable = kb.collectionObservable(new kb.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel });
+    collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel });
     assert.equal(SimpleViewModel.view_models.length, 2, 'Created: 2');
 
     kb.release(collection_observable);
@@ -214,13 +214,13 @@ describe('knockback.js memory management', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('kb.CollectionObservable with external store', () => {
+  it('Backbone.CollectionObservable with external store', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ref counted view model
     let store = new kb.Store();
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(new kb.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: RefCountableViewModel, store });
+    let collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: RefCountableViewModel, store });
     assert.equal(RefCountableViewModel.view_models.length, 2, 'Created: 2');
 
     const instance = collection_observable()[0].retain();
@@ -238,7 +238,7 @@ describe('knockback.js memory management', () => {
     // destroyable view model
     store = new kb.Store();
     DestroyableViewModel.view_models = [];
-    collection_observable = kb.collectionObservable(new kb.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel, store });
+    collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel, store });
     assert.equal(DestroyableViewModel.view_models.length, 2, 'Created: 2');
 
     kb.release(collection_observable);
@@ -252,7 +252,7 @@ describe('knockback.js memory management', () => {
     // simple view model
     store = new kb.Store();
     SimpleViewModel.view_models = [];
-    collection_observable = kb.collectionObservable(new kb.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel, store });
+    collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel, store });
     assert.equal(SimpleViewModel.view_models.length, 2, 'Created: 2');
 
     kb.release(collection_observable);
@@ -285,8 +285,8 @@ describe('knockback.js memory management', () => {
       value: ko.observable('hi'),
       array_value1: ko.observable(['Hello', 'Friend']),
       array_value2: ko.observableArray(['Hello', 'Friend']),
-      model_value: kb.viewModel(new kb.Model()),
-      collection_value: kb.collectionObservable(new kb.Collection()),
+      model_value: kb.viewModel(new Backbone.Model()),
+      collection_value: kb.collectionObservable(new Backbone.Collection()),
     };
 
     kb.release(view_model);

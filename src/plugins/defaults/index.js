@@ -7,9 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import kb from '../../core';
+import './extensions';
+import DefaultObservable from './default-observable';
 
-module.exports = kb;
-
-require('./extensions');
-kb.DefaultObservable = require('./default-observable');
+kb.DefaultObservable = DefaultObservable;
+export default kb;

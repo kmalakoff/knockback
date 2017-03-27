@@ -7,11 +7,11 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-const TypedValue = require('./typed-value');
-const EventWatcher = require('./event-watcher');
+import _ from 'underscore';
+import ko from 'knockout';
 
-const { _, ko } = kb;
+import TypedValue from './typed-value';
+import EventWatcher from './event-watcher';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'];
 const KEYS_INFO = ['args', 'read', 'write'];
@@ -39,7 +39,7 @@ const KEYS_INFO = ['args', 'read', 'write'];
 //     var the_model = observable.model(); // get
 //     observable.model(new Backbone.Model({name: 'fred'})); // set
 //
-class Observable {
+export default class Observable {
 
   // Used to create a new kb.Observable.
   //
@@ -178,6 +178,5 @@ class Observable {
     return this._value.update(new_value);
   }
 }
-module.exports = Observable;
 
-kb.observable = (...args) => new Observable(...args);
+export const observable = (...args) => new Observable(...args);

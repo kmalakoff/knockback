@@ -9,8 +9,8 @@ describe('knockback_core utils', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
@@ -28,7 +28,7 @@ describe('knockback_core utils', () => {
   it('kb.utils.wrappedModel', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ name: 'Bob' });
+    const model = new Backbone.Model({ name: 'Bob' });
     const instance = {};
     assert.equal(kb.utils.wrappedModel(instance), instance, 'no model was wrapped so return the instance'); // get
 
@@ -41,19 +41,19 @@ describe('knockback_core utils', () => {
   it('kb.utils.wrappedStore', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const collection_observable = kb.collectionObservable(new kb.Collection());
+    const collection_observable = kb.collectionObservable(new Backbone.Collection());
     assert.ok(!!kb.utils.wrappedStore(collection_observable), 'Store is available on a collection observable');
 
     // can get and share store
-    let collection_observable_shared = kb.collectionObservable(new kb.Collection(), { store: kb.utils.wrappedStore(collection_observable) });
+    let collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), { store: kb.utils.wrappedStore(collection_observable) });
     assert.equal(kb.utils.wrappedStore(collection_observable), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observables');
     kb.release(collection_observable_shared); // clean up
 
-    const view_model = kb.viewModel(new kb.Model({ name: 'Bob' }));
+    const view_model = kb.viewModel(new Backbone.Model({ name: 'Bob' }));
     assert.ok(!!kb.utils.wrappedStore(view_model), 'Store is available on a view model');
 
     // can get and share store
-    collection_observable_shared = kb.collectionObservable(new kb.Collection(), { store: kb.utils.wrappedStore(view_model) });
+    collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), { store: kb.utils.wrappedStore(view_model) });
 
     assert.equal(kb.utils.wrappedStore(view_model), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observable and view model');
 
@@ -68,15 +68,15 @@ describe('knockback_core utils', () => {
   it('kb.utils.valueType', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const co = kb.collectionObservable(new kb.Collection());
-    assert.equal(kb.utils.valueType(co), kb.TYPE_COLLECTION, 'kb.CollectionObservable is a collection type');
+    const co = kb.collectionObservable(new Backbone.Collection());
+    assert.equal(kb.utils.valueType(co), kb.TYPE_COLLECTION, 'Backbone.CollectionObservable is a collection type');
     kb.release(co); // clean up
 
-    const o = kb.observable(new kb.Model({ name: 'name1' }), 'name');
+    const o = kb.observable(new Backbone.Model({ name: 'name1' }), 'name');
     assert.equal(kb.utils.valueType(o), kb.TYPE_SIMPLE, 'kb.Observable is a kb.TYPE_SIMPLE');
     kb.release(o); // clean up
 
-    const model = new kb.Model({ simple_type: 3, model_type: new kb.Model(), collection_type: new kb.Collection() });
+    const model = new Backbone.Model({ simple_type: 3, model_type: new Backbone.Model(), collection_type: new Backbone.Collection() });
     let view_model = kb.viewModel(model);
 
     assert.equal(kb.utils.valueType(view_model.simple_type), kb.TYPE_SIMPLE, 'simple is kb.TYPE_SIMPLE');
@@ -84,7 +84,7 @@ describe('knockback_core utils', () => {
     assert.equal(kb.utils.valueType(view_model.collection_type), kb.TYPE_COLLECTION, 'collection is kb.TYPE_COLLECTION');
     kb.release(view_model); // clean up
 
-    view_model = kb.viewModel(new kb.Model({ simple_attr: null, model_attr: null }), { factories: { model_attr: kb.ViewModel } });
+    view_model = kb.viewModel(new Backbone.Model({ simple_attr: null, model_attr: null }), { factories: { model_attr: kb.ViewModel } });
     assert.equal(kb.utils.valueType(view_model.simple_attr), kb.TYPE_SIMPLE, 'simple_attr is kb.TYPE_SIMPLE');
     assert.equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL');
     kb.release(view_model); // clean up
@@ -114,7 +114,7 @@ describe('knockback_core utils', () => {
   it('kb.release handling type changes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model();
+    const model = new Backbone.Model();
     model.set({ foo: [1, 2, 3] });
     const observable = kb.viewModel(model);
     model.set({ foo: null });
@@ -127,7 +127,7 @@ describe('knockback_core utils', () => {
   it('kb.release releases all events', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new kb.Model({ id: 1, name: 'Zebra', age: 22, genus: 'Equus' });
+    const model = new Backbone.Model({ id: 1, name: 'Zebra', age: 22, genus: 'Equus' });
     assert.ok(kb.Statistics.eventsStats(model).count === 0, 'No events yet');
 
     const view_model = { model: kb.viewModel(model) };

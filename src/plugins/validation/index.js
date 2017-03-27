@@ -7,9 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import kb from '../../core';
+import * as validators from './validators';
+import * as validation from './validation';
 
-module.exports = kb;
-
-require('./validators');
-require('./validation');
+kb.assign(kb, validators);
+kb.assign(kb, validation);
+export default kb;

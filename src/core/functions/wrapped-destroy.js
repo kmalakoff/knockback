@@ -8,7 +8,7 @@
 */
 
 // @nodoc
-const wrappedDestroy = (obj) => {
+export default (obj) => {
   if (!obj.__kb) return;
   if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
 
@@ -17,16 +17,16 @@ const wrappedDestroy = (obj) => {
 
   if (__kb.observable) {
     __kb.observable.destroy = null; __kb.observable.release = null;
-    wrappedDestroy(__kb.observable);
-    __kb.observable = null;
+    wrappedDestroy(__kb.observable); __kb.observable = null;
   }
-
   __kb.factory = null;
 
-  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy(); // release the event_watcher
+  // release the event_watcher
+  if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy();
   __kb.event_watcher = null;
 
-  if (__kb.store_is_owned) __kb.store.destroy(); // release the store
+  // release the store
+  if (__kb.store_is_owned) __kb.store.destroy();
   __kb.store = null;
 
   if (__kb.stores_references) {
@@ -37,4 +37,3 @@ const wrappedDestroy = (obj) => {
     }
   }
 };
-module.exports = wrappedDestroy;

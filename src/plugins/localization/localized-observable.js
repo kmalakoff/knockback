@@ -7,15 +7,17 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import _ from 'underscore';
+import Backbone from 'backbone';
+import ko from 'knockout';
 
-const { _, ko } = kb;
+import kb from '../../core';
 
 const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 
 // Locale Manager - if you are using localization, set this property.
 // It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-if (!kb.locale_manager) { kb.locale_manager = undefined; }
+if (!kb.locale_manager) kb.locale_manager = undefined;
 
 // @abstract You must provide the following two methods:
 //   * read: function(value, observable) called to get the value and each time the locale changes
@@ -62,9 +64,9 @@ if (!kb.locale_manager) { kb.locale_manager = undefined; }
 //          return kb.LocalizedObservable.prototype.constructor.apply(this, arguments);
 //        }
 //     });
-class LocalizedObservable {
+export default class LocalizedObservable {
   static initClass() {
-    LocalizedObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+    LocalizedObservable.extend = Backbone.Model.extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
@@ -157,8 +159,6 @@ class LocalizedObservable {
   }
 }
 LocalizedObservable.initClass();
-module.exports = LocalizedObservable;
 
 // factory function
-kb.localizedObservable = (...args) => new LocalizedObservable(...args);
-kb.observableLocalized = kb.localizedObservable;
+export const localizedObservable = (...args) => new LocalizedObservable(...args);

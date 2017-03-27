@@ -7,23 +7,36 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
+import _ from 'underscore';
+import Backbone from 'backbone';
+import ko from 'knockout';
+
+import kb from './kb';
+import CollectionObservable from './collection-observable';
+import Observable from './observable';
+import ViewModel from './view-model';
+import configure from './configure';
+import utils from './utils';
+import Statistics from './statistics';
+import EventWatcher from './event-watcher';
+import Store from './store';
+import Factory from './factory';
+import './inject';
+
+const api = {
+  _,
+  Backbone,
+  ko,
+  CollectionObservable,
+  Observable,
+  ViewModel,
+  configure,
+  utils,
+  Statistics,
+  EventWatcher,
+  Store,
+  Factory,
+};
+kb.assign(kb, api);
 
 module.exports = kb;
-
-kb.configure = require('./configure');
-
-require('./monkey-patches');
-kb.utils = require('./utils');
-kb.Statistics = require('./statistics');
-kb.Store = require('./store');
-kb.Factory = require('./factory');
-kb.EventWatcher = require('./event-watcher');
-
-kb.CollectionObservable = require('./collection-observable');
-kb.Observable = require('./observable');
-kb.ViewModel = require('./view-model');
-require('./inject');
-
-// re-expose modules
-kb.modules = { underscore: kb._, backbone: kb.Parse || kb.Backbone, knockout: kb.ko };

@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import ko from 'knockout';
 
 const KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
@@ -17,7 +16,7 @@ const KEYS_PUBLISH = ['destroy', 'setToDefault'];
 //
 // @example Provide a observable with observable and/or non observable default argument in the form of:
 //   var wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
-class DefaultObservable {
+export default class DefaultObservable {
   // Used to create a new kb.DefaultObservable.
   //
   // @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
@@ -48,7 +47,5 @@ class DefaultObservable {
   // @note Can be used with kb.utils.setToDefault, kb.Observable.setToDefault, kb.ViewModel.setToDefault
   setToDefault() { return kb.utils.wrappedObservable(this)(this.dv); }
 }
-module.exports = DefaultObservable;
 
-kb.defaultObservable = (...args) => new DefaultObservable(...args);
-kb.observableDefault = kb.defaultObservable;
+export const defaultObservable = (...args) => new DefaultObservable(...args);

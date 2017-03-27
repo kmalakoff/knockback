@@ -7,9 +7,8 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import ko from 'knockout';
 
 // Regular expressions from Angular.js: https://github.com/angular/angular.js
 const URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
@@ -17,7 +16,7 @@ const EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
 const NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
 // A validator should return true if there are errors (similar to the binding check in HTML, eg. $name().required).
-kb.valid = {
+export const valid = {
   required(value) { return !value; },
   url(value) { return !URL_REGEXP.test(value); },
   email(value) { return !EMAIL_REGEXP.test(value); },
@@ -25,7 +24,7 @@ kb.valid = {
 };
 
 // Convention is that if they end in Fn then returns a function pointer based on parameters passed.
-kb.hasChangedFn = function (model) {
+export const hasChangedFn = (model) => {
   let m = null; let attributes = null;
   return () => {
     const current_model = ko.utils.unwrapObservable(model);
@@ -39,9 +38,9 @@ kb.hasChangedFn = function (model) {
   };
 };
 
-kb.minLengthFn = length => value => !value || (value.length < length);
+export const minLengthFn = length => value => !value || (value.length < length);
 
-kb.uniqueValueFn = (model, key, collection) =>
+export const uniqueValueFn = (model, key, collection) =>
   function (value) {
     const m = ko.utils.unwrapObservable(model); const k = ko.utils.unwrapObservable(key); const c = ko.utils.unwrapObservable(collection);
     if (!(m && k && c)) return false;
@@ -49,7 +48,7 @@ kb.uniqueValueFn = (model, key, collection) =>
   }
 ;
 
-kb.untilTrueFn = function (stand_in, fn, model) {
+export const untilTrueFn = function (stand_in, fn, model) {
   let was_true = false;
   if (model && ko.isObservable(model)) model.subscribe(() => { was_true = false; }); // reset if the model changes
   return function (value) {
@@ -61,7 +60,7 @@ kb.untilTrueFn = function (stand_in, fn, model) {
   };
 };
 
-kb.untilFalseFn = function (stand_in, fn, model) {
+export const untilFalseFn = function (stand_in, fn, model) {
   let was_false = false;
   if (model && ko.isObservable(model)) model.subscribe(() => { was_false = false; }); // reset if the model changes
   return function (value) {

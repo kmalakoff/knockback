@@ -7,11 +7,10 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('../../core');
+import _ from 'underscore';
+import ko from 'knockout';
 
-const { _, ko } = kb;
-
-kb.toFormattedString = function (format, ...args) {
+export const toFormattedString = (format, ...args) => {
   let result = format.slice();
   _.each(args, (arg, index) => {
     let value = ko.utils.unwrapObservable(arg);
@@ -26,7 +25,7 @@ kb.toFormattedString = function (format, ...args) {
   return result;
 };
 
-kb.parseFormattedString = function (string, format) {
+export const parseFormattedString = (string, format) => {
   let regex_string = format.slice(); let index = 0; let parameter_count = 0; const positions = {};
   while (regex_string.search(`\\{${index}\\}`) >= 0) {
     // store the positions of the replacements
@@ -73,7 +72,7 @@ kb.parseFormattedString = function (string, format) {
 //
 // @example change the formatted name whenever a model's name attribute changes
 //   var observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
-class FormattedObservable {
+export default class FormattedObservable {
   // Used to create a new kb.FormattedObservable.
   //
   // @param [String|ko.observable] format the format string.
@@ -107,7 +106,5 @@ class FormattedObservable {
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
   destroy() { return kb.utils.wrappedDestroy(this); }
 }
-module.exports = FormattedObservable;
 
-kb.formattedObservable = (...args) => new FormattedObservable(...args);
-kb.observableFormatted = kb.formattedObservable;
+export const formattedObservable = (...args) => new FormattedObservable(...args);

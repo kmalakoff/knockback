@@ -7,9 +7,7 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-
-const { _ } = kb;
+import _ from 'underscore';
 
 // Used to share the hierachy of constructors and create functions by path to allow for custom creation per Model attribute.
 //
@@ -17,7 +15,7 @@ const { _ } = kb;
 //   var factory = new kb.Factory();
 //   factory.addPathMapping('bob.the.builder', kb.ViewModel);
 //   view_model = factory.createForPath(new Backbone.Model({name: 'Bob'}), 'bob.the.builder'); // creates kb.ViewModel
-class Factory {
+export default class Factory {
   // Used to either register yourself with the existing factory or to create a new factory.
   //
   // @param [Object] options please pass the options from your constructor to the register method. For example, constructor(model, options)
@@ -71,4 +69,3 @@ class Factory {
     return null;
   }
 }
-module.exports = Factory;

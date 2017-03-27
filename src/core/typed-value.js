@@ -1,9 +1,17 @@
-const kb = require('./kb');
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
 
-const { _, ko } = kb;
+import _ from 'underscore';
+import ko from 'knockout';
 
 // @nodoc
-class TypedValue {
+export default class TypedValue {
   constructor(create_options) {
     this.create_options = create_options;
     this._vo = ko.observable(null); // create a value observable for the first dependency
@@ -123,4 +131,3 @@ class TypedValue {
     return this._vo(value);
   }
 }
-module.exports = TypedValue;

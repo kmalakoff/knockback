@@ -7,13 +7,13 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-
-const { _, ko } = kb;
+import _ from 'underscore';
+import Backbone from 'backbone';
+import ko from 'knockout';
 
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 //
-class EventWatcher {
+export default class EventWatcher {
 
   // Used to either register yourself with the existing emitter watcher or to create a new one.
   //
@@ -70,7 +70,7 @@ class EventWatcher {
     }
 
     // set up current
-    if (kb.Backbone && kb.Backbone.ModelRef && (new_emitter instanceof kb.Backbone.ModelRef)) {
+    if (Backbone && Backbone.ModelRef && (new_emitter instanceof Backbone.ModelRef)) {
       this.model_ref = new_emitter; this.model_ref.retain();
       this.model_ref.bind('loaded', this._onModelLoaded);
       this.model_ref.bind('unloaded', this._onModelUnloaded);
@@ -177,7 +177,6 @@ class EventWatcher {
     });
   }
 }
-module.exports = EventWatcher;
 
 // factory function
-kb.emitterObservable = (emitter, observable) => new EventWatcher(emitter, observable);
+export const emitterObservable = (emitter, observable) => new EventWatcher(emitter, observable);

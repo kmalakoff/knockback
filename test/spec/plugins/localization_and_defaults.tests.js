@@ -61,8 +61,8 @@ class LocalizedString {
   }
 }
 
-const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-const Contacts = kb.Collection.extend({ model: Contact });
+const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+const Contacts = Backbone.Collection.extend({ model: Contact });
 
 // class LocalizedStringLocalizer extends kb.LocalizedObservable {
 //   constructor(/* value, options, view_model */) {
@@ -120,8 +120,8 @@ describe('localized-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Globalize, 'Globalize');
   });
@@ -562,9 +562,9 @@ describe('localized-observable', () => {
     const george = new Contact({ name: 'George', date: new Date(george_birthdate.valueOf()) });
     const ringo_birthdate = new Date(1940, 7, 7);
     const ringo = new Contact({ name: 'Ringo', date: new Date(ringo_birthdate.valueOf()) });
-    const major_duo = new kb.Collection([john, paul]);
-    const minor_duo = new kb.Collection([george, ringo]);
-    const nested_model = new kb.Model({
+    const major_duo = new Backbone.Collection([john, paul]);
+    const minor_duo = new Backbone.Collection([george, ringo]);
+    const nested_model = new Backbone.Model({
       john,
       paul,
       george,
@@ -760,8 +760,8 @@ describe('defaults', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Globalize, 'Globalize');
   });

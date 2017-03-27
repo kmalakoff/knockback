@@ -7,9 +7,9 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-const kb = require('./kb');
-
-const { _, ko } = kb;
+import kb from './kb';
+import _ from 'underscore';
+import Backbone from 'backbone';
 
 const COMPARE_EQUAL = 0;
 const COMPARE_ASCENDING = -1;
@@ -17,7 +17,7 @@ const COMPARE_DESCENDING = 1;
 
 const KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'];
 
-kb.compare = function (value_a, value_b) {
+export const compare = (value_a, value_b) => {
   // String compare
   if (_.isString(value_a)) { return value_a.localeCompare(`${value_b}`); }
   if (_.isString(value_b)) { return value_b.localeCompare(`${value_a}`); }
@@ -58,10 +58,10 @@ kb.compare = function (value_a, value_b) {
 //   Dual-purpose getter/setter ko.computed for the observed collection.
 //   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 //
-class CollectionObservable {
+export default class CollectionObservable {
   static initClass() {
     // @nodoc
-    CollectionObservable.extend = kb.Parse ? kb.Parse._extend : kb.Model.extend;
+    CollectionObservable.extend = Backbone.Model.extend;
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
@@ -472,7 +472,7 @@ class CollectionObservable {
   _attributeComparator(sort_attribute) {
     const modelAttributeCompare = function (model_a, model_b) {
       const attribute_name = ko.utils.unwrapObservable(sort_attribute);
-      return kb.compare(model_a.get(attribute_name), model_b.get(attribute_name));
+      return compare(model_a.get(attribute_name), model_b.get(attribute_name));
     };
     return (this.models_only ? modelAttributeCompare : (model_a, model_b) => modelAttributeCompare(kb.utils.wrappedModel(model_a), kb.utils.wrappedModel(model_b)));
   }
@@ -495,8 +495,6 @@ class CollectionObservable {
   }
 }
 CollectionObservable.initClass();
-module.exports = CollectionObservable;
 
 // factory function
-kb.collectionObservable = (...args) => new CollectionObservable(...args);
-kb.observableCollection = kb.collectionObservable;
+export const collectionObservable = (...args) => new CollectionObservable(...args);

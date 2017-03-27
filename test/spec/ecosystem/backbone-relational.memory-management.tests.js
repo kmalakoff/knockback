@@ -90,7 +90,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
   }
   SimpleViewModel.initClass();
 
-  it('kb.CollectionObservable with recursive view models', () => {
+  it('Backbone.CollectionObservable with recursive view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new root.Person({
@@ -114,7 +114,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
       friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-3'],
     });
 
-    const band = new kb.Collection([john, paul, george, ringo]);
+    const band = new Backbone.Collection([john, paul, george, ringo]);
 
     // ref counted view model
     RefCountableViewModel.view_models = [];
@@ -147,7 +147,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('kb.CollectionObservable with recursive view models and external store', () => {
+  it('Backbone.CollectionObservable with recursive view models and external store', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const john = new root.Person({
@@ -171,7 +171,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
       friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-3'],
     });
 
-    const band = new kb.Collection([john, paul, george, ringo]);
+    const band = new Backbone.Collection([john, paul, george, ringo]);
 
     // ref counted view model
     let store = new kb.Store();

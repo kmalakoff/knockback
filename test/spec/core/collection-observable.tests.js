@@ -3,19 +3,19 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 
-describe('collection-observable', () => {
+describe.only('collection-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
-    assert.ok(!!kb.Model, 'kb.Model');
-    assert.ok(!!kb.Collection, 'kb.Collection');
+    assert.ok(!!Backbone.Model, 'Backbone.Model');
+    assert.ok(!!Backbone.Collection, 'Backbone.Collection');
     assert.ok(!!kb, 'kb');
   });
 
-  const Contact = kb.Parse ? kb.Model.extend('Contact', { defaults: { name: '', number: 0, date: new Date() } }) : kb.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
-  const Contacts = kb.Collection.extend({ model: Contact });
+  const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
+  const Contacts = Backbone.Collection.extend({ model: Contact });
 
   const ContactViewModel = function (model) {
     this.name = kb.observable(model, 'name');
@@ -40,6 +40,7 @@ describe('collection-observable', () => {
   }
 
   it('2. Basic Usage: collection observable with ko.computed', () => {
+    debugger;
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const collection = new Contacts();
@@ -296,7 +297,7 @@ describe('collection-observable', () => {
   it('8. Collection sorting with callbacks', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    kb.NameSortedContacts = kb.Collection.extend({
+    kb.NameSortedContacts = Backbone.Collection.extend({
       model: Contact,
       comparator(model) { return model.get('name'); },
     });
@@ -422,8 +423,8 @@ describe('collection-observable', () => {
     const george = new Contact({ name: 'George', date: new Date(george_birthdate.valueOf()) });
     const ringo_birthdate = new Date(1940, 7, 7);
     const ringo = new Contact({ name: 'Ringo', date: new Date(ringo_birthdate.valueOf()) });
-    const major_duo = new kb.Collection([john, paul]);
-    const minor_duo = new kb.Collection([george, ringo]);
+    const major_duo = new Backbone.Collection([john, paul]);
+    const minor_duo = new Backbone.Collection([george, ringo]);
 
     const nested_view_model = {
       major_duo1: kb.collectionObservable(major_duo),
@@ -520,7 +521,7 @@ describe('collection-observable', () => {
 
   it('11. Shared Options', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const collection = new kb.Collection({ id: 1, name: 'Bob' });
+    const collection = new Backbone.Collection({ id: 1, name: 'Bob' });
 
     const collection_observable1 = kb.collectionObservable(collection);
     const collection_observable2 = kb.collectionObservable(collection);
@@ -536,7 +537,7 @@ describe('collection-observable', () => {
 
   it('12. Filters option', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
+    const collection = new Backbone.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 
     const collection_observable1 = kb.collectionObservable(collection);
     const collection_observable2 = kb.collectionObservable(collection, { filters: 1 });
@@ -574,7 +575,7 @@ describe('collection-observable', () => {
 
   it('13. Setting view models', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
+    const collection = new Backbone.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 
     // set the viewmodels (simulating a selectOptions)
     let collection_observable = kb.collectionObservable(collection);
@@ -611,7 +612,7 @@ describe('collection-observable', () => {
 
   it('14. collection change is observable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
-    const collection = new kb.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
+    const collection = new Backbone.Collection([{ id: 1, name: 'Bob' }, { id: 2, name: 'Fred' }, { id: 3, name: 'George' }]);
 
     const collection_observable = kb.collectionObservable(collection);
 
@@ -673,7 +674,7 @@ describe('collection-observable', () => {
 
     let count_manual = 0;
     ko.computed(() => {
-      collection_observable([new TestViewModel(new kb.Model({ id: 10, name: 'Manual' }))]); // should not depend
+      collection_observable([new TestViewModel(new Backbone.Model({ id: 10, name: 'Manual' }))]); // should not depend
       return count_manual++;
     });
 
@@ -707,7 +708,7 @@ describe('collection-observable', () => {
     assert.equal(count_remove, 1, 'count_remove');
     assert.equal(observable_count, 1, 'observable_count');
 
-    collection_observable([new TestViewModel(new kb.Model({ id: 10, name: 'Manual' }))]); // should not depend
+    collection_observable([new TestViewModel(new Backbone.Model({ id: 10, name: 'Manual' }))]); // should not depend
     collection.reset([{ id: 20, name: 'Reset1' }, { id: 21, name: 'Reset2' }]); // should not depend
     collection.add([{ id: 30, name: 'Add1' }, { id: 31, name: 'Add2' }]); // should not depend
     collection.remove(collection.at(0));
@@ -916,7 +917,7 @@ describe('collection-observable', () => {
 
     class PersonViewModel extends kb.ViewModel {}
     class OtherViewModel extends kb.ViewModel {}
-    const collection_observable = kb.collectionObservable(new kb.Collection(), PersonViewModel, { factories: { 'models.other': OtherViewModel } });
+    const collection_observable = kb.collectionObservable(new Backbone.Collection(), PersonViewModel, { factories: { 'models.other': OtherViewModel } });
     assert.equal(collection_observable.collection().length, 0, 'no view models');
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
@@ -938,7 +939,7 @@ describe('collection-observable', () => {
 
     class PersonViewModel extends kb.ViewModel {}
     class OtherViewModel extends kb.ViewModel {}
-    const collection_observable = kb.collectionObservable(new kb.Collection(), PersonViewModel, {}, {}, {}, { factories: { 'models.other': OtherViewModel } });
+    const collection_observable = kb.collectionObservable(new Backbone.Collection(), PersonViewModel, {}, {}, {}, { factories: { 'models.other': OtherViewModel } });
     assert.equal(collection_observable.collection().length, 0, 'no view models');
     collection_observable.collection().reset(([1, 2, 3, 4].map(id => new Contact({ id, other: null }))));
     assert.equal(collection_observable.collection().length, 4, '4 view models');
