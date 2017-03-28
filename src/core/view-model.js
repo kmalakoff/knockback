@@ -139,7 +139,6 @@ export default class ViewModel {
       if (_.isArray(args[0])) args[0] = { keys: args[0] };
       if (!this.__kb) { this.__kb = {}; } this.__kb.view_model = (args.length > 1 ? args.pop() : this);
 
-      debugger;
       let options = {};
       _.each(args, (arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
       _.each(KEYS_OPTIONS, (key) => { if (Object.prototype.hasOwnProperty.call(options, key)) this.__kb[key] = options[key]; });
@@ -150,6 +149,11 @@ export default class ViewModel {
       // view model factory
       this.__kb.path = options.path;
       kb.Factory.useOptionsOrCreate(options, this, options.path);
+
+      const event_watcher = kb.utils.wrappedEventWatcher(this, new EventWatcher(model, this, {
+        emitter: this._model,
+        update: (() => kb.ignore(() => !(event_watcher && event_watcher.ee) || this.createObservables(event_watcher.ee))),
+      }));
 
       const _model = kb.utils.set(this, '_model', ko.observable());
       this.model = ko.computed({
@@ -163,11 +167,6 @@ export default class ViewModel {
         },
       ),
       });
-
-      const event_watcher = kb.utils.wrappedEventWatcher(this, new EventWatcher(model, this, {
-        emitter: this._model,
-        update: (() => kb.ignore(() => !(event_watcher && event_watcher.ee) || this.createObservables(event_watcher.ee))),
-      }));
 
       model = event_watcher.ee;
       kb.utils.wrappedObject(this, model); _model(event_watcher.ee);

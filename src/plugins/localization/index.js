@@ -19,5 +19,4 @@ const api = {
 };
 kb.assign(kb, api);
 
-kb.LocalizedObservable = LocalizedObservable;
-export default kb;
+module.exports = kb;

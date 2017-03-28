@@ -30,6 +30,7 @@ const api = {
   ko,
   CollectionObservable,
   collectionObservable,
+  observableCollection: collectionObservable, 
   compare,
   configure,
   settings,

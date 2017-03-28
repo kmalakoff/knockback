@@ -116,7 +116,7 @@ kb.ShortDateLocalizer = kb.LocalizedObservable.extend({
 });
 // ##############################
 
-describe.only('localized-observable', () => {
+describe('localized-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');

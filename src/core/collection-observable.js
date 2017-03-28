@@ -37,7 +37,7 @@ export const compare = (value_a, value_b) => {
 //   };
 //
 // @example How to access and change the observed collection.
-//    var todos = new Backbone.CollectionObservable(new Backbone.Collection([{name: 'name1'}, {name: 'name2'}]);
+//    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'name1'}, {name: 'name2'}]);
 //    var current_collection = todos.collection(); // get
 //    todos.collection(new Backbone.Collection([{name: 'name3'}, {name: 'name4'}])); // set
 //
@@ -47,10 +47,10 @@ export const compare = (value_a, value_b) => {
 //   @param [Object] class_properties the properties to add to the class
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observableArray
 //   @example
-//     var MyCollectionObservable = Backbone.CollectionObservable.extend({
+//     var MyCollectionObservable = kb.CollectionObservable.extend({
 //        constructor: function(collection, options) {
 //          // the constructor does not return 'this' but a ko.observableArray
-//          return Backbone.CollectionObservable.prototype.constructor.call(this, collection, {
+//          return kb.CollectionObservable.prototype.constructor.call(this, collection, {
 //            view_model: MyViewModel,
 //            options: options
 //        });
@@ -67,7 +67,7 @@ export default class CollectionObservable {
      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
   }
 
-  // Used to create a new Backbone.CollectionObservable.
+  // Used to create a new kb.CollectionObservable.
   //
   // When the observable is updated, the following Backbone.Events are triggered:
   //
@@ -96,7 +96,7 @@ export default class CollectionObservable {
   constructor(...args) {
     return kb.ignore(() => {
       let collection = null;
-      if (args[0] instanceof Backbone.Collection) collection = args.shift();
+      if (kb.isCollection(args[0])) collection = args.shift();
       else collection = _.isArray(args[0]) ? new Backbone.Collection(args.shift()) : new Backbone.Collection();
       if (_.isFunction(args[0])) args[0] = { view_model: args[0] };
 
@@ -104,7 +104,7 @@ export default class CollectionObservable {
       _.each(args, (arg) => { kb.assign(options, arg); options = kb.utils.collapseOptions(options); });
 
       let observable = kb.utils.wrappedObservable(this, ko.observableArray([]));
-      observable.__kb_is_co = true; // mark as a Backbone.CollectionObservable
+      observable.__kb_is_co = true; // mark as a kb.CollectionObservable
       this.in_edit = 0;
 
       // bind callbacks
@@ -255,7 +255,7 @@ export default class CollectionObservable {
     return this._filters([]);
   }
 
-  // Setter for the sorted index function for auto-sorting the ViewModels or Models in a Backbone.CollectionObservable.
+  // Setter for the sorted index function for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   //
   // @param [Function] comparator a function that returns an index where to insert the model. Signature: function(models, model)
   // @param [Function] comparator a function that is used to sort an object. Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
@@ -269,12 +269,12 @@ export default class CollectionObservable {
   //    );
   comparator(comparator) { return this._comparator(comparator); }
 
-  // Setter for the sort attribute name for auto-sorting the ViewModels or Models in a Backbone.CollectionObservable.
+  // Setter for the sort attribute name for auto-sorting the ViewModels or Models in a kb.CollectionObservable.
   //
   // @param [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
   //
   // @example
-  //    var todos = new Backbone.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
+  //    var todos = new kb.CollectionObservable(new Backbone.Collection([{name: 'Zanadu', name: 'Alex'}]));
   //    // in order of Zanadu then Alex
   //    todos.sortAttribute('name');
   //    // in order of Alex then Zanadu
@@ -290,9 +290,9 @@ export default class CollectionObservable {
   // Will return true unless created with models_only option.
   //
   // @example
-  //   var todos1 = new Backbone.CollectionObservable(new Backbone.Collection(), {models_only: true});
+  //   var todos1 = new kb.CollectionObservable(new Backbone.Collection(), {models_only: true});
   //   todos1.hasViewModels();     // false
-  //   var todos2 = new Backbone.CollectionObservable(new Backbone.Collection());
+  //   var todos2 = new kb.CollectionObservable(new Backbone.Collection());
   //   todos2.hasViewModels();     // true
   hasViewModels() { return !this.models_only; }
 

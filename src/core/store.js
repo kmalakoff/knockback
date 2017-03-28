@@ -13,7 +13,7 @@ import ko from 'knockout';
 import kb from './kb';
 
 // Used to share and manage the persistence of ViewModels and observables. ks.Store can be used to break relationship cycles between models,
-// to reduce memory usage, and to share view models between Backbone.CollectionObservables (for example, when using Knockout.js selectedOptions).
+// to reduce memory usage, and to share view models between kb.CollectionObservables (for example, when using Knockout.js selectedOptions).
 //
 // @example How to create a ko.CollectionObservable using the ko.collectionObservable factory.
 //   var co = kb.collectionObservable(new Backbone.Collection());
@@ -199,7 +199,7 @@ export default class Store {
   }
 
   // @nodoc
-  _canRegister(observable) { return observable && !ko.isObservable(observable) && !observable.__kb_is_co; } // only register view models not basic ko.observables nor Backbone.CollectionObservables
+  _canRegister(observable) { return observable && !ko.isObservable(observable) && !observable.__kb_is_co; } // only register view models not basic ko.observables nor kb.CollectionObservables
 
   // @nodoc
   _cid(obj) {

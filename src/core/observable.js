@@ -10,6 +10,7 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
+import kb from './kb';
 import TypedValue from './lib/typed-value';
 import EventWatcher from './event-watcher';
 
@@ -162,7 +163,7 @@ export default class Observable {
     return kb.utils.wrappedDestroy(this);
   }
 
-  // @return [Backbone.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable.
+  // @return [kb.CollectionObservable|kb.ViewModel|ko.observable] exposes the raw value inside the kb.observable.
   // For example, if your attribute is a Collection, it will hold a CollectionObservable.
   value() { return this._value.rawValue(); }
 

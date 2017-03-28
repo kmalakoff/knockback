@@ -23,4 +23,4 @@ const api = {
 };
 kb.assign(kb, api);
 
-export default kb;
+module.exports = kb;

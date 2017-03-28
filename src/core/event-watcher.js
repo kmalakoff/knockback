@@ -11,6 +11,8 @@ import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
+import kb from './kb';
+
 // Used to provide a central place to aggregate registered Model events rather than having all kb.Observables register for updates independently.
 //
 export default class EventWatcher {
