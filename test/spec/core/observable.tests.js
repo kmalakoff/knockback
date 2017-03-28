@@ -136,7 +136,7 @@ describe('observable', () => {
   it('5. Inferring observable types: the easy way', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    class ChildrenCollection extends Backbone.CollectionObservable {
+    class ChildrenCollection extends kb.CollectionObservable {
       constructor(collection, options) {
         super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
         return kb.utils.wrappedObservable(this);
@@ -212,7 +212,7 @@ describe('observable', () => {
   it('6. Inferring observable types: the hard way', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    class ChildrenCollection extends Backbone.CollectionObservable {
+    class ChildrenCollection extends kb.CollectionObservable {
       constructor(collection, options) {
         super(collection, { view_model: InferringViewModel, options }); // return the observable instead of this
         return kb.utils.wrappedObservable(this);

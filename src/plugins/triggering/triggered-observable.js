@@ -10,6 +10,8 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
+import kb from '../../core';
+
 const KEYS_PUBLISH = ['destroy'];
 
 // Class for observing emitter events.

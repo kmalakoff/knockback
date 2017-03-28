@@ -10,6 +10,9 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
+import kb from '../../core';
+import valid from './valid';
+
 // internal helper
 const callOrGet = function (value, ...args) {
   value = ko.utils.unwrapObservable(value);
@@ -57,23 +60,23 @@ const callOrGet = function (value, ...args) {
 //   It will automatically generate validators from the input for the following attributes:
 //   * type: for url, email, and number
 //   * required: must have a length or a value
-//   @note Called using `kb.inputValidator` (not  kb.inputValidator)
+//   @note Called using `inputValidator` (not  inputValidator)
 //   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
 //   @example Binding an input using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>
+//     <input type="url" name="name" data-bind="value: name, inject: inputValidator" required>
 //     Adds the following to your ViewModel:
 //       $name: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
 //   @example Binding an input with custom validations using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {unique: nameTaken}" required>
+//     <input type="url" name="name" data-bind="value: name, inject: inputValidator, validations: {unique: nameTaken}" required>
 //     Adds the following to your ViewModel:
 //       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
 //   @example Binding an input with validation options using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: 'url'}" required>
+//     <input type="url" name="name" data-bind="value: name, inject: inputValidator, validation_options: {disable: disable, priorities: 'url'}" required>
 //     Adds the following to your ViewModel:
 //       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $enabled: Boolean, $disabled: Boolean, $active_error: String})
 //
 // @method .formValidator(view_model, el)
-//   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
+//   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `inputValidator`. See inputValidator for per input options.
 //   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
 //    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
 //   @note Called using `kb.formValidator` (not  kb.formValidator)
@@ -168,7 +171,7 @@ export const valueValidator = (value, bindings, validation_options = {}) => ko.c
 });
 
 export const inputValidator = (view_model, el, validation_options = {}) => {
-  const validators = kb.valid;
+  const validators = valid;
   let input_name = el.getAttribute('name');
   if (input_name && !_.isString(input_name)) { input_name = null; }
 
@@ -190,7 +193,7 @@ export const inputValidator = (view_model, el, validation_options = {}) => {
   if (options.validations) {
     _.each(options.validations, (validator, identifier) => { bindings[identifier] = validator; });
   }
-  const result = kb.valueValidator(options.value, bindings, validation_options);
+  const result = valueValidator(options.value, bindings, validation_options);
 
   // if there is a name, add to the view_model with $scoping
   (!input_name && !validation_options.no_attach) || (view_model[`$${input_name}`] = result);
@@ -216,7 +219,7 @@ export const formValidator = (view_model, el) => {
   _.each(el.getElementsByTagName('input'), (input_el) => {
     const name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
-    const validator = kb.inputValidator(view_model, input_el, validation_options);
+    const validator = inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
   });
 

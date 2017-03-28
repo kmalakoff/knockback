@@ -10,6 +10,8 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
+import kb from '../../core';
+
 const KEYS_PUBLISH = ['destroy', 'setToDefault'];
 
 // Used to provide a default value when an observable is null, undefined, or the empty string.

@@ -13,6 +13,7 @@ import TriggeredObservable, { triggeredObservable } from './triggered-observable
 const api = {
   TriggeredObservable,
   triggeredObservable,
+  observableTriggered: triggeredObservable,
 };
 kb.assign(kb, api);
 

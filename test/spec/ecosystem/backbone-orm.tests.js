@@ -932,7 +932,7 @@ describe('Knockback.js with BackboneORM', () => {
       }
     }
 
-    class PersonCollection extends Backbone.CollectionObservable {
+    class PersonCollection extends kb.CollectionObservable {
       constructor(collection, options) {
         super(collection, {
           factories: {

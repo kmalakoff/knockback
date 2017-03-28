@@ -8,7 +8,7 @@ if (Backbone && !Backbone.Relational && r) try { require('backbone-relational');
 
 describe('Knockback.js with Backbone-Relational.js', () => {
   beforeEach(() => {
-    if (!(Backbone != null ? Backbone.Relational : undefined)) return;
+    if (!Backbone || !Backbone.Relational) return;
     !Backbone.Relational || Backbone.Relational.store.reset();
     if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
 
@@ -62,8 +62,6 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     assert.ok(!!Backbone.Relational, 'Backbone.Relational');
     kb.configure({ orm: 'backbone-relational' });
   });
-
-  if (!(Backbone != null ? Backbone.Relational : undefined)) return;
 
   it('1. Model with HasMany relations: A house with multiple people living in it', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -897,7 +895,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
       }
     }
 
-    class PersonCollection extends Backbone.CollectionObservable {
+    class PersonCollection extends kb.CollectionObservable {
       constructor(collection, options) {
         super(collection, { factories: { models: PersonViewModel }, options });
         return kb.utils.wrappedObservable(this);
@@ -1038,7 +1036,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     const Collection = Backbone.Collection.extend({ model: Model });
     const col = new Collection([{ id: 1, sub_model: null }, { id: 2, sub_model: null }]);
 
-    const co = new Backbone.CollectionObservable(col);
+    const co = new kb.CollectionObservable(col);
 
     col.models[0].set('sub_model', 1);
     col.models[1].set('sub_model', 1);

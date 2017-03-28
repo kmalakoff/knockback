@@ -7,7 +7,7 @@
 		exports["kb"] = factory(require("underscore"), require("knockout"), require("backbone"));
 	else
 		root["kb"] = factory(root["_"], root["ko"], root["Backbone"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_3__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_4__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 35);
+/******/ 	return __webpack_require__(__webpack_require__.s = 37);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -93,7 +93,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -112,7 +112,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -120,13 +120,15 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _windowOrGlobal = __webpack_require__(7);
+
+var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -360,12 +362,12 @@ var kb = function () {
     value: function renderTemplate(template, view_model) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      if (!root.document) {
+      if (!_windowOrGlobal2.default.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
         return undefined;
       }
 
-      var el = root.document.createElement('div');
+      var el = _windowOrGlobal2.default.document.createElement('div');
       var observable = _knockout2.default.renderTemplate(template, view_model, options, el, 'replaceChildren');
 
       // do not return the template wrapper if possible
@@ -396,7 +398,7 @@ var kb = function () {
   }, {
     key: 'applyBindings',
     value: function applyBindings(view_model, node) {
-      if (!root.document) {
+      if (!_windowOrGlobal2.default.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
         return undefined;
       }
@@ -404,7 +406,7 @@ var kb = function () {
       if (node.length) {
         // convert to a root element
         var children = node;
-        node = root.document.createElement('div');
+        node = _windowOrGlobal2.default.document.createElement('div');
         _underscore2.default.each(children, function (child) {
           return node.appendChild(child);
         });
@@ -495,16 +497,9 @@ var kb = function () {
 exports.default = kb;
 
 kb.initClass();
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -514,7 +509,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -522,17 +517,17 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-__webpack_require__(20);
+__webpack_require__(21);
 
 var _kb = __webpack_require__(2);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _collectionObservable = __webpack_require__(12);
+var _collectionObservable = __webpack_require__(13);
 
 var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
 
-var _configure = __webpack_require__(13);
+var _configure = __webpack_require__(14);
 
 var _configure2 = _interopRequireDefault(_configure);
 
@@ -540,29 +535,29 @@ var _eventWatcher = __webpack_require__(5);
 
 var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
 
-var _factory = __webpack_require__(14);
+var _factory = __webpack_require__(15);
 
 var _factory2 = _interopRequireDefault(_factory);
 
-var _inject = __webpack_require__(18);
+var _inject = __webpack_require__(19);
 
-var _observable = __webpack_require__(21);
+var _observable = __webpack_require__(22);
 
 var _observable2 = _interopRequireDefault(_observable);
 
-var _statistics = __webpack_require__(24);
+var _statistics = __webpack_require__(25);
 
 var _statistics2 = _interopRequireDefault(_statistics);
 
-var _store = __webpack_require__(25);
+var _store = __webpack_require__(26);
 
 var _store2 = _interopRequireDefault(_store);
 
-var _utils = __webpack_require__(26);
+var _utils = __webpack_require__(27);
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _viewModel = __webpack_require__(27);
+var _viewModel = __webpack_require__(28);
 
 var _viewModel2 = _interopRequireDefault(_viewModel);
 
@@ -580,7 +575,7 @@ var api = {
   settings: _configure.settings,
   EventWatcher: _eventWatcher2.default,
   Factory: _factory2.default,
-  RECUSIVE_AUTO_INJECT: _inject.RECUSIVE_AUTO_INJECT,
+  RECUSIVE_AUTO_INJECT: true,
   injectViewModels: _inject.injectViewModels,
   Observable: _observable2.default,
   observable: _observable.observable,
@@ -601,6 +596,12 @@ var api = {
 _kb2.default.assign(_kb2.default, api);
 
 module.exports = _kb2.default;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
 
 /***/ }),
 /* 5 */
@@ -627,7 +628,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -870,33 +871,59 @@ var emitterObservable = exports.emitterObservable = function emitterObservable(e
 
 /***/ }),
 /* 6 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-var g;
+"use strict";
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
 
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
 
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
+// Regular expressions from Angular.js: https://github.com/angular/angular.js
+var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
+var EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
+var NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
-module.exports = g;
-
+// A validator should return true if there are errors (similar to the binding check in HTML, eg. $name().required).
+var valid = {
+  required: function required(value) {
+    return !value;
+  },
+  url: function url(value) {
+    return !URL_REGEXP.test(value);
+  },
+  email: function email(value) {
+    return !EMAIL_REGEXP.test(value);
+  },
+  number: function number(value) {
+    return !NUMBER_REGEXP.test(value);
+  }
+};
+exports.default = valid;
 
 /***/ }),
 /* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+module.exports = (typeof self === 'object' && self.self === self && self) ||
+  (typeof global === 'object' && global.global === global && global) ||
+  this
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(36)))
+
+/***/ }),
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -906,13 +933,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
-__webpack_require__(29);
+__webpack_require__(30);
 
-var _defaultObservable = __webpack_require__(28);
+var _defaultObservable = __webpack_require__(29);
 
 var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
 
@@ -935,17 +962,17 @@ _core2.default.assign(_core2.default, api);
 exports.default = _core2.default;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _formattedObservable = __webpack_require__(30);
+var _formattedObservable = __webpack_require__(31);
 
 var _formattedObservable2 = _interopRequireDefault(_formattedObservable);
 
@@ -962,24 +989,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var api = {
   FormattedObservable: _formattedObservable2.default,
-  formattedObservable: _formattedObservable.formattedObservable
+  formattedObservable: _formattedObservable.formattedObservable,
+  observableFormatted: _formattedObservable.formattedObservable
 };
 _core2.default.assign(_core2.default, api);
 
 module.exports = _core2.default;
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _localizedObservable = __webpack_require__(31);
+var _localizedObservable = __webpack_require__(32);
 
 var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
 
@@ -1006,17 +1034,17 @@ _core2.default.assign(_core2.default, api);
 module.exports = _core2.default;
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _triggeredObservable = __webpack_require__(32);
+var _triggeredObservable = __webpack_require__(33);
 
 var _triggeredObservable2 = _interopRequireDefault(_triggeredObservable);
 
@@ -1033,30 +1061,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var api = {
   TriggeredObservable: _triggeredObservable2.default,
-  triggeredObservable: _triggeredObservable.triggeredObservable
+  triggeredObservable: _triggeredObservable.triggeredObservable,
+  observableTriggered: _triggeredObservable.triggeredObservable
 };
 _core2.default.assign(_core2.default, api);
 
 module.exports = _core2.default;
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _validation = __webpack_require__(33);
+var _valid = __webpack_require__(6);
 
-var _validators = __webpack_require__(34);
+var _valid2 = _interopRequireDefault(_valid);
+
+var _validation = __webpack_require__(34);
+
+var _validators = __webpack_require__(35);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
 var api = {
+  valid: _valid2.default,
   valueValidator: _validation.valueValidator,
   inputValidator: _validation.inputValidator,
   formValidator: _validation.formValidator,
@@ -1065,21 +1108,13 @@ var api = {
   uniqueValueFn: _validators.uniqueValueFn,
   untilTrueFn: _validators.untilTrueFn,
   untilFalseFn: _validators.untilFalseFn
-}; /*
-     knockback.js 1.2.2
-     Copyright (c)  2011-2016 Kevin Malakoff.
-     License: MIT (http://www.opensource.org/licenses/mit-license.php)
-     Source: https://github.com/kmalakoff/knockback
-     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-   */
-
+};
 _core2.default.assign(_core2.default, api);
 
 module.exports = _core2.default;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1103,7 +1138,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -1725,7 +1760,7 @@ var collectionObservable = exports.collectionObservable = function collectionObs
 };
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1734,17 +1769,17 @@ var collectionObservable = exports.collectionObservable = function collectionObs
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.configure = exports.settings = undefined;
+exports.settings = undefined;
 
 var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backboneAssociations = __webpack_require__(22);
+var _backboneAssociations = __webpack_require__(23);
 
 var _backboneAssociations2 = _interopRequireDefault(_backboneAssociations);
 
-var _backboneRelational = __webpack_require__(23);
+var _backboneRelational = __webpack_require__(24);
 
 var _backboneRelational2 = _interopRequireDefault(_backboneRelational);
 
@@ -1770,7 +1805,8 @@ for (var key in ALL_ORMS) {
 }
 
 // @nodoc
-var configure = exports.configure = function configure() {
+
+exports.default = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   _underscore2.default.each(options, function (value, key) {
@@ -1799,7 +1835,7 @@ var configure = exports.configure = function configure() {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1923,7 +1959,7 @@ var Factory = function () {
 exports.default = Factory;
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2022,7 +2058,7 @@ exports.default = function (options) {
 };
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2065,7 +2101,7 @@ exports.default = function (obj) {
    */
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2118,16 +2154,16 @@ var wrappedDestroy = function wrappedDestroy(obj) {
 exports.default = wrappedDestroy;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.injectViewModels = exports.RECUSIVE_AUTO_INJECT = undefined;
+exports.injectViewModels = undefined;
 
 var _underscore = __webpack_require__(0);
 
@@ -2137,8 +2173,17 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _windowOrGlobal = __webpack_require__(7);
+
+var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
+
+var _kb = __webpack_require__(2);
+
+var _kb2 = _interopRequireDefault(_kb);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// custom Knockout `inject` binding
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -2148,22 +2193,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
-
-var RECUSIVE_AUTO_INJECT = exports.RECUSIVE_AUTO_INJECT = true;
-
-// custom Knockout `inject` binding
 var inject = function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
   var doInject = function doInject(value) {
     if (_underscore2.default.isFunction(value)) {
       view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
-      kb.releaseOnNodeRemove(view_model, element);
+      _kb2.default.releaseOnNodeRemove(view_model, element);
     } else {
       // view_model constructor causes a scope change
       if (value.view_model) {
         // specifying a view_model changes the scope so we need to bind a destroy
         view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
-        kb.releaseOnNodeRemove(view_model, element);
+        _kb2.default.releaseOnNodeRemove(view_model, element);
       }
 
       // resolve and merge in each key
@@ -2176,7 +2216,7 @@ var inject = function inject(data, view_model, element, value_accessor, all_bind
         // resolve nested with assign or not
         else if (_underscore2.default.isObject(item) && !_underscore2.default.isFunction(item)) {
             var target = nested || item && item.create ? {} : view_model;
-            view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
+            view_model[key] = inject(item, target, element, value_accessor, all_bindings_accessor, true);
 
             // simple set
           } else view_model[key] = item;
@@ -2187,7 +2227,7 @@ var inject = function inject(data, view_model, element, value_accessor, all_bind
   };
 
   // in recursive calls, we are already protected from propagating dependencies to the template
-  return nested ? doInject(data) : kb.ignore(function () {
+  return nested ? doInject(data) : _kb2.default.ignore(function () {
     return doInject(data);
   });
 };
@@ -2280,7 +2320,7 @@ var doBind = function doBind(app) {
   if (beforeBinding) {
     beforeBinding.call(app.view_model, app.view_model, app.el, options);
   }
-  kb.applyBindings(app.view_model, app.el, options);
+  _kb2.default.applyBindings(app.view_model, app.el, options);
   if (afterBinding) {
     afterBinding.call(app.view_model, app.view_model, app.el, options);
   }
@@ -2291,7 +2331,7 @@ var doBind = function doBind(app) {
 // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
 // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
 var injectViewModels = exports.injectViewModels = function injectViewModels() {
-  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
+  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _windowOrGlobal2.default.document;
 
   var results = [];
   if (!el.__kb_injected) {
@@ -2323,26 +2363,25 @@ _knockout2.default.applyBindings = function () {
   }
 
   var el = args[1];
-  var results = kb.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
+  var results = _kb2.default.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
   return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [undefined].concat(args));
 };
 
 // ############################
 // Auto Inject results
 // ############################
-if (root && typeof root.document !== 'undefined') {
+if (_windowOrGlobal2.default && typeof _windowOrGlobal2.default.document !== 'undefined') {
   // use simple ready check
   var onReady = function onReady() {
     // keep waiting for the document to load
-    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0);
+    if (_windowOrGlobal2.default.document.readyState !== 'complete') return setTimeout(onReady, 0);
     return injectViewModels(); // the document is loaded
   };
   onReady();
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(6)))
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2523,7 +2562,7 @@ var TypedValue = function () {
 exports.default = TypedValue;
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2533,9 +2572,22 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _kb = __webpack_require__(2);
+
+var _kb2 = _interopRequireDefault(_kb);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
 if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _knockout2.default.subscribable.fn.extend) {
   var _extend = _knockout2.default.subscribable.fn.extend;
   _knockout2.default.subscribable.fn.extend = function () {
@@ -2548,7 +2600,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
     var target = _extend.apply(this, args);
 
     // release the extended observable
-    if (target !== this && kb.isReleaseable(this)) {
+    if (target !== this && _kb2.default.isReleaseable(this)) {
       var _dispose = target.dispose;
       target.dispose = function () {
         for (var _len2 = arguments.length, args2 = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
@@ -2556,23 +2608,16 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
         }
 
         !_dispose || _dispose.apply(target, args2);
-        return kb.release(_this);
+        return _kb2.default.release(_this);
       };
     }
 
     return target;
   };
-} /*
-    knockback.js 1.2.2
-    Copyright (c)  2011-2016 Kevin Malakoff.
-    License: MIT (http://www.opensource.org/licenses/mit-license.php)
-    Source: https://github.com/kmalakoff/knockback
-    Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-  */
+}
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2604,7 +2649,7 @@ var _kb = __webpack_require__(2);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _typedValue = __webpack_require__(19);
+var _typedValue = __webpack_require__(20);
 
 var _typedValue2 = _interopRequireDefault(_typedValue);
 
@@ -2838,7 +2883,7 @@ var observable = exports.observable = function observable() {
 };
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2861,7 +2906,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -2913,7 +2958,7 @@ var BackboneAssociations = function () {
 exports.default = BackboneAssociations;
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2936,7 +2981,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -3003,7 +3048,7 @@ var BackboneRelational = function () {
 exports.default = BackboneRelational;
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3188,7 +3233,7 @@ var Statistics = function () {
 exports.default = Statistics;
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3606,7 +3651,7 @@ exports.default = Store;
 Store.initClass();
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3629,7 +3674,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -3641,15 +3686,15 @@ var _kb = __webpack_require__(2);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _wrappedDestroy = __webpack_require__(17);
+var _wrappedDestroy = __webpack_require__(18);
 
 var _wrappedDestroy2 = _interopRequireDefault(_wrappedDestroy);
 
-var _collapseOptions = __webpack_require__(15);
+var _collapseOptions = __webpack_require__(16);
 
 var _collapseOptions2 = _interopRequireDefault(_collapseOptions);
 
-var _unwrapModels = __webpack_require__(16);
+var _unwrapModels = __webpack_require__(17);
 
 var _unwrapModels2 = _interopRequireDefault(_unwrapModels);
 
@@ -3995,7 +4040,7 @@ utils.unwrapModels = _unwrapModels2.default;
 exports.default = utils;
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4019,7 +4064,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -4322,7 +4367,7 @@ var viewModel = exports.viewModel = function viewModel() {
 };
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4350,6 +4395,10 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -4375,7 +4424,7 @@ var DefaultObservable = function () {
 
     // @dv is default value
     this.dv = dv;
-    var observable = kb.utils.wrappedObservable(this, _knockout2.default.computed({
+    var observable = _core2.default.utils.wrappedObservable(this, _knockout2.default.computed({
       read: function read() {
         var current_target = _knockout2.default.utils.unwrapObservable(target_observable());
         return _underscore2.default.isNull(current_target) || _underscore2.default.isUndefined(current_target) ? _knockout2.default.utils.unwrapObservable(_this.dv) : current_target;
@@ -4386,7 +4435,7 @@ var DefaultObservable = function () {
     }));
 
     // publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, this, KEYS_PUBLISH);
+    _core2.default.publishMethods(observable, this, KEYS_PUBLISH);
 
     return observable;
   }
@@ -4398,7 +4447,7 @@ var DefaultObservable = function () {
   _createClass(DefaultObservable, [{
     key: 'destroy',
     value: function destroy() {
-      return kb.utils.wrappedDestroy(this);
+      return _core2.default.utils.wrappedDestroy(this);
     }
 
     // Forces the observable to take the default value.
@@ -4407,7 +4456,7 @@ var DefaultObservable = function () {
   }, {
     key: 'setToDefault',
     value: function setToDefault() {
-      return kb.utils.wrappedObservable(this)(this.dv);
+      return _core2.default.utils.wrappedObservable(this)(this.dv);
     }
   }]);
 
@@ -4424,7 +4473,7 @@ var defaultObservable = exports.defaultObservable = function defaultObservable()
 };
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4438,7 +4487,7 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
@@ -4487,7 +4536,7 @@ _core2.default.utils.setToDefault = function (obj) {
 };
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4514,6 +4563,10 @@ var _underscore2 = _interopRequireDefault(_underscore);
 var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4609,16 +4662,16 @@ var FormattedObservable = function () {
 
     // being called by the factory function
     var observable_args = _underscore2.default.isArray(args[0]) ? args[0] : args;
-    var observable = kb.utils.wrappedObservable(this, _knockout2.default.computed({
+    var observable = _core2.default.utils.wrappedObservable(this, _knockout2.default.computed({
       read: function read() {
         args = [_knockout2.default.utils.unwrapObservable(format)];
         _underscore2.default.each(observable_args, function (arg) {
           return args.push(_knockout2.default.utils.unwrapObservable(arg));
         });
-        return kb.toFormattedString.apply(null, args);
+        return toFormattedString.apply(null, args);
       },
       write: function write(value) {
-        var matches = kb.parseFormattedString(value, _knockout2.default.utils.unwrapObservable(format));
+        var matches = parseFormattedString(value, _knockout2.default.utils.unwrapObservable(format));
         var max_count = Math.min(observable_args.length, matches.length);var index = 0;
         while (index < max_count) {
           observable_args[index](matches[index]);
@@ -4637,7 +4690,7 @@ var FormattedObservable = function () {
   _createClass(FormattedObservable, [{
     key: 'destroy',
     value: function destroy() {
-      return kb.utils.wrappedDestroy(this);
+      return _core2.default.utils.wrappedDestroy(this);
     }
   }]);
 
@@ -4654,7 +4707,7 @@ var formattedObservable = exports.formattedObservable = function formattedObserv
 };
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4678,7 +4731,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -4686,7 +4739,7 @@ var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _core = __webpack_require__(4);
+var _core = __webpack_require__(3);
 
 var _core2 = _interopRequireDefault(_core);
 
@@ -4885,7 +4938,7 @@ var localizedObservable = exports.localizedObservable = function localizedObserv
 };
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4912,6 +4965,10 @@ var _underscore2 = _interopRequireDefault(_underscore);
 var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4952,20 +5009,20 @@ var TriggeredObservable = function () {
     _classCallCheck(this, TriggeredObservable);
 
     this.event_selector = event_selector;
-    emitter || kb._throwMissing(this, 'emitter');
-    this.event_selector || kb._throwMissing(this, 'event_selector');
+    emitter || _core2.default._throwMissing(this, 'emitter');
+    this.event_selector || _core2.default._throwMissing(this, 'event_selector');
 
     // internal state
     this.vo = _knockout2.default.observable();
-    var observable = kb.utils.wrappedObservable(this, _knockout2.default.computed(function () {
+    var observable = _core2.default.utils.wrappedObservable(this, _knockout2.default.computed(function () {
       return _this.vo();
     }));
 
     // publish public interface on the observable and return instead of this
-    kb.publishMethods(observable, this, KEYS_PUBLISH);
+    _core2.default.publishMethods(observable, this, KEYS_PUBLISH);
 
     // create emitter observable
-    kb.utils.wrappedEventWatcher(this, new kb.EventWatcher(emitter, this, { emitter: _underscore2.default.bind(this.emitter, this), update: _underscore2.default.bind(this.update, this), event_selector: this.event_selector }));
+    _core2.default.utils.wrappedEventWatcher(this, new _core2.default.EventWatcher(emitter, this, { emitter: _underscore2.default.bind(this.emitter, this), update: _underscore2.default.bind(this.update, this), event_selector: this.event_selector }));
 
     return observable;
   }
@@ -4977,7 +5034,7 @@ var TriggeredObservable = function () {
   _createClass(TriggeredObservable, [{
     key: 'destroy',
     value: function destroy() {
-      return kb.utils.wrappedDestroy(this);
+      return _core2.default.utils.wrappedDestroy(this);
     }
 
     // Dual-purpose getter/setter for the observed emitter.
@@ -5029,7 +5086,7 @@ var triggeredObservable = exports.triggeredObservable = function triggeredObserv
 };
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5047,6 +5104,14 @@ var _underscore2 = _interopRequireDefault(_underscore);
 var _knockout = __webpack_require__(1);
 
 var _knockout2 = _interopRequireDefault(_knockout);
+
+var _core = __webpack_require__(3);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _valid = __webpack_require__(6);
+
+var _valid2 = _interopRequireDefault(_valid);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5111,23 +5176,23 @@ var callOrGet = function callOrGet(value) {
 //   It will automatically generate validators from the input for the following attributes:
 //   * type: for url, email, and number
 //   * required: must have a length or a value
-//   @note Called using `kb.inputValidator` (not  kb.inputValidator)
+//   @note Called using `inputValidator` (not  inputValidator)
 //   @return [ko.computed] a single observable storing an Object with all of the validators and generated helpers
 //   @example Binding an input using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>
+//     <input type="url" name="name" data-bind="value: name, inject: inputValidator" required>
 //     Adds the following to your ViewModel:
 //       $name: kb.observable({required: Boolean, url: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
 //   @example Binding an input with custom validations using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {unique: nameTaken}" required>
+//     <input type="url" name="name" data-bind="value: name, inject: inputValidator, validations: {unique: nameTaken}" required>
 //     Adds the following to your ViewModel:
 //       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $active_error: String})
 //   @example Binding an input with validation options using Knockback inject.
-//     <input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: 'url'}" required>
+//     <input type="url" name="name" data-bind="value: name, inject: inputValidator, validation_options: {disable: disable, priorities: 'url'}" required>
 //     Adds the following to your ViewModel:
 //       $name: kb.observable({required: Boolean, url: Boolean, unique: Boolean, $valid: Boolean, $error_count: Number, $enabled: Boolean, $disabled: Boolean, $active_error: String})
 //
 // @method .formValidator(view_model, el)
-//   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `kb.inputValidator`. See kb.inputValidator for per input options.
+//   Used to create an observable that wraps all of the validators for all the inputs on an HTML form element using `inputValidator`. See inputValidator for per input options.
 //   In addition, the formValidator aggregates the following helpers for its inputs: $valid, $error_count, $enabled, and $disabled.
 //    Also, if you provide a name attribute for the form, it will attach all of the inputs to a $name property on your view model.
 //   @note Called using `kb.formValidator` (not  kb.formValidator)
@@ -5227,7 +5292,7 @@ var valueValidator = exports.valueValidator = function valueValidator(value, bin
 var inputValidator = exports.inputValidator = function inputValidator(view_model, el) {
   var validation_options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-  var validators = kb.valid;
+  var validators = _valid2.default;
   var input_name = el.getAttribute('name');
   if (input_name && !_underscore2.default.isString(input_name)) {
     input_name = null;
@@ -5253,7 +5318,7 @@ var inputValidator = exports.inputValidator = function inputValidator(view_model
       bindings[identifier] = validator;
     });
   }
-  var result = kb.valueValidator(options.value, bindings, validation_options);
+  var result = valueValidator(options.value, bindings, validation_options);
 
   // if there is a name, add to the view_model with $scoping
   !input_name && !validation_options.no_attach || (view_model['$' + input_name] = result);
@@ -5279,7 +5344,7 @@ var formValidator = exports.formValidator = function formValidator(view_model, e
   _underscore2.default.each(el.getElementsByTagName('input'), function (input_el) {
     var name = input_el.getAttribute('name');
     if (!name) return; // need named inputs to set up an object
-    var validator = kb.inputValidator(view_model, input_el, validation_options);
+    var validator = inputValidator(view_model, input_el, validation_options);
     !validator || validators.push(results[name] = validator);
   });
 
@@ -5313,7 +5378,7 @@ var formValidator = exports.formValidator = function formValidator(view_model, e
 };
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5322,7 +5387,7 @@ var formValidator = exports.formValidator = function formValidator(view_model, e
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.untilFalseFn = exports.untilTrueFn = exports.uniqueValueFn = exports.minLengthFn = exports.hasChangedFn = exports.valid = undefined;
+exports.untilFalseFn = exports.untilTrueFn = exports.uniqueValueFn = exports.minLengthFn = exports.hasChangedFn = undefined;
 
 var _underscore = __webpack_require__(0);
 
@@ -5334,7 +5399,7 @@ var _knockout2 = _interopRequireDefault(_knockout);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// Regular expressions from Angular.js: https://github.com/angular/angular.js
+// Convention is that if they end in Fn then returns a function pointer based on parameters passed.
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -5344,27 +5409,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
-var EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
-var NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
-
-// A validator should return true if there are errors (similar to the binding check in HTML, eg. $name().required).
-var valid = exports.valid = {
-  required: function required(value) {
-    return !value;
-  },
-  url: function url(value) {
-    return !URL_REGEXP.test(value);
-  },
-  email: function email(value) {
-    return !EMAIL_REGEXP.test(value);
-  },
-  number: function number(value) {
-    return !NUMBER_REGEXP.test(value);
-  }
-};
-
-// Convention is that if they end in Fn then returns a function pointer based on parameters passed.
 var hasChangedFn = exports.hasChangedFn = function hasChangedFn(model) {
   var m = null;var attributes = null;
   return function () {
@@ -5425,15 +5469,42 @@ var untilFalseFn = exports.untilFalseFn = function untilFalseFn(stand_in, fn, mo
 };
 
 /***/ }),
-/* 35 */
+/* 36 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(7);
 __webpack_require__(8);
 __webpack_require__(9);
 __webpack_require__(10);
 __webpack_require__(11);
-module.exports = __webpack_require__(4);
+__webpack_require__(12);
+module.exports = __webpack_require__(3);
 
 
 /***/ })

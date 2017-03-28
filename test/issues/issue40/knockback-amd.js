@@ -368,7 +368,7 @@
           relation = _.find(owner.getRelations(), test => test.key === key);
           if (relation) {
             if (relation.collectionType || _.isArray(relation.keyContents)) {
-              return Backbone.CollectionObservable;
+              return kb.CollectionObservable;
             }
             return kb.ViewModel;
           }
@@ -380,7 +380,7 @@
           return kb.ViewModel;
         }
         if (value instanceof Backbone.Collection) {
-          return Backbone.CollectionObservable;
+          return kb.CollectionObservable;
         }
         return null;
       };
@@ -1376,7 +1376,7 @@
   */
 
 
-    Backbone.CollectionObservable = (function () {
+    kb.CollectionObservable = (function () {
       CollectionObservable.extend = Backbone.Model.extend;
 
       function CollectionObservable(collection, options) {
@@ -1790,10 +1790,10 @@
       return CollectionObservable;
     }());
 
-    __extends(Backbone.CollectionObservable.prototype, Backbone.Events);
+    __extends(kb.CollectionObservable.prototype, Backbone.Events);
 
     kb.collectionObservable = function (collection, options) {
-      return new Backbone.CollectionObservable(collection, options);
+      return new kb.CollectionObservable(collection, options);
     };
 
     kb.sortedIndexWrapAttr = kb.siwa = function (attribute_name, wrapper_constructor) {

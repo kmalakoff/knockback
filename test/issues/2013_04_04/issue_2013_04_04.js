@@ -11,9 +11,9 @@
     },
   });
 
-  window.SingleExecutionCollection = Backbone.CollectionObservable.extend({
+  window.SingleExecutionCollection = kb.CollectionObservable.extend({
     constructor(collection, options) {
-      return Backbone.CollectionObservable.prototype.constructor.call(this, collection, {
+      return kb.CollectionObservable.prototype.constructor.call(this, collection, {
         view_model: SingleExecutionViewModel,
         options,
       });

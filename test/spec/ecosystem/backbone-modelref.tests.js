@@ -15,7 +15,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     assert.ok(!!kb, 'kb');
   });
 
-  if (!(root.Backbone != null ? root.Backbone.ModelRef : undefined)) return;
+  if (!Backbone || !Backbone.ModelRef) return;
 
   const Contact = Backbone.Model.extend({ defaults: { name: '', number: 0, date: new Date() } });
   const Contacts = Backbone.Collection.extend({ model: Contact });

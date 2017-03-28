@@ -3,7 +3,7 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 
 describe('knockback_core utils', () => {
   it('TEST DEPENDENCY MISSING', () => {
@@ -69,7 +69,7 @@ describe('knockback_core utils', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const co = kb.collectionObservable(new Backbone.Collection());
-    assert.equal(kb.utils.valueType(co), kb.TYPE_COLLECTION, 'Backbone.CollectionObservable is a collection type');
+    assert.equal(kb.utils.valueType(co), kb.TYPE_COLLECTION, 'kb.CollectionObservable is a collection type');
     kb.release(co); // clean up
 
     const o = kb.observable(new Backbone.Model({ name: 'name1' }), 'name');

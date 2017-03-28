@@ -5,7 +5,7 @@ let assert = root.assert; try { assert = assert || (r ? require('chai').assert :
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
 const { _, Backbone, ko } = kb;
 
-describe.only('collection-observable', () => {
+describe('collection-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');

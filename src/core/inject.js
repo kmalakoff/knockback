@@ -9,10 +9,9 @@
 
 import _ from 'underscore';
 import ko from 'knockout';
+import root from 'window-or-global';
 
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-
-export const RECUSIVE_AUTO_INJECT = true;
+import kb from './kb';
 
 // custom Knockout `inject` binding
 const inject = (data, view_model, element, value_accessor, all_bindings_accessor, nested) => {
@@ -38,7 +37,7 @@ const inject = (data, view_model, element, value_accessor, all_bindings_accessor
         // resolve nested with assign or not
         else if (_.isObject(item) && !_.isFunction(item)) {
           const target = nested || (item && item.create) ? {} : view_model;
-          view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
+          view_model[key] = inject(item, target, element, value_accessor, all_bindings_accessor, true);
 
         // simple set
         } else view_model[key] = item;

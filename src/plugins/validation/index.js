@@ -8,10 +8,12 @@
 */
 
 import kb from '../../core';
+import valid from './valid';
 import { valueValidator, inputValidator, formValidator } from './validation';
 import { hasChangedFn, minLengthFn, uniqueValueFn, untilTrueFn, untilFalseFn } from './validators';
 
 const api = {
+  valid,
   valueValidator,
   inputValidator,
   formValidator,

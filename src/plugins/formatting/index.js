@@ -13,6 +13,7 @@ import FormattedObservable, { formattedObservable } from './formatted-observable
 const api = {
   FormattedObservable,
   formattedObservable,
+  observableFormatted: formattedObservable,
 };
 kb.assign(kb, api);
 

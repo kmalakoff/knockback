@@ -10,19 +10,6 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
-// Regular expressions from Angular.js: https://github.com/angular/angular.js
-const URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
-const EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
-const NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
-
-// A validator should return true if there are errors (similar to the binding check in HTML, eg. $name().required).
-export const valid = {
-  required(value) { return !value; },
-  url(value) { return !URL_REGEXP.test(value); },
-  email(value) { return !EMAIL_REGEXP.test(value); },
-  number(value) { return !NUMBER_REGEXP.test(value); },
-};
-
 // Convention is that if they end in Fn then returns a function pointer based on parameters passed.
 export const hasChangedFn = (model) => {
   let m = null; let attributes = null;

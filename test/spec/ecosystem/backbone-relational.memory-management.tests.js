@@ -8,7 +8,7 @@ if (Backbone && !Backbone.Relational && r) try { require('backbone-relational');
 
 describe('Knockback.js with Backbone-Relational.js (memory)', () => {
   beforeEach(() => {
-    if (!(Backbone != null ? Backbone.Relational : undefined)) return;
+    if (!Backbone || !Backbone.Relational) return;
     !Backbone.Relational || Backbone.Relational.store.reset();
     if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
 
@@ -29,8 +29,6 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     assert.ok(!!Backbone.Relational, 'Backbone.Relational');
     kb.configure({ orm: 'backbone-relational' });
   });
-
-  if (!(Backbone != null ? Backbone.Relational : undefined)) return;
 
   // ref counted view model
   class RefCountableViewModel {

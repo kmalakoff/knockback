@@ -17,7 +17,7 @@ import CollectionObservable, { collectionObservable, compare } from './collectio
 import configure, { settings } from './configure';
 import EventWatcher from './event-watcher';
 import Factory from './factory';
-import { RECUSIVE_AUTO_INJECT, injectViewModels } from './inject';
+import { injectViewModels } from './inject';
 import Observable, { observable } from './observable';
 import Statistics from './statistics';
 import Store from './store';
@@ -36,7 +36,7 @@ const api = {
   settings,
   EventWatcher,
   Factory,
-  RECUSIVE_AUTO_INJECT,
+  RECUSIVE_AUTO_INJECT: true,
   injectViewModels,
   Observable,
   observable,

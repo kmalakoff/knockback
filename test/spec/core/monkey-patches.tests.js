@@ -38,7 +38,7 @@ describe('money-patches', () => {
   });
 
   // # https://github.com/kmalakoff/knockback/issues/124
-  it('fixes memory management for extend on Backbone.CollectionObservable', () => {
+  it('fixes memory management for extend on kb.CollectionObservable', () => {
     if (!ko.subscribable && !ko.subscribable.fn && !ko.subscribable.fn.extend) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 

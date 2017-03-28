@@ -818,7 +818,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       }
     }
 
-    class PersonCollection extends Backbone.CollectionObservable {
+    class PersonCollection extends kb.CollectionObservable {
       constructor(collection, options) {
         super(collection, {
           factories: {

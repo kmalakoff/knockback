@@ -77,7 +77,8 @@
     "moment": "*",
     "nuget": "*",
     "requirejs": "*",
-    "webpack": "*"
+    "webpack": "*",
+    "window-or-global": "*"
   },
   "optionalDependencies": {
     "backbone-relational": "*",

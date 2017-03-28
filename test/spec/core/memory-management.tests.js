@@ -3,7 +3,7 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 const { $ } = root;
 
 describe('knockback.js memory management', () => {
@@ -180,7 +180,7 @@ describe('knockback.js memory management', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('Backbone.CollectionObservable', () => {
+  it('kb.CollectionObservable', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ref counted view model
@@ -214,7 +214,7 @@ describe('knockback.js memory management', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('Backbone.CollectionObservable with external store', () => {
+  it('kb.CollectionObservable with external store', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     // ref counted view model

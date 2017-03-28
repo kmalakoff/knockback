@@ -22,7 +22,7 @@ for (const key in ALL_ORMS) {
 }
 
 // @nodoc
-export const configure = (options = {}) => {
+export default (options = {}) => {
   _.each(options, (value, key) => {
     switch (key) {
       case 'orm':

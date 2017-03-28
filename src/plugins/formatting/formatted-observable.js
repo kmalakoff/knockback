@@ -10,6 +10,8 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
+import kb from '../../core';
+
 export const toFormattedString = (format, ...args) => {
   let result = format.slice();
   _.each(args, (arg, index) => {
@@ -87,10 +89,10 @@ export default class FormattedObservable {
       read() {
         args = [ko.utils.unwrapObservable(format)];
         _.each(observable_args, arg => args.push(ko.utils.unwrapObservable(arg)));
-        return kb.toFormattedString.apply(null, args);
+        return toFormattedString.apply(null, args);
       },
       write(value) {
-        const matches = kb.parseFormattedString(value, ko.utils.unwrapObservable(format));
+        const matches = parseFormattedString(value, ko.utils.unwrapObservable(format));
         const max_count = Math.min(observable_args.length, matches.length); let index = 0;
         while (index < max_count) {
           observable_args[index](matches[index]);

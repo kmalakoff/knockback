@@ -3,7 +3,7 @@ const root = (typeof window !== 'undefined') ? window : (typeof global !== 'unde
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
 let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
-const { _, ko } = kb;
+const { _, Backbone, ko } = kb;
 const { $ } = root;
 
 describe('validation', () => {
@@ -18,9 +18,7 @@ describe('validation', () => {
   it('kb.valueValidator', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model =
-      { value: ko.observable() };
-
+    const view_model = { value: ko.observable() };
     const validator = kb.valueValidator(view_model.value, { required: kb.valid.required, url: kb.valid.url });
     assert.ok('required' in validator(), 'has required');
     assert.ok('url' in validator(), 'has url');

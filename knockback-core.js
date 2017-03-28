@@ -87,7 +87,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -114,13 +114,15 @@ var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _windowOrGlobal = __webpack_require__(5);
+
+var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -354,12 +356,12 @@ var kb = function () {
     value: function renderTemplate(template, view_model) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      if (!root.document) {
+      if (!_windowOrGlobal2.default.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
         return undefined;
       }
 
-      var el = root.document.createElement('div');
+      var el = _windowOrGlobal2.default.document.createElement('div');
       var observable = _knockout2.default.renderTemplate(template, view_model, options, el, 'replaceChildren');
 
       // do not return the template wrapper if possible
@@ -390,7 +392,7 @@ var kb = function () {
   }, {
     key: 'applyBindings',
     value: function applyBindings(view_model, node) {
-      if (!root.document) {
+      if (!_windowOrGlobal2.default.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
         return undefined;
       }
@@ -398,7 +400,7 @@ var kb = function () {
       if (node.length) {
         // convert to a root element
         var children = node;
-        node = root.document.createElement('div');
+        node = _windowOrGlobal2.default.document.createElement('div');
         _underscore2.default.each(children, function (child) {
           return node.appendChild(child);
         });
@@ -489,7 +491,6 @@ var kb = function () {
 exports.default = kb;
 
 kb.initClass();
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 2 */
@@ -771,30 +772,15 @@ var emitterObservable = exports.emitterObservable = function emitterObservable(e
 
 /***/ }),
 /* 5 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-var g;
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+module.exports = (typeof self === 'object' && self.self === self && self) ||
+  (typeof global === 'object' && global.global === global && global) ||
+  this
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(23)))
 
 /***/ }),
 /* 6 */
@@ -1452,7 +1438,7 @@ var collectionObservable = exports.collectionObservable = function collectionObs
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.configure = exports.settings = undefined;
+exports.settings = undefined;
 
 var _underscore = __webpack_require__(0);
 
@@ -1488,7 +1474,8 @@ for (var key in ALL_ORMS) {
 }
 
 // @nodoc
-var configure = exports.configure = function configure() {
+
+exports.default = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
   _underscore2.default.each(options, function (value, key) {
@@ -1645,12 +1632,12 @@ exports.default = Factory;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
+
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.injectViewModels = exports.RECUSIVE_AUTO_INJECT = undefined;
+exports.injectViewModels = undefined;
 
 var _underscore = __webpack_require__(0);
 
@@ -1660,8 +1647,17 @@ var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _windowOrGlobal = __webpack_require__(5);
+
+var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
+
+var _kb = __webpack_require__(1);
+
+var _kb2 = _interopRequireDefault(_kb);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// custom Knockout `inject` binding
 /*
   knockback.js 1.2.2
   Copyright (c)  2011-2016 Kevin Malakoff.
@@ -1671,22 +1667,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
-
-var RECUSIVE_AUTO_INJECT = exports.RECUSIVE_AUTO_INJECT = true;
-
-// custom Knockout `inject` binding
 var inject = function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
   var doInject = function doInject(value) {
     if (_underscore2.default.isFunction(value)) {
       view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
-      kb.releaseOnNodeRemove(view_model, element);
+      _kb2.default.releaseOnNodeRemove(view_model, element);
     } else {
       // view_model constructor causes a scope change
       if (value.view_model) {
         // specifying a view_model changes the scope so we need to bind a destroy
         view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
-        kb.releaseOnNodeRemove(view_model, element);
+        _kb2.default.releaseOnNodeRemove(view_model, element);
       }
 
       // resolve and merge in each key
@@ -1699,7 +1690,7 @@ var inject = function inject(data, view_model, element, value_accessor, all_bind
         // resolve nested with assign or not
         else if (_underscore2.default.isObject(item) && !_underscore2.default.isFunction(item)) {
             var target = nested || item && item.create ? {} : view_model;
-            view_model[key] = kb.Inject.inject(item, target, element, value_accessor, all_bindings_accessor, true);
+            view_model[key] = inject(item, target, element, value_accessor, all_bindings_accessor, true);
 
             // simple set
           } else view_model[key] = item;
@@ -1710,7 +1701,7 @@ var inject = function inject(data, view_model, element, value_accessor, all_bind
   };
 
   // in recursive calls, we are already protected from propagating dependencies to the template
-  return nested ? doInject(data) : kb.ignore(function () {
+  return nested ? doInject(data) : _kb2.default.ignore(function () {
     return doInject(data);
   });
 };
@@ -1803,7 +1794,7 @@ var doBind = function doBind(app) {
   if (beforeBinding) {
     beforeBinding.call(app.view_model, app.view_model, app.el, options);
   }
-  kb.applyBindings(app.view_model, app.el, options);
+  _kb2.default.applyBindings(app.view_model, app.el, options);
   if (afterBinding) {
     afterBinding.call(app.view_model, app.view_model, app.el, options);
   }
@@ -1814,7 +1805,7 @@ var doBind = function doBind(app) {
 // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
 // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
 var injectViewModels = exports.injectViewModels = function injectViewModels() {
-  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
+  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _windowOrGlobal2.default.document;
 
   var results = [];
   if (!el.__kb_injected) {
@@ -1846,23 +1837,22 @@ _knockout2.default.applyBindings = function () {
   }
 
   var el = args[1];
-  var results = kb.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
+  var results = _kb2.default.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
   return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [undefined].concat(args));
 };
 
 // ############################
 // Auto Inject results
 // ############################
-if (root && typeof root.document !== 'undefined') {
+if (_windowOrGlobal2.default && typeof _windowOrGlobal2.default.document !== 'undefined') {
   // use simple ready check
   var onReady = function onReady() {
     // keep waiting for the document to load
-    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0);
+    if (_windowOrGlobal2.default.document.readyState !== 'complete') return setTimeout(onReady, 0);
     return injectViewModels(); // the document is loaded
   };
   onReady();
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 10 */
@@ -1875,9 +1865,22 @@ var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
+var _kb = __webpack_require__(1);
+
+var _kb2 = _interopRequireDefault(_kb);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
+/*
+  knockback.js 1.2.2
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
 if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _knockout2.default.subscribable.fn.extend) {
   var _extend = _knockout2.default.subscribable.fn.extend;
   _knockout2.default.subscribable.fn.extend = function () {
@@ -1890,7 +1893,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
     var target = _extend.apply(this, args);
 
     // release the extended observable
-    if (target !== this && kb.isReleaseable(this)) {
+    if (target !== this && _kb2.default.isReleaseable(this)) {
       var _dispose = target.dispose;
       target.dispose = function () {
         for (var _len2 = arguments.length, args2 = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
@@ -1898,20 +1901,13 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
         }
 
         !_dispose || _dispose.apply(target, args2);
-        return kb.release(_this);
+        return _kb2.default.release(_this);
       };
     }
 
     return target;
   };
-} /*
-    knockback.js 1.2.2
-    Copyright (c)  2011-2016 Kevin Malakoff.
-    License: MIT (http://www.opensource.org/licenses/mit-license.php)
-    Source: https://github.com/kmalakoff/knockback
-    Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-    Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-  */
+}
 
 /***/ }),
 /* 11 */
@@ -3770,7 +3766,7 @@ var api = {
   settings: _configure.settings,
   EventWatcher: _eventWatcher2.default,
   Factory: _factory2.default,
-  RECUSIVE_AUTO_INJECT: _inject.RECUSIVE_AUTO_INJECT,
+  RECUSIVE_AUTO_INJECT: true,
   injectViewModels: _inject.injectViewModels,
   Observable: _observable2.default,
   observable: _observable.observable,
@@ -4137,6 +4133,33 @@ var BackboneRelational = function () {
 }();
 
 exports.default = BackboneRelational;
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ })
 /******/ ]);
