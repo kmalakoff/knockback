@@ -26,7 +26,6 @@ module.exports = async () => {
     await new Promise((resolve, reject) => {
       const config = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '..', '_temp/webpack')) } }, require(configPath));
       webpack(config, (err, stats) => {
-        console.log('HERE3');
         if (err) return reject(err);
 
         console.log(stats.toString({}));

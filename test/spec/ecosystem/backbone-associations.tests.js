@@ -17,7 +17,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.configure({ orm: 'backbone-associations' });
   });
 
-  if (!(Backbone != null ? Backbone.Associations : undefined)) return;
+  if (!Backbone || !Backbone.Associations) return;
   Backbone.Associations.scopes.push(root);
 
   root.Person = Backbone.AssociatedModel.extend({

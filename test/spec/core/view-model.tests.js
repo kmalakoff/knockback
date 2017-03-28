@@ -409,7 +409,7 @@ describe('view-model', () => {
     const model = new Backbone.Model({ reused: null });
     const view_model = kb.viewModel(model, { factories: {
       reused: { create(obj, options) {
-        if (kb.isCollection(obj) || (!obj && (kb.utils.valueType(view_model ? view_model.reused : undefined) === kb.TYPE_COLLECTION))) {
+        if (kb.isCollection(obj) || (!obj && (kb.utils.valueType(view_model && view_model.reused) === kb.TYPE_COLLECTION))) {
           return kb.collectionObservable(obj, options);
         }
         return kb.viewModel(obj, options);

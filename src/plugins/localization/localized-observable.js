@@ -99,7 +99,7 @@ export default class LocalizedObservable {
         this.write || kb._throwUnexpected(this, 'writing to read-only');
         this.write(x, ko.utils.unwrapObservable(this.value));
         this.vo(x);
-        return this.__kb._onChange ? this.__kb._onChange(x) : undefined;
+        !this.__kb._onChange || this.__kb._onChange(x);
       },
 
       owner: this.vm,

@@ -17,8 +17,9 @@ describe('knockback.js memory management', () => {
 
   // ref counted view model
   class RefCountableViewModel {
-    static view_models = [];
-
+    static initClass() {
+      this.view_models = [];
+    }
     constructor() {
       RefCountableViewModel.view_models.push(this);
       this.ref_count = 1;
@@ -43,11 +44,13 @@ describe('knockback.js memory management', () => {
       return RefCountableViewModel.view_models.splice(_.indexOf(RefCountableViewModel.view_models, this), 1);
     }
   }
+  RefCountableViewModel.initClass();
 
   // destroyable view model
   class DestroyableViewModel {
-    static view_models = [];
-
+    static initClass() {
+      this.view_models = [];
+    }
     constructor() {
       DestroyableViewModel.view_models.push(this);
     }
@@ -56,16 +59,19 @@ describe('knockback.js memory management', () => {
       return DestroyableViewModel.view_models.splice(_.indexOf(DestroyableViewModel.view_models, this), 1);
     }
   }
+  DestroyableViewModel.initClass();
 
   // simple view model
   class SimpleViewModel {
-    static view_models = [];
-
+    static initClass() {
+      this.view_models = [];
+    }
     constructor() {
       this.prop = ko.observable();
       SimpleViewModel.view_models.push(this);
     }
   }
+  SimpleViewModel.initClass();
 
   it('Basic view model properties', () => {
     kb.statistics = new kb.Statistics(); // turn on stats

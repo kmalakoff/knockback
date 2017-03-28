@@ -4828,7 +4828,7 @@ var LocalizedObservable = function () {
         _this.write || _core2.default._throwUnexpected(_this, 'writing to read-only');
         _this.write(x, _knockout2.default.utils.unwrapObservable(_this.value));
         _this.vo(x);
-        return _this.__kb._onChange ? _this.__kb._onChange(x) : undefined;
+        !_this.__kb._onChange || _this.__kb._onChange(x);
       },
 
       owner: this.vm
