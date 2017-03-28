@@ -83,7 +83,6 @@
   "optionalDependencies": {
     "backbone-relational": "*",
     "backbone-modelref": "*",
-    "backbone.localstorage": "*",
     "lodash": "*",
     "backbone-orm": "*",
     "backbone-associations": "*"
