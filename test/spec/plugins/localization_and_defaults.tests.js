@@ -18,10 +18,6 @@ if (!Globalize) {
 
 // ##############################
 class LocaleManager {
-  static initClass() {
-    kb.assign(LocaleManager.prototype, Backbone.Events);
-  }
-
   constructor(locale_identifier, translations_by_locale) {
     this.translations_by_locale = translations_by_locale;
     if (locale_identifier) { this.setLocale(locale_identifier); }
@@ -51,7 +47,7 @@ class LocaleManager {
 
   getLocales() { return _.keys(this.translations_by_locale); }
 }
-LocaleManager.initClass();
+kb.assign(LocaleManager.prototype, Backbone.Events);
 
 class LocalizedString {
   constructor(string_id) {

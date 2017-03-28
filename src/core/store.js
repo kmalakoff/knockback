@@ -21,10 +21,8 @@ import kb from './kb';
 //     store: kb.utils.wrappedStore(co)
 //   });
 export default class Store {
-  static initClass() {
-    // @nodoc
-    Store.instances = [];
-  }
+  // @nodoc
+  static instances = [];
 
   // Used to either register yourself with the existing store or to create a new store.
   //
@@ -289,4 +287,3 @@ export default class Store {
     return undefined;
   }
 }
-Store.initClass();

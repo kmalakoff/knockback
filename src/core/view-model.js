@@ -105,11 +105,9 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
 //     view_model.model(new Backbone.Model({name: 'fred'})); // set
 //
 export default class ViewModel {
-  static initClass() {
-    // @nodoc
-    ViewModel.extend = Backbone.Model.extend;
-     // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
-  }
+  // @nodoc
+  static extend = Backbone.Model.extend;
+    // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   // Used to create a new kb.ViewModel.
   //
@@ -229,7 +227,6 @@ export default class ViewModel {
     }
   }
 }
-ViewModel.initClass();
 
 // Factory function to create a kb.ViewModel.
 export const viewModel = (...args) => new ViewModel(...args);

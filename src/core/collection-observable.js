@@ -61,11 +61,9 @@ export const compare = (value_a, value_b) => {
 //   @return [Collection|void] getter: the collection whose models are being observed (can be null) OR setter: void
 //
 export default class CollectionObservable {
-  static initClass() {
-    // @nodoc
-    CollectionObservable.extend = Backbone.Model.extend;
-     // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
-  }
+  // @nodoc
+  static extend = Backbone.Model.extend;
+    // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   // Used to create a new kb.CollectionObservable.
   //
@@ -496,7 +494,6 @@ export default class CollectionObservable {
     return true;
   }
 }
-CollectionObservable.initClass();
 
 // factory function
 export const collectionObservable = (...args) => new CollectionObservable(...args);

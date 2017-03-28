@@ -126,6 +126,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
+var _ignore = function _ignore(callback, callbackTarget, callbackArgs) {
+  var value = null;
+  _knockout2.default.computed(function () {
+    value = callback.apply(callbackTarget, callbackArgs || []);
+  }).dispose();
+  return value;
+};
+
 // The 'kb' namespace for classes, factory functions, constants, etc.
 //
 // @method .configure(options)
@@ -180,51 +188,40 @@ var kb = function () {
   }
 
   _createClass(kb, null, [{
-    key: 'initClass',
-    value: function initClass() {
-      // Knockback library semantic version
-      kb.VERSION = '1.2.2';
+    key: 'wasReleased',
 
-      // ###################################
-      // OBSERVABLE STORAGE TYPES
-      // ###################################
-
-      // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
-      kb.TYPE_UNKNOWN = 0;
-      // Stored value type is simple like a String or Number -> observable type: ko.observable
-      kb.TYPE_SIMPLE = 1;
-      // Stored value type is an Array -> observable type: ko.observableArray
-      kb.TYPE_ARRAY = 2;
-      // Stored value type is a Model -> observable type: ViewModel
-      kb.TYPE_MODEL = 3;
-      // Stored value type is a Collection -> observable type: kb.CollectionObservable
-      kb.TYPE_COLLECTION = 4;
-
-      // cache local reference to underscore
-      kb.assign = _underscore2.default.assign || _underscore2.default.extend;
-
-      // cache local reference to Knockout
-      var _ignore = function _ignore(callback, callbackTarget, callbackArgs) {
-        var value = null;
-        _knockout2.default.computed(function () {
-          value = callback.apply(callbackTarget, callbackArgs || []);
-        }).dispose();
-        return value;
-      };
-      kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.dependencyDetection.ignore ? _knockout2.default.dependencyDetection.ignore : _ignore;
-    }
 
     // Checks if an object has been released.
     // @param [Any] obj the object to release and also release its keys
 
-  }, {
-    key: 'wasReleased',
+
+    // cache local reference to underscore
+
+    // Stored value type is a Model -> observable type: ViewModel
+
+    // Stored value type is simple like a String or Number -> observable type: ko.observable
+
+    // Knockback library semantic version
     value: function wasReleased(obj) {
       return !obj || obj.__kb_released;
     }
 
     // Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.
     // @param [Any] obj the object to release and also release its keys
+
+
+    // cache local reference to Knockout
+
+    // Stored value type is a Collection -> observable type: kb.CollectionObservable
+
+    // Stored value type is an Array -> observable type: ko.observableArray
+
+
+    // ###################################
+    // OBSERVABLE STORAGE TYPES
+    // ###################################
+
+    // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
 
   }, {
     key: 'isReleaseable',
@@ -488,9 +485,15 @@ var kb = function () {
   return kb;
 }();
 
+kb.VERSION = '1.2.2';
+kb.TYPE_UNKNOWN = 0;
+kb.TYPE_SIMPLE = 1;
+kb.TYPE_ARRAY = 2;
+kb.TYPE_MODEL = 3;
+kb.TYPE_COLLECTION = 4;
+kb.assign = _underscore2.default.assign || _underscore2.default.extend;
+kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.dependencyDetection.ignore ? _knockout2.default.dependencyDetection.ignore : _ignore;
 exports.default = kb;
-
-kb.initClass();
 
 /***/ }),
 /* 2 */
@@ -876,43 +879,34 @@ var compare = exports.compare = function compare(value_a, value_b) {
 //
 
 var CollectionObservable = function () {
-  _createClass(CollectionObservable, null, [{
-    key: 'initClass',
-    value: function initClass() {
-      // @nodoc
-      CollectionObservable.extend = _backbone2.default.Model.extend;
-      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
-    }
+  // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
-    // Used to create a new kb.CollectionObservable.
-    //
-    // When the observable is updated, the following Backbone.Events are triggered:
-    //
-    // * ***add***: (view_model, collection_observable) or if batch: (collection_observable)
-    // * ***resort***: (view_model, collection_observable, new_index) or if batch: (collection_observable)
-    // * ***remove***: (view_model, collection_observable) or if batch: (collection_observable)
-    //
-    // @param [Collection] collection the collection to observe (can be null)
-    // @param [Object] options the create options
-    // @option options [Boolean] models_only flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.
-    // @option options [Boolean] auto_compact flag used to compact memory used by the collection observable when large changes occur, eg. resetting the collection.
-    // @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
-    // @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
-    // @option options [Object] factories a map of dot-deliminated paths;
-    // for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
-    // @option options [Function] comparator a function that is used to sort an object.
-    // Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
-    // @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
-    // @option options [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
-    // @option options [String] path the path to the value (used to create related observables from the factory).
-    // @option options [kb.Store] store a store used to cache and share view models.
-    // @option options [kb.Factory] factory a factory used to create view models.
-    // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
-    // @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
-    // @note the constructor does not return 'this' but a ko.observableArray
-
-  }]);
-
+  // Used to create a new kb.CollectionObservable.
+  //
+  // When the observable is updated, the following Backbone.Events are triggered:
+  //
+  // * ***add***: (view_model, collection_observable) or if batch: (collection_observable)
+  // * ***resort***: (view_model, collection_observable, new_index) or if batch: (collection_observable)
+  // * ***remove***: (view_model, collection_observable) or if batch: (collection_observable)
+  //
+  // @param [Collection] collection the collection to observe (can be null)
+  // @param [Object] options the create options
+  // @option options [Boolean] models_only flag for skipping the creation of view models. The collection observable will be populated with (possibly sorted) models.
+  // @option options [Boolean] auto_compact flag used to compact memory used by the collection observable when large changes occur, eg. resetting the collection.
+  // @option options [Constructor] view_model the view model constructor used for models in the collection. Signature: constructor(model, options)
+  // @option options [Function] create a function used to create a view model for models in the collection. Signature: create(model, options)
+  // @option options [Object] factories a map of dot-deliminated paths;
+  // for example 'models.owner': kb.ViewModel to either constructors or create functions. Signature: 'some.path': function(object, options)
+  // @option options [Function] comparator a function that is used to sort an object.
+  // Signature: `function(model_a, model_b)` returns negative value for ascending, 0 for equal, and positive for descending
+  // @option options [String] sort_attribute the name of an attribute. Default: resort on all changes to a model.
+  // @option options [Id|Function|Array] filters filters can be individual ids (observable or simple) or arrays of ids, functions, or arrays of functions.
+  // @option options [String] path the path to the value (used to create related observables from the factory).
+  // @option options [kb.Store] store a store used to cache and share view models.
+  // @option options [kb.Factory] factory a factory used to create view models.
+  // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
+  // @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
+  // @note the constructor does not return 'this' but a ko.observableArray
   function CollectionObservable() {
     var _this = this;
 
@@ -1170,6 +1164,8 @@ var CollectionObservable = function () {
   // Required clean up function to break cycles, release view models, etc.
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
 
+  // @nodoc
+
 
   _createClass(CollectionObservable, [{
     key: 'destroy',
@@ -1415,11 +1411,11 @@ var CollectionObservable = function () {
   return CollectionObservable;
 }();
 
-exports.default = CollectionObservable;
-
-CollectionObservable.initClass();
-
 // factory function
+
+
+CollectionObservable.extend = _backbone2.default.Model.extend;
+exports.default = CollectionObservable;
 var collectionObservable = exports.collectionObservable = function collectionObservable() {
   for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     args[_key2] = arguments[_key2];
@@ -2406,11 +2402,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 //   });
 var Store = function () {
   _createClass(Store, null, [{
-    key: 'initClass',
-    value: function initClass() {
-      // @nodoc
-      Store.instances = [];
-    }
+    key: 'useOptionsOrCreate',
+
 
     // Used to either register yourself with the existing store or to create a new store.
     //
@@ -2419,9 +2412,6 @@ var Store = function () {
     // @param [ko.observable] observable the observable that will own the store
     // @example
     //   kb.Store.useOptionsOrCreate(model, this, options);
-
-  }, {
-    key: 'useOptionsOrCreate',
     value: function useOptionsOrCreate(options, obj, observable) {
       if (!options.store) {
         _kb2.default.utils.wrappedStoreIsOwned(observable, true);
@@ -2432,6 +2422,8 @@ var Store = function () {
     }
 
     // Used to create a new kb.Store.
+
+    // @nodoc
 
   }]);
 
@@ -2774,9 +2766,8 @@ var Store = function () {
   return Store;
 }();
 
+Store.instances = [];
 exports.default = Store;
-
-Store.initClass();
 
 /***/ }),
 /* 14 */
@@ -3304,37 +3295,28 @@ var KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults
 //
 
 var ViewModel = function () {
-  _createClass(ViewModel, null, [{
-    key: 'initClass',
-    value: function initClass() {
-      // @nodoc
-      ViewModel.extend = _backbone2.default.Model.extend;
-      // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
-    }
+  // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
-    // Used to create a new kb.ViewModel.
-    //
-    // @param [Model|ModelRef] model the model to observe (can be null)
-    // @param [Object] options the create options
-    // @option options [Array|String] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
-    // @option options [Array|String] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model.
-    // Useful for binding Views that require specific observables to exist
-    // @option options [Array|String] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
-    // @option options [Object|Array|String] excludes if an array is supplied, excludes keys to exclude on the view model;
-    // for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
-    // @option options [Array] statics creates non-observable properties on your view model for Model attributes that do not need to be observed for changes.
-    // @option options [Object] static_defaults provides default values for statics.
-    // @option options [String] path the path to the value (used to create related observables from the factory).
-    // @option options [kb.Store] store a store used to cache and share view models.
-    // @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions.
-    // Signature: `{'some.path': function(object, options)}`
-    // @option options [kb.Factory] factory a factory used to create view models.
-    // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
-    // @return [ko.observable] the constructor returns 'this'
-    // @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
-
-  }]);
-
+  // Used to create a new kb.ViewModel.
+  //
+  // @param [Model|ModelRef] model the model to observe (can be null)
+  // @param [Object] options the create options
+  // @option options [Array|String] internals an array of atttributes that should be scoped with an underscore, eg. name -> _name
+  // @option options [Array|String] requires an array of atttributes that will have kb.Observables created even if they do not exist on the Model.
+  // Useful for binding Views that require specific observables to exist
+  // @option options [Array|String] keys restricts the keys used on a model. Useful for reducing the number of kb.Observables created from a limited set of Model attributes
+  // @option options [Object|Array|String] excludes if an array is supplied, excludes keys to exclude on the view model;
+  // for example, if you want to provide a custom implementation. If an Object, it provides options to the kb.Observable constructor.
+  // @option options [Array] statics creates non-observable properties on your view model for Model attributes that do not need to be observed for changes.
+  // @option options [Object] static_defaults provides default values for statics.
+  // @option options [String] path the path to the value (used to create related observables from the factory).
+  // @option options [kb.Store] store a store used to cache and share view models.
+  // @option options [Object] factories a map of dot-deliminated paths; for example `{'models.name': kb.ViewModel}` to either constructors or create functions.
+  // Signature: `{'some.path': function(object, options)}`
+  // @option options [kb.Factory] factory a factory used to create view models.
+  // @option options [Object] options a set of options merge into these options. Useful for extending options when deriving classes rather than merging them by hand.
+  // @return [ko.observable] the constructor returns 'this'
+  // @param [Object] view_model a view model to also set the kb.Observables on. Useful when batch creating observable on an owning view model.
   function ViewModel() {
     var _this = this;
 
@@ -3412,6 +3394,8 @@ var ViewModel = function () {
   // Required clean up function to break cycles, release view models, etc.
   // Can be called directly, via kb.release(object) or as a consequence of ko.releaseNode(element).
 
+  // @nodoc
+
 
   _createClass(ViewModel, [{
     key: 'destroy',
@@ -3481,11 +3465,11 @@ var ViewModel = function () {
   return ViewModel;
 }();
 
-exports.default = ViewModel;
-
-ViewModel.initClass();
-
 // Factory function to create a kb.ViewModel.
+
+
+ViewModel.extend = _backbone2.default.Model.extend;
+exports.default = ViewModel;
 var viewModel = exports.viewModel = function viewModel() {
   for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
     args[_key2] = arguments[_key2];

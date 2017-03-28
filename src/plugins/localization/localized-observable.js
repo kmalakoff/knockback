@@ -61,10 +61,8 @@ const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];
 //        }
 //     });
 export default class LocalizedObservable {
-  static initClass() {
-    LocalizedObservable.extend = Backbone.Model.extend;
-     // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
-  }
+  static extend = Backbone.Model.extend;
+    // for Backbone non-Coffeescript inheritance (use "kb.SuperClass.extend({})" in Javascript instead of "class MyClass extends kb.SuperClass")
 
   // Used to create a new kb.LocalizedObservable. This an abstract class.
   //
@@ -154,7 +152,6 @@ export default class LocalizedObservable {
     return undefined;
   }
 }
-LocalizedObservable.initClass();
 
 // factory function
 export const localizedObservable = (...args) => new LocalizedObservable(...args);

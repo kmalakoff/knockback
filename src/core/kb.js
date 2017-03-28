@@ -14,6 +14,12 @@ import root from 'window-or-global';
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
+const _ignore = (callback, callbackTarget, callbackArgs) => {
+  let value = null;
+  ko.computed(() => { value = callback.apply(callbackTarget, callbackArgs || []); }).dispose();
+  return value;
+};
+
 // The 'kb' namespace for classes, factory functions, constants, etc.
 //
 // @method .configure(options)
@@ -62,36 +68,29 @@ const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 //   @param [Object] options the create options
 //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 export default class kb {
-  static initClass() {
-    // Knockback library semantic version
-    kb.VERSION = '1.2.2';
+  // Knockback library semantic version
+  static VERSION = '1.2.2';
 
-    // ###################################
-    // OBSERVABLE STORAGE TYPES
-    // ###################################
+  // ###################################
+  // OBSERVABLE STORAGE TYPES
+  // ###################################
 
-    // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
-    kb.TYPE_UNKNOWN = 0;
-    // Stored value type is simple like a String or Number -> observable type: ko.observable
-    kb.TYPE_SIMPLE = 1;
-    // Stored value type is an Array -> observable type: ko.observableArray
-    kb.TYPE_ARRAY = 2;
-    // Stored value type is a Model -> observable type: ViewModel
-    kb.TYPE_MODEL = 3;
-    // Stored value type is a Collection -> observable type: kb.CollectionObservable
-    kb.TYPE_COLLECTION = 4;
+  // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
+  static TYPE_UNKNOWN = 0;
+  // Stored value type is simple like a String or Number -> observable type: ko.observable
+  static TYPE_SIMPLE = 1;
+  // Stored value type is an Array -> observable type: ko.observableArray
+  static TYPE_ARRAY = 2;
+  // Stored value type is a Model -> observable type: ViewModel
+  static TYPE_MODEL = 3;
+  // Stored value type is a Collection -> observable type: kb.CollectionObservable
+  static TYPE_COLLECTION = 4;
 
-    // cache local reference to underscore
-    kb.assign = _.assign || _.extend;
+  // cache local reference to underscore
+  static assign = _.assign || _.extend;
 
-    // cache local reference to Knockout
-    const _ignore = (callback, callbackTarget, callbackArgs) => {
-      let value = null;
-      ko.computed(() => { value = callback.apply(callbackTarget, callbackArgs || []); }).dispose();
-      return value;
-    };
-    kb.ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
-  }
+  // cache local reference to Knockout
+  static ignore = ko.dependencyDetection && ko.dependencyDetection.ignore ? ko.dependencyDetection.ignore : _ignore;
 
   // Checks if an object has been released.
   // @param [Any] obj the object to release and also release its keys
@@ -295,4 +294,3 @@ export default class kb {
   // @nodoc
   static isCollection(obj) { return obj && (obj instanceof Backbone.Collection); }
 }
-kb.initClass();
