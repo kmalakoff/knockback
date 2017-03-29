@@ -1,7 +1,7 @@
 _temp
 node_modules
 test/lib
-test/spec/parameters.js
+test/parameters.js
 test/issues
 vendor
 knockback-core-stack.js

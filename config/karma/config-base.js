@@ -2,7 +2,7 @@ module.exports = {
   basePath: '.',
   frameworks: ['mocha', 'chai'],
 
-  preprocessors: { 'test/spec/**/*.js': ['babel'] },
+  preprocessors: { 'test/**/*.js': ['babel'] },
   babelPreprocessor: { options: { presets: ['es2015', 'stage-1'] } },
 
   reporters: ['dots'],

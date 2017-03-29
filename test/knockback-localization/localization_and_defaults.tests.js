@@ -9,11 +9,11 @@ if (kb && !kb.LocalizedObservable && r) require('knockback-localization');
 
 let Globalize = root.Globalize;
 if (!Globalize) {
-  Globalize = r ? require('../../lib/globalize') : undefined;
+  Globalize = r ? require('../lib/globalize') : undefined;
   if (typeof require === 'function') {
-    require('../../lib/globalize.culture.en-GB.js');
+    require('../lib/globalize.culture.en-GB.js');
   } if (typeof require === 'function') {
-    require('../../lib/globalize.culture.fr-FR.js');
+    require('../lib/globalize.culture.fr-FR.js');
   }
 }
 

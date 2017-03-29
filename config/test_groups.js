@@ -39,15 +39,15 @@ _.each(KNOCKBACK, (library_files, library_name) => {
             library_files,
             LOCALIZATION_DEPENCIES,
             resolveModule('backbone-modelref'),
-            './test/spec/core/**/*.tests.js',
-            './test/spec/plugins/**/*.tests.js',
-            './test/spec/issues/**/*.tests.js',
+            './test/core/**/*.tests.js',
+            './test/plugins/**/*.tests.js',
+            './test/issues/**/*.tests.js',
           ]),
         });
       } else { // Parse
         TEST_GROUPS.browser_globals.push({
           name: `${dep_name}_${library_name}`,
-          files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/spec/core/**/*.tests.js', './test/spec/plugins/**/*.tests.js']),
+          files: _.flattenDeep([dep_files, library_files, LOCALIZATION_DEPENCIES, './test/core/**/*.tests.js', './test/plugins/**/*.tests.js']),
         });
       }
     });
@@ -60,7 +60,7 @@ _.each(KNOCKBACK, (library_files, library_name) => {
 TEST_GROUPS.core = [];
 _.each(KNOCKBACK, (library_files, test_name) => {
   if (~test_name.indexOf('core') && !~test_name.indexOf('stack')) {
-    TEST_GROUPS.core.push({ name: `core_${test_name}`, files: _.flattenDeep([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/spec/core/**/*.tests.js']) });
+    TEST_GROUPS.core.push({ name: `core_${test_name}`, files: _.flattenDeep([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/core/**/*.tests.js']) });
   }
 });
 
@@ -68,9 +68,9 @@ _.each(KNOCKBACK, (library_files, test_name) => {
 // ORM
 // ##############################
 const ORM_TESTS = {
-  backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/spec/ecosystem/**/backbone-orm*.tests.js'],
-  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/spec/ecosystem/**/backbone-relational*.tests.js'],
-  backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/spec/ecosystem/**/backbone-associations*.tests.js'],
+  backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/ecosystem/**/backbone-orm*.tests.js'],
+  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/ecosystem/**/backbone-relational*.tests.js'],
+  backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/ecosystem/**/backbone-associations*.tests.js'],
 };
 
 TEST_GROUPS.orm = [];
