@@ -2,7 +2,7 @@
   "name": "knockback-associations",
   "version": "2.0.0-alpha.1",
   "description": "Provides associations extensions for Knockback.js",
-  "main": "knockback-associations.js",
+  "main": "dist/knockback-associations.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"

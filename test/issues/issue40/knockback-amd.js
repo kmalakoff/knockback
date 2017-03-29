@@ -1043,7 +1043,7 @@
           path: create_options.path,
         });
         this.__kb_value || this.update();
-        if (kb.LocalizedObservable && create_options.localizer) {
+        if (kbl.LocalizedObservable && create_options.localizer) {
           observable = new create_options.localizer(observable);
           delete create_options.localizer;
         }
@@ -2005,7 +2005,7 @@
   */
 
 
-    kb.LocalizedObservable = (function () {
+    kbl.LocalizedObservable = (function () {
       LocalizedObservable.extend = Backbone.Model.extend;
 
       function LocalizedObservable(value, options, vm) {
@@ -2091,7 +2091,7 @@
     }());
 
     kb.localizedObservable = function (value, options, view_model) {
-      return new kb.LocalizedObservable(value, options, view_model);
+      return new kbl.LocalizedObservable(value, options, view_model);
     };
 
   /*

@@ -5,7 +5,7 @@ module.exports = {
   output: {
     filename: 'knockback-localization.js',
     path: path.join(__dirname, 'dist'),
-    library: 'kbl',
+    library: 'kb',
     libraryTarget: 'umd2',
   },
 

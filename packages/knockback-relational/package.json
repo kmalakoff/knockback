@@ -2,7 +2,7 @@
   "name": "knockback-relational",
   "version": "2.0.0-alpha.1",
   "description": "Provides relational extensions for Knockback.js",
-  "main": "knockback-relational.js",
+  "main": "dist/knockback-relational.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"

@@ -2,7 +2,7 @@
   "name": "knockback-validation",
   "version": "2.0.0-alpha.1",
   "description": "Provides validation extensions for Knockback.js",
-  "main": "knockback-validation.js",
+  "main": "dist/knockback-validation.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"

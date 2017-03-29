@@ -1,10 +1,10 @@
 const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
+let assert = root.assert; assert = assert || (r ? require('chai').assert : undefined);
 
-let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { /* */ }
+let kb = root.kb; kb = kb || (r ? require('knockback') : undefined);
 const { _, Backbone, ko } = kb;
-let BackboneORM = root.BackboneORM; try { BackboneORM = BackboneORM || (r ? require('backbone-orm') : undefined); } catch (e) { /**/ }
+let BackboneORM = root.BackboneORM; BackboneORM = BackboneORM || (r ? require('backbone-orm') : undefined);
 const { Queue } = BackboneORM;
 
 describe('Knockback.js with BackboneORM', () => {

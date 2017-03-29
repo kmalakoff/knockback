@@ -10,7 +10,6 @@
 import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
-
 import kb from 'knockback';
 
 const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'];

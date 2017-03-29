@@ -2,7 +2,7 @@
   "name": "knockback-formatting",
   "version": "2.0.0-alpha.1",
   "description": "Provides formatting extensions for Knockback.js",
-  "main": "knockback-formatting.js",
+  "main": "dist/knockback-formatting.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"

@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define(["knockback", "backbone", "underscore", "knockout"], factory);
 	else if(typeof exports === 'object')
-		exports["kbl"] = factory(require("knockback"), require("backbone"), require("underscore"), require("knockout"));
+		exports["kb"] = factory(require("knockback"), require("backbone"), require("underscore"), require("knockout"));
 	else
-		root["kbl"] = factory(root["kb"], root["Backbone"], root["_"], root["ko"]);
+		root["kb"] = factory(root["kb"], root["Backbone"], root["_"], root["ko"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache

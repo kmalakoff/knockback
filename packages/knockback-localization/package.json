@@ -2,7 +2,7 @@
   "name": "knockback-localization",
   "version": "2.0.0-alpha.1",
   "description": "Provides localization extensions for Knockback.js",
-  "main": "knockback-localization.js",
+  "main": "dist/knockback-localization.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"

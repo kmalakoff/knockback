@@ -1,9 +1,10 @@
 const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
+let assert = root.assert; assert = assert || (r ? require('chai').assert : undefined);
 
-let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { /* */ }
+let kb = root.kb; kb = kb || (r ? require('knockback') : undefined);
 const { _, Backbone, ko } = kb;
+if (kb && !kb.valueValidator && r) require('knockback-validation');
 const { $ } = root;
 
 describe('validation', () => {

@@ -2,7 +2,7 @@
   "name": "knockback-triggering",
   "version": "2.0.0-alpha.1",
   "description": "Provides triggering extensions for Knockback.js",
-  "main": "knockback-triggering.js",
+  "main": "dist/knockback-triggering.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"
