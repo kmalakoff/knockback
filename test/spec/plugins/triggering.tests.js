@@ -2,7 +2,7 @@ const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 let assert = root.assert; try { assert = assert || (r ? require('chai').assert : undefined); } catch (e) { /**/ }
 
-let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { kb = kb || (r ? require('../../../knockback') : undefined); }
+let kb = root.kb; try { kb = kb || (r ? require('knockback') : undefined); } catch (e) { /* */ }
 const { _, Backbone, ko } = kb;
 
 describe('triggered-observable', () => {

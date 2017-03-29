@@ -10,7 +10,7 @@
 import _ from 'underscore';
 import ko from 'knockout';
 
-import kb from '..';
+import kb from '../kb';
 
 // @nodoc
 export default class TypedValue {

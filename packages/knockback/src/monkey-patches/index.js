@@ -9,7 +9,7 @@
 
 import ko from 'knockout';
 
-import kb from '..';
+import kb from '../kb';
 
 // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
 if (ko.subscribable && ko.subscribable.fn && ko.subscribable.fn.extend) {

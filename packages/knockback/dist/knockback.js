@@ -7,7 +7,7 @@
 		exports["kb"] = factory(require("underscore"), require("knockout"), require("backbone"));
 	else
 		root["kb"] = factory(root["_"], root["ko"], root["Backbone"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_3__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -84,12 +84,6 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -116,11 +110,11 @@ var _backbone = __webpack_require__(3);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _windowOrGlobal = __webpack_require__(6);
+var _windowOrGlobal = __webpack_require__(5);
 
 var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
 
@@ -502,6 +496,12 @@ kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.depende
 exports.default = kb;
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+
+/***/ }),
 /* 3 */
 /***/ (function(module, exports) {
 
@@ -536,11 +536,11 @@ var _backbone = __webpack_require__(3);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -778,105 +778,6 @@ var emitterObservable = exports.emitterObservable = function emitterObservable(e
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-var _underscore = __webpack_require__(0);
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _backbone = __webpack_require__(3);
-
-var _backbone2 = _interopRequireDefault(_backbone);
-
-var _knockout = __webpack_require__(1);
-
-var _knockout2 = _interopRequireDefault(_knockout);
-
-__webpack_require__(11);
-
-var _kb = __webpack_require__(2);
-
-var _kb2 = _interopRequireDefault(_kb);
-
-var _collectionObservable = __webpack_require__(7);
-
-var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
-
-var _configure = __webpack_require__(8);
-
-var _configure2 = _interopRequireDefault(_configure);
-
-var _eventWatcher = __webpack_require__(4);
-
-var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
-
-var _factory = __webpack_require__(9);
-
-var _factory2 = _interopRequireDefault(_factory);
-
-var _inject = __webpack_require__(10);
-
-var _observable = __webpack_require__(12);
-
-var _observable2 = _interopRequireDefault(_observable);
-
-var _statistics = __webpack_require__(13);
-
-var _statistics2 = _interopRequireDefault(_statistics);
-
-var _store = __webpack_require__(14);
-
-var _store2 = _interopRequireDefault(_store);
-
-var _utils = __webpack_require__(15);
-
-var _utils2 = _interopRequireDefault(_utils);
-
-var _viewModel = __webpack_require__(16);
-
-var _viewModel2 = _interopRequireDefault(_viewModel);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var api = {
-  _: _underscore2.default,
-  Backbone: _backbone2.default,
-  ko: _knockout2.default,
-  CollectionObservable: _collectionObservable2.default,
-  collectionObservable: _collectionObservable.collectionObservable,
-  observableCollection: _collectionObservable.collectionObservable,
-  compare: _collectionObservable.compare,
-  configure: _configure2.default,
-  settings: _configure.settings,
-  EventWatcher: _eventWatcher2.default,
-  Factory: _factory2.default,
-  RECUSIVE_AUTO_INJECT: true,
-  injectViewModels: _inject.injectViewModels,
-  Observable: _observable2.default,
-  observable: _observable.observable,
-  Statistics: _statistics2.default,
-  Store: _store2.default,
-  utils: _utils2.default,
-  ViewModel: _viewModel2.default,
-  viewModel: _viewModel.viewModel
-}; /*
-     knockback.js 1.2.2
-     Copyright (c)  2011-2016 Kevin Malakoff.
-     License: MIT (http://www.opensource.org/licenses/mit-license.php)
-     Source: https://github.com/kmalakoff/knockback
-     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-   */
-
-_kb2.default.assign(_kb2.default, api);
-
-module.exports = _kb2.default;
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /* WEBPACK VAR INJECTION */(function(global) {
 module.exports = (typeof self === 'object' && self.self === self && self) ||
   (typeof global === 'object' && global.global === global && global) ||
@@ -885,7 +786,7 @@ module.exports = (typeof self === 'object' && self.self === self && self) ||
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -913,11 +814,11 @@ var _backbone = __webpack_require__(3);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -1524,7 +1425,7 @@ var collectionObservable = exports.collectionObservable = function collectionObs
 };
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1591,7 +1492,7 @@ exports.default = function () {
 };
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1614,7 +1515,7 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -1715,7 +1616,7 @@ var Factory = function () {
 exports.default = Factory;
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1730,15 +1631,15 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _windowOrGlobal = __webpack_require__(6);
+var _windowOrGlobal = __webpack_require__(5);
 
 var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -1942,19 +1843,19 @@ if (_windowOrGlobal2.default && typeof _windowOrGlobal2.default.document !== 'un
 }
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _ = __webpack_require__(5);
+var _kb = __webpack_require__(1);
 
-var _2 = _interopRequireDefault(_);
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -1980,7 +1881,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
     var target = _extend.apply(this, args);
 
     // release the extended observable
-    if (target !== this && _2.default.isReleaseable(this)) {
+    if (target !== this && _kb2.default.isReleaseable(this)) {
       var _dispose = target.dispose;
       target.dispose = function () {
         for (var _len2 = arguments.length, args2 = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
@@ -1988,7 +1889,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
         }
 
         !_dispose || _dispose.apply(target, args2);
-        return _2.default.release(_this);
+        return _kb2.default.release(_this);
       };
     }
 
@@ -1997,7 +1898,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
 }
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2021,11 +1922,11 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -2263,7 +2164,7 @@ var observable = exports.observable = function observable() {
 };
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2448,7 +2349,7 @@ var Statistics = function () {
 exports.default = Statistics;
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2471,11 +2372,11 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -2861,7 +2762,7 @@ Store.instances = [];
 exports.default = Store;
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2888,23 +2789,23 @@ var _backbone = __webpack_require__(3);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _wrappedDestroy = __webpack_require__(19);
+var _wrappedDestroy = __webpack_require__(18);
 
 var _wrappedDestroy2 = _interopRequireDefault(_wrappedDestroy);
 
-var _collapseOptions = __webpack_require__(17);
+var _collapseOptions = __webpack_require__(16);
 
 var _collapseOptions2 = _interopRequireDefault(_collapseOptions);
 
-var _unwrapModels = __webpack_require__(18);
+var _unwrapModels = __webpack_require__(17);
 
 var _unwrapModels2 = _interopRequireDefault(_unwrapModels);
 
@@ -3250,7 +3151,7 @@ utils.unwrapModels = _unwrapModels2.default;
 exports.default = utils;
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3278,11 +3179,11 @@ var _backbone = __webpack_require__(3);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _kb = __webpack_require__(2);
+var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
@@ -3570,7 +3471,7 @@ var viewModel = exports.viewModel = function viewModel() {
 };
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3667,7 +3568,7 @@ exports.default = function (options) {
 };
 
 /***/ }),
-/* 18 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3710,7 +3611,7 @@ exports.default = function (obj) {
    */
 
 /***/ }),
-/* 19 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3763,6 +3664,105 @@ var wrappedDestroy = function wrappedDestroy(obj) {
 exports.default = wrappedDestroy;
 
 /***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _underscore = __webpack_require__(0);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _backbone = __webpack_require__(3);
+
+var _backbone2 = _interopRequireDefault(_backbone);
+
+var _knockout = __webpack_require__(2);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+__webpack_require__(10);
+
+var _kb = __webpack_require__(1);
+
+var _kb2 = _interopRequireDefault(_kb);
+
+var _collectionObservable = __webpack_require__(6);
+
+var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
+
+var _configure = __webpack_require__(7);
+
+var _configure2 = _interopRequireDefault(_configure);
+
+var _eventWatcher = __webpack_require__(4);
+
+var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
+
+var _factory = __webpack_require__(8);
+
+var _factory2 = _interopRequireDefault(_factory);
+
+var _inject = __webpack_require__(9);
+
+var _observable = __webpack_require__(11);
+
+var _observable2 = _interopRequireDefault(_observable);
+
+var _statistics = __webpack_require__(12);
+
+var _statistics2 = _interopRequireDefault(_statistics);
+
+var _store = __webpack_require__(13);
+
+var _store2 = _interopRequireDefault(_store);
+
+var _utils = __webpack_require__(14);
+
+var _utils2 = _interopRequireDefault(_utils);
+
+var _viewModel = __webpack_require__(15);
+
+var _viewModel2 = _interopRequireDefault(_viewModel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var api = {
+  _: _underscore2.default,
+  Backbone: _backbone2.default,
+  ko: _knockout2.default,
+  CollectionObservable: _collectionObservable2.default,
+  collectionObservable: _collectionObservable.collectionObservable,
+  observableCollection: _collectionObservable.collectionObservable,
+  compare: _collectionObservable.compare,
+  configure: _configure2.default,
+  settings: _configure.settings,
+  EventWatcher: _eventWatcher2.default,
+  Factory: _factory2.default,
+  RECUSIVE_AUTO_INJECT: true,
+  injectViewModels: _inject.injectViewModels,
+  Observable: _observable2.default,
+  observable: _observable.observable,
+  Statistics: _statistics2.default,
+  Store: _store2.default,
+  utils: _utils2.default,
+  ViewModel: _viewModel2.default,
+  viewModel: _viewModel.viewModel
+}; /*
+     knockback.js 1.2.2
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
+
+_kb2.default.assign(_kb2.default, api);
+
+module.exports = _kb2.default;
+
+/***/ }),
 /* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3786,13 +3786,13 @@ var _underscore = __webpack_require__(0);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _knockout = __webpack_require__(1);
+var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _2 = __webpack_require__(5);
+var _kb = __webpack_require__(1);
 
-var _3 = _interopRequireDefault(_2);
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3814,9 +3814,9 @@ var TypedValue = function () {
       var previous_value = this.__kb_value;
       if (previous_value) {
         this.__kb_value = null;
-        if (this.create_options.store && _3.default.utils.wrappedCreator(previous_value)) {
+        if (this.create_options.store && _kb2.default.utils.wrappedCreator(previous_value)) {
           this.create_options.store.release(previous_value);
-        } else _3.default.release(previous_value);
+        } else _kb2.default.release(previous_value);
       }
       this.create_options = null;
     }
@@ -3833,7 +3833,7 @@ var TypedValue = function () {
   }, {
     key: 'valueType',
     value: function valueType(model, key) {
-      var new_value = _3.default.getValue(model, key);
+      var new_value = _kb2.default.getValue(model, key);
       this.value_type || this._updateValueObservable(new_value); // create so we can check the type
       return this.value_type;
     }
@@ -3844,7 +3844,7 @@ var TypedValue = function () {
 
       // determine the new type
       new_value !== undefined || (new_value = null); // ensure null instead of undefined
-      var new_type = _3.default.utils.valueType(new_value);
+      var new_type = _kb2.default.utils.valueType(new_value);
 
       if (this.__kb_value && this.__kb_value.__kb_released) {
         this.__kb_value = undefined;this.value_type = undefined;
@@ -3852,19 +3852,19 @@ var TypedValue = function () {
       var value = this.__kb_value;
 
       switch (this.value_type) {
-        case _3.default.TYPE_COLLECTION:
-          if (this.value_type === _3.default.TYPE_COLLECTION && new_type === _3.default.TYPE_ARRAY) return value(new_value);
-          if (new_type === _3.default.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
+        case _kb2.default.TYPE_COLLECTION:
+          if (this.value_type === _kb2.default.TYPE_COLLECTION && new_type === _kb2.default.TYPE_ARRAY) return value(new_value);
+          if (new_type === _kb2.default.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
             // use the provided CollectionObservable
-            if (new_value && new_value instanceof _3.default.CollectionObservable) this._updateValueObservable(_3.default.utils.wrappedObject(new_value), new_value);else if (_3.default.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
+            if (new_value && new_value instanceof _kb2.default.CollectionObservable) this._updateValueObservable(_kb2.default.utils.wrappedObject(new_value), new_value);else if (_kb2.default.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
             return undefined;
           }
           break;
 
-        case _3.default.TYPE_MODEL:
-          if (new_type === _3.default.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
+        case _kb2.default.TYPE_MODEL:
+          if (new_type === _kb2.default.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
             // use the provided ViewModel
-            if (new_value && !_3.default.isModel(new_value)) this._updateValueObservable(_3.default.utils.wrappedObject(new_value), new_value);else if (_3.default.utils.wrappedObject(value) !== _3.default.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
+            if (new_value && !_kb2.default.isModel(new_value)) this._updateValueObservable(_kb2.default.utils.wrappedObject(new_value), new_value);else if (_kb2.default.utils.wrappedObject(value) !== _kb2.default.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
             return undefined;
           }
           break;
@@ -3873,8 +3873,8 @@ var TypedValue = function () {
       }
 
       if (this.value_type === new_type && !_underscore2.default.isUndefined(this.value_type)) {
-        if (_3.default.peek(value) !== new_value) return value(new_value);
-      } else if (_3.default.peek(value) !== new_value) return this._updateValueObservable(new_value);
+        if (_kb2.default.peek(value) !== new_value) return value(new_value);
+      } else if (_kb2.default.peek(value) !== new_value) return this._updateValueObservable(new_value);
       return undefined;
     }
   }, {
@@ -3882,15 +3882,15 @@ var TypedValue = function () {
     value: function _updateValueObservable(new_value, new_observable) {
       var create_options = this.create_options;
 
-      var creator = _3.default.utils.inferCreator(new_value, create_options.factory, create_options.path);
+      var creator = _kb2.default.utils.inferCreator(new_value, create_options.factory, create_options.path);
 
       // retain previous type
       if (new_value === null && !creator) {
-        if (this.value_type === _3.default.TYPE_MODEL) creator = _3.default.ViewModel;else if (this.value_type === _3.default.TYPE_COLLECTION) creator = _3.default.CollectionObservable;
+        if (this.value_type === _kb2.default.TYPE_MODEL) creator = _kb2.default.ViewModel;else if (this.value_type === _kb2.default.TYPE_COLLECTION) creator = _kb2.default.CollectionObservable;
       }
       create_options.creator = creator;
 
-      var value_type = _3.default.TYPE_UNKNOWN;
+      var value_type = _kb2.default.TYPE_UNKNOWN;
       var previous_value = this.__kb_value;
       this.__kb_value = undefined;
 
@@ -3906,30 +3906,30 @@ var TypedValue = function () {
 
         // create manually
         else if (creator.models_only) {
-            value = new_value;value_type = _3.default.TYPE_SIMPLE;
+            value = new_value;value_type = _kb2.default.TYPE_SIMPLE;
           } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
 
         // create and cache the type
       } else if (_underscore2.default.isArray(new_value)) {
-        value_type = _3.default.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
+        value_type = _kb2.default.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
       } else {
-        value_type = _3.default.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
+        value_type = _kb2.default.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
       }
 
       // determine the type
       this.value_type = value_type;
-      if (value_type === _3.default.TYPE_UNKNOWN) {
+      if (value_type === _kb2.default.TYPE_UNKNOWN) {
         // a view model, recognize view_models as non-observable
         if (!_knockout2.default.isObservable(value)) {
-          this.value_type = _3.default.TYPE_MODEL;_3.default.utils.wrappedObject(value, _3.default.utils.resolveModel(new_value));
+          this.value_type = _kb2.default.TYPE_MODEL;_kb2.default.utils.wrappedObject(value, _kb2.default.utils.resolveModel(new_value));
         } else if (value.__kb_is_co) {
-          this.value_type = _3.default.TYPE_COLLECTION;_3.default.utils.wrappedObject(value, new_value);
-        } else if (!this.value_type) this.value_type = _3.default.TYPE_SIMPLE;
+          this.value_type = _kb2.default.TYPE_COLLECTION;_kb2.default.utils.wrappedObject(value, new_value);
+        } else if (!this.value_type) this.value_type = _kb2.default.TYPE_SIMPLE;
       }
 
       // release previous
       if (previous_value) {
-        this.create_options.store ? this.create_options.store.release(previous_value) : _3.default.release(previous_value);
+        this.create_options.store ? this.create_options.store.release(previous_value) : _kb2.default.release(previous_value);
       }
 
       // store the value

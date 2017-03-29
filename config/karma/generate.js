@@ -14,12 +14,12 @@ const TEST_GROUPS = require('../test_groups');
 
 module.exports = async () => {
   // install knockback
-  fs.removeSync('node_modules/knockback', true);
-  await new Promise((resolve, reject) =>
-    gulp.src(['./knockback.js', './package.json'])
-      .pipe(gulp.dest('node_modules/knockback'))
-      .on('error', reject).on('end', resolve),
-  );
+  // fs.removeSync('node_modules/knockback', true);
+  // await new Promise((resolve, reject) =>
+  //   gulp.src(['./knockback.js', './package.json'])
+  //     .pipe(gulp.dest('node_modules/knockback'))
+  //     .on('error', reject).on('end', resolve),
+  // );
 
   const configPaths = glob.sync('**/*.webpack.config.js', { cwd: path.join(__dirname, '..', 'builds', 'test'), absolute: true });
   for (const configPath of configPaths) {
@@ -60,6 +60,6 @@ module.exports = async () => {
     );
   }
 
-  // uninstall knockback
-  fs.removeSync('node_modules/knockback', true);
+  // // uninstall knockback
+  // fs.removeSync('node_modules/knockback', true);
 };
