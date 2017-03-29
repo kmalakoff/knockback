@@ -1,8 +1,7 @@
 {
-  "name": "knockback",
+  "name": "knockback-packager",
   "version": "1.2.2",
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
-  "main": "knockback.js",
   "author": {
     "name": "Kevin Malakoff",
     "url": "https://github.com/kmalakoff"
@@ -73,6 +72,7 @@
     "karma-requirejs": "*",
     "karma-safari-launcher": "*",
     "karma-spec-reporter": "*",
+    "lerna": "2.0.0-beta.38",
     "mocha": "*",
     "moment": "*",
     "nuget": "*",
