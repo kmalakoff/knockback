@@ -1,6 +1,7 @@
 .DS_Store
 npm-debug.log
 *.map
+*.log
 
 node_modules/
 doc/

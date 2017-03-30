@@ -1,6 +1,6 @@
 const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
-let kb = root.kb; kb = kb || (r ? require('knockback') : undefined);
+const kb = root.kb || (r ? require('@knockback/knockback-core') : undefined);
 
 const exports = { LocaleManager: require('./lib/locale_manager') };
 

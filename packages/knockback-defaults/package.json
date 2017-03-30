@@ -1,5 +1,5 @@
 {
-  "name": "knockback-defaults",
+  "name": "@knockback/knockback-defaults",
   "version": "2.0.0-alpha.1",
   "description": "Provides defaults extensions for Knockback.js",
   "main": "dist/knockback-defaults.js",
@@ -28,6 +28,6 @@
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
     "knockout": ">=2.1.0",
-    "knockback": "^2.0.0-alpha.1"
+    "@knockback/knockback-core": "^2.0.0-alpha.1"
   }
 }

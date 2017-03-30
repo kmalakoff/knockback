@@ -1,5 +1,6 @@
 {
-  "name": "knockback-packager",
+  "name": "knockback-monorepo",
+  "private": true,
   "version": "1.2.2",
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "author": {
@@ -15,7 +16,6 @@
     "knockout",
     "knockoutjs"
   ],
-  "private": true,
   "url": "http://kmalakoff.github.com/knockback/",
   "homepage": "http://kmalakoff.github.com/knockback/",
   "repository": {
@@ -29,11 +29,6 @@
     "lint": "eslint src/ test/ config/",
     "lint-fix": "eslint src/ test/ config/ --fix",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
-  },
-  "dependencies": {
-    "backbone": ">=0.5.1",
-    "knockout": ">=2.1.0",
-    "underscore": ">=1.1.7"
   },
   "devDependencies": {
     "babel-cli": "^6.24.0",
@@ -80,14 +75,11 @@
     "moment": "*",
     "nuget": "*",
     "requirejs": "*",
-    "webpack": "*",
-    "window-or-global": "*"
+    "webpack": "*"
   },
   "optionalDependencies": {
-    "backbone-relational": "*",
-    "backbone-modelref": "*",
-    "lodash": "*",
     "backbone-orm": "*",
-    "backbone-associations": "*"
+    "backbone-modelref": "*",
+    "lodash": "*"
   }
 }
