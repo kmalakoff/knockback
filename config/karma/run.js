@@ -10,7 +10,7 @@ const TEST_GROUPS = require('../test_groups');
 
 module.exports = async () => {
   fs.removeSync('./_temp', true);
-  fs.removeSync('node_modules/knockback', true);
+  // fs.removeSync('node_modules/knockback', true);
 
   try {
     await generate();
@@ -34,5 +34,5 @@ module.exports = async () => {
     }
 
     fs.removeSync('./_temp', true);
-  } catch (err) { /**/ }
+  } catch (err) { console.error(err); }
 };

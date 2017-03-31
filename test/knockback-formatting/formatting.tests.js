@@ -2,11 +2,11 @@ const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
-const kb = root.kb || (r ? require('@knockback/knockback-core') : undefined);
+const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
-if (kb && !kb.FormattedObservable && r) require('@knockback/knockback-formatting');
+if (kb && !kb.FormattedObservable && r) require('@knockback/formatting');
 
 describe('formatted-observable', () => {
   it('TEST DEPENDENCY MISSING', () => {
