@@ -17,4 +17,4 @@ const api = {
 };
 kb.assign(kb, api);
 
-module.exports = kb;
+module.exports = api;

@@ -1,10 +1,10 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("backbone"), require("underscore"), require("knockback"));
+		module.exports = factory(require("backbone"), require("underscore"), require("@knockback/core"));
 	else if(typeof define === 'function' && define.amd)
-		define(["backbone", "underscore", "knockback"], factory);
+		define(["backbone", "underscore", "@knockback/core"], factory);
 	else if(typeof exports === 'object')
-		exports["kba"] = factory(require("backbone"), require("underscore"), require("knockback"));
+		exports["kba"] = factory(require("backbone"), require("underscore"), require("@knockback/core"));
 	else
 		root["kba"] = factory(root["Backbone"], root["_"], root["kb"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) {

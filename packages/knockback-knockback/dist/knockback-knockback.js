@@ -4512,7 +4512,7 @@ var api = {
 };
 _core2.default.assign(_core2.default, api);
 
-module.exports = _core2.default;
+module.exports = api;
 
 /***/ }),
 /* 9 */
@@ -4549,7 +4549,7 @@ var api = {
 };
 _core2.default.assign(_core2.default, api);
 
-module.exports = _core2.default;
+module.exports = api;
 
 /***/ }),
 /* 10 */
@@ -4584,7 +4584,7 @@ var api = {
 };
 _core2.default.assign(_core2.default, api);
 
-module.exports = _core2.default;
+module.exports = api;
 
 /***/ }),
 /* 11 */
@@ -4629,7 +4629,7 @@ var api = {
 };
 _core2.default.assign(_core2.default, api);
 
-module.exports = _core2.default;
+module.exports = api;
 
 /***/ }),
 /* 12 */

@@ -2,12 +2,13 @@ const r = typeof require !== 'undefined';
 const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
-const kb = root.kb || (r ? require('@knockback/core') : undefined);
+let kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
 if (Backbone && !Backbone.ModelRef && r) require('backbone-modelref');
 if (kb && !kb.LocalizedObservable && r) require('@knockback/localization');
+if (kb && !kb.utils.setToDefault && r) require('@knockback/defaults');
 
 let Globalize = root.Globalize;
 if (!Globalize) {

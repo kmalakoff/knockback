@@ -16,6 +16,6 @@ module.exports = {
     { underscore: { root: '_', amd: 'underscore', commonjs: 'underscore', commonjs2: 'underscore' } },
     { backbone: { root: 'Backbone', amd: 'backbone', commonjs: 'backbone', commonjs2: 'backbone' } },
     { knockout: { root: 'ko', amd: 'knockout', commonjs: 'knockout', commonjs2: 'knockout' } },
-    { knockback: { root: 'kb', amd: 'knockback', commonjs: 'knockback', commonjs2: 'knockback' } },
+    { '@knockback/core': { root: 'kb', amd: '@knockback/core', commonjs: '@knockback/core', commonjs2: '@knockback/core' } },
   ],
 };

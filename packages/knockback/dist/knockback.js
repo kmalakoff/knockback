@@ -4668,7 +4668,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       };
       _core2.default.assign(_core2.default, api);
 
-      module.exports = _core2.default;
+      module.exports = api;
 
       /***/
     },
@@ -4707,7 +4707,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       };
       _core2.default.assign(_core2.default, api);
 
-      module.exports = _core2.default;
+      module.exports = api;
 
       /***/
     },
@@ -4744,7 +4744,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       };
       _core2.default.assign(_core2.default, api);
 
-      module.exports = _core2.default;
+      module.exports = api;
 
       /***/
     },
@@ -4791,7 +4791,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       };
       _core2.default.assign(_core2.default, api);
 
-      module.exports = _core2.default;
+      module.exports = api;
 
       /***/
     },
