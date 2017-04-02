@@ -1597,61 +1597,22 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       });
       exports.settings = undefined;
 
-      var _underscore = __webpack_require__(0);
+      var _kb = __webpack_require__(1);
 
-      var _underscore2 = _interopRequireDefault(_underscore);
+      var _kb2 = _interopRequireDefault(_kb);
 
       function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : { default: obj };
       }
 
-      // import BackboneAssociations from './orms/backbone-associations';
-      // import BackboneRelational from './orms/backbone-relational';
-
-      var ALL_ORMS = {
-        default: null
-      };
-
       // @nodoc
-      var settings = exports.settings = { orm: ALL_ORMS.default };
-      for (var key in ALL_ORMS) {
-        if (Object.prototype.hasOwnProperty.call(ALL_ORMS, key)) {
-          var value = ALL_ORMS[key];
-          if (value && value.isAvailable()) {
-            settings.orm = value;
-            break;
-          }
-        }
-      }
+      var settings = exports.settings = { orm: null };
 
       // @nodoc
 
       exports.default = function () {
         var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-        _underscore2.default.each(options, function (value, key) {
-          switch (key) {
-            case 'orm':
-              // set by name
-              if (_underscore2.default.isString(value)) {
-                if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, value)) {
-                  typeof console === 'undefined' || console.log('Knockback configure: could not find orm: ' + value + '. Available: ' + _underscore2.default.keys(ALL_ORMS).join(', '));
-                  return;
-                }
-
-                var orm = ALL_ORMS[value];
-                if (orm && !orm.isAvailable()) {
-                  typeof console === 'undefined' || console.log('Knockback configure: could not enable orm ' + value + '. Make sure it is included before Knockback');
-                  return;
-                }
-                settings.orm = orm;
-              } else settings.orm = value;
-              break;
-
-            default:
-              settings[key] = value;break;
-          }
-        });
+        return _kb2.default.assign(settings, options);
       };
 
       /***/
@@ -4286,10 +4247,6 @@ exports.default = valid;
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        knockback.js 2.0.0-alpha.1
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Copyright (c)  2011-2016 Kevin Malakoff.
@@ -4315,24 +4272,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var AssociatedModel = null; // lazy bind so this file can be loaded before relational library
-
 // @nodoc
-
-var BackboneAssociations = function () {
+module.exports = function () {
   function BackboneAssociations() {
     _classCallCheck(this, BackboneAssociations);
   }
 
   _createClass(BackboneAssociations, null, [{
-    key: 'isAvailable',
-    value: function isAvailable() {
-      return !!(AssociatedModel = _backbone2.default ? _backbone2.default.AssociatedModel : null);
-    }
-  }, {
     key: 'keys',
     value: function keys(model) {
-      if (!(model instanceof AssociatedModel)) return null;
+      if (!_backbone2.default.AssociatedModel || !(model instanceof _backbone2.default.AssociatedModel)) return null;
       return _underscore2.default.map(model.relations, function (x) {
         return x.key;
       });
@@ -4340,7 +4289,7 @@ var BackboneAssociations = function () {
   }, {
     key: 'relationType',
     value: function relationType(model, key) {
-      if (!(model instanceof AssociatedModel)) return null;
+      if (!_backbone2.default.AssociatedModel || !(model instanceof _backbone2.default.AssociatedModel)) return null;
       var relation = _underscore2.default.find(model.relations, function (x) {
         return x.key === key;
       });
@@ -4352,18 +4301,12 @@ var BackboneAssociations = function () {
   return BackboneAssociations;
 }();
 
-exports.default = BackboneAssociations;
-
 /***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }(); /*
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        knockback.js 2.0.0-alpha.1
@@ -4390,24 +4333,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var RelationalModel = null; // lazy bind so this file can be loaded before relational library
-
 // @nodoc
-
-var BackboneRelational = function () {
+module.exports = function () {
   function BackboneRelational() {
     _classCallCheck(this, BackboneRelational);
   }
 
   _createClass(BackboneRelational, null, [{
-    key: 'isAvailable',
-    value: function isAvailable() {
-      return !!(RelationalModel = _backbone2.default ? _backbone2.default.RelationalModel : null);
-    }
-  }, {
     key: 'relationType',
     value: function relationType(model, key) {
-      if (!(model instanceof RelationalModel)) return null;
+      if (!_backbone2.default.RelationalModel || !(model instanceof _backbone2.default.RelationalModel)) return null;
       var relation = _underscore2.default.find(model.getRelations(), function (test) {
         return test.key === key;
       });
@@ -4441,8 +4376,6 @@ var BackboneRelational = function () {
 
   return BackboneRelational;
 }();
-
-exports.default = BackboneRelational;
 
 /***/ }),
 /* 7 */

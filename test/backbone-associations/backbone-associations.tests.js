@@ -7,6 +7,7 @@ const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
 if (Backbone && !Backbone.Associations && r) require('backbone-associations');
+const kba = root.kba || (r ? require('@knockback/backbone-associations') : undefined);
 
 describe('Knockback.js with Backbone-Associations.js', () => {
   it('TEST DEPENDENCY MISSING', () => {
@@ -15,7 +16,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Backbone.Associations, 'Backbone.Associations');
-    kb.configure({ orm: 'backbone-associations' });
+    kb.configure({ orm: kba });
   });
 
   if (!Backbone || !Backbone.Associations) return;
@@ -854,6 +855,6 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: null }));
 });
 

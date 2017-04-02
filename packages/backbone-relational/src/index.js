@@ -12,14 +12,10 @@ import Backbone from 'backbone';
 
 import kb from '@knockback/core';
 
-let RelationalModel = null; // lazy bind so this file can be loaded before relational library
-
 // @nodoc
-export default class BackboneRelational {
-  static isAvailable() { return !!(RelationalModel = Backbone ? Backbone.RelationalModel : null); }
-
+module.exports = class BackboneRelational {
   static relationType(model, key) {
-    if (!(model instanceof RelationalModel)) return null;
+    if (!Backbone.RelationalModel || !(model instanceof Backbone.RelationalModel)) return null;
     const relation = _.find(model.getRelations(), test => test.key === key);
     if (!relation) return null;
     return (relation.collectionType || _.isArray(relation.keyContents)) ? kb.TYPE_COLLECTION : kb.TYPE_MODEL;

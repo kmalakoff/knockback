@@ -17,7 +17,7 @@ describe('Knockback.js with BackboneORM', () => {
     assert.ok(!!kb, 'kb');
     assert.ok(!!kb, 'kb');
     assert.ok(!!BackboneORM, 'BackboneORM');
-    kb.configure({ orm: 'backbone-orm' }); kb.configure({ orm: 'default' });
+    kb.configure({ orm: null });
   });
 
   BackboneORM.configure({ model_cache: { enabled: true, max: 100 } });
@@ -969,5 +969,5 @@ describe('Knockback.js with BackboneORM', () => {
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
 
-  it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: null }));
 });

@@ -7,11 +7,12 @@ const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
 if (Backbone && !Backbone.Relational && r) require('backbone-relational');
+const kbr = root.kbr || (r ? require('@knockback/backbone-relational') : undefined);
 
 describe('Knockback.js with Backbone-Relational.js', () => {
   beforeEach(() => {
     if (!Backbone || !Backbone.Relational) return;
-    !Backbone.Relational || Backbone.Relational.store.reset();
+    Backbone.Relational.store = new Backbone.Store();
     if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
 
     root.Person = Backbone.RelationalModel.extend({
@@ -62,7 +63,7 @@ describe('Knockback.js with Backbone-Relational.js', () => {
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Backbone.Relational, 'Backbone.Relational');
-    kb.configure({ orm: 'backbone-relational' });
+    kb.configure({ orm: kbr });
   });
 
   it('1. Model with HasMany relations: A house with multiple people living in it', () => {
@@ -1113,5 +1114,5 @@ describe('Knockback.js with Backbone-Relational.js', () => {
   //   assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
   //   done()
 
-  it('CLEANUP', () => kb.configure({ orm: 'default' }));
+  it('CLEANUP', () => kb.configure({ orm: null }));
 });

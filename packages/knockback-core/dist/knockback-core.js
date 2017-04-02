@@ -1450,59 +1450,20 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.settings = undefined;
 
-var _underscore = __webpack_require__(0);
+var _kb = __webpack_require__(1);
 
-var _underscore2 = _interopRequireDefault(_underscore);
+var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import BackboneAssociations from './orms/backbone-associations';
-// import BackboneRelational from './orms/backbone-relational';
-
-var ALL_ORMS = {
-  default: null
-};
-
 // @nodoc
-var settings = exports.settings = { orm: ALL_ORMS.default };
-for (var key in ALL_ORMS) {
-  if (Object.prototype.hasOwnProperty.call(ALL_ORMS, key)) {
-    var value = ALL_ORMS[key];
-    if (value && value.isAvailable()) {
-      settings.orm = value;
-      break;
-    }
-  }
-}
+var settings = exports.settings = { orm: null };
 
 // @nodoc
 
 exports.default = function () {
   var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-  _underscore2.default.each(options, function (value, key) {
-    switch (key) {
-      case 'orm':
-        // set by name
-        if (_underscore2.default.isString(value)) {
-          if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, value)) {
-            typeof console === 'undefined' || console.log('Knockback configure: could not find orm: ' + value + '. Available: ' + _underscore2.default.keys(ALL_ORMS).join(', '));
-            return;
-          }
-
-          var orm = ALL_ORMS[value];
-          if (orm && !orm.isAvailable()) {
-            typeof console === 'undefined' || console.log('Knockback configure: could not enable orm ' + value + '. Make sure it is included before Knockback');
-            return;
-          }
-          settings.orm = orm;
-        } else settings.orm = value;
-        break;
-
-      default:
-        settings[key] = value;break;
-    }
-  });
+  return _kb2.default.assign(settings, options);
 };
 
 /***/ }),
