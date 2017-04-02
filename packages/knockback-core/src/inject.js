@@ -9,9 +9,10 @@
 
 import _ from 'underscore';
 import ko from 'knockout';
-import root from 'window-or-global';
 
 import kb from './kb';
+
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 // custom Knockout `inject` binding
 const inject = (data, view_model, element, value_accessor, all_bindings_accessor, nested) => {

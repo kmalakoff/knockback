@@ -24,11 +24,15 @@ const HEADER = (module.exports = `\
 `);
 
 gulp.task('build', async () => {
+  const BUILD_ORDER = ['knockback-knockback.js', 'knockback.js'];
+  const sort = x => (x.output.filename === 'knockback-core.js') ? -2 : BUILD_ORDER.indexOf(x.output.filename);
+
   const configPaths = glob.sync('**/webpack.config.js', { cwd: path.join(__dirname, 'packages'), ignore: '**/node_modules/**', absolute: true });
-  for (const configPath of configPaths) {
-    console.log('configPath', configPath);
+  const configs = _.sortBy(configPaths.map(x => require(x)), sort); // build in specific order
+
+  for (const config of configs) {
     await new Promise((resolve, reject) => {
-      webpack(require(configPath), (err, stats) => {
+      webpack(config, (err, stats) => {
         if (err) return reject(err);
 
         console.log(stats.toString({}));

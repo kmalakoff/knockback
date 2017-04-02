@@ -10,7 +10,8 @@
 import _ from 'underscore';
 import Backbone from 'backbone';
 import ko from 'knockout';
-import root from 'window-or-global';
+
+const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 

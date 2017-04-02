@@ -73,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 18);
+/******/ 	return __webpack_require__(__webpack_require__.s = 19);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -87,7 +87,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -114,15 +114,13 @@ var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _windowOrGlobal = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"window-or-global\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-
-var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
 var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
 
@@ -353,12 +351,12 @@ var kb = function () {
     value: function renderTemplate(template, view_model) {
       var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-      if (!_windowOrGlobal2.default.document) {
+      if (!root.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
         return undefined;
       }
 
-      var el = _windowOrGlobal2.default.document.createElement('div');
+      var el = root.document.createElement('div');
       var observable = _knockout2.default.renderTemplate(template, view_model, options, el, 'replaceChildren');
 
       // do not return the template wrapper if possible
@@ -389,7 +387,7 @@ var kb = function () {
   }, {
     key: 'applyBindings',
     value: function applyBindings(view_model, node) {
-      if (!_windowOrGlobal2.default.document) {
+      if (!root.document) {
         typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
         return undefined;
       }
@@ -397,7 +395,7 @@ var kb = function () {
       if (node.length) {
         // convert to a root element
         var children = node;
-        node = _windowOrGlobal2.default.document.createElement('div');
+        node = root.document.createElement('div');
         _underscore2.default.each(children, function (child) {
           return node.appendChild(child);
         });
@@ -494,6 +492,7 @@ kb.TYPE_COLLECTION = 4;
 kb.assign = _underscore2.default.assign || _underscore2.default.extend;
 kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.dependencyDetection.ignore ? _knockout2.default.dependencyDetection.ignore : _ignore;
 exports.default = kb;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 2 */
@@ -775,6 +774,33 @@ var emitterObservable = exports.emitterObservable = function emitterObservable(e
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1413,7 +1439,7 @@ var collectionObservable = exports.collectionObservable = function collectionObs
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1480,7 +1506,7 @@ exports.default = function () {
 };
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1604,11 +1630,11 @@ var Factory = function () {
 exports.default = Factory;
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
+/* WEBPACK VAR INJECTION */(function(global) {
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1623,15 +1649,13 @@ var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _windowOrGlobal = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"window-or-global\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
-
-var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
-
 var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
 // custom Knockout `inject` binding
 /*
@@ -1781,7 +1805,7 @@ var doBind = function doBind(app) {
 // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
 // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
 var injectViewModels = exports.injectViewModels = function injectViewModels() {
-  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _windowOrGlobal2.default.document;
+  var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
 
   var results = [];
   if (!el.__kb_injected) {
@@ -1820,18 +1844,19 @@ _knockout2.default.applyBindings = function () {
 // ############################
 // Auto Inject results
 // ############################
-if (_windowOrGlobal2.default && typeof _windowOrGlobal2.default.document !== 'undefined') {
+if (root && typeof root.document !== 'undefined') {
   // use simple ready check
   var onReady = function onReady() {
     // keep waiting for the document to load
-    if (_windowOrGlobal2.default.document.readyState !== 'complete') return setTimeout(onReady, 0);
+    if (root.document.readyState !== 'complete') return setTimeout(onReady, 0);
     return injectViewModels(); // the document is loaded
   };
   onReady();
 }
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1886,7 +1911,7 @@ if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _kn
 }
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1918,7 +1943,7 @@ var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _typedValue = __webpack_require__(19);
+var _typedValue = __webpack_require__(20);
 
 var _typedValue2 = _interopRequireDefault(_typedValue);
 
@@ -2152,7 +2177,7 @@ var observable = exports.observable = function observable() {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2337,7 +2362,7 @@ var Statistics = function () {
 exports.default = Statistics;
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2750,7 +2775,7 @@ Store.instances = [];
 exports.default = Store;
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2785,15 +2810,15 @@ var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _wrappedDestroy = __webpack_require__(17);
+var _wrappedDestroy = __webpack_require__(18);
 
 var _wrappedDestroy2 = _interopRequireDefault(_wrappedDestroy);
 
-var _collapseOptions = __webpack_require__(15);
+var _collapseOptions = __webpack_require__(16);
 
 var _collapseOptions2 = _interopRequireDefault(_collapseOptions);
 
-var _unwrapModels = __webpack_require__(16);
+var _unwrapModels = __webpack_require__(17);
 
 var _unwrapModels2 = _interopRequireDefault(_unwrapModels);
 
@@ -3139,7 +3164,7 @@ utils.unwrapModels = _unwrapModels2.default;
 exports.default = utils;
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3459,7 +3484,7 @@ var viewModel = exports.viewModel = function viewModel() {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3556,7 +3581,7 @@ exports.default = function (options) {
 };
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3599,7 +3624,7 @@ exports.default = function (obj) {
    */
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3652,7 +3677,7 @@ var wrappedDestroy = function wrappedDestroy(obj) {
 exports.default = wrappedDestroy;
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3670,17 +3695,17 @@ var _knockout = __webpack_require__(2);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-__webpack_require__(9);
+__webpack_require__(10);
 
 var _kb = __webpack_require__(1);
 
 var _kb2 = _interopRequireDefault(_kb);
 
-var _collectionObservable = __webpack_require__(5);
+var _collectionObservable = __webpack_require__(6);
 
 var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
 
-var _configure = __webpack_require__(6);
+var _configure = __webpack_require__(7);
 
 var _configure2 = _interopRequireDefault(_configure);
 
@@ -3688,29 +3713,29 @@ var _eventWatcher = __webpack_require__(4);
 
 var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
 
-var _factory = __webpack_require__(7);
+var _factory = __webpack_require__(8);
 
 var _factory2 = _interopRequireDefault(_factory);
 
-var _inject = __webpack_require__(8);
+var _inject = __webpack_require__(9);
 
-var _observable = __webpack_require__(10);
+var _observable = __webpack_require__(11);
 
 var _observable2 = _interopRequireDefault(_observable);
 
-var _statistics = __webpack_require__(11);
+var _statistics = __webpack_require__(12);
 
 var _statistics2 = _interopRequireDefault(_statistics);
 
-var _store = __webpack_require__(12);
+var _store = __webpack_require__(13);
 
 var _store2 = _interopRequireDefault(_store);
 
-var _utils = __webpack_require__(13);
+var _utils = __webpack_require__(14);
 
 var _utils2 = _interopRequireDefault(_utils);
 
-var _viewModel = __webpack_require__(14);
+var _viewModel = __webpack_require__(15);
 
 var _viewModel2 = _interopRequireDefault(_viewModel);
 
@@ -3751,7 +3776,7 @@ _kb2.default.assign(_kb2.default, api);
 module.exports = _kb2.default;
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

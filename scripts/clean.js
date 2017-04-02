@@ -32,10 +32,10 @@ const run = async (cmd, args, options = {}) => {
       }
 
       const GENERATED_FOLDER = ['node_modules', 'dist'];
-      for (folder of GENERATED_FOLDER) {
+      for (const folder of GENERATED_FOLDER) {
         const packageModules = path.resolve(path.join(pkg.path, folder));
         if (fs.existsSync(packageModules)) {
-          console.log(`Removing modules ${fs.existsSync(packageModules)} ${packageModules} ${path.relative(path.join(__dirname, '..'), packageModules)}`);
+          console.log(`Removing directory ${packageModules}`);
           await run('rm', ['-rf', packageModules]);
         }
       }

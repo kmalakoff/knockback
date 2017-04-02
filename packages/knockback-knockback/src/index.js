@@ -7,19 +7,19 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-import * as associations from '@knockback/associations';
-import * as relational from '@knockback/relational';
 import * as core from '@knockback/core';
-import * as defaults from '@knockback/defaults';
-import * as formatting from '@knockback/formatting';
-import * as localization from '@knockback/localization';
-import * as triggering from '@knockback/triggering';
-import * as validation from '@knockback/validation';
+import * as associations from '@knockback/backbone-associations/src/index';
+import * as relational from '@knockback/backbone-relational/src/index';
+import * as defaults from '@knockback/defaults/src/index';
+import * as formatting from '@knockback/formatting/src/index';
+import * as localization from '@knockback/localization/src/index';
+import * as triggering from '@knockback/triggering/src/index';
+import * as validation from '@knockback/validation/src/index';
 
 const api = {
+  core,
   associations,
   relational,
-  core,
   defaults,
   formatting,
   localization,

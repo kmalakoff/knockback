@@ -203,433 +203,435 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
+      /* WEBPACK VAR INJECTION */
+      (function (global) {
 
-      Object.defineProperty(exports, "__esModule", {
-        value: true
-      });
+        Object.defineProperty(exports, "__esModule", {
+          value: true
+        });
 
-      var _createClass = function () {
-        function defineProperties(target, props) {
-          for (var i = 0; i < props.length; i++) {
-            var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+        var _createClass = function () {
+          function defineProperties(target, props) {
+            for (var i = 0; i < props.length; i++) {
+              var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+            }
+          }return function (Constructor, protoProps, staticProps) {
+            if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+          };
+        }(); /*
+               knockback.js 2.0.0-alpha.1
+               Copyright (c)  2011-2016 Kevin Malakoff.
+               License: MIT (http://www.opensource.org/licenses/mit-license.php)
+               Source: https://github.com/kmalakoff/knockback
+               Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+               Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+             */
+
+        var _underscore = __webpack_require__(0);
+
+        var _underscore2 = _interopRequireDefault(_underscore);
+
+        var _backbone = __webpack_require__(3);
+
+        var _backbone2 = _interopRequireDefault(_backbone);
+
+        var _knockout = __webpack_require__(2);
+
+        var _knockout2 = _interopRequireDefault(_knockout);
+
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
+
+        function _toConsumableArray(arr) {
+          if (Array.isArray(arr)) {
+            for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+              arr2[i] = arr[i];
+            }return arr2;
+          } else {
+            return Array.from(arr);
           }
-        }return function (Constructor, protoProps, staticProps) {
-          if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+        }
+
+        function _classCallCheck(instance, Constructor) {
+          if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+          }
+        }
+
+        var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
+
+        var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
+
+        var _ignore = function _ignore(callback, callbackTarget, callbackArgs) {
+          var value = null;
+          _knockout2.default.computed(function () {
+            value = callback.apply(callbackTarget, callbackArgs || []);
+          }).dispose();
+          return value;
         };
-      }(); /*
-             knockback.js 2.0.0-alpha.1
-             Copyright (c)  2011-2016 Kevin Malakoff.
-             License: MIT (http://www.opensource.org/licenses/mit-license.php)
-             Source: https://github.com/kmalakoff/knockback
-             Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-             Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-           */
 
-      var _underscore = __webpack_require__(0);
+        // The 'kb' namespace for classes, factory functions, constants, etc.
+        //
+        // @method .configure(options)
+        //   Method to update Knockback global configuration.
+        //   @param [Object] configuration options.
+        // 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational)
+        // 2) deep_retain - true to multiply retain view models in the store
+        //
+        // @method .collectionObservable(collection, options)
+        //   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
+        //   @param [Collection] collection the collection to observe (can be null)
+        //   @param [Object] options the create options
+        //   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
+        //
+        // @method .observable(model, options, view_model)
+        //   Factory to create a new kb.Observable. See {kb.Observable#constructor} for information on options
+        //   @param [Model] model the model to observe (can be null)
+        //   @param [String|Array|Object] options the create options. String is a single attribute name, Array is an array of attribute names.
+        //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+        //
+        // @method .viewModel(model, options, view_model)
+        //   Factory to create a new kb.ViewModel. See {kb.ViewModel#constructor} for information on options
+        //   @param [Model|ModelRef] model the model to observe (can be null)
+        //   @param [Object] options the create options
+        //   @return [ko.observable] the constructor returns 'this'
+        //
+        // @method .defaultObservable(target, default_value)
+        //   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options.
+        //   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
+        //   @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
+        //   @param [Any] default_value the default value. Can be a value, string or ko.observable
+        //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+        //
+        // @method .formattedObservable(format, arg1, arg2, etc)
+        //   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options.
+        //   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
+        //   @param [String|ko.observable] format the format string.
+        //   Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
+        //   @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
+        //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
+        //
+        // @method .localizedObservable(value, options, view_model)
+        //   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options.
+        //   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
+        //   @param [Data|ko.observable] value the value to localize
+        //   @param [Object] options the create options
+        //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
 
-      var _underscore2 = _interopRequireDefault(_underscore);
-
-      var _backbone = __webpack_require__(3);
-
-      var _backbone2 = _interopRequireDefault(_backbone);
-
-      var _knockout = __webpack_require__(2);
-
-      var _knockout2 = _interopRequireDefault(_knockout);
-
-      var _windowOrGlobal = __webpack_require__(5);
-
-      var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
-
-      function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : { default: obj };
-      }
-
-      function _toConsumableArray(arr) {
-        if (Array.isArray(arr)) {
-          for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
-            arr2[i] = arr[i];
-          }return arr2;
-        } else {
-          return Array.from(arr);
-        }
-      }
-
-      function _classCallCheck(instance, Constructor) {
-        if (!(instance instanceof Constructor)) {
-          throw new TypeError("Cannot call a class as a function");
-        }
-      }
-
-      var LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'];
-
-      var _ignore = function _ignore(callback, callbackTarget, callbackArgs) {
-        var value = null;
-        _knockout2.default.computed(function () {
-          value = callback.apply(callbackTarget, callbackArgs || []);
-        }).dispose();
-        return value;
-      };
-
-      // The 'kb' namespace for classes, factory functions, constants, etc.
-      //
-      // @method .configure(options)
-      //   Method to update Knockback global configuration.
-      //   @param [Object] configuration options.
-      // 1) orm - select the library for relationships (default, backbone-orm, backbone-associations, backbone-relational)
-      // 2) deep_retain - true to multiply retain view models in the store
-      //
-      // @method .collectionObservable(collection, options)
-      //   Factory to create a new kb.CollectionObservable. See {kb.CollectionObservable#constructor} for information on options
-      //   @param [Collection] collection the collection to observe (can be null)
-      //   @param [Object] options the create options
-      //   @return [ko.observableArray] the constructor does not return 'this' but a ko.observableArray
-      //
-      // @method .observable(model, options, view_model)
-      //   Factory to create a new kb.Observable. See {kb.Observable#constructor} for information on options
-      //   @param [Model] model the model to observe (can be null)
-      //   @param [String|Array|Object] options the create options. String is a single attribute name, Array is an array of attribute names.
-      //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-      //
-      // @method .viewModel(model, options, view_model)
-      //   Factory to create a new kb.ViewModel. See {kb.ViewModel#constructor} for information on options
-      //   @param [Model|ModelRef] model the model to observe (can be null)
-      //   @param [Object] options the create options
-      //   @return [ko.observable] the constructor returns 'this'
-      //
-      // @method .defaultObservable(target, default_value)
-      //   Factory to create a new kb.DefaultObservable. See {kb.DefaultObservable#constructor} for information on options.
-      //   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-defaults component.
-      //   @param [ko.observable] target_observable the observable to check for null, undefined, or the empty string
-      //   @param [Any] default_value the default value. Can be a value, string or ko.observable
-      //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-      //
-      // @method .formattedObservable(format, arg1, arg2, etc)
-      //   Factory to create a new kb.FormattedObservable. See {kb.FormattedObservable#constructor} for information on options.
-      //   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-formatting component.
-      //   @param [String|ko.observable] format the format string.
-      //   Format: `"{0} and {1}"` where `{0}` and `{1}` would be synchronized with the arguments (eg. "Bob and Carol" where `{0}` is Bob and `{1}` is Carol)
-      //   @param [Array] args arguments to be passed to the kb.LocaleManager's get() method
-      //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-      //
-      // @method .localizedObservable(value, options, view_model)
-      //   Factory to create a new kb.LocalizedObservable. See {kb.LocalizedObservable#constructor} for information on options.
-      //   If you are using knockback-core or knockback-core-stack, you can include this from the lib/knockback-localization component.
-      //   @param [Data|ko.observable] value the value to localize
-      //   @param [Object] options the create options
-      //   @return [ko.observable] the constructor does not return 'this' but a ko.observable
-
-      var kb = function () {
-        function kb() {
-          _classCallCheck(this, kb);
-        }
-
-        _createClass(kb, null, [{
-          key: 'wasReleased',
-
-          // Checks if an object has been released.
-          // @param [Any] obj the object to release and also release its keys
-
-
-          // cache local reference to underscore
-
-          // Stored value type is a Model -> observable type: ViewModel
-
-          // Stored value type is simple like a String or Number -> observable type: ko.observable
-
-          // Knockback library semantic version
-          value: function wasReleased(obj) {
-            return !obj || obj.__kb_released;
+        var kb = function () {
+          function kb() {
+            _classCallCheck(this, kb);
           }
 
-          // Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.
-          // @param [Any] obj the object to release and also release its keys
+          _createClass(kb, null, [{
+            key: 'wasReleased',
+
+            // Checks if an object has been released.
+            // @param [Any] obj the object to release and also release its keys
 
 
-          // cache local reference to Knockout
+            // cache local reference to underscore
 
-          // Stored value type is a Collection -> observable type: kb.CollectionObservable
+            // Stored value type is a Model -> observable type: ViewModel
 
-          // Stored value type is an Array -> observable type: ko.observableArray
+            // Stored value type is simple like a String or Number -> observable type: ko.observable
 
-
-          // ###################################
-          // OBSERVABLE STORAGE TYPES
-          // ###################################
-
-          // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
-
-        }, {
-          key: 'isReleaseable',
-          value: function isReleaseable(obj, depth) {
-            if (depth == null) {
-              depth = 0;
-            }
-            if (!obj || obj !== Object(obj) || obj.__kb_released) return false; // must be an object and not already released
-            if (_knockout2.default.isObservable(obj) || obj instanceof kb.ViewModel) return true; // a known type that is releasable
-            if (typeof obj === 'function' || kb.isModel(obj) || kb.isCollection(obj)) return false; // a known type that is not releaseable
-            for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
-              var method = LIFECYCLE_METHODS[i];
-              if (typeof obj[method] === 'function') return true;
+            // Knockback library semantic version
+            value: function wasReleased(obj) {
+              return !obj || obj.__kb_released;
             }
 
-            if (depth > 0) return false; // max depth check for ViewModel inside of ViewModel
-            for (var key in obj) {
-              if (Object.prototype.hasOwnProperty.call(obj, key)) {
-                var value = obj[key];
-                if (key !== '__kb' && kb.isReleaseable(value, depth + 1)) return true;
+            // Checks if an object can be released. Used to perform minimal nested releasing on objects by checking if self or next level contained items can be released.
+            // @param [Any] obj the object to release and also release its keys
+
+
+            // cache local reference to Knockout
+
+            // Stored value type is a Collection -> observable type: kb.CollectionObservable
+
+            // Stored value type is an Array -> observable type: ko.observableArray
+
+
+            // ###################################
+            // OBSERVABLE STORAGE TYPES
+            // ###################################
+
+            // Stored value type is not known like null/undefined (could be observed as a Model or a Collection or a simple type)
+
+          }, {
+            key: 'isReleaseable',
+            value: function isReleaseable(obj, depth) {
+              if (depth == null) {
+                depth = 0;
               }
-            }
-            return false;
-          }
+              if (!obj || obj !== Object(obj) || obj.__kb_released) return false; // must be an object and not already released
+              if (_knockout2.default.isObservable(obj) || obj instanceof kb.ViewModel) return true; // a known type that is releasable
+              if (typeof obj === 'function' || kb.isModel(obj) || kb.isCollection(obj)) return false; // a known type that is not releaseable
+              for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+                var method = LIFECYCLE_METHODS[i];
+                if (typeof obj[method] === 'function') return true;
+              }
 
-          // Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
-          // @param [Any] obj the object to release and also release its keys
-          //
-          // @example
-          //   var view_model = kb.viewModel(model);
-          //   kb.release(view_model); view_model = null;
-          // @example
-          //   var todos = kb.collectionObservable(collection);
-          //   kb.release(todos); todos = null;
-
-        }, {
-          key: 'release',
-          value: function release(obj) {
-            if (!kb.isReleaseable(obj)) return;
-            obj.__kb_released = true; // mark as released
-
-            // release array's items
-            if (_underscore2.default.isArray(obj)) {
-              _underscore2.default.each(obj, function (value, index) {
-                if (kb.isReleaseable(value)) {
-                  obj[index] = null;kb.release(value);
+              if (depth > 0) return false; // max depth check for ViewModel inside of ViewModel
+              for (var key in obj) {
+                if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                  var value = obj[key];
+                  if (key !== '__kb' && kb.isReleaseable(value, depth + 1)) return true;
                 }
-              });
-              return;
+              }
+              return false;
             }
 
-            // observable or lifecycle managed
-            var array = kb.peek(obj);
-            if (_knockout2.default.isObservable(obj) && _underscore2.default.isArray(array)) {
-              if (obj.__kb_is_co || obj.__kb_is_o && obj.valueType() === kb.TYPE_COLLECTION) {
-                if (typeof obj.destroy === 'function') obj.destroy();
+            // Releases any type of view model or observable or items in an array using the conventions of release(), destroy(), dispose().
+            // @param [Any] obj the object to release and also release its keys
+            //
+            // @example
+            //   var view_model = kb.viewModel(model);
+            //   kb.release(view_model); view_model = null;
+            // @example
+            //   var todos = kb.collectionObservable(collection);
+            //   kb.release(todos); todos = null;
+
+          }, {
+            key: 'release',
+            value: function release(obj) {
+              if (!kb.isReleaseable(obj)) return;
+              obj.__kb_released = true; // mark as released
+
+              // release array's items
+              if (_underscore2.default.isArray(obj)) {
+                _underscore2.default.each(obj, function (value, index) {
+                  if (kb.isReleaseable(value)) {
+                    obj[index] = null;kb.release(value);
+                  }
+                });
                 return;
               }
-              _underscore2.default.each(array, function (value, index) {
-                if (kb.isReleaseable(value)) {
-                  array[index] = null;kb.release(value);
-                }
-              });
-              if (typeof obj.dispose === 'function') {
-                obj.dispose();
-              }
-              return;
-            }
 
-            // releaseable signature
-            for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
-              var method = LIFECYCLE_METHODS[i];
-              if (typeof obj[method] === 'function') {
-                obj[method].call(obj);
+              // observable or lifecycle managed
+              var array = kb.peek(obj);
+              if (_knockout2.default.isObservable(obj) && _underscore2.default.isArray(array)) {
+                if (obj.__kb_is_co || obj.__kb_is_o && obj.valueType() === kb.TYPE_COLLECTION) {
+                  if (typeof obj.destroy === 'function') obj.destroy();
+                  return;
+                }
+                _underscore2.default.each(array, function (value, index) {
+                  if (kb.isReleaseable(value)) {
+                    array[index] = null;kb.release(value);
+                  }
+                });
+                if (typeof obj.dispose === 'function') {
+                  obj.dispose();
+                }
                 return;
               }
-            }
 
-            if (!_knockout2.default.isObservable(obj)) this.releaseKeys(obj); // view model
-          }
-
-          // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
-
-        }, {
-          key: 'releaseKeys',
-          value: function releaseKeys(obj) {
-            _underscore2.default.each(obj, function (value, key) {
-              if (key !== '__kb' && kb.isReleaseable(value)) {
-                obj[key] = null;
-                kb.release(value);
+              // releaseable signature
+              for (var i = 0, l = LIFECYCLE_METHODS.length; i < l; i++) {
+                var method = LIFECYCLE_METHODS[i];
+                if (typeof obj[method] === 'function') {
+                  obj[method].call(obj);
+                  return;
+                }
               }
-            });
-          }
 
-          // Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
-          // ```
-          // ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );
-          // ```
-          // @example The hard way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
-          //   var el = $('<div data-bind="name: name"></div>')[0];
-          //   var view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}));
-          //   ko.applyBindings(view_model, el);
-          //   kb.releaseOnNodeRemove(view_model, el);
-          //   ...
-          //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-
-        }, {
-          key: 'releaseOnNodeRemove',
-          value: function releaseOnNodeRemove(view_model, node) {
-            view_model || kb._throwUnexpected(this, 'missing view model');
-            node || kb._throwUnexpected(this, 'missing node');
-            return _knockout2.default.utils.domNodeDisposal.addDisposeCallback(node, function () {
-              return kb.release(view_model);
-            });
-          }
-
-          // Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
-          //
-          // NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options,
-          // afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
-          //
-          // @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
-          //   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
-          //   ...
-          //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-
-        }, {
-          key: 'renderTemplate',
-          value: function renderTemplate(template, view_model) {
-            var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-            if (!_windowOrGlobal2.default.document) {
-              typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
-              return undefined;
+              if (!_knockout2.default.isObservable(obj)) this.releaseKeys(obj); // view model
             }
 
-            var el = _windowOrGlobal2.default.document.createElement('div');
-            var observable = _knockout2.default.renderTemplate(template, view_model, options, el, 'replaceChildren');
+            // Releases and clears all of the keys on an object using the conventions of release(), destroy(), dispose() without releasing the top level object itself.
 
-            // do not return the template wrapper if possible
-            if (el.childNodes.length === 1) el = el.childNodes[0];else if (el.childNodes.length) {
-              for (var i = 0, end = el.childNodes.length, asc = end >= 0; asc ? i <= end : i >= end; asc ? i++ : i--) {
-                // ensure the context is passed up to wrapper from a child
-                try {
-                  _knockout2.default.storedBindingContextForNode(el, _knockout2.default.contextFor(el.childNodes[i]));
-                  break;
-                } catch (err) {/**/}
-              }
-            }
-            kb.releaseOnNodeRemove(view_model, el);
-            observable.dispose(); // we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
-
-            if (view_model.afterRender && !options.afterRender) view_model.afterRender(el); // call afterRender for custom setup unless provided in options (so doesn't get double called)
-            return el;
-          }
-
-          // Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
-          //
-          // @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
-          //   var el = $('<div data-bind="name: name"></div>')[0];
-          //   kb.applyBindings(kb.viewModel(new Backbone.Model({name: 'Bob'})), el);
-          //   ...
-          //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
-
-        }, {
-          key: 'applyBindings',
-          value: function applyBindings(view_model, node) {
-            if (!_windowOrGlobal2.default.document) {
-              typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
-              return undefined;
-            }
-
-            if (node.length) {
-              // convert to a root element
-              var children = node;
-              node = _windowOrGlobal2.default.document.createElement('div');
-              _underscore2.default.each(children, function (child) {
-                return node.appendChild(child);
+          }, {
+            key: 'releaseKeys',
+            value: function releaseKeys(obj) {
+              _underscore2.default.each(obj, function (value, key) {
+                if (key !== '__kb' && kb.isReleaseable(value)) {
+                  obj[key] = null;
+                  kb.release(value);
+                }
               });
             }
-            _knockout2.default.applyBindings(view_model, node);
-            kb.releaseOnNodeRemove(view_model, node);
-            return node;
-          }
-        }, {
-          key: 'getValue',
-          value: function getValue(model, key, args) {
-            if (!model) return undefined;
-            if (!args) return model.get(key);
-            return model.get.apply(model, _toConsumableArray(_underscore2.default.map([key].concat(args), function (value) {
-              return kb.peek(value);
-            })));
-          }
-        }, {
-          key: 'setValue',
-          value: function setValue(model, key, value) {
-            var attributes = void 0;
-            if (!model) return undefined;
-            (attributes = {})[key] = value;
-            return model.set(attributes);
-          }
 
-          // ###################################
-          // INTERNAL HELPERS
-          // ###################################
-          // @nodoc
+            // Binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+            // ```
+            // ko.utils.domNodeDisposal.addDisposeCallback(node, function() { kb.release(view_model)} );
+            // ```
+            // @example The hard way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+            //   var el = $('<div data-bind="name: name"></div>')[0];
+            //   var view_model = kb.viewModel(new Backbone.Model({name: 'Bob'}));
+            //   ko.applyBindings(view_model, el);
+            //   kb.releaseOnNodeRemove(view_model, el);
+            //   ...
+            //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
 
-        }, {
-          key: '_throwMissing',
-          value: function _throwMissing(instance, message) {
-            throw new Error((_underscore2.default.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is missing');
-          }
+          }, {
+            key: 'releaseOnNodeRemove',
+            value: function releaseOnNodeRemove(view_model, node) {
+              view_model || kb._throwUnexpected(this, 'missing view model');
+              node || kb._throwUnexpected(this, 'missing node');
+              return _knockout2.default.utils.domNodeDisposal.addDisposeCallback(node, function () {
+                return kb.release(view_model);
+              });
+            }
 
-          // @nodoc
+            // Renders a template and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+            //
+            // NOTE: if you provide an afterRender method on the View Model and do not provide afterRender in the options,
+            // afterRender will be called with the following signature: afterRender(element) which differs from the Knockout signture of afterRender(elements)
+            //
+            // @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+            //   var el = kb.renderTemplate('my_template', kb.viewModel(new Backbone.Model({name: 'Bob'})));
+            //   ...
+            //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
 
-        }, {
-          key: '_throwUnexpected',
-          value: function _throwUnexpected(instance, message) {
-            throw new Error((_underscore2.default.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is unexpected');
-          }
+          }, {
+            key: 'renderTemplate',
+            value: function renderTemplate(template, view_model) {
+              var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-          // @nodoc
+              if (!root.document) {
+                typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
+                return undefined;
+              }
 
-        }, {
-          key: 'publishMethods',
-          value: function publishMethods(observable, instance, methods) {
-            _underscore2.default.each(methods, function (fn) {
-              observable[fn] = kb._.bind(instance[fn], instance);
-            });
-          }
+              var el = root.document.createElement('div');
+              var observable = _knockout2.default.renderTemplate(template, view_model, options, el, 'replaceChildren');
 
-          // @nodoc
+              // do not return the template wrapper if possible
+              if (el.childNodes.length === 1) el = el.childNodes[0];else if (el.childNodes.length) {
+                for (var i = 0, end = el.childNodes.length, asc = end >= 0; asc ? i <= end : i >= end; asc ? i++ : i--) {
+                  // ensure the context is passed up to wrapper from a child
+                  try {
+                    _knockout2.default.storedBindingContextForNode(el, _knockout2.default.contextFor(el.childNodes[i]));
+                    break;
+                  } catch (err) {/**/}
+                }
+              }
+              kb.releaseOnNodeRemove(view_model, el);
+              observable.dispose(); // we will handle memory management with ko.removeNode (otherwise creates memory leak on default bound dispose function)
 
-        }, {
-          key: 'peek',
-          value: function peek(obs) {
-            if (!_knockout2.default.isObservable(obs)) return obs;
-            if (obs.peek) return obs.peek();
-            return kb.ignore(function () {
-              return obs();
-            });
-          }
+              if (view_model.afterRender && !options.afterRender) view_model.afterRender(el); // call afterRender for custom setup unless provided in options (so doesn't get double called)
+              return el;
+            }
 
-          // @nodoc
+            // Applies bindings and binds a callback to the node that releases the view model when the node is removed using ko.removeNode.
+            //
+            // @example The easy way to set up automatic calling of 'kb.release(view_model)' when the bound element is released.
+            //   var el = $('<div data-bind="name: name"></div>')[0];
+            //   kb.applyBindings(kb.viewModel(new Backbone.Model({name: 'Bob'})), el);
+            //   ...
+            //   ko.removeNode(el); // removes el from the DOM and calls kb.release(view_model)
 
-        }, {
-          key: 'isModel',
-          value: function isModel(obj) {
-            return obj && (obj instanceof _backbone2.default.Model || typeof obj.get === 'function' && typeof obj.bind === 'function');
-          }
+          }, {
+            key: 'applyBindings',
+            value: function applyBindings(view_model, node) {
+              if (!root.document) {
+                typeof console === 'undefined' || console.log('renderTemplate: document is undefined');
+                return undefined;
+              }
 
-          // @nodoc
+              if (node.length) {
+                // convert to a root element
+                var children = node;
+                node = root.document.createElement('div');
+                _underscore2.default.each(children, function (child) {
+                  return node.appendChild(child);
+                });
+              }
+              _knockout2.default.applyBindings(view_model, node);
+              kb.releaseOnNodeRemove(view_model, node);
+              return node;
+            }
+          }, {
+            key: 'getValue',
+            value: function getValue(model, key, args) {
+              if (!model) return undefined;
+              if (!args) return model.get(key);
+              return model.get.apply(model, _toConsumableArray(_underscore2.default.map([key].concat(args), function (value) {
+                return kb.peek(value);
+              })));
+            }
+          }, {
+            key: 'setValue',
+            value: function setValue(model, key, value) {
+              var attributes = void 0;
+              if (!model) return undefined;
+              (attributes = {})[key] = value;
+              return model.set(attributes);
+            }
 
-        }, {
-          key: 'isCollection',
-          value: function isCollection(obj) {
-            return obj && obj instanceof _backbone2.default.Collection;
-          }
-        }]);
+            // ###################################
+            // INTERNAL HELPERS
+            // ###################################
+            // @nodoc
 
-        return kb;
-      }();
+          }, {
+            key: '_throwMissing',
+            value: function _throwMissing(instance, message) {
+              throw new Error((_underscore2.default.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is missing');
+            }
 
-      kb.VERSION = '2.0.0-alpha.1';
-      kb.TYPE_UNKNOWN = 0;
-      kb.TYPE_SIMPLE = 1;
-      kb.TYPE_ARRAY = 2;
-      kb.TYPE_MODEL = 3;
-      kb.TYPE_COLLECTION = 4;
-      kb.assign = _underscore2.default.assign || _underscore2.default.extend;
-      kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.dependencyDetection.ignore ? _knockout2.default.dependencyDetection.ignore : _ignore;
-      exports.default = kb;
+            // @nodoc
+
+          }, {
+            key: '_throwUnexpected',
+            value: function _throwUnexpected(instance, message) {
+              throw new Error((_underscore2.default.isString(instance) ? instance : instance.constructor.name) + ': ' + message + ' is unexpected');
+            }
+
+            // @nodoc
+
+          }, {
+            key: 'publishMethods',
+            value: function publishMethods(observable, instance, methods) {
+              _underscore2.default.each(methods, function (fn) {
+                observable[fn] = kb._.bind(instance[fn], instance);
+              });
+            }
+
+            // @nodoc
+
+          }, {
+            key: 'peek',
+            value: function peek(obs) {
+              if (!_knockout2.default.isObservable(obs)) return obs;
+              if (obs.peek) return obs.peek();
+              return kb.ignore(function () {
+                return obs();
+              });
+            }
+
+            // @nodoc
+
+          }, {
+            key: 'isModel',
+            value: function isModel(obj) {
+              return obj && (obj instanceof _backbone2.default.Model || typeof obj.get === 'function' && typeof obj.bind === 'function');
+            }
+
+            // @nodoc
+
+          }, {
+            key: 'isCollection',
+            value: function isCollection(obj) {
+              return obj && obj instanceof _backbone2.default.Collection;
+            }
+          }]);
+
+          return kb;
+        }();
+
+        kb.VERSION = '2.0.0-alpha.1';
+        kb.TYPE_UNKNOWN = 0;
+        kb.TYPE_SIMPLE = 1;
+        kb.TYPE_ARRAY = 2;
+        kb.TYPE_MODEL = 3;
+        kb.TYPE_COLLECTION = 4;
+        kb.assign = _underscore2.default.assign || _underscore2.default.extend;
+        kb.ignore = _knockout2.default.dependencyDetection && _knockout2.default.dependencyDetection.ignore ? _knockout2.default.dependencyDetection.ignore : _ignore;
+        exports.default = kb;
+        /* WEBPACK VAR INJECTION */
+      }).call(exports, __webpack_require__(5));
 
       /***/
     },
@@ -927,15 +929,28 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       /***/
     },
     /* 5 */
-    /***/function (module, exports, __webpack_require__) {
+    /***/function (module, exports) {
 
-      "use strict";
-      /* WEBPACK VAR INJECTION */
-      (function (global) {
-        module.exports = (typeof self === 'undefined' ? 'undefined' : _typeof(self)) === 'object' && self.self === self && self || (typeof global === 'undefined' ? 'undefined' : _typeof(global)) === 'object' && global.global === global && global || this;
+      var g;
 
-        /* WEBPACK VAR INJECTION */
-      }).call(exports, __webpack_require__(21));
+      // This works in non-strict mode
+      g = function () {
+        return this;
+      }();
+
+      try {
+        // This works if eval is allowed (see CSP)
+        g = g || Function("return this")() || (1, eval)("this");
+      } catch (e) {
+        // This works if the window reference is available
+        if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === "object") g = window;
+      }
+
+      // g can still be undefined, but nothing to do about it...
+      // We return undefined, instead of nothing here, so it's
+      // easier to handle this case. if(!global) { ...}
+
+      module.exports = g;
 
       /***/
     },
@@ -1801,228 +1816,230 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
+      /* WEBPACK VAR INJECTION */
+      (function (global) {
 
-      Object.defineProperty(exports, "__esModule", {
-        value: true
-      });
-      exports.injectViewModels = undefined;
+        Object.defineProperty(exports, "__esModule", {
+          value: true
+        });
+        exports.injectViewModels = undefined;
 
-      var _underscore = __webpack_require__(0);
+        var _underscore = __webpack_require__(0);
 
-      var _underscore2 = _interopRequireDefault(_underscore);
+        var _underscore2 = _interopRequireDefault(_underscore);
 
-      var _knockout = __webpack_require__(2);
+        var _knockout = __webpack_require__(2);
 
-      var _knockout2 = _interopRequireDefault(_knockout);
+        var _knockout2 = _interopRequireDefault(_knockout);
 
-      var _windowOrGlobal = __webpack_require__(5);
+        var _kb = __webpack_require__(1);
 
-      var _windowOrGlobal2 = _interopRequireDefault(_windowOrGlobal);
+        var _kb2 = _interopRequireDefault(_kb);
 
-      var _kb = __webpack_require__(1);
+        function _interopRequireDefault(obj) {
+          return obj && obj.__esModule ? obj : { default: obj };
+        }
 
-      var _kb2 = _interopRequireDefault(_kb);
+        var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : undefined;
 
-      function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : { default: obj };
-      }
+        // custom Knockout `inject` binding
+        /*
+          knockback.js 2.0.0-alpha.1
+          Copyright (c)  2011-2016 Kevin Malakoff.
+          License: MIT (http://www.opensource.org/licenses/mit-license.php)
+          Source: https://github.com/kmalakoff/knockback
+          Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+          Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+        */
 
-      // custom Knockout `inject` binding
-      /*
-        knockback.js 2.0.0-alpha.1
-        Copyright (c)  2011-2016 Kevin Malakoff.
-        License: MIT (http://www.opensource.org/licenses/mit-license.php)
-        Source: https://github.com/kmalakoff/knockback
-        Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-      */
-
-      var inject = function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
-        var doInject = function doInject(value) {
-          if (_underscore2.default.isFunction(value)) {
-            view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
-            _kb2.default.releaseOnNodeRemove(view_model, element);
-          } else {
-            // view_model constructor causes a scope change
-            if (value.view_model) {
-              // specifying a view_model changes the scope so we need to bind a destroy
-              view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
+        var inject = function inject(data, view_model, element, value_accessor, all_bindings_accessor, nested) {
+          var doInject = function doInject(value) {
+            if (_underscore2.default.isFunction(value)) {
+              view_model = new value(view_model, element, value_accessor, all_bindings_accessor); // use 'new' to allow for classes in addition to functions
               _kb2.default.releaseOnNodeRemove(view_model, element);
+            } else {
+              // view_model constructor causes a scope change
+              if (value.view_model) {
+                // specifying a view_model changes the scope so we need to bind a destroy
+                view_model = new value.view_model(view_model, element, value_accessor, all_bindings_accessor);
+                _kb2.default.releaseOnNodeRemove(view_model, element);
+              }
+
+              // resolve and merge in each key
+              _underscore2.default.each(value, function (item, key) {
+                if (key === 'view_model') return;
+
+                // create function
+                if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
+
+                // resolve nested with assign or not
+                else if (_underscore2.default.isObject(item) && !_underscore2.default.isFunction(item)) {
+                    var target = nested || item && item.create ? {} : view_model;
+                    view_model[key] = inject(item, target, element, value_accessor, all_bindings_accessor, true);
+
+                    // simple set
+                  } else view_model[key] = item;
+              });
             }
 
-            // resolve and merge in each key
-            _underscore2.default.each(value, function (item, key) {
-              if (key === 'view_model') return;
+            return view_model;
+          };
 
-              // create function
-              if (key === 'create') item(view_model, element, value_accessor, all_bindings_accessor);
+          // in recursive calls, we are already protected from propagating dependencies to the template
+          return nested ? doInject(data) : _kb2.default.ignore(function () {
+            return doInject(data);
+          });
+        };
 
-              // resolve nested with assign or not
-              else if (_underscore2.default.isObject(item) && !_underscore2.default.isFunction(item)) {
-                  var target = nested || item && item.create ? {} : view_model;
-                  view_model[key] = inject(item, target, element, value_accessor, all_bindings_accessor, true);
+        _knockout2.default.bindingHandlers.inject = {
+          init: function init(element, value_accessor, all_bindings_accessor, view_model) {
+            return inject(_knockout2.default.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
+          }
+        };
 
-                  // simple set
-                } else view_model[key] = item;
+        // Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
+        //
+        // * `'view_model'` class used to create a new ViewModel instance
+        // * `'create'` function used to manually add observables to a view model
+        // * `'options'` to pass to ko.applyBindings
+        // * `'afterBinding'` callback (can alternatively be in the options)
+        // * `'beforeBinding'` callback (can alternatively be in the options)
+        //
+        // Each function/constructor gets called with the following signature `'function(view_model, element)'`.
+        //
+        // @example Bind your application automatically when the DOM is loaded.
+        //   <div kb-inject><span data-bind="text: 'Hello World!'"></span></div>
+        // @example Bind your application with properties.
+        //   <div kb-inject="message: ko.observable('Hello World!')"><input data-bind="value: message"></input></div>
+        // @example Bind your application creating a specific ViewModel instance when the DOM is loaded.
+        //   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
+        //   var MyViewModel = function(view_model, el) {
+        //     this.message = ko.observable('Hello World!');
+        //   }
+        // @example Bind your application using a function when the DOM is loaded (like Angular.js controllers).
+        //   <div kb-inject="create: MyController"><input data-bind="value: message"></input></div>
+        //   var MyController = function(view_model, el) {
+        //     view_model.message = ko.observable('Hello World!');
+        //   }
+        // @example Bind your application with a specific ViewModel instance and a callback before and after the binding.
+        //   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
+        //   var MyViewModel = function(view_model, el) {
+        //     this.message = ko.observable('Hello World!');
+        //     this.beforeBinding = function() {alert('before'); };
+        //     this.afterBinding = function() {alert('after'); };
+        //   }
+        // @example Dynamically inject new properties into your ViewModel.
+        //   <div kb-inject="MyViewModel">
+        //     <div class="control-group" data-bind="inject: {site: ko.observable('http://your.url.com')}">
+        //       <label>Website</label>
+        //       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+        //     </div>
+        //   </div>
+        //   var MyViewModel = function(view_model, el) {
+        //     // site will be dynamically attached to this ViewModel
+        //   }
+        // @example Dynamically bind a form.
+        //   <div kb-inject="MyViewModel">
+        //      <form name="my_form" data-bind="inject: kb.formValidator">
+        //        <div class="control-group">
+        //         <label>Name</label>
+        //         <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
+        //       </div>
+        //       <div class="control-group">
+        //         <label>Website</label>
+        //         <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
+        //       </div>
+        //     </form>
+        //   </div>
+        //   var MyViewModel = kb.ViewModel.extend({
+        //     constructor: ->
+        //       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
+        //       kb.ViewModel.prototype.constructor.call(this, model);
+        //   });
+
+        var doBind = function doBind(app) {
+          var options = {};
+          var afterBinding = null;
+          var beforeBinding = null;
+
+          // evaluate the app data
+          var expression = app.binding;
+          if (expression) {
+            !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
+            var data = new Function('', 'return ( ' + expression + ' )')() || {};
+            if (data.options) {
+              options = data.options;delete data.options;
+            }
+            app.view_model = inject(data, app.view_model, app.el, null, null, true);
+            afterBinding = app.view_model.afterBinding || options.afterBinding;
+            beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
+          }
+
+          // auto-bind
+          if (beforeBinding) {
+            beforeBinding.call(app.view_model, app.view_model, app.el, options);
+          }
+          _kb2.default.applyBindings(app.view_model, app.el, options);
+          if (afterBinding) {
+            afterBinding.call(app.view_model, app.view_model, app.el, options);
+          }
+        };
+
+        // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
+        // Also, used with the data-bind `'inject'` custom binding.
+        // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
+        // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
+        var injectViewModels = exports.injectViewModels = function injectViewModels() {
+          var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : root.document;
+
+          var results = [];
+          if (!el.__kb_injected) {
+            // already injected -> skip, but still process children in case they were added afterwards
+            var attr = _underscore2.default.find(el.attributes || [], function (x) {
+              return x.name === 'kb-inject';
             });
+            if (attr) {
+              el.__kb_injected = true; // mark injected
+              var app = { el: el, view_model: {}, binding: attr.value };
+              doBind(app);
+              results.push(app);
+            }
           }
-
-          return view_model;
+          _underscore2.default.each(el.childNodes, function (child) {
+            var childResults = injectViewModels(child);
+            if (childResults.length) _underscore2.default.each(childResults, function (x) {
+              return results.push(x);
+            });
+          });
+          return results;
         };
 
-        // in recursive calls, we are already protected from propagating dependencies to the template
-        return nested ? doInject(data) : _kb2.default.ignore(function () {
-          return doInject(data);
-        });
-      };
-
-      _knockout2.default.bindingHandlers.inject = {
-        init: function init(element, value_accessor, all_bindings_accessor, view_model) {
-          return inject(_knockout2.default.utils.unwrapObservable(value_accessor()), view_model, element, value_accessor, all_bindings_accessor);
-        }
-      };
-
-      // Used to inject ViewModels and observables dynamically from your HTML Views. For both the `'kb-inject'` attribute and the data-bind `'inject'` custom binding, the following properties are reserved:
-      //
-      // * `'view_model'` class used to create a new ViewModel instance
-      // * `'create'` function used to manually add observables to a view model
-      // * `'options'` to pass to ko.applyBindings
-      // * `'afterBinding'` callback (can alternatively be in the options)
-      // * `'beforeBinding'` callback (can alternatively be in the options)
-      //
-      // Each function/constructor gets called with the following signature `'function(view_model, element)'`.
-      //
-      // @example Bind your application automatically when the DOM is loaded.
-      //   <div kb-inject><span data-bind="text: 'Hello World!'"></span></div>
-      // @example Bind your application with properties.
-      //   <div kb-inject="message: ko.observable('Hello World!')"><input data-bind="value: message"></input></div>
-      // @example Bind your application creating a specific ViewModel instance when the DOM is loaded.
-      //   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
-      //   var MyViewModel = function(view_model, el) {
-      //     this.message = ko.observable('Hello World!');
-      //   }
-      // @example Bind your application using a function when the DOM is loaded (like Angular.js controllers).
-      //   <div kb-inject="create: MyController"><input data-bind="value: message"></input></div>
-      //   var MyController = function(view_model, el) {
-      //     view_model.message = ko.observable('Hello World!');
-      //   }
-      // @example Bind your application with a specific ViewModel instance and a callback before and after the binding.
-      //   <div kb-inject="MyViewModel"><input data-bind="value: message"></input></div>
-      //   var MyViewModel = function(view_model, el) {
-      //     this.message = ko.observable('Hello World!');
-      //     this.beforeBinding = function() {alert('before'); };
-      //     this.afterBinding = function() {alert('after'); };
-      //   }
-      // @example Dynamically inject new properties into your ViewModel.
-      //   <div kb-inject="MyViewModel">
-      //     <div class="control-group" data-bind="inject: {site: ko.observable('http://your.url.com')}">
-      //       <label>Website</label>
-      //       <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
-      //     </div>
-      //   </div>
-      //   var MyViewModel = function(view_model, el) {
-      //     // site will be dynamically attached to this ViewModel
-      //   }
-      // @example Dynamically bind a form.
-      //   <div kb-inject="MyViewModel">
-      //      <form name="my_form" data-bind="inject: kb.formValidator">
-      //        <div class="control-group">
-      //         <label>Name</label>
-      //         <input type="text" name="name" data-bind="value: name, valueUpdate: 'keyup'" required>
-      //       </div>
-      //       <div class="control-group">
-      //         <label>Website</label>
-      //         <input type="url" name="site" data-bind="value: site, valueUpdate: 'keyup'" required>
-      //       </div>
-      //     </form>
-      //   </div>
-      //   var MyViewModel = kb.ViewModel.extend({
-      //     constructor: ->
-      //       model = new Backbone.Model({name: '', site: 'http://your.url.com'});
-      //       kb.ViewModel.prototype.constructor.call(this, model);
-      //   });
-
-      var doBind = function doBind(app) {
-        var options = {};
-        var afterBinding = null;
-        var beforeBinding = null;
-
-        // evaluate the app data
-        var expression = app.binding;
-        if (expression) {
-          !~expression.search(/[:]/) || (expression = '{' + expression + '}'); // wrap if is an object
-          var data = new Function('', 'return ( ' + expression + ' )')() || {};
-          if (data.options) {
-            options = data.options;delete data.options;
+        // auto-inject recursively
+        var _ko_applyBindings = _knockout2.default.applyBindings;
+        _knockout2.default.applyBindings = function () {
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
           }
-          app.view_model = inject(data, app.view_model, app.el, null, null, true);
-          afterBinding = app.view_model.afterBinding || options.afterBinding;
-          beforeBinding = app.view_model.beforeBinding || options.beforeBinding;
-        }
 
-        // auto-bind
-        if (beforeBinding) {
-          beforeBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-        _kb2.default.applyBindings(app.view_model, app.el, options);
-        if (afterBinding) {
-          afterBinding.call(app.view_model, app.view_model, app.el, options);
-        }
-      };
-
-      // Searches the DOM from root or document for elements with the `'kb-inject'` attribute and create/customizes ViewModels for the DOM tree when encountered.
-      // Also, used with the data-bind `'inject'` custom binding.
-      // @param [DOM element] root the root DOM element to start searching for `'kb-inject'` attributes.
-      // @return [Array] array of Objects with the DOM elements and ViewModels that were bound in the form `{el: DOM element, view_model: ViewModel}`.
-      var injectViewModels = exports.injectViewModels = function injectViewModels() {
-        var el = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : _windowOrGlobal2.default.document;
-
-        var results = [];
-        if (!el.__kb_injected) {
-          // already injected -> skip, but still process children in case they were added afterwards
-          var attr = _underscore2.default.find(el.attributes || [], function (x) {
-            return x.name === 'kb-inject';
-          });
-          if (attr) {
-            el.__kb_injected = true; // mark injected
-            var app = { el: el, view_model: {}, binding: attr.value };
-            doBind(app);
-            results.push(app);
-          }
-        }
-        _underscore2.default.each(el.childNodes, function (child) {
-          var childResults = injectViewModels(child);
-          if (childResults.length) _underscore2.default.each(childResults, function (x) {
-            return results.push(x);
-          });
-        });
-        return results;
-      };
-
-      // auto-inject recursively
-      var _ko_applyBindings = _knockout2.default.applyBindings;
-      _knockout2.default.applyBindings = function () {
-        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-          args[_key] = arguments[_key];
-        }
-
-        var el = args[1];
-        var results = _kb2.default.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
-        return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [undefined].concat(args));
-      };
-
-      // ############################
-      // Auto Inject results
-      // ############################
-      if (_windowOrGlobal2.default && typeof _windowOrGlobal2.default.document !== 'undefined') {
-        // use simple ready check
-        var onReady = function onReady() {
-          // keep waiting for the document to load
-          if (_windowOrGlobal2.default.document.readyState !== 'complete') return setTimeout(onReady, 0);
-          return injectViewModels(); // the document is loaded
+          var el = args[1];
+          var results = _kb2.default.RECUSIVE_AUTO_INJECT ? injectViewModels(el) : [];
+          return results.length ? results : _ko_applyBindings.call.apply(_ko_applyBindings, [undefined].concat(args));
         };
-        onReady();
-      }
+
+        // ############################
+        // Auto Inject results
+        // ############################
+        if (root && typeof root.document !== 'undefined') {
+          // use simple ready check
+          var onReady = function onReady() {
+            // keep waiting for the document to load
+            if (root.document.readyState !== 'complete') return setTimeout(onReady, 0);
+            return injectViewModels(); // the document is loaded
+          };
+          onReady();
+        }
+        /* WEBPACK VAR INJECTION */
+      }).call(exports, __webpack_require__(5));
 
       /***/
     },
@@ -4214,32 +4231,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }();
 
       exports.default = TypedValue;
-
-      /***/
-    },
-    /* 21 */
-    /***/function (module, exports) {
-
-      var g;
-
-      // This works in non-strict mode
-      g = function () {
-        return this;
-      }();
-
-      try {
-        // This works if eval is allowed (see CSP)
-        g = g || Function("return this")() || (1, eval)("this");
-      } catch (e) {
-        // This works if the window reference is available
-        if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) === "object") g = window;
-      }
-
-      // g can still be undefined, but nothing to do about it...
-      // We return undefined, instead of nothing here, so it's
-      // easier to handle this case. if(!global) { ...}
-
-      module.exports = g;
 
       /***/
     }])
