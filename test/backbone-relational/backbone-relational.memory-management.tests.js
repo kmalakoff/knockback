@@ -11,7 +11,9 @@ if (Backbone && !Backbone.Relational && r) require('backbone-relational');
 const kbr = root.kbr || (r ? require('@knockback/backbone-relational') : undefined);
 
 describe('Knockback.js with Backbone-Relational.js (memory)', () => {
-  beforeEach(() => {
+  if (!Backbone || !Backbone.Relational) return;
+
+  before(() => {
     kb.configure({ orm: kbr });
 
     Backbone.Relational.store = new Backbone.Store();
@@ -25,7 +27,8 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
       }],
     });
   });
-  afterEach(() => {
+
+  after(() => {
     kb.configure({ orm: null });
     delete root.Person;
   });

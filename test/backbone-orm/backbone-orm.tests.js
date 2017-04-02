@@ -11,33 +11,27 @@ const BackboneORM = root.BackboneORM || (r ? require('backbone-orm') : undefined
 const Queue = BackboneORM.Queue;
 
 describe('Knockback.js with BackboneORM', () => {
-  beforeEach(() => {
-    BackboneORM.configure({ model_cache: { enabled: true, max: 100 } });
+  BackboneORM.configure({ model_cache: { enabled: true, max: 100 } });
 
-    root.Person = class Person extends Backbone.Model {};
-    Person.prototype.model_name = 'Person';
-    Person.prototype.schema = {
-      id: [{ manual: true }],
-      friends() { return ['hasMany', Person, { foreign_key: 'friends_id', as: 'friends_with_me' }]; },
-      friends_with_me() { return ['hasMany', Person, { foreign_key: 'friends_with_me_id', as: 'friends' }]; },
-      best_friend() { return ['belongsTo', Person, { as: 'best_friends_with_me' }]; },
-      best_friends_with_me() { return ['hasMany', Person, { as: 'best_friend' }]; },
-      occupies() { return ['belongsTo', Building, { as: 'occupants' }]; },
-    };
-    Person.prototype.sync = BackboneORM.sync(Person);
+  class Person extends Backbone.Model {};
+  Person.prototype.model_name = 'Person';
+  Person.prototype.schema = {
+    id: [{ manual: true }],
+    friends() { return ['hasMany', Person, { foreign_key: 'friends_id', as: 'friends_with_me' }]; },
+    friends_with_me() { return ['hasMany', Person, { foreign_key: 'friends_with_me_id', as: 'friends' }]; },
+    best_friend() { return ['belongsTo', Person, { as: 'best_friends_with_me' }]; },
+    best_friends_with_me() { return ['hasMany', Person, { as: 'best_friend' }]; },
+    occupies() { return ['belongsTo', Building, { as: 'occupants' }]; },
+  };
+  Person.prototype.sync = BackboneORM.sync(Person);
 
-    root.Building = class Building extends Backbone.Model {};
-    Building.prototype.model_name = 'Building';
-    Building.prototype.schema = {
-      id: [{ manual: true }],
-      occupants() { return ['hasMany', Person, { as: 'occupies' }]; },
-    };
-    Building.prototype.sync = BackboneORM.sync(Building);
-  });
-  afterEach(() => {
-    delete root.Person;
-    delete root.Building;
-  });
+  class Building extends Backbone.Model {};
+  Building.prototype.model_name = 'Building';
+  Building.prototype.schema = {
+    id: [{ manual: true }],
+    occupants() { return ['hasMany', Person, { as: 'occupies' }]; },
+  };
+  Building.prototype.sync = BackboneORM.sync(Building);
 
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');

@@ -11,10 +11,11 @@ if (Backbone && !Backbone.Associations && r) require('backbone-associations');
 const kba = root.kba || (r ? require('@knockback/backbone-associations') : undefined);
 
 describe('Knockback.js with Backbone-Associations.js', () => {
-  beforeEach(() => {
+  if (!Backbone || !Backbone.Associations) return;
+
+  before(() => {
     kb.configure({ orm: kba });
 
-    if (!Backbone || !Backbone.Associations) return;
     Backbone.Associations.scopes.push(root);
 
     root.Person = Backbone.AssociatedModel.extend({
@@ -45,7 +46,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       }],
     });
   });
-  afterEach(() => {
+
+  after(() => {
     kb.configure({ orm: null });
     delete root.Person;
     delete root.Building;
