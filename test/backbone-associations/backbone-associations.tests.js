@@ -6,48 +6,58 @@ const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 if (Backbone && !Backbone.Associations && r) require('backbone-associations');
 const kba = root.kba || (r ? require('@knockback/backbone-associations') : undefined);
 
 describe('Knockback.js with Backbone-Associations.js', () => {
+  beforeEach(() => {
+    kb.configure({ orm: kba });
+
+    if (!Backbone || !Backbone.Associations) return;
+    Backbone.Associations.scopes.push(root);
+
+    root.Person = Backbone.AssociatedModel.extend({
+      relations: [{
+        type: Backbone.Many,
+        key: 'friends',
+        relatedModel: 'Person',
+      }, {
+        type: Backbone.One,
+        key: 'best_friend',
+        relatedModel: 'Person',
+        // reverseRelation: {
+        //   type: Backbone.Many,
+        //   key: 'best_friends_with_me',
+        // },
+      }],
+    });
+
+    root.Building = Backbone.AssociatedModel.extend({
+      relations: [{
+        type: Backbone.Many,
+        key: 'occupants',
+        relatedModel: 'Person',
+        // reverseRelation: {
+        //   type: Backbone.One,
+        //   key: 'occupies',
+        // }
+      }],
+    });
+  });
+  afterEach(() => {
+    kb.configure({ orm: null });
+    delete root.Person;
+    delete root.Building;
+  });
+
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Backbone.Associations, 'Backbone.Associations');
-    kb.configure({ orm: kba });
-  });
-
-  if (!Backbone || !Backbone.Associations) return;
-  Backbone.Associations.scopes.push(root);
-
-  root.Person = Backbone.AssociatedModel.extend({
-    relations: [{
-      type: Backbone.Many,
-      key: 'friends',
-      relatedModel: 'Person',
-    }, {
-      type: Backbone.One,
-      key: 'best_friend',
-      relatedModel: 'Person',
-      // reverseRelation: {
-      //   type: Backbone.Many,
-      //   key: 'best_friends_with_me',
-      // },
-    }],
-  });
-
-  root.Building = Backbone.AssociatedModel.extend({
-    relations: [{
-      type: Backbone.Many,
-      key: 'occupants',
-      relatedModel: 'Person',
-      // reverseRelation: {
-      //   type: Backbone.One,
-      //   key: 'occupies',
-      // }
-    }],
+    assert.ok(!!kba, 'kba');
   });
 
   it('1. Model with Many relations: A house with multiple people living in it', () => {
@@ -854,7 +864,5 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
-
-  it('CLEANUP', () => kb.configure({ orm: null }));
 });
 

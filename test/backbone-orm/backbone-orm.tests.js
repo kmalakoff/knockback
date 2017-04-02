@@ -6,10 +6,39 @@ const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 const BackboneORM = root.BackboneORM || (r ? require('backbone-orm') : undefined);
-const { Queue } = BackboneORM;
+const Queue = BackboneORM.Queue;
 
 describe('Knockback.js with BackboneORM', () => {
+  beforeEach(() => {
+    BackboneORM.configure({ model_cache: { enabled: true, max: 100 } });
+
+    root.Person = class Person extends Backbone.Model {};
+    Person.prototype.model_name = 'Person';
+    Person.prototype.schema = {
+      id: [{ manual: true }],
+      friends() { return ['hasMany', Person, { foreign_key: 'friends_id', as: 'friends_with_me' }]; },
+      friends_with_me() { return ['hasMany', Person, { foreign_key: 'friends_with_me_id', as: 'friends' }]; },
+      best_friend() { return ['belongsTo', Person, { as: 'best_friends_with_me' }]; },
+      best_friends_with_me() { return ['hasMany', Person, { as: 'best_friend' }]; },
+      occupies() { return ['belongsTo', Building, { as: 'occupants' }]; },
+    };
+    Person.prototype.sync = BackboneORM.sync(Person);
+
+    root.Building = class Building extends Backbone.Model {};
+    Building.prototype.model_name = 'Building';
+    Building.prototype.schema = {
+      id: [{ manual: true }],
+      occupants() { return ['hasMany', Person, { as: 'occupies' }]; },
+    };
+    Building.prototype.sync = BackboneORM.sync(Building);
+  });
+  afterEach(() => {
+    delete root.Person;
+    delete root.Building;
+  });
+
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
@@ -17,38 +46,7 @@ describe('Knockback.js with BackboneORM', () => {
     assert.ok(!!kb, 'kb');
     assert.ok(!!kb, 'kb');
     assert.ok(!!BackboneORM, 'BackboneORM');
-    kb.configure({ orm: null });
   });
-
-  BackboneORM.configure({ model_cache: { enabled: true, max: 100 } });
-
-  class Person extends Backbone.Model {
-    static initClass() {
-      this.prototype.model_name = 'Person';
-      this.prototype.schema = {
-        id: [{ manual: true }],
-        friends() { return ['hasMany', Person, { foreign_key: 'friends_id', as: 'friends_with_me' }]; },
-        friends_with_me() { return ['hasMany', Person, { foreign_key: 'friends_with_me_id', as: 'friends' }]; },
-        best_friend() { return ['belongsTo', Person, { as: 'best_friends_with_me' }]; },
-        best_friends_with_me() { return ['hasMany', Person, { as: 'best_friend' }]; },
-        occupies() { return ['belongsTo', Building, { as: 'occupants' }]; },
-      };
-      this.prototype.sync = BackboneORM.sync(Person);
-    }
-  }
-  Person.initClass();
-
-  class Building extends Backbone.Model {
-    static initClass() {
-      this.prototype.model_name = 'Building';
-      this.prototype.schema = {
-        id: [{ manual: true }],
-        occupants() { return ['hasMany', Person, { as: 'occupies' }]; },
-      };
-      this.prototype.sync = BackboneORM.sync(Building);
-    }
-  }
-  Building.initClass();
 
   it('1. Model with HasMany relations: A house with multiple people living in it', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
@@ -968,6 +966,4 @@ describe('Knockback.js with BackboneORM', () => {
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
-
-  it('CLEANUP', () => kb.configure({ orm: null }));
 });

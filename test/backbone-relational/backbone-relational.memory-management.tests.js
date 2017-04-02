@@ -6,12 +6,14 @@ const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 if (Backbone && !Backbone.Relational && r) require('backbone-relational');
 const kbr = root.kbr || (r ? require('@knockback/backbone-relational') : undefined);
 
 describe('Knockback.js with Backbone-Relational.js (memory)', () => {
   beforeEach(() => {
-    if (!Backbone || !Backbone.Relational) return;
+    kb.configure({ orm: kbr });
+
     Backbone.Relational.store = new Backbone.Store();
     if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
 
@@ -23,6 +25,10 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
       }],
     });
   });
+  afterEach(() => {
+    kb.configure({ orm: null });
+    delete root.Person;
+  });
 
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
@@ -30,7 +36,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     assert.ok(!!Backbone, 'Backbone');
     assert.ok(!!kb, 'kb');
     assert.ok(!!Backbone.Relational, 'Backbone.Relational');
-    kb.configure({ orm: kbr });
+    assert.ok(!!kbr, 'kbr');
   });
 
   // ref counted view model
@@ -224,6 +230,4 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
-
-  it('CLEANUP', () => kb.configure({ orm: null }));
 });

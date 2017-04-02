@@ -8,6 +8,8 @@
  * http://jquery.org/license
  */
 
+var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+
 (function( window, undefined ) {
 
 var Globalize,
@@ -1570,4 +1572,4 @@ Globalize.culture = function( cultureSelector ) {
 	return this.findClosestCulture( cultureSelector ) || this.culture[ "default" ];
 };
 
-}( this ));
+}( root ));

@@ -5,16 +5,15 @@ const glob = require('glob');
 const resolveModule = module_name => path.relative('.', require.resolve(module_name));
 
 const KNOCKBACK = {
-  // browser_globals: [resolveModule('@knockback/knockback')],
-  browser_globals: [resolveModule('knockback')],
+  browser_globals: [resolveModule('@knockback/knockback')],
   // browser_globals_legacy: [resolveModule('knockback')],
   // browser_globals_min: ['./knockback.min.js'],
-  // core: [resolveModule('@knockback/core')],
+  core: [resolveModule('@knockback/core')],
   // core_min: ['./knockback-core.min.js'],
 };
 
 const REQUIRED_DEPENDENCIES = {
-  backbone_underscore_latest: ['jquery', 'underscore', 'backbone', 'knockout'].map(x => resolveModule(x)),
+  backbone_underscore_latest: ['underscore', 'backbone', 'knockout'].map(x => resolveModule(x)),
   // backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
   // backbone_lodash_latest: ['lodash', 'backbone', 'knockout'].map(x => resolveModule(x)),
   // backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
@@ -28,47 +27,65 @@ const TEST_GROUPS = {};
 // Full Library
 // ##############################
 TEST_GROUPS.browser_globals = [];
-_.each(KNOCKBACK, (library_files, library_name) => {
-  if (!~library_name.indexOf('browser_globals')) return;
-  _.each(REQUIRED_DEPENDENCIES, (dep_files, dep_name) => {
-    TEST_GROUPS.browser_globals.push({
-      name: `${dep_name}_${library_name}`,
-      files: _.flattenDeep([
-        dep_files,
-        library_files,
-        LOCALIZATION_DEPENCIES,
-        resolveModule('backbone-modelref'),
-        './test/**/*.tests.js',
-      ]),
-    });
-  });
-});
+// _.each(KNOCKBACK, (library_files, library_name) => {
+//   if (!~library_name.indexOf('browser_globals')) return;
+//   _.each(REQUIRED_DEPENDENCIES, (dep_files, dep_name) => {
+//     TEST_GROUPS.browser_globals.push({
+//       name: `${dep_name}_${library_name}`,
+//       files: _.flattenDeep([
+//         dep_files,
+//         library_files,
+//         LOCALIZATION_DEPENCIES,
+//         resolveModule('jquery'),
+//         resolveModule('backbone-modelref'),
+//         './test/knockback-*/**/*.tests.js',
+//       ]),
+//     });
+//   });
+// });
 
 // ##############################
 // Core Library
 // ##############################
 TEST_GROUPS.core = [];
-_.each(KNOCKBACK, (library_files, test_name) => {
-  if (~test_name.indexOf('core') && !~test_name.indexOf('stack')) {
-    TEST_GROUPS.core.push({ name: `core_${test_name}`, files: _.flattenDeep([REQUIRED_DEPENDENCIES.backbone_underscore_latest, library_files, './test/knockback-core/**/*.tests.js']) });
-  }
-});
+// _.each(KNOCKBACK, (library_files, test_name) => {
+//   if (!~test_name.indexOf('core')) return;
+//   _.each(REQUIRED_DEPENDENCIES, (dep_files, dep_name) => {
+//     TEST_GROUPS.core.push({
+//       name: `core_${test_name}`,
+//       files: _.flattenDeep([
+//         dep_files,
+//         library_files,
+//         './test/knockback-core/**/*.tests.js',
+//       ]),
+//     });
+//   });
+// });
 
 // ##############################
 // ORM
 // ##############################
 const ORM_TESTS = {
-  backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/ecosystem/**/backbone-orm*.tests.js'],
-  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), './test/ecosystem/**/backbone-relational*.tests.js'],
-  backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), './test/ecosystem/**/backbone-associations*.tests.js'],
+  // backbone_orm: [KNOCKBACK.browser_globals, resolveModule('backbone-orm'), './test/backbone-orm/**/*.tests.js'],
+  // backbone_orm_core: [KNOCKBACK.core, resolveModule('backbone-orm'), './test/backbone-orm/**/*.tests.js'],
+  backbone_relational: [KNOCKBACK.browser_globals, resolveModule('backbone-relational'), resolveModule('@knockback/backbone-relational'), './test/backbone-relational/**/*.tests.js'],
+  // backbone_relational_core: [KNOCKBACK.core, resolveModule('backbone-relational'), resolveModule('@knockback/backbone-relational'), './test/backbone-relational/**/*.tests.js'],
+  // backbone_associations: [KNOCKBACK.browser_globals, resolveModule('backbone-associations'), resolveModule('@knockback/backbone-associations'), './test/backbone-associations/**/*.tests.js'],
+  // backbone_associations_core: [KNOCKBACK.core, resolveModule('backbone-associations'), resolveModule('@knockback/backbone-associations'), './test/backbone-associations/**/*.tests.js'],
 };
 
 TEST_GROUPS.orm = [];
-// _.each(_.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest'), (dep_files, dep_name) => {
-//   _.each(ORM_TESTS, (test_files, test_name) => {
-//     TEST_GROUPS.orm.push({ name: `${dep_name}_${test_name}`, files: _.flattenDeep([dep_files, test_files]) });
-//   });
-// });
+_.each(_.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest'), (dep_files, dep_name) => {
+  _.each(ORM_TESTS, (test_files, test_name) => {
+    TEST_GROUPS.orm.push({
+      name: `${dep_name}_${test_name}`,
+      files: _.flattenDeep([
+        dep_files,
+        test_files,
+      ]),
+    });
+  });
+});
 
 // ##############################
 // AMD

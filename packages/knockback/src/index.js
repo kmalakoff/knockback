@@ -7,6 +7,6 @@
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
 */
 
-import * as kb from '@knockback/knockback';
+import kb from '@knockback/knockback';
 
 module.exports = kb;

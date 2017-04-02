@@ -11,6 +11,8 @@
  * Translation: bugs found in this file need to be fixed in the generator
  */
 
+var root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+
 (function( window, undefined ) {
 
 var Globalize;
@@ -52,4 +54,4 @@ Globalize.addCultureInfo( "en-GB", "default", {
 	}
 });
 
-}( this ));
+}( root ));

@@ -6,9 +6,11 @@ const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
-if (Backbone && !Backbone.ModelRef && r) require('backbone-modelref');
 
 describe('Knockback.js with Backbone.ModelRef.js', () => {
+  before(() => { if (Backbone && !Backbone.ModelRef && r) require('backbone-modelref'); });
+  after(() => delete Backbone.ModeRef);
+
   it('TEST DEPENDENCY MISSING', () => {
     assert.ok(!!ko, 'ko');
     assert.ok(!!_, '_');
@@ -129,6 +131,4 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
   });
-
-  it('CLEANUP', () => delete Backbone.ModeRef);
 });
