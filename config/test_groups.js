@@ -5,19 +5,19 @@ const glob = require('glob');
 const resolveModule = module_name => path.relative('.', require.resolve(module_name));
 
 const KNOCKBACK = {
-  // browser_globals: ['./knockback.js'],
+  // browser_globals: [resolveModule('@knockback/knockback')],
+  browser_globals: [resolveModule('knockback')],
+  // browser_globals_legacy: [resolveModule('knockback')],
   // browser_globals_min: ['./knockback.min.js'],
-  // browser_globals_stack: ['./knockback-browser_globals-stack.js'],
-  core: [resolveModule('@knockback/core')],
+  // core: [resolveModule('@knockback/core')],
   // core_min: ['./knockback-core.min.js'],
-  // core_stack: ['./knockback-core-stack.js'],
 };
 
 const REQUIRED_DEPENDENCIES = {
   backbone_underscore_latest: ['jquery', 'underscore', 'backbone', 'knockout'].map(x => resolveModule(x)),
-  backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
-  backbone_lodash_latest: ['lodash', 'backbone', 'knockout'].map(x => resolveModule(x)),
-  backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
+  // backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
+  // backbone_lodash_latest: ['lodash', 'backbone', 'knockout'].map(x => resolveModule(x)),
+  // backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
 };
 
 const LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize.culture.en-GB.js', './test/lib/globalize.culture.fr-FR.js'];
@@ -29,22 +29,19 @@ const TEST_GROUPS = {};
 // ##############################
 TEST_GROUPS.browser_globals = [];
 _.each(KNOCKBACK, (library_files, library_name) => {
-  if (~library_name.indexOf('browser_globals') && !~library_name.indexOf('stack')) {
-    _.each(REQUIRED_DEPENDENCIES, (dep_files, dep_name) => {
-      TEST_GROUPS.browser_globals.push({
-        name: `${dep_name}_${library_name}`,
-        files: _.flattenDeep([
-          dep_files,
-          library_files,
-          LOCALIZATION_DEPENCIES,
-          resolveModule('backbone-modelref'),
-          './test/knockback-core/**/*.tests.js',
-          // './test/plugins/**/*.tests.js',
-          // './test/issues/**/*.tests.js',
-        ]),
-      });
+  if (!~library_name.indexOf('browser_globals')) return;
+  _.each(REQUIRED_DEPENDENCIES, (dep_files, dep_name) => {
+    TEST_GROUPS.browser_globals.push({
+      name: `${dep_name}_${library_name}`,
+      files: _.flattenDeep([
+        dep_files,
+        library_files,
+        LOCALIZATION_DEPENCIES,
+        resolveModule('backbone-modelref'),
+        './test/**/*.tests.js',
+      ]),
     });
-  }
+  });
 });
 
 // ##############################

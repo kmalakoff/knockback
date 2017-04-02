@@ -10,7 +10,7 @@ const browserify = require('gulp-browserify');
 const concat = require('gulp-concat');
 const wrapAMD = require('gulp-wrap-amd-infer');
 
-const BABEL_OPTIONS = JSON.stringify(fs.readFileSync(path.join(__dirname, '..', '..', '.babelrc'), 'utf8'));
+const BABEL_OPTIONS = JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', '.babelrc'), 'utf8'));
 const TEST_GROUPS = require('../test_groups');
 
 module.exports = async () => {
@@ -46,7 +46,7 @@ module.exports = async () => {
     for (const test of (TEST_GROUPS.amd || [])) {
       await new Promise((resolve, reject) =>
         gulp.src(test.build.files)
-          .pipe(babel({ presets: ['es2015'] }))
+          .pipe(babel(BABEL_OPTIONS))
           .pipe(wrapAMD(test.build.options))
           .pipe(gulp.dest(test.build.destination))
           .on('error', reject)
