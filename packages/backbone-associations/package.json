@@ -24,11 +24,11 @@
     "url": "http://github.com/kmalakoff/knockback.git"
   },
   "bugs": "https://github.com/kmalakoff/knockback/issues",
-  "dependencies": {
+  "peerDependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
     "knockout": ">=2.1.0",
     "@knockback/core": "^2.0.0-alpha.1",
-    "backbone-associations": "latest"
+    "backbone-associations": "*"
   }
 }

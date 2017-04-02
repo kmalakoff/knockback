@@ -26,6 +26,7 @@ const HEADER = (module.exports = `\
 gulp.task('build', async () => {
   const configPaths = glob.sync('**/webpack.config.js', { cwd: path.join(__dirname, 'packages'), ignore: '**/node_modules/**', absolute: true });
   for (const configPath of configPaths) {
+    console.log('configPath', configPath);
     await new Promise((resolve, reject) => {
       webpack(require(configPath), (err, stats) => {
         if (err) return reject(err);

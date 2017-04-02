@@ -30,6 +30,18 @@
     "lint-fix": "eslint src/ test/ config/ --fix",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
   },
+  "dependencies": {
+    "backbone": "*",
+    "underscore": "*",
+    "knockout": "*"
+  },
+  "optionalDependencies": {
+    "backbone-associations": "*",
+    "backbone-orm": "*",
+    "backbone-modelref": "*",
+    "backbone-relational": "*",
+    "lodash": "*"
+  },
   "devDependencies": {
     "babel-cli": "^6.24.0",
     "babel-core": "*",
@@ -77,10 +89,5 @@
     "nuget": "*",
     "requirejs": "*",
     "webpack": "*"
-  },
-  "optionalDependencies": {
-    "backbone-orm": "*",
-    "backbone-modelref": "*",
-    "lodash": "*"
   }
 }

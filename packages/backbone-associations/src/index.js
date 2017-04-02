@@ -1,5 +1,5 @@
 /*
-  knockback.js 1.2.2
+  knockback.js 2.0.0-alpha.1
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
