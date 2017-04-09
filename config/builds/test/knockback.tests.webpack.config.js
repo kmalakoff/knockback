@@ -5,7 +5,9 @@ const TEST_DIR = path.resolve(path.join(__dirname, '..', '..', '..', 'test'));
 
 module.exports = {
   entry: {
-    'knockback.tests': glob.sync('**/*.tests.js', { cwd: path.join(TEST_DIR), absolute: true }),
+    // TODO: bundle not just core
+    'knockback.tests': glob.sync('**/*.tests.js', { cwd: path.join(TEST_DIR, 'knockback-core'), absolute: true }),
+    // 'knockback.tests': glob.sync('**/*.tests.js', { cwd: path.join(TEST_DIR), absolute: true }),
   },
   module: { rules: [{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }] },
   resolve: {

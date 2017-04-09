@@ -6,7 +6,7 @@ const resolveModule = module_name => path.relative('.', require.resolve(module_n
 
 const KNOCKBACK = {
   browser_globals: [resolveModule('@knockback/knockback')],
-  browser_globals_legacy: [resolveModule('knockback')],
+  // browser_globals_legacy: [resolveModule('knockback')],
   // browser_globals_min: ['./knockback.min.js'],
   core: [resolveModule('@knockback/core')],
   // core_min: ['./knockback-core.min.js'],
@@ -14,9 +14,9 @@ const KNOCKBACK = {
 
 const REQUIRED_DEPENDENCIES = {
   backbone_underscore_latest: ['jquery', 'underscore', 'backbone', 'knockout'].map(x => resolveModule(x)),
-  backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
+  // backbone_underscore_legacy: ['./vendor/underscore-1.1.7.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
   backbone_lodash_latest: ['lodash', 'backbone', 'knockout'].map(x => resolveModule(x)),
-  backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
+  // backbone_lodash_legacy: ['./vendor/lodash-0.3.2.js', './vendor/backbone-0.5.1.js', './vendor/knockout-2.1.0.js'],
 };
 
 const LOCALIZATION_DEPENCIES = ['./test/lib/globalize.js', './test/lib/globalize.culture.en-GB.js', './test/lib/globalize.culture.fr-FR.js'];
@@ -92,45 +92,49 @@ _.each(_.pick(REQUIRED_DEPENDENCIES, 'backbone_underscore_latest'), (dep_files, 
 const AMD_OPTIONS = require('./amd/gulp-options');
 
 TEST_GROUPS.amd = [];
-// TEST_GROUPS.browser_globals.concat(TEST_GROUPS.core).forEach((test) => {
-//   if (!~test.name.indexOf('_min') && !~test.name.indexOf('legacy_') && !~test.name.indexOf('parse_')) {
-//     const test_files = test.files.concat(['./node_modules/jquery/dist/jquery.js']);
-//     const files = [];
-//     const test_patterns = [];
-//     const path_files = [];
+TEST_GROUPS.core.forEach((test) => {
+  if (!~test.name.indexOf('_min') && !~test.name.indexOf('legacy_')) {
+    const test_files = test.files.concat(['./node_modules/jquery/dist/jquery.js']);
+    const files = [];
+    const test_patterns = [];
+    const path_files = [];
 
-//     _.each(test_files, (file) => {
-//       if (~file.indexOf('.tests.')) test_patterns.push(file);
-//       else {
-//         files.push({ pattern: file, included: false });
-//         path_files.push(file);
-//       }
-//     });
-//     files.push(`_temp/amd/${test.name}/**/*.js`);
-//     TEST_GROUPS.amd.push({ name: `amd_${test.name}`, files, build: { files: test_patterns, destination: `_temp/amd/${test.name}`, options: _.extend({ path_files }, AMD_OPTIONS) } });
-//   }
-// });
+    _.each(test_files, (file) => {
+      if (~file.indexOf('.tests.')) test_patterns.push(file);
+      else {
+        files.push({ pattern: file, included: false });
+        path_files.push(file);
+      }
+    });
+    files.push(`_temp/amd/${test.name}/**/*.js`);
+    TEST_GROUPS.amd.push({ name: `amd_${test.name}`, files, build: { files: test_patterns, destination: `_temp/amd/${test.name}`, options: _.extend({ path_files }, AMD_OPTIONS) } });
+  }
+});
+
+TEST_GROUPS.core = [];
 
 // ##############################
 // Webpack
 // ##############################
-const WEBPACK_TESTS = glob.sync('**/*.tests.webpack.config.js', { cwd: path.join(__dirname, 'build', 'test'), absolute: true });
+const WEBPACK_TESTS = glob.sync('**/*.tests.webpack.config.js', { cwd: path.join(__dirname, 'builds', 'test'), absolute: true });
 TEST_GROUPS.webpack = [];
-// WEBPACK_TESTS.forEach((file) => {
-//   TEST_GROUPS.webpack.push({ name: `webpack_${file.replace('.js', '')}`, files: _.flattenDeep([(~file.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), file]) });
-// });
+WEBPACK_TESTS.forEach((configPath) => {
+  const config = _.merge({ output: { path: path.resolve(path.join(__dirname, '..', '_temp/webpack')) } }, require(configPath));
+  const fileName = _.keys(config.entry)[0];
+  TEST_GROUPS.webpack.push({ name: `webpack_${fileName}`, files: _.flattenDeep([(~fileName.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), `${path.join(config.output.path, fileName)}.js`]) });
+});
 
 // ##############################
 // Browserify
 // ##############################
 TEST_GROUPS.browserify = [];
-// _.each(require('./browserify/tests'), (test_info, test_name) => {
-//   TEST_GROUPS.browserify.push({
-//     name: `browserify_${test_name}`,
-//     files: _.flattenDeep([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]),
-//     build: { destination: test_info.output, options: test_info.options, files: test_info.files },
-//   });
-// });
+_.each(require('./browserify/tests'), (test_info, test_name) => {
+  TEST_GROUPS.browserify.push({
+    name: `browserify_${test_name}`,
+    files: _.flattenDeep([(~test_info.files.indexOf('core') ? [] : LOCALIZATION_DEPENCIES), test_info.output]),
+    build: { destination: test_info.output, options: test_info.options, files: test_info.files },
+  });
+});
 
 // TEST_GROUPS = {browser_globals: TEST_GROUPS.browser_globals.slice(0, 1)};
 // TEST_GROUPS = {amd: TEST_GROUPS.amd.slice(0, 1)};
