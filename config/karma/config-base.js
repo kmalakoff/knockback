@@ -10,14 +10,14 @@ module.exports = {
   colors: true,
   logLevel: 'INFO',
 
-  // customLaunchers: { 'PhantomJS_custom': { base: 'PhantomJS', debug: true } },
-  // browsers: ['PhantomJS_custom'],
+  // customLaunchers: { 'ChromeHeadless_custom': { base: 'ChromeHeadless', flags: ['--remote-debugging-port=5858'] } },
+  // browsers: ['ChromeHeadless_custom'],
   // singleRun: false,
 
   // browsers: ['Chrome'],
   // singleRun: false,
 
-  browsers: ['PhantomJS'],
+  browsers: ['ChromeHeadless'],
   singleRun: true,
 
   // browsers: ['Chrome', 'Firefox', 'Chrome', 'Safari'],

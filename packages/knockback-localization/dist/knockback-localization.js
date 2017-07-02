@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("@knockback/core"), require("backbone"), require("underscore"), require("knockout"));
+		module.exports = factory(require("@knockback/core"), require("underscore"), require("backbone"), require("knockout"));
 	else if(typeof define === 'function' && define.amd)
-		define(["@knockback/core", "backbone", "underscore", "knockout"], factory);
+		define(["@knockback/core", "underscore", "backbone", "knockout"], factory);
 	else if(typeof exports === 'object')
-		exports["kb"] = factory(require("@knockback/core"), require("backbone"), require("underscore"), require("knockout"));
+		exports["kb"] = factory(require("@knockback/core"), require("underscore"), require("backbone"), require("knockout"));
 	else
-		root["kb"] = factory(root["kb"], root["Backbone"], root["_"], root["ko"]);
+		root["kb"] = factory(root["kb"], root["_"], root["Backbone"], root["ko"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -42,9 +42,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -73,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -84,6 +81,43 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _core = __webpack_require__(0);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _localizedObservable = __webpack_require__(2);
+
+var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// Locale Manager - if you are using localization, set this property.
+// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
+/*
+  knockback.js 2.0.0-alpha.1
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var api = {
+  locale_manager: undefined,
+  LocalizedObservable: _localizedObservable2.default,
+  localizedObservable: _localizedObservable.localizedObservable
+};
+_core2.default.assign(_core2.default, api);
+
+module.exports = api;
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -103,11 +137,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      */
 
-var _underscore = __webpack_require__(4);
+var _underscore = __webpack_require__(3);
 
 var _underscore2 = _interopRequireDefault(_underscore);
 
-var _backbone = __webpack_require__(3);
+var _backbone = __webpack_require__(4);
 
 var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -304,43 +338,6 @@ var localizedObservable = exports.localizedObservable = function localizedObserv
 
   return new (Function.prototype.bind.apply(LocalizedObservable, [null].concat(args)))();
 };
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _core = __webpack_require__(0);
-
-var _core2 = _interopRequireDefault(_core);
-
-var _localizedObservable = __webpack_require__(1);
-
-var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Locale Manager - if you are using localization, set this property.
-// It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-/*
-  knockback.js 2.0.0-alpha.1
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var api = {
-  locale_manager: undefined,
-  LocalizedObservable: _localizedObservable2.default,
-  localizedObservable: _localizedObservable.localizedObservable
-};
-_core2.default.assign(_core2.default, api);
-
-module.exports = api;
 
 /***/ }),
 /* 3 */

@@ -1,4 +1,4 @@
-const fs = require('fs-extra');
+const rimraf = require('rimraf');
 const _ = require('lodash');
 const { Server } = require('karma');
 const generate = require('./generate');
@@ -9,8 +9,8 @@ const KARMA_CONFIG_AMD = require('./config-amd');
 const TEST_GROUPS = require('../test_groups');
 
 module.exports = async () => {
-  fs.removeSync('./_temp', true);
-  // fs.removeSync('node_modules/knockback', true);
+  rimraf.sync('./_temp');
+  // rimraf.sync('node_modules/knockback');
 
   try {
     await generate();
@@ -33,6 +33,6 @@ module.exports = async () => {
       }
     }
 
-    fs.removeSync('./_temp', true);
+    rimraf.sync('./_temp');
   } catch (err) { console.error(err); }
 };

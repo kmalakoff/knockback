@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("backbone"), require("underscore"), require("knockout"));
+		module.exports = factory(require("underscore"), require("knockout"), require("backbone"));
 	else if(typeof define === 'function' && define.amd)
-		define(["backbone", "underscore", "knockout"], factory);
+		define(["underscore", "knockout", "backbone"], factory);
 	else if(typeof exports === 'object')
-		exports["kb"] = factory(require("backbone"), require("underscore"), require("knockout"));
+		exports["kb"] = factory(require("underscore"), require("knockout"), require("backbone"));
 	else
-		root["kb"] = factory(root["Backbone"], root["_"], root["ko"]);
+		root["kb"] = factory(root["_"], root["ko"], root["Backbone"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -42,9 +42,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -73,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -99,12 +96,34 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+var _knockback = __webpack_require__(4);
+
+var _knockback2 = _interopRequireDefault(_knockback);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = _knockback2.default; /*
+                                        knockback.js 2.0.0-alpha.1
+                                        Copyright (c)  2011-2016 Kevin Malakoff.
+                                        License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                                        Source: https://github.com/kmalakoff/knockback
+                                        Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                                      */
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(module) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
 
 var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 (function webpackUniversalModuleDefinition(root, factory) {
-  if (( false ? 'undefined' : _typeof2(exports)) === 'object' && ( false ? 'undefined' : _typeof2(module)) === 'object') module.exports = factory(__webpack_require__(1), __webpack_require__(2), __webpack_require__(0));else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(1), __webpack_require__(2), __webpack_require__(0)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+  if (( false ? 'undefined' : _typeof2(exports)) === 'object' && ( false ? 'undefined' : _typeof2(module)) === 'object') module.exports = factory(__webpack_require__(0), __webpack_require__(1), __webpack_require__(2));else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(0), __webpack_require__(1), __webpack_require__(2)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));else if ((typeof exports === 'undefined' ? 'undefined' : _typeof2(exports)) === 'object') exports["kb"] = factory(require("underscore"), require("knockout"), require("backbone"));else root["kb"] = factory(root["_"], root["ko"], root["Backbone"]);
@@ -118,9 +137,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       /******/function __webpack_require__(moduleId) {
         /******/
         /******/ // Check if module is in cache
-        /******/if (installedModules[moduleId])
+        /******/if (installedModules[moduleId]) {
           /******/return installedModules[moduleId].exports;
-        /******/
+          /******/
+        }
         /******/ // Create a new module (and put it into the cache)
         /******/var module = installedModules[moduleId] = {
           /******/i: moduleId,
@@ -145,11 +165,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       /******/
       /******/ // expose the module cache
       /******/__webpack_require__.c = installedModules;
-      /******/
-      /******/ // identity function for calling harmony imports with the correct context
-      /******/__webpack_require__.i = function (value) {
-        return value;
-      };
       /******/
       /******/ // define getter function for harmony exports
       /******/__webpack_require__.d = function (exports, name, getter) {
@@ -187,7 +202,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
       /******/__webpack_require__.p = "";
       /******/
       /******/ // Load entry module and return exports
-      /******/return __webpack_require__(__webpack_require__.s = 10);
+      /******/return __webpack_require__(__webpack_require__.s = 5);
       /******/
     }(
     /************************************************************************/
@@ -232,9 +247,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/function __webpack_require__(moduleId) {
                 /******/
                 /******/ // Check if module is in cache
-                /******/if (installedModules[moduleId])
+                /******/if (installedModules[moduleId]) {
                   /******/return installedModules[moduleId].exports;
-                /******/
+                  /******/
+                }
                 /******/ // Create a new module (and put it into the cache)
                 /******/var module = installedModules[moduleId] = {
                   /******/i: moduleId,
@@ -259,11 +275,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/
               /******/ // expose the module cache
               /******/__webpack_require__.c = installedModules;
-              /******/
-              /******/ // identity function for calling harmony imports with the correct context
-              /******/__webpack_require__.i = function (value) {
-                return value;
-              };
               /******/
               /******/ // define getter function for harmony exports
               /******/__webpack_require__.d = function (exports, name, getter) {
@@ -301,7 +312,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/__webpack_require__.p = "";
               /******/
               /******/ // Load entry module and return exports
-              /******/return __webpack_require__(__webpack_require__.s = 19);
+              /******/return __webpack_require__(__webpack_require__.s = 6);
               /******/
             }(
             /************************************************************************/
@@ -1074,6 +1085,164 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               "use strict";
 
+              var _underscore = __webpack_require__(0);
+
+              var _underscore2 = _interopRequireDefault(_underscore);
+
+              var _backbone = __webpack_require__(3);
+
+              var _backbone2 = _interopRequireDefault(_backbone);
+
+              var _knockout = __webpack_require__(2);
+
+              var _knockout2 = _interopRequireDefault(_knockout);
+
+              __webpack_require__(7);
+
+              var _kb = __webpack_require__(1);
+
+              var _kb2 = _interopRequireDefault(_kb);
+
+              var _collectionObservable = __webpack_require__(8);
+
+              var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
+
+              var _configure = __webpack_require__(9);
+
+              var _configure2 = _interopRequireDefault(_configure);
+
+              var _eventWatcher = __webpack_require__(4);
+
+              var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
+
+              var _factory = __webpack_require__(10);
+
+              var _factory2 = _interopRequireDefault(_factory);
+
+              var _inject = __webpack_require__(11);
+
+              var _observable = __webpack_require__(12);
+
+              var _observable2 = _interopRequireDefault(_observable);
+
+              var _statistics = __webpack_require__(14);
+
+              var _statistics2 = _interopRequireDefault(_statistics);
+
+              var _store = __webpack_require__(15);
+
+              var _store2 = _interopRequireDefault(_store);
+
+              var _utils = __webpack_require__(16);
+
+              var _utils2 = _interopRequireDefault(_utils);
+
+              var _viewModel = __webpack_require__(20);
+
+              var _viewModel2 = _interopRequireDefault(_viewModel);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              var api = {
+                _: _underscore2.default,
+                Backbone: _backbone2.default,
+                ko: _knockout2.default,
+                CollectionObservable: _collectionObservable2.default,
+                collectionObservable: _collectionObservable.collectionObservable,
+                observableCollection: _collectionObservable.collectionObservable,
+                compare: _collectionObservable.compare,
+                configure: _configure2.default,
+                settings: _configure.settings,
+                EventWatcher: _eventWatcher2.default,
+                Factory: _factory2.default,
+                RECUSIVE_AUTO_INJECT: true,
+                injectViewModels: _inject.injectViewModels,
+                Observable: _observable2.default,
+                observable: _observable.observable,
+                Statistics: _statistics2.default,
+                Store: _store2.default,
+                utils: _utils2.default,
+                ViewModel: _viewModel2.default,
+                viewModel: _viewModel.viewModel
+              }; /*
+                   knockback.js 2.0.0-alpha.1
+                   Copyright (c)  2011-2016 Kevin Malakoff.
+                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                   Source: https://github.com/kmalakoff/knockback
+                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                 */
+
+              _kb2.default.assign(_kb2.default, api);
+
+              module.exports = _kb2.default;
+
+              /***/
+            },
+            /* 7 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              var _knockout = __webpack_require__(2);
+
+              var _knockout2 = _interopRequireDefault(_knockout);
+
+              var _kb = __webpack_require__(1);
+
+              var _kb2 = _interopRequireDefault(_kb);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _knockout2.default.subscribable.fn.extend) {
+                var _extend = _knockout2.default.subscribable.fn.extend;
+                _knockout2.default.subscribable.fn.extend = function () {
+                  var _this = this;
+
+                  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+                    args[_key] = arguments[_key];
+                  }
+
+                  var target = _extend.apply(this, args);
+
+                  // release the extended observable
+                  if (target !== this && _kb2.default.isReleaseable(this)) {
+                    var _dispose = target.dispose;
+                    target.dispose = function () {
+                      for (var _len2 = arguments.length, args2 = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                        args2[_key2] = arguments[_key2];
+                      }
+
+                      !_dispose || _dispose.apply(target, args2);
+                      return _kb2.default.release(_this);
+                    };
+                  }
+
+                  return target;
+                };
+              }
+
+              /***/
+            },
+            /* 8 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
               Object.defineProperty(exports, "__esModule", {
                 value: true
               });
@@ -1720,7 +1889,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 7 */
+            /* 9 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -1750,7 +1919,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 8 */
+            /* 10 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -1888,7 +2057,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 9 */
+            /* 11 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -2120,64 +2289,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 10 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _knockout = __webpack_require__(2);
-
-              var _knockout2 = _interopRequireDefault(_knockout);
-
-              var _kb = __webpack_require__(1);
-
-              var _kb2 = _interopRequireDefault(_kb);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              // Allow for dependent release until is resolved https://github.com/knockout/knockout/issues/1464
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              if (_knockout2.default.subscribable && _knockout2.default.subscribable.fn && _knockout2.default.subscribable.fn.extend) {
-                var _extend = _knockout2.default.subscribable.fn.extend;
-                _knockout2.default.subscribable.fn.extend = function () {
-                  var _this = this;
-
-                  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-                    args[_key] = arguments[_key];
-                  }
-
-                  var target = _extend.apply(this, args);
-
-                  // release the extended observable
-                  if (target !== this && _kb2.default.isReleaseable(this)) {
-                    var _dispose = target.dispose;
-                    target.dispose = function () {
-                      for (var _len2 = arguments.length, args2 = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                        args2[_key2] = arguments[_key2];
-                      }
-
-                      !_dispose || _dispose.apply(target, args2);
-                      return _kb2.default.release(_this);
-                    };
-                  }
-
-                  return target;
-                };
-              }
-
-              /***/
-            },
-            /* 11 */
+            /* 12 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -2216,7 +2328,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               var _kb2 = _interopRequireDefault(_kb);
 
-              var _typedValue = __webpack_require__(20);
+              var _typedValue = __webpack_require__(13);
 
               var _typedValue2 = _interopRequireDefault(_typedValue);
 
@@ -2457,7 +2569,202 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 12 */
+            /* 13 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              Object.defineProperty(exports, "__esModule", {
+                value: true
+              });
+
+              var _createClass = function () {
+                function defineProperties(target, props) {
+                  for (var i = 0; i < props.length; i++) {
+                    var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+                  }
+                }return function (Constructor, protoProps, staticProps) {
+                  if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+                };
+              }(); /*
+                     knockback.js 2.0.0-alpha.1
+                     Copyright (c)  2011-2016 Kevin Malakoff.
+                     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                     Source: https://github.com/kmalakoff/knockback
+                     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                   */
+
+              var _underscore = __webpack_require__(0);
+
+              var _underscore2 = _interopRequireDefault(_underscore);
+
+              var _knockout = __webpack_require__(2);
+
+              var _knockout2 = _interopRequireDefault(_knockout);
+
+              var _kb = __webpack_require__(1);
+
+              var _kb2 = _interopRequireDefault(_kb);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              function _classCallCheck(instance, Constructor) {
+                if (!(instance instanceof Constructor)) {
+                  throw new TypeError("Cannot call a class as a function");
+                }
+              }
+
+              // @nodoc
+              var TypedValue = function () {
+                function TypedValue(create_options) {
+                  _classCallCheck(this, TypedValue);
+
+                  this.create_options = create_options;
+                  this._vo = _knockout2.default.observable(null); // create a value observable for the first dependency
+                }
+
+                _createClass(TypedValue, [{
+                  key: 'destroy',
+                  value: function destroy() {
+                    this.__kb_released = true;
+                    var previous_value = this.__kb_value;
+                    if (previous_value) {
+                      this.__kb_value = null;
+                      if (this.create_options.store && _kb2.default.utils.wrappedCreator(previous_value)) {
+                        this.create_options.store.release(previous_value);
+                      } else _kb2.default.release(previous_value);
+                    }
+                    this.create_options = null;
+                  }
+                }, {
+                  key: 'value',
+                  value: function value() {
+                    return _knockout2.default.utils.unwrapObservable(this._vo());
+                  }
+                }, {
+                  key: 'rawValue',
+                  value: function rawValue() {
+                    return this.__kb_value;
+                  }
+                }, {
+                  key: 'valueType',
+                  value: function valueType(model, key) {
+                    var new_value = _kb2.default.getValue(model, key);
+                    this.value_type || this._updateValueObservable(new_value); // create so we can check the type
+                    return this.value_type;
+                  }
+                }, {
+                  key: 'update',
+                  value: function update(new_value) {
+                    if (this.__kb_released) return undefined; // destroyed, nothing to do
+
+                    // determine the new type
+                    new_value !== undefined || (new_value = null); // ensure null instead of undefined
+                    var new_type = _kb2.default.utils.valueType(new_value);
+
+                    if (this.__kb_value && this.__kb_value.__kb_released) {
+                      this.__kb_value = undefined;this.value_type = undefined;
+                    }
+                    var value = this.__kb_value;
+
+                    switch (this.value_type) {
+                      case _kb2.default.TYPE_COLLECTION:
+                        if (this.value_type === _kb2.default.TYPE_COLLECTION && new_type === _kb2.default.TYPE_ARRAY) return value(new_value);
+                        if (new_type === _kb2.default.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
+                          // use the provided CollectionObservable
+                          if (new_value && new_value instanceof _kb2.default.CollectionObservable) this._updateValueObservable(_kb2.default.utils.wrappedObject(new_value), new_value);else if (_kb2.default.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
+                          return undefined;
+                        }
+                        break;
+
+                      case _kb2.default.TYPE_MODEL:
+                        if (new_type === _kb2.default.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
+                          // use the provided ViewModel
+                          if (new_value && !_kb2.default.isModel(new_value)) this._updateValueObservable(_kb2.default.utils.wrappedObject(new_value), new_value);else if (_kb2.default.utils.wrappedObject(value) !== _kb2.default.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
+                          return undefined;
+                        }
+                        break;
+                      default:
+                        break;
+                    }
+
+                    if (this.value_type === new_type && !_underscore2.default.isUndefined(this.value_type)) {
+                      if (_kb2.default.peek(value) !== new_value) return value(new_value);
+                    } else if (_kb2.default.peek(value) !== new_value) return this._updateValueObservable(new_value);
+                    return undefined;
+                  }
+                }, {
+                  key: '_updateValueObservable',
+                  value: function _updateValueObservable(new_value, new_observable) {
+                    var create_options = this.create_options;
+
+                    var creator = _kb2.default.utils.inferCreator(new_value, create_options.factory, create_options.path);
+
+                    // retain previous type
+                    if (new_value === null && !creator) {
+                      if (this.value_type === _kb2.default.TYPE_MODEL) creator = _kb2.default.ViewModel;else if (this.value_type === _kb2.default.TYPE_COLLECTION) creator = _kb2.default.CollectionObservable;
+                    }
+                    create_options.creator = creator;
+
+                    var value_type = _kb2.default.TYPE_UNKNOWN;
+                    var previous_value = this.__kb_value;
+                    this.__kb_value = undefined;
+
+                    var value = void 0;
+                    if (new_observable) {
+                      value = new_observable;
+                      if (create_options.store) create_options.store.retain(new_observable, new_value, creator);
+
+                      // found a creator
+                    } else if (creator) {
+                      // have the store, use it to create
+                      if (create_options.store) value = create_options.store.retainOrCreate(new_value, create_options, true);
+
+                      // create manually
+                      else if (creator.models_only) {
+                          value = new_value;value_type = _kb2.default.TYPE_SIMPLE;
+                        } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
+
+                      // create and cache the type
+                    } else if (_underscore2.default.isArray(new_value)) {
+                      value_type = _kb2.default.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
+                    } else {
+                      value_type = _kb2.default.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
+                    }
+
+                    // determine the type
+                    this.value_type = value_type;
+                    if (value_type === _kb2.default.TYPE_UNKNOWN) {
+                      // a view model, recognize view_models as non-observable
+                      if (!_knockout2.default.isObservable(value)) {
+                        this.value_type = _kb2.default.TYPE_MODEL;_kb2.default.utils.wrappedObject(value, _kb2.default.utils.resolveModel(new_value));
+                      } else if (value.__kb_is_co) {
+                        this.value_type = _kb2.default.TYPE_COLLECTION;_kb2.default.utils.wrappedObject(value, new_value);
+                      } else if (!this.value_type) this.value_type = _kb2.default.TYPE_SIMPLE;
+                    }
+
+                    // release previous
+                    if (previous_value) {
+                      this.create_options.store ? this.create_options.store.release(previous_value) : _kb2.default.release(previous_value);
+                    }
+
+                    // store the value
+                    this.__kb_value = value;
+                    return this._vo(value);
+                  }
+                }]);
+
+                return TypedValue;
+              }();
+
+              exports.default = TypedValue;
+
+              /***/
+            },
+            /* 14 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -2656,7 +2963,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 13 */
+            /* 15 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -3082,7 +3389,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 14 */
+            /* 16 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -3124,15 +3431,15 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               var _kb2 = _interopRequireDefault(_kb);
 
-              var _wrappedDestroy = __webpack_require__(18);
+              var _wrappedDestroy = __webpack_require__(17);
 
               var _wrappedDestroy2 = _interopRequireDefault(_wrappedDestroy);
 
-              var _collapseOptions = __webpack_require__(16);
+              var _collapseOptions = __webpack_require__(18);
 
               var _collapseOptions2 = _interopRequireDefault(_collapseOptions);
 
-              var _unwrapModels = __webpack_require__(17);
+              var _unwrapModels = __webpack_require__(19);
 
               var _unwrapModels2 = _interopRequireDefault(_unwrapModels);
 
@@ -3484,7 +3791,204 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 15 */
+            /* 17 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              Object.defineProperty(exports, "__esModule", {
+                value: true
+              });
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              // @nodoc
+              var wrappedDestroy = function wrappedDestroy(obj) {
+                if (!obj.__kb) return;
+                if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
+
+                var __kb = obj.__kb;
+
+                obj.__kb = null; // clear now to break cycles
+
+                if (__kb.observable) {
+                  __kb.observable.destroy = null;__kb.observable.release = null;
+                  wrappedDestroy(__kb.observable);__kb.observable = null;
+                }
+                __kb.factory = null;
+
+                // release the event_watcher
+                if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy();
+                __kb.event_watcher = null;
+
+                // release the store
+                if (__kb.store_is_owned) __kb.store.destroy();
+                __kb.store = null;
+
+                if (__kb.stores_references) {
+                  var store_references = __kb.stores_references.pop();
+                  while (store_references) {
+                    if (!store_references.store.__kb_released) store_references.store.release(obj);
+                    store_references = __kb.stores_references.pop();
+                  }
+                }
+              };
+
+              exports.default = wrappedDestroy;
+
+              /***/
+            },
+            /* 18 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              Object.defineProperty(exports, "__esModule", {
+                value: true
+              });
+
+              var _underscore = __webpack_require__(0);
+
+              var _underscore2 = _interopRequireDefault(_underscore);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              var assign = _underscore2.default.assign || _underscore2.default.extend;
+
+              // @nodoc
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              var _mergeArray = function _mergeArray(result, key, value) {
+                if (!result[key]) result[key] = [];
+                if (!_underscore2.default.isArray(value)) value = [value];
+                result[key] = result[key].length ? _underscore2.default.union(result[key], value) : value;
+                return result;
+              };
+
+              // @nodoc
+              var _mergeObject = function _mergeObject(result, key, value) {
+                if (!result[key]) result[key] = {};
+                return assign(result[key], value);
+              };
+
+              // @nodoc
+              var _keyArrayToObject = function _keyArrayToObject(value) {
+                var result = {};
+                _underscore2.default.each(value, function (item) {
+                  result[item] = { key: item };
+                });
+                return result;
+              };
+
+              var _mergeOptions = function _mergeOptions(result, options) {
+                if (!options) return result;
+
+                _underscore2.default.each(options, function (value, key) {
+                  switch (key) {
+                    case 'internals':case 'requires':case 'excludes':case 'statics':
+                      _mergeArray(result, key, value);break;
+                    case 'keys':
+                      // an object
+                      if (_underscore2.default.isObject(value) && !_underscore2.default.isArray(value) || _underscore2.default.isObject(result[key]) && !_underscore2.default.isArray(result[key])) {
+                        if (!_underscore2.default.isObject(value)) {
+                          value = [value];
+                        }
+                        if (_underscore2.default.isArray(value)) {
+                          value = _keyArrayToObject(value);
+                        }
+                        if (_underscore2.default.isArray(result[key])) {
+                          result[key] = _keyArrayToObject(result[key]);
+                        }
+                        _mergeObject(result, key, value);
+
+                        // an array
+                      } else _mergeArray(result, key, value);
+                      break;
+
+                    case 'factories':
+                      if (_underscore2.default.isFunction(value)) result[key] = value;else _mergeObject(result, key, value);
+                      break;
+                    case 'static_defaults':
+                      _mergeObject(result, key, value);break;
+                    case 'options':
+                      break;
+                    default:
+                      result[key] = value;break;
+                  }
+                });
+
+                return _mergeOptions(result, options.options);
+              };
+
+              // @nodoc
+
+              exports.default = function (options) {
+                return _mergeOptions({}, options);
+              };
+
+              /***/
+            },
+            /* 19 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              Object.defineProperty(exports, "__esModule", {
+                value: true
+              });
+
+              var _underscore = __webpack_require__(0);
+
+              var _underscore2 = _interopRequireDefault(_underscore);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              // @nodoc
+              exports.default = function (obj) {
+                if (!obj) return obj;
+                if (obj.__kb) return Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj;
+                if (_underscore2.default.isArray(obj)) return _underscore2.default.map(obj, function (test) {
+                  return unwrapModels(test);
+                });
+                if (_underscore2.default.isObject(obj) && obj.constructor === {}.constructor) {
+                  // a simple object
+                  var result = {};
+                  _underscore2.default.each(obj, function (value, key) {
+                    result[key] = unwrapModels(value);
+                  });
+                  return result;
+                }
+
+                return obj;
+              }; /*
+                   knockback.js 2.0.0-alpha.1
+                   Copyright (c)  2011-2016 Kevin Malakoff.
+                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                   Source: https://github.com/kmalakoff/knockback
+                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                 */
+
+              /***/
+            },
+            /* 20 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -3817,500 +4321,8 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               };
 
               /***/
-            },
-            /* 16 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              Object.defineProperty(exports, "__esModule", {
-                value: true
-              });
-
-              var _underscore = __webpack_require__(0);
-
-              var _underscore2 = _interopRequireDefault(_underscore);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              var assign = _underscore2.default.assign || _underscore2.default.extend;
-
-              // @nodoc
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              var _mergeArray = function _mergeArray(result, key, value) {
-                if (!result[key]) result[key] = [];
-                if (!_underscore2.default.isArray(value)) value = [value];
-                result[key] = result[key].length ? _underscore2.default.union(result[key], value) : value;
-                return result;
-              };
-
-              // @nodoc
-              var _mergeObject = function _mergeObject(result, key, value) {
-                if (!result[key]) result[key] = {};
-                return assign(result[key], value);
-              };
-
-              // @nodoc
-              var _keyArrayToObject = function _keyArrayToObject(value) {
-                var result = {};
-                _underscore2.default.each(value, function (item) {
-                  result[item] = { key: item };
-                });
-                return result;
-              };
-
-              var _mergeOptions = function _mergeOptions(result, options) {
-                if (!options) return result;
-
-                _underscore2.default.each(options, function (value, key) {
-                  switch (key) {
-                    case 'internals':case 'requires':case 'excludes':case 'statics':
-                      _mergeArray(result, key, value);break;
-                    case 'keys':
-                      // an object
-                      if (_underscore2.default.isObject(value) && !_underscore2.default.isArray(value) || _underscore2.default.isObject(result[key]) && !_underscore2.default.isArray(result[key])) {
-                        if (!_underscore2.default.isObject(value)) {
-                          value = [value];
-                        }
-                        if (_underscore2.default.isArray(value)) {
-                          value = _keyArrayToObject(value);
-                        }
-                        if (_underscore2.default.isArray(result[key])) {
-                          result[key] = _keyArrayToObject(result[key]);
-                        }
-                        _mergeObject(result, key, value);
-
-                        // an array
-                      } else _mergeArray(result, key, value);
-                      break;
-
-                    case 'factories':
-                      if (_underscore2.default.isFunction(value)) result[key] = value;else _mergeObject(result, key, value);
-                      break;
-                    case 'static_defaults':
-                      _mergeObject(result, key, value);break;
-                    case 'options':
-                      break;
-                    default:
-                      result[key] = value;break;
-                  }
-                });
-
-                return _mergeOptions(result, options.options);
-              };
-
-              // @nodoc
-
-              exports.default = function (options) {
-                return _mergeOptions({}, options);
-              };
-
-              /***/
-            },
-            /* 17 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              Object.defineProperty(exports, "__esModule", {
-                value: true
-              });
-
-              var _underscore = __webpack_require__(0);
-
-              var _underscore2 = _interopRequireDefault(_underscore);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              // @nodoc
-              exports.default = function (obj) {
-                if (!obj) return obj;
-                if (obj.__kb) return Object.prototype.hasOwnProperty.call(obj.__kb, 'object') ? obj.__kb.object : obj;
-                if (_underscore2.default.isArray(obj)) return _underscore2.default.map(obj, function (test) {
-                  return unwrapModels(test);
-                });
-                if (_underscore2.default.isObject(obj) && obj.constructor === {}.constructor) {
-                  // a simple object
-                  var result = {};
-                  _underscore2.default.each(obj, function (value, key) {
-                    result[key] = unwrapModels(value);
-                  });
-                  return result;
-                }
-
-                return obj;
-              }; /*
-                   knockback.js 2.0.0-alpha.1
-                   Copyright (c)  2011-2016 Kevin Malakoff.
-                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                   Source: https://github.com/kmalakoff/knockback
-                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                 */
-
-              /***/
-            },
-            /* 18 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              Object.defineProperty(exports, "__esModule", {
-                value: true
-              });
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              // @nodoc
-              var wrappedDestroy = function wrappedDestroy(obj) {
-                if (!obj.__kb) return;
-                if (obj.__kb.event_watcher) obj.__kb.event_watcher.releaseCallbacks(obj);
-
-                var __kb = obj.__kb;
-
-                obj.__kb = null; // clear now to break cycles
-
-                if (__kb.observable) {
-                  __kb.observable.destroy = null;__kb.observable.release = null;
-                  wrappedDestroy(__kb.observable);__kb.observable = null;
-                }
-                __kb.factory = null;
-
-                // release the event_watcher
-                if (__kb.event_watcher_is_owned) __kb.event_watcher.destroy();
-                __kb.event_watcher = null;
-
-                // release the store
-                if (__kb.store_is_owned) __kb.store.destroy();
-                __kb.store = null;
-
-                if (__kb.stores_references) {
-                  var store_references = __kb.stores_references.pop();
-                  while (store_references) {
-                    if (!store_references.store.__kb_released) store_references.store.release(obj);
-                    store_references = __kb.stores_references.pop();
-                  }
-                }
-              };
-
-              exports.default = wrappedDestroy;
-
-              /***/
-            },
-            /* 19 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _underscore = __webpack_require__(0);
-
-              var _underscore2 = _interopRequireDefault(_underscore);
-
-              var _backbone = __webpack_require__(3);
-
-              var _backbone2 = _interopRequireDefault(_backbone);
-
-              var _knockout = __webpack_require__(2);
-
-              var _knockout2 = _interopRequireDefault(_knockout);
-
-              __webpack_require__(10);
-
-              var _kb = __webpack_require__(1);
-
-              var _kb2 = _interopRequireDefault(_kb);
-
-              var _collectionObservable = __webpack_require__(6);
-
-              var _collectionObservable2 = _interopRequireDefault(_collectionObservable);
-
-              var _configure = __webpack_require__(7);
-
-              var _configure2 = _interopRequireDefault(_configure);
-
-              var _eventWatcher = __webpack_require__(4);
-
-              var _eventWatcher2 = _interopRequireDefault(_eventWatcher);
-
-              var _factory = __webpack_require__(8);
-
-              var _factory2 = _interopRequireDefault(_factory);
-
-              var _inject = __webpack_require__(9);
-
-              var _observable = __webpack_require__(11);
-
-              var _observable2 = _interopRequireDefault(_observable);
-
-              var _statistics = __webpack_require__(12);
-
-              var _statistics2 = _interopRequireDefault(_statistics);
-
-              var _store = __webpack_require__(13);
-
-              var _store2 = _interopRequireDefault(_store);
-
-              var _utils = __webpack_require__(14);
-
-              var _utils2 = _interopRequireDefault(_utils);
-
-              var _viewModel = __webpack_require__(15);
-
-              var _viewModel2 = _interopRequireDefault(_viewModel);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              var api = {
-                _: _underscore2.default,
-                Backbone: _backbone2.default,
-                ko: _knockout2.default,
-                CollectionObservable: _collectionObservable2.default,
-                collectionObservable: _collectionObservable.collectionObservable,
-                observableCollection: _collectionObservable.collectionObservable,
-                compare: _collectionObservable.compare,
-                configure: _configure2.default,
-                settings: _configure.settings,
-                EventWatcher: _eventWatcher2.default,
-                Factory: _factory2.default,
-                RECUSIVE_AUTO_INJECT: true,
-                injectViewModels: _inject.injectViewModels,
-                Observable: _observable2.default,
-                observable: _observable.observable,
-                Statistics: _statistics2.default,
-                Store: _store2.default,
-                utils: _utils2.default,
-                ViewModel: _viewModel2.default,
-                viewModel: _viewModel.viewModel
-              }; /*
-                   knockback.js 2.0.0-alpha.1
-                   Copyright (c)  2011-2016 Kevin Malakoff.
-                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                   Source: https://github.com/kmalakoff/knockback
-                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                 */
-
-              _kb2.default.assign(_kb2.default, api);
-
-              module.exports = _kb2.default;
-
-              /***/
-            },
-            /* 20 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              Object.defineProperty(exports, "__esModule", {
-                value: true
-              });
-
-              var _createClass = function () {
-                function defineProperties(target, props) {
-                  for (var i = 0; i < props.length; i++) {
-                    var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
-                  }
-                }return function (Constructor, protoProps, staticProps) {
-                  if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
-                };
-              }(); /*
-                     knockback.js 2.0.0-alpha.1
-                     Copyright (c)  2011-2016 Kevin Malakoff.
-                     License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                     Source: https://github.com/kmalakoff/knockback
-                     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                   */
-
-              var _underscore = __webpack_require__(0);
-
-              var _underscore2 = _interopRequireDefault(_underscore);
-
-              var _knockout = __webpack_require__(2);
-
-              var _knockout2 = _interopRequireDefault(_knockout);
-
-              var _kb = __webpack_require__(1);
-
-              var _kb2 = _interopRequireDefault(_kb);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              function _classCallCheck(instance, Constructor) {
-                if (!(instance instanceof Constructor)) {
-                  throw new TypeError("Cannot call a class as a function");
-                }
-              }
-
-              // @nodoc
-              var TypedValue = function () {
-                function TypedValue(create_options) {
-                  _classCallCheck(this, TypedValue);
-
-                  this.create_options = create_options;
-                  this._vo = _knockout2.default.observable(null); // create a value observable for the first dependency
-                }
-
-                _createClass(TypedValue, [{
-                  key: 'destroy',
-                  value: function destroy() {
-                    this.__kb_released = true;
-                    var previous_value = this.__kb_value;
-                    if (previous_value) {
-                      this.__kb_value = null;
-                      if (this.create_options.store && _kb2.default.utils.wrappedCreator(previous_value)) {
-                        this.create_options.store.release(previous_value);
-                      } else _kb2.default.release(previous_value);
-                    }
-                    this.create_options = null;
-                  }
-                }, {
-                  key: 'value',
-                  value: function value() {
-                    return _knockout2.default.utils.unwrapObservable(this._vo());
-                  }
-                }, {
-                  key: 'rawValue',
-                  value: function rawValue() {
-                    return this.__kb_value;
-                  }
-                }, {
-                  key: 'valueType',
-                  value: function valueType(model, key) {
-                    var new_value = _kb2.default.getValue(model, key);
-                    this.value_type || this._updateValueObservable(new_value); // create so we can check the type
-                    return this.value_type;
-                  }
-                }, {
-                  key: 'update',
-                  value: function update(new_value) {
-                    if (this.__kb_released) return undefined; // destroyed, nothing to do
-
-                    // determine the new type
-                    new_value !== undefined || (new_value = null); // ensure null instead of undefined
-                    var new_type = _kb2.default.utils.valueType(new_value);
-
-                    if (this.__kb_value && this.__kb_value.__kb_released) {
-                      this.__kb_value = undefined;this.value_type = undefined;
-                    }
-                    var value = this.__kb_value;
-
-                    switch (this.value_type) {
-                      case _kb2.default.TYPE_COLLECTION:
-                        if (this.value_type === _kb2.default.TYPE_COLLECTION && new_type === _kb2.default.TYPE_ARRAY) return value(new_value);
-                        if (new_type === _kb2.default.TYPE_COLLECTION || _underscore2.default.isNull(new_value)) {
-                          // use the provided CollectionObservable
-                          if (new_value && new_value instanceof _kb2.default.CollectionObservable) this._updateValueObservable(_kb2.default.utils.wrappedObject(new_value), new_value);else if (_kb2.default.peek(value.collection) !== new_value) value.collection(new_value); // collection observables are allocated once
-                          return undefined;
-                        }
-                        break;
-
-                      case _kb2.default.TYPE_MODEL:
-                        if (new_type === _kb2.default.TYPE_MODEL || _underscore2.default.isNull(new_value)) {
-                          // use the provided ViewModel
-                          if (new_value && !_kb2.default.isModel(new_value)) this._updateValueObservable(_kb2.default.utils.wrappedObject(new_value), new_value);else if (_kb2.default.utils.wrappedObject(value) !== _kb2.default.utils.resolveModel(new_value)) this._updateValueObservable(new_value);
-                          return undefined;
-                        }
-                        break;
-                      default:
-                        break;
-                    }
-
-                    if (this.value_type === new_type && !_underscore2.default.isUndefined(this.value_type)) {
-                      if (_kb2.default.peek(value) !== new_value) return value(new_value);
-                    } else if (_kb2.default.peek(value) !== new_value) return this._updateValueObservable(new_value);
-                    return undefined;
-                  }
-                }, {
-                  key: '_updateValueObservable',
-                  value: function _updateValueObservable(new_value, new_observable) {
-                    var create_options = this.create_options;
-
-                    var creator = _kb2.default.utils.inferCreator(new_value, create_options.factory, create_options.path);
-
-                    // retain previous type
-                    if (new_value === null && !creator) {
-                      if (this.value_type === _kb2.default.TYPE_MODEL) creator = _kb2.default.ViewModel;else if (this.value_type === _kb2.default.TYPE_COLLECTION) creator = _kb2.default.CollectionObservable;
-                    }
-                    create_options.creator = creator;
-
-                    var value_type = _kb2.default.TYPE_UNKNOWN;
-                    var previous_value = this.__kb_value;
-                    this.__kb_value = undefined;
-
-                    var value = void 0;
-                    if (new_observable) {
-                      value = new_observable;
-                      if (create_options.store) create_options.store.retain(new_observable, new_value, creator);
-
-                      // found a creator
-                    } else if (creator) {
-                      // have the store, use it to create
-                      if (create_options.store) value = create_options.store.retainOrCreate(new_value, create_options, true);
-
-                      // create manually
-                      else if (creator.models_only) {
-                          value = new_value;value_type = _kb2.default.TYPE_SIMPLE;
-                        } else if (creator.create) value = creator.create(new_value, create_options);else value = new creator(new_value, create_options);
-
-                      // create and cache the type
-                    } else if (_underscore2.default.isArray(new_value)) {
-                      value_type = _kb2.default.TYPE_ARRAY;value = _knockout2.default.observableArray(new_value);
-                    } else {
-                      value_type = _kb2.default.TYPE_SIMPLE;value = _knockout2.default.observable(new_value);
-                    }
-
-                    // determine the type
-                    this.value_type = value_type;
-                    if (value_type === _kb2.default.TYPE_UNKNOWN) {
-                      // a view model, recognize view_models as non-observable
-                      if (!_knockout2.default.isObservable(value)) {
-                        this.value_type = _kb2.default.TYPE_MODEL;_kb2.default.utils.wrappedObject(value, _kb2.default.utils.resolveModel(new_value));
-                      } else if (value.__kb_is_co) {
-                        this.value_type = _kb2.default.TYPE_COLLECTION;_kb2.default.utils.wrappedObject(value, new_value);
-                      } else if (!this.value_type) this.value_type = _kb2.default.TYPE_SIMPLE;
-                    }
-
-                    // release previous
-                    if (previous_value) {
-                      this.create_options.store ? this.create_options.store.release(previous_value) : _kb2.default.release(previous_value);
-                    }
-
-                    // store the value
-                    this.__kb_value = value;
-                    return this._vo(value);
-                  }
-                }]);
-
-                return TypedValue;
-              }();
-
-              exports.default = TypedValue;
-
-              /***/
-            }])
+            }]
+            /******/)
           );
         });
         /* WEBPACK VAR INJECTION */
@@ -4357,6 +4369,42 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
+
+      var _core = __webpack_require__(2);
+
+      var _core2 = _interopRequireDefault(_core);
+
+      __webpack_require__(6);
+
+      __webpack_require__(7);
+
+      __webpack_require__(8);
+
+      __webpack_require__(9);
+
+      __webpack_require__(10);
+
+      function _interopRequireDefault(obj) {
+        return obj && obj.__esModule ? obj : { default: obj };
+      }
+
+      /*
+        knockback.js 2.0.0-alpha.1
+        Copyright (c)  2011-2016 Kevin Malakoff.
+        License: MIT (http://www.opensource.org/licenses/mit-license.php)
+        Source: https://github.com/kmalakoff/knockback
+        Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+      */
+
+      module.exports = _core2.default;
+
+      /***/
+    },
+    /* 6 */
+    /***/function (module, exports, __webpack_require__) {
+
+      "use strict";
       /* WEBPACK VAR INJECTION */
       (function (module) {
         var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;
@@ -4379,9 +4427,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/function __webpack_require__(moduleId) {
                 /******/
                 /******/ // Check if module is in cache
-                /******/if (installedModules[moduleId])
+                /******/if (installedModules[moduleId]) {
                   /******/return installedModules[moduleId].exports;
-                /******/
+                  /******/
+                }
                 /******/ // Create a new module (and put it into the cache)
                 /******/var module = installedModules[moduleId] = {
                   /******/i: moduleId,
@@ -4406,11 +4455,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/
               /******/ // expose the module cache
               /******/__webpack_require__.c = installedModules;
-              /******/
-              /******/ // identity function for calling harmony imports with the correct context
-              /******/__webpack_require__.i = function (value) {
-                return value;
-              };
               /******/
               /******/ // define getter function for harmony exports
               /******/__webpack_require__.d = function (exports, name, getter) {
@@ -4448,7 +4492,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/__webpack_require__.p = "";
               /******/
               /******/ // Load entry module and return exports
-              /******/return __webpack_require__(__webpack_require__.s = 5);
+              /******/return __webpack_require__(__webpack_require__.s = 3);
               /******/
             }(
             /************************************************************************/
@@ -4475,6 +4519,108 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /***/
             },
             /* 3 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              var _core = __webpack_require__(0);
+
+              var _core2 = _interopRequireDefault(_core);
+
+              __webpack_require__(4);
+
+              var _defaultObservable = __webpack_require__(5);
+
+              var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              var api = {
+                DefaultObservable: _defaultObservable2.default,
+                defaultObservable: _defaultObservable.defaultObservable
+              }; /*
+                   knockback.js 2.0.0-alpha.1
+                   Copyright (c)  2011-2016 Kevin Malakoff.
+                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                   Source: https://github.com/kmalakoff/knockback
+                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                 */
+
+              _core2.default.assign(_core2.default, api);
+
+              module.exports = _core2.default;
+
+              /***/
+            },
+            /* 4 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              var _underscore = __webpack_require__(1);
+
+              var _underscore2 = _interopRequireDefault(_underscore);
+
+              var _knockout = __webpack_require__(2);
+
+              var _knockout2 = _interopRequireDefault(_knockout);
+
+              var _core = __webpack_require__(0);
+
+              var _core2 = _interopRequireDefault(_core);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              _core2.default.Observable.prototype.setToDefault = function () {
+                if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
+              }; /*
+                   knockback.js 2.0.0-alpha.1
+                   Copyright (c)  2011-2016 Kevin Malakoff.
+                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                   Source: https://github.com/kmalakoff/knockback
+                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+                 */
+
+              _core2.default.ViewModel.prototype.setToDefault = function () {
+                _underscore2.default.each(this.__kb.vm_keys, function (value) {
+                  if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
+                });
+              };
+
+              // @example
+              //   var model = new Backbone.Model({name: 'Bob'});
+              //   var view_model = {
+              //     wrapped_name: kb.defaultWrapper(kb.observable(model, 'name'), '(no name)')
+              //   }; // view_model.wrapped name: Bob
+              //   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
+              _core2.default.utils.setToDefault = function (obj) {
+                var _this = this;
+
+                if (!obj) return undefined;
+
+                // observable
+                if (_knockout2.default.isObservable(obj)) {
+                  if (typeof obj.setToDefault === 'function') obj.setToDefault();
+
+                  // view model
+                } else if (_underscore2.default.isObject(obj)) {
+                  _underscore2.default.each(obj, function (value, key) {
+                    if (value && (_knockout2.default.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
+                  });
+                }
+
+                return obj;
+              };
+
+              /***/
+            },
+            /* 5 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -4593,109 +4739,8 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               };
 
               /***/
-            },
-            /* 4 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _underscore = __webpack_require__(1);
-
-              var _underscore2 = _interopRequireDefault(_underscore);
-
-              var _knockout = __webpack_require__(2);
-
-              var _knockout2 = _interopRequireDefault(_knockout);
-
-              var _core = __webpack_require__(0);
-
-              var _core2 = _interopRequireDefault(_core);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              _core2.default.Observable.prototype.setToDefault = function () {
-                if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
-              }; /*
-                   knockback.js 2.0.0-alpha.1
-                   Copyright (c)  2011-2016 Kevin Malakoff.
-                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                   Source: https://github.com/kmalakoff/knockback
-                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                 */
-
-              _core2.default.ViewModel.prototype.setToDefault = function () {
-                _underscore2.default.each(this.__kb.vm_keys, function (value) {
-                  if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
-                });
-              };
-
-              // @example
-              //   var model = new Backbone.Model({name: 'Bob'});
-              //   var view_model = {
-              //     wrapped_name: kb.defaultWrapper(kb.observable(model, 'name'), '(no name)')
-              //   }; // view_model.wrapped name: Bob
-              //   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
-              _core2.default.utils.setToDefault = function (obj) {
-                var _this = this;
-
-                if (!obj) return undefined;
-
-                // observable
-                if (_knockout2.default.isObservable(obj)) {
-                  if (typeof obj.setToDefault === 'function') obj.setToDefault();
-
-                  // view model
-                } else if (_underscore2.default.isObject(obj)) {
-                  _underscore2.default.each(obj, function (value, key) {
-                    if (value && (_knockout2.default.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
-                  });
-                }
-
-                return obj;
-              };
-
-              /***/
-            },
-            /* 5 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _core = __webpack_require__(0);
-
-              var _core2 = _interopRequireDefault(_core);
-
-              __webpack_require__(4);
-
-              var _defaultObservable = __webpack_require__(3);
-
-              var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              var api = {
-                DefaultObservable: _defaultObservable2.default,
-                defaultObservable: _defaultObservable.defaultObservable
-              }; /*
-                   knockback.js 2.0.0-alpha.1
-                   Copyright (c)  2011-2016 Kevin Malakoff.
-                   License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                   Source: https://github.com/kmalakoff/knockback
-                   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                 */
-
-              _core2.default.assign(_core2.default, api);
-
-              module.exports = _core2.default;
-
-              /***/
-            }])
+            }]
+            /******/)
           );
         });
         /* WEBPACK VAR INJECTION */
@@ -4703,7 +4748,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
       /***/
     },
-    /* 6 */
+    /* 7 */
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
@@ -4729,9 +4774,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/function __webpack_require__(moduleId) {
                 /******/
                 /******/ // Check if module is in cache
-                /******/if (installedModules[moduleId])
+                /******/if (installedModules[moduleId]) {
                   /******/return installedModules[moduleId].exports;
-                /******/
+                  /******/
+                }
                 /******/ // Create a new module (and put it into the cache)
                 /******/var module = installedModules[moduleId] = {
                   /******/i: moduleId,
@@ -4756,11 +4802,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/
               /******/ // expose the module cache
               /******/__webpack_require__.c = installedModules;
-              /******/
-              /******/ // identity function for calling harmony imports with the correct context
-              /******/__webpack_require__.i = function (value) {
-                return value;
-              };
               /******/
               /******/ // define getter function for harmony exports
               /******/__webpack_require__.d = function (exports, name, getter) {
@@ -4798,7 +4839,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/__webpack_require__.p = "";
               /******/
               /******/ // Load entry module and return exports
-              /******/return __webpack_require__(__webpack_require__.s = 2);
+              /******/return __webpack_require__(__webpack_require__.s = 1);
               /******/
             }(
             /************************************************************************/
@@ -4811,6 +4852,43 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /***/
             },
             /* 1 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              var _core = __webpack_require__(0);
+
+              var _core2 = _interopRequireDefault(_core);
+
+              var _formattedObservable = __webpack_require__(2);
+
+              var _formattedObservable2 = _interopRequireDefault(_formattedObservable);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              var api = {
+                FormattedObservable: _formattedObservable2.default,
+                formattedObservable: _formattedObservable.formattedObservable,
+                observableFormatted: _formattedObservable.formattedObservable
+              };
+              _core2.default.assign(_core2.default, api);
+
+              module.exports = api;
+
+              /***/
+            },
+            /* 2 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -4995,43 +5073,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 2 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _core = __webpack_require__(0);
-
-              var _core2 = _interopRequireDefault(_core);
-
-              var _formattedObservable = __webpack_require__(1);
-
-              var _formattedObservable2 = _interopRequireDefault(_formattedObservable);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              var api = {
-                FormattedObservable: _formattedObservable2.default,
-                formattedObservable: _formattedObservable.formattedObservable,
-                observableFormatted: _formattedObservable.formattedObservable
-              };
-              _core2.default.assign(_core2.default, api);
-
-              module.exports = api;
-
-              /***/
-            },
             /* 3 */
             /***/function (module, exports) {
 
@@ -5045,7 +5086,8 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
 
               /***/
-            }])
+            }]
+            /******/)
           );
         });
         /* WEBPACK VAR INJECTION */
@@ -5053,7 +5095,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
       /***/
     },
-    /* 7 */
+    /* 8 */
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
@@ -5068,7 +5110,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
         };
 
         (function webpackUniversalModuleDefinition(root, factory) {
-          if ((false ? 'undefined' : _typeof(exports)) === 'object' && (false ? 'undefined' : _typeof(module)) === 'object') module.exports = factory(__webpack_require__(2), __webpack_require__(4), __webpack_require__(0), __webpack_require__(1));else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(4), __webpack_require__(0), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));else if ((typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') exports["kb"] = factory(require("@knockback/core"), require("backbone"), require("underscore"), require("knockout"));else root["kb"] = factory(root["kb"], root["Backbone"], root["_"], root["ko"]);
+          if ((false ? 'undefined' : _typeof(exports)) === 'object' && (false ? 'undefined' : _typeof(module)) === 'object') module.exports = factory(__webpack_require__(2), __webpack_require__(0), __webpack_require__(4), __webpack_require__(1));else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(0), __webpack_require__(4), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));else if ((typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') exports["kb"] = factory(require("@knockback/core"), require("underscore"), require("backbone"), require("knockout"));else root["kb"] = factory(root["kb"], root["_"], root["Backbone"], root["ko"]);
         })(undefined, function (__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_3__, __WEBPACK_EXTERNAL_MODULE_4__, __WEBPACK_EXTERNAL_MODULE_5__) {
           return (/******/function (modules) {
               // webpackBootstrap
@@ -5079,9 +5121,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/function __webpack_require__(moduleId) {
                 /******/
                 /******/ // Check if module is in cache
-                /******/if (installedModules[moduleId])
+                /******/if (installedModules[moduleId]) {
                   /******/return installedModules[moduleId].exports;
-                /******/
+                  /******/
+                }
                 /******/ // Create a new module (and put it into the cache)
                 /******/var module = installedModules[moduleId] = {
                   /******/i: moduleId,
@@ -5106,11 +5149,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/
               /******/ // expose the module cache
               /******/__webpack_require__.c = installedModules;
-              /******/
-              /******/ // identity function for calling harmony imports with the correct context
-              /******/__webpack_require__.i = function (value) {
-                return value;
-              };
               /******/
               /******/ // define getter function for harmony exports
               /******/__webpack_require__.d = function (exports, name, getter) {
@@ -5148,7 +5186,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/__webpack_require__.p = "";
               /******/
               /******/ // Load entry module and return exports
-              /******/return __webpack_require__(__webpack_require__.s = 2);
+              /******/return __webpack_require__(__webpack_require__.s = 1);
               /******/
             }(
             /************************************************************************/
@@ -5161,6 +5199,45 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /***/
             },
             /* 1 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              var _core = __webpack_require__(0);
+
+              var _core2 = _interopRequireDefault(_core);
+
+              var _localizedObservable = __webpack_require__(2);
+
+              var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              // Locale Manager - if you are using localization, set this property.
+              // It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              var api = {
+                locale_manager: undefined,
+                LocalizedObservable: _localizedObservable2.default,
+                localizedObservable: _localizedObservable.localizedObservable
+              };
+              _core2.default.assign(_core2.default, api);
+
+              module.exports = api;
+
+              /***/
+            },
+            /* 2 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -5187,11 +5264,11 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
                      Optional dependencies: Backbone.ModelRef.js and BackboneORM.
                    */
 
-              var _underscore = __webpack_require__(4);
+              var _underscore = __webpack_require__(3);
 
               var _underscore2 = _interopRequireDefault(_underscore);
 
-              var _backbone = __webpack_require__(3);
+              var _backbone = __webpack_require__(4);
 
               var _backbone2 = _interopRequireDefault(_backbone);
 
@@ -5397,45 +5474,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 2 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _core = __webpack_require__(0);
-
-              var _core2 = _interopRequireDefault(_core);
-
-              var _localizedObservable = __webpack_require__(1);
-
-              var _localizedObservable2 = _interopRequireDefault(_localizedObservable);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              // Locale Manager - if you are using localization, set this property.
-              // It must have Backbone.Events mixed in and implement a get method like Backbone.Model, eg. get: (attribute_name) -> return somthing
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              var api = {
-                locale_manager: undefined,
-                LocalizedObservable: _localizedObservable2.default,
-                localizedObservable: _localizedObservable.localizedObservable
-              };
-              _core2.default.assign(_core2.default, api);
-
-              module.exports = api;
-
-              /***/
-            },
             /* 3 */
             /***/function (module, exports) {
 
@@ -5456,7 +5494,8 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               module.exports = __WEBPACK_EXTERNAL_MODULE_5__;
 
               /***/
-            }])
+            }]
+            /******/)
           );
         });
         /* WEBPACK VAR INJECTION */
@@ -5464,7 +5503,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
       /***/
     },
-    /* 8 */
+    /* 9 */
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
@@ -5490,9 +5529,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/function __webpack_require__(moduleId) {
                 /******/
                 /******/ // Check if module is in cache
-                /******/if (installedModules[moduleId])
+                /******/if (installedModules[moduleId]) {
                   /******/return installedModules[moduleId].exports;
-                /******/
+                  /******/
+                }
                 /******/ // Create a new module (and put it into the cache)
                 /******/var module = installedModules[moduleId] = {
                   /******/i: moduleId,
@@ -5517,11 +5557,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/
               /******/ // expose the module cache
               /******/__webpack_require__.c = installedModules;
-              /******/
-              /******/ // identity function for calling harmony imports with the correct context
-              /******/__webpack_require__.i = function (value) {
-                return value;
-              };
               /******/
               /******/ // define getter function for harmony exports
               /******/__webpack_require__.d = function (exports, name, getter) {
@@ -5559,7 +5594,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/__webpack_require__.p = "";
               /******/
               /******/ // Load entry module and return exports
-              /******/return __webpack_require__(__webpack_require__.s = 2);
+              /******/return __webpack_require__(__webpack_require__.s = 1);
               /******/
             }(
             /************************************************************************/
@@ -5572,6 +5607,43 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /***/
             },
             /* 1 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
+              var _core = __webpack_require__(0);
+
+              var _core2 = _interopRequireDefault(_core);
+
+              var _triggeredObservable = __webpack_require__(2);
+
+              var _triggeredObservable2 = _interopRequireDefault(_triggeredObservable);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              var api = {
+                TriggeredObservable: _triggeredObservable2.default,
+                triggeredObservable: _triggeredObservable.triggeredObservable,
+                observableTriggered: _triggeredObservable.triggeredObservable
+              };
+              _core2.default.assign(_core2.default, api);
+
+              module.exports = api;
+
+              /***/
+            },
+            /* 2 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -5733,43 +5805,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 2 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _core = __webpack_require__(0);
-
-              var _core2 = _interopRequireDefault(_core);
-
-              var _triggeredObservable = __webpack_require__(1);
-
-              var _triggeredObservable2 = _interopRequireDefault(_triggeredObservable);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              var api = {
-                TriggeredObservable: _triggeredObservable2.default,
-                triggeredObservable: _triggeredObservable.triggeredObservable,
-                observableTriggered: _triggeredObservable.triggeredObservable
-              };
-              _core2.default.assign(_core2.default, api);
-
-              module.exports = api;
-
-              /***/
-            },
             /* 3 */
             /***/function (module, exports) {
 
@@ -5783,7 +5818,8 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               module.exports = __WEBPACK_EXTERNAL_MODULE_4__;
 
               /***/
-            }])
+            }]
+            /******/)
           );
         });
         /* WEBPACK VAR INJECTION */
@@ -5791,7 +5827,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
       /***/
     },
-    /* 9 */
+    /* 10 */
     /***/function (module, exports, __webpack_require__) {
 
       "use strict";
@@ -5807,7 +5843,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
         (function webpackUniversalModuleDefinition(root, factory) {
           if ((false ? 'undefined' : _typeof(exports)) === 'object' && (false ? 'undefined' : _typeof(module)) === 'object') module.exports = factory(__webpack_require__(2), __webpack_require__(0), __webpack_require__(1));else if (true) !(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(2), __webpack_require__(0), __webpack_require__(1)], __WEBPACK_AMD_DEFINE_FACTORY__ = factory, __WEBPACK_AMD_DEFINE_RESULT__ = typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ? __WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__) : __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));else if ((typeof exports === 'undefined' ? 'undefined' : _typeof(exports)) === 'object') exports["kbv"] = factory(require("@knockback/core"), require("underscore"), require("knockout"));else root["kbv"] = factory(root["kb"], root["_"], root["ko"]);
-        })(undefined, function (__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
+        })(undefined, function (__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
           return (/******/function (modules) {
               // webpackBootstrap
               /******/ // The module cache
@@ -5817,9 +5853,10 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/function __webpack_require__(moduleId) {
                 /******/
                 /******/ // Check if module is in cache
-                /******/if (installedModules[moduleId])
+                /******/if (installedModules[moduleId]) {
                   /******/return installedModules[moduleId].exports;
-                /******/
+                  /******/
+                }
                 /******/ // Create a new module (and put it into the cache)
                 /******/var module = installedModules[moduleId] = {
                   /******/i: moduleId,
@@ -5844,11 +5881,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/
               /******/ // expose the module cache
               /******/__webpack_require__.c = installedModules;
-              /******/
-              /******/ // identity function for calling harmony imports with the correct context
-              /******/__webpack_require__.i = function (value) {
-                return value;
-              };
               /******/
               /******/ // define getter function for harmony exports
               /******/__webpack_require__.d = function (exports, name, getter) {
@@ -5886,12 +5918,19 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               /******/__webpack_require__.p = "";
               /******/
               /******/ // Load entry module and return exports
-              /******/return __webpack_require__(__webpack_require__.s = 6);
+              /******/return __webpack_require__(__webpack_require__.s = 4);
               /******/
             }(
             /************************************************************************/
             /******/[
             /* 0 */
+            /***/function (module, exports) {
+
+              module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
+
+              /***/
+            },
+            /* 1 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -5932,13 +5971,6 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 1 */
-            /***/function (module, exports) {
-
-              module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-              /***/
-            },
             /* 2 */
             /***/function (module, exports) {
 
@@ -5958,6 +5990,53 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               "use strict";
 
+              var _core = __webpack_require__(0);
+
+              var _core2 = _interopRequireDefault(_core);
+
+              var _valid = __webpack_require__(1);
+
+              var _valid2 = _interopRequireDefault(_valid);
+
+              var _validation = __webpack_require__(5);
+
+              var _validators = __webpack_require__(6);
+
+              function _interopRequireDefault(obj) {
+                return obj && obj.__esModule ? obj : { default: obj };
+              }
+
+              /*
+                knockback.js 2.0.0-alpha.1
+                Copyright (c)  2011-2016 Kevin Malakoff.
+                License: MIT (http://www.opensource.org/licenses/mit-license.php)
+                Source: https://github.com/kmalakoff/knockback
+                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+              */
+
+              var api = {
+                valid: _valid2.default,
+                valueValidator: _validation.valueValidator,
+                inputValidator: _validation.inputValidator,
+                formValidator: _validation.formValidator,
+                hasChangedFn: _validators.hasChangedFn,
+                minLengthFn: _validators.minLengthFn,
+                uniqueValueFn: _validators.uniqueValueFn,
+                untilTrueFn: _validators.untilTrueFn,
+                untilFalseFn: _validators.untilFalseFn
+              };
+              _core2.default.assign(_core2.default, api);
+
+              module.exports = api;
+
+              /***/
+            },
+            /* 5 */
+            /***/function (module, exports, __webpack_require__) {
+
+              "use strict";
+
               Object.defineProperty(exports, "__esModule", {
                 value: true
               });
@@ -5971,11 +6050,11 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               var _knockout2 = _interopRequireDefault(_knockout);
 
-              var _core = __webpack_require__(1);
+              var _core = __webpack_require__(0);
 
               var _core2 = _interopRequireDefault(_core);
 
-              var _valid = __webpack_require__(0);
+              var _valid = __webpack_require__(1);
 
               var _valid2 = _interopRequireDefault(_valid);
 
@@ -6247,7 +6326,7 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
 
               /***/
             },
-            /* 5 */
+            /* 6 */
             /***/function (module, exports, __webpack_require__) {
 
               "use strict";
@@ -6339,122 +6418,19 @@ var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbo
               };
 
               /***/
-            },
-            /* 6 */
-            /***/function (module, exports, __webpack_require__) {
-
-              "use strict";
-
-              var _core = __webpack_require__(1);
-
-              var _core2 = _interopRequireDefault(_core);
-
-              var _valid = __webpack_require__(0);
-
-              var _valid2 = _interopRequireDefault(_valid);
-
-              var _validation = __webpack_require__(4);
-
-              var _validators = __webpack_require__(5);
-
-              function _interopRequireDefault(obj) {
-                return obj && obj.__esModule ? obj : { default: obj };
-              }
-
-              /*
-                knockback.js 2.0.0-alpha.1
-                Copyright (c)  2011-2016 Kevin Malakoff.
-                License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                Source: https://github.com/kmalakoff/knockback
-                Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-              */
-
-              var api = {
-                valid: _valid2.default,
-                valueValidator: _validation.valueValidator,
-                inputValidator: _validation.inputValidator,
-                formValidator: _validation.formValidator,
-                hasChangedFn: _validators.hasChangedFn,
-                minLengthFn: _validators.minLengthFn,
-                uniqueValueFn: _validators.uniqueValueFn,
-                untilTrueFn: _validators.untilTrueFn,
-                untilFalseFn: _validators.untilFalseFn
-              };
-              _core2.default.assign(_core2.default, api);
-
-              module.exports = api;
-
-              /***/
-            }])
+            }]
+            /******/)
           );
         });
         /* WEBPACK VAR INJECTION */
       }).call(exports, __webpack_require__(3)(module));
 
       /***/
-    },
-    /* 10 */
-    /***/function (module, exports, __webpack_require__) {
-
-      "use strict";
-
-      var _core = __webpack_require__(2);
-
-      var _core2 = _interopRequireDefault(_core);
-
-      __webpack_require__(5);
-
-      __webpack_require__(6);
-
-      __webpack_require__(7);
-
-      __webpack_require__(8);
-
-      __webpack_require__(9);
-
-      function _interopRequireDefault(obj) {
-        return obj && obj.__esModule ? obj : { default: obj };
-      }
-
-      /*
-        knockback.js 2.0.0-alpha.1
-        Copyright (c)  2011-2016 Kevin Malakoff.
-        License: MIT (http://www.opensource.org/licenses/mit-license.php)
-        Source: https://github.com/kmalakoff/knockback
-        Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-      */
-
-      module.exports = _core2.default;
-
-      /***/
-    }])
+    }]
+    /******/)
   );
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _knockback = __webpack_require__(3);
-
-var _knockback2 = _interopRequireDefault(_knockback);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-module.exports = _knockback2.default; /*
-                                        knockback.js 2.0.0-alpha.1
-                                        Copyright (c)  2011-2016 Kevin Malakoff.
-                                        License: MIT (http://www.opensource.org/licenses/mit-license.php)
-                                        Source: https://github.com/kmalakoff/knockback
-                                        Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-                                        Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-                                      */
 
 /***/ }),
 /* 5 */

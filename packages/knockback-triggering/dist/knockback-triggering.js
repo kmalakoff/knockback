@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -42,9 +42,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -73,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -84,6 +81,41 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _core = __webpack_require__(0);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _triggeredObservable = __webpack_require__(2);
+
+var _triggeredObservable2 = _interopRequireDefault(_triggeredObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/*
+  knockback.js 2.0.0-alpha.1
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var api = {
+  TriggeredObservable: _triggeredObservable2.default,
+  triggeredObservable: _triggeredObservable.triggeredObservable,
+  observableTriggered: _triggeredObservable.triggeredObservable
+};
+_core2.default.assign(_core2.default, api);
+
+module.exports = api;
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -229,41 +261,6 @@ var triggeredObservable = exports.triggeredObservable = function triggeredObserv
 
   return new (Function.prototype.bind.apply(TriggeredObservable, [null].concat(args)))();
 };
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _core = __webpack_require__(0);
-
-var _core2 = _interopRequireDefault(_core);
-
-var _triggeredObservable = __webpack_require__(1);
-
-var _triggeredObservable2 = _interopRequireDefault(_triggeredObservable);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/*
-  knockback.js 2.0.0-alpha.1
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var api = {
-  TriggeredObservable: _triggeredObservable2.default,
-  triggeredObservable: _triggeredObservable.triggeredObservable,
-  observableTriggered: _triggeredObservable.triggeredObservable
-};
-_core2.default.assign(_core2.default, api);
-
-module.exports = api;
 
 /***/ }),
 /* 3 */

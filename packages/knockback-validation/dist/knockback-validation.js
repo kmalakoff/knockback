@@ -7,7 +7,7 @@
 		exports["kbv"] = factory(require("@knockback/core"), require("underscore"), require("knockout"));
 	else
 		root["kbv"] = factory(root["kb"], root["_"], root["ko"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -42,9 +42,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -73,11 +70,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_0__;
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -118,12 +121,6 @@ var valid = {
 exports.default = valid;
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
-
-/***/ }),
 /* 2 */
 /***/ (function(module, exports) {
 
@@ -142,6 +139,51 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
 "use strict";
 
 
+var _core = __webpack_require__(0);
+
+var _core2 = _interopRequireDefault(_core);
+
+var _valid = __webpack_require__(1);
+
+var _valid2 = _interopRequireDefault(_valid);
+
+var _validation = __webpack_require__(5);
+
+var _validators = __webpack_require__(6);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/*
+  knockback.js 2.0.0-alpha.1
+  Copyright (c)  2011-2016 Kevin Malakoff.
+  License: MIT (http://www.opensource.org/licenses/mit-license.php)
+  Source: https://github.com/kmalakoff/knockback
+  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+*/
+
+var api = {
+  valid: _valid2.default,
+  valueValidator: _validation.valueValidator,
+  inputValidator: _validation.inputValidator,
+  formValidator: _validation.formValidator,
+  hasChangedFn: _validators.hasChangedFn,
+  minLengthFn: _validators.minLengthFn,
+  uniqueValueFn: _validators.uniqueValueFn,
+  untilTrueFn: _validators.untilTrueFn,
+  untilFalseFn: _validators.untilFalseFn
+};
+_core2.default.assign(_core2.default, api);
+
+module.exports = api;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -155,11 +197,11 @@ var _knockout = __webpack_require__(3);
 
 var _knockout2 = _interopRequireDefault(_knockout);
 
-var _core = __webpack_require__(1);
+var _core = __webpack_require__(0);
 
 var _core2 = _interopRequireDefault(_core);
 
-var _valid = __webpack_require__(0);
+var _valid = __webpack_require__(1);
 
 var _valid2 = _interopRequireDefault(_valid);
 
@@ -428,7 +470,7 @@ var formValidator = exports.formValidator = function formValidator(view_model, e
 };
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -517,51 +559,6 @@ var untilFalseFn = exports.untilFalseFn = function untilFalseFn(stand_in, fn, mo
     return was_false ? result : _knockout2.default.utils.unwrapObservable(stand_in);
   };
 };
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _core = __webpack_require__(1);
-
-var _core2 = _interopRequireDefault(_core);
-
-var _valid = __webpack_require__(0);
-
-var _valid2 = _interopRequireDefault(_valid);
-
-var _validation = __webpack_require__(4);
-
-var _validators = __webpack_require__(5);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/*
-  knockback.js 2.0.0-alpha.1
-  Copyright (c)  2011-2016 Kevin Malakoff.
-  License: MIT (http://www.opensource.org/licenses/mit-license.php)
-  Source: https://github.com/kmalakoff/knockback
-  Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-  Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/
-
-var api = {
-  valid: _valid2.default,
-  valueValidator: _validation.valueValidator,
-  inputValidator: _validation.inputValidator,
-  formValidator: _validation.formValidator,
-  hasChangedFn: _validators.hasChangedFn,
-  minLengthFn: _validators.minLengthFn,
-  uniqueValueFn: _validators.uniqueValueFn,
-  untilTrueFn: _validators.untilTrueFn,
-  untilFalseFn: _validators.untilFalseFn
-};
-_core2.default.assign(_core2.default, api);
-
-module.exports = api;
 
 /***/ })
 /******/ ]);

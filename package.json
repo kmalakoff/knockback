@@ -23,6 +23,7 @@
     "url": "http://github.com/kmalakoff/knockback.git"
   },
   "scripts": {
+    "postinstall": "npm run bootstrap",
     "bootstrap": "./node_modules/.bin/babel-node scripts/bootstrap.js",
     "clean": "./node_modules/.bin/babel-node scripts/clean.js",
     "test": "gulp test",
@@ -32,18 +33,16 @@
   },
   "dependencies": {
     "backbone": "*",
-    "underscore": "*",
-    "knockout": "*"
-  },
-  "optionalDependencies": {
     "backbone-associations": "*",
-    "backbone-orm": "*",
     "backbone-modelref": "*",
+    "backbone-orm": "*",
     "backbone-relational": "*",
-    "lodash": "*"
+    "knockout": "*",
+    "lodash": "*",
+    "underscore": "*"
   },
   "devDependencies": {
-    "babel-cli": "^6.24.0",
+    "babel-cli": "*",
     "babel-core": "*",
     "babel-eslint": "*",
     "babel-loader": "*",
@@ -59,7 +58,6 @@
     "eslint-config-airbnb-base": "*",
     "eslint-plugin-import": "*",
     "event-stream": "*",
-    "fs-extra": "*",
     "glob": "*",
     "gulp": "*",
     "gulp-babel": "*",
@@ -79,15 +77,15 @@
     "karma-cli": "*",
     "karma-firefox-launcher": "*",
     "karma-mocha": "*",
-    "karma-phantomjs-launcher": "*",
     "karma-requirejs": "*",
     "karma-safari-launcher": "*",
     "karma-spec-reporter": "*",
-    "lerna": "2.0.0-beta.38",
+    "lerna": "*",
     "mocha": "*",
     "moment": "*",
     "nuget": "*",
     "requirejs": "*",
+    "rimraf": "*",
     "webpack": "*"
   }
 }

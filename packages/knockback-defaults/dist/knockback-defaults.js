@@ -16,9 +16,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -42,9 +42,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
 /******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
@@ -73,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -96,6 +93,104 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _core = __webpack_require__(0);
+
+var _core2 = _interopRequireDefault(_core);
+
+__webpack_require__(4);
+
+var _defaultObservable = __webpack_require__(5);
+
+var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var api = {
+  DefaultObservable: _defaultObservable2.default,
+  defaultObservable: _defaultObservable.defaultObservable
+}; /*
+     knockback.js 2.0.0-alpha.1
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
+
+_core2.default.assign(_core2.default, api);
+
+module.exports = _core2.default;
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _underscore = __webpack_require__(1);
+
+var _underscore2 = _interopRequireDefault(_underscore);
+
+var _knockout = __webpack_require__(2);
+
+var _knockout2 = _interopRequireDefault(_knockout);
+
+var _core = __webpack_require__(0);
+
+var _core2 = _interopRequireDefault(_core);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_core2.default.Observable.prototype.setToDefault = function () {
+  if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
+}; /*
+     knockback.js 2.0.0-alpha.1
+     Copyright (c)  2011-2016 Kevin Malakoff.
+     License: MIT (http://www.opensource.org/licenses/mit-license.php)
+     Source: https://github.com/kmalakoff/knockback
+     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
+     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
+   */
+
+_core2.default.ViewModel.prototype.setToDefault = function () {
+  _underscore2.default.each(this.__kb.vm_keys, function (value) {
+    if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
+  });
+};
+
+// @example
+//   var model = new Backbone.Model({name: 'Bob'});
+//   var view_model = {
+//     wrapped_name: kb.defaultWrapper(kb.observable(model, 'name'), '(no name)')
+//   }; // view_model.wrapped name: Bob
+//   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
+_core2.default.utils.setToDefault = function (obj) {
+  var _this = this;
+
+  if (!obj) return undefined;
+
+  // observable
+  if (_knockout2.default.isObservable(obj)) {
+    if (typeof obj.setToDefault === 'function') obj.setToDefault();
+
+    // view model
+  } else if (_underscore2.default.isObject(obj)) {
+    _underscore2.default.each(obj, function (value, key) {
+      if (value && (_knockout2.default.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
+    });
+  }
+
+  return obj;
+};
+
+/***/ }),
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -199,104 +294,6 @@ var defaultObservable = exports.defaultObservable = function defaultObservable()
 
   return new (Function.prototype.bind.apply(DefaultObservable, [null].concat(args)))();
 };
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _underscore = __webpack_require__(1);
-
-var _underscore2 = _interopRequireDefault(_underscore);
-
-var _knockout = __webpack_require__(2);
-
-var _knockout2 = _interopRequireDefault(_knockout);
-
-var _core = __webpack_require__(0);
-
-var _core2 = _interopRequireDefault(_core);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_core2.default.Observable.prototype.setToDefault = function () {
-  if (this.__kb_value && this.__kb_value.setToDefault) this.__kb_value.setToDefault();
-}; /*
-     knockback.js 2.0.0-alpha.1
-     Copyright (c)  2011-2016 Kevin Malakoff.
-     License: MIT (http://www.opensource.org/licenses/mit-license.php)
-     Source: https://github.com/kmalakoff/knockback
-     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-   */
-
-_core2.default.ViewModel.prototype.setToDefault = function () {
-  _underscore2.default.each(this.__kb.vm_keys, function (value) {
-    if (value.__kb_value && value.__kb_value.setToDefault) value.__kb_value.setToDefault();
-  });
-};
-
-// @example
-//   var model = new Backbone.Model({name: 'Bob'});
-//   var view_model = {
-//     wrapped_name: kb.defaultWrapper(kb.observable(model, 'name'), '(no name)')
-//   }; // view_model.wrapped name: Bob
-//   kb.utils.setToDefault(view_model); // view_model.wrapped name: (no name)
-_core2.default.utils.setToDefault = function (obj) {
-  var _this = this;
-
-  if (!obj) return undefined;
-
-  // observable
-  if (_knockout2.default.isObservable(obj)) {
-    if (typeof obj.setToDefault === 'function') obj.setToDefault();
-
-    // view model
-  } else if (_underscore2.default.isObject(obj)) {
-    _underscore2.default.each(obj, function (value, key) {
-      if (value && (_knockout2.default.isObservable(value) || typeof value !== 'function') && (key[0] !== '_' || key.search('__kb'))) _this.setToDefault(value);
-    });
-  }
-
-  return obj;
-};
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _core = __webpack_require__(0);
-
-var _core2 = _interopRequireDefault(_core);
-
-__webpack_require__(4);
-
-var _defaultObservable = __webpack_require__(3);
-
-var _defaultObservable2 = _interopRequireDefault(_defaultObservable);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var api = {
-  DefaultObservable: _defaultObservable2.default,
-  defaultObservable: _defaultObservable.defaultObservable
-}; /*
-     knockback.js 2.0.0-alpha.1
-     Copyright (c)  2011-2016 Kevin Malakoff.
-     License: MIT (http://www.opensource.org/licenses/mit-license.php)
-     Source: https://github.com/kmalakoff/knockback
-     Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
-     Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-   */
-
-_core2.default.assign(_core2.default, api);
-
-module.exports = _core2.default;
 
 /***/ })
 /******/ ]);
