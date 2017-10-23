@@ -28,15 +28,15 @@
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
   },
   "dependencies": {
-    "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
-    "knockout": ">=2.1.0"
+    "knockout": ">=2.1.0",
+    "underscore": ">=1.1.7"
   },
   "devDependencies": {
     "async": "*",
     "chai": "*",
     "codo": "2.x",
-    "coffee-loader": "*",
+    "coffee-loader": "0.6.x",
     "coffee-script": "*",
     "event-stream": "*",
     "fs-extra": "*",
