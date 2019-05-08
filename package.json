@@ -25,7 +25,9 @@
   },
   "scripts": {
     "test": "gulp test",
-    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
+    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
+    "lint": "eslint . --ext js,mjs",
+    "format": "prettier --write '**/*.{js,mjs}'"
   },
   "dependencies": {
     "backbone": ">=0.5.1",
@@ -34,10 +36,18 @@
   },
   "devDependencies": {
     "async": "*",
+    "babel-eslint": "^10.0.1",
     "chai": "*",
     "codo": "2.x",
     "coffee-loader": "0.6.x",
     "coffee-script": "*",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
     "event-stream": "*",
     "fs-extra": "*",
     "fs-readdir-recursive": "*",
@@ -46,7 +56,7 @@
     "gulp-coffee": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
-    "gulp-mocha": "3.x",
+    "gulp-mocha": "^6.0.0",
     "gulp-mocha-phantomjs": "*",
     "gulp-rename": "*",
     "gulp-shell": "*",
@@ -69,6 +79,7 @@
     "karma-spec-reporter": "*",
     "mocha": "*",
     "nuget": "*",
+    "prettier": "^1.17.0",
     "queue-async": "*",
     "requirejs": "*",
     "webpack": "*"
