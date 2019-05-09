@@ -42,7 +42,7 @@ describe 'inject @quick @inject', ->
 
   root.SubClass = class SubClass extends SuperClass
     constructor: ->
-      super
+      super arguments...
       @sub_class = true
 
   it '1. kb-inject', (done) ->

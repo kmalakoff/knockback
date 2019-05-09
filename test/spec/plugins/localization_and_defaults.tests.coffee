@@ -10,8 +10,6 @@ unless Globalize
 
 ###############################
 class LocaleManager
-  @prototype extends kb.Events # Mix in kb.Events so callers can subscribe
-
   constructor: (locale_identifier, @translations_by_locale) ->
     @setLocale(locale_identifier) if locale_identifier
 
@@ -36,6 +34,8 @@ class LocaleManager
     locales.push(string_id) for string_id, value of @translations_by_locale
     return locales
 
+_.extend(LocaleManager.prototype, kb.Events) # Mix in kb.Events so callers can subscribe
+
 class LocalizedString
   constructor: (@string_id) ->
     throw 'missing kb.locale_manager' unless kb.locale_manager
@@ -46,7 +46,7 @@ Contacts = kb.Collection.extend({model: Contact})
 
 class LocalizedStringLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
-    super
+    super arguments...
     return kb.utils.wrappedObservable(@)
   read: (value) ->
     return if (value.string_id) then kb.locale_manager.get(value.string_id) else ''
@@ -58,7 +58,7 @@ class kb.LocalizedStringLocalizer extends kb.LocalizedObservable
 # NOTE: dependency on globalize
 class kb.LongDateLocalizer extends kb.LocalizedObservable
   constructor: (value, options, view_model) ->
-    return super # return the observable instead of this
+    return super arguments... # return the observable instead of this
   read: (value) ->
     return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())
   write: (localized_string, value) ->
@@ -155,7 +155,7 @@ describe 'localized-observable @quick @localization', ->
   # NOTE: dependency on globalize and knockback-defaults
   class LongDateLocalizer extends kb.LocalizedObservable
     constructor: (value, options, view_model) ->
-      super
+      super arguments...
       return kb.utils.wrappedObservable(@)
     read: (value) ->
       return Globalize.format(value, 'dd MMMM yyyy', kb.locale_manager.getLocale())

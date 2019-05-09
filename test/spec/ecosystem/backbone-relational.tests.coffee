@@ -727,7 +727,7 @@ describe 'Knockback.js with Backbone-Relational.js @backbone-relational', ->
       @
     class BandMemberViewModel extends kb.ViewModel
       constructor: (model, options) ->
-        super
+        super arguments...
         @type = ko.observable('band_member')
 
     collection_observable = kb.collectionObservable(new kb.Collection([john, paul, george, ringo]), {

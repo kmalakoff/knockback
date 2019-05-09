@@ -19,7 +19,7 @@ describe 'view-model @quick @view-model', ->
 
   class TestViewModel extends kb.ViewModel
     constructor: ->
-      super
+      super arguments...
       @test = ko.observable('hello')
       value = @test()
       value = @name()

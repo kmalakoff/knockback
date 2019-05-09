@@ -71,8 +71,8 @@ testBrowsers = (callback) ->
 
 gulp.task 'test-node', ['build'], testNode
 
-# gulp.task 'test-browsers', testBrowsers
-gulp.task 'test-browsers', ['minify'], testBrowsers
+gulp.task 'test-browsers', testBrowsers
+# gulp.task 'test-browsers', ['minify'], testBrowsers
 
 gulp.task 'test', ['minify'], (callback) ->
   Async.series [testNode, testBrowsers], (err) -> not err || console.log(err); process.exit(if err then 1 else 0)

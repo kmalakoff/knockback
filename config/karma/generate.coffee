@@ -54,5 +54,5 @@ module.exports = (options={}, callback) ->
 
   # uninstall knockback
   queue.await (err) ->
-    fs.removeSync('node_modules/knockback', true)
+    fs.removeSync('node_modules/knockback')
     callback(err)

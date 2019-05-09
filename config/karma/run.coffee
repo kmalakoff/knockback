@@ -10,8 +10,8 @@ KARMA_CONFIG_BASE = require './config-base'
 KARMA_CONFIG_AMD = require './config-amd'
 
 module.exports = (options={}, callback) ->
-  fs.removeSync('./_temp', true)
-  fs.removeSync('node_modules/knockback', true)
+  fs.removeSync('./_temp')
+  fs.removeSync('node_modules/knockback')
   queue = new Queue(1)
   queue.defer (callback) -> generate(options, callback)
 
@@ -35,5 +35,5 @@ module.exports = (options={}, callback) ->
         ).start()
 
   queue.await (err) ->
-    fs.removeSync('./_temp', true) unless err
+    fs.removeSync('./_temp') unless err
     callback(err)
