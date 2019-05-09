@@ -1,5 +1,5 @@
 /*
-  knockback-full-stack.js 1.2.2
+  knockback-full-stack.js 1.2.3
   Copyright (c)  2011-2019 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
