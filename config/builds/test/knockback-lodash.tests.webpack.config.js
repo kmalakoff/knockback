@@ -9,11 +9,12 @@ module.exports = {
     'knockback-lodash.tests': glob.sync('**/*.tests.js', { cwd: path.join(TEST_DIR, 'knockback-core'), absolute: true })
     // 'knockback-lodash.tests': glob.sync('**/*.tests.js', { cwd: path.join(TEST_DIR), absolute: true }),
   },
-  module: { rules: [{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader', options: { babelrc: true } }] },
+  mode: 'development',
+
+  module: { rules: [{ test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }] },
   resolve: {
     extensions: ['.js'],
     modules: ['node_modules'],
     alias: { underscore: require.resolve('lodash') }
-  },
-  mode: 'development'
+  }
 };
