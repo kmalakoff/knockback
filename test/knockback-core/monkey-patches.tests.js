@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -36,7 +36,8 @@ describe('money-patches', () => {
     assert.ok(!!kb.wasReleased(observable), 'observable released');
     assert.ok(!!kb.wasReleased(extended_observable), 'observable released');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // # https://github.com/kmalakoff/knockback/issues/124
@@ -44,7 +45,7 @@ describe('money-patches', () => {
     if (!ko.subscribable && !ko.subscribable.fn && !ko.subscribable.fn.extend) return;
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    ko.extenders.lazyArray = function (target, timeout) {
+    ko.extenders.lazyArray = function(target, timeout) {
       let addTimeout = null;
       target.elementsToDisplay = ko.observable(0);
 
@@ -52,11 +53,11 @@ describe('money-patches', () => {
         const all = target();
         if (target.elementsToDisplay() > all.length) {
           target.elementsToDisplay(all.length);
-        } else if ((addTimeout === null) && (target.elementsToDisplay() < all.length)) {
-          addTimeout = setTimeout((() => {
+        } else if (addTimeout === null && target.elementsToDisplay() < all.length) {
+          addTimeout = setTimeout(() => {
             addTimeout = null;
             return target.elementsToDisplay(target.elementsToDisplay() + 1);
-          }), timeout);
+          }, timeout);
         }
         return all.slice(0, target.elementsToDisplay());
       });
@@ -75,7 +76,8 @@ describe('money-patches', () => {
     assert.ok(!!kb.wasReleased(extended_collection_observable), 'collection_observable released');
 
     delete ko.extenders.lazyArray;
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/127
@@ -100,6 +102,7 @@ describe('money-patches', () => {
     assert.ok(!view_model.list2);
     assert.ok(!view_model.totalNumberOfItems);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

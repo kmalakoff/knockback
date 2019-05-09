@@ -1,5 +1,5 @@
 module.exports = {
-  extends: 'airbnb-base',
+  extends: ['airbnb-base', 'prettier'],
   plugins: ['import'],
   parser: 'babel-eslint',
   env: {
@@ -10,7 +10,9 @@ module.exports = {
   },
   rules: {
     'max-len': ['error', 200, 2],
+    'comma-dangle': 'off',
     'no-underscore-dangle': 'off',
+    'prefer-destructuring': 'off',
     'import/no-unresolved': 'off',
     'global-require': 'off',
     'no-nested-ternary': 'off',
@@ -32,6 +34,6 @@ module.exports = {
     'no-await-in-loop': 'off',
     'import/no-dynamic-require': 'off',
 
-    'camelcase': 'off',
+    camelcase: 'off'
   }
 };

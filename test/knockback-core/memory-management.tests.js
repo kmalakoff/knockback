@@ -1,11 +1,12 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 const { $ } = root;
 
 describe('knockback.js memory management', () => {
@@ -22,19 +23,26 @@ describe('knockback.js memory management', () => {
     static initClass() {
       this.view_models = [];
     }
+
     constructor() {
       RefCountableViewModel.view_models.push(this);
       this.ref_count = 1;
     }
 
-    refCount() { return this.ref_count; }
+    refCount() {
+      return this.ref_count;
+    }
+
     retain() {
       this.ref_count++;
       return this;
     }
+
     release() {
       --this.ref_count;
-      if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
+      if (this.ref_count < 0) {
+        throw new Error('ref count is corrupt');
+      }
       if (!this.ref_count) {
         this.is_destroyed = true;
         this.__destroy();
@@ -53,6 +61,7 @@ describe('knockback.js memory management', () => {
     static initClass() {
       this.view_models = [];
     }
+
     constructor() {
       DestroyableViewModel.view_models.push(this);
     }
@@ -68,6 +77,7 @@ describe('knockback.js memory management', () => {
     static initClass() {
       this.view_models = [];
     }
+
     constructor() {
       this.prop = ko.observable();
       SimpleViewModel.view_models.push(this);
@@ -79,7 +89,7 @@ describe('knockback.js memory management', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const nested_view_model = kb.viewModel(new Backbone.Model({ name: 'name1' }), { name: {} });
-    const ViewModel = function () {
+    const ViewModel = function() {
       this.prop1 = ko.observable();
       this.prop2 = ko.observable(['test', 1, null, kb.viewModel(new Backbone.Model({ name: 'name1' }))]);
       this.prop3 = ko.observableArray(['test', 1, null, kb.viewModel(new Backbone.Model({ name: 'name1' }))]);
@@ -93,11 +103,14 @@ describe('knockback.js memory management', () => {
     const view_model = new ViewModel();
     kb.release(view_model);
 
-    for (let index = 1; index <= 9; index++) { assert.ok(!view_model[`prop${index}`], `Property released: prop${index}`); }
+    for (let index = 1; index <= 9; index++) {
+      assert.ok(!view_model[`prop${index}`], `Property released: prop${index}`);
+    }
     assert.ok(!view_model.name, 'Property released: view_model.name'); // kb.viewModel(new Backbone.Model({name: 'name1'}), 'name', this)
     assert.ok(!nested_view_model.name, 'Property released: nested_view_model.name'); // nested_view_model
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('Releasing with nodes', () => {
@@ -107,11 +120,15 @@ describe('knockback.js memory management', () => {
 
     const model = new Backbone.Model({ name: 'Bob' });
     const view_model = kb.viewModel(model);
-    const collection_observable = kb.collectionObservable(new Backbone.Collection([new Backbone.Model({ name: 'Fred' }), new Backbone.Model({ name: 'Mary' })]));
+    const collection_observable = kb.collectionObservable(
+      new Backbone.Collection([new Backbone.Model({ name: 'Fred' }), new Backbone.Model({ name: 'Mary' })])
+    );
 
     const $vm_el = $('<div id="vm" data-bind="text: name"></div>');
     const $co_el = $('<div id="co" data-bind="foreach: co"><div data-bind="text: name"></div></div>');
-    $('body').append($vm_el).append($co_el);
+    $('body')
+      .append($vm_el)
+      .append($co_el);
 
     kb.applyBindings(view_model, $vm_el[0]);
     kb.applyBindings({ co: collection_observable }, $co_el[0]);
@@ -135,8 +152,12 @@ describe('knockback.js memory management', () => {
     // dispose of the model node
     ko.removeNode($vm_el[0]);
 
-    assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.ok(
+      kb.Statistics.eventsStats(model).count === 0,
+      `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`
+    );
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('RefCounting', () => {
@@ -149,14 +170,20 @@ describe('knockback.js memory management', () => {
         this.ref_count = 1;
       }
 
-      refCount() { return this.ref_count; }
+      refCount() {
+        return this.ref_count;
+      }
+
       retain() {
         this.ref_count++;
         return this;
       }
+
       release() {
         --this.ref_count;
-        if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
+        if (this.ref_count < 0) {
+          throw new Error('ref count is corrupt');
+        }
         if (!this.ref_count) {
           this.is_destroyed = true;
           this.__destroy();
@@ -165,13 +192,13 @@ describe('knockback.js memory management', () => {
       }
 
       __destroy() {
-        kb.release(this.prop); this.prop = null;
+        kb.release(this.prop);
+        this.prop = null;
       }
     }
 
     const ref_counted = new RefViewModel();
-    const view_model =
-      { ref_counted: ref_counted.retain() };
+    const view_model = { ref_counted: ref_counted.retain() };
     kb.release(view_model);
     assert.ok(!view_model.ref_counted, 'Property released: view_model.ref_counted');
     assert.ok(!!ref_counted.prop, 'Property not released: ref_counted.prop');
@@ -179,7 +206,8 @@ describe('knockback.js memory management', () => {
     ref_counted.release();
     assert.ok(!ref_counted.prop, 'Property released: ref_counted.prop');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.CollectionObservable', () => {
@@ -211,9 +239,12 @@ describe('knockback.js memory management', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Destroyed: 2');
-    _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => {
+      assert.ok(!view_model.prop, 'Prop destroyed');
+    });
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.CollectionObservable with external store', () => {
@@ -222,7 +253,10 @@ describe('knockback.js memory management', () => {
     // ref counted view model
     let store = new kb.Store();
     RefCountableViewModel.view_models = [];
-    let collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: RefCountableViewModel, store });
+    let collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), {
+      view_model: RefCountableViewModel,
+      store
+    });
     assert.equal(RefCountableViewModel.view_models.length, 2, 'Created: 2');
 
     const instance = collection_observable()[0].retain();
@@ -232,7 +266,8 @@ describe('knockback.js memory management', () => {
 
     assert.equal(instance.refCount(), 2, 'One instance retained and one in the store');
 
-    store.destroy(); store = null;
+    store.destroy();
+    store = null;
 
     assert.equal(RefCountableViewModel.view_models.length, 1, 'Still one reference');
     assert.equal(instance.refCount(), 1, "All instances were destroyed in the collection's store");
@@ -240,13 +275,17 @@ describe('knockback.js memory management', () => {
     // destroyable view model
     store = new kb.Store();
     DestroyableViewModel.view_models = [];
-    collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel, store });
+    collection_observable = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), {
+      view_model: DestroyableViewModel,
+      store
+    });
     assert.equal(DestroyableViewModel.view_models.length, 2, 'Created: 2');
 
     kb.release(collection_observable);
     assert.equal(DestroyableViewModel.view_models.length, 2, 'All destroyed');
 
-    store.destroy(); store = null;
+    store.destroy();
+    store = null;
 
     // all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     assert.equal(DestroyableViewModel.view_models.length, 0, 'All destroyed');
@@ -259,15 +298,21 @@ describe('knockback.js memory management', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 2, 'Remaining: 2');
-    _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => {
+      assert.ok(view_model.prop, 'Prop destroyed');
+    });
 
-    store.destroy(); store = null;
+    store.destroy();
+    store = null;
 
     // all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     assert.equal(SimpleViewModel.view_models.length, 2, 'Destroyed: 2');
-    _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => {
+      assert.ok(!view_model.prop, 'Prop destroyed');
+    });
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.release destructiveness', () => {
@@ -288,7 +333,7 @@ describe('knockback.js memory management', () => {
       array_value1: ko.observable(['Hello', 'Friend']),
       array_value2: ko.observableArray(['Hello', 'Friend']),
       model_value: kb.viewModel(new Backbone.Model()),
-      collection_value: kb.collectionObservable(new Backbone.Collection()),
+      collection_value: kb.collectionObservable(new Backbone.Collection())
     };
 
     kb.release(view_model);
@@ -300,6 +345,7 @@ describe('knockback.js memory management', () => {
     assert.ok(!view_model.model_value, 'releases observables: model_value');
     assert.ok(!view_model.collection_value, 'releases observables: collection_value');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

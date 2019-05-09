@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -21,7 +21,7 @@ describe('observable', () => {
   it('1. Standard use case: direct attributes with read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModel = function (model) {
+    const ContactViewModel = function(model) {
       this.name = kb.observable(model, 'name');
       this.number = kb.observable(model, { key: 'number' });
     };
@@ -48,19 +48,32 @@ describe('observable', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.ok(kb.Statistics.eventsStats(model).count === 0, `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.ok(
+      kb.Statistics.eventsStats(model).count === 0,
+      `All model events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`
+    );
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('2. Standard use case: direct attributes with custom read and write', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelCustom = function (model) {
-      this.name = kb.observable(model, { key: 'name', read() { return `First: ${model.get('name')}`; } });
+    const ContactViewModelCustom = function(model) {
+      this.name = kb.observable(model, {
+        key: 'name',
+        read() {
+          return `First: ${model.get('name')}`;
+        }
+      });
       this.number = kb.observable(model, {
         key: 'number',
-        read() { return `#: ${model.get('number')}`; },
-        write(value) { return model.set({ number: value.substring(3) }); },
+        read() {
+          return `#: ${model.get('number')}`;
+        },
+        write(value) {
+          return model.set({ number: value.substring(3) });
+        }
       });
     };
 
@@ -86,34 +99,53 @@ describe('observable', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('3. Read args', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const args = [];
-    const ContactViewModelCustom = function (model) {
-      this.name = kb.observable(model, { key: 'name', read(key, arg1, arg2) { args.push(arg1); args.push(arg2); return model.get('name'); }, args: ['name', 1] });
-      this.number = kb.observable(model, { key: 'number', read(key, arg) { args.push(arg); return model.get('number'); }, args: 'number' });
+    const ContactViewModelCustom = function(model) {
+      this.name = kb.observable(model, {
+        key: 'name',
+        read(key, arg1, arg2) {
+          args.push(arg1);
+          args.push(arg2);
+          return model.get('name');
+        },
+        args: ['name', 1]
+      });
+      this.number = kb.observable(model, {
+        key: 'number',
+        read(key, arg) {
+          args.push(arg);
+          return model.get('number');
+        },
+        args: 'number'
+      });
     };
 
     const model = new Contact({ name: 'Ringo', number: '555-555-5556' });
     new ContactViewModelCustom(model);
     assert.ok(_.isEqual(args, ['name', 1, 'number']) || _.isEqual(args, ['name', 1, 'name', 1, 'number', 'number']), `got the args: ${args.join(', ')}`);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('4. Standard use case: ko.computed', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModel = function (model) {
+    const ContactViewModel = function(model) {
       this.name = kb.observable(model, { key: 'name' });
       this.formatted_name = ko.computed({
         read: this.name,
-        write(value) { return this.name(`${value}`.trim()); },
-        owner: this,
+        write(value) {
+          return this.name(`${value}`.trim());
+        },
+        owner: this
       });
     };
 
@@ -132,7 +164,8 @@ describe('observable', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('5. Inferring observable types: the easy way', () => {
@@ -151,16 +184,23 @@ describe('observable', () => {
           keys: ['name', 'parent', 'children', 'maybe_null_name', 'maybe_null_parent', 'maybe_null_children'],
           factories: {
             maybe_null_parent: InferringViewModel,
-            maybe_null_children: ChildrenCollection,
+            maybe_null_children: ChildrenCollection
           },
-          options,
+          options
         });
       }
     }
 
     const parent = new Backbone.Model({ id: _.uniqueId(), name: 'Daddy' });
     const children_child = new Backbone.Model({ id: _.uniqueId(), name: 'Baby' });
-    const children = new Backbone.Collection([{ id: _.uniqueId(), name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child]) }]);
+    const children = new Backbone.Collection([
+      {
+        id: _.uniqueId(),
+        name: 'Bob',
+        children: new Backbone.Collection([children_child]),
+        maybe_null_children: new Backbone.Collection([children_child])
+      }
+    ]);
     const model = new Backbone.Model({ id: _.uniqueId() });
 
     const view_model = new InferringViewModel(model);
@@ -176,14 +216,21 @@ describe('observable', () => {
     model.set({
       name: 'Fred',
       parent,
-      children,
+      children
     });
     assert.equal(view_model.name(), 'Fred', 'name is Fred');
     assert.equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy');
     assert.ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel');
     assert.equal(view_model.children()[0].name(), 'Bob', 'child name is Bob');
     assert.ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel');
-    assert.equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby');
+    assert.equal(
+      view_model
+        .children()[0]
+        .children()[0]
+        .name(),
+      'Baby',
+      'child child name is Baby'
+    );
     assert.ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel');
     assert.equal(view_model.maybe_null_name(), null, 'name is null');
     assert.equal(view_model.maybe_null_parent().name(), null, 'parent name is null');
@@ -193,22 +240,40 @@ describe('observable', () => {
     model.set({
       maybe_null_name: model.get('name'),
       maybe_null_parent: model.get('parent'),
-      maybe_null_children: model.get('children'),
+      maybe_null_children: model.get('children')
     });
     assert.equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred');
     assert.equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy');
     assert.ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is InferringViewModel');
     assert.equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob');
     assert.ok(view_model.maybe_null_children()[0] instanceof InferringViewModel, 'child type is InferringViewModel');
-    assert.equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby');
+    assert.equal(
+      view_model
+        .maybe_null_children()[0]
+        .children()[0]
+        .name(),
+      'Baby',
+      'child child name is Baby'
+    );
     assert.ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel');
-    assert.equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby');
-    assert.ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel, 'maybe_null_children maybe_null_children type is InferringViewModel');
+    assert.equal(
+      view_model
+        .maybe_null_children()[0]
+        .maybe_null_children()[0]
+        .name(),
+      'Baby',
+      'maybe_null_children maybe_null_children name is Baby'
+    );
+    assert.ok(
+      view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel,
+      'maybe_null_children maybe_null_children type is InferringViewModel'
+    );
 
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('6. Inferring observable types: the hard way', () => {
@@ -221,7 +286,7 @@ describe('observable', () => {
       }
     }
 
-    const InferringViewModel = function (model, options) {
+    const InferringViewModel = function(model, options) {
       this._auto = kb.viewModel(model, { keys: ['name', 'parent', 'children'], options }, this);
       this.maybe_null_name = kb.observable(model, 'maybe_null_name');
 
@@ -234,7 +299,14 @@ describe('observable', () => {
 
     const parent = new Backbone.Model({ id: _.uniqueId(), name: 'Daddy' });
     const children_child = new Backbone.Model({ id: _.uniqueId(), name: 'Baby' });
-    const children = new Backbone.Collection([{ id: _.uniqueId(), name: 'Bob', children: new Backbone.Collection([children_child]), maybe_null_children: new Backbone.Collection([children_child]) }]);
+    const children = new Backbone.Collection([
+      {
+        id: _.uniqueId(),
+        name: 'Bob',
+        children: new Backbone.Collection([children_child]),
+        maybe_null_children: new Backbone.Collection([children_child])
+      }
+    ]);
     const model = new Backbone.Model({ id: _.uniqueId() });
 
     const view_model = new InferringViewModel(model);
@@ -250,14 +322,21 @@ describe('observable', () => {
     model.set({
       name: 'Fred',
       parent,
-      children,
+      children
     });
     assert.equal(view_model.name(), 'Fred', 'name is Fred');
     assert.equal(view_model.parent().name(), 'Daddy', 'parent name is Daddy');
     assert.ok(view_model.parent() instanceof kb.ViewModel, 'parent type is kb.ViewModel');
     assert.equal(view_model.children()[0].name(), 'Bob', 'child name is Bob');
     assert.ok(view_model.children()[0] instanceof kb.ViewModel, 'child type is kb.ViewModel');
-    assert.equal(view_model.children()[0].children()[0].name(), 'Baby', 'child child name is Baby');
+    assert.equal(
+      view_model
+        .children()[0]
+        .children()[0]
+        .name(),
+      'Baby',
+      'child child name is Baby'
+    );
     assert.ok(view_model.children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel');
     assert.equal(view_model.maybe_null_name(), null, 'name is null');
     assert.equal(view_model.maybe_null_parent().name(), null, 'parent name is null');
@@ -267,22 +346,40 @@ describe('observable', () => {
     model.set({
       maybe_null_name: model.get('name'),
       maybe_null_parent: model.get('parent'),
-      maybe_null_children: model.get('children'),
+      maybe_null_children: model.get('children')
     });
     assert.equal(view_model.maybe_null_name(), 'Fred', 'maybe_null_name is Fred');
     assert.equal(view_model.maybe_null_parent().name(), 'Daddy', 'maybe_null_parent name is Daddy');
     assert.ok(view_model.maybe_null_parent() instanceof InferringViewModel, 'maybe_null_parent type is InferringViewModel');
     assert.equal(view_model.maybe_null_children()[0].name(), 'Bob', 'child name is Bob');
     assert.ok(view_model.maybe_null_children()[0] instanceof InferringViewModel, 'child type is InferringViewModel');
-    assert.equal(view_model.maybe_null_children()[0].children()[0].name(), 'Baby', 'child child name is Baby');
+    assert.equal(
+      view_model
+        .maybe_null_children()[0]
+        .children()[0]
+        .name(),
+      'Baby',
+      'child child name is Baby'
+    );
     assert.ok(view_model.maybe_null_children()[0].children()[0] instanceof kb.ViewModel, 'child child type is kb.ViewModel');
-    assert.equal(view_model.maybe_null_children()[0].maybe_null_children()[0].name(), 'Baby', 'maybe_null_children maybe_null_children name is Baby');
-    assert.ok(view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel, 'maybe_null_children maybe_null_children type is InferringViewModel');
+    assert.equal(
+      view_model
+        .maybe_null_children()[0]
+        .maybe_null_children()[0]
+        .name(),
+      'Baby',
+      'maybe_null_children maybe_null_children name is Baby'
+    );
+    assert.ok(
+      view_model.maybe_null_children()[0].maybe_null_children()[0] instanceof InferringViewModel,
+      'maybe_null_children maybe_null_children type is InferringViewModel'
+    );
 
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('7. model change is observable', () => {
@@ -292,14 +389,18 @@ describe('observable', () => {
     const observable = kb.observable(model, 'name');
 
     let count = 0;
-    ko.computed(() => { observable.model(); return count++; });
+    ko.computed(() => {
+      observable.model();
+      return count++;
+    });
 
     observable.model(null);
     observable.model(model);
     assert.equal(count, 3, 'model change was observed');
     kb.release(observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('8. view model changes do not cause dependencies inside ko.computed', () => {
@@ -320,14 +421,17 @@ describe('observable', () => {
       return observable_count++;
     });
 
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(observable_count, 1, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(observable_count, 1, 'observable_count');
 
     observable('Update');
-    assert.equal(count_manual, 1, 'count_manual'); assert.equal(observable_count, 2, 'observable_count');
+    assert.equal(count_manual, 1, 'count_manual');
+    assert.equal(observable_count, 2, 'observable_count');
 
     kb.release(observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('9. this is bound', () => {
@@ -335,20 +439,30 @@ describe('observable', () => {
 
     const model = new Backbone.Model({ number: 33 });
 
-    const ViewModel = function (m) {
+    const ViewModel = function(m) {
       this.number = kb.observable(m, 'number');
-      this.formatted_number = kb.observable(m, {
-        key: 'number',
-        read() { return `#: ${this.number()}`; },
-        write(value) { return this.number(value.substring(3)); },
-      }, {}, this);
+      this.formatted_number = kb.observable(
+        m,
+        {
+          key: 'number',
+          read() {
+            return `#: ${this.number()}`;
+          },
+          write(value) {
+            return this.number(value.substring(3));
+          }
+        },
+        {},
+        this
+      );
     };
 
     const view_model = new ViewModel(model);
 
     assert.equal(view_model.formatted_number(), `#: ${view_model.number()}`);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/108
@@ -378,6 +492,7 @@ describe('observable', () => {
     m1.set({ n: 'm1_4' });
     assert.deepEqual(values, ['m1_2', 'm2', 'm2_2']);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

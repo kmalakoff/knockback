@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -8,7 +8,9 @@ const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
 
 describe('Knockback.js with Backbone.ModelRef.js', () => {
-  before(() => { if (Backbone && !Backbone.ModelRef && r) require('backbone-modelref'); });
+  before(() => {
+    if (Backbone && !Backbone.ModelRef && r) require('backbone-modelref');
+  });
   after(() => delete Backbone.ModeRef);
 
   it('TEST DEPENDENCY MISSING', () => {
@@ -27,12 +29,18 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
   it('Standard use case: just enough to get the picture', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModel = function (model) {
-      this._auto = kb.viewModel(model, { keys: {
-        name: { key: 'name' },
-        number: { key: 'number' },
-        date: { key: 'date' },
-      } }, this);
+    const ContactViewModel = function(model) {
+      this._auto = kb.viewModel(
+        model,
+        {
+          keys: {
+            name: { key: 'name' },
+            number: { key: 'number' },
+            date: { key: 'date' }
+          }
+        },
+        this
+      );
     };
 
     const collection = new Contacts();
@@ -41,7 +49,14 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
 
     assert.equal(view_model.name(), null, 'Is that what we want to convey?');
 
-    collection.add(collection.parse({ id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9) }));
+    collection.add(
+      collection.parse({
+        id: 'b4',
+        name: 'John',
+        number: '555-555-5558',
+        date: new Date(1940, 10, 9)
+      })
+    );
     const model = collection.get('b4');
 
     // get
@@ -66,7 +81,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     assert.equal(view_model.name(), 'Yoko', 'Name changed');
     assert.equal(view_model.number(), '818-818-8181', 'Number was changed');
     model.set({ date: new Date(1940, 10, 9) });
-    assert.equal(view_model.date().toString(), (new Date(1940, 10, 9)).toString(), "John's birthdate");
+    assert.equal(view_model.date().toString(), new Date(1940, 10, 9).toString(), "John's birthdate");
     view_model.date(new Date(1940, 10, 10));
     current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1940, 'year is good');
@@ -76,7 +91,8 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('Standard use case with kb.ViewModels', () => {
@@ -94,13 +110,20 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
 
     assert.equal(view_model.name(), null, 'Is that what we want to convey?');
 
-    collection.add(collection.parse({ id: 'b4', name: 'John', number: '555-555-5558', date: new Date(1940, 10, 9) }));
+    collection.add(
+      collection.parse({
+        id: 'b4',
+        name: 'John',
+        number: '555-555-5558',
+        date: new Date(1940, 10, 9)
+      })
+    );
     const model = collection.get('b4');
 
     // get
     assert.equal(view_model.name(), 'John', 'It is a name');
     assert.equal(view_model.number(), '555-555-5558', 'Not so interesting number');
-    assert.equal(view_model.date().toString(), (new Date(1940, 10, 9)).toString(), "John's birthdate matches");
+    assert.equal(view_model.date().toString(), new Date(1940, 10, 9).toString(), "John's birthdate matches");
 
     // set from the view model
     assert.equal(model.get('name'), 'John', 'Name not changed');
@@ -119,7 +142,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     assert.equal(view_model.name(), 'Yoko', 'Name changed');
     assert.equal(view_model.number(), '818-818-8181', 'Number was changed');
     model.set({ date: new Date(1940, 10, 9) });
-    assert.equal(view_model.date().toString(), (new Date(1940, 10, 9)).toString(), "John's birthdate");
+    assert.equal(view_model.date().toString(), new Date(1940, 10, 9).toString(), "John's birthdate");
     view_model.date(new Date(1940, 10, 10));
     current_date = model.get('date');
     assert.equal(current_date.getFullYear(), 1940, 'year is good');
@@ -129,6 +152,7 @@ describe('Knockback.js with Backbone.ModelRef.js', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

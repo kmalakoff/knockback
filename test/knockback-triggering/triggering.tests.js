@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -24,8 +24,7 @@ describe('triggered-observable', () => {
 
     let trigger_count = 0;
 
-    const view_model =
-      { triggered_observable: kb.triggeredObservable(model, 'change') };
+    const view_model = { triggered_observable: kb.triggeredObservable(model, 'change') };
     view_model.counter = ko.computed(() => {
       view_model.triggered_observable(); // add a dependency
       return trigger_count++;
@@ -47,7 +46,8 @@ describe('triggered-observable', () => {
     model.setLocale('fr-FR');
     assert.equal(trigger_count, 3, '3: no change');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('2. Standard use case: simple events notifications (kb.observableTriggered)', () => {
@@ -57,8 +57,7 @@ describe('triggered-observable', () => {
 
     let trigger_count = 0;
 
-    const view_model =
-      { triggered_observable: kb.observableTriggered(model, 'change') };
+    const view_model = { triggered_observable: kb.observableTriggered(model, 'change') };
     view_model.counter = ko.computed(() => {
       view_model.triggered_observable(); // add a dependency
       return trigger_count++;
@@ -80,6 +79,7 @@ describe('triggered-observable', () => {
     model.setLocale('fr-FR');
     assert.equal(trigger_count, 3, '3: no change');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

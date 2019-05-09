@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -24,7 +24,8 @@ describe('knockback_core utils', () => {
     kb.utils.wrappedObservable(instance, observable); // set
     assert.equal(kb.utils.wrappedObservable(instance), observable, 'observable was wrapped'); // get
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.utils.wrappedModel', () => {
@@ -37,7 +38,8 @@ describe('knockback_core utils', () => {
     kb.utils.wrappedModel(instance, model); // set
     assert.equal(kb.utils.wrappedModel(instance), model, 'model was wrapped'); // get
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.utils.wrappedStore', () => {
@@ -48,7 +50,11 @@ describe('knockback_core utils', () => {
 
     // can get and share store
     let collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), { store: kb.utils.wrappedStore(collection_observable) });
-    assert.equal(kb.utils.wrappedStore(collection_observable), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observables');
+    assert.equal(
+      kb.utils.wrappedStore(collection_observable),
+      kb.utils.wrappedStore(collection_observable_shared),
+      'Store is shared between collection observables'
+    );
     kb.release(collection_observable_shared); // clean up
 
     const view_model = kb.viewModel(new Backbone.Model({ name: 'Bob' }));
@@ -57,14 +63,19 @@ describe('knockback_core utils', () => {
     // can get and share store
     collection_observable_shared = kb.collectionObservable(new Backbone.Collection(), { store: kb.utils.wrappedStore(view_model) });
 
-    assert.equal(kb.utils.wrappedStore(view_model), kb.utils.wrappedStore(collection_observable_shared), 'Store is shared between collection observable and view model');
+    assert.equal(
+      kb.utils.wrappedStore(view_model),
+      kb.utils.wrappedStore(collection_observable_shared),
+      'Store is shared between collection observable and view model'
+    );
 
     // clean up
     kb.release(collection_observable);
     kb.release(collection_observable_shared);
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.utils.valueType', () => {
@@ -91,7 +102,8 @@ describe('knockback_core utils', () => {
     assert.equal(kb.utils.valueType(view_model.model_attr), kb.TYPE_MODEL, 'model_attr is kb.TYPE_MODEL');
     kb.release(view_model); // clean up
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.utils.path', () => {
@@ -109,7 +121,8 @@ describe('knockback_core utils', () => {
     assert.equal(kb.utils.optionsPathJoin({ path: 'bob.harry' }, 'key').path, 'bob.harry.key', 'bob.harry.key path joined');
     assert.equal(kb.utils.optionsPathJoin({ path: 'bob.harry.' }, 'key').path, 'bob.harry.key', 'bob.harry.key path joined');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/103
@@ -122,14 +135,20 @@ describe('knockback_core utils', () => {
     model.set({ foo: null });
     kb.release(observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/101
   it('kb.release releases all events', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const model = new Backbone.Model({ id: 1, name: 'Zebra', age: 22, genus: 'Equus' });
+    const model = new Backbone.Model({
+      id: 1,
+      name: 'Zebra',
+      age: 22,
+      genus: 'Equus'
+    });
     assert.ok(kb.Statistics.eventsStats(model).count === 0, 'No events yet');
 
     const view_model = { model: kb.viewModel(model) };
@@ -138,6 +157,7 @@ describe('knockback_core utils', () => {
     kb.release(view_model);
 
     assert.ok(kb.Statistics.eventsStats(model).count === 0, `All events cleared. Expected: 0. Actual: ${JSON.stringify(kb.Statistics.eventsStats(model))}`);
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

@@ -2,15 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import spawn from 'cross-spawn';
 
-const run = async (cmd, args, options = {}) => {
-  return new Promise((resolve, reject) => {
+const run = async (cmd, args, options = {}) =>
+  new Promise((resolve, reject) => {
     const res = spawn(cmd, args, options);
     res.stdout.pipe(process.stdout);
     res.stderr.pipe(process.stderr);
     res.on('close', resolve);
     res.on('error', reject);
   });
-}
 
 (async () => {
   try {
@@ -21,11 +20,13 @@ const run = async (cmd, args, options = {}) => {
       try {
         const packagePath = path.join(__dirname, '..', 'packages', name);
         packages.push({ name, path: packagePath, package: JSON.parse(fs.readFileSync(path.join(packagePath, 'package.json'))) });
-      } catch (err) { }
+      } catch (err) {
+        /* */
+      }
     }
 
     for (const pkg of packages) {
-      const packagePath = path.resolve(path.join.apply(path, [__dirname, '..', 'node_modules'].concat(pkg.package.name.split('/'))));
+      const packagePath = path.resolve(path.join(...[__dirname, '..', 'node_modules'].concat(pkg.package.name.split('/'))));
       if (fs.existsSync(packagePath)) {
         console.log(`Removing link ${path.relative(path.join(__dirname, '..'), packagePath)}`);
         await run('rm', ['-rf', packagePath]);
@@ -44,8 +45,7 @@ const run = async (cmd, args, options = {}) => {
     console.log('*************************');
     console.log('Clean successful');
     process.exit(0);
-  }
-  catch (err) {
+  } catch (err) {
     console.log('Clean failed. Error:', err.message);
     process.exit(0);
   }

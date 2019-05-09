@@ -18,7 +18,7 @@ module.exports = {
   // singleRun: false,
 
   browsers: ['ChromeHeadless'],
-  singleRun: true,
+  singleRun: true
 
   // browsers: ['Chrome', 'Firefox', 'Chrome', 'Safari'],
   // singleRun: true,

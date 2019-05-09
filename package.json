@@ -25,11 +25,11 @@
   "scripts": {
     "postinstall": "npm run bootstrap",
     "bootstrap": "./node_modules/.bin/babel-node scripts/bootstrap.js",
+    "build": "gulp build",
     "clean": "./node_modules/.bin/babel-node scripts/clean.js",
     "test": "gulp test",
-    "lint": "eslint src/ test/ config/",
-    "lint-fix": "eslint src/ test/ config/ --fix",
-    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
+    "lint": "eslint . --ext js,mjs",
+    "format": "prettier --write '**/*.{js,mjs}'"
   },
   "dependencies": {
     "backbone": "*",
@@ -42,8 +42,8 @@
     "underscore": "*"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.4",
     "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.4.4",
     "@babel/node": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
@@ -64,11 +64,14 @@
     "@babel/plugin-transform-async-to-generator": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
     "browserify": "^16.2.3",
     "chai": "*",
     "cross-spawn": "*",
     "eslint": "*",
     "eslint-config-airbnb-base": "*",
+    "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-import": "*",
     "event-stream": "*",
     "glob": "*",
@@ -93,10 +96,11 @@
     "karma-requirejs": "*",
     "karma-safari-launcher": "*",
     "karma-spec-reporter": "*",
-    "lerna": "*",
+    "lerna": "^3.13.4",
     "mocha": "*",
     "moment": "*",
     "nuget": "*",
+    "prettier": "^1.17.0",
     "requirejs": "*",
     "rimraf": "*",
     "webpack": "^4.31.0"

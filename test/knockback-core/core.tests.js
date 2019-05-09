@@ -1,11 +1,12 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 const { $ } = root;
 
 describe('knockback_core', () => {
@@ -26,6 +27,7 @@ describe('knockback_core', () => {
       constructor() {
         this.name = ko.observable('Bob');
       }
+
       afterRender() {
         this.was_called = true;
       }
@@ -46,11 +48,16 @@ describe('knockback_core', () => {
     assert.ok(!view_model.was_called, 'afterRender not called yet');
     el = $('<script type="text/x-jquery-tmpl" id="the_template2"><div data-bind="text: name"></div></script>');
     $('body').append(el);
-    kb.renderTemplate('the_template2', view_model, { afterRender() { was_called = true; } });
+    kb.renderTemplate('the_template2', view_model, {
+      afterRender() {
+        was_called = true;
+      }
+    });
     assert.ok(was_called, 'afterRender (options) was called');
     assert.ok(!view_model.was_called, 'afterRender was not called');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.ignore', () => {
@@ -81,8 +88,16 @@ describe('knockback_core', () => {
     assert.equal(counter_ignore, 1);
 
     // ignore with arguments
-    kb.ignore(((arg1, arg2) => { assert.equal(arg1, 1); assert.equal(arg2, 2); }), null, [1, 2]);
+    kb.ignore(
+      (arg1, arg2) => {
+        assert.equal(arg1, 1);
+        assert.equal(arg2, 2);
+      },
+      null,
+      [1, 2]
+    );
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

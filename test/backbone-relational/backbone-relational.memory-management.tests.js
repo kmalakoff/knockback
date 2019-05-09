@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -20,11 +20,13 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     if (typeof Backbone.Relational.store.addModelScope === 'function') Backbone.Relational.store.addModelScope(root);
 
     root.Person = Backbone.RelationalModel.extend({
-      relations: [{
-        type: Backbone.HasMany,
-        key: 'friends',
-        relatedModel: 'Person',
-      }],
+      relations: [
+        {
+          type: Backbone.HasMany,
+          key: 'friends',
+          relatedModel: 'Person'
+        }
+      ]
     });
   });
 
@@ -47,19 +49,26 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     static initClass() {
       this.view_models = [];
     }
+
     constructor() {
       RefCountableViewModel.view_models.push(this);
       this.ref_count = 1;
     }
 
-    refCount() { return this.ref_count; }
+    refCount() {
+      return this.ref_count;
+    }
+
     retain() {
       this.ref_count++;
       return this;
     }
+
     release() {
       --this.ref_count;
-      if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
+      if (this.ref_count < 0) {
+        throw new Error('ref count is corrupt');
+      }
       if (!this.ref_count) {
         this.is_destroyed = true;
         this.__destroy();
@@ -78,6 +87,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     static initClass() {
       this.view_models = [];
     }
+
     constructor() {
       DestroyableViewModel.view_models.push(this);
     }
@@ -93,6 +103,7 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     static initClass() {
       this.view_models = [];
     }
+
     constructor() {
       this.prop = ko.observable();
       SimpleViewModel.view_models.push(this);
@@ -106,22 +117,22 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     const john = new root.Person({
       id: 'root.Person-1-1',
       name: 'John',
-      friends: ['root.Person-1-2', 'root.Person-1-3', 'root.Person-1-4'],
+      friends: ['root.Person-1-2', 'root.Person-1-3', 'root.Person-1-4']
     });
     const paul = new root.Person({
       id: 'root.Person-1-2',
       name: 'Paul',
-      friends: ['root.Person-1-1', 'root.Person-1-3', 'root.Person-1-4'],
+      friends: ['root.Person-1-1', 'root.Person-1-3', 'root.Person-1-4']
     });
     const george = new root.Person({
       id: 'root.Person-1-3',
       name: 'George',
-      friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-4'],
+      friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-4']
     });
     const ringo = new root.Person({
       id: 'root.Person-1-4',
       name: 'Ringo',
-      friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-3'],
+      friends: ['root.Person-1-1', 'root.Person-1-2', 'root.Person-1-3']
     });
 
     const band = new Backbone.Collection([john, paul, george, ringo]);
@@ -152,9 +163,12 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 4, 'Destroyed: 4');
-    _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => {
+      assert.ok(!view_model.prop, 'Prop destroyed');
+    });
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('Backbone.CollectionObservable with recursive view models and external store', () => {
@@ -163,22 +177,22 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     const john = new root.Person({
       id: 'root.Person-2-1',
       name: 'John',
-      friends: ['root.Person-2-2', 'root.Person-2-3', 'root.Person-2-4'],
+      friends: ['root.Person-2-2', 'root.Person-2-3', 'root.Person-2-4']
     });
     const paul = new root.Person({
       id: 'root.Person-2-2',
       name: 'Paul',
-      friends: ['root.Person-2-1', 'root.Person-2-3', 'root.Person-2-4'],
+      friends: ['root.Person-2-1', 'root.Person-2-3', 'root.Person-2-4']
     });
     const george = new root.Person({
       id: 'root.Person-2-3',
       name: 'George',
-      friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-4'],
+      friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-4']
     });
     const ringo = new root.Person({
       id: 'root.Person-2-4',
       name: 'Ringo',
-      friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-3'],
+      friends: ['root.Person-2-1', 'root.Person-2-2', 'root.Person-2-3']
     });
 
     const band = new Backbone.Collection([john, paul, george, ringo]);
@@ -196,7 +210,8 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
 
     assert.equal(instance.refCount(), 2, 'One instance retained and one in the store');
 
-    store.destroy(); store = null;
+    store.destroy();
+    store = null;
 
     assert.equal(RefCountableViewModel.view_models.length, 1, 'Still one reference');
     assert.equal(instance.refCount(), 1, "All instances were destroyed in the collection's store");
@@ -210,7 +225,8 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
     kb.release(collection_observable);
     assert.equal(DestroyableViewModel.view_models.length, 4, 'All destroyed');
 
-    store.destroy(); store = null;
+    store.destroy();
+    store = null;
 
     // all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     assert.equal(DestroyableViewModel.view_models.length, 0, 'All destroyed');
@@ -223,14 +239,20 @@ describe('Knockback.js with Backbone-Relational.js (memory)', () => {
 
     kb.release(collection_observable);
     assert.equal(SimpleViewModel.view_models.length, 4, 'Remaining: 4');
-    _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => {
+      assert.ok(view_model.prop, 'Prop destroyed');
+    });
 
-    store.destroy(); store = null;
+    store.destroy();
+    store = null;
 
     // all instances in the collection's store were released when it was destroyed (to remove potential cycles)
     assert.equal(SimpleViewModel.view_models.length, 4, 'Destroyed: 4');
-    _.each(SimpleViewModel.view_models, (view_model) => { assert.ok(!view_model.prop, 'Prop destroyed'); });
+    _.each(SimpleViewModel.view_models, view_model => {
+      assert.ok(!view_model.prop, 'Prop destroyed');
+    });
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

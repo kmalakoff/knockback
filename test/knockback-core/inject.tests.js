@@ -1,11 +1,12 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 const { $ } = root;
 
 describe('inject', () => {
@@ -20,22 +21,28 @@ describe('inject', () => {
   });
 
   root.kb = kb;
-  root.appCreate = (view_model) => { view_model.app_create = true; };
+  root.appCreate = view_model => {
+    view_model.app_create = true;
+  };
 
-  root.app = function () {
+  root.app = function() {
     this.app = true;
     kb.statistics.register('app', this);
     this.destroy = () => kb.statistics.unregister('app', this);
     return this; // return self
   };
 
-  root.appCallbacks = function () {
+  root.appCallbacks = function() {
     this.app = true;
     kb.statistics.register('app', this);
     this.destroy = () => kb.statistics.unregister('app', this);
 
-    this.beforeBinding = () => { this.before_was_called = true; };
-    this.afterBinding = () => { this.after_was_called = true; };
+    this.beforeBinding = () => {
+      this.before_was_called = true;
+    };
+    this.afterBinding = () => {
+      this.after_was_called = true;
+    };
 
     return this; // return self
   };
@@ -45,6 +52,7 @@ describe('inject', () => {
       this.super_class = true;
       kb.statistics.register('SuperClass', this);
     }
+
     destroy() {
       return kb.statistics.unregister('SuperClass', this);
     }
@@ -127,7 +135,9 @@ describe('inject', () => {
     ko.removeNode(inject_el);
 
     // ViewModel property and Create should take ViewModel
-    inject_el = $('<div kb-inject="view_model: app, create: appCreate"><span data-bind="visible: app"></span><span data-bind="visible: app_create"></span></div>')[0];
+    inject_el = $(
+      '<div kb-inject="view_model: app, create: appCreate"><span data-bind="visible: app"></span><span data-bind="visible: app_create"></span></div>'
+    )[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
@@ -140,7 +150,9 @@ describe('inject', () => {
     ko.removeNode(inject_el);
 
     // Create and ViewModel property should take ViewModel
-    inject_el = $('<div kb-inject="create: appCreate, view_model: app"><span data-bind="visible: app"></span><span data-bind="visible: app_create"></span></div>')[0];
+    inject_el = $(
+      '<div kb-inject="create: appCreate, view_model: app"><span data-bind="visible: app"></span><span data-bind="visible: app_create"></span></div>'
+    )[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
@@ -174,9 +186,9 @@ describe('inject', () => {
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Object: app was injected');
-    assert.ok((view_model instanceof SuperClass), 'Mix: is SuperClass');
+    assert.ok(view_model instanceof SuperClass, 'Mix: is SuperClass');
     assert.equal(view_model.super_class, true, 'Mix: has super_class');
-    assert.ok((view_model.sub_class instanceof SubClass), 'Mix: is SubClass');
+    assert.ok(view_model.sub_class instanceof SubClass, 'Mix: is SubClass');
     assert.equal(view_model.sub_class.sub_class, true, 'Mix: has sub_class');
     assert.ok(!(view_model.created instanceof appCreate), 'Mix: is not create');
     assert.equal(view_model.created.app_create, true, 'Mix: has create');
@@ -187,9 +199,15 @@ describe('inject', () => {
     // Properties with callbacks
     let before_was_called = false;
     let after_was_called = false;
-    root.beforeBinding = (x) => { before_was_called = x.hello; };
-    root.afterBinding = (x) => { after_was_called = x.hello; };
-    inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
+    root.beforeBinding = x => {
+      before_was_called = x.hello;
+    };
+    root.afterBinding = x => {
+      after_was_called = x.hello;
+    };
+    inject_el = $(
+      '<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>'
+    )[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
@@ -202,9 +220,15 @@ describe('inject', () => {
     // Create function with callbacks
     before_was_called = false;
     after_was_called = false;
-    root.beforeBinding = (x) => { before_was_called = x.hello; };
-    root.afterBinding = (x) => { after_was_called = x.hello; };
-    inject_el = $('<div kb-inject="create: appCreate, hello: true, beforeBinding: beforeBinding, afterBinding: afterBinding"><span data-bind="visible: app_create"></span></div>')[0];
+    root.beforeBinding = x => {
+      before_was_called = x.hello;
+    };
+    root.afterBinding = x => {
+      after_was_called = x.hello;
+    };
+    inject_el = $(
+      '<div kb-inject="create: appCreate, hello: true, beforeBinding: beforeBinding, afterBinding: afterBinding"><span data-bind="visible: app_create"></span></div>'
+    )[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
@@ -222,7 +246,7 @@ describe('inject', () => {
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
     assert.equal(injected[0].el, inject_el, 'ViewModel Property + Callbacks: app was injected');
-    assert.ok((view_model instanceof root.appCallbacks), 'Create: view_model type appCallbacks');
+    assert.ok(view_model instanceof root.appCallbacks, 'Create: view_model type appCallbacks');
     assert.equal(view_model.app, true, 'ViewModel Property + Callbacks: view model was injected');
     assert.ok(view_model.before_was_called, 'ViewModel Property + Callbacks: before_was_called was called');
     assert.ok(view_model.after_was_called, 'ViewModel Property + Callbacks: after_was_called was called');
@@ -231,10 +255,16 @@ describe('inject', () => {
     // ViewModel Object with callbacks
     before_was_called = false;
     after_was_called = false;
-    root.beforeBinding = (x) => { before_was_called = x.hello; };
-    root.afterBinding = (x) => { after_was_called = x.hello; };
+    root.beforeBinding = x => {
+      before_was_called = x.hello;
+    };
+    root.afterBinding = x => {
+      after_was_called = x.hello;
+    };
 
-    inject_el = $('<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>')[0];
+    inject_el = $(
+      '<div kb-inject="hello: true, options: {beforeBinding: beforeBinding, afterBinding: afterBinding}"><span data-bind="visible: hello"></span></div>'
+    )[0];
     $('body').append(inject_el);
     injected = kb.injectViewModels();
     view_model = injected[0].view_model;
@@ -244,19 +274,22 @@ describe('inject', () => {
     assert.ok(after_was_called, 'ViewModel Object + Callbacks: after_was_called was called');
     ko.removeNode(inject_el);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('2. data-bind inject recusive', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const previous = kb.RECUSIVE_AUTO_INJECT; kb.RECUSIVE_AUTO_INJECT = true;
+    const previous = kb.RECUSIVE_AUTO_INJECT;
+    kb.RECUSIVE_AUTO_INJECT = true;
 
     let was_auto_injected = 0;
     root.AutoInject = class AutoInject {
       constructor() {
         was_auto_injected++;
       }
+
       destroy() {
         return was_auto_injected--;
       }
@@ -280,7 +313,8 @@ describe('inject', () => {
 
     kb.RECUSIVE_AUTO_INJECT = previous;
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('3. data-bind inject', () => {
@@ -308,7 +342,9 @@ describe('inject', () => {
     ko.removeNode(inject_el);
 
     // Function
-    root.testFunction = (x) => { x.hello = true; };
+    root.testFunction = x => {
+      x.hello = true;
+    };
     inject_el = $('<div data-bind="inject: {embedded: testFunction}"><span data-bind="click: embedded.testFunction"></span></div>')[0];
     view_model = {};
     kb.applyBindings(view_model, inject_el);
@@ -350,9 +386,9 @@ describe('inject', () => {
 </div>`)[0];
     view_model = {};
     kb.applyBindings(view_model, inject_el);
-    assert.ok((view_model.new_context instanceof SuperClass), 'Mix: is SuperClass');
+    assert.ok(view_model.new_context instanceof SuperClass, 'Mix: is SuperClass');
     assert.equal(view_model.new_context.super_class, true, 'Mix: has super_class');
-    assert.ok((view_model.new_context.sub_class instanceof SubClass), 'Mix: is SubClass');
+    assert.ok(view_model.new_context.sub_class instanceof SubClass, 'Mix: is SubClass');
     assert.equal(view_model.new_context.sub_class.sub_class, true, 'Mix: has sub_class');
     assert.ok(!(view_model.new_context.created instanceof appCreate), 'Mix: is not create');
     assert.equal(view_model.new_context.created.app_create, true, 'Mix: has create');
@@ -360,6 +396,7 @@ describe('inject', () => {
     assert.equal(view_model.new_context.hello, true, 'Mix: hello is true');
     ko.removeNode(inject_el);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

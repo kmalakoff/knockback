@@ -30,28 +30,32 @@ module.exports = async () => {
     }
 
     // build test browserify
-    for (const test of (TEST_GROUPS.browserify || [])) {
+    for (const test of TEST_GROUPS.browserify || []) {
       await new Promise((resolve, reject) =>
-        gulp.src(test.build.files)
+        gulp
+          .src(test.build.files)
           .pipe(babel(BABEL_OPTIONS))
           .pipe(concat(path.basename(test.build.destination)))
           .pipe(browserify(test.build.options))
           .pipe(gulp.dest(path.dirname(test.build.destination)))
           .on('error', reject)
-          .on('end', resolve),
+          .on('end', resolve)
       );
     }
 
     // wrap AMD tests
-    for (const test of (TEST_GROUPS.amd || [])) {
+    for (const test of TEST_GROUPS.amd || []) {
       await new Promise((resolve, reject) =>
-        gulp.src(test.build.files)
+        gulp
+          .src(test.build.files)
           .pipe(babel(BABEL_OPTIONS))
           .pipe(wrapAMD(test.build.options))
           .pipe(gulp.dest(test.build.destination))
           .on('error', reject)
-          .on('end', resolve),
+          .on('end', resolve)
       );
     }
-  } catch (err) { console.error(err); }
+  } catch (err) {
+    console.error(err);
+  }
 };

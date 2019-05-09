@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -19,31 +19,36 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     Backbone.Associations.scopes.push(root);
 
     root.Person = Backbone.AssociatedModel.extend({
-      relations: [{
-        type: Backbone.Many,
-        key: 'friends',
-        relatedModel: 'Person',
-      }, {
-        type: Backbone.One,
-        key: 'best_friend',
-        relatedModel: 'Person',
-        // reverseRelation: {
-        //   type: Backbone.Many,
-        //   key: 'best_friends_with_me',
-        // },
-      }],
+      relations: [
+        {
+          type: Backbone.Many,
+          key: 'friends',
+          relatedModel: 'Person'
+        },
+        {
+          type: Backbone.One,
+          key: 'best_friend',
+          relatedModel: 'Person'
+          // reverseRelation: {
+          //   type: Backbone.Many,
+          //   key: 'best_friends_with_me',
+          // },
+        }
+      ]
     });
 
     root.Building = Backbone.AssociatedModel.extend({
-      relations: [{
-        type: Backbone.Many,
-        key: 'occupants',
-        relatedModel: 'Person',
-        // reverseRelation: {
-        //   type: Backbone.One,
-        //   key: 'occupies',
-        // }
-      }],
+      relations: [
+        {
+          type: Backbone.Many,
+          key: 'occupants',
+          relatedModel: 'Person'
+          // reverseRelation: {
+          //   type: Backbone.One,
+          //   key: 'occupies',
+          // }
+        }
+      ]
     });
   });
 
@@ -67,18 +72,18 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     const john = new Person({
       id: 'person-1-1',
-      name: 'John',
+      name: 'John'
     });
 
     const paul = new Person({
       id: 'person-1-2',
-      name: 'Paul',
+      name: 'Paul'
     });
 
     const our_house = new Building({
       id: 'house-1-1',
       location: 'in the middle of the street',
-      occupants: [john, paul],
+      occupants: [john, paul]
     });
 
     const model_stats = {};
@@ -89,28 +94,37 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const house_view_model = new kb.ViewModel(our_house);
     assert.equal(house_view_model.location(), 'in the middle of the street', 'In the right place');
     assert.equal(house_view_model.occupants().length, 2, 'Expected occupant count');
-    _.each(house_view_model.occupants(), (occupant_observable) => {
+    _.each(house_view_model.occupants(), occupant_observable => {
       assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable.name()), 'Expected name');
     });
-      // assert.equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
+    // assert.equal(occupant_observable.occupies().location(), 'in the middle of the street', 'Expected location')
 
-      // nested check
-      // assert.equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count")
-      // for occupant_observable2 in occupant_observable.occupies().occupants()
-      //   assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
-      //   assert.equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
+    // nested check
+    // assert.equal(occupant_observable.occupies().occupants().length, 2, "Excepted occupant count")
+    // for occupant_observable2 in occupant_observable.occupies().occupants()
+    //   assert.ok(~_.indexOf(['John', 'Paul'], occupant_observable2.name()), 'Expected name')
+    //   assert.equal(occupant_observable2.occupies().location(), 'in the middle of the street', 'Expected location')
 
     kb.release(house_view_model);
 
-    _.each(model_stats, (stats) => {
+    _.each(model_stats, stats => {
       const statsCountCheck = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
-      assert.ok(statsCountCheck, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+      assert.ok(
+        statsCountCheck,
+        `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(
+          kb.Statistics.eventsStats(stats.model)
+        )}`
+      );
     });
     our_house.set({ occupants: [] });
     _.each(model_stats, (stats, name) => {
-      assert.ok(kb.Statistics.eventsStats(stats.model).count === 0, `All model events cleared (${name}). Expected: 1. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+      assert.ok(
+        kb.Statistics.eventsStats(stats.model).count === 0,
+        `All model events cleared (${name}). Expected: 1. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`
+      );
     });
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('2. Collection with models with Many relations: Multiple houses with multiple people living in them', () => {
@@ -118,49 +132,49 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     const john = new Person({
       id: 'person-2-1',
-      name: 'John',
+      name: 'John'
     });
     const paul = new Person({
       id: 'person-2-2',
-      name: 'Paul',
+      name: 'Paul'
     });
     const george = new Person({
       id: 'person-2-3',
-      name: 'George',
+      name: 'George'
     });
     const ringo = new Person({
       id: 'person-2-4',
-      name: 'Ringo',
+      name: 'Ringo'
     });
 
     const abbey_flats = new Building({
       id: 'house-2-1',
       location: 'one side of the street',
-      occupants: [john, paul, george, ringo],
+      occupants: [john, paul, george, ringo]
     });
     const abbey_studios = new Building({
       id: 'studio-2-2',
       location: 'the other side of the street',
-      occupants: [],
+      occupants: []
     });
 
     // check the set up state
     const places = new Backbone.Collection([abbey_flats, abbey_studios]);
     const places_observable = kb.collectionObservable(places, { view_model: kb.ViewModel });
-    _.each(places_observable(), (place_view_model) => {
+    _.each(places_observable(), place_view_model => {
       if (place_view_model.id() === 'house-2-1') {
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 4, 'Everyone is here');
-        _.each(place_view_model.occupants(), (occupant_observable) => {
+        _.each(place_view_model.occupants(), occupant_observable => {
           assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
         });
-          // assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
+        // assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
-          // # nested check
-          // assert.equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here")
-          // for occupant_observable2 in occupant_observable.occupies().occupants()
-          //   assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
-          //   assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
+        // # nested check
+        // assert.equal(occupant_observable.occupies().occupants().length, 4, "Everyone is here")
+        // for occupant_observable2 in occupant_observable.occupies().occupants()
+        //   assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
+        //   assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
       } else {
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 0, 'No one is here');
@@ -170,42 +184,43 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     // a beattle crosses the road
     abbey_studios.get('occupants').add(john);
 
-    _.each(places_observable(), (place_view_model) => {
+    _.each(places_observable(), place_view_model => {
       if (place_view_model.id() === 'house-2-1') {
         assert.equal(place_view_model.location(), 'one side of the street', 'In the right place');
 
         // assert.equal(place_view_model.occupants().length, 3, "Almost everyone is here") # no backlink maintenance
         assert.equal(place_view_model.occupants().length, 4, 'Everyone is here');
 
-        _.each(place_view_model.occupants(), (occupant_observable) => {
+        _.each(place_view_model.occupants(), occupant_observable => {
           assert.ok(~_.indexOf(['John', 'Paul', 'George', 'Ringo'], occupant_observable.name()), 'Expected name');
         });
-          // assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
+        // assert.equal(occupant_observable.occupies().location(), 'one side of the street', 'Expected location')
 
-          // # nested check
-          // assert.equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here")
-          // for occupant_observable2 in occupant_observable.occupies().occupants()
-          //   assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
-          //   assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
+        // # nested check
+        // assert.equal(occupant_observable.occupies().occupants().length, 3, "Almost everyone is here")
+        // for occupant_observable2 in occupant_observable.occupies().occupants()
+        //   assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], occupant_observable2.name()), 'Expected name')
+        //   assert.equal(occupant_observable2.occupies().location(), 'one side of the street', 'Expected location')
       } else {
         assert.equal(place_view_model.location(), 'the other side of the street', 'In the right place');
         assert.equal(place_view_model.occupants().length, 1, 'In the studio');
-        _.each(place_view_model.occupants(), (occupant_observable) => {
+        _.each(place_view_model.occupants(), occupant_observable => {
           assert.equal(occupant_observable.name(), 'John', 'Expected name');
         });
       }
     });
-          // assert.equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location')
+    // assert.equal(occupant_observable.occupies().location(), 'the other side of the street', 'Expected location')
 
-          // # nested check
-          // assert.equal(occupant_observable.occupies().occupants().length, 1, "In the studio")
-          // for occupant_observable2 in occupant_observable.occupies().occupants()
-          //   assert.equal(occupant_observable2.name(), 'John', 'Expected name')
-          //   assert.equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location')
+    // # nested check
+    // assert.equal(occupant_observable.occupies().occupants().length, 1, "In the studio")
+    // for occupant_observable2 in occupant_observable.occupies().occupants()
+    //   assert.equal(occupant_observable2.name(), 'John', 'Expected name')
+    //   assert.equal(occupant_observable2.occupies().location(), 'the other side of the street', 'Expected location')
 
     kb.release(places_observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('3. Model with recursive Many relations: Person with users who are people', () => {
@@ -214,7 +229,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const george = new Person({
       id: 'person-3-3',
       name: 'George',
-      friends: [],
+      friends: []
       // friends: ['person-3-1', 'person-3-2', 'person-3-4']
     });
     const john = new Person({
@@ -222,7 +237,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       name: 'John',
       friends: [],
       // friends: ['person-3-2', 'person-3-3', 'person-3-4']
-      best_friend: george,
+      best_friend: george
     });
     george.set({ best_friend: john });
     const paul = new Person({
@@ -230,12 +245,12 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       name: 'Paul',
       friends: [],
       // friends: ['person-3-1', 'person-3-3', 'person-3-4']
-      best_friend: george,
+      best_friend: george
     });
     const ringo = new Person({
       id: 'person-3-4',
       name: 'Ringo',
-      friends: [],
+      friends: []
       // friends: ['person-3-1', 'person-3-2', 'person-3-3']
     });
     george.get('friends').reset([john, paul, ringo]);
@@ -251,51 +266,62 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     let john_view_model = new kb.ViewModel(john);
     assert.equal(john_view_model.name(), 'John', 'Name is correct');
-    _.each(john_view_model.friends(), (friend) => {
+    _.each(john_view_model.friends(), friend => {
       assert.ok(~_.indexOf(['Paul', 'George', 'Ringo'], friend.name()), 'Expected name');
     });
     assert.equal(john_view_model.best_friend().name(), 'George', 'Expected name');
     // assert.equal(john_view_model.best_friends_with_me()[0].name(), 'George', 'Expected name')
-    kb.release(john_view_model); john_view_model = null;
+    kb.release(john_view_model);
+    john_view_model = null;
 
     let paul_view_model = new kb.ViewModel(paul);
     assert.equal(paul_view_model.name(), 'Paul', 'Name is correct');
-    _.each(paul_view_model.friends(), (friend) => {
+    _.each(paul_view_model.friends(), friend => {
       assert.ok(~_.indexOf(['John', 'George', 'Ringo'], friend.name()), 'Expected name');
     });
     assert.equal(paul_view_model.best_friend().name(), 'George', 'Expected name');
     // assert.equal(paul_view_model.best_friends_with_me().length, 0, 'No best friends with me')
-    kb.release(paul_view_model); paul_view_model = null;
+    kb.release(paul_view_model);
+    paul_view_model = null;
 
     let george_view_model = new kb.ViewModel(george);
     assert.equal(george_view_model.name(), 'George', 'Name is correct');
-    _.each(george_view_model.friends(), (friend) => {
+    _.each(george_view_model.friends(), friend => {
       assert.ok(~_.indexOf(['John', 'Paul', 'Ringo'], friend.name()), 'Expected name');
     });
     assert.equal(george_view_model.best_friend().name(), 'John', 'Expected name');
     // assert.equal(george_view_model.best_friends_with_me()[0].name(), 'John', 'Expected name')
     // assert.equal(george_view_model.best_friends_with_me()[1].name(), 'Paul', 'Expected name')
-    kb.release(george_view_model); george_view_model = null;
+    kb.release(george_view_model);
+    george_view_model = null;
 
-    _.each(model_stats, (stats) => {
+    _.each(model_stats, stats => {
       const statsCountCheck = kb.Statistics.eventsStats(stats.model).count === stats.event_stats.count;
-      assert.ok(statsCountCheck, `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(kb.Statistics.eventsStats(stats.model))}`);
+      assert.ok(
+        statsCountCheck,
+        `All model events cleared to initial state. Expected: ${JSON.stringify(stats.event_stats)}. Actual: ${JSON.stringify(
+          kb.Statistics.eventsStats(stats.model)
+        )}`
+      );
     });
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('4. After view model create, add models', () => {
     const Occupant = Backbone.AssociatedModel.extend({});
 
     const House = Backbone.AssociatedModel.extend({
-      relations: [{
-        type: Backbone.Many,
-        key: 'occupants',
-        relatedModel: Occupant,
-        reverseRelation: {
-          key: 'livesIn',
-        },
-      }],
+      relations: [
+        {
+          type: Backbone.Many,
+          key: 'occupants',
+          relatedModel: Occupant,
+          reverseRelation: {
+            key: 'livesIn'
+          }
+        }
+      ]
     });
 
     const bob = new Occupant({ id: 'person-1', name: 'Bob' });
@@ -303,7 +329,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     const house = new House({
       location: 'In the middle of our street',
-      occupants: [],
+      occupants: []
     });
 
     // confirm no occupants
@@ -324,7 +350,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const person1 = new Person({ id: 'person-6-1', name: 'Daddy', friends: [] });
     const person2 = new Person({ id: 'person-6-2', name: 'Mommy' });
     const house = new Building({ id: 'house-6-1', name: 'Home Sweet Home', occupants: [person1, person2] });
-    person1.get('friends').add(person2); person2.set({ best_friend: person1 });
+    person1.get('friends').add(person2);
+    person2.set({ best_friend: person1 });
 
     const view_model_person1 = kb.viewModel(person1);
     const view_model_house1 = kb.viewModel(house);
@@ -343,7 +370,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_person1);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('7a. Inferring observable types: late binding', () => {
@@ -363,13 +391,15 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants');
 
     // add some friends
-    person1.get('friends').add(person2); person2.set({ best_friend: person1 });
+    person1.get('friends').add(person2);
+    person2.set({ best_friend: person1 });
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend');
     assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy');
     // assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
     // add some occupants
-    house.get('occupants').add(person1); house.get('occupants').add(person2);
+    house.get('occupants').add(person1);
+    house.get('occupants').add(person2);
     // assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants');
     assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it');
@@ -378,7 +408,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_person1);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('7b. Inferring observable types: late binding (attribute setting)', () => {
@@ -398,14 +429,19 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants');
 
     // add some friends
-    const friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({ friends });
+    const friends = _.clone(person1.get('friends').models);
+    friends.push(person2);
+    person1.set({ friends });
     person2.set({ best_friend: person1 });
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend');
     assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy');
     // assert.equal(view_model_person1.best_friends_with_me()[0].name(), 'Mommy', 'person1 is best friends with Mommy')
 
     // add some occupants
-    const occupants = _.clone(house.get('occupants').models); occupants.push(person1); occupants.push(person2); house.set({ occupants });
+    const occupants = _.clone(house.get('occupants').models);
+    occupants.push(person1);
+    occupants.push(person2);
+    house.set({ occupants });
     // assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants');
     assert.equal(view_model_house1.occupants()[0].name(), 'Daddy', 'house has Daddy in it');
@@ -414,7 +450,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(view_model_person1);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('8a. Customizing observable types: from the start', () => {
@@ -424,20 +461,24 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     class BestFriendViewModel extends kb.ViewModel {}
     class PersonViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'friends.models': FriendViewModel,
-          best_friend: BestFriendViewModel,
-          // 'occupies': HouseViewModel
-        },
-          options });
+        super(model, {
+          factories: {
+            'friends.models': FriendViewModel,
+            best_friend: BestFriendViewModel
+            // 'occupies': HouseViewModel
+          },
+          options
+        });
       }
     }
     class HouseViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'occupants.models': PersonViewModel,
-        },
-          options });
+        super(model, {
+          factories: {
+            'occupants.models': PersonViewModel
+          },
+          options
+        });
       }
     }
 
@@ -477,7 +518,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(co_family);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // TODO: put back when test why running both Backbone.Relational and this together fail
@@ -488,20 +530,24 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     class BestFriendViewModel extends kb.ViewModel {}
     class PersonViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'friends.models': FriendViewModel,
-          best_friend: BestFriendViewModel,
-          // 'occupies': HouseViewModel
-        },
-          options });
+        super(model, {
+          factories: {
+            'friends.models': FriendViewModel,
+            best_friend: BestFriendViewModel
+            // 'occupies': HouseViewModel
+          },
+          options
+        });
       }
     }
     class HouseViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'occupants.models': PersonViewModel,
-        },
-          options });
+        super(model, {
+          factories: {
+            'occupants.models': PersonViewModel
+          },
+          options
+        });
       }
     }
 
@@ -510,7 +556,9 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const family = new Backbone.Collection([person1, person2]);
     const house = new Building({ id: 'house-8b-1', name: 'Home Sweet Home', occupants: [person1.toJSON()] });
     house.set({ occupants: [person1.toJSON(), person2.toJSON()] });
-    const friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({ friends });
+    const friends = _.clone(person1.get('friends').models);
+    friends.push(person2);
+    person1.set({ friends });
     person2.set({ best_friend: person1 });
 
     const view_model_person1 = new PersonViewModel(person1);
@@ -542,7 +590,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(co_family);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('9a. Customizing observable types: late binding', () => {
@@ -555,19 +604,21 @@ describe('Knockback.js with Backbone-Associations.js', () => {
         super(model, {
           factories: {
             'friends.models': FriendViewModel,
-            best_friend: BestFriendViewModel,
+            best_friend: BestFriendViewModel
             // 'occupies': HouseViewModel
           },
-          options,
+          options
         });
       }
     }
     class HouseViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'occupants.models': PersonViewModel,
-        },
-          options });
+        super(model, {
+          factories: {
+            'occupants.models': PersonViewModel
+          },
+          options
+        });
       }
     }
 
@@ -589,7 +640,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants');
 
     // check friends
-    person1.get('friends').add(person2); person2.set({ best_friend: person1 });
+    person1.get('friends').add(person2);
+    person2.set({ best_friend: person1 });
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend');
     assert.ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel');
     assert.equal(view_model_person1.friends()[0].name(), 'Mommy', 'person1 is friends with Mommy');
@@ -600,7 +652,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     // assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     // check occupants
-    house.get('occupants').add(person1); house.get('occupants').add(person2);
+    house.get('occupants').add(person1);
+    house.get('occupants').add(person2);
     // assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants');
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it');
@@ -614,7 +667,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(co_family);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('9b. Customizing observable types: late binding (attributes setting)', () => {
@@ -627,19 +681,21 @@ describe('Knockback.js with Backbone-Associations.js', () => {
         super(model, {
           factories: {
             'friends.models': FriendViewModel,
-            best_friend: BestFriendViewModel,
+            best_friend: BestFriendViewModel
             // 'occupies': HouseViewModel
           },
-          options,
+          options
         });
       }
     }
     class HouseViewModel extends kb.ViewModel {
       constructor(model, options) {
-        super(model, { factories: {
-          'occupants.models': PersonViewModel,
-        },
-          options });
+        super(model, {
+          factories: {
+            'occupants.models': PersonViewModel
+          },
+          options
+        });
       }
     }
 
@@ -661,7 +717,9 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     assert.equal(view_model_house1.occupants().length, 0, 'house has no occupants');
 
     // check friends
-    const friends = _.clone(person1.get('friends').models); friends.push(person2); person1.set({ friends });
+    const friends = _.clone(person1.get('friends').models);
+    friends.push(person2);
+    person1.set({ friends });
     person2.set({ best_friend: person1 });
     assert.equal(view_model_person1.friends().length, 1, 'person1 has one friend');
     assert.ok(view_model_person1.friends()[0] instanceof FriendViewModel, 'person1 is friends are FriendViewModel');
@@ -673,7 +731,10 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     // assert.ok(view_model_person2.occupies() instanceof HouseViewModel, 'person2 is occupies HouseViewModel')
 
     // check occupants
-    const occupants = _.clone(house.get('occupants').models); occupants.push(person1); occupants.push(person2); house.set({ occupants });
+    const occupants = _.clone(house.get('occupants').models);
+    occupants.push(person1);
+    occupants.push(person2);
+    house.set({ occupants });
     // assert.equal(view_model_person1.occupies().name(), 'Home Sweet Home', 'person1 occupies home sweet home')
     assert.equal(view_model_house1.occupants().length, 2, 'house has two occupants');
     assert.ok(view_model_house1.occupants()[0] instanceof PersonViewModel, 'house has PersonViewModel in it');
@@ -687,7 +748,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     kb.release(co_family);
     kb.release(view_model_house1);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('10. Nested custom view models', () => {
@@ -696,7 +758,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const george = new Person({
       id: 'person-10-3',
       name: 'George',
-      friends: [],
+      friends: []
       // friends: ['person-10-1', 'person-10-2', 'person-10-4']
     });
     const john = new Person({
@@ -704,7 +766,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       name: 'John',
       friends: [],
       // friends: ['person-10-2', 'person-10-3', 'person-10-4']
-      best_friend: george,
+      best_friend: george
     });
     george.set({ best_friend: john });
     const paul = new Person({
@@ -712,24 +774,24 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       name: 'Paul',
       friends: [],
       // friends: ['person-10-1', 'person-10-3', 'person-10-4']
-      best_friend: george,
+      best_friend: george
     });
     const ringo = new Person({
       id: 'person-10-4',
       name: 'Ringo',
-      friends: [],
+      friends: []
       // friends: ['person-10-1', 'person-10-2', 'person-10-3']
     });
     george.get('friends').reset([john, paul, ringo]);
     john.get('friends').reset([paul, george, ringo]);
     paul.get('friends').reset([john, george, ringo]);
     ringo.get('friends').reset([john, paul, george]);
-    const FriendViewModel = function (model) {
+    const FriendViewModel = function(model) {
       this.name = kb.observable(model, 'name');
       this.type = ko.observable('friend');
       return this;
     };
-    const BestFriendViewModel = function (model) {
+    const BestFriendViewModel = function(model) {
       this.name = kb.observable(model, 'name');
       this.type = ko.observable('best_friend');
       return this;
@@ -744,16 +806,20 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const collection_observable = kb.collectionObservable(new Backbone.Collection([john, paul, george, ringo]), {
       factories: {
         models: BandMemberViewModel,
-        'models.best_friend': { create(model) { return model ? new BestFriendViewModel(model) : null; } },
-        'models.friends.models': FriendViewModel,
-      },
+        'models.best_friend': {
+          create(model) {
+            return model ? new BestFriendViewModel(model) : null;
+          }
+        },
+        'models.friends.models': FriendViewModel
+      }
     });
 
-    const validateFriends = function (co, names) {
-      _.each(names, (name) => {
+    const validateFriends = function(co, names) {
+      _.each(names, name => {
         let found = false;
-        _.each(co(), (vm) => {
-          if (vm.name && (vm.name() === name)) {
+        _.each(co(), vm => {
+          if (vm.name && vm.name() === name) {
             found = true;
             validateFriend(vm, name);
           }
@@ -791,7 +857,8 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     // and cleanup after yourself when you are done.
     kb.release(collection_observable);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // TODO: put back when test why running both Backbone.Relational and this together fail
@@ -801,22 +868,22 @@ describe('Knockback.js with Backbone-Associations.js', () => {
     const george = new Person({
       id: 'person-11-3',
       name: 'George',
-      friends: ['person-11-1', 'person-11-2', 'person-11-4'],
+      friends: ['person-11-1', 'person-11-2', 'person-11-4']
     });
     const john = new Person({
       id: 'person-11-1',
       name: 'John',
-      friends: ['person-11-2', 'person-11-3', 'person-11-4'],
+      friends: ['person-11-2', 'person-11-3', 'person-11-4']
     });
     const paul = new Person({
       id: 'person-11-2',
       name: 'Paul',
-      friends: ['person-11-1', 'person-11-3', 'person-11-4'],
+      friends: ['person-11-1', 'person-11-3', 'person-11-4']
     });
     const ringo = new Person({
       id: 'person-11-4',
       name: 'Ringo',
-      friends: ['person-11-1', 'person-11-2', 'person-11-3'],
+      friends: ['person-11-1', 'person-11-2', 'person-11-3']
     });
 
     class PersonViewModel extends kb.ViewModel {
@@ -824,10 +891,10 @@ describe('Knockback.js with Backbone-Associations.js', () => {
         super(model, {
           factories: {
             friends: PersonCollection,
-            best_friend: PersonViewModel,
+            best_friend: PersonViewModel
           },
-            // 'best_friends_with_me': PersonViewModel
-          options,
+          // 'best_friends_with_me': PersonViewModel
+          options
         });
       }
     }
@@ -836,9 +903,9 @@ describe('Knockback.js with Backbone-Associations.js', () => {
       constructor(collection, options) {
         super(collection, {
           factories: {
-            models: PersonViewModel,
+            models: PersonViewModel
           },
-          options,
+          options
         });
         return kb.utils.wrappedObservable(this);
       }
@@ -864,7 +931,7 @@ describe('Knockback.js with Backbone-Associations.js', () => {
 
     kb.release([view_model_george, view_model_john, view_model_paul, view_model_ringo]);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });
-

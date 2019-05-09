@@ -1,5 +1,5 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
@@ -7,6 +7,7 @@ const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
 if (kb && !kb.valueValidator && r) require('@knockback/validation');
+
 const { $ } = root;
 
 describe('validation', () => {
@@ -47,16 +48,18 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.inputValidator', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model =
-      { name: ko.observable() };
+    const view_model = { name: ko.observable() };
 
     const el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator" required>')[0];
     ko.applyBindings(view_model, el);
@@ -89,16 +92,18 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.inputValidator with custom validators', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model =
-      { name: ko.observable() };
+    const view_model = { name: ko.observable() };
 
     root.nameTaken = value => value === 'Bob';
     const el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validations: {unique: nameTaken}" required>')[0];
@@ -143,18 +148,22 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.inputValidator with validation_options', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    let view_model =
-      { name: ko.observable() };
+    let view_model = { name: ko.observable() };
     root.disable = ko.observable(true);
-    let el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: \'url\'}" required>')[0];
+    let el = $(
+      '<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable, priorities: \'url\'}" required>'
+    )[0];
     ko.applyBindings(view_model, el);
 
     let validator = view_model.$name;
@@ -192,8 +201,7 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    view_model =
-      { name: ko.observable() };
+    view_model = { name: ko.observable() };
     root.disable = () => true;
     el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator, validation_options: {disable: disable}" required>')[0];
     ko.applyBindings(view_model, el);
@@ -212,17 +220,20 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.formValidator with name', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = {
       name: ko.observable(),
-      site: ko.observable(),
+      site: ko.observable()
     };
 
     const HTML = `\
@@ -285,17 +296,20 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.formValidator no name with validation_options', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const view_model = {
       name: ko.observable(),
-      site: ko.observable(),
+      site: ko.observable()
     };
 
     const HTML = `\
@@ -365,19 +379,22 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.formValidator with inject and disable', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
     root.MyViewModel = kb.ViewModel.extend({
       constructor() {
         const model = new Backbone.Model({ name: '', site: '' });
         kb.ViewModel.prototype.constructor.call(this, model);
-      },
+      }
     });
 
     const HTML = `\
@@ -454,16 +471,18 @@ describe('validation', () => {
 
     ko.removeNode(inject_el);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('kb.inputValidator without required', () => {
     if (!$ || !root.document) return;
-    if (!root.kb) { root.kb = kb; } // make kb global for bindings
+    if (!root.kb) {
+      root.kb = kb;
+    } // make kb global for bindings
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model =
-      { name: ko.observable() };
+    const view_model = { name: ko.observable() };
 
     const el = $('<input type="url" name="name" data-bind="value: name, inject: kb.inputValidator">')[0];
     ko.applyBindings(view_model, el);
@@ -493,6 +512,7 @@ describe('validation', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

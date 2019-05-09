@@ -12,22 +12,26 @@ const header = require('gulp-header');
 const spawn = require('cross-spawn');
 const nuget = require('nuget');
 
-const HEADER = (module.exports = `\
+const HEADER = `
 /*
   <%= file.path.split('/').splice(-1)[0].replace('.min', '') %> <%= pkg.version %>
-  Copyright (c)  2011-${(new Date()).getFullYear()} Kevin Malakoff.
+  Copyright (c)  2011-${new Date().getFullYear()} Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
   Dependencies: Knockout.js, Backbone.js, and Underscore.js (or LoDash.js).
   Optional dependencies: Backbone.ModelRef.js and BackboneORM.
-*/\n\
-`);
+*/
+`;
 
 gulp.task('build', async () => {
   const BUILD_ORDER = ['knockback-knockback.js', 'knockback.js'];
-  const sort = x => (x.output.filename === 'knockback-core.js') ? -2 : BUILD_ORDER.indexOf(x.output.filename);
+  const sort = x => (x.output.filename === 'knockback-core.js' ? -2 : BUILD_ORDER.indexOf(x.output.filename));
 
-  const configPaths = glob.sync('**/webpack.config.js', { cwd: path.join(__dirname, 'packages'), ignore: '**/node_modules/**', absolute: true });
+  const configPaths = glob.sync('**/webpack.config.js', {
+    cwd: path.join(__dirname, 'packages'),
+    ignore: '**/node_modules/**',
+    absolute: true
+  });
   const configs = _.sortBy(configPaths.map(x => require(x)), sort); // build in specific order
 
   for (const config of configs) {
@@ -36,9 +40,11 @@ gulp.task('build', async () => {
         if (err) return reject(err);
 
         console.log(stats.toString({}));
-        if (stats.compilation.errors.length) return reject(new Error(`Webpack had ${stats.compilation.errors.length} errors`));
+        if (stats.compilation.errors.length) {
+          return reject(new Error(`Webpack had ${stats.compilation.errors.length} errors`));
+        }
 
-//     .pipe(header(HEADER, { pkg: require('./package.json') }))
+        //     .pipe(header(HEADER, { pkg: require('./package.json') }))
 
         return resolve();
       });
@@ -46,20 +52,24 @@ gulp.task('build', async () => {
   }
 });
 
-gulp.task('minify', ['build'], () => gulp.src(['knockback.js', 'knockback-*.js', '!*.min.js'])
+gulp.task('minify', ['build'], () =>
+  gulp
+    .src(['knockback.js', 'knockback-*.js', '!*.min.js'])
     .pipe(uglify())
     .pipe(rename({ suffix: '.min' }))
     .pipe(header(HEADER, { pkg: require('./package.json') }))
-    .pipe(gulp.dest(file => file.base)));
+    .pipe(gulp.dest(file => file.base))
+);
 
-const testNode = () => new Promise((resolve, reject) => {
-  console.log('Running Node tests');
-  const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'spec', '--recursive']);
-  res.stdout.pipe(process.stdout);
-  res.stderr.pipe(process.stderr);
-  res.on('close', resolve);
-  res.on('error', reject);
-});
+const testNode = () =>
+  new Promise((resolve, reject) => {
+    console.log('Running Node tests');
+    const res = spawn('mocha', ['test/**/*.tests.js', '--reporter', 'spec', '--recursive']);
+    res.stdout.pipe(process.stdout);
+    res.stderr.pipe(process.stderr);
+    res.on('close', resolve);
+    res.on('error', reject);
+  });
 
 const testBrowsers = async () => {
   console.log('Running Browser tests');
@@ -79,26 +89,35 @@ gulp.task('test', ['minify'], async () => {
 });
 
 const copyLibraryFiles = async (destination, others) => {
-  const LIBRARY_FILES = _.flattenDeep(fs.readdirSync(path.join(__dirname, 'config', 'builds', 'library')).map(x => [x.replace('webpack.config.js', 'js'), x.replace('webpack.config.js', 'min.js')]))
+  const LIBRARY_FILES = _.flattenDeep(
+    fs
+      .readdirSync(path.join(__dirname, 'config', 'builds', 'library'))
+      .map(x => [x.replace('webpack.config.js', 'js'), x.replace('webpack.config.js', 'min.js')])
+  );
 
   await new Promise((resolve, reject) =>
-    gulp.src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
+    gulp
+      .src(LIBRARY_FILES.concat(['README.md', 'RELEASE_NOTES.md'].concat(others)))
       .pipe(gulp.dest(file => path.join(destination, path.dirname(file.path).replace(__dirname, ''))))
-      .on('error', reject).on('end', resolve),
+      .on('error', reject)
+      .on('end', resolve)
   );
 };
 
 gulp.task('publish', ['minify'], async () => {
   await copyLibraryFiles('packages/npm', ['component.json', 'bower.json']);
   await copyLibraryFiles('packages/nuget/Content/Scripts', []);
-  await gulp.src('packages/nuget/*.nuspec')
-    .pipe(es.map((file, callback) =>
+  await gulp.src('packages/nuget/*.nuspec').pipe(
+    es.map((file, callback) =>
       nuget.pack(file, (err, nupkgFile) => {
-        if (err) { return callback(err); }
-        return nuget.push(nupkgFile, (err) => {
-          if (err) return console.log(err);
+        if (err) {
+          return callback(err);
+        }
+        return nuget.push(nupkgFile, err2 => {
+          if (err2) return console.log(err2);
           return callback();
         });
       })
-    ));
+    )
+  );
 });

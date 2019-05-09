@@ -1,11 +1,12 @@
 const r = typeof require !== 'undefined';
-const root = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined') ? global : this;
+const root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this;
 const assert = root.assert || (r ? require('chai').assert : undefined);
 
 const kb = root.kb || (r ? require('@knockback/core') : undefined);
 const _ = root._ || (r ? require('underscore') : undefined);
 const Backbone = root.Backbone || (r ? require('backbone') : undefined);
 const ko = root.ko || (r ? require('knockout') : undefined);
+
 const { $ } = root;
 
 describe('view-model', () => {
@@ -51,7 +52,8 @@ describe('view-model', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('2. Using classes', () => {
@@ -84,20 +86,34 @@ describe('view-model', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('3. Using simple Javascript classes', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const ContactViewModelCustom = (model) => {
+    const ContactViewModelCustom = model => {
       const view_model = kb.viewModel(model);
-      view_model.formatted_name = kb.observable(model, { key: 'name', read() { return `First: ${model.get('name')}`; } });
-      view_model.formatted_number = kb.observable(model, {
-        key: 'number',
-        read() { return `#: ${model.get('number')}`; },
-        write(value) { return model.set({ number: value.substring(3) }); },
-      }, view_model);
+      view_model.formatted_name = kb.observable(model, {
+        key: 'name',
+        read() {
+          return `First: ${model.get('name')}`;
+        }
+      });
+      view_model.formatted_number = kb.observable(
+        model,
+        {
+          key: 'number',
+          read() {
+            return `#: ${model.get('number')}`;
+          },
+          write(value) {
+            return model.set({ number: value.substring(3) });
+          }
+        },
+        view_model
+      );
       return view_model;
     };
 
@@ -126,7 +142,8 @@ describe('view-model', () => {
     // and cleanup after yourself when you are done.
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('4. requires', () => {
@@ -173,7 +190,8 @@ describe('view-model', () => {
     // clean up
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('5. reference counting and custom __destroy (class inheritance)', () => {
@@ -186,15 +204,24 @@ describe('view-model', () => {
 
         // monkey patch reference counting
         this.ref_count = 1;
-        this.super_destroy = this.destroy; this.destroy = null;
+        this.super_destroy = this.destroy;
+        this.destroy = null;
         this.is_destroyed = false;
       }
 
-      retain() { return this.ref_count++; }
-      refCount() { return this.ref_count; }
+      retain() {
+        return this.ref_count++;
+      }
+
+      refCount() {
+        return this.ref_count;
+      }
+
       release() {
         --this.ref_count;
-        if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
+        if (this.ref_count < 0) {
+          throw new Error('ref count is corrupt');
+        }
         if (this.ref_count) return;
         this.is_destroyed = true;
         this.super_destroy();
@@ -219,9 +246,10 @@ describe('view-model', () => {
     assert.equal(view_model.is_destroyed, true, 'is destroyed using overridden destroy function');
 
     assert.ok(!view_model.first, "Hello doesn't exist anymore");
-    assert.throw((() => view_model.release()), Error, 'ref count is corrupt');
+    assert.throw(() => view_model.release(), Error, 'ref count is corrupt');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('6. reference counting and custom __destroy (Javascript inheritance)', () => {
@@ -233,19 +261,26 @@ describe('view-model', () => {
 
         // monkey patch reference counting
         this.ref_count = 1;
-        this.super_destroy = this.destroy; this.destroy = null;
+        this.super_destroy = this.destroy;
+        this.destroy = null;
         this.is_destroyed = false;
       },
 
-      retain() { return this.ref_count++; },
-      refCount() { return this.ref_count; },
+      retain() {
+        return this.ref_count++;
+      },
+      refCount() {
+        return this.ref_count;
+      },
       release() {
         --this.ref_count;
-        if (this.ref_count < 0) { throw new Error('ref count is corrupt'); }
+        if (this.ref_count < 0) {
+          throw new Error('ref count is corrupt');
+        }
         if (this.ref_count) return;
         this.is_destroyed = true;
         this.super_destroy();
-      },
+      }
     });
 
     const model = new Backbone.Model({ first: 'Hello' });
@@ -266,9 +301,10 @@ describe('view-model', () => {
     assert.equal(view_model.is_destroyed, true, 'is destroyed using overridden destroy function');
 
     assert.ok(!view_model.first, "Hello doesn't exist anymore");
-    assert.throw((() => view_model.release()), Error, 'ref count is corrupt');
+    assert.throw(() => view_model.release(), Error, 'ref count is corrupt');
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('7. Nested custom view models', () => {
@@ -300,22 +336,34 @@ describe('view-model', () => {
       major_duo3: major_duo,
       minor_duo1: minor_duo,
       minor_duo2: minor_duo,
-      minor_duo3: minor_duo,
+      minor_duo3: minor_duo
     });
 
     const nested_view_model = kb.viewModel(nested_model, {
       factories: {
         john: ContactViewModelDate,
-        george: { create(model, options) { return new ContactViewModelDate(model, options); } },
+        george: {
+          create(model, options) {
+            return new ContactViewModelDate(model, options);
+          }
+        },
         'major_duo1.models': ContactViewModelDate,
-        'major_duo2.models': { create(model, options) { return new ContactViewModelDate(model, options); } },
+        'major_duo2.models': {
+          create(model, options) {
+            return new ContactViewModelDate(model, options);
+          }
+        },
         'major_duo3.models': { models_only: true },
         'minor_duo1.models': kb.ViewModel,
-        'minor_duo2.models': { create(model, options) { return new kb.ViewModel(model, options); } },
-      },
+        'minor_duo2.models': {
+          create(model, options) {
+            return new kb.ViewModel(model, options);
+          }
+        }
+      }
     });
 
-    const validateContactViewModel = function (view_model, name, birthdate) {
+    const validateContactViewModel = function(view_model, name, birthdate) {
       const model = kb.utils.wrappedModel(view_model);
       assert.equal(view_model.name(), name, `${name}: Name matches`);
 
@@ -344,7 +392,7 @@ describe('view-model', () => {
       return model.set({ date: new Date(birthdate.valueOf()) }); // restore birthdate
     };
 
-    const validateGenericViewModel = function (view_model, name, birthdate) {
+    const validateGenericViewModel = function(view_model, name, birthdate) {
       assert.equal(view_model.name(), name, `${name}: Name matches`);
       return assert.equal(view_model.date().valueOf(), birthdate.valueOf(), `${name}: Birthdate matches`);
     };
@@ -377,7 +425,8 @@ describe('view-model', () => {
     // and cleanup after yourself when you are done.
     kb.release(nested_view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('8a. Changing attribute types', () => {
@@ -402,22 +451,25 @@ describe('view-model', () => {
     // clean up
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('8b. Changing attribute types', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
     const model = new Backbone.Model({ reused: null });
-    const view_model = kb.viewModel(model, { factories: {
-      reused: { create(obj, options) {
-        if (kb.isCollection(obj) || (!obj && (kb.utils.valueType(view_model && view_model.reused) === kb.TYPE_COLLECTION))) {
-          return kb.collectionObservable(obj, options);
+    const view_model = kb.viewModel(model, {
+      factories: {
+        reused: {
+          create(obj, options) {
+            if (kb.isCollection(obj) || (!obj && kb.utils.valueType(view_model && view_model.reused) === kb.TYPE_COLLECTION)) {
+              return kb.collectionObservable(obj, options);
+            }
+            return kb.viewModel(obj, options);
+          }
         }
-        return kb.viewModel(obj, options);
-      },
-      },
-    },
+      }
     });
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL');
 
@@ -436,7 +488,8 @@ describe('view-model', () => {
     // clean up
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('9. Shared Options', () => {
@@ -449,12 +502,13 @@ describe('view-model', () => {
     const view_model2 = kb.viewModel(model2);
     const view_model3 = kb.viewModel(model3, view_model1.shareOptions());
 
-    assert.ok((view_model1.name !== view_model2.name) && (view_model1.name() === view_model2.name()), 'not sharing');
-    assert.ok((view_model1.name !== view_model3.name) && (view_model1.name() === view_model3.name()), 'sharing');
+    assert.ok(view_model1.name !== view_model2.name && view_model1.name() === view_model2.name(), 'not sharing');
+    assert.ok(view_model1.name !== view_model3.name && view_model1.name() === view_model3.name(), 'sharing');
 
     kb.release([view_model1, view_model2, view_model3]);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('10. Options', () => {
@@ -522,7 +576,8 @@ describe('view-model', () => {
     assert.ok(!view_model.date, 'mappings: date');
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('11. array attributes', () => {
@@ -535,11 +590,11 @@ describe('view-model', () => {
             properties: ['title', 'description', 'num_points'],
             query: {
               type: 'active',
-              limit: 6,
-            },
-          },
-        },
-      },
+              limit: 6
+            }
+          }
+        }
+      }
     });
 
     const view_model = kb.viewModel(model);
@@ -556,25 +611,29 @@ describe('view-model', () => {
     const view_model = kb.viewModel(model);
 
     let count = 0;
-    ko.computed(() => { view_model.model(); return count++; });
+    ko.computed(() => {
+      view_model.model();
+      return count++;
+    });
 
     view_model.model(null);
     view_model.model(model);
     assert.equal(count, 3, 'model change was observed');
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('13. model replacement', () => {
     kb.statistics = new kb.Statistics();
     const model_opts = {
       attributes: {
-        prop: 1,
+        prop: 1
       },
       defaults: {
-        prop: 1,
-      },
+        prop: 1
+      }
     };
 
     const Model = Backbone.Model.extend(model_opts);
@@ -593,7 +652,8 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('14. model replacement with select', () => {
@@ -603,18 +663,17 @@ describe('view-model', () => {
 
     const model_opts = {
       attributes: {
-        prop: 1,
+        prop: 1
       },
       defaults: {
-        prop: 1,
-      },
+        prop: 1
+      }
     };
 
     const Model = Backbone.Model.extend(model_opts);
 
     const model1 = new Model();
     const view_model = kb.viewModel(model1);
-
 
     const el = $(`\
 <div id="the_template1">
@@ -644,7 +703,8 @@ describe('view-model', () => {
     el.remove();
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('16. model replacement with input', () => {
@@ -654,18 +714,17 @@ describe('view-model', () => {
 
     const model_opts = {
       attributes: {
-        prop: 1,
+        prop: 1
       },
       defaults: {
-        prop: 1,
-      },
+        prop: 1
+      }
     };
 
     const Model = Backbone.Model.extend(model_opts);
 
     const model1 = new Model();
     const view_model = kb.viewModel(model1);
-
 
     const el = $(`\
 <div id="the_template1">
@@ -691,7 +750,8 @@ describe('view-model', () => {
     el.remove();
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('17. model replacement with multiple selects and weird backbone bug', () => {
@@ -701,12 +761,12 @@ describe('view-model', () => {
 
     const default_attrs = {
       prop1: 'p1-wrong',
-      prop2: 'p2-wrong',
+      prop2: 'p2-wrong'
     };
 
     const model_opts = {
       attributes: default_attrs,
-      defaults: default_attrs,
+      defaults: default_attrs
     };
 
     const Model = Backbone.Model.extend(model_opts);
@@ -739,7 +799,7 @@ describe('view-model', () => {
     const model2 = new Model({
       DUMMY: '',
       prop1: 'p1-right',
-      prop2: 'p2-right',
+      prop2: 'p2-right'
     });
     assert.equal(model2.get('prop1'), 'p1-right', 'sanity check 2');
     assert.equal(model2.get('prop2'), 'p2-right', 'sanity check 3');
@@ -756,7 +816,8 @@ describe('view-model', () => {
     el.remove();
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('18. can merge unique options', () => {
@@ -770,9 +831,9 @@ describe('view-model', () => {
         excludes: 'exclude2',
         options: {
           excludes: ['exclude3'],
-          factories: { 'collection.models': function () {} },
-        },
-      },
+          factories: { 'collection.models': function() {} }
+        }
+      }
     };
 
     const collapsed_options = kb.utils.collapseOptions(options);
@@ -783,8 +844,8 @@ describe('view-model', () => {
   });
 
   it('19. can merge non-unique options', () => {
-    const factoryOverride = function () {};
-    const factory = function () {};
+    const factoryOverride = function() {};
+    const factory = function() {};
 
     const options = {
       internals: ['internal1'],
@@ -796,9 +857,9 @@ describe('view-model', () => {
         excludes: 'exclude1',
         options: {
           excludes: ['exclude1'],
-          factories: { models: factoryOverride },
-        },
-      },
+          factories: { models: factoryOverride }
+        }
+      }
     };
 
     const collapsed_options = kb.utils.collapseOptions(options);
@@ -814,8 +875,8 @@ describe('view-model', () => {
     let options = {
       keys: { name: { key: 'name' } },
       options: {
-        keys: { thing: { key: 'thing' } },
-      },
+        keys: { thing: { key: 'thing' } }
+      }
     };
 
     let collapsed_options = kb.utils.collapseOptions(options);
@@ -824,8 +885,8 @@ describe('view-model', () => {
     options = {
       keys: 'name',
       options: {
-        keys: { thing: { key: 'thing' } },
-      },
+        keys: { thing: { key: 'thing' } }
+      }
     };
 
     collapsed_options = kb.utils.collapseOptions(options);
@@ -834,8 +895,8 @@ describe('view-model', () => {
     options = {
       keys: ['name'],
       options: {
-        keys: { thing: { key: 'thing' } },
-      },
+        keys: { thing: { key: 'thing' } }
+      }
     };
 
     collapsed_options = kb.utils.collapseOptions(options);
@@ -844,8 +905,8 @@ describe('view-model', () => {
     options = {
       keys: { name: { key: 'name' } },
       options: {
-        keys: 'thing',
-      },
+        keys: 'thing'
+      }
     };
 
     collapsed_options = kb.utils.collapseOptions(options);
@@ -854,8 +915,8 @@ describe('view-model', () => {
     options = {
       keys: { name: { key: 'name' } },
       options: {
-        keys: ['thing'],
-      },
+        keys: ['thing']
+      }
     };
 
     collapsed_options = kb.utils.collapseOptions(options);
@@ -937,16 +998,17 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('22. statics and static defaults keyword', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model = kb.viewModel(
-      new Backbone.Model({ id: 1, name: 'Initial', date: new Date() }),
-      { statics: ['name', 'author', 'description', 'tags'], static_defaults: { author: '(none)', description: null } },
-    );
+    const view_model = kb.viewModel(new Backbone.Model({ id: 1, name: 'Initial', date: new Date() }), {
+      statics: ['name', 'author', 'description', 'tags'],
+      static_defaults: { author: '(none)', description: null }
+    });
 
     assert.ok(view_model.name && !ko.isObservable(view_model.name), 'name: non-observable');
     assert.equal(view_model.name, 'Initial', 'name: value is correct');
@@ -968,7 +1030,8 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('23. Issue 94', () => {
@@ -979,29 +1042,31 @@ describe('view-model', () => {
     const Parent = Backbone.Model.extend({
       defaults: {
         child: new Child({ name: 'SingleChild' }),
-        children: new Backbone.Collection([new Child({ name: 'Child1' }), new Child({ name: 'Child2' })], { model: Child }),
-      },
+        children: new Backbone.Collection([new Child({ name: 'Child1' }), new Child({ name: 'Child2' })], { model: Child })
+      }
     });
 
-    const ChildViewModel = function (model) {
+    const ChildViewModel = function(model) {
       assert.ok(!!model, 'model is null?');
       const view_model = kb.viewModel(model);
 
       view_model.nameComputed = ko.computed(() => {
         let ret = 'no name function!';
-        if (view_model.name) { ret = `Hello, ${view_model.name()}`; }
+        if (view_model.name) {
+          ret = `Hello, ${view_model.name()}`;
+        }
         return ret;
       });
 
       return view_model;
     };
 
-    const ParentViewModel = function (model) {
+    const ParentViewModel = function(model) {
       const view_model = kb.viewModel(model, {
         factories: {
           'children.models': ChildViewModel,
-          child: ChildViewModel,
-        },
+          child: ChildViewModel
+        }
       });
       view_model.nameComputed = ko.computed(() => `Hello, ${view_model.name()}`);
       return view_model;
@@ -1011,21 +1076,19 @@ describe('view-model', () => {
 
     kb.release(parent_view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/82
   it('24. Issue 82 - createObservables', () => {
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const children = new Backbone.Collection([
-      new Backbone.Model({ name: 'Charles' }),
-      new Backbone.Model({ name: 'Eve' }),
-    ]);
+    const children = new Backbone.Collection([new Backbone.Model({ name: 'Charles' }), new Backbone.Model({ name: 'Eve' })]);
 
     const parent = new Backbone.Model({ name: 'Bob', children });
 
-    const subFactory = (model) => {
+    const subFactory = model => {
       const subVm = new kb.ViewModel(model);
       subVm.cid = ko.computed(() => model.cid);
       return subVm;
@@ -1038,7 +1101,8 @@ describe('view-model', () => {
 
     kb.release(vm);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/121
@@ -1046,7 +1110,7 @@ describe('view-model', () => {
     let model1;
     kb.statistics = new kb.Statistics(); // turn on stats
 
-    const view_model = kb.viewModel(model1 = new Backbone.Model());
+    const view_model = kb.viewModel((model1 = new Backbone.Model()));
     model1.set({ propB: 'val2' });
     assert.equal(view_model.propB(), 'val2');
 
@@ -1056,7 +1120,8 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('can update an unshared null', () => {
@@ -1069,7 +1134,8 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('cannot update a shared null', () => {
@@ -1085,7 +1151,7 @@ describe('view-model', () => {
     assert.equal(view_model.model2().model(), null, 'model2 is null');
 
     // cannot change a shared model
-    assert.throw((() => view_model.model1().model(new Backbone.Model({ name: 'Bob' }))), 'Trying to change a shared view model. Ref count: 3');
+    assert.throw(() => view_model.model1().model(new Backbone.Model({ name: 'Bob' })), 'Trying to change a shared view model. Ref count: 3');
     assert.equal(view_model.model1().model(), null, 'model1 is still null');
     assert.ok(!view_model.model1().name, 'name has not been added to the shared view model');
 
@@ -1097,7 +1163,8 @@ describe('view-model', () => {
     kb.release(view_model);
     kb.configure({ deep_retain: false });
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   it('cannot update a shared view model', () => {
@@ -1115,7 +1182,7 @@ describe('view-model', () => {
     assert.equal(view_model.model2().name(), 'Fred', 'name is Fred');
 
     // cannot change a shared model
-    assert.throw((() => view_model.model1().model(new Backbone.Model({ name: 'Bob' }))), 'Trying to change a shared view model. Ref count: 2');
+    assert.throw(() => view_model.model1().model(new Backbone.Model({ name: 'Bob' })), 'Trying to change a shared view model. Ref count: 2');
     assert.equal(view_model.model1().model(), model, 'model1 is still model');
     assert.equal(view_model.model1().name(), 'Fred', 'name has not been changed');
 
@@ -1126,7 +1193,8 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/134
@@ -1138,7 +1206,8 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 
   // https://github.com/kmalakoff/knockback/issues/73
@@ -1152,6 +1221,7 @@ describe('view-model', () => {
 
     kb.release(view_model);
 
-    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats'); kb.statistics = null;
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', 'Cleanup: stats');
+    kb.statistics = null;
   });
 });

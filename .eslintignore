@@ -1,9 +1,12 @@
-_temp
+packages/
+vendor/
+test/issues
+test/lib
+
+  _temp
 node_modules
 test/lib
 test/parameters.js
-test/issues
-vendor
 knockback-core-stack.js
 knockback-core-stack.min.js
 knockback-core.js
