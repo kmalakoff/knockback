@@ -128,7 +128,7 @@ class kb.ViewModel
     @model = ko.computed {
       read: => ko.utils.unwrapObservable(_model)
       write: (new_model) => kb.ignore =>
-        return if (kb.utils.wrappedObject(@) is new_model) or kb.wasReleased(@) or not event_watcher
+        return if kb.wasReleased(@) or not event_watcher
 
         @__kb.store.reuse(@, kb.utils.resolveModel(new_model))
         event_watcher.emitter(new_model); _model(event_watcher.ee)

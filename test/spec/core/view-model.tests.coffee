@@ -1074,3 +1074,31 @@ describe 'view-model @quick @view-model', ->
 
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
+
+  # https://github.com/kmalakoff/knockback/issues/166
+  it 'handles multiple model setting', (done) ->
+    kb.statistics = new kb.Statistics() # turn on stats
+
+    model1 = new kb.Model({idAttribute: 'itemId', itemId: 1})
+    model2 = new kb.Model({idAttribute: 'itemId', itemId: 2})
+    vm = kb.viewModel(model1)
+
+    swapModel = ->
+      newModel = if vm.model().get('itemId') == 1 then model2 else model1
+      assert.notEqual(newModel, vm.model())
+      vm.model(newModel)
+
+    assert.equal(vm.model().get('itemId'), 1, 'original')
+    swapModel();
+    assert.equal(vm.model().get('itemId'), 2, 'swap 1')
+    swapModel();
+    assert.equal(vm.model().get('itemId'), 1, 'swap 2')
+    swapModel();
+    assert.equal(vm.model().get('itemId'), 2, 'swap 3')
+    swapModel();
+    assert.equal(vm.model().get('itemId'), 1, 'swap 4')
+
+    kb.release(vm)
+
+    assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
+    done()

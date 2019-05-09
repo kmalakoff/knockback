@@ -2484,7 +2484,7 @@ kb.ViewModel = (function() {
         },
         write: function(new_model) {
           return kb.ignore(function() {
-            if ((kb.utils.wrappedObject(_this) === new_model) || kb.wasReleased(_this) || !event_watcher) {
+            if (kb.wasReleased(_this) || !event_watcher) {
               return;
             }
             _this.__kb.store.reuse(_this, kb.utils.resolveModel(new_model));
