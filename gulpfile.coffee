@@ -71,8 +71,8 @@ testBrowsers = (callback) ->
 
 gulp.task 'test-node', ['build'], testNode
 
-gulp.task 'test-browsers', testBrowsers
-# gulp.task 'test-browsers', ['minify'], testBrowsers
+# gulp.task 'test-browsers', testBrowsers
+gulp.task 'test-browsers', ['minify'], testBrowsers
 
 gulp.task 'test', ['minify'], (callback) ->
   Async.series [testNode, testBrowsers], (err) -> not err || console.log(err); process.exit(if err then 1 else 0)
@@ -85,7 +85,7 @@ gulp.task 'publish', ['minify'], (callback) ->
       .on('end', callback)
 
   queue = new Queue(1)
-  # queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
+  queue.defer (callback) -> Async.series [testNode, testBrowsers], callback
   queue.defer (callback) -> copyLibraryFiles('packages/npm', ['component.json', 'bower.json'], callback)
   queue.defer (callback) -> copyLibraryFiles('packages/nuget/Content/Scripts', [], callback)
   queue.defer (callback) ->
