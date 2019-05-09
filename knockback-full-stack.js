@@ -89,7 +89,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -110,7 +110,7 @@ module.exports = kb = (function() {
 
   function kb() {}
 
-  kb.VERSION = '1.2.2';
+  kb.VERSION = '1.2.3';
 
   kb.TYPE_UNKNOWN = 0;
 
@@ -2314,7 +2314,7 @@ module.exports = TypedValue = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -2780,7 +2780,7 @@ kb.observableCollection = kb.collectionObservable;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -2990,7 +2990,7 @@ kb.emitterObservable = function(emitter, observable) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3070,7 +3070,7 @@ kb.Factory = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3096,7 +3096,7 @@ kb.modules = {
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3241,7 +3241,7 @@ if (typeof document !== "undefined" && document !== null) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3278,7 +3278,7 @@ if ((_ref = ko.subscribable) != null ? (_ref1 = _ref.fn) != null ? _ref1.extend 
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3449,7 +3449,7 @@ kb.observable = function(model, key, options, view_model) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3584,7 +3584,7 @@ module.exports = kb.Statistics = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -3890,7 +3890,7 @@ module.exports = kb.Store = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4087,7 +4087,7 @@ kb.utils = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4289,7 +4289,7 @@ kb.viewModel = function(model, options, view_model) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4352,7 +4352,7 @@ kb.observableDefault = kb.defaultObservable;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4488,7 +4488,7 @@ kb.observableFormatted = kb.formattedObservable;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4598,7 +4598,7 @@ kb.observableLocalized = kb.localizedObservable;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -4672,7 +4672,7 @@ kb.observableTriggered = kb.triggeredObservable;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -6934,7 +6934,7 @@ kb.formValidator = function(view_model, el) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7031,7 +7031,7 @@ module.exports = function(options) {
 /***/ (function(module, exports) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7108,7 +7108,7 @@ module.exports = extend;
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7150,7 +7150,7 @@ module.exports = unwrapModels = function(obj) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7201,7 +7201,7 @@ module.exports = wrappedDestroy = function(obj) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7262,7 +7262,7 @@ module.exports = BackboneAssociations = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7350,7 +7350,7 @@ module.exports = BackboneRelational = (function() {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
@@ -7408,7 +7408,7 @@ kb.utils.setToDefault = function(obj) {
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
-  knockback.js 1.2.2
+  knockback.js 1.2.3
   Copyright (c)  2011-2016 Kevin Malakoff.
   License: MIT (http://www.opensource.org/licenses/mit-license.php)
   Source: https://github.com/kmalakoff/knockback
