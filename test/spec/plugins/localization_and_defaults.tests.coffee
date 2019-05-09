@@ -237,6 +237,7 @@ describe 'localized-observable @quick @localization', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
+  # TODO: fix these tests in browserify
   it.skip '2. internals test (Coffeescript inheritance)', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
@@ -308,6 +309,7 @@ describe 'localized-observable @quick @localization', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
+  # TODO: fix these tests in browserify
   it.skip '3. internals test (Javascript inheritance)', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
@@ -872,6 +874,7 @@ describe 'defaults @quick @defaults', ->
       assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
       done()
 
+  # TODO: fix these tests in browserify
   it.skip '3. internals test (Coffeescript inheritance)', (done) ->
     kb.statistics = new kb.Statistics() # turn on stats
     kb.locale_manager = locale_manager
