@@ -10846,11 +10846,9 @@
                           i > 1 &&
                             toSelector(
                               // If the preceding token was a descendant combinator, insert an implicit any-element `*`
-                              tokens
-                                .slice(0, i - 1)
-                                .concat({
-                                  value: tokens[i - 2].type === " " ? "*" : "",
-                                })
+                              tokens.slice(0, i - 1).concat({
+                                value: tokens[i - 2].type === " " ? "*" : "",
+                              })
                             ).replace(rtrim, "$1"),
                           matcher,
                           i < j && matcherFromTokens(tokens.slice(i, j)),
