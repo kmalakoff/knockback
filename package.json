@@ -26,7 +26,7 @@
     "build": "",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
     "test": "gulp test:node",
-    "test:engines": "nvu engines gulp test:node"
+    "test:engines": "npm test"
   },
   "devDependencies": {
     "@babel/core": "^7.18.9",
