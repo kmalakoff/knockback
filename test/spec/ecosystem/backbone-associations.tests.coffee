@@ -1,7 +1,7 @@
 root = if window? then window else global
 assert = assert or require?('chai').assert
 
-describe 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
+describe.skip 'Knockback.js with Backbone-Associations.js @backbone-associations', ->
 
   # after -> delete root.Person; delete root.Building
 

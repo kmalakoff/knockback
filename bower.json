@@ -16,9 +16,7 @@
     "bower_components"
   ],
   "homepage": "https://github.com/kmalakoff/knockback",
-  "authors": [
-    "Kevin Malakoff <kmalakoff@gmail.com>"
-  ],
+  "authors": ["Kevin Malakoff <kmalakoff@gmail.com>"],
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "keywords": [
     "knockback",
@@ -28,11 +26,7 @@
     "knockout",
     "knockoutjs"
   ],
-  "moduleType": [
-    "amd",
-    "globals",
-    "node"
-  ],
+  "moduleType": ["amd", "globals", "node"],
   "dependencies": {
     "underscore": ">=1.1.7",
     "backbone": ">=0.5.1",
