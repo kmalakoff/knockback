@@ -22,12 +22,9 @@
     "url": "https://github.com/kmalakoff"
   },
   "main": "knockback.js",
-  "engines": {
-    "node": "lts"
-  },
   "scripts": {
+    "build": "",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
-    "build": "gulp build",
     "test": "gulp test:node",
     "test:engines": "nvu engines gulp test:node"
   },
@@ -89,6 +86,9 @@
     "lodash": "*",
     "moment": "*",
     "parse": "3.4.x"
+  },
+  "engines": {
+    "node": "lts"
   },
   "jam": {
     "dependencies": {
