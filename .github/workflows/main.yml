@@ -19,7 +19,7 @@ jobs:
       - run: git config --global user.email "actions@users.noreply.github.com"
       - run: npm install node-version-use -g
       - run: npm ci
-      - run: npx playwright install --with-deps
+      - 
       - run: npm run lint
       - run: npm run build
       - run: npm run test:engines
