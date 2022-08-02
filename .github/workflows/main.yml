@@ -1,7 +1,8 @@
 name: CI
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
 jobs:
   test:
     name: Node.js ${{ matrix.node-version }} ${{ matrix.os }}
