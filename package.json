@@ -26,6 +26,7 @@
     "build": "",
     "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/.",
     "lint": "",
+    "format": "",
     "test": "gulp test:node",
     "test:engines": "npm test"
   },
