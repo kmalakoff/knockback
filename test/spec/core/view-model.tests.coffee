@@ -387,11 +387,12 @@ describe 'view-model @quick @view-model', ->
     kb.statistics = new kb.Statistics() # turn on stats
 
     model = new kb.Model({reused: null})
-    view_model = kb.viewModel(model, {factories:
-      reused: {create: (obj, options) ->
-        return kb.collectionObservable(obj, options) if kb.isCollection(obj) or ((obj is null) and (kb.utils.valueType(view_model?.reused) is kb.TYPE_COLLECTION))
-        return kb.viewModel(obj, options)
-      }
+    view_model = kb.viewModel(model, {
+      factories:
+        reused: {create: (obj, options) ->
+          return kb.collectionObservable(obj, options) if kb.isCollection(obj) or ((obj is null) and (kb.utils.valueType(view_model?.reused) is kb.TYPE_COLLECTION))
+          return kb.viewModel(obj, options)
+        }
     })
     assert.equal(kb.utils.valueType(view_model.reused), kb.TYPE_MODEL, 'reused is kb.TYPE_MODEL')
 

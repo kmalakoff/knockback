@@ -1,37 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Knockback Issue 34 Test</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body>
-
-  <ul data-bind="foreach: books">
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Knockback Issue 34 Test</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <ul data-bind="foreach: books">
       <!-- ko ifnot: editMode -->
       <li>
-          <span data-bind="text:name"></span>
-          by <span data-bind="text:author"></span>
-          <button data-bind="click: edit">Edit</button>
+        <span data-bind="text:name"></span>
+        by <span data-bind="text:author"></span>
+        <button data-bind="click: edit">Edit</button>
       </li>
       <!-- /ko  -->
       <!-- ko if: editMode -->
       <li>
-          <input data-bind="value: name">
-          <button data-bind="click: confirm">Confirm</button>
-          <button data-bind="click: cancel">Cancel</button>
+        <input data-bind="value: name" />
+        <button data-bind="click: confirm">Confirm</button>
+        <button data-bind="click: cancel">Cancel</button>
       </li>
       <!-- /ko  -->
-  </ul>
+    </ul>
 
-  <script src="../../../vendor/optional/jquery-2.1.1.js"></script>
-  <script src="../../../knockback-core-stack.js"></script>
-  <script src="../../../vendor/optional/backbone-relational-0.8.8.js"></script>
-  <script src="issue34.js"></script>
-
-</body>
+    <script src="../../../vendor/optional/jquery-2.1.1.js"></script>
+    <script src="../../../knockback-core-stack.js"></script>
+    <script src="../../../vendor/optional/backbone-relational-0.8.8.js"></script>
+    <script src="issue34.js"></script>
+  </body>
 </html>

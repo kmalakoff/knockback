@@ -1,10 +1,11 @@
 var children = new Backbone.Collection([
-  new Backbone.Model({name:"Charles"}),
-  new Backbone.Model({name:"Eve"})
+  new Backbone.Model({ name: "Charles" }),
+  new Backbone.Model({ name: "Eve" }),
 ]);
 
 var parent = new Backbone.Model({
-  name:"Bob", children:children
+  name: "Bob",
+  children: children,
 });
 
 var subFactory = function (model) {
@@ -15,7 +16,7 @@ var subFactory = function (model) {
   return subVm;
 };
 
-var vm = new kb.ViewModel(null, {excludes : ["children"]});
+var vm = new kb.ViewModel(null, { excludes: ["children"] });
 
 vm.shareOptions().factory.addPathMapping("children.models", subFactory);
 vm.createObservables(null, ["children"]);
