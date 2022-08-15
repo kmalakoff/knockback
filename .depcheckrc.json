@@ -1,0 +1,36 @@
+{
+  "parsers": {
+    "**/*.js": ["es6"],
+    "**/*.cjs": ["es6"],
+    "**/*.mjs": ["es6"],
+    "**/*.coffee": ["coffeescript"],
+    "**/*.jsx": ["jsx"],
+    "**/*.json": ["json1", "json2"],
+    "**/*.ts": ["typescript"],
+    "**/*.tsx": ["typescript"]
+  },
+  "ignores": [
+    "@babel/core",
+    "@babel/preset-env",
+    "async",
+    "chai",
+    "gulp-wrap-amd-infer",
+    "gulp-zip",
+    "imports-loader",
+    "jsdom",
+    "karma-chai",
+    "karma-chrome-launcher",
+    "karma-cli",
+    "karma-coffee-preprocessor",
+    "karma-firefox-launcher",
+    "karma-mocha",
+    "karma-safari-launcher",
+    "karma-spec-reporter",
+    "minimatch",
+    "mocha",
+    "puppeteer",
+    "requirejs",
+    "localStorage",
+    "xmlhttprequest"
+  ]
+}

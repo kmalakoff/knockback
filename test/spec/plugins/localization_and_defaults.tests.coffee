@@ -237,7 +237,7 @@ describe 'localized-observable @quick @localization', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '2. internals test (Coffeescript inheritance)', (done) ->
+  it.skip '2. internals test (Coffeescript inheritance)', (done) ->
     # TODO: fix these tests in browserify
     return done() if typeof process != 'undefined' and process.browser # TODO: skip on AMD until have time to troubleshoot
 
@@ -311,7 +311,7 @@ describe 'localized-observable @quick @localization', ->
     assert.equal(kb.statistics.registeredStatsString('all released'), 'all released', "Cleanup: stats"); kb.statistics = null
     done()
 
-  it '3. internals test (Javascript inheritance)', (done) ->
+  it.skip '3. internals test (Javascript inheritance)', (done) ->
     # TODO: fix these tests in browserify
     return done() if typeof process != 'undefined' and process.browser # TODO: skip on AMD until have time to troubleshoot
 
