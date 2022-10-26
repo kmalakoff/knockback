@@ -68,7 +68,7 @@
     "minimatch": "^5.1.0",
     "mocha": "*",
     "nuget": "*",
-    "puppeteer": "^16.1.0",
+    "puppeteer": "^19.2.0",
     "queue-async": "*",
     "requirejs": "*",
     "webpack": "^5.74.0"
