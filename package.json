@@ -87,7 +87,7 @@
     "jquery": "*",
     "lodash": "*",
     "moment": "*",
-    "parse": "3.4.x"
+    "parse": "3.5.x"
   },
   "engines": {
     "node": "lts"
