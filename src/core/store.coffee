@@ -79,7 +79,9 @@ module.exports = class kb.Store
     creator or= observable.constructor # default is to use the constructor
 
     if current_observable = @find(obj, creator)
-      (@_getOrCreateStoreReferences(observable).ref_count++; return observable) if current_observable is observable # already in this store
+      if current_observable is observable # already in this store
+        @_getOrCreateStoreReferences(observable).ref_count++
+        return observable 
       @_retire(current_observable)
 
     @_add(observable, obj, creator)
@@ -141,12 +143,16 @@ module.exports = class kb.Store
   # @nodoc
   find: (obj, creator) ->
     return null unless records = @observable_records[@_creatorId(creator)]
-    (delete records[@_cid(obj)]; return null) if (observable = records[@_cid(obj)])?.__kb_released
+    if (observable = records[@_cid(obj)])?.__kb_released
+      delete records[@_cid(obj)]
+      return null
     return observable
 
   # @nodoc
   _refCount: (observable) ->
-    (console?.log 'Observable already released'; return 0) if observable.__kb_released
+    if observable.__kb_released
+      console?.log 'Observable already released'
+      return 0
     return 1 unless stores_references = kb.utils.get(observable, 'stores_references')
     return _.reduce(stores_references, ((memo, store_references) -> memo + store_references.ref_count), 0)
 
@@ -178,7 +184,10 @@ module.exports = class kb.Store
   # @nodoc
   _clearStoreReferences: (observable) ->
     if stores_references = kb.utils.get(observable, 'stores_references')
-      (observable.__kb.stores_references.splice(index, 1); break) for index, store_references of observable.__kb.stores_references when store_references.store is @
+      for index, store_references of observable.__kb.stores_references
+        if store_references.store is @
+          observable.__kb.stores_references.splice(index, 1)
+          break 
     return
 
   # @nodoc
