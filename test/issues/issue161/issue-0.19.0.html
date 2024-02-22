@@ -1,28 +1,31 @@
-<!doctype html>
+<!DOCTYPE html>
 <!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Knockback Issue 161 Test</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body>
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Knockback Issue 161 Test</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div id="some-div">
+      <h1>Parent</h1>
+      <span data-bind="html: name"></span>
 
-  <div id="some-div">
-    <h1>Parent</h1>
-    <span data-bind="html: name"></span>
+      <h2>Children</h2>
+      <ul data-bind="foreach: children">
+        <li><span data-bind="html: name"></span></li>
+      </ul>
+    </div>
 
-    <h2>Children</h2>
-    <ul data-bind="foreach: children">
-      <li><span data-bind="html: name"></span></li>
-    </ul>
-  </div>
-
-  <script type="text/javascript" src="https://unpkg.com/knockback@0.19.0/knockback-full-stack.js"></script>
-  <script src="issue-0.19.0.js"></script>
-
-</body>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/knockback@0.19.0/knockback-full-stack.js"
+    ></script>
+    <script src="issue-0.19.0.js"></script>
+  </body>
 </html>

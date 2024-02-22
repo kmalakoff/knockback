@@ -5,19 +5,25 @@
  * <http://documentcloud.github.com/underscore>
  * Available under MIT license <http://lodash.com/license>
  */
-;(function(window, undefined) {
-  'use strict';
+(function (window, undefined) {
+  "use strict";
 
   /** Detect free variable `exports` */
-  var freeExports = typeof exports == 'object' && exports &&
-    (typeof global == 'object' && global && global == global.global && (window = global), exports);
+  var freeExports =
+    typeof exports == "object" &&
+    exports &&
+    (typeof global == "object" &&
+      global &&
+      global == global.global &&
+      (window = global),
+    exports);
 
   /**
    * Detect the JScript [[DontEnum]] bug:
    * In IE < 9 an objects own properties, shadowing non-enumerable ones, are
    * made non-enumerable as well.
    */
-  var hasDontEnumBug = !{ 'valueOf': 0 }.propertyIsEnumerable('valueOf');
+  var hasDontEnumBug = !{ valueOf: 0 }.propertyIsEnumerable("valueOf");
 
   /** Used to generate unique IDs */
   var idCounter = 0;
@@ -26,9 +32,13 @@
   var oldDash = window._;
 
   /** Used to detect if a method is native */
-  var reNative = RegExp('^' + ({}.valueOf + '')
-    .replace(/[.*+?^=!:${}()|[\]\/\\]/g, '\\$&')
-    .replace(/valueOf|for [^\]]+/g, '.+?') + '$');
+  var reNative = RegExp(
+    "^" +
+      ({}.valueOf + "")
+        .replace(/[.*+?^=!:${}()|[\]\/\\]/g, "\\$&")
+        .replace(/valueOf|for [^\]]+/g, ".+?") +
+      "$"
+  );
 
   /** Used to match tokens in template text */
   var reToken = /__token__(\d+)/g;
@@ -41,15 +51,20 @@
 
   /** Used to fix the JScript [[DontEnum]] bug */
   var shadowed = [
-    'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable',
-    'toLocaleString', 'toString', 'valueOf'
+    "constructor",
+    "hasOwnProperty",
+    "isPrototypeOf",
+    "propertyIsEnumerable",
+    "toLocaleString",
+    "toString",
+    "valueOf",
   ];
 
   /** Used to make template sourceURLs easier to identify */
   var templateCounter = 0;
 
   /** Used to replace template delimiters */
-  var token = '__token__';
+  var token = "__token__";
 
   /** Used to store tokenized template text snippets */
   var tokenized = [];
@@ -57,8 +72,8 @@
   /** Detect if sourceURL syntax is usable without erroring */
   try {
     // Adobe's and Narwhal's JS engines will error
-    var useSourceURL = (Function('//@')(), true);
-  } catch(e){ }
+    var useSourceURL = (Function("//@")(), true);
+  } catch (e) {}
 
   /**
    * Used to escape characters for inclusion in HTML.
@@ -67,65 +82,68 @@
    * http://mathiasbynens.be/notes/ambiguous-ampersands (semi-related fun fact)
    */
   var htmlEscapes = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '"': '&quot;',
-    "'": '&#x27;'
+    "&": "&amp;",
+    "<": "&lt;",
+    '"': "&quot;",
+    "'": "&#x27;",
   };
 
   /** Used to determine if values are of the language type Object */
   var valueTypes = {
-    'boolean': false,
-    'function': true,
-    'object': true,
-    'number': false,
-    'string': false,
-    'undefined': false
+    boolean: false,
+    function: true,
+    object: true,
+    number: false,
+    string: false,
+    undefined: false,
   };
 
   /** Used to escape characters for inclusion in compiled string literals */
   var stringEscapes = {
-    '\\': '\\',
+    "\\": "\\",
     "'": "'",
-    '\n': 'n',
-    '\r': 'r',
-    '\t': 't',
-    '\u2028': 'u2028',
-    '\u2029': 'u2029'
+    "\n": "n",
+    "\r": "r",
+    "\t": "t",
+    "\u2028": "u2028",
+    "\u2029": "u2029",
   };
 
   /** Object#toString result shortcuts */
-  var arrayClass = '[object Array]',
-      boolClass = '[object Boolean]',
-      dateClass = '[object Date]',
-      funcClass = '[object Function]',
-      numberClass = '[object Number]',
-      regexpClass = '[object RegExp]',
-      stringClass = '[object String]';
+  var arrayClass = "[object Array]",
+    boolClass = "[object Boolean]",
+    dateClass = "[object Date]",
+    funcClass = "[object Function]",
+    numberClass = "[object Number]",
+    regexpClass = "[object RegExp]",
+    stringClass = "[object String]";
 
   /** Native prototype shortcuts */
   var ArrayProto = Array.prototype,
-      ObjectProto = Object.prototype;
+    ObjectProto = Object.prototype;
 
   /** Native method shortcuts */
   var concat = ArrayProto.concat,
-      hasOwnProperty = ObjectProto.hasOwnProperty,
-      push = ArrayProto.push,
-      slice = ArrayProto.slice,
-      toString = ObjectProto.toString;
+    hasOwnProperty = ObjectProto.hasOwnProperty,
+    push = ArrayProto.push,
+    slice = ArrayProto.slice,
+    toString = ObjectProto.toString;
 
   /* Used if `Function#bind` exists and is inferred to be fast (i.e. all but V8) */
-  var nativeBind = reNative.test(nativeBind = slice.bind) &&
-    /\n|Opera/.test(nativeBind + toString.call(window.opera)) && nativeBind;
+  var nativeBind =
+    reNative.test((nativeBind = slice.bind)) &&
+    /\n|Opera/.test(nativeBind + toString.call(window.opera)) &&
+    nativeBind;
 
   /* Native method shortcuts for methods with the same name as other `lodash` methods */
-  var nativeIsArray = reNative.test(nativeIsArray = Array.isArray) && nativeIsArray,
-      nativeIsFinite = window.isFinite,
-      nativeKeys = reNative.test(nativeKeys = Object.keys) && nativeKeys;
+  var nativeIsArray =
+      reNative.test((nativeIsArray = Array.isArray)) && nativeIsArray,
+    nativeIsFinite = window.isFinite,
+    nativeKeys = reNative.test((nativeKeys = Object.keys)) && nativeKeys;
 
   /** Timer shortcuts */
   var clearTimeout = window.clearTimeout,
-      setTimeout = window.setTimeout;
+    setTimeout = window.setTimeout;
 
   /*--------------------------------------------------------------------------*/
 
@@ -166,7 +184,6 @@
    * @type Object
    */
   lodash.templateSettings = {
-
     /**
      * Used to detect `data` property values to be HTML-escaped.
      *
@@ -174,7 +191,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'escape': /<%-([\s\S]+?)%>/g,
+    escape: /<%-([\s\S]+?)%>/g,
 
     /**
      * Used to detect code to be evaluated.
@@ -183,7 +200,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'evaluate': /<%([\s\S]+?)%>/g,
+    evaluate: /<%([\s\S]+?)%>/g,
 
     /**
      * Used to detect `data` property values to inject.
@@ -192,7 +209,7 @@
      * @memberOf _.templateSettings
      * @type RegExp
      */
-    'interpolate': /<%=([\s\S]+?)%>/g,
+    interpolate: /<%=([\s\S]+?)%>/g,
 
     /**
      * Used to reference the data object in the template text.
@@ -201,7 +218,7 @@
      * @memberOf _.templateSettings
      * @type String
      */
-    'variable': 'obj'
+    variable: "obj",
   };
 
   /*--------------------------------------------------------------------------*/
@@ -215,73 +232,68 @@
    */
   var iteratorTemplate = template(
     // assign the `result` variable an initial value
-    'var index, result<% if (init) { %> = <%= init %><% } %>;\n' +
-    // add code to exit early or do so if the first argument is falsey
-    '<%= exit %>;\n' +
-    // add code after the exit snippet but before the iteration branches
-    '<%= top %>;\n' +
-
-    // the following branch is for iterating arrays and array-like objects
-    '<% if (arrayBranch) { %>' +
-    'var length = <%= firstArg %>.length; index = -1;' +
-    '  <% if (objectBranch) { %>\nif (length === length >>> 0) {<% } %>\n' +
-    '  <%= arrayBranch.beforeLoop %>;\n' +
-    '  while (<%= arrayBranch.loopExp %>) {\n' +
-    '    <%= arrayBranch.inLoop %>;\n' +
-    '  }' +
-    '  <% if (objectBranch) { %>\n}\n<% }' +
-    '}' +
-
-    // the following branch is for iterating an object's own/inherited properties
-    'if (objectBranch) {' +
-    '  if (arrayBranch) { %>else {\n<% }' +
-    '  if (!hasDontEnumBug) { %>  var skipProto = typeof <%= iteratedObject %> == \'function\';\n<% } %>' +
-    '  <%= objectBranch.beforeLoop %>;\n' +
-    '  for (<%= objectBranch.loopExp %>) {' +
-    '  \n<%' +
-    '  if (hasDontEnumBug) {' +
-    '    if (useHas) { %>    if (<%= hasExp %>) {\n  <% } %>' +
-    '    <%= objectBranch.inLoop %>;<%' +
-    '    if (useHas) { %>\n    }<% }' +
-    '  }' +
-    '  else {' +
-    '  %>' +
-
-    // Firefox < 3.6, Opera > 9.50 - Opera < 11.60, and Safari < 5.1
-    // (if the prototype or a property on the prototype has been set)
-    // incorrectly sets a function's `prototype` property [[Enumerable]]
-    // value to `true`. Because of this Lo-Dash standardizes on skipping
-    // the the `prototype` property of functions regardless of its
-    // [[Enumerable]] value.
-    '    if (!(skipProto && index == \'prototype\')<% if (useHas) { %> && <%= hasExp %><% } %>) {\n' +
-    '      <%= objectBranch.inLoop %>;\n' +
-    '    }' +
-    '  <% } %>\n' +
-    '  }' +
-
-    // Because IE < 9 can't set the `[[Enumerable]]` attribute of an
-    // existing property and the `constructor` property of a prototype
-    // defaults to non-enumerable, Lo-Dash skips the `constructor`
-    // property when it infers it's iterating over a `prototype` object.
-    '  <% if (hasDontEnumBug) { %>\n' +
-    '  var ctor = <%= iteratedObject %>.constructor;\n' +
-    '  <% for (var k = 0; k < 7; k++) { %>\n' +
-    '  index = \'<%= shadowed[k] %>\';\n' +
-    '  if (<%' +
-    '      if (shadowed[k] == \'constructor\') {' +
-    '        %>!(ctor && ctor.prototype === <%= iteratedObject %>) && <%' +
-    '      } %><%= hasExp %>) {\n' +
-    '    <%= objectBranch.inLoop %>;\n' +
-    '  }<%' +
-    '     }' +
-    '   }' +
-    '   if (arrayBranch) { %>\n}<% }' +
-    '} %>\n' +
-
-    // add code to the bottom of the iteration function
-    '<%= bottom %>;\n' +
-    // finally, return the `result`
-    'return result'
+    "var index, result<% if (init) { %> = <%= init %><% } %>;\n" +
+      // add code to exit early or do so if the first argument is falsey
+      "<%= exit %>;\n" +
+      // add code after the exit snippet but before the iteration branches
+      "<%= top %>;\n" +
+      // the following branch is for iterating arrays and array-like objects
+      "<% if (arrayBranch) { %>" +
+      "var length = <%= firstArg %>.length; index = -1;" +
+      "  <% if (objectBranch) { %>\nif (length === length >>> 0) {<% } %>\n" +
+      "  <%= arrayBranch.beforeLoop %>;\n" +
+      "  while (<%= arrayBranch.loopExp %>) {\n" +
+      "    <%= arrayBranch.inLoop %>;\n" +
+      "  }" +
+      "  <% if (objectBranch) { %>\n}\n<% }" +
+      "}" +
+      // the following branch is for iterating an object's own/inherited properties
+      "if (objectBranch) {" +
+      "  if (arrayBranch) { %>else {\n<% }" +
+      "  if (!hasDontEnumBug) { %>  var skipProto = typeof <%= iteratedObject %> == 'function';\n<% } %>" +
+      "  <%= objectBranch.beforeLoop %>;\n" +
+      "  for (<%= objectBranch.loopExp %>) {" +
+      "  \n<%" +
+      "  if (hasDontEnumBug) {" +
+      "    if (useHas) { %>    if (<%= hasExp %>) {\n  <% } %>" +
+      "    <%= objectBranch.inLoop %>;<%" +
+      "    if (useHas) { %>\n    }<% }" +
+      "  }" +
+      "  else {" +
+      "  %>" +
+      // Firefox < 3.6, Opera > 9.50 - Opera < 11.60, and Safari < 5.1
+      // (if the prototype or a property on the prototype has been set)
+      // incorrectly sets a function's `prototype` property [[Enumerable]]
+      // value to `true`. Because of this Lo-Dash standardizes on skipping
+      // the the `prototype` property of functions regardless of its
+      // [[Enumerable]] value.
+      "    if (!(skipProto && index == 'prototype')<% if (useHas) { %> && <%= hasExp %><% } %>) {\n" +
+      "      <%= objectBranch.inLoop %>;\n" +
+      "    }" +
+      "  <% } %>\n" +
+      "  }" +
+      // Because IE < 9 can't set the `[[Enumerable]]` attribute of an
+      // existing property and the `constructor` property of a prototype
+      // defaults to non-enumerable, Lo-Dash skips the `constructor`
+      // property when it infers it's iterating over a `prototype` object.
+      "  <% if (hasDontEnumBug) { %>\n" +
+      "  var ctor = <%= iteratedObject %>.constructor;\n" +
+      "  <% for (var k = 0; k < 7; k++) { %>\n" +
+      "  index = '<%= shadowed[k] %>';\n" +
+      "  if (<%" +
+      "      if (shadowed[k] == 'constructor') {" +
+      "        %>!(ctor && ctor.prototype === <%= iteratedObject %>) && <%" +
+      "      } %><%= hasExp %>) {\n" +
+      "    <%= objectBranch.inLoop %>;\n" +
+      "  }<%" +
+      "     }" +
+      "   }" +
+      "   if (arrayBranch) { %>\n}<% }" +
+      "} %>\n" +
+      // add code to the bottom of the iteration function
+      "<%= bottom %>;\n" +
+      // finally, return the `result`
+      "return result"
   );
 
   /**
@@ -289,68 +301,70 @@
    * `every`, `filter`, `find`, `forEach`, `forIn`, `forOwn`, `map`, `reject`, and `some`.
    */
   var baseIteratorOptions = {
-    'args': 'collection, callback, thisArg',
-    'init': 'collection',
-    'top':
-      'if (!callback) {\n' +
-      '  callback = identity\n' +
-      '}\n' +
-      'else if (thisArg) {\n' +
-      '  callback = iteratorBind(callback, thisArg)\n' +
-      '}',
-    'inLoop': 'callback(collection[index], index, collection)'
+    args: "collection, callback, thisArg",
+    init: "collection",
+    top:
+      "if (!callback) {\n" +
+      "  callback = identity\n" +
+      "}\n" +
+      "else if (thisArg) {\n" +
+      "  callback = iteratorBind(callback, thisArg)\n" +
+      "}",
+    inLoop: "callback(collection[index], index, collection)",
   };
 
   /** Reusable iterator options for `every` and `some` */
   var everyIteratorOptions = {
-    'init': 'true',
-    'inLoop': 'if (!callback(collection[index], index, collection)) return !result'
+    init: "true",
+    inLoop:
+      "if (!callback(collection[index], index, collection)) return !result",
   };
 
   /** Reusable iterator options for `defaults` and `extend` */
   var extendIteratorOptions = {
-    'args': 'object',
-    'init': 'object',
-    'top':
-      'for (var source, sourceIndex = 1, length = arguments.length; sourceIndex < length; sourceIndex++) {\n' +
-      '  source = arguments[sourceIndex];\n' +
-      (hasDontEnumBug ? '  if (source) {' : ''),
-    'loopExp': 'index in source',
-    'useHas': false,
-    'inLoop': 'object[index] = source[index]',
-    'bottom': (hasDontEnumBug ? '  }\n' : '') + '}'
+    args: "object",
+    init: "object",
+    top:
+      "for (var source, sourceIndex = 1, length = arguments.length; sourceIndex < length; sourceIndex++) {\n" +
+      "  source = arguments[sourceIndex];\n" +
+      (hasDontEnumBug ? "  if (source) {" : ""),
+    loopExp: "index in source",
+    useHas: false,
+    inLoop: "object[index] = source[index]",
+    bottom: (hasDontEnumBug ? "  }\n" : "") + "}",
   };
 
   /** Reusable iterator options for `filter` and `reject` */
   var filterIteratorOptions = {
-    'init': '[]',
-    'inLoop': 'callback(collection[index], index, collection) && result.push(collection[index])'
+    init: "[]",
+    inLoop:
+      "callback(collection[index], index, collection) && result.push(collection[index])",
   };
 
   /** Reusable iterator options for `find`, `forEach`, `forIn`, and `forOwn` */
   var forEachIteratorOptions = {
-    'top': 'if (thisArg) callback = iteratorBind(callback, thisArg)'
+    top: "if (thisArg) callback = iteratorBind(callback, thisArg)",
   };
 
   /** Reusable iterator options for `forIn` and `forOwn` */
   var forOwnIteratorOptions = {
-    'inLoop': {
-      'object': baseIteratorOptions.inLoop
-    }
+    inLoop: {
+      object: baseIteratorOptions.inLoop,
+    },
   };
 
- /** Reusable iterator options for `invoke`, `map`, and `pluck` */
+  /** Reusable iterator options for `invoke`, `map`, and `pluck` */
   var mapIteratorOptions = {
-    'init': '',
-    'exit': 'if (!collection) return []',
-    'beforeLoop': {
-      'array':  'result = Array(length)',
-      'object': 'result = []'
+    init: "",
+    exit: "if (!collection) return []",
+    beforeLoop: {
+      array: "result = Array(length)",
+      object: "result = []",
     },
-    'inLoop': {
-      'array':  'result[index] = callback(collection[index], index, collection)',
-      'object': 'result.push(callback(collection[index], index, collection))'
-    }
+    inLoop: {
+      array: "result[index] = callback(collection[index], index, collection)",
+      object: "result.push(callback(collection[index], index, collection))",
+    },
   };
 
   /*--------------------------------------------------------------------------*/
@@ -393,29 +407,29 @@
    */
   function createIterator() {
     var object,
-        prop,
-        value,
-        index = -1,
-        length = arguments.length;
+      prop,
+      value,
+      index = -1,
+      length = arguments.length;
 
     // merge options into a template data object
     var data = {
-      'bottom': '',
-      'exit': '',
-      'init': '',
-      'top': '',
-      'arrayBranch': { 'beforeLoop': '', 'loopExp': '++index < length' },
-      'objectBranch': { 'beforeLoop': '' }
+      bottom: "",
+      exit: "",
+      init: "",
+      top: "",
+      arrayBranch: { beforeLoop: "", loopExp: "++index < length" },
+      objectBranch: { beforeLoop: "" },
     };
 
     while (++index < length) {
       object = arguments[index];
       for (prop in object) {
-        value = (value = object[prop]) == null ? '' : value;
+        value = (value = object[prop]) == null ? "" : value;
         // keep this regexp explicit for the build pre-process
         if (/beforeLoop|loopExp|inLoop/.test(prop)) {
-          if (typeof value == 'string') {
-            value = { 'array': value, 'object': value };
+          if (typeof value == "string") {
+            value = { array: value, object: value };
           }
           data.arrayBranch[prop] = value.array;
           data.objectBranch[prop] = value.object;
@@ -426,38 +440,49 @@
     }
     // set additional template data values
     var args = data.args,
-        arrayBranch = data.arrayBranch,
-        objectBranch = data.objectBranch,
-        firstArg = /^[^,]+/.exec(args)[0],
-        loopExp = objectBranch.loopExp,
-        iteratedObject = /\S+$/.exec(loopExp || firstArg)[0];
+      arrayBranch = data.arrayBranch,
+      objectBranch = data.objectBranch,
+      firstArg = /^[^,]+/.exec(args)[0],
+      loopExp = objectBranch.loopExp,
+      iteratedObject = /\S+$/.exec(loopExp || firstArg)[0];
 
     data.firstArg = firstArg;
     data.hasDontEnumBug = hasDontEnumBug;
-    data.hasExp = 'hasOwnProperty.call(' + iteratedObject + ', index)';
+    data.hasExp = "hasOwnProperty.call(" + iteratedObject + ", index)";
     data.iteratedObject = iteratedObject;
     data.shadowed = shadowed;
     data.useHas = data.useHas !== false;
 
     if (!data.exit) {
-      data.exit = 'if (!' + firstArg + ') return result';
+      data.exit = "if (!" + firstArg + ") return result";
     }
-    if (firstArg == 'object' || !arrayBranch.inLoop) {
+    if (firstArg == "object" || !arrayBranch.inLoop) {
       data.arrayBranch = null;
     }
     if (!loopExp) {
-      objectBranch.loopExp = 'index in ' + iteratedObject;
+      objectBranch.loopExp = "index in " + iteratedObject;
     }
     // create the function factory
     var factory = Function(
-        'arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes, ' +
-        'slice, stringClass, toString, undefined',
-      '"use strict"; return function(' + args + ') {\n' + iteratorTemplate(data) + '\n}'
+      "arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes, " +
+        "slice, stringClass, toString, undefined",
+      '"use strict"; return function(' +
+        args +
+        ") {\n" +
+        iteratorTemplate(data) +
+        "\n}"
     );
     // return the compiled function
     return factory(
-      arrayClass, funcClass, hasOwnProperty, identity, iteratorBind, valueTypes,
-      slice, stringClass, toString
+      arrayClass,
+      funcClass,
+      hasOwnProperty,
+      identity,
+      iteratorBind,
+      valueTypes,
+      slice,
+      stringClass,
+      toString
     );
   }
 
@@ -482,7 +507,7 @@
    * @returns {String} Returns the escaped character.
    */
   function escapeStringChar(match) {
-    return '\\' + stringEscapes[match];
+    return "\\" + stringEscapes[match];
   }
 
   /**
@@ -506,7 +531,7 @@
    * @returns {Function} Returns the new bound function.
    */
   function iteratorBind(func, thisArg) {
-    return function(value, index, object) {
+    return function (value, index, object) {
       return func.call(thisArg, value, index, object);
     };
   }
@@ -529,10 +554,10 @@
    * @returns {Array} Returns a new array of property names.
    */
   var shimKeys = createIterator({
-    'args': 'object',
-    'exit': 'if (!valueTypes[typeof object] || object === null) throw TypeError()',
-    'init': '[]',
-    'inLoop': 'result.push(index)'
+    args: "object",
+    exit: "if (!valueTypes[typeof object] || object === null) throw TypeError()",
+    init: "[]",
+    inLoop: "result.push(index)",
   });
 
   /**
@@ -596,9 +621,9 @@
    * // => true
    */
   var contains = createIterator({
-    'args': 'collection, target',
-    'init': 'false',
-    'inLoop': 'if (collection[index] === target) return true'
+    args: "collection, target",
+    init: "false",
+    inLoop: "if (collection[index] === target) return true",
   });
 
   /**
@@ -664,8 +689,9 @@
    * // => 2
    */
   var find = createIterator(baseIteratorOptions, forEachIteratorOptions, {
-    'init': '',
-    'inLoop': 'if (callback(collection[index], index, collection)) return collection[index]'
+    init: "",
+    inLoop:
+      "if (callback(collection[index], index, collection)) return collection[index]",
   });
 
   /**
@@ -715,14 +741,16 @@
    * // => [['1', '2', '3'], ['4', '5', '6']]
    */
   var invoke = createIterator(mapIteratorOptions, {
-    'args': 'collection, methodName',
-    'top':
-      'var args = slice.call(arguments, 2),\n' +
-      '    isFunc = typeof methodName == \'function\'',
-    'inLoop': {
-      'array': 'result[index] = (isFunc ? methodName : collection[index][methodName]).apply(collection[index], args)',
-      'object': 'result.push((isFunc ? methodName : collection[index][methodName]).apply(collection[index], args))'
-    }
+    args: "collection, methodName",
+    top:
+      "var args = slice.call(arguments, 2),\n" +
+      "    isFunc = typeof methodName == 'function'",
+    inLoop: {
+      array:
+        "result[index] = (isFunc ? methodName : collection[index][methodName]).apply(collection[index], args)",
+      object:
+        "result.push((isFunc ? methodName : collection[index][methodName]).apply(collection[index], args))",
+    },
   });
 
   /**
@@ -771,11 +799,11 @@
    * // => ['moe', 'larry', 'curly']
    */
   var pluck = createIterator(mapIteratorOptions, {
-    'args': 'collection, property',
-    'inLoop': {
-      'array':  'result[index] = collection[index][property]',
-      'object': 'result.push(collection[index][property])'
-    }
+    args: "collection, property",
+    inLoop: {
+      array: "result[index] = collection[index][property]",
+      object: "result.push(collection[index][property])",
+    },
   });
 
   /**
@@ -800,22 +828,21 @@
    * // => 6
    */
   var reduce = createIterator({
-    'args': 'collection, callback, accumulator, thisArg',
-    'init': 'accumulator',
-    'top':
-      'var noaccum = arguments.length < 3;\n' +
-      'if (thisArg) callback = iteratorBind(callback, thisArg)',
-    'beforeLoop': {
-      'array': 'if (noaccum) result = collection[++index]'
+    args: "collection, callback, accumulator, thisArg",
+    init: "accumulator",
+    top:
+      "var noaccum = arguments.length < 3;\n" +
+      "if (thisArg) callback = iteratorBind(callback, thisArg)",
+    beforeLoop: {
+      array: "if (noaccum) result = collection[++index]",
     },
-    'inLoop': {
-      'array':
-        'result = callback(result, collection[index], index, collection)',
-      'object':
-        'result = noaccum\n' +
-        '  ? (noaccum = false, collection[index])\n' +
-        '  : callback(result, collection[index], index, collection)'
-    }
+    inLoop: {
+      array: "result = callback(result, collection[index], index, collection)",
+      object:
+        "result = noaccum\n" +
+        "  ? (noaccum = false, collection[index])\n" +
+        "  : callback(result, collection[index], index, collection)",
+    },
   });
 
   /**
@@ -842,9 +869,9 @@
     }
 
     var length = collection.length,
-        noaccum = arguments.length < 3;
+      noaccum = arguments.length < 3;
 
-    if(thisArg) {
+    if (thisArg) {
       callback = iteratorBind(callback, thisArg);
     }
     if (length === length >>> 0) {
@@ -852,13 +879,18 @@
         accumulator = collection[--length];
       }
       while (length--) {
-        accumulator = callback(accumulator, collection[length], length, collection);
+        accumulator = callback(
+          accumulator,
+          collection[length],
+          length,
+          collection
+        );
       }
       return accumulator;
     }
 
     var prop,
-        props = keys(collection);
+      props = keys(collection);
 
     length = props.length;
     if (length && noaccum) {
@@ -888,7 +920,7 @@
    * // => [1, 3, 5]
    */
   var reject = createIterator(baseIteratorOptions, filterIteratorOptions, {
-    'inLoop': '!' + filterIteratorOptions.inLoop
+    inLoop: "!" + filterIteratorOptions.inLoop,
   });
 
   /**
@@ -912,8 +944,8 @@
    * // => true
    */
   var some = createIterator(baseIteratorOptions, everyIteratorOptions, {
-    'init': 'false',
-    'inLoop': everyIteratorOptions.inLoop.replace('!', '')
+    init: "false",
+    inLoop: everyIteratorOptions.inLoop.replace("!", ""),
   });
 
   /**
@@ -966,7 +998,7 @@
       return result;
     }
     var index = -1,
-        length = array.length;
+      length = array.length;
 
     while (++index < length) {
       if (array[index]) {
@@ -998,8 +1030,8 @@
       return result;
     }
     var index = -1,
-        length = array.length,
-        flattened = concat.apply(result, slice.call(arguments, 1));
+      length = array.length,
+      flattened = concat.apply(result, slice.call(arguments, 1));
 
     while (++index < length) {
       if (indexOf(flattened, array[index]) < 0) {
@@ -1030,7 +1062,7 @@
    */
   function first(array, n, guard) {
     if (array) {
-      return (n == undefined || guard) ? array[0] : slice.call(array, 0, n);
+      return n == undefined || guard ? array[0] : slice.call(array, 0, n);
     }
   }
 
@@ -1058,8 +1090,8 @@
       return result;
     }
     var value,
-        index = -1,
-        length = array.length;
+      index = -1,
+      length = array.length;
 
     while (++index < length) {
       value = array[index];
@@ -1103,10 +1135,10 @@
       return result;
     }
     var prop,
-        value,
-        index = -1,
-        isFunc = typeof callback == 'function',
-        length = array.length;
+      value,
+      index = -1,
+      isFunc = typeof callback == "function",
+      length = array.length;
 
     if (isFunc && thisArg) {
       callback = iteratorBind(callback, thisArg);
@@ -1114,7 +1146,10 @@
     while (++index < length) {
       value = array[index];
       prop = isFunc ? callback(value, index, array) : value[callback];
-      (hasOwnProperty.call(result, prop) ? result[prop] : result[prop] = []).push(value);
+      (hasOwnProperty.call(result, prop)
+        ? result[prop]
+        : (result[prop] = [])
+      ).push(value);
     }
     return result;
   }
@@ -1148,11 +1183,12 @@
       return -1;
     }
     var index = -1,
-        length = array.length;
+      length = array.length;
 
     if (fromIndex) {
-      if (typeof fromIndex == 'number') {
-        index = (fromIndex < 0 ? Math.max(0, length + fromIndex) : fromIndex) - 1;
+      if (typeof fromIndex == "number") {
+        index =
+          (fromIndex < 0 ? Math.max(0, length + fromIndex) : fromIndex) - 1;
       } else {
         index = sortedIndex(array, value);
         return array[index] === value ? index : -1;
@@ -1187,7 +1223,7 @@
     if (!array) {
       return [];
     }
-    return slice.call(array, 0, -((n == undefined || guard) ? 1 : n));
+    return slice.call(array, 0, -(n == undefined || guard ? 1 : n));
   }
 
   /**
@@ -1210,14 +1246,18 @@
       return result;
     }
     var value,
-        index = -1,
-        length = array.length,
-        others = slice.call(arguments, 1);
+      index = -1,
+      length = array.length,
+      others = slice.call(arguments, 1);
 
     while (++index < length) {
       value = array[index];
-      if (indexOf(result, value) < 0 &&
-          every(others, function(other) { return indexOf(other, value) > -1; })) {
+      if (
+        indexOf(result, value) < 0 &&
+        every(others, function (other) {
+          return indexOf(other, value) > -1;
+        })
+      ) {
         result.push(value);
       }
     }
@@ -1245,7 +1285,9 @@
   function last(array, n, guard) {
     if (array) {
       var length = array.length;
-      return (n == undefined || guard) ? array[length - 1] : slice.call(array, -n || length);
+      return n == undefined || guard
+        ? array[length - 1]
+        : slice.call(array, -n || length);
     }
   }
 
@@ -1273,8 +1315,11 @@
       return -1;
     }
     var index = array.length;
-    if (fromIndex && typeof fromIndex == 'number') {
-      index = (fromIndex < 0 ? Math.max(0, index + fromIndex) : Math.min(fromIndex, index - 1)) + 1;
+    if (fromIndex && typeof fromIndex == "number") {
+      index =
+        (fromIndex < 0
+          ? Math.max(0, index + fromIndex)
+          : Math.min(fromIndex, index - 1)) + 1;
     }
     while (index--) {
       if (array[index] === value) {
@@ -1310,14 +1355,14 @@
    */
   function max(array, callback, thisArg) {
     var computed = -Infinity,
-        result = computed;
+      result = computed;
 
     if (!array) {
       return result;
     }
     var current,
-        index = -1,
-        length = array.length;
+      index = -1,
+      length = array.length;
 
     if (!callback) {
       while (++index < length) {
@@ -1360,14 +1405,14 @@
    */
   function min(array, callback, thisArg) {
     var computed = Infinity,
-        result = computed;
+      result = computed;
 
     if (!array) {
       return result;
     }
     var current,
-        index = -1,
-        length = array.length;
+      index = -1,
+      length = array.length;
 
     if (!callback) {
       while (++index < length) {
@@ -1427,8 +1472,8 @@
     }
 
     var index = -1,
-        length = Math.max(Math.ceil((end - start) / step), 0),
-        result = Array(length);
+      length = Math.max(Math.ceil((end - start) / step), 0),
+      result = Array(length);
 
     while (++index < length) {
       result[index] = start;
@@ -1459,7 +1504,7 @@
     if (!array) {
       return [];
     }
-    return slice.call(array, (n == undefined || guard) ? 1 : n);
+    return slice.call(array, n == undefined || guard ? 1 : n);
   }
 
   /**
@@ -1481,9 +1526,9 @@
       return [];
     }
     var rand,
-        index = -1,
-        length = array.length,
-        result = Array(length);
+      index = -1,
+      length = array.length,
+      result = Array(length);
 
     while (++index < length) {
       rand = Math.floor(Math.random() * (index + 1));
@@ -1522,25 +1567,27 @@
     if (!array) {
       return [];
     }
-    if (typeof callback == 'string') {
+    if (typeof callback == "string") {
       var prop = callback;
-      callback = function(array) { return array[prop]; };
+      callback = function (array) {
+        return array[prop];
+      };
     } else if (thisArg) {
       callback = iteratorBind(callback, thisArg);
     }
     var index = -1,
-        length = array.length,
-        result = Array(length);
+      length = array.length,
+      result = Array(length);
 
     while (++index < length) {
       result[index] = {
-        'criteria': callback(array[index], index, array),
-        'value': array[index]
+        criteria: callback(array[index], index, array),
+        value: array[index],
       };
     }
-    result.sort(function(left, right) {
+    result.sort(function (left, right) {
       var a = left.criteria,
-          b = right.criteria;
+        b = right.criteria;
 
       if (a === undefined) {
         return 1;
@@ -1597,8 +1644,8 @@
       return 0;
     }
     var mid,
-        low = 0,
-        high = array.length;
+      low = 0,
+      high = array.length;
 
     if (callback) {
       if (thisArg) {
@@ -1607,12 +1654,12 @@
       value = callback(value);
       while (low < high) {
         mid = (low + high) >>> 1;
-        callback(array[mid]) < value ? low = mid + 1 : high = mid;
+        callback(array[mid]) < value ? (low = mid + 1) : (high = mid);
       }
     } else {
       while (low < high) {
         mid = (low + high) >>> 1;
-        array[mid] < value ? low = mid + 1 : high = mid;
+        array[mid] < value ? (low = mid + 1) : (high = mid);
       }
     }
     return low;
@@ -1634,9 +1681,9 @@
    */
   function union() {
     var index = -1,
-        result = [],
-        flattened = concat.apply(result, arguments),
-        length = flattened.length;
+      result = [],
+      flattened = concat.apply(result, arguments),
+      length = flattened.length;
 
     while (++index < length) {
       if (indexOf(result, flattened[index]) < 0) {
@@ -1683,12 +1730,12 @@
       return result;
     }
     var computed,
-        index = -1,
-        length = array.length,
-        seen = [];
+      index = -1,
+      length = array.length,
+      seen = [];
 
     // juggle arguments
-    if (typeof isSorted == 'function') {
+    if (typeof isSorted == "function") {
       thisArg = callback;
       callback = isSorted;
       isSorted = false;
@@ -1700,10 +1747,11 @@
     }
     while (++index < length) {
       computed = callback(array[index], index, array);
-      if (isSorted
-            ? !index || seen[seen.length - 1] !== computed
-            : indexOf(seen, computed) < 0
-          ) {
+      if (
+        isSorted
+          ? !index || seen[seen.length - 1] !== computed
+          : indexOf(seen, computed) < 0
+      ) {
         seen.push(computed);
         result.push(array[index]);
       }
@@ -1732,8 +1780,8 @@
       return result;
     }
     var excluded = slice.call(arguments, 1),
-        index = -1,
-        length = array.length;
+      index = -1,
+      length = array.length;
 
     while (++index < length) {
       if (indexOf(excluded, array[index]) < 0) {
@@ -1764,8 +1812,8 @@
       return [];
     }
     var index = -1,
-        length = max(pluck(arguments, 'length')),
-        result = Array(length);
+      length = max(pluck(arguments, "length")),
+      result = Array(length);
 
     while (++index < length) {
       result[index] = pluck(arguments, index);
@@ -1798,7 +1846,7 @@
     if (n < 1) {
       return func();
     }
-    return function() {
+    return function () {
       if (--n < 1) {
         return func.apply(this, arguments);
       }
@@ -1850,7 +1898,7 @@
    */
   function bind(func, thisArg) {
     var methodName,
-        isFunc = toString.call(func) == funcClass;
+      isFunc = toString.call(func) == funcClass;
 
     // juggle arguments
     if (!isFunc) {
@@ -1868,27 +1916,25 @@
       // `Function#bind` spec
       // http://es5.github.com/#x15.3.4.5
       var args = arguments,
-          thisBinding = thisArg;
+        thisBinding = thisArg;
 
       if (!isFunc) {
         func = thisArg[methodName];
       }
       if (partialArgs.length) {
-        args = args.length
-          ? concat.apply(partialArgs, args)
-          : partialArgs;
+        args = args.length ? concat.apply(partialArgs, args) : partialArgs;
       }
       if (this instanceof bound) {
         // get `func` instance if `bound` is invoked in a `new` expression
         noop.prototype = func.prototype;
-        thisBinding = new noop;
+        thisBinding = new noop();
 
         // mimic the constructor's `return` behavior
         // http://es5.github.com/#x13.2.2
         var result = func.apply(thisBinding, args);
         return valueTypes[typeof result] && result !== null
           ? result
-          : thisBinding
+          : thisBinding;
       }
       return func.apply(thisBinding, args);
     }
@@ -1921,7 +1967,7 @@
    */
   function bindAll(object) {
     var funcs = arguments,
-        index = 1;
+      index = 1;
 
     if (funcs.length == 1) {
       index = 0;
@@ -1953,9 +1999,9 @@
    */
   function compose() {
     var funcs = arguments;
-    return function() {
+    return function () {
       var args = arguments,
-          length = funcs.length;
+        length = funcs.length;
 
       while (length--) {
         args = [funcs[length].apply(this, args)];
@@ -1985,10 +2031,7 @@
    * jQuery(window).on('resize', lazyLayout);
    */
   function debounce(func, wait, immediate) {
-    var args,
-        result,
-        thisArg,
-        timeoutId;
+    var args, result, thisArg, timeoutId;
 
     function delayed() {
       timeoutId = undefined;
@@ -1997,7 +2040,7 @@
       }
     }
 
-    return function() {
+    return function () {
       var isImmediate = immediate && !timeoutId;
       args = arguments;
       thisArg = this;
@@ -2031,7 +2074,9 @@
    */
   function delay(func, wait) {
     var args = slice.call(arguments, 2);
-    return setTimeout(function() { return func.apply(undefined, args); }, wait);
+    return setTimeout(function () {
+      return func.apply(undefined, args);
+    }, wait);
   }
 
   /**
@@ -2051,7 +2096,9 @@
    */
   function defer(func) {
     var args = slice.call(arguments, 1);
-    return setTimeout(function() { return func.apply(undefined, args); }, 1);
+    return setTimeout(function () {
+      return func.apply(undefined, args);
+    }, 1);
   }
 
   /**
@@ -2074,7 +2121,7 @@
    */
   function memoize(func, resolver) {
     var cache = {};
-    return function() {
+    return function () {
       var prop = resolver ? resolver.apply(this, arguments) : arguments[0];
       return hasOwnProperty.call(cache, prop)
         ? cache[prop]
@@ -2100,9 +2147,9 @@
    */
   function once(func) {
     var result,
-        ran = false;
+      ran = false;
 
-    return function() {
+    return function () {
       if (ran) {
         return result;
       }
@@ -2133,17 +2180,18 @@
    */
   function partial(func) {
     var args = slice.call(arguments, 1),
-        argsLength = args.length;
+      argsLength = args.length;
 
-    return function() {
+    return function () {
       var result,
-          others = arguments;
+        others = arguments;
 
       if (others.length) {
         args.length = argsLength;
         push.apply(args, others);
       }
-      result = args.length == 1 ? func.call(this, args[0]) : func.apply(this, args);
+      result =
+        args.length == 1 ? func.call(this, args[0]) : func.apply(this, args);
       args.length = argsLength;
       return result;
     };
@@ -2169,20 +2217,20 @@
    */
   function throttle(func, wait) {
     var args,
-        result,
-        thisArg,
-        timeoutId,
-        lastCalled = 0;
+      result,
+      thisArg,
+      timeoutId,
+      lastCalled = 0;
 
     function trailingCall() {
-      lastCalled = new Date;
+      lastCalled = new Date();
       timeoutId = undefined;
       func.apply(thisArg, args);
     }
 
-    return function() {
-      var now = new Date,
-          remain = wait - (now - lastCalled);
+    return function () {
+      var now = new Date(),
+        remain = wait - (now - lastCalled);
 
       args = arguments;
       thisArg = this;
@@ -2190,8 +2238,7 @@
       if (remain <= 0) {
         lastCalled = now;
         result = func.apply(thisArg, args);
-      }
-      else if (!timeoutId) {
+      } else if (!timeoutId) {
         timeoutId = setTimeout(trailingCall, remain);
       }
       return result;
@@ -2220,7 +2267,7 @@
    * // => 'before, hello: moe, after'
    */
   function wrap(func, wrapper) {
-    return function() {
+    return function () {
       var args = [func];
       if (arguments.length) {
         push.apply(args, arguments);
@@ -2247,7 +2294,9 @@
    */
   function clone(value) {
     return valueTypes[typeof value] && value !== null
-      ? (isArray(value) ? value.slice() : extend({}, value))
+      ? isArray(value)
+        ? value.slice()
+        : extend({}, value)
       : value;
   }
 
@@ -2269,7 +2318,7 @@
    * // => { 'flavor': 'chocolate', 'sprinkles': 'rainbow' }
    */
   var defaults = createIterator(extendIteratorOptions, {
-    'inLoop': 'if (object[index] == undefined)' + extendIteratorOptions.inLoop
+    inLoop: "if (object[index] == undefined)" + extendIteratorOptions.inLoop,
   });
 
   /**
@@ -2316,9 +2365,14 @@
    * });
    * // => alerts 'name' and 'bark' (order is not guaranteed)
    */
-  var forIn = createIterator(baseIteratorOptions, forEachIteratorOptions, forOwnIteratorOptions, {
-    'useHas': false
-  });
+  var forIn = createIterator(
+    baseIteratorOptions,
+    forEachIteratorOptions,
+    forOwnIteratorOptions,
+    {
+      useHas: false,
+    }
+  );
 
   /**
    * Iterates over `object`'s own enumerable properties, executing the `callback`
@@ -2339,7 +2393,11 @@
    * });
    * // => alerts '0', '1', and 'length' (order is not guaranteed)
    */
-  var forOwn = createIterator(baseIteratorOptions, forEachIteratorOptions, forOwnIteratorOptions);
+  var forOwn = createIterator(
+    baseIteratorOptions,
+    forEachIteratorOptions,
+    forOwnIteratorOptions
+  );
 
   /**
    * Produces a sorted array of the enumerable properties, own and inherited,
@@ -2357,11 +2415,11 @@
    * // => ['all', 'any', 'bind', 'bindAll', 'clone', 'compact', 'compose', ...]
    */
   var functions = createIterator({
-    'args': 'object',
-    'init': '[]',
-    'useHas': false,
-    'inLoop': 'if (toString.call(object[index]) == funcClass) result.push(index)',
-    'bottom': 'result.sort()'
+    args: "object",
+    init: "[]",
+    useHas: false,
+    inLoop: "if (toString.call(object[index]) == funcClass) result.push(index)",
+    bottom: "result.sort()",
   });
 
   /**
@@ -2399,13 +2457,13 @@
    * _.isArguments([1, 2, 3]);
    * // => false
    */
-  var isArguments = function(value) {
-    return toString.call(value) == '[object Arguments]';
+  var isArguments = function (value) {
+    return toString.call(value) == "[object Arguments]";
   };
   // fallback for browser like IE < 9 which detect `arguments` as `[object Object]`
   if (!isArguments(arguments)) {
-    isArguments = function(value) {
-      return !!(value && hasOwnProperty.call(value, 'callee'));
+    isArguments = function (value) {
+      return !!(value && hasOwnProperty.call(value, "callee"));
     };
   }
 
@@ -2425,9 +2483,11 @@
    * _.isArray([1, 2, 3]);
    * // => true
    */
-  var isArray = nativeIsArray || function(value) {
-    return toString.call(value) == arrayClass;
-  };
+  var isArray =
+    nativeIsArray ||
+    function (value) {
+      return toString.call(value) == arrayClass;
+    };
 
   /**
    * Checks if `value` is a boolean (`true` or `false`) value.
@@ -2443,7 +2503,9 @@
    * // => false
    */
   function isBoolean(value) {
-    return value === true || value === false || toString.call(value) == boolClass;
+    return (
+      value === true || value === false || toString.call(value) == boolClass
+    );
   }
 
   /**
@@ -2498,14 +2560,14 @@
    * // => true
    */
   var isEmpty = createIterator({
-    'args': 'value',
-    'init': 'true',
-    'top':
-      'var className = toString.call(value);\n' +
-      'if (className == arrayClass || className == stringClass) return !value.length',
-    'inLoop': {
-      'object': 'return false'
-    }
+    args: "value",
+    init: "true",
+    top:
+      "var className = toString.call(value);\n" +
+      "if (className == arrayClass || className == stringClass) return !value.length",
+    inLoop: {
+      object: "return false",
+    },
   });
 
   /**
@@ -2537,7 +2599,7 @@
     // exit early for identical values
     if (a === b) {
       // treat `+0` vs. `-0` as not equal
-      return a !== 0 || (1 / a == 1 / b);
+      return a !== 0 || 1 / a == 1 / b;
     }
     // a strict comparison is necessary because `null == undefined`
     if (a == undefined || b == undefined) {
@@ -2573,8 +2635,10 @@
         // treat `NaN` vs. `NaN` as equal
         return a != +a
           ? b != +b
-          // but treat `+0` vs. `-0` as not equal
-          : (a == 0 ? (1 / a == 1 / b) : a == +b);
+          : // but treat `+0` vs. `-0` as not equal
+          a == 0
+          ? 1 / a == 1 / b
+          : a == +b;
 
       case boolClass:
       case dateClass:
@@ -2584,12 +2648,14 @@
 
       // regexps are compared by their source and flags
       case regexpClass:
-        return a.source == b.source &&
-               a.global == b.global &&
-               a.multiline == b.multiline &&
-               a.ignoreCase == b.ignoreCase;
+        return (
+          a.source == b.source &&
+          a.global == b.global &&
+          a.multiline == b.multiline &&
+          a.ignoreCase == b.ignoreCase
+        );
     }
-    if (typeof a != 'object' || typeof b != 'object') {
+    if (typeof a != "object" || typeof b != "object") {
       return false;
     }
     // Assume equality for cyclic structures. The algorithm for detecting cyclic
@@ -2604,8 +2670,8 @@
     }
 
     var index = -1,
-        result = true,
-        size = 0;
+      result = true,
+      size = 0;
 
     // add the first collection to the stack of traversed objects
     stack.push(a);
@@ -2626,7 +2692,10 @@
       }
     } else {
       // objects with different constructors are not equivalent
-      if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) {
+      if (
+        "constructor" in a != "constructor" in b ||
+        a.constructor != b.constructor
+      ) {
         return false;
       }
       // deep compare objects.
@@ -2635,7 +2704,10 @@
           // count the number of properties.
           size++;
           // deep compare each property value.
-          if (!(result = hasOwnProperty.call(b, prop) && isEqual(a[prop], b[prop], stack))) {
+          if (
+            !(result =
+              hasOwnProperty.call(b, prop) && isEqual(a[prop], b[prop], stack))
+          ) {
             break;
           }
         }
@@ -2647,7 +2719,7 @@
           // bug that causes `!size--` to throw an error so it must be wrapped
           // in parentheses.
           // https://github.com/documentcloud/underscore/issues/355
-          if (hasOwnProperty.call(b, prop) && !(size--)) {
+          if (hasOwnProperty.call(b, prop) && !size--) {
             break;
           }
         }
@@ -2658,7 +2730,11 @@
         while (++index < 7) {
           prop = shadowed[index];
           if (hasOwnProperty.call(a, prop)) {
-            if (!(result = hasOwnProperty.call(b, prop) && isEqual(a[prop], b[prop], stack))) {
+            if (
+              !(result =
+                hasOwnProperty.call(b, prop) &&
+                isEqual(a[prop], b[prop], stack))
+            ) {
               break;
             }
           }
@@ -2764,7 +2840,7 @@
   function isNaN(value) {
     // `NaN` as a primitive is the only value that is not equal to itself
     // (perform the [[Class]] check first to avoid errors with some host objects in IE)
-    return toString.call(value) == numberClass && value != +value
+    return toString.call(value) == numberClass && value != +value;
   }
 
   /**
@@ -2870,12 +2946,14 @@
    * _.keys({ 'one': 1, 'two': 2, 'three': 3 });
    * // => ['one', 'two', 'three'] (order is not guaranteed)
    */
-  var keys = !nativeKeys ? shimKeys : function(object) {
-    // avoid iterating over the `prototype` property
-    return typeof object == 'function'
-      ? shimKeys(object)
-      : nativeKeys(object);
-  };
+  var keys = !nativeKeys
+    ? shimKeys
+    : function (object) {
+        // avoid iterating over the `prototype` property
+        return typeof object == "function"
+          ? shimKeys(object)
+          : nativeKeys(object);
+      };
 
   /**
    * Creates an object composed of the specified properties. Property names may
@@ -2894,10 +2972,10 @@
    */
   function pick(object) {
     var prop,
-        index = 0,
-        props = concat.apply(ArrayProto, arguments),
-        length = props.length,
-        result = {};
+      index = 0,
+      props = concat.apply(ArrayProto, arguments),
+      length = props.length,
+      result = {};
 
     // start `index` at `1` to skip `object`
     while (++index < length) {
@@ -2952,9 +3030,9 @@
    * // => [1, 2, 3]
    */
   var values = createIterator({
-    'args': 'object',
-    'init': '[]',
-    'inLoop': 'result.push(object[index])'
+    args: "object",
+    init: "[]",
+    inLoop: "result.push(object[index])",
   });
 
   /*--------------------------------------------------------------------------*/
@@ -2974,7 +3052,9 @@
    * // => "Curly, Larry &amp; Moe"
    */
   function escape(string) {
-    return string == null ? '' : (string + '').replace(reUnescapedHtml, escapeHtmlChar);
+    return string == null
+      ? ""
+      : (string + "").replace(reUnescapedHtml, escapeHtmlChar);
   }
 
   /**
@@ -3019,10 +3099,10 @@
    * // => 'Larry'
    */
   function mixin(object) {
-    forEach(functions(object), function(methodName) {
-      var func = lodash[methodName] = object[methodName];
+    forEach(functions(object), function (methodName) {
+      var func = (lodash[methodName] = object[methodName]);
 
-      LoDash.prototype[methodName] = function() {
+      LoDash.prototype[methodName] = function () {
         var args = [this._wrapped];
         if (arguments.length) {
           push.apply(args, arguments);
@@ -3146,11 +3226,11 @@
     options || (options = {});
 
     var result,
-        defaults = lodash.templateSettings,
-        escapeDelimiter = options.escape,
-        evaluateDelimiter = options.evaluate,
-        interpolateDelimiter = options.interpolate,
-        variable = options.variable;
+      defaults = lodash.templateSettings,
+      escapeDelimiter = options.escape,
+      evaluateDelimiter = options.evaluate,
+      interpolateDelimiter = options.interpolate,
+      variable = options.variable;
 
     // use template defaults if no option is provided
     if (escapeDelimiter == null) {
@@ -3176,9 +3256,12 @@
 
     // escape characters that cannot be included in string literals and
     // detokenize delimiter code snippets
-    text = "__p='" + text
-      .replace(reUnescapedString, escapeStringChar)
-      .replace(reToken, detokenize) + "';\n";
+    text =
+      "__p='" +
+      text
+        .replace(reUnescapedString, escapeStringChar)
+        .replace(reToken, detokenize) +
+      "';\n";
 
     // clear stored code snippets
     tokenized.length = 0;
@@ -3186,22 +3269,26 @@
     // if `options.variable` is not specified, add `data` to the top of the scope chain
     if (!variable) {
       variable = defaults.variable;
-      text = 'with (' + variable + ' || {}) {\n' + text + '\n}\n';
+      text = "with (" + variable + " || {}) {\n" + text + "\n}\n";
     }
 
-    text = 'function(' + variable + ') {\n' +
-      'var __p, __t, __j = Array.prototype.join;\n' +
-      'function print() { __p += __j.call(arguments, \'\') }\n' +
+    text =
+      "function(" +
+      variable +
+      ") {\n" +
+      "var __p, __t, __j = Array.prototype.join;\n" +
+      "function print() { __p += __j.call(arguments, '') }\n" +
       text +
-      'return __p\n}';
+      "return __p\n}";
 
     // add a sourceURL for easier debugging
     // http://www.html5rocks.com/en/tutorials/developertools/sourcemaps/#toc-sourceurl
     if (useSourceURL) {
-      text += '\n//@ sourceURL=/lodash/template/source[' + (templateCounter++) + ']';
+      text +=
+        "\n//@ sourceURL=/lodash/template/source[" + templateCounter++ + "]";
     }
 
-    result = Function('_', 'return ' + text)(lodash);
+    result = Function("_", "return " + text)(lodash);
 
     if (data) {
       return result(data);
@@ -3363,7 +3450,7 @@
    * @memberOf _
    * @type String
    */
-  lodash.VERSION = '0.3.2';
+  lodash.VERSION = "0.3.2";
 
   // assign static methods
   lodash.after = after;
@@ -3485,36 +3572,39 @@
   LoDash.prototype.value = wrapperValue;
 
   // add all mutator Array functions to the wrapper.
-  forEach(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(methodName) {
-    var func = ArrayProto[methodName];
+  forEach(
+    ["pop", "push", "reverse", "shift", "sort", "splice", "unshift"],
+    function (methodName) {
+      var func = ArrayProto[methodName];
 
-    LoDash.prototype[methodName] = function() {
-      var value = this._wrapped;
-      func.apply(value, arguments);
+      LoDash.prototype[methodName] = function () {
+        var value = this._wrapped;
+        func.apply(value, arguments);
 
-      // IE compatibility mode and IE < 9 have buggy Array `shift()` and `splice()`
-      // functions that fail to remove the last element, `value[0]`, of
-      // array-like objects even though the `length` property is set to `0`.
-      // The `shift()` method is buggy in IE 8 compatibility mode, while `splice()`
-      // is buggy regardless of mode in IE < 9 and buggy in compatibility mode in IE 9.
-      if (value.length === 0) {
-        delete value[0];
-      }
-      if (this._chain) {
-        value = new LoDash(value);
-        value._chain = true;
-      }
-      return value;
-    };
-  });
+        // IE compatibility mode and IE < 9 have buggy Array `shift()` and `splice()`
+        // functions that fail to remove the last element, `value[0]`, of
+        // array-like objects even though the `length` property is set to `0`.
+        // The `shift()` method is buggy in IE 8 compatibility mode, while `splice()`
+        // is buggy regardless of mode in IE < 9 and buggy in compatibility mode in IE 9.
+        if (value.length === 0) {
+          delete value[0];
+        }
+        if (this._chain) {
+          value = new LoDash(value);
+          value._chain = true;
+        }
+        return value;
+      };
+    }
+  );
 
   // add all accessor Array functions to the wrapper.
-  forEach(['concat', 'join', 'slice'], function(methodName) {
+  forEach(["concat", "join", "slice"], function (methodName) {
     var func = ArrayProto[methodName];
 
-    LoDash.prototype[methodName] = function() {
+    LoDash.prototype[methodName] = function () {
       var value = this._wrapped,
-          result = func.apply(value, arguments);
+        result = func.apply(value, arguments);
 
       if (this._chain) {
         result = new LoDash(result);
@@ -3528,7 +3618,11 @@
 
   // expose Lo-Dash
   // some AMD build optimizers, like r.js, check for specific condition patterns like the following:
-  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+  if (
+    typeof define == "function" &&
+    typeof define.amd == "object" &&
+    define.amd
+  ) {
     // Expose Lo-Dash to the global object even when an AMD loader is present in
     // case Lo-Dash was injected by a third-party script and not intended to be
     // loaded as a module. The global assignment can be reverted in the Lo-Dash
@@ -3537,23 +3631,22 @@
 
     // define as an anonymous module so, through path mapping, it can be
     // referenced as the "underscore" module
-    define(function() {
+    define(function () {
       return lodash;
     });
   }
   // check for `exports` after `define` in case a build optimizer adds an `exports` object
   else if (freeExports) {
     // in Node.js or RingoJS v0.8.0+
-    if (typeof module == 'object' && module && module.exports == freeExports) {
+    if (typeof module == "object" && module && module.exports == freeExports) {
       (module.exports = lodash)._ = lodash;
     }
     // in Narwhal or RingoJS v0.7.0-
     else {
       freeExports._ = lodash;
     }
-  }
-  else {
+  } else {
     // in a browser or Rhino
     window._ = lodash;
   }
-}(this));
+})(this);
