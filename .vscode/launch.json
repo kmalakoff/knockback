@@ -1,16 +1,35 @@
 {
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "GulpTester",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceRoot}/node_modules/gulp/bin/gulp.js",
-      "stopOnEntry": false,
-      "args": [],
-      "cwd": "${workspaceRoot}",
-      "runtimeArgs": ["--nolazy"],
-      "console": "internalConsole"
+      "name": "mocha",
+      "program": "${workspaceFolder}/node_modules/mocha-compat/bin/_mocha-compat",
+      "args": ["--no-timeouts", "--colors", "${workspaceFolder}/test/**/*.test.*"],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "memory",
+      "cwd": "${workspaceFolder}/performance",
+      "program": "${workspaceFolder}/performance/memory/index.js",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "ops",
+      "cwd": "${workspaceFolder}/performance",
+      "program": "${workspaceFolder}/performance/operations/index.js",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
     }
   ]
 }

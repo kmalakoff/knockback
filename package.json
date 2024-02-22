@@ -1,13 +1,8 @@
 {
   "name": "knockback",
   "version": "1.2.3",
+  "private": true,
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
-  "main": "knockback.js",
-  "author": {
-    "name": "Kevin Malakoff",
-    "url": "https://github.com/kmalakoff"
-  },
-  "license": "MIT",
   "keywords": [
     "knockback",
     "knockbackjs",
@@ -16,79 +11,51 @@
     "knockout",
     "knockoutjs"
   ],
-  "private": true,
-  "url": "http://kmalakoff.github.com/knockback/",
   "homepage": "http://kmalakoff.github.com/knockback/",
   "repository": {
     "type": "git",
     "url": "http://github.com/kmalakoff/knockback.git"
   },
+  "license": "MIT",
+  "author": {
+    "name": "Kevin Malakoff",
+    "url": "https://github.com/kmalakoff"
+  },
+  "main": "dist/cjs/index.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "gulp test",
-    "docs": "./node_modules/.bin/codo -n Knockback.js -o doc src/."
+    "build": "tsds build",
+    "deploy": "tsds deploy",
+    "format": "biome check --apply-unsafe src/ test/",
+    "test": "tsds test:node --timeout=10000",
+    "test:engines": "nvu engines npm test",
+    "version": "tsds version"
   },
   "dependencies": {
-    "backbone": ">=0.5.1",
-    "knockout": ">=2.1.0",
-    "underscore": ">=1.1.7"
+    "backbone": "*",
+    "knockout": "*",
+    "underscore": "*"
   },
   "devDependencies": {
-    "async": "*",
-    "chai": "*",
-    "codo": "2.x",
-    "coffee-loader": "0.6.x",
-    "coffee-script": "^1.6.3",
-    "event-stream": "*",
-    "fs-extra": "*",
-    "fs-readdir-recursive": "*",
-    "gulp": "^3.9.1",
-    "gulp-browserify": "*",
-    "gulp-coffee": "*",
-    "gulp-concat": "*",
-    "gulp-header": "*",
-    "gulp-mocha": "3.x",
-    "gulp-rename": "*",
-    "gulp-shell": "*",
-    "gulp-uglify": "*",
-    "gulp-util": "*",
-    "gulp-webpack-config": "*",
-    "gulp-wrap-amd-infer": "*",
-    "gulp-zip": "*",
-    "imports-loader": "*",
-    "jsdom": "*",
-    "karma": "*",
-    "karma-chai": "*",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-cli": "*",
-    "karma-coffee-preprocessor": "*",
-    "karma-firefox-launcher": "*",
-    "karma-mocha": "*",
-    "karma-safari-launcher": "*",
-    "karma-spec-reporter": "*",
-    "minimatch": "^3.0.4",
-    "mocha": "*",
-    "nuget": "*",
-    "puppeteer": "^1.15.0",
-    "queue-async": "*",
-    "requirejs": "*",
-    "webpack": "*"
+    "@biomejs/biome": "^1.5.3",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.11.19",
+    "backbone": "^1.6.0",
+    "depcheck": "^1.4.7",
+    "knockout": "^3.5.1",
+    "ts-dev-stack": "^0.15.3",
+    "underscore": "^1.13.6"
   },
-  "optionalDependencies": {
-    "backbone-relational": "*",
-    "backbone-modelref": "*",
-    "backbone.localstorage": "*",
-    "lodash": "*",
-    "backbone-orm": "*",
-    "jquery": "*",
-    "moment": "*",
-    "backbone-associations": "*",
-    "parse": "1.5.x"
-  },
-  "jam": {
-    "dependencies": {
-      "underscore": ">=1.1.7",
-      "backbone": ">=0.5.1",
-      "knockout": ">=2.2.1"
+  "url": "http://kmalakoff.github.com/knockback/",
+  "tsds": {
+    "source": "src/core/index.js",
+    "globals": {
+      "knockout": "ko",
+      "backbone": "Backbone",
+      "underscore": "_"
     }
   }
 }

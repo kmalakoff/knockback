@@ -3,6 +3,7 @@ npm-debug.log
 *.map
 
 node_modules/
+npm-debug.log
 doc/
 _temp/
 

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "lib": ["es2015"],
+    "types": ["mocha", "node"],
+    "target": "es2020",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "allowJs": true
+  },
+  "exclude": ["node_modules", "dist", "test/data"],
+  "include": ["src", "test"]
+}

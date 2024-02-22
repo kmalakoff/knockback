@@ -1,0 +1,38 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.5.3/schema.json",
+  "files": {
+    "ignore": [".yarn/**", "android/**", "build/**", "dist/**", "ios/**", "node_modules/**", "out/**", "vendor/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "lineWidth": 320,
+    "indentStyle": "space"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingComma": "es5"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noForEach": "off",
+        "useArrowFunction": "off",
+        "useOptionalChain": "off"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "noInnerDeclarations": "off"
+      },
+      "style": {
+        "noVar": "off",
+        "noParameterAssign": "off",
+        "noArguments": "off",
+        "useTemplate": "off"
+      }
+    }
+  }
+}

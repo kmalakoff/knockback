@@ -1,0 +1,1 @@
+ignores: ["knockback", "depcheck", "ts-dev-stack", "@types/*"]
