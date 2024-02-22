@@ -1,38 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <!--[if lt IE 7]> <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
 <!--[if IE 7]>    <html class="no-js lt-ie9 lt-ie8" lang="en"> <![endif]-->
 <!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <title>Knockback Issue 141 Test</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-</head>
-<body>
-
-  <div id="some-div">
-    <table>
-      <tbody data-bind="foreach: coll">
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang="en">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Knockback Issue 141 Test</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+  <body>
+    <div id="some-div">
+      <table>
+        <tbody data-bind="foreach: coll">
           <tr>
-              <td>...</td>
-              <td><button data-bind="click: cancel" class="btn btn-danger">Cancel</button></td>
+            <td>...</td>
+            <td>
+              <button data-bind="click: cancel" class="btn btn-danger">
+                Cancel
+              </button>
+            </td>
           </tr>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
 
-  <script type="text/javascript" src="../../../node_modules/jquery/dist/jquery.js"></script>
-  <script type="text/javascript" src="../../../node_modules/knockout/build/output/knockout-latest.debug.js"></script>
-  <script type="text/javascript" src="../../../node_modules/underscore/underscore.js"></script>
-  <script type="text/javascript" src="../../../node_modules/backbone/backbone.js"></script>
+    <script
+      type="text/javascript"
+      src="../../../node_modules/jquery/dist/jquery.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../../../node_modules/knockout/build/output/knockout-latest.debug.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../../../node_modules/underscore/underscore.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="../../../node_modules/backbone/backbone.js"
+    ></script>
 
-  <!-- ECOSYSTEM -->
-  <script type="text/javascript" src="../../../node_modules/backbone-relational/backbone-relational.js"></script>
+    <!-- ECOSYSTEM -->
+    <script
+      type="text/javascript"
+      src="../../../node_modules/backbone-relational/backbone-relational.js"
+    ></script>
 
-  <!-- LIBRARY -->
-  <script type="text/javascript" src="../../../knockback.js"></script>
-  <script src="issue.js"></script>
-
-</body>
+    <!-- LIBRARY -->
+    <script type="text/javascript" src="../../../knockback.js"></script>
+    <script src="issue.js"></script>
+  </body>
 </html>
