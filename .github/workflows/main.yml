@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test:
+    name: Node.js ${{ matrix.node-version }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node: ["latest"]
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: git config --global user.name "Github Actions"
+      - run: git config --global user.email "actions@users.noreply.github.com"
+      - run: npm uninstall node-version-use -g
+      - run: npm install node-version-use -g
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:engines
