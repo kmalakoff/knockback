@@ -1,0 +1,44 @@
+---
+title: Knockback.js
+description: Knockout.js magic for Backbone.js Models and Collections
+template: splash
+hero:
+  tagline: The best of Knockout.js and Backbone.js, together at last!
+  actions:
+    - text: Get Started
+      link: /intro/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/kmalakoff/knockback
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why Knockback.js?
+
+<CardGrid stagger>
+	<Card title="Best of Both Worlds" icon="star">
+		Combines Backbone's bullet-proof ORM with Knockout's magical data-binding.
+	</Card>
+	<Card title="Automatic Updates" icon="rocket">
+		Views automatically update when your models change. No manual DOM manipulation.
+	</Card>
+	<Card title="Proper MVVM" icon="puzzle">
+		Clear separation between Models, Views, and ViewModels.
+	</Card>
+	<Card title="Built-in Localization" icon="translate">
+		First-class support for internationalization and localization.
+	</Card>
+</CardGrid>
+
+## Feature Comparison
+
+| Backbone.js | Knockback.js | Knockout.js |
+|-------------|--------------|-------------|
+| ✅ Bullet-proof ORM | ⬅️ | ❌ Weak ORM |
+| ✅ Built-in serialization | ⬅️ | ❌ Manual serialization |
+| ❌ MVC | ➡️ | ✅ MVVM |
+| ❌ Manual view updating | ➡️ | ✅ data-bind sorcery |
+| ✅ Routing & history | ⬅️ | ❌ No routing |
