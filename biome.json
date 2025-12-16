@@ -1,0 +1,6 @@
+{
+  "extends": ["tsds-config/biome.json"],
+  "files": {
+    "includes": ["!dist", "!node_modules", "!.git", "!docs"]
+  }
+}

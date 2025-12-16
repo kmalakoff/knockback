@@ -5,6 +5,8 @@ npm-debug.log
 node_modules/
 doc/
 _temp/
+dist/
+.claude/
 
 # web site noise
 tutorials/*
