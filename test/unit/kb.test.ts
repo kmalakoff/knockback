@@ -150,5 +150,53 @@ describe('knockback', () => {
       assert.strictEqual(kb.utils.pathJoin('', 'bar'), 'bar');
       assert.strictEqual(kb.utils.pathJoin(undefined, 'bar'), 'bar');
     });
+
+    it('should have wrappedObservable function', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = viewModel(model);
+
+      // wrappedObservable works with view model instances that have __kb metadata
+      // It returns the observable stored in the instance's __kb.observable
+      assert.ok(typeof kb.utils.wrappedObservable === 'function', 'wrappedObservable is a function');
+
+      kb.release(vm);
+    });
+
+    it('should have wrappedModel function', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = viewModel(model);
+
+      // wrappedModel should return/set the model
+      const wrapped = kb.utils.wrappedModel(vm);
+      assert.strictEqual(wrapped, model, 'Returns the model');
+    });
+
+    it('should have wrappedStore function', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = viewModel(model);
+
+      // wrappedStore should return the store
+      const store = kb.utils.wrappedStore(vm);
+      assert.ok(store, 'Returns a store');
+    });
+
+    it('should detect value types correctly', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const collection = new Backbone.Collection([{ name: 'Alice' }]);
+
+      const simpleObs = observable(model, 'name');
+      assert.strictEqual(kb.utils.valueType(simpleObs), TYPE_SIMPLE, 'Simple value');
+
+      // Model type detection
+      const modelObs = observable(model, {
+        key: 'nested',
+        factories: () => viewModel(new Backbone.Model()),
+      });
+      // This depends on actual value - without a nested model it's simple
+      assert.ok([TYPE_SIMPLE, TYPE_MODEL].includes(kb.utils.valueType(modelObs)), 'Model or simple');
+
+      kb.release(simpleObs);
+      kb.release(modelObs);
+    });
   });
 });

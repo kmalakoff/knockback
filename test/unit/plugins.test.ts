@@ -149,6 +149,57 @@ describe('knockback plugins', () => {
         assert.strictEqual(validation.$error_count, 0);
         assert.strictEqual(validation.$valid, true);
       });
+
+      it('should respect disable option', () => {
+        const value = ko.observable('');
+        const disabled = ko.observable(false);
+        const result = valueValidator(
+          value,
+          {
+            required: valid.required,
+          },
+          { disable: () => disabled() }
+        );
+
+        // Initially enabled - should show error
+        let validation = result();
+        assert.strictEqual(validation.required, true, 'Error when enabled');
+        assert.strictEqual(validation.$error_count, 1);
+        assert.strictEqual(validation.$enabled, true);
+        assert.strictEqual(validation.$disable, false);
+
+        // Disable validations
+        disabled(true);
+        validation = result();
+        assert.strictEqual(validation.required, false, 'No error when disabled');
+        assert.strictEqual(validation.$error_count, 0);
+        assert.strictEqual(validation.$enabled, false);
+        assert.strictEqual(validation.$disable, true);
+      });
+
+      it('should respect enable option', () => {
+        const value = ko.observable('');
+        const enabled = ko.observable(true);
+        const result = valueValidator(
+          value,
+          {
+            required: valid.required,
+          },
+          { enable: () => enabled() }
+        );
+
+        // Initially enabled - should show error
+        let validation = result();
+        assert.strictEqual(validation.required, true, 'Error when enabled');
+        assert.strictEqual(validation.$valid, false);
+
+        // Disable via enable: false
+        enabled(false);
+        validation = result();
+        assert.strictEqual(validation.required, false, 'No error when disabled via enable');
+        assert.strictEqual(validation.$valid, true);
+        assert.strictEqual(validation.$enabled, false);
+      });
     });
   });
 });
