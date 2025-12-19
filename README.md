@@ -38,7 +38,7 @@ npm install backbone knockout underscore
 ```typescript
 import Backbone from 'backbone';
 import ko from 'knockout';
-import { viewModel } from 'knockback';
+import { viewModel } from '@mcpeasy/knockback';
 
 const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
 ko.applyBindings(viewModel(model));
@@ -54,7 +54,7 @@ When you type in the input boxes, the values are properly transferred bi-directi
 ```typescript
 import Backbone from 'backbone';
 import ko from 'knockout';
-import { viewModel, release } from 'knockback';
+import { viewModel, release } from '@mcpeasy/knockback';
 
 // Create a model
 const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });

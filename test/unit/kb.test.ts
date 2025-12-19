@@ -1,10 +1,10 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import * as kb from 'knockback';
-import { collectionObservable, observable, viewModel } from 'knockback';
+import * as kb from '@mcpeasy/knockback';
+import { collectionObservable, observable, viewModel } from '@mcpeasy/knockback';
 import ko from 'knockout';
 
-describe('knockback', () => {
+describe('@mcpeasy/knockback', () => {
   describe('kb namespace', () => {
     it('should have VERSION', () => {
       assert.ok(kb.VERSION);

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import { getLocaleManager, localizedObservable, release, setLocaleManager } from 'knockback';
+import { getLocaleManager, localizedObservable, release, setLocaleManager } from '@mcpeasy/knockback';
 import ko from 'knockout';
 
 describe('Localization plugin', () => {
