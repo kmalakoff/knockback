@@ -2,7 +2,7 @@ import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
 import kb from './kb.ts';
-import type { CreateOptions, Creator, KBObservable, KBObservableBase, Store, ValueType } from './types.ts';
+import type { CreateOptions, Creator, InternalCreateOptions, KBObservable, KBObservableBase, Store, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import utils from './utils.ts';
 
@@ -11,10 +11,10 @@ export class TypedValue {
   __kb_released = false;
   __kb_value: unknown;
   value_type?: ValueType;
-  create_options: CreateOptions;
+  create_options: InternalCreateOptions;
   private _vo: ko.Observable<unknown>;
 
-  constructor(createOptions: CreateOptions) {
+  constructor(createOptions: InternalCreateOptions) {
     this.create_options = createOptions;
     this._vo = ko.observable(null);
   }
@@ -33,7 +33,7 @@ export class TypedValue {
       }
     }
 
-    this.create_options = undefined as unknown as CreateOptions;
+    this.create_options = undefined as unknown as InternalCreateOptions;
   }
 
   // Get the unwrapped value

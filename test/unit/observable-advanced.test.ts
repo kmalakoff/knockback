@@ -1,13 +1,14 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import kb, { observable, Statistics } from 'knockback';
+import * as kb from 'knockback';
+import { observable, Statistics, setStatistics } from 'knockback';
 import ko from 'knockout';
 
 describe('observable advanced', () => {
   describe('custom read and write', () => {
     it('should support custom read function', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Ringo', number: '555-555-5556' });
 
@@ -23,12 +24,12 @@ describe('observable advanced', () => {
 
       kb.release(nameObs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should support custom read and write functions', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ number: '555-555-5556' });
 
@@ -46,14 +47,14 @@ describe('observable advanced', () => {
 
       kb.release(numberObs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('ko.computed integration', () => {
     it('should work as source for ko.computed', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Ringo' });
       const nameObs = observable(model, 'name');
@@ -74,14 +75,14 @@ describe('observable advanced', () => {
       formattedName.dispose();
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('model observable', () => {
     it('should make model changes observable via .model()', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ id: 1, name: 'Bob' });
       const obs = observable(model, 'name') as unknown as ko.Observable & { model: ko.Observable<Backbone.Model | null> };
@@ -102,14 +103,14 @@ describe('observable advanced', () => {
 
       kb.release(obs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('dependency tracking', () => {
     it('should not create dependencies when writing inside ko.computed', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ id: 1, name: 'Initial' });
       const obs = observable(model, 'name');
@@ -135,14 +136,14 @@ describe('observable advanced', () => {
 
       kb.release(obs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('this binding', () => {
     it('should bind this correctly in read/write callbacks', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ number: 33 });
 
@@ -175,14 +176,14 @@ describe('observable advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('model swapping', () => {
     it('should stop updating from old model after swap', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const values: string[] = [];
       const m1 = new Backbone.Model({ n: 'm1' });
@@ -209,14 +210,14 @@ describe('observable advanced', () => {
 
       kb.release(obs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('read args', () => {
     it('should pass args to read function', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const receivedArgs: unknown[] = [];
       const model = new Backbone.Model({ name: 'Ringo' });
@@ -238,7 +239,7 @@ describe('observable advanced', () => {
 
       kb.release(obs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 });

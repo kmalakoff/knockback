@@ -5,11 +5,16 @@ import { Factory } from './factory.ts';
 import kb from './kb.ts';
 import { observable as kbObservable } from './observable.ts';
 import { Store } from './store.ts';
-import type { CreateOptions, KBMetadata, ObservableOptions, ViewModelOptions } from './types.ts';
-import utils, { type KBObject } from './utils.ts';
+import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ObservableOptions, ViewModelOptions } from './types.ts';
+import utils from './utils.ts';
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'] as const;
 
+/**
+ * Extended metadata for ViewModels
+ * @hidden
+ * @internal
+ */
 interface ViewModelMetadata extends KBMetadata {
   view_model?: ViewModel;
   keys?: string[] | Record<string, ObservableOptions>;
@@ -18,7 +23,7 @@ interface ViewModelMetadata extends KBMetadata {
   statics?: string[];
   static_defaults?: Record<string, unknown>;
   path?: string;
-  create_options?: CreateOptions;
+  create_options?: InternalCreateOptions;
   vm_keys?: Record<string, boolean>;
 }
 
@@ -37,7 +42,7 @@ function assignViewModelKey(vm: ViewModel, key: string): string | undefined {
 }
 
 // Create an observable for a key
-function createObservable(vm: ViewModel, model: Backbone.Model | null, key: string, createOptions: CreateOptions): void {
+function createObservable(vm: ViewModel, model: Backbone.Model | null, key: string, createOptions: InternalCreateOptions): void {
   const __kb = vm.__kb as ViewModelMetadata;
 
   if (__kb.excludes && __kb.excludes.indexOf(key) >= 0) return;
@@ -79,12 +84,15 @@ function createStaticObservables(vm: ViewModel, model: Backbone.Model): void {
  * ViewModel class for Backbone models.
  * Creates Knockout observables for all model attributes automatically.
  */
-class ViewModel implements KBObject {
+class ViewModel {
   // Index signature for dynamic property access
   [key: string]: unknown;
 
+  /** @hidden */
   __kb: ViewModelMetadata;
+  /** @hidden */
   __kb_released?: boolean;
+  /** @hidden */
   __kb_is_vm = true;
   model!: ko.Computed<Backbone.Model | null>;
 
@@ -115,7 +123,7 @@ class ViewModel implements KBObject {
     __kb.view_model = viewModel || this;
 
     // Collapse options
-    const mergedOptions = utils.collapseOptions(opts) as ViewModelOptions;
+    const mergedOptions = utils.collapseOptions(opts) as InternalViewModelOptions;
 
     // Copy relevant options to __kb
     for (const key of KEYS_OPTIONS) {

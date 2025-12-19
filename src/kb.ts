@@ -1,8 +1,7 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
-import _ from 'underscore';
-import type { KBObservableBase, KBSettings, LocaleManager, ValueType } from './types.ts';
-import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
+import type { KBObservableBase, KBSettings, LocaleManager } from './types.ts';
+import { TYPE_COLLECTION } from './types.ts';
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'] as const;
 
@@ -17,31 +16,26 @@ interface KoExtended {
   storedBindingContextForNode?: (node: Node, context: unknown) => void;
 }
 
+// Statistics type (avoiding circular import)
+interface StatisticsLike {
+  register: (name: string, obj: unknown) => void;
+  unregister: (name: string, obj: unknown) => void;
+  addModelEvent: (event: unknown) => void;
+}
+
 // The 'kb' namespace for classes, factory functions, constants, etc.
 const kb = {
   // Knockback library semantic version
   VERSION: '2.0.0',
-
-  // Observable storage types
-  TYPE_UNKNOWN,
-  TYPE_SIMPLE,
-  TYPE_ARRAY,
-  TYPE_MODEL,
-  TYPE_COLLECTION,
-
-  // Re-exports
-  _: _,
-  ko: ko,
-  Backbone: Backbone,
-  Collection: Backbone.Collection,
-  Model: Backbone.Model,
-  Events: Backbone.Events,
 
   // Settings
   settings: {} as KBSettings,
 
   // Locale manager (for localized observables)
   locale_manager: null as LocaleManager | null,
+
+  // Statistics (for debugging/testing)
+  statistics: null as StatisticsLike | null,
 
   // Checks if an object has been released
   wasReleased(obj: unknown): boolean {
@@ -299,8 +293,7 @@ const kb = {
   },
 
   // Publish methods from instance to observable
-  // biome-ignore lint/suspicious/noExplicitAny: Dynamically setting methods on various object types
-  publishMethods(observable: any, instance: Record<string, unknown>, methods: string[]): void {
+  publishMethods(observable: Record<string, unknown>, instance: Record<string, unknown>, methods: string[]): void {
     for (const fn of methods) {
       observable[fn] = (instance[fn] as (...args: unknown[]) => unknown).bind(instance);
     }
@@ -308,6 +301,3 @@ const kb = {
 };
 
 export default kb;
-export { _, ko, Backbone };
-export { TYPE_UNKNOWN, TYPE_SIMPLE, TYPE_ARRAY, TYPE_MODEL, TYPE_COLLECTION };
-export type { ValueType };

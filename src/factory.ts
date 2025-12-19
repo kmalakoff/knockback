@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import type { Creator, FactoriesOption, ViewModelOptions } from './types.ts';
+import type { Creator, FactoriesOption, InternalViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
 interface PathMapping {
@@ -13,7 +13,7 @@ export class Factory {
   parent_factory?: Factory;
 
   // Use existing factory from options or create a new one
-  static useOptionsOrCreate(options: ViewModelOptions, obj: unknown, ownerPath?: string): Factory {
+  static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, ownerPath?: string): Factory {
     // Share existing factory if it has all required mappings
     if (options.factory) {
       const factory = options.factory as Factory;

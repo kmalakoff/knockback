@@ -15,19 +15,81 @@ export type { ViewModel } from './view-model.ts';
 export { viewModel } from './view-model.ts';
 
 // =============================================================================
-// Memory Management
+// Core Utilities
 // =============================================================================
 
 import kb from './kb.ts';
+import type { Statistics } from './statistics.ts';
+
+/** Knockback library version */
+export const VERSION = kb.VERSION;
+
+/** Global settings for Knockback */
+export const settings = kb.settings;
+
+/** Get the locale manager for localized observables */
+export const getLocaleManager = () => kb.locale_manager;
+
+/** Set the locale manager for localized observables */
+export const setLocaleManager = (manager: typeof kb.locale_manager) => {
+  kb.locale_manager = manager;
+};
+
+/** Get the statistics instance for debugging */
+export const getStatistics = (): Statistics | null => kb.statistics as Statistics | null;
+
+/** Set the statistics instance for debugging */
+export const setStatistics = (stats: Statistics | null): void => {
+  kb.statistics = stats;
+};
+
+// =============================================================================
+// Memory Management
+// =============================================================================
 
 /** Release a view model or observable and all its resources */
 export const release = kb.release.bind(kb);
+
+/** Release all observable keys on an object */
+export const releaseKeys = kb.releaseKeys.bind(kb);
 
 /** Bind automatic release to DOM node removal */
 export const releaseOnNodeRemove = kb.releaseOnNodeRemove.bind(kb);
 
 /** Apply Knockout bindings with automatic release on node removal */
 export const applyBindings = kb.applyBindings.bind(kb);
+
+/** Render a template with automatic release */
+export const renderTemplate = kb.renderTemplate.bind(kb);
+
+// =============================================================================
+// Type Guards
+// =============================================================================
+
+/** Check if an object has been released */
+export const wasReleased = kb.wasReleased.bind(kb);
+
+/** Check if an object can be released */
+export const isReleaseable = kb.isReleaseable.bind(kb);
+
+/** Check if an object is a Backbone.Model */
+export const isModel = kb.isModel.bind(kb);
+
+/** Check if an object is a Backbone.Collection */
+export const isCollection = kb.isCollection.bind(kb);
+
+/** Check if an object is a Knockback ViewModel */
+export const isViewModel = kb.isViewModel.bind(kb);
+
+// =============================================================================
+// Model Helpers
+// =============================================================================
+
+/** Get a value from a Backbone model */
+export const getValue = kb.getValue.bind(kb);
+
+/** Set a value on a Backbone model */
+export const setValue = kb.setValue.bind(kb);
 
 // =============================================================================
 // Plugins
@@ -61,68 +123,24 @@ export { Statistics } from './statistics.ts';
 // Types
 // =============================================================================
 
-export type { CollectionObservableOptions, CreateOptions, ObservableOptions, ViewModelOptions } from './types.ts';
+// Public types only - internal types (Store, Factory, EventWatcher, KBMetadata) are not exported
+export type {
+  // Options for factory functions
+  CollectionObservableOptions,
+  CreateOptions,
+  // Factory/creator types
+  Creator,
+  FactoriesOption,
+  FilterType,
+  // Return types
+  KBCollectionObservable,
+  KBObservable,
+  // Settings
+  KBSettings,
+  ObservableOptions,
+  // Value type
+  ValueType,
+  ViewModelBase,
+  ViewModelOptions,
+} from './types.ts';
 export { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
-
-// =============================================================================
-// kb namespace (for UMD/legacy support)
-// =============================================================================
-
-import { collectionObservable } from './collection-observable.ts';
-import { observable } from './observable.ts';
-import { defaultObservable, setToDefault } from './plugins/defaults/index.ts';
-import { formattedObservable, parseFormattedString, toFormattedString } from './plugins/formatting/index.ts';
-import { localizedObservable } from './plugins/localization/index.ts';
-import { triggeredObservable } from './plugins/triggering/index.ts';
-import { formValidator, hasChangedFn, inputValidator, minLengthFn, uniqueValueFn, untilFalseFn, untilTrueFn, valid, valueValidator } from './plugins/validation/index.ts';
-import { viewModel } from './view-model.ts';
-
-const kbNamespace = kb as typeof kb & {
-  // Core
-  observable: typeof observable;
-  viewModel: typeof viewModel;
-  collectionObservable: typeof collectionObservable;
-  // Plugins
-  defaultObservable: typeof defaultObservable;
-  setToDefault: typeof setToDefault;
-  formattedObservable: typeof formattedObservable;
-  toFormattedString: typeof toFormattedString;
-  parseFormattedString: typeof parseFormattedString;
-  localizedObservable: typeof localizedObservable;
-  triggeredObservable: typeof triggeredObservable;
-  valueValidator: typeof valueValidator;
-  inputValidator: typeof inputValidator;
-  formValidator: typeof formValidator;
-  valid: typeof valid;
-  hasChangedFn: typeof hasChangedFn;
-  minLengthFn: typeof minLengthFn;
-  uniqueValueFn: typeof uniqueValueFn;
-  untilTrueFn: typeof untilTrueFn;
-  untilFalseFn: typeof untilFalseFn;
-};
-
-// Core
-kbNamespace.observable = observable;
-kbNamespace.viewModel = viewModel;
-kbNamespace.collectionObservable = collectionObservable;
-
-// Plugins
-kbNamespace.defaultObservable = defaultObservable;
-kbNamespace.setToDefault = setToDefault;
-kbNamespace.formattedObservable = formattedObservable;
-kbNamespace.toFormattedString = toFormattedString;
-kbNamespace.parseFormattedString = parseFormattedString;
-kbNamespace.localizedObservable = localizedObservable;
-kbNamespace.triggeredObservable = triggeredObservable;
-kbNamespace.valueValidator = valueValidator;
-kbNamespace.inputValidator = inputValidator;
-kbNamespace.formValidator = formValidator;
-kbNamespace.valid = valid;
-kbNamespace.hasChangedFn = hasChangedFn;
-kbNamespace.minLengthFn = minLengthFn;
-kbNamespace.uniqueValueFn = uniqueValueFn;
-kbNamespace.untilTrueFn = untilTrueFn;
-kbNamespace.untilFalseFn = untilFalseFn;
-
-export { kbNamespace as kb };
-export default kbNamespace;

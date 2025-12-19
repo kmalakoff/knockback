@@ -1,7 +1,7 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import kb from './kb.ts';
-import type { EventCallbackInfo, KBMetadata } from './types.ts';
+import type { EventCallbackInfo, EventWatcher as EventWatcherInterface, KBMetadata } from './types.ts';
 import utils from './utils.ts';
 
 /** @internal */
@@ -25,7 +25,7 @@ export class EventWatcher {
   ee: Backbone.Model | null = null;
 
   // Use existing event watcher from options or create a new one
-  static useOptionsOrCreate(options: { event_watcher?: EventWatcher }, emitter: Backbone.Model | null, obj: unknown, callbackOptions: CallbackInfo): EventWatcher {
+  static useOptionsOrCreate(options: { event_watcher?: EventWatcherInterface }, emitter: Backbone.Model | null, obj: unknown, callbackOptions: CallbackInfo): EventWatcher {
     if (options.event_watcher) {
       const ew = options.event_watcher;
       if (ew.emitter() !== emitter) {

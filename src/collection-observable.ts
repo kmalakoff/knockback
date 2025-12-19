@@ -4,7 +4,7 @@ import _ from 'underscore';
 import { Factory } from './factory.ts';
 import kb from './kb.ts';
 import { Store } from './store.ts';
-import type { CollectionObservableOptions, CreateOptions, Creator, KBCollectionObservable, KBObservable, ViewModelOptions } from './types.ts';
+import type { CollectionObservableOptions, Creator, InternalCollectionObservableOptions, InternalCreateOptions, KBCollectionObservable, KBCollectionObservableInternal, KBObservable } from './types.ts';
 import utils from './utils.ts';
 import { viewModel as viewModelFactory } from './view-model.ts';
 
@@ -28,7 +28,7 @@ export interface CollectionObservableInstance {
   models_only?: boolean;
   auto_compact?: boolean;
   path?: string;
-  create_options: CreateOptions & { creator?: Creator };
+  create_options: InternalCreateOptions;
   collection: ko.Computed<Backbone.Collection | null>;
 
   // Methods
@@ -66,7 +66,7 @@ export function compare(valueA: unknown, valueB: unknown): number {
  * @returns A Knockout observable array with Knockback extensions
  */
 export function collectionObservable(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions): KBCollectionObservable {
-  return kb.ignore<KBCollectionObservable>(() => {
+  return kb.ignore(() => {
     // Normalize arguments
     let collection: Backbone.Collection;
     if (inputCollection instanceof Backbone.Collection) {
@@ -96,7 +96,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
       models_only: undefined,
       auto_compact: undefined,
       path: undefined,
-      create_options: {} as CreateOptions & { creator?: Creator },
+      create_options: {} as InternalCreateOptions,
       collection: undefined as unknown as ko.Computed<Backbone.Collection | null>,
 
       destroy,
@@ -141,8 +141,8 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
     }
 
     // Store
-    const createOptions: CreateOptions & { creator?: Creator } = {
-      store: Store.useOptionsOrCreate(mergedOptions as ViewModelOptions, collection, observable),
+    const createOptions: InternalCreateOptions = {
+      store: Store.useOptionsOrCreate(mergedOptions as InternalCollectionObservableOptions, collection, observable),
     };
     state.create_options = createOptions;
     utils.wrappedObject(observable, collection);
@@ -188,7 +188,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
       },
     });
 
-    observable.collection = state.collection = collectionComputed;
+    (observable as KBCollectionObservableInternal).collection = state.collection = collectionComputed;
 
     // Bind to initial collection
     if (collection) {
@@ -276,7 +276,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
 
       _comparator(null);
 
-      state.create_options = undefined as unknown as CreateOptions;
+      state.create_options = undefined as unknown as InternalCreateOptions;
       utils.wrappedDestroy(state);
 
       const stats = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
@@ -346,7 +346,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
     // Private Helpers (closures)
     // =============================================================================
 
-    function shareOrCreateFactory(opts: CollectionObservableOptions): Factory {
+    function shareOrCreateFactory(opts: InternalCollectionObservableOptions): Factory {
       const absoluteModelsPath = utils.pathJoin(opts.path, 'models');
       const factories = opts.factories;
 
@@ -555,7 +555,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
 
       return true;
     }
-  }) as ko.ObservableArray & { collection: ko.Computed<Backbone.Collection | null> };
+  }) as KBCollectionObservable;
 }
 
 export default collectionObservable;

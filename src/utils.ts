@@ -8,8 +8,14 @@ import kb from './kb.ts';
 import type { Creator, EventWatcher, Factory, KBMetadata, KBObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
-/** Any object that can have __kb metadata */
-// biome-ignore lint/suspicious/noExplicitAny: KBObject must be flexible to work with various types
+/**
+ * Any object that can have __kb metadata.
+ * Internal type - not exported from index.ts.
+ * Uses 'any' for flexibility since this is only used internally.
+ * @hidden
+ * @internal
+ */
+// biome-ignore lint/suspicious/noExplicitAny: Internal type for objects with __kb metadata
 export type KBObject = { __kb?: KBMetadata } & Record<string, any>;
 
 // =============================================================================

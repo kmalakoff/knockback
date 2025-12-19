@@ -4,7 +4,7 @@ import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
 import kb from './kb.ts';
 import { TypedValue } from './typed-value.ts';
-import type { KBObservable, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
+import type { InternalObservableOptions, KBObservable, KBObservableBase, KBObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'] as const;
@@ -77,7 +77,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       }
     }
 
-    const createOptions = utils.collapseOptions(options) as ViewModelOptions & { event_watcher?: EventWatcher };
+    const createOptions = utils.collapseOptions(options) as InternalObservableOptions;
     const eventWatcher = createOptions.event_watcher;
     delete createOptions.event_watcher;
 
@@ -129,7 +129,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       })
     ) as KBObservable;
 
-    koObservable.__kb_is_o = true;
+    (koObservable as KBObservableBase).__kb_is_o = true;
     createOptions.store = utils.wrappedStore(koObservable, createOptions.store);
     createOptions.path = utils.pathJoin(createOptions.path, state.key as string);
 
@@ -164,7 +164,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       },
     });
 
-    koObservable.model = state.model = modelComputed;
+    (koObservable as KBObservableInternal).model = state.model = modelComputed;
 
     // Set up event watcher
     EventWatcher.useOptionsOrCreate({ event_watcher: eventWatcher }, model || null, state, {
@@ -208,7 +208,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       state.model.dispose();
       state.model = undefined as unknown as ko.Computed<Backbone.Model | null>;
       if (obs) {
-        (obs as KBObservable).model = undefined;
+        (obs as unknown as KBObservableInternal).model = undefined as unknown as ko.Computed<Backbone.Model | null>;
       }
       utils.wrappedDestroy(state);
     }

@@ -1,6 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import kb, { collectionObservable, observable, viewModel } from 'knockback';
+import * as kb from 'knockback';
+import { collectionObservable, observable, viewModel } from 'knockback';
 import ko from 'knockout';
 
 describe('knockback', () => {

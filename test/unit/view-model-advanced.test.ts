@@ -1,13 +1,14 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import kb, { Statistics, type ViewModel, viewModel } from 'knockback';
+import * as kb from 'knockback';
+import { Statistics, setStatistics, type ViewModel, viewModel } from 'knockback';
 import ko from 'knockout';
 
 describe('ViewModel advanced', () => {
   describe('options', () => {
     it('should support keys option to limit observables', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob', age: 30, email: 'bob@test.com', phone: '555-1234' });
       const vm = viewModel(model, { keys: ['name', 'age'] }) as Record<string, unknown>;
@@ -19,12 +20,12 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should support excludes option', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob', password: 'secret', email: 'bob@test.com' });
       const vm = viewModel(model, { excludes: ['password'] }) as Record<string, unknown>;
@@ -35,12 +36,12 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should support internals option with underscore prefix', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob', id: 123 });
       const vm = viewModel(model, { internals: ['id'] }) as Record<string, unknown>;
@@ -51,12 +52,12 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should support requires option', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
       const vm = viewModel(model, { requires: ['name', 'age', 'email'] }) as Record<string, unknown>;
@@ -73,14 +74,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('statics and static_defaults', () => {
     it('should support statics option for non-observable values', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob', type: 'admin' });
       const vm = viewModel(model, { statics: ['type'] }) as Record<string, unknown>;
@@ -95,12 +96,12 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should support static_defaults option', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
       const vm = viewModel(model, {
@@ -113,14 +114,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('model observable', () => {
     it('should expose model as observable', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
       const vm = viewModel(model) as ViewModel;
@@ -130,12 +131,12 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should trigger updates when model changes', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model1 = new Backbone.Model({ name: 'Bob' });
       const model2 = new Backbone.Model({ name: 'Alice' });
@@ -157,14 +158,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('model replacement', () => {
     it('should update all observables when model is replaced', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model1 = new Backbone.Model({ name: 'Bob', age: 30 });
       const model2 = new Backbone.Model({ name: 'Alice', age: 25 });
@@ -188,14 +189,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('shareOptions', () => {
     it('should share store and factory between view models', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
       const vm = viewModel(model) as ViewModel;
@@ -206,14 +207,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('createObservables', () => {
     it('should dynamically create observables for new keys', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       // biome-ignore lint/suspicious/noExplicitAny: Creating untyped model for dynamic attributes
       const model: any = new Backbone.Model({ name: 'Bob' });
@@ -231,14 +232,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('dependency isolation', () => {
     it('should not cause dependencies when setting values inside ko.computed', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Initial' });
       const vm = viewModel(model) as ViewModel & { name: ko.Observable<string> };
@@ -264,14 +265,14 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('mappings', () => {
     it('should support mappings option for key configuration', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
       const vm = viewModel(model, {
@@ -293,7 +294,7 @@ describe('ViewModel advanced', () => {
 
       kb.release(vm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 });

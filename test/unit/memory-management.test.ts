@@ -1,6 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import kb, { collectionObservable, observable, Statistics, type ViewModel, viewModel } from 'knockback';
+import * as kb from 'knockback';
+import { collectionObservable, observable, Statistics, setStatistics, type ViewModel, viewModel } from 'knockback';
 import ko from 'knockout';
 
 describe('memory management', () => {
@@ -77,7 +78,7 @@ describe('memory management', () => {
   describe('basic view model properties', () => {
     it('should release all property types', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const nestedViewModel = viewModel(new Backbone.Model({ name: 'name1' }));
 
@@ -101,14 +102,14 @@ describe('memory management', () => {
       }
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('reference counting', () => {
     it('should respect refCount/retain/release lifecycle', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       class RefViewModel {
         ref_count = 1;
@@ -159,14 +160,14 @@ describe('memory management', () => {
       assert.ok(!refCounted.prop, 'Property released: refCounted.prop');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('CollectionObservable memory', () => {
     it('should destroy view models when collection observable is released', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       // Test with destroyable view model
       DestroyableViewModel.view_models = [];
@@ -177,12 +178,12 @@ describe('memory management', () => {
       assert.strictEqual(DestroyableViewModel.view_models.length, 0, 'All destroyed');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should handle simple view models without destroy method', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       SimpleViewModel.view_models = [];
       const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel as unknown as new () => ViewModel });
@@ -196,7 +197,7 @@ describe('memory management', () => {
       }
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
@@ -213,7 +214,7 @@ describe('memory management', () => {
 
     it('should release observables but preserve plain data in view models', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const vm: Record<string, unknown> = {
         array: ['Hello', 'Friend'],
@@ -236,14 +237,14 @@ describe('memory management', () => {
       assert.ok(!vm.collection_value, 'releases observables: collection_value');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 
   describe('event cleanup', () => {
     it('should clear all model events on release', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
       const vm = viewModel(model);
@@ -256,12 +257,12 @@ describe('memory management', () => {
       assert.strictEqual(eventStats.count, 0, 'All model events cleared');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
 
     it('should clear all events when observable is released', () => {
       const stats = new Statistics();
-      (kb as unknown as { statistics: Statistics }).statistics = stats;
+      setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
       const eventCountBefore = Statistics.eventsStats(model).count;
@@ -274,7 +275,7 @@ describe('memory management', () => {
       assert.ok(eventStats.count <= eventCountBefore + 1, 'Model events mostly cleared');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      (kb as unknown as { statistics: undefined }).statistics = undefined;
+      setStatistics(null);
     });
   });
 });

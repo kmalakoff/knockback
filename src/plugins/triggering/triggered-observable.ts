@@ -73,7 +73,7 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
   (state as unknown as Record<string, unknown>).destroy = () => utils.wrappedDestroy(state);
 
   // Publish public interface on the observable
-  kb.publishMethods(observable, state, KEYS_PUBLISH as unknown as string[]);
+  kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);
 
   // Create emitter observable via EventWatcher
   utils.setEventWatcher(

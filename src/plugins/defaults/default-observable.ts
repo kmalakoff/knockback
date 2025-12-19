@@ -59,7 +59,7 @@ export function defaultObservable(targetObservable: ko.Observable, defaultValue:
   ) as ko.Observable & { destroy: () => void; setToDefault: () => void };
 
   // Publish public interface on the observable
-  kb.publishMethods(observable, state, KEYS_PUBLISH as unknown as string[]);
+  kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);
 
   return observable;
 

@@ -1,7 +1,7 @@
 import ko from 'knockout';
 import _ from 'underscore';
 import kb from './kb.ts';
-import type { CreateOptions, Creator, KBObservable, StoreReference, ViewModelOptions } from './types.ts';
+import type { CreateOptions, Creator, InternalCreateOptions, InternalViewModelOptions, KBObservableBase, StoreReference, ViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
 interface ObservableRecord {
@@ -17,13 +17,12 @@ export class Store {
   replaced_observables: unknown[] = [];
 
   // Use existing store from options or create a new one
-  // biome-ignore lint/suspicious/noExplicitAny: Observable can be any object with __kb
-  static useOptionsOrCreate(options: ViewModelOptions, obj: unknown, observable: any): Store {
+  static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, observable: KBObservableBase): Store {
     if (!options.store) {
       utils.wrappedStoreIsOwned(observable, true);
     }
 
-    const store = utils.wrappedStore(observable, options.store || new Store()) as Store;
+    const store = utils.wrappedStore(observable, (options.store as Store) || new Store()) as Store;
     store.retain(observable, obj, options.creator);
     return store;
   }
@@ -99,7 +98,7 @@ export class Store {
   }
 
   // Find or create an observable
-  retainOrCreate(obj: unknown, options: CreateOptions, deepRetain?: boolean): unknown {
+  retainOrCreate(obj: unknown, options: InternalCreateOptions, deepRetain?: boolean): unknown {
     const creator = this._creator(obj, options);
     if (!creator) {
       return utils.createFromDefaultCreator(obj, options as ViewModelOptions);
@@ -212,7 +211,7 @@ export class Store {
   private _canRegister(observable: unknown): boolean {
     if (!observable) return false;
     if (ko.isObservable(observable)) return false;
-    if ((observable as KBObservable).__kb_is_co) return false;
+    if ((observable as KBObservableBase).__kb_is_co) return false;
     return true;
   }
 
@@ -313,7 +312,7 @@ export class Store {
   }
 
   // Get creator for object
-  private _creator(obj: unknown, options: CreateOptions): Creator | undefined {
+  private _creator(obj: unknown, options: InternalCreateOptions): Creator | undefined {
     if (options.creator) return options.creator;
 
     const creator = utils.inferCreator(obj, options.factory, options.path || '');
