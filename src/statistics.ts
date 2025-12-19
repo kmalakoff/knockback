@@ -129,7 +129,7 @@ export class Statistics {
    * @private
    */
   private getRegisteredTracker(key: string): unknown[] {
-    if (Object.prototype.hasOwnProperty.call(this.registeredTracker, key)) {
+    if (Object.hasOwn(this.registeredTracker, key)) {
       return this.registeredTracker[key];
     }
     const typeTracker: unknown[] = [];
@@ -139,14 +139,15 @@ export class Statistics {
 
   /**
    * Get event statistics for an object
-   * @param obj - The object with events (_events or _callbacks)
+   * @param obj - The object with events (_events or _callbacks), typically a Backbone.Model or Collection
    * @param key - Optional specific event key to check
    * @returns Statistics about the events
    */
-  static eventsStats(obj: { _events?: Record<string, unknown[]>; _callbacks?: Record<string, unknown> }, key?: string): EventStats {
+  static eventsStats(obj: unknown, key?: string): EventStats {
     const stats: EventStats = { count: 0 };
-
-    const events = obj._events || obj._callbacks || {};
+    // biome-ignore lint/suspicious/noExplicitAny: Backbone internals
+    const objAny = obj as any;
+    const events = objAny._events || objAny._callbacks || {};
     const keys = key ? [key] : Object.keys(events);
 
     for (const eventKey of keys) {

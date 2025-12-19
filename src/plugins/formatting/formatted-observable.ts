@@ -2,6 +2,10 @@ import ko from 'knockout';
 import _ from 'underscore';
 import utils from '../../utils.ts';
 
+// =============================================================================
+// Utility Functions
+// =============================================================================
+
 /**
  * Converts arguments to a formatted string using {0}, {1}, etc. placeholders
  * @param format - The format string with placeholders
@@ -80,7 +84,7 @@ export function parseFormattedString(string: string, format: string): string[] {
   for (let matchIndex = 0; matchIndex < sortedPositions.length; matchIndex++) {
     const parameterIndex = sortedPositions[matchIndex];
     const formatIndex = positions[parameterIndex];
-    if (!Object.prototype.hasOwnProperty.call(formatIndicesToMatchedIndices, formatIndex)) {
+    if (!Object.hasOwn(formatIndicesToMatchedIndices, formatIndex)) {
       formatIndicesToMatchedIndices[formatIndex] = matchIndex;
     }
   }
@@ -93,68 +97,72 @@ export function parseFormattedString(string: string, format: string): string[] {
   return results;
 }
 
+// =============================================================================
+// Interface
+// =============================================================================
+
+export interface FormattedObservableInstance {
+  __kb: { observable?: ko.Observable };
+  __kb_released?: boolean;
+  destroy(): void;
+}
+
+// =============================================================================
+// Factory Function (Primary API)
+// =============================================================================
+
 /**
- * Handles two-way formatted string conversions and will reformat a string
- * when any argument changes. The format string can also be an observable.
+ * Creates an observable that handles two-way formatted string conversions.
+ * Will reformat a string when any argument changes. The format string can also be an observable.
+ *
+ * @param format - The format string or observable. Format: "{0} and {1}"
+ * @param args - Arguments to be formatted
+ * @returns A ko.observable with formatting support
  *
  * @example
  *   const observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
  */
-export class FormattedObservable {
-  __kb: { observable?: ko.Observable };
-  __kb_released?: boolean;
+export function formattedObservable(format: string | ko.Observable<string>, ...args: ko.Observable[]): ko.Observable<string> & { destroy: () => void } {
+  // Instance state (closure-based)
+  const state: FormattedObservableInstance = {
+    __kb: {},
+    __kb_released: false,
+    destroy,
+  };
 
-  /**
-   * Create a new FormattedObservable
-   *
-   * @param format - The format string or observable. Format: "{0} and {1}"
-   * @param args - Arguments to be formatted
-   * @returns A ko.observable (not 'this')
-   */
-  constructor(format: string | ko.Observable<string>, args: ko.Observable[]) {
-    this.__kb = {};
+  const observableArgs = args;
 
-    const observableArgs = args;
+  const observable = utils.setObservable(
+    state,
+    ko.computed({
+      read: () => {
+        const formatStr = ko.utils.unwrapObservable(format) as string;
+        const values = observableArgs.map((arg) => ko.utils.unwrapObservable(arg));
+        return toFormattedString(formatStr, ...values);
+      },
+      write: (value: string) => {
+        const formatStr = ko.utils.unwrapObservable(format) as string;
+        const matches = parseFormattedString(value, formatStr);
+        const maxCount = Math.min(observableArgs.length, matches.length);
 
-    const observable = utils.wrappedObservable(
-      this,
-      ko.computed({
-        read: () => {
-          const formatStr = ko.utils.unwrapObservable(format) as string;
-          const values = observableArgs.map((arg) => ko.utils.unwrapObservable(arg));
-          return toFormattedString(formatStr, ...values);
-        },
-        write: (value: string) => {
-          const formatStr = ko.utils.unwrapObservable(format) as string;
-          const matches = parseFormattedString(value, formatStr);
-          const maxCount = Math.min(observableArgs.length, matches.length);
+        for (let i = 0; i < maxCount; i++) {
+          observableArgs[i](matches[i]);
+        }
+      },
+    })
+  ) as ko.Observable<string> & { destroy: () => void };
 
-          for (let i = 0; i < maxCount; i++) {
-            observableArgs[i](matches[i]);
-          }
-        },
-      })
-    );
+  observable.destroy = destroy;
 
-    return observable as unknown as FormattedObservable;
-  }
+  return observable;
 
-  /**
-   * Required clean up function to break cycles, release view models, etc.
-   */
-  destroy(): void {
-    utils.wrappedDestroy(this);
+  // =============================================================================
+  // Instance Methods (closures)
+  // =============================================================================
+
+  function destroy(): void {
+    utils.wrappedDestroy(state);
   }
 }
 
-/**
- * Factory function for creating a FormattedObservable
- */
-export function formattedObservable(format: string | ko.Observable<string>, ...args: ko.Observable[]): ko.Observable<string> {
-  return new FormattedObservable(format, args) as unknown as ko.Observable<string>;
-}
-
-// Alias
-export const observableFormatted = formattedObservable;
-
-export default FormattedObservable;
+export default formattedObservable;

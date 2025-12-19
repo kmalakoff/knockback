@@ -3,11 +3,11 @@ import ko from 'knockout';
 import _ from 'underscore';
 
 // Regular expressions from Angular.js: https://github.com/angular/angular.js
-const URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+const URL_REGEXP = /^(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?$/;
 const EMAIL_REGEXP = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$/;
-const NUMBER_REGEXP = /^\s*(\-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
+const NUMBER_REGEXP = /^\s*(-|\+)?(\d+|(\d*(\.\d*)))\s*$/;
 
-export type ValidatorFn = (value: unknown) => boolean;
+export type ValidatorFn = (value: unknown) => boolean | unknown;
 
 /**
  * A validator should return true if there are errors
@@ -68,11 +68,7 @@ export function minLengthFn(length: number): ValidatorFn {
  * @param collection - The collection to check against
  * @returns A validator function that returns true if value is not unique
  */
-export function uniqueValueFn(
-  model: Backbone.Model | ko.Observable<Backbone.Model | null>,
-  key: string | ko.Observable<string>,
-  collection: Backbone.Collection | ko.Observable<Backbone.Collection | null>
-): ValidatorFn {
+export function uniqueValueFn(model: Backbone.Model | ko.Observable<Backbone.Model | null>, key: string | ko.Observable<string>, collection: Backbone.Collection | ko.Observable<Backbone.Collection | null>): ValidatorFn {
   return (value: unknown): boolean => {
     const m = ko.utils.unwrapObservable(model) as Backbone.Model | null;
     const k = ko.utils.unwrapObservable(key);
@@ -93,11 +89,7 @@ export function uniqueValueFn(
  * @param model - Optional model observable (will reset when model changes)
  * @returns A validator function
  */
-export function untilTrueFn(
-  standIn: unknown,
-  fn: ValidatorFn | ko.Observable<ValidatorFn | null>,
-  model?: ko.Observable<unknown>
-): ValidatorFn {
+export function untilTrueFn(standIn: unknown, fn: ValidatorFn | ko.Observable<ValidatorFn | null>, model?: ko.Observable<unknown>): ValidatorFn {
   let wasTrue = false;
 
   // Reset if the model changes
@@ -127,11 +119,7 @@ export function untilTrueFn(
  * @param model - Optional model observable (will reset when model changes)
  * @returns A validator function
  */
-export function untilFalseFn(
-  standIn: unknown,
-  fn: ValidatorFn | ko.Observable<ValidatorFn | null>,
-  model?: ko.Observable<unknown>
-): ValidatorFn {
+export function untilFalseFn(standIn: unknown, fn: ValidatorFn | ko.Observable<ValidatorFn | null>, model?: ko.Observable<unknown>): ValidatorFn {
   let wasFalse = false;
 
   // Reset if the model changes

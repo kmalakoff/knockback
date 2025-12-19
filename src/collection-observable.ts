@@ -1,12 +1,12 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
-import kb from './kb.ts';
-import utils from './utils.ts';
-import extend from './functions/extend.ts';
 import { Factory } from './factory.ts';
+import kb from './kb.ts';
 import { Store } from './store.ts';
-import type { CollectionObservableOptions, CreateOptions, Creator, KBObservable, ViewModelOptions } from './types.ts';
+import type { CollectionObservableOptions, CreateOptions, Creator, KBCollectionObservable, KBObservable, ViewModelOptions } from './types.ts';
+import utils from './utils.ts';
+import { viewModel as viewModelFactory } from './view-model.ts';
 
 const COMPARE_EQUAL = 0;
 const COMPARE_ASCENDING = -1;
@@ -16,6 +16,31 @@ const KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortA
 
 type ComparatorFn = (a: unknown, b: unknown) => number;
 type FilterFn = (model: Backbone.Model) => boolean;
+
+// =============================================================================
+// CollectionObservable Interface
+// =============================================================================
+
+export interface CollectionObservableInstance {
+  __kb: Record<string, unknown>;
+  __kb_released?: boolean;
+  in_edit: number;
+  models_only?: boolean;
+  auto_compact?: boolean;
+  path?: string;
+  create_options: CreateOptions & { creator?: Creator };
+  collection: ko.Computed<Backbone.Collection | null>;
+
+  // Methods
+  destroy(): void;
+  shareOptions(): { store: unknown; factory: unknown };
+  filters(filters?: unknown | unknown[]): void;
+  comparator(comparator: ComparatorFn | null): void;
+  sortAttribute(sortAttribute: string | null): void;
+  viewModelByModel(model: Backbone.Model): unknown | null;
+  hasViewModels(): boolean;
+  compact(): void;
+}
 
 // Compare two values
 export function compare(valueA: unknown, valueB: unknown): number {
@@ -28,513 +53,509 @@ export function compare(valueA: unknown, valueB: unknown): number {
   return valueA === valueB ? COMPARE_EQUAL : valueA < valueB ? COMPARE_ASCENDING : COMPARE_DESCENDING;
 }
 
-// CollectionObservable for Backbone collections
-export class CollectionObservable {
-  static extend = extend;
+// =============================================================================
+// Factory Function (Primary API)
+// =============================================================================
 
-  __kb: Record<string, unknown> = {};
-  __kb_released?: boolean;
-  in_edit = 0;
-  models_only?: boolean;
-  auto_compact?: boolean;
-  path?: string;
-  create_options!: CreateOptions & { creator?: Creator };
-
-  private _collection!: ko.Observable<Backbone.Collection | null>;
-  private _comparator!: ko.Observable<ComparatorFn | null>;
-  private _filters!: ko.ObservableArray<unknown>;
-  private _mapper!: ko.Computed<void>;
-
-  collection!: ko.Computed<Backbone.Collection | null>;
-
-  constructor(collection?: Backbone.Collection | unknown[], viewModel?: unknown, options?: CollectionObservableOptions) {
-    return kb.ignore(() => {
-      // Handle arguments
-      let args = Array.from(arguments);
-
-      // First argument is collection
-      let inputCollection: Backbone.Collection;
-      if (args[0] instanceof Backbone.Collection) {
-        inputCollection = args.shift() as Backbone.Collection;
-      } else if (Array.isArray(args[0])) {
-        inputCollection = new Backbone.Collection(args.shift() as Backbone.Model[]);
-      } else {
-        inputCollection = new Backbone.Collection();
-      }
-
-      // Second argument can be view_model constructor
-      if (typeof args[0] === 'function') {
-        args[0] = { view_model: args[0] };
-      }
-
-      // Merge remaining options
-      let mergedOptions: CollectionObservableOptions = {};
-      for (const arg of args) {
-        if (arg && typeof arg === 'object') {
-          Object.assign(mergedOptions, arg);
-        }
-      }
-
-      // Create the observable array
-      const observable = utils.wrappedObservable(this, ko.observableArray([])) as KBObservable & ko.ObservableArray;
-      observable.__kb_is_co = true;
-
-      // Options
-      mergedOptions = utils.collapseOptions(mergedOptions) as CollectionObservableOptions;
-      if (mergedOptions.auto_compact) {
-        this.auto_compact = true;
-      }
-
-      // Comparator
-      if (mergedOptions.sort_attribute) {
-        this._comparator = ko.observable(this._attributeComparator(mergedOptions.sort_attribute));
-      } else {
-        this._comparator = ko.observable(mergedOptions.comparator || null);
-      }
-
-      // Filters
-      if (mergedOptions.filters) {
-        this._filters = ko.observableArray(Array.isArray(mergedOptions.filters) ? mergedOptions.filters : [mergedOptions.filters]);
-      } else {
-        this._filters = ko.observableArray([]);
-      }
-
-      // Store
-      const createOptions: CreateOptions & { creator?: Creator } = {
-        store: Store.useOptionsOrCreate(mergedOptions as ViewModelOptions, inputCollection, observable),
-      };
-      this.create_options = createOptions;
-      utils.wrappedObject(observable, inputCollection);
-
-      // Factory
-      this.path = mergedOptions.path;
-      createOptions.factory = utils.wrappedFactory(observable, this._shareOrCreateFactory(mergedOptions));
-      createOptions.path = utils.pathJoin(mergedOptions.path, 'models');
-
-      // Check for models_only
-      createOptions.creator = (createOptions.factory as Factory).creatorForPath(null, createOptions.path);
-      if (createOptions.creator) {
-        this.models_only = (createOptions.creator as { models_only?: boolean }).models_only;
-      }
-
-      // Publish methods
-      kb.publishMethods(observable as unknown as Record<string, unknown>, this as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
-
-      // Collection observable
-      this._collection = ko.observable(inputCollection);
-
-      const collectionComputed = ko.computed({
-        read: () => this._collection(),
-        write: (newCollection: Backbone.Collection | null) => {
-          kb.ignore(() => {
-            const previousCollection = this._collection();
-            if (previousCollection === newCollection) return;
-
-            utils.wrappedObject(observable, newCollection);
-
-            // Unbind from previous
-            if (previousCollection) {
-              previousCollection.off('all', this._onCollectionChange);
-            }
-
-            // Bind to new
-            if (newCollection) {
-              newCollection.on('all', this._onCollectionChange);
-            }
-
-            this._collection(newCollection);
-          });
-        },
-      });
-
-      observable.collection = this.collection = collectionComputed;
-
-      // Bind to initial collection
-      if (inputCollection) {
-        inputCollection.on('all', this._onCollectionChange);
-      }
-
-      // Mapper computed
-      this._mapper = ko.computed(() => {
-        const comparator = this._comparator();
-        const filters = this._filters();
-
-        // Create dependencies on filters
-        if (filters) {
-          for (const filter of filters) {
-            ko.utils.unwrapObservable(filter);
-          }
-        }
-
-        const currentCollection = this._collection();
-        if (this.in_edit) return;
-
-        const obs = utils.wrappedObservable(this) as ko.ObservableArray;
-        const previousViewModels = kb.peek(obs);
-        const models = currentCollection?.models;
-
-        let viewModels: unknown[];
-
-        if (!models || models.length === 0) {
-          viewModels = [];
-        } else {
-          // Apply filters
-          let filteredModels = filters.length ? models.filter((model: Backbone.Model) => this._selectModel(model)) : models;
-
-          // Apply sorting
-          if (comparator) {
-            viewModels = filteredModels.map((model: Backbone.Model) => this._createViewModel(model)).sort(comparator);
-          } else {
-            if (this.models_only) {
-              viewModels = filters.length ? filteredModels : filteredModels.slice();
-            } else {
-              viewModels = filteredModels.map((model: Backbone.Model) => this._createViewModel(model));
-            }
-          }
-        }
-
-        // Update observable array
-        this.in_edit++;
-        obs(viewModels);
-        this.in_edit--;
-      });
-
-      // Subscribe to changes
-      observable.subscribe(this._onObservableArrayChange.bind(this));
-
-      // Statistics
-      const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
-      if (statistics) {
-        statistics.register('CollectionObservable', this);
-      }
-
-      return observable as unknown as CollectionObservable;
-    }) as unknown as CollectionObservable;
-  }
-
-  // Clean up
-  destroy(): void {
-    this.__kb_released = true;
-    const observable = utils.wrappedObservable(this) as KBObservable & ko.ObservableArray;
-    const collection = kb.peek(this._collection);
-
-    utils.wrappedObject(observable, null);
-
-    if (collection) {
-      collection.off('all', this._onCollectionChange);
-      const array = kb.peek(observable);
-      array.splice(0, array.length);
-    }
-
-    this.collection.dispose();
-    this._collection = undefined as unknown as ko.Observable<Backbone.Collection | null>;
-    (observable as unknown as Record<string, unknown>).collection = this.collection = undefined as unknown as ko.Computed<Backbone.Collection | null>;
-
-    this._mapper.dispose();
-    this._mapper = undefined as unknown as ko.Computed<void>;
-
-    kb.release(this._filters);
-    this._filters = undefined as unknown as ko.ObservableArray<unknown>;
-
-    this._comparator(null);
-    this._comparator = undefined as unknown as ko.Observable<ComparatorFn | null>;
-
-    this.create_options = undefined as unknown as CreateOptions;
-    utils.wrappedDestroy(this);
-
-    const statistics = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
-    if (statistics) {
-      statistics.unregister('CollectionObservable', this);
-    }
-  }
-
-  // Get share options
-  shareOptions(): { store: unknown; factory: unknown } {
-    const observable = utils.wrappedObservable(this);
-    return {
-      store: utils.wrappedStore(observable),
-      factory: utils.wrappedFactory(observable),
-    };
-  }
-
-  // Set filters
-  filters(filters?: unknown | unknown[]): void {
-    if (filters) {
-      this._filters(Array.isArray(filters) ? filters : [filters]);
+/**
+ * Creates an observable array bound to a Backbone collection.
+ *
+ * @param inputCollection - Backbone collection or array of models
+ * @param viewModelOrOptions - ViewModel constructor or options
+ * @param options - Additional options
+ * @returns A Knockout observable array with Knockback extensions
+ */
+export function collectionObservable(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions): KBCollectionObservable {
+  return kb.ignore<KBCollectionObservable>(() => {
+    // Normalize arguments
+    let collection: Backbone.Collection;
+    if (inputCollection instanceof Backbone.Collection) {
+      collection = inputCollection;
+    } else if (Array.isArray(inputCollection)) {
+      collection = new Backbone.Collection(inputCollection as Backbone.Model[]);
     } else {
-      this._filters([]);
+      collection = new Backbone.Collection();
     }
-  }
 
-  // Set comparator
-  comparator(comparator: ComparatorFn | null): void {
-    this._comparator(comparator);
-  }
+    // Handle viewModel as function
+    let mergedOptions: CollectionObservableOptions = {};
+    if (typeof viewModelOrOptions === 'function') {
+      mergedOptions = { view_model: viewModelOrOptions as Creator };
+    } else if (viewModelOrOptions && typeof viewModelOrOptions === 'object') {
+      Object.assign(mergedOptions, viewModelOrOptions);
+    }
+    if (options && typeof options === 'object') {
+      Object.assign(mergedOptions, options);
+    }
 
-  // Set sort attribute
-  sortAttribute(sortAttribute: string | null): void {
-    this._comparator(sortAttribute ? this._attributeComparator(sortAttribute) : null);
-  }
+    // Instance state (closure-based)
+    const state: CollectionObservableInstance = {
+      __kb: {},
+      __kb_released: false,
+      in_edit: 0,
+      models_only: undefined,
+      auto_compact: undefined,
+      path: undefined,
+      create_options: {} as CreateOptions & { creator?: Creator },
+      collection: undefined as unknown as ko.Computed<Backbone.Collection | null>,
 
-  // Find view model by model
-  viewModelByModel(model: Backbone.Model): unknown | null {
-    if (this.models_only) return null;
+      destroy,
+      shareOptions,
+      filters,
+      comparator: setComparator,
+      sortAttribute,
+      viewModelByModel,
+      hasViewModels,
+      compact,
+    };
 
-    const idAttribute = Object.prototype.hasOwnProperty.call(model, model.idAttribute) ? model.idAttribute : 'cid';
-    const observable = utils.wrappedObservable(this) as ko.ObservableArray;
+    // Private state
+    let _collection: ko.Observable<Backbone.Collection | null>;
+    let _comparator: ko.Observable<ComparatorFn | null>;
+    let _filters: ko.ObservableArray<unknown>;
+    let _mapper: ko.Computed<void>;
 
-    return kb.peek(observable).find((test: unknown) => {
-      const testObj = test as { __kb?: { object?: Backbone.Model } };
-      if (testObj?.__kb?.object) {
-        return (testObj.__kb.object as Record<string, unknown>)[idAttribute] === (model as Record<string, unknown>)[idAttribute];
-      }
-      return false;
-    }) || null;
-  }
+    // Create the observable array
+    // biome-ignore lint/suspicious/noExplicitAny: Observable needs dynamic collection property
+    const observable = utils.setObservable(state, ko.observableArray([])) as any;
+    observable.__kb_is_co = true;
 
-  // Check if has view models
-  hasViewModels(): boolean {
-    return !this.models_only;
-  }
+    // Options
+    mergedOptions = utils.collapseOptions(mergedOptions) as CollectionObservableOptions;
+    if (mergedOptions.auto_compact) {
+      state.auto_compact = true;
+    }
 
-  // Compact the store
-  compact(): void {
-    kb.ignore(() => {
-      const observable = utils.wrappedObservable(this);
-      if (!utils.wrappedStoreIsOwned(observable)) return;
+    // Comparator
+    if (mergedOptions.sort_attribute) {
+      _comparator = ko.observable(attributeComparator(mergedOptions.sort_attribute));
+    } else {
+      _comparator = ko.observable(mergedOptions.comparator || null);
+    }
 
-      const store = utils.wrappedStore(observable) as Store;
-      store.clear();
-      this._collection.notifySubscribers(this._collection());
+    // Filters
+    if (mergedOptions.filters) {
+      _filters = ko.observableArray(Array.isArray(mergedOptions.filters) ? mergedOptions.filters : [mergedOptions.filters]);
+    } else {
+      _filters = ko.observableArray([]);
+    }
+
+    // Store
+    const createOptions: CreateOptions & { creator?: Creator } = {
+      store: Store.useOptionsOrCreate(mergedOptions as ViewModelOptions, collection, observable),
+    };
+    state.create_options = createOptions;
+    utils.wrappedObject(observable, collection);
+
+    // Factory
+    state.path = mergedOptions.path;
+    createOptions.factory = utils.wrappedFactory(observable, shareOrCreateFactory(mergedOptions));
+    createOptions.path = utils.pathJoin(mergedOptions.path, 'models');
+
+    // Check for models_only
+    createOptions.creator = (createOptions.factory as Factory).creatorForPath(null, createOptions.path);
+    if (createOptions.creator) {
+      state.models_only = (createOptions.creator as { models_only?: boolean }).models_only;
+    }
+
+    // Publish methods
+    kb.publishMethods(observable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
+
+    // Collection observable
+    _collection = ko.observable(collection);
+
+    const collectionComputed = ko.computed({
+      read: () => _collection(),
+      write: (newCollection: Backbone.Collection | null) => {
+        kb.ignore(() => {
+          const previousCollection = _collection();
+          if (previousCollection === newCollection) return;
+
+          utils.wrappedObject(observable, newCollection);
+
+          // Unbind from previous
+          if (previousCollection) {
+            previousCollection.off('all', onCollectionChange);
+          }
+
+          // Bind to new
+          if (newCollection) {
+            newCollection.on('all', onCollectionChange);
+          }
+
+          _collection(newCollection);
+        });
+      },
     });
-  }
 
-  // Create or share factory
-  private _shareOrCreateFactory(options: CollectionObservableOptions): Factory {
-    const absoluteModelsPath = utils.pathJoin(options.path, 'models');
-    const factories = options.factories;
+    observable.collection = state.collection = collectionComputed;
 
-    // Check existing factory
-    const existingFactory = options.factory as Factory | undefined;
-    if (existingFactory) {
-      const existingCreator = existingFactory.creatorForPath(null, absoluteModelsPath);
-      if (existingCreator && (!factories || (factories as Record<string, Creator>)['models'] === existingCreator)) {
-        if (!factories) return existingFactory;
-        if (existingFactory.hasPathMappings(factories, options.path)) {
-          return existingFactory;
+    // Bind to initial collection
+    if (collection) {
+      collection.on('all', onCollectionChange);
+    }
+
+    // Mapper computed
+    _mapper = ko.computed(() => {
+      const comparatorFn = _comparator();
+      const filterList = _filters();
+
+      // Create dependencies on filters
+      if (filterList) {
+        for (const filter of filterList) {
+          ko.utils.unwrapObservable(filter);
         }
       }
-    }
 
-    // Create new factory
-    const factory = new Factory(existingFactory);
-    if (factories) {
-      factory.addPathMappings(factories, options.path);
-    }
+      const currentCollection = _collection();
+      if (state.in_edit) return;
 
-    // Set up default creator
-    if (!factory.creatorForPath(null, absoluteModelsPath)) {
-      if (Object.prototype.hasOwnProperty.call(options, 'models_only')) {
-        if (options.models_only) {
-          factory.addPathMapping(absoluteModelsPath, { models_only: true });
+      const obs = utils.getObservable(state) as ko.ObservableArray;
+      const models = currentCollection?.models;
+
+      let viewModels: unknown[];
+
+      if (!models || models.length === 0) {
+        viewModels = [];
+      } else {
+        // Apply filters
+        const filteredModels = filterList.length ? models.filter((model: Backbone.Model) => selectModel(model)) : models;
+
+        // Apply sorting
+        if (comparatorFn) {
+          viewModels = filteredModels.map((model: Backbone.Model) => createViewModel(model)).sort(comparatorFn);
         } else {
-          factory.addPathMapping(absoluteModelsPath, (kb as { ViewModel?: Creator }).ViewModel!);
-        }
-      } else if (options.view_model) {
-        factory.addPathMapping(absoluteModelsPath, options.view_model);
-      } else if (options.create) {
-        factory.addPathMapping(absoluteModelsPath, { create: options.create });
-      } else {
-        factory.addPathMapping(absoluteModelsPath, (kb as { ViewModel?: Creator }).ViewModel!);
-      }
-    }
-
-    return factory;
-  }
-
-  // Collection change handler
-  private _onCollectionChange = (event: string, arg: Backbone.Model): void => {
-    kb.ignore(() => {
-      if (this.in_edit || kb.wasReleased(this)) return;
-
-      switch (event) {
-        case 'reset':
-          if (this.auto_compact) {
-            this.compact();
+          if (state.models_only) {
+            viewModels = filterList.length ? filteredModels : filteredModels.slice();
           } else {
-            this._collection.notifySubscribers(this._collection());
+            viewModels = filteredModels.map((model: Backbone.Model) => createViewModel(model));
           }
-          break;
-
-        case 'sort':
-        case 'resort':
-          this._collection.notifySubscribers(this._collection());
-          break;
-
-        case 'new':
-        case 'add':
-          if (!this._selectModel(arg)) return;
-
-          const observable = utils.wrappedObservable(this) as ko.ObservableArray;
-          const collection = this._collection();
-          if (!collection || collection.indexOf(arg) === -1) return;
-          if (this.viewModelByModel(arg)) return;
-
-          this.in_edit++;
-          const comparator = this._comparator();
-          if (comparator) {
-            (observable as ko.ObservableArray)().push(this._createViewModel(arg));
-            observable.sort(comparator);
-          } else {
-            observable.splice(collection.indexOf(arg), 0, this._createViewModel(arg));
-          }
-          this.in_edit--;
-          break;
-
-        case 'remove':
-        case 'destroy':
-          this._onModelRemove(arg);
-          break;
-
-        case 'change':
-          if (!this._selectModel(arg)) {
-            this._onModelRemove(arg);
-            return;
-          }
-
-          const viewModel = this.models_only ? arg : this.viewModelByModel(arg);
-          if (!viewModel) {
-            this._onCollectionChange('add', arg);
-            return;
-          }
-
-          const comp = this._comparator();
-          if (!comp) return;
-
-          this.in_edit++;
-          (utils.wrappedObservable(this) as ko.ObservableArray).sort(comp);
-          this.in_edit--;
-          break;
-      }
-    });
-  };
-
-  // Model remove handler
-  private _onModelRemove(model: Backbone.Model): void {
-    const viewModel = this.models_only ? model : this.viewModelByModel(model);
-    if (!viewModel) return;
-
-    const observable = utils.wrappedObservable(this) as ko.ObservableArray;
-    this.in_edit++;
-    observable.remove(viewModel);
-    this.in_edit--;
-  }
-
-  // Observable array change handler
-  private _onObservableArrayChange(modelsOrViewModels: unknown[]): void {
-    kb.ignore(() => {
-      if (this.in_edit) return;
-
-      const observable = utils.wrappedObservable(this) as ko.ObservableArray;
-      const collection = kb.peek(this._collection);
-      const hasFilters = kb.peek(this._filters).length > 0;
-
-      if (!collection) return;
-
-      let viewModels = modelsOrViewModels;
-      let models: Backbone.Model[];
-
-      if (this.models_only) {
-        models = hasFilters
-          ? modelsOrViewModels.filter((model) => this._selectModel(model as Backbone.Model)) as Backbone.Model[]
-          : modelsOrViewModels as Backbone.Model[];
-      } else {
-        if (hasFilters) viewModels = [];
-        models = [];
-
-        for (const viewModel of modelsOrViewModels) {
-          const model = utils.wrappedObject(viewModel) as Backbone.Model;
-
-          if (hasFilters) {
-            if (!this._selectModel(model)) continue;
-            (viewModels as unknown[]).push(viewModel);
-          }
-
-          // Retain in store
-          const store = this.create_options.store as Store;
-          const currentViewModel = store.find(model, this.create_options.creator!);
-          if (currentViewModel) {
-            if (currentViewModel.constructor !== (viewModel as object).constructor) {
-              kb._throwUnexpected(this, 'replacing different type of view model');
-            }
-          }
-          store.retain(viewModel, model, this.create_options.creator);
-          models.push(model);
         }
       }
 
-      this.in_edit++;
-      if (modelsOrViewModels.length !== viewModels.length) {
-        observable(viewModels);
-      }
-      if (!_.isEqual(collection.models, models)) {
-        collection.reset(models);
-      }
-      this.in_edit--;
+      // Update observable array
+      state.in_edit++;
+      obs(viewModels);
+      state.in_edit--;
     });
-  }
 
-  // Create attribute comparator
-  private _attributeComparator(sortAttribute: string): ComparatorFn {
-    const modelAttributeCompare = (modelA: Backbone.Model, modelB: Backbone.Model): number => {
-      const attributeName = ko.utils.unwrapObservable(sortAttribute);
-      return compare(modelA.get(attributeName), modelB.get(attributeName));
-    };
+    // Subscribe to changes
+    observable.subscribe(onObservableArrayChange);
 
-    if (this.models_only) {
-      return modelAttributeCompare;
+    // Statistics
+    const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
+    if (statistics) {
+      statistics.register('CollectionObservable', state);
     }
 
-    return (a: unknown, b: unknown): number => {
-      return modelAttributeCompare(
-        utils.wrappedModel(a) as Backbone.Model,
-        utils.wrappedModel(b) as Backbone.Model
+    return observable as KBCollectionObservable;
+
+    // =============================================================================
+    // Instance Methods (closures)
+    // =============================================================================
+
+    function destroy(): void {
+      state.__kb_released = true;
+      const obs = utils.getObservable(state) as KBObservable & ko.ObservableArray;
+      const coll = kb.peek(_collection);
+
+      utils.wrappedObject(obs, null);
+
+      if (coll) {
+        coll.off('all', onCollectionChange);
+        const array = kb.peek(obs) as unknown[];
+        array.splice(0, array.length);
+      }
+
+      state.collection.dispose();
+      (obs as unknown as Record<string, unknown>).collection = state.collection = undefined as unknown as ko.Computed<Backbone.Collection | null>;
+
+      _mapper.dispose();
+
+      kb.release(_filters);
+
+      _comparator(null);
+
+      state.create_options = undefined as unknown as CreateOptions;
+      utils.wrappedDestroy(state);
+
+      const stats = (kb as { statistics?: { unregister: (name: string, obj: unknown) => void } }).statistics;
+      if (stats) {
+        stats.unregister('CollectionObservable', state);
+      }
+    }
+
+    function shareOptions(): { store: unknown; factory: unknown } {
+      const obs = utils.getObservable(state);
+      return {
+        store: utils.wrappedStore(obs),
+        factory: utils.wrappedFactory(obs),
+      };
+    }
+
+    function filters(newFilters?: unknown | unknown[]): void {
+      if (newFilters) {
+        _filters(Array.isArray(newFilters) ? newFilters : [newFilters]);
+      } else {
+        _filters([]);
+      }
+    }
+
+    function setComparator(comparatorFn: ComparatorFn | null): void {
+      _comparator(comparatorFn);
+    }
+
+    function sortAttribute(attr: string | null): void {
+      _comparator(attr ? attributeComparator(attr) : null);
+    }
+
+    function viewModelByModel(model: Backbone.Model): unknown | null {
+      if (state.models_only) return null;
+
+      const idAttribute = Object.hasOwn(model, model.idAttribute) ? model.idAttribute : 'cid';
+      const obs = utils.getObservable(state) as ko.ObservableArray;
+
+      return (
+        kb.peek(obs).find((test: unknown) => {
+          const testObj = test as { __kb?: { object?: Backbone.Model } };
+          if (testObj?.__kb?.object) {
+            // biome-ignore lint/suspicious/noExplicitAny: Dynamic property access on Backbone.Model
+            return (testObj.__kb.object as any)[idAttribute] === (model as any)[idAttribute];
+          }
+          return false;
+        }) || null
       );
-    };
-  }
-
-  // Create view model for model
-  private _createViewModel(model: Backbone.Model): unknown {
-    if (this.models_only) return model;
-    const store = this.create_options.store as Store;
-    return store.retainOrCreate(model, this.create_options);
-  }
-
-  // Check if model passes filters
-  private _selectModel(model: Backbone.Model): boolean {
-    const filters = kb.peek(this._filters);
-
-    for (let filter of filters) {
-      filter = kb.peek(filter);
-
-      if (typeof filter === 'function') {
-        if (!(filter as FilterFn)(model)) return false;
-      } else if (Array.isArray(filter)) {
-        if (!filter.includes(model.id)) return false;
-      } else {
-        if (model.id !== filter) return false;
-      }
     }
 
-    return true;
-  }
+    function hasViewModels(): boolean {
+      return !state.models_only;
+    }
+
+    function compact(): void {
+      kb.ignore(() => {
+        const obs = utils.getObservable(state);
+        if (!utils.wrappedStoreIsOwned(obs)) return;
+
+        const store = utils.wrappedStore(obs) as Store;
+        store.clear();
+        _collection.notifySubscribers(_collection());
+      });
+    }
+
+    // =============================================================================
+    // Private Helpers (closures)
+    // =============================================================================
+
+    function shareOrCreateFactory(opts: CollectionObservableOptions): Factory {
+      const absoluteModelsPath = utils.pathJoin(opts.path, 'models');
+      const factories = opts.factories;
+
+      // Check existing factory
+      const existingFactory = opts.factory as Factory | undefined;
+      if (existingFactory) {
+        const existingCreator = existingFactory.creatorForPath(null, absoluteModelsPath);
+        if (existingCreator && (!factories || (factories as Record<string, Creator>).models === existingCreator)) {
+          if (!factories) return existingFactory;
+          if (existingFactory.hasPathMappings(factories, opts.path)) {
+            return existingFactory;
+          }
+        }
+      }
+
+      // Create new factory
+      const factory = new Factory(existingFactory);
+      if (factories) {
+        factory.addPathMappings(factories, opts.path);
+      }
+
+      // Set up default creator
+      if (!factory.creatorForPath(null, absoluteModelsPath)) {
+        if (Object.hasOwn(opts, 'models_only')) {
+          if (opts.models_only) {
+            factory.addPathMapping(absoluteModelsPath, { models_only: true });
+          } else {
+            factory.addPathMapping(absoluteModelsPath, viewModelFactory as unknown as Creator);
+          }
+        } else if (opts.view_model) {
+          factory.addPathMapping(absoluteModelsPath, opts.view_model);
+        } else if (opts.create) {
+          factory.addPathMapping(absoluteModelsPath, { create: opts.create });
+        } else {
+          factory.addPathMapping(absoluteModelsPath, viewModelFactory as unknown as Creator);
+        }
+      }
+
+      return factory;
+    }
+
+    function onCollectionChange(event: string, arg: Backbone.Model): void {
+      kb.ignore(() => {
+        if (state.in_edit || kb.wasReleased(state)) return;
+
+        switch (event) {
+          case 'reset':
+            if (state.auto_compact) {
+              compact();
+            } else {
+              _collection.notifySubscribers(_collection());
+            }
+            break;
+
+          case 'sort':
+          case 'resort':
+            _collection.notifySubscribers(_collection());
+            break;
+
+          case 'new':
+          case 'add': {
+            if (!selectModel(arg)) return;
+
+            const obs = utils.getObservable(state) as ko.ObservableArray;
+            const coll = _collection();
+            if (!coll || coll.indexOf(arg) === -1) return;
+            if (viewModelByModel(arg)) return;
+
+            state.in_edit++;
+            const comp = _comparator();
+            if (comp) {
+              (obs as ko.ObservableArray)().push(createViewModel(arg));
+              obs.sort(comp);
+            } else {
+              obs.splice(coll.indexOf(arg), 0, createViewModel(arg));
+            }
+            state.in_edit--;
+            break;
+          }
+
+          case 'remove':
+          case 'destroy':
+            onModelRemove(arg);
+            break;
+
+          case 'change': {
+            if (!selectModel(arg)) {
+              onModelRemove(arg);
+              return;
+            }
+
+            const vm = state.models_only ? arg : viewModelByModel(arg);
+            if (!vm) {
+              onCollectionChange('add', arg);
+              return;
+            }
+
+            const comp = _comparator();
+            if (!comp) return;
+
+            state.in_edit++;
+            (utils.getObservable(state) as ko.ObservableArray).sort(comp);
+            state.in_edit--;
+            break;
+          }
+        }
+      });
+    }
+
+    function onModelRemove(model: Backbone.Model): void {
+      const vm = state.models_only ? model : viewModelByModel(model);
+      if (!vm) return;
+
+      const obs = utils.getObservable(state) as ko.ObservableArray;
+      state.in_edit++;
+      obs.remove(vm);
+      state.in_edit--;
+    }
+
+    function onObservableArrayChange(modelsOrViewModels: unknown[]): void {
+      kb.ignore(() => {
+        if (state.in_edit) return;
+
+        const obs = utils.getObservable(state) as ko.ObservableArray;
+        const coll = kb.peek(_collection);
+        const hasFilters = kb.peek(_filters).length > 0;
+
+        if (!coll) return;
+
+        let viewModels = modelsOrViewModels;
+        let models: Backbone.Model[];
+
+        if (state.models_only) {
+          models = hasFilters ? (modelsOrViewModels.filter((model) => selectModel(model as Backbone.Model)) as Backbone.Model[]) : (modelsOrViewModels as Backbone.Model[]);
+        } else {
+          if (hasFilters) viewModels = [];
+          models = [];
+
+          for (const vm of modelsOrViewModels) {
+            const model = utils.wrappedObject(vm) as Backbone.Model;
+
+            if (hasFilters) {
+              if (!selectModel(model)) continue;
+              (viewModels as unknown[]).push(vm);
+            }
+
+            // Retain in store
+            const store = state.create_options.store as Store;
+            const currentViewModel = state.create_options.creator ? store.find(model, state.create_options.creator) : null;
+            if (currentViewModel) {
+              if (currentViewModel.constructor !== (vm as object).constructor) {
+                kb._throwUnexpected({ constructor: { name: 'CollectionObservable' } }, 'replacing different type of view model');
+              }
+            }
+            store.retain(vm, model, state.create_options.creator);
+            models.push(model);
+          }
+        }
+
+        state.in_edit++;
+        if (modelsOrViewModels.length !== viewModels.length) {
+          obs(viewModels);
+        }
+        if (!_.isEqual(coll.models, models)) {
+          coll.reset(models);
+        }
+        state.in_edit--;
+      });
+    }
+
+    function attributeComparator(attr: string): ComparatorFn {
+      const modelAttributeCompare = (modelA: Backbone.Model, modelB: Backbone.Model): number => {
+        const attributeName = ko.utils.unwrapObservable(attr);
+        return compare(modelA.get(attributeName), modelB.get(attributeName));
+      };
+
+      if (state.models_only) {
+        return modelAttributeCompare;
+      }
+
+      return (a: unknown, b: unknown): number => {
+        return modelAttributeCompare(utils.wrappedModel(a) as Backbone.Model, utils.wrappedModel(b) as Backbone.Model);
+      };
+    }
+
+    function createViewModel(model: Backbone.Model): unknown {
+      if (state.models_only) return model;
+      const store = state.create_options.store as Store;
+      return store.retainOrCreate(model, state.create_options);
+    }
+
+    function selectModel(model: Backbone.Model): boolean {
+      const filterList = kb.peek(_filters);
+
+      for (let filter of filterList) {
+        filter = kb.peek(filter);
+
+        if (typeof filter === 'function') {
+          if (!(filter as FilterFn)(model)) return false;
+        } else if (Array.isArray(filter)) {
+          if (!filter.includes(model.id)) return false;
+        } else {
+          if (model.id !== filter) return false;
+        }
+      }
+
+      return true;
+    }
+  }) as ko.ObservableArray & { collection: ko.Computed<Backbone.Collection | null> };
 }
 
-// Factory functions
-export function collectionObservable(collection?: Backbone.Collection | unknown[], viewModel?: unknown, options?: CollectionObservableOptions): ko.ObservableArray {
-  return new CollectionObservable(collection, viewModel, options) as unknown as ko.ObservableArray;
-}
-
-export const observableCollection = collectionObservable;
-
-export default CollectionObservable;
+export default collectionObservable;

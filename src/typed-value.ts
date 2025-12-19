@@ -2,9 +2,9 @@ import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
 import kb from './kb.ts';
-import utils from './utils.ts';
+import type { CreateOptions, Creator, KBObservable, KBObservableBase, Store, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
-import type { CreateOptions, Creator, KBObservable, Store, ValueType } from './types.ts';
+import utils from './utils.ts';
 
 // Internal class for managing typed observable values
 export class TypedValue {
@@ -187,10 +187,10 @@ export class TypedValue {
       if (!ko.isObservable(value)) {
         // View model
         this.value_type = TYPE_MODEL;
-        utils.wrappedObject(value, utils.resolveModel(newValue));
-      } else if ((value as KBObservable).__kb_is_co) {
+        utils.wrappedObject(value, utils.resolveModel(newValue) as Backbone.Model | null);
+      } else if ((value as KBObservableBase).__kb_is_co) {
         this.value_type = TYPE_COLLECTION;
-        utils.wrappedObject(value, newValue);
+        utils.wrappedObject(value, newValue as Backbone.Collection | null);
       } else if (!this.value_type) {
         this.value_type = TYPE_SIMPLE;
       }

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
-import ko from 'knockout';
 import kb, { observable, Statistics } from 'knockback';
+import ko from 'knockout';
 
 describe('observable advanced', () => {
   describe('custom read and write', () => {
@@ -84,7 +84,7 @@ describe('observable advanced', () => {
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
       const model = new Backbone.Model({ id: 1, name: 'Bob' });
-      const obs = observable(model, 'name') as ko.Observable & { model: ko.Observable<Backbone.Model | null> };
+      const obs = observable(model, 'name') as unknown as ko.Observable & { model: ko.Observable<Backbone.Model | null> };
 
       let count = 0;
       ko.computed(() => {
@@ -147,11 +147,13 @@ describe('observable advanced', () => {
       const model = new Backbone.Model({ number: 33 });
 
       class TestViewModel {
+        // biome-ignore lint/suspicious/noExplicitAny: Test class with dynamic properties
+        [key: string]: any;
         number: ko.Observable<number>;
         formatted_number: ko.Observable<string>;
 
         constructor(m: Backbone.Model) {
-          this.number = observable(m, 'number');
+          this.number = observable(m, 'number') as unknown as ko.Observable<number>;
           this.formatted_number = observable(
             m,
             {
@@ -160,8 +162,8 @@ describe('observable advanced', () => {
               write: (value: string) => this.number(parseInt(value.substring(3), 10)),
             },
             {},
-            this
-          );
+            this as unknown as Record<string, unknown>
+          ) as unknown as ko.Observable<string>;
         }
       }
 
@@ -186,7 +188,7 @@ describe('observable advanced', () => {
       const m1 = new Backbone.Model({ n: 'm1' });
       const m2 = new Backbone.Model({ n: 'm2' });
 
-      const obs = observable(m1, 'n') as ko.Observable<string> & { model: (m?: Backbone.Model | null) => Backbone.Model | null };
+      const obs = observable(m1, 'n') as unknown as ko.Observable<string> & { model: (m?: Backbone.Model | null) => Backbone.Model | null };
 
       obs.subscribe((nv: string) => values.push(nv));
 
@@ -221,7 +223,7 @@ describe('observable advanced', () => {
 
       const obs = observable(model, {
         key: 'name',
-        read: (key: string, arg1: string, arg2: number) => {
+        read: (_key: string, arg1: string, arg2: number) => {
           receivedArgs.push(arg1, arg2);
           return model.get('name');
         },

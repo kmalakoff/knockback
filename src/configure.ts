@@ -30,7 +30,7 @@ export function configure(options: ConfigureOptions = {}): void {
       case 'orm':
         // Set by name
         if (_.isString(value)) {
-          if (!Object.prototype.hasOwnProperty.call(ALL_ORMS, value)) {
+          if (!Object.hasOwn(ALL_ORMS, value)) {
             console.log(`Knockback configure: could not find orm: ${value}. Available: ${Object.keys(ALL_ORMS).join(', ')}`);
             continue;
           }

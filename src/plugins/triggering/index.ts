@@ -1,1 +1,1 @@
-export { TriggeredObservable, triggeredObservable, observableTriggered } from './triggered-observable.ts';
+export { triggeredObservable } from './triggered-observable.ts';

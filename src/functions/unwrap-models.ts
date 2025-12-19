@@ -12,7 +12,7 @@ export default function unwrapModels(obj: unknown): unknown {
   // Check if it's a kb-wrapped object
   const kbObj = obj as KBObject;
   if (kbObj.__kb) {
-    return Object.prototype.hasOwnProperty.call(kbObj.__kb, 'object') ? kbObj.__kb.object : obj;
+    return Object.hasOwn(kbObj.__kb, 'object') ? kbObj.__kb.object : obj;
   }
 
   // Handle arrays

@@ -1,23 +1,13 @@
 import assert from 'assert';
 import Backbone from 'backbone';
+import { defaultObservable, formattedObservable, minLengthFn, observable, parseFormattedString, toFormattedString, triggeredObservable, valid, valueValidator } from 'knockback';
 import ko from 'knockout';
-import kb, {
-  defaultObservable,
-  formattedObservable,
-  toFormattedString,
-  parseFormattedString,
-  triggeredObservable,
-  valid,
-  minLengthFn,
-  valueValidator,
-  observable,
-} from 'knockback';
 
 describe('knockback plugins', () => {
   describe('defaults plugin', () => {
     it('should provide default value when observable is null', () => {
       const model = new Backbone.Model({ name: null });
-      const nameObs = observable(model, 'name');
+      const nameObs = observable(model, 'name') as unknown as ko.Observable;
       const wrapped = defaultObservable(nameObs, '(no name)');
 
       assert.strictEqual(wrapped(), '(no name)');
@@ -25,7 +15,7 @@ describe('knockback plugins', () => {
 
     it('should return actual value when not null', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = observable(model, 'name');
+      const nameObs = observable(model, 'name') as unknown as ko.Observable;
       const wrapped = defaultObservable(nameObs, '(no name)');
 
       assert.strictEqual(wrapped(), 'Bob');
@@ -33,7 +23,7 @@ describe('knockback plugins', () => {
 
     it('should update when underlying observable changes', () => {
       const model = new Backbone.Model({ name: null });
-      const nameObs = observable(model, 'name');
+      const nameObs = observable(model, 'name') as unknown as ko.Observable;
       const wrapped = defaultObservable(nameObs, '(no name)');
 
       assert.strictEqual(wrapped(), '(no name)');

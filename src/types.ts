@@ -10,7 +10,60 @@ export const TYPE_COLLECTION = 4;
 
 export type ValueType = typeof TYPE_UNKNOWN | typeof TYPE_SIMPLE | typeof TYPE_ARRAY | typeof TYPE_MODEL | typeof TYPE_COLLECTION;
 
+// =============================================================================
+// Forward declarations for classes
+// These interfaces define the PUBLIC API contract for each class
+// =============================================================================
+
+/** Store for caching and sharing view models */
+export interface Store {
+  __kb_released?: boolean;
+  destroy(): void;
+  clear(): void;
+  compact(): void;
+  release(observable: unknown, force?: boolean): void;
+  retain(observable: unknown, obj: unknown, creator?: Creator): unknown;
+  retainOrCreate(obj: unknown, options: CreateOptions, deepRetain?: boolean): unknown;
+  reuse(observable: unknown, obj: unknown): void;
+  find(obj: unknown, creator: Creator): unknown;
+}
+
+/** Factory for creating view models based on path mappings */
+export interface Factory {
+  paths: Record<string, unknown>;
+  parent_factory?: Factory;
+  hasPath(path: string): boolean;
+  addPathMapping(path: string, createInfo: unknown): void;
+  addPathMappings(factories: FactoriesOption, ownerPath?: string): void;
+  hasPathMappings(factories: FactoriesOption, ownerPath?: string): boolean;
+  creatorForPath(obj: unknown, path: string): Creator | undefined;
+}
+
+/** Aggregates model events for efficient event handling */
+export interface EventWatcher {
+  __kb: { callbacks?: Record<string, unknown> | null };
+  ee: Backbone.Model | null;
+  destroy(): void;
+  emitter(): Backbone.Model | null;
+  emitter(newEmitter: Backbone.Model | null): Backbone.Model | null;
+  registerCallbacks(obj: unknown, callbackInfo: EventCallbackInfo): this;
+  releaseCallbacks(obj: unknown): void;
+}
+
+/** Callback info for event watcher registration */
+export interface EventCallbackInfo {
+  obj?: unknown;
+  key?: string | ko.Observable<string>;
+  path?: string;
+  update?: () => void;
+  emitter?: (model: Backbone.Model | null) => void;
+  event_selector?: string;
+}
+
+// =============================================================================
 // Core options interfaces
+// =============================================================================
+
 export interface CreateOptions {
   store?: Store;
   factory?: Factory;
@@ -45,11 +98,12 @@ export interface ViewModelOptions {
   path?: string;
   store?: Store;
   factory?: Factory;
+  creator?: Creator;
   options?: ViewModelOptions;
 }
 
 export interface CollectionObservableOptions {
-  view_model?: new (model: Backbone.Model, options: CreateOptions) => unknown;
+  view_model?: Creator;
   create?: (model: Backbone.Model, options: CreateOptions) => unknown;
   models_only?: boolean;
   auto_compact?: boolean;
@@ -66,9 +120,12 @@ export type FilterType = string | ((model: Backbone.Model) => boolean);
 export type FactoriesOption = Record<string, Creator> | Creator;
 export type Creator = { create?: (obj: unknown, options: CreateOptions) => unknown; models_only?: boolean } | (new (obj: unknown, options: CreateOptions) => unknown);
 
+// =============================================================================
 // Internal metadata interface
+// =============================================================================
+
 export interface KBMetadata {
-  observable?: ko.Observable | ko.ObservableArray;
+  observable?: ko.Observable | ko.Computed | ko.ObservableArray;
   object?: Backbone.Model | Backbone.Collection | null;
   creator?: Creator;
   store?: Store;
@@ -85,50 +142,52 @@ export interface StoreReference {
   release: () => void;
 }
 
-// Forward declarations for classes (will be replaced with actual imports)
-export interface Store {
-  __kb_released?: boolean;
-  destroy(): void;
-  release(obj: unknown): void;
-  retain(observable: ko.Observable, obj: unknown, creator: Creator): void;
-  retainOrCreate(obj: unknown, options: CreateOptions, deep_retain?: boolean): unknown;
-  reuse(observable: ko.Observable, obj: unknown): void;
-  find(obj: unknown, creator: Creator): unknown;
-}
+// =============================================================================
+// Knockback-enhanced observable types
+// =============================================================================
 
-export interface Factory {
-  creatorForPath(obj: unknown, path: string): Creator | undefined;
-}
-
-export interface EventWatcher {
-  destroy(): void;
-  releaseCallbacks(obj: unknown): void;
-  registerCallbacks(obj: unknown, callbacks: EventCallbacks): void;
-  model(): Backbone.Model | null;
-}
-
-export interface EventCallbacks {
-  [event: string]: () => void;
-}
-
-// Knockback-enhanced observable
-export interface KBObservable<T = unknown> extends ko.Observable<T> {
+/** Base type for all Knockback observables */
+export interface KBObservableBase {
   __kb?: KBMetadata;
   __kb_is_o?: boolean;
   __kb_is_co?: boolean;
+  __kb_released?: boolean;
   destroy?: () => void;
-  release?: () => void;
-  dispose?: () => void;
   valueType?: () => ValueType;
   model?: ko.Computed<Backbone.Model | null>;
 }
 
+/** Knockback observable (wraps ko.Computed internally) */
+export type KBObservable<T = unknown> = ko.Computed<T> & KBObservableBase;
+
+/** Knockback collection observable (wraps ko.ObservableArray internally) */
+// biome-ignore lint/suspicious/noExplicitAny: ko.ObservableArray.destroy conflicts with our destroy
+export type KBCollectionObservable<T = unknown> = ko.ObservableArray<T> & {
+  __kb?: KBMetadata;
+  __kb_is_co?: boolean;
+  __kb_released?: boolean;
+  collection: ko.Computed<Backbone.Collection | null>;
+};
+
+// =============================================================================
 // Settings interface
+// =============================================================================
+
 export interface KBSettings {
   orm?: {
     useFunction?: (model: Backbone.Model, key: string) => boolean;
     keys?: (model: Backbone.Model) => string[];
-    bind?: (model: Backbone.Model, key: string, update: () => void, path: string) => void;
+    bind?: (model: Backbone.Model, key: string, update: () => void, path: string) => (() => void) | undefined;
   };
   deep_retain?: boolean;
+}
+
+/** Locale manager interface for localized observables */
+export interface LocaleManager {
+  get(id: string): string;
+  getLocale(): string;
+  setLocale(locale: string): void;
+  // Event methods (from Backbone.Events)
+  on?(event: string, callback: (...args: unknown[]) => void, context?: unknown): this;
+  off?(event: string, callback?: (...args: unknown[]) => void, context?: unknown): this;
 }

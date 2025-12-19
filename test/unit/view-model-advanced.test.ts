@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
+import kb, { Statistics, type ViewModel, viewModel } from 'knockback';
 import ko from 'knockout';
-import kb, { viewModel, ViewModel, Statistics } from 'knockback';
 
 describe('ViewModel advanced', () => {
   describe('options', () => {
@@ -215,7 +215,8 @@ describe('ViewModel advanced', () => {
       const stats = new Statistics();
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
-      const model = new Backbone.Model({ name: 'Bob' });
+      // biome-ignore lint/suspicious/noExplicitAny: Creating untyped model for dynamic attributes
+      const model: any = new Backbone.Model({ name: 'Bob' });
       const vm = viewModel(model, { keys: ['name'] }) as ViewModel & Record<string, unknown>;
 
       assert.ok(ko.isObservable(vm.name), 'name exists');

@@ -1,17 +1,23 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
-import _ from 'underscore';
-import kb from './kb.ts';
-import utils from './utils.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
+import kb from './kb.ts';
 import { TypedValue } from './typed-value.ts';
 import type { KBObservable, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
+import utils from './utils.ts';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'] as const;
 const KEYS_INFO = ['args', 'read', 'write'] as const;
 
-interface ObservableInstance {
+// =============================================================================
+// Observable Interface
+// =============================================================================
+
+export interface ObservableInstance {
+  // Index signature for dynamic property access
+  [key: string]: unknown;
+
   key: string | ko.Observable<string>;
   args?: unknown[];
   read?: (...args: unknown[]) => unknown;
@@ -21,198 +27,213 @@ interface ObservableInstance {
   _model: ko.Observable<Backbone.Model | null>;
   model: ko.Computed<Backbone.Model | null>;
   __kb_released?: boolean;
+  __kb?: unknown;
+
+  // Methods
+  destroy(): void;
+  value(): unknown;
+  valueType(): ValueType;
+  update(newValue?: unknown): void;
 }
 
-// Observable class for model attributes
-export class Observable implements ObservableInstance {
-  key: string | ko.Observable<string>;
-  args?: unknown[];
-  read?: (...args: unknown[]) => unknown;
-  write?: (value: unknown) => void;
-  _vm: Record<string, unknown>;
-  _value!: TypedValue;
-  _model!: ko.Observable<Backbone.Model | null>;
-  model!: ko.Computed<Backbone.Model | null>;
-  __kb_released?: boolean;
+// =============================================================================
+// Factory Function (Primary API)
+// =============================================================================
 
-  constructor(model: Backbone.Model | null, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}) {
-    return kb.ignore(() => {
-      if (!keyOrInfo) kb._throwMissing(this, 'key_or_info');
+/**
+ * Creates a Knockout observable bound to a Backbone model attribute.
+ *
+ * @param model - The Backbone model to observe
+ * @param keyOrInfo - Attribute key string or options object
+ * @param options - Additional view model options
+ * @param vm - Parent view model context
+ * @returns A Knockout observable with Knockback extensions
+ */
+export function observable(model: Backbone.Model | null, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}): KBObservable {
+  return kb.ignore(() => {
+    if (!keyOrInfo) kb._throwMissing({ constructor: { name: 'Observable' } }, 'key_or_info');
 
-      const info = typeof keyOrInfo === 'string' ? { key: keyOrInfo } : keyOrInfo;
-      this.key = info.key || (keyOrInfo as string);
-      this._vm = vm;
+    const info = typeof keyOrInfo === 'string' ? { key: keyOrInfo } : keyOrInfo;
 
-      // Copy info properties
-      for (const key of KEYS_INFO) {
-        if (info[key] !== undefined) {
-          (this as Record<string, unknown>)[key] = info[key];
-        }
+    // Instance state (closure-based)
+    const state: ObservableInstance = {
+      key: info.key || (keyOrInfo as string),
+      _vm: vm,
+      _value: undefined as unknown as TypedValue,
+      _model: undefined as unknown as ko.Observable<Backbone.Model | null>,
+      model: undefined as unknown as ko.Computed<Backbone.Model | null>,
+      __kb_released: false,
+
+      destroy,
+      value,
+      valueType,
+      update,
+    };
+
+    // Copy info properties
+    for (const key of KEYS_INFO) {
+      if (info[key] !== undefined) {
+        (state as Record<string, unknown>)[key] = info[key];
       }
+    }
 
-      const createOptions = utils.collapseOptions(options) as ViewModelOptions & { event_watcher?: EventWatcher };
-      const eventWatcher = createOptions.event_watcher;
-      delete createOptions.event_watcher;
+    const createOptions = utils.collapseOptions(options) as ViewModelOptions & { event_watcher?: EventWatcher };
+    const eventWatcher = createOptions.event_watcher;
+    delete createOptions.event_watcher;
 
-      // Set up basics
-      this._value = new TypedValue(createOptions);
-      this._model = ko.observable(null);
+    // Set up basics
+    state._value = new TypedValue(createOptions);
+    state._model = ko.observable(null);
 
-      const observable = utils.wrappedObservable(
-        this,
-        ko.computed({
-          read: () => {
-            const _model = this._model();
-            // Create dependency on args
-            const args = [this.key].concat(this.args || []);
-            for (const arg of args) {
-              ko.utils.unwrapObservable(arg);
-            }
+    const koObservable = utils.setObservable(
+      state,
+      ko.computed({
+        read: () => {
+          const _model = state._model();
+          // Create dependency on args
+          const args: unknown[] = [state.key, ...(state.args || [])];
+          for (const arg of args) {
+            ko.utils.unwrapObservable(arg);
+          }
 
-            // Update event watcher
-            const ew = utils.wrappedEventWatcher(this) as EventWatcher | undefined;
-            ew?.emitter(_model || null);
+          // Update event watcher
+          const ew = utils.getEventWatcher(state);
+          ew?.emitter(_model || null);
 
-            if (this.read) {
-              this.update(this.read.apply(this._vm, args));
-            } else if (_model !== undefined) {
-              kb.ignore(() => this.update(kb.getValue(_model, kb.peek(this.key), this.args)));
-            }
+          if (state.read) {
+            updateWithValue(state.read.apply(state._vm, args));
+          } else if (_model !== undefined) {
+            kb.ignore(() => updateWithValue(kb.getValue(_model, kb.peek(state.key), state.args)));
+          }
 
-            return this._value.value();
-          },
+          return state._value.value();
+        },
 
-          write: (newValue: unknown) => {
-            kb.ignore(() => {
-              const unwrappedNewValue = utils.unwrapModels(newValue);
-              const _model = kb.peek(this._model);
-
-              if (this.write) {
-                this.write.call(this._vm, unwrappedNewValue);
-                newValue = kb.getValue(_model, kb.peek(this.key), this.args);
-              } else if (_model) {
-                kb.setValue(_model, kb.peek(this.key), unwrappedNewValue);
-              }
-
-              this.update(newValue);
-            });
-          },
-
-          owner: this._vm,
-        })
-      ) as KBObservable;
-
-      observable.__kb_is_o = true;
-      createOptions.store = utils.wrappedStore(observable, createOptions.store);
-      createOptions.path = utils.pathJoin(createOptions.path, this.key as string);
-
-      // Handle factories
-      if (createOptions.factories && (typeof createOptions.factories === 'function' || (createOptions.factories as { create?: unknown }).create)) {
-        createOptions.factory = utils.wrappedFactory(observable, new Factory(createOptions.factory as Factory));
-        (createOptions.factory as Factory).addPathMapping(createOptions.path, createOptions.factories);
-      } else {
-        createOptions.factory = Factory.useOptionsOrCreate(createOptions, observable, createOptions.path);
-      }
-      delete createOptions.factories;
-
-      // Publish methods
-      kb.publishMethods(observable as unknown as Record<string, unknown>, this as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
-
-      // Create model computed
-      const modelComputed = ko.computed({
-        read: () => ko.utils.unwrapObservable(this._model),
-        write: (newModel: Backbone.Model | null) => {
+        write: (newValue: unknown) => {
           kb.ignore(() => {
-            if (this.__kb_released || kb.peek(this._model) === newModel) return;
+            const unwrappedNewValue = utils.unwrapModels(newValue);
+            const _model = kb.peek(state._model);
 
-            const newValue = kb.getValue(newModel, kb.peek(this.key), this.args);
-            this._model(newModel);
-
-            if (!newModel) {
-              this.update(null);
-            } else if (newValue !== undefined) {
-              this.update(newValue);
+            if (state.write) {
+              state.write.call(state._vm, unwrappedNewValue);
+              newValue = kb.getValue(_model, kb.peek(state.key), state.args);
+            } else if (_model) {
+              kb.setValue(_model, kb.peek(state.key), unwrappedNewValue);
             }
+
+            updateWithValue(newValue);
           });
         },
-      });
 
-      observable.model = this.model = modelComputed;
+        owner: state._vm,
+      })
+    ) as KBObservable;
 
-      // Set up event watcher
-      EventWatcher.useOptionsOrCreate(
-        { event_watcher: eventWatcher },
-        model || null,
-        this,
-        {
-          emitter: (m: Backbone.Model | null) => this.model(m),
-          update: () => kb.ignore(() => this.update()),
-          key: this.key as string,
-          path: createOptions.path,
-        }
-      );
+    koObservable.__kb_is_o = true;
+    createOptions.store = utils.wrappedStore(koObservable, createOptions.store);
+    createOptions.path = utils.pathJoin(createOptions.path, state.key as string);
 
-      // Initialize value
-      if (!this._value.rawValue()) {
-        this._value.update();
-      }
-
-      // Wrap with localizer if specified
-      let result: ko.Observable = observable;
-      const LocalizedObservable = (kb as { LocalizedObservable?: new (o: ko.Observable) => ko.Observable }).LocalizedObservable;
-      if (LocalizedObservable && info.localizer) {
-        result = new info.localizer(result);
-      }
-
-      // Wrap with default observable if specified
-      const defaultObservable = (kb as { defaultObservable?: (o: ko.Observable, d: unknown) => ko.Observable }).defaultObservable;
-      if (defaultObservable && Object.prototype.hasOwnProperty.call(info, 'default')) {
-        result = defaultObservable(result, info.default);
-      }
-
-      return result as unknown as Observable;
-    }) as unknown as Observable;
-  }
-
-  // Clean up
-  destroy(): void {
-    const observable = utils.wrappedObservable(this);
-    this.__kb_released = true;
-    this._value.destroy();
-    this._value = undefined as unknown as TypedValue;
-    this.model.dispose();
-    this.model = undefined as unknown as ko.Computed<Backbone.Model | null>;
-    if (observable) {
-      (observable as KBObservable).model = undefined;
+    // Handle factories
+    if (createOptions.factories && (typeof createOptions.factories === 'function' || (createOptions.factories as { create?: unknown }).create)) {
+      createOptions.factory = utils.wrappedFactory(koObservable, new Factory(createOptions.factory as Factory));
+      (createOptions.factory as Factory).addPathMapping(createOptions.path, createOptions.factories);
+    } else {
+      createOptions.factory = Factory.useOptionsOrCreate(createOptions, koObservable, createOptions.path);
     }
-    utils.wrappedDestroy(this);
-  }
+    delete createOptions.factories;
 
-  // Get raw value
-  value(): unknown {
-    return this._value.rawValue();
-  }
+    // Publish methods
+    kb.publishMethods(koObservable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
 
-  // Get value type
-  valueType(): ValueType {
-    return this._value.valueType(kb.peek(this._model), kb.peek(this.key));
-  }
+    // Create model computed
+    const modelComputed = ko.computed({
+      read: () => ko.utils.unwrapObservable(state._model),
+      write: (newModel: Backbone.Model | null) => {
+        kb.ignore(() => {
+          if (state.__kb_released || kb.peek(state._model) === newModel) return;
 
-  // Update value
-  update(newValue?: unknown): void {
-    if (this.__kb_released) return;
+          const newValue = kb.getValue(newModel, kb.peek(state.key), state.args);
+          state._model(newModel);
 
-    if (arguments.length === 0) {
-      newValue = kb.getValue(kb.peek(this._model), kb.peek(this.key));
+          if (!newModel) {
+            updateWithValue(null);
+          } else if (newValue !== undefined) {
+            updateWithValue(newValue);
+          }
+        });
+      },
+    });
+
+    koObservable.model = state.model = modelComputed;
+
+    // Set up event watcher
+    EventWatcher.useOptionsOrCreate({ event_watcher: eventWatcher }, model || null, state, {
+      obj: state,
+      emitter: (m: Backbone.Model | null) => state.model(m),
+      update: () => kb.ignore(() => update()),
+      key: state.key as string,
+      path: createOptions.path,
+    });
+
+    // Initialize value
+    if (!state._value.rawValue()) {
+      state._value.update();
     }
 
-    this._value.update(newValue);
-  }
+    // Wrap with localizer if specified
+    // biome-ignore lint/suspicious/noExplicitAny: Dynamic wrapper types
+    let result: any = koObservable;
+    if (info.localizer) {
+      result = new info.localizer(result);
+    }
+
+    // Wrap with default observable if specified
+    // biome-ignore lint/suspicious/noExplicitAny: Dynamic kb method access
+    const defaultObservableFn = (kb as any).defaultObservable;
+    if (defaultObservableFn && Object.hasOwn(info, 'default')) {
+      result = defaultObservableFn(result, info.default);
+    }
+
+    return result as KBObservable;
+
+    // =============================================================================
+    // Instance Methods (closures)
+    // =============================================================================
+
+    function destroy(): void {
+      const obs = utils.getObservable(state);
+      state.__kb_released = true;
+      state._value.destroy();
+      state._value = undefined as unknown as TypedValue;
+      state.model.dispose();
+      state.model = undefined as unknown as ko.Computed<Backbone.Model | null>;
+      if (obs) {
+        (obs as KBObservable).model = undefined;
+      }
+      utils.wrappedDestroy(state);
+    }
+
+    function value(): unknown {
+      return state._value.rawValue();
+    }
+
+    function valueType(): ValueType {
+      return state._value.valueType(kb.peek(state._model), kb.peek(state.key));
+    }
+
+    // Update with explicit value (avoids arguments.length check)
+    function updateWithValue(newValue: unknown): void {
+      if (state.__kb_released) return;
+      state._value.update(newValue);
+    }
+
+    // Update by reading from model (no argument)
+    function update(): void {
+      if (state.__kb_released) return;
+      const newValue = kb.getValue(kb.peek(state._model), kb.peek(state.key));
+      state._value.update(newValue);
+    }
+  }) as KBObservable;
 }
 
-// Factory function
-export function observable(model: Backbone.Model | null, key: string | ObservableOptions, options?: ViewModelOptions, viewModel?: Record<string, unknown>): ko.Observable {
-  return new Observable(model, key, options, viewModel) as unknown as ko.Observable;
-}
-
-export default Observable;
+export default observable;

@@ -1,7 +1,1 @@
-export {
-  FormattedObservable,
-  formattedObservable,
-  observableFormatted,
-  toFormattedString,
-  parseFormattedString,
-} from './formatted-observable.ts';
+export { formattedObservable, parseFormattedString, toFormattedString } from './formatted-observable.ts';

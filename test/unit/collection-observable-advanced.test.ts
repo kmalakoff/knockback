@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
+import kb, { collectionObservable, Statistics, type ViewModel, viewModel } from 'knockback';
 import ko from 'knockout';
-import kb, { collectionObservable, viewModel, ViewModel, Statistics } from 'knockback';
 
 describe('CollectionObservable advanced', () => {
   describe('sorting', () => {
@@ -66,7 +66,7 @@ describe('CollectionObservable advanced', () => {
       assert.deepStrictEqual(names, ['Alice', 'Charlie', 'Bob'], 'Initial sort');
 
       // Change priority
-      collection.at(0)!.set('priority', 5);
+      collection.at(0)?.set('priority', 5);
 
       names = co().map((vm: ViewModel & { name: ko.Observable<string> }) => vm.name());
       assert.deepStrictEqual(names, ['Alice', 'Bob', 'Charlie'], 'Re-sorted after change');
@@ -117,11 +117,11 @@ describe('CollectionObservable advanced', () => {
       assert.strictEqual(co().length, 1);
 
       // Activate Bob
-      collection.at(1)!.set('active', true);
+      collection.at(1)?.set('active', true);
       assert.strictEqual(co().length, 2);
 
       // Deactivate Alice
-      collection.at(0)!.set('active', false);
+      collection.at(0)?.set('active', false);
       assert.strictEqual(co().length, 1);
       assert.strictEqual((co()[0] as ViewModel & { name: ko.Observable<string> }).name(), 'Bob');
 
@@ -137,7 +137,7 @@ describe('CollectionObservable advanced', () => {
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
       const collection = new Backbone.Collection([{ name: 'Alice' }]);
-      const co = collectionObservable(collection) as ko.ObservableArray & {
+      const co = collectionObservable(collection) as unknown as ko.ObservableArray & {
         collection: ko.Observable<Backbone.Collection>;
       };
 
@@ -190,11 +190,11 @@ describe('CollectionObservable advanced', () => {
 
       collection.push(new Backbone.Model({ name: 'Bob' }));
       assert.strictEqual(co().length, 2);
-      assert.strictEqual(co()[1].get('name'), 'Bob');
+      assert.strictEqual((co()[1] as Backbone.Model).get('name'), 'Bob');
 
       collection.unshift(new Backbone.Model({ name: 'Zack' }));
       assert.strictEqual(co().length, 3);
-      assert.strictEqual(co()[0].get('name'), 'Zack');
+      assert.strictEqual((co()[0] as Backbone.Model).get('name'), 'Zack');
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
@@ -214,7 +214,7 @@ describe('CollectionObservable advanced', () => {
 
       collection.remove(alice);
       assert.strictEqual(co().length, 1);
-      assert.strictEqual(co()[0].get('name'), 'Bob');
+      assert.strictEqual((co()[0] as Backbone.Model).get('name'), 'Bob');
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
@@ -232,7 +232,7 @@ describe('CollectionObservable advanced', () => {
 
       collection.reset([{ name: 'Charlie' }]);
       assert.strictEqual(co().length, 1);
-      assert.strictEqual(co()[0].get('name'), 'Charlie');
+      assert.strictEqual((co()[0] as Backbone.Model).get('name'), 'Charlie');
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');

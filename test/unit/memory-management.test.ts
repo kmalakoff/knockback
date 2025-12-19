@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
+import kb, { collectionObservable, observable, Statistics, type ViewModel, viewModel } from 'knockback';
 import ko from 'knockout';
-import kb, { viewModel, observable, collectionObservable, Statistics, ViewModel } from 'knockback';
 
 describe('memory management', () => {
   // Helper: Ref-countable view model for testing
@@ -116,7 +116,7 @@ describe('memory management', () => {
         prop: ko.Observable<string> | null;
 
         constructor() {
-          this.prop = observable(new Backbone.Model({ name: 'name1' }), 'name');
+          this.prop = observable(new Backbone.Model({ name: 'name1' }), 'name') as unknown as ko.Observable<string>;
         }
 
         refCount(): number {
@@ -170,10 +170,7 @@ describe('memory management', () => {
 
       // Test with destroyable view model
       DestroyableViewModel.view_models = [];
-      const co = collectionObservable(
-        new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]),
-        { view_model: DestroyableViewModel as unknown as new () => ViewModel }
-      );
+      const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel as unknown as new () => ViewModel });
       assert.strictEqual(DestroyableViewModel.view_models.length, 2, 'Created: 2');
 
       kb.release(co);
@@ -188,10 +185,7 @@ describe('memory management', () => {
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
       SimpleViewModel.view_models = [];
-      const co = collectionObservable(
-        new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]),
-        { view_model: SimpleViewModel as unknown as new () => ViewModel }
-      );
+      const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel as unknown as new () => ViewModel });
       assert.strictEqual(SimpleViewModel.view_models.length, 2, 'Created: 2');
 
       kb.release(co);

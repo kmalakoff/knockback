@@ -1,14 +1,21 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
-import extend from './functions/extend.ts';
-import type { KBObservable, KBSettings, ValueType } from './types.ts';
+import type { KBObservableBase, KBSettings, LocaleManager, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'] as const;
 
 // Get global window object (works in browser and Node)
-const globalWindow = typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : {});
+const globalWindow: (Window & typeof globalThis) | undefined = typeof window !== 'undefined' ? window : undefined;
+
+// Extended Knockout types for internal APIs
+interface KoExtended {
+  dependencyDetection?: {
+    ignore: <T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]) => T;
+  };
+  storedBindingContextForNode?: (node: Node, context: unknown) => void;
+}
 
 // The 'kb' namespace for classes, factory functions, constants, etc.
 const kb = {
@@ -33,8 +40,8 @@ const kb = {
   // Settings
   settings: {} as KBSettings,
 
-  // Backbone-style extend
-  extend,
+  // Locale manager (for localized observables)
+  locale_manager: null as LocaleManager | null,
 
   // Checks if an object has been released
   wasReleased(obj: unknown): boolean {
@@ -97,7 +104,7 @@ const kb = {
 
     // Observable or lifecycle managed
     if (ko.isObservable(obj)) {
-      const kbObs = obj as KBObservable;
+      const kbObs = obj as KBObservableBase;
       const array = kb.peek(obj);
 
       if (Array.isArray(array)) {
@@ -115,8 +122,10 @@ const kb = {
         }
       }
 
-      if (typeof (obj as { dispose?: () => void }).dispose === 'function') {
-        (obj as { dispose: () => void }).dispose();
+      // Dispose computed/observable
+      const disposable = obj as { dispose?: () => void };
+      if (typeof disposable.dispose === 'function') {
+        disposable.dispose();
       }
       return;
     }
@@ -155,11 +164,11 @@ const kb = {
 
   // Renders a template and binds automatic release
   renderTemplate(template: string, view_model: { afterRender?: (el: Element) => void }, options: { afterRender?: () => void } = {}): Element | null {
-    const doc = globalWindow?.document;
-    if (!doc) {
+    if (!globalWindow?.document) {
       console?.log?.('renderTemplate: document is undefined');
       return null;
     }
+    const doc = globalWindow.document;
 
     let el: Element = doc.createElement('div');
     const observable = ko.renderTemplate(template, view_model, options, el, 'replaceChildren');
@@ -167,9 +176,10 @@ const kb = {
     if (el.childNodes.length === 1) {
       el = el.childNodes[0] as Element;
     } else if (el.childNodes.length) {
+      const koExt = ko as unknown as KoExtended;
       for (let i = 0; i < el.childNodes.length; i++) {
         try {
-          ko.storedBindingContextForNode(el, ko.contextFor(el.childNodes[i] as Element));
+          koExt.storedBindingContextForNode?.(el, ko.contextFor(el.childNodes[i] as Element));
           break;
         } catch {
           // Ignore errors
@@ -189,10 +199,12 @@ const kb = {
 
   // Applies bindings and binds automatic release
   applyBindings(view_model: unknown, node: Element | NodeList | HTMLCollection): Element {
-    const doc = globalWindow?.document;
-
     // Convert NodeList/HTMLCollection to root element
     if ('length' in node) {
+      if (!globalWindow?.document) {
+        throw new Error('applyBindings: document is undefined');
+      }
+      const doc = globalWindow.document;
       const children = Array.from(node as NodeList);
       node = doc.createElement('div');
       for (const child of children) {
@@ -210,9 +222,10 @@ const kb = {
     if (!model) return undefined;
 
     // Check if ORM wants to use a function
-    const modelAny = model as Record<string, unknown>;
+    // biome-ignore lint/suspicious/noExplicitAny: Backbone Model may have custom methods
+    const modelAny = model as any;
     if (typeof modelAny[key] === 'function' && kb.settings.orm?.useFunction?.(model, key)) {
-      return (modelAny[key] as (...a: unknown[]) => unknown)();
+      return modelAny[key]();
     }
 
     if (!args) {
@@ -220,7 +233,8 @@ const kb = {
     }
 
     const allArgs = [key, ...args].map((value) => kb.peek(value));
-    return (model.get as (...a: unknown[]) => unknown).apply(model, allArgs);
+    // biome-ignore lint/suspicious/noExplicitAny: Using get with spread args
+    return (model.get as any).apply(model, allArgs);
   },
 
   // Set value on model
@@ -228,9 +242,10 @@ const kb = {
     if (!model) return;
 
     // Check if ORM wants to use a function
-    const modelAny = model as Record<string, unknown>;
+    // biome-ignore lint/suspicious/noExplicitAny: Backbone Model may have custom methods
+    const modelAny = model as any;
     if (typeof modelAny[key] === 'function' && kb.settings.orm?.useFunction?.(model, key)) {
-      (modelAny[key] as (v: unknown) => void)(value);
+      modelAny[key](value);
       return;
     }
 
@@ -238,13 +253,15 @@ const kb = {
   },
 
   // Helper to ignore dependencies in a function
-  ignore: ko.dependencyDetection?.ignore || ((callback: () => unknown, callbackTarget?: unknown, callbackArgs?: unknown[]) => {
-    let value: unknown = null;
-    ko.computed(() => {
-      value = callback.apply(callbackTarget, callbackArgs || []);
-    }).dispose();
-    return value;
-  }),
+  ignore:
+    (ko as unknown as KoExtended).dependencyDetection?.ignore ||
+    (<T>(callback: () => T, callbackTarget?: unknown, callbackArgs?: unknown[]): T => {
+      let value: T = null as T;
+      ko.computed(() => {
+        value = callback.apply(callbackTarget, callbackArgs || []);
+      }).dispose();
+      return value;
+    }),
 
   // Peek at observable value without creating dependency
   peek<T>(obs: T | ko.Observable<T>): T {
@@ -282,7 +299,8 @@ const kb = {
   },
 
   // Publish methods from instance to observable
-  publishMethods(observable: Record<string, unknown>, instance: Record<string, unknown>, methods: string[]): void {
+  // biome-ignore lint/suspicious/noExplicitAny: Dynamically setting methods on various object types
+  publishMethods(observable: any, instance: Record<string, unknown>, methods: string[]): void {
     for (const fn of methods) {
       observable[fn] = (instance[fn] as (...args: unknown[]) => unknown).bind(instance);
     }

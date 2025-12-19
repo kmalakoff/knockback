@@ -1,4 +1,4 @@
-import type { KBMetadata, KBObservable, StoreReference } from '../types.ts';
+import type { KBMetadata } from '../types.ts';
 
 interface KBObject {
   __kb?: KBMetadata | null;
@@ -19,7 +19,8 @@ export default function wrappedDestroy(obj: KBObject): void {
 
   // Clean up nested observable
   if (__kb.observable) {
-    const obs = __kb.observable as KBObservable;
+    // biome-ignore lint/suspicious/noExplicitAny: Clearing dynamic properties
+    const obs = __kb.observable as any;
     obs.destroy = undefined;
     obs.release = undefined;
     wrappedDestroy(__kb.observable as unknown as KBObject);
@@ -43,8 +44,7 @@ export default function wrappedDestroy(obj: KBObject): void {
 
   // Release store references
   if (__kb.stores_references) {
-    let storeRef: StoreReference | undefined;
-    while ((storeRef = __kb.stores_references.pop())) {
+    for (let storeRef = __kb.stores_references.pop(); storeRef; storeRef = __kb.stores_references.pop()) {
       if (!storeRef.store.__kb_released) {
         storeRef.store.release(obj);
       }

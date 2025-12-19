@@ -2,194 +2,127 @@
 // Copyright (c) 2011-2024 Kevin Malakoff.
 // License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
-import Backbone from 'backbone';
-import ko from 'knockout';
-import _ from 'underscore';
+// =============================================================================
+// Core API
+// =============================================================================
 
-// Core
+// CollectionObservable - bind to a Backbone collection
+export { collectionObservable } from './collection-observable.ts';
+// Observable - bind to a single model attribute
+export { observable } from './observable.ts';
+// ViewModel - auto-generate observables for all model attributes
+export type { ViewModel } from './view-model.ts';
+export { viewModel } from './view-model.ts';
+
+// =============================================================================
+// Memory Management
+// =============================================================================
+
 import kb from './kb.ts';
-import utils from './utils.ts';
 
-// Types
-export * from './types.ts';
-export { TYPE_UNKNOWN, TYPE_SIMPLE, TYPE_ARRAY, TYPE_MODEL, TYPE_COLLECTION } from './types.ts';
+/** Release a view model or observable and all its resources */
+export const release = kb.release.bind(kb);
 
-// Functions
-export { default as extend } from './functions/extend.ts';
-export { default as collapseOptions } from './functions/collapse-options.ts';
-export { default as unwrapModels } from './functions/unwrap-models.ts';
-export { default as wrappedDestroy } from './functions/wrapped-destroy.ts';
+/** Bind automatic release to DOM node removal */
+export const releaseOnNodeRemove = kb.releaseOnNodeRemove.bind(kb);
 
-// Core classes
-export { Factory } from './factory.ts';
-export { Store } from './store.ts';
-export { EventWatcher, emitterObservable } from './event-watcher.ts';
-export { TypedValue } from './typed-value.ts';
+/** Apply Knockout bindings with automatic release on node removal */
+export const applyBindings = kb.applyBindings.bind(kb);
 
-// Main classes
-export { Observable, observable } from './observable.ts';
-export { ViewModel, viewModel } from './view-model.ts';
-export { CollectionObservable, collectionObservable, observableCollection, compare } from './collection-observable.ts';
-
+// =============================================================================
 // Plugins
-export * from './plugins/index.ts';
+// =============================================================================
 
-// Additional modules
-export { configure, registerORM, getRegisteredORMs } from './configure.ts';
-export type { ORM, ConfigureOptions } from './configure.ts';
+// Defaults - wrap observables with default values
+export { defaultObservable, setToDefault } from './plugins/defaults/index.ts';
+
+// Formatting - two-way string formatting
+export { formattedObservable, parseFormattedString, toFormattedString } from './plugins/formatting/index.ts';
+
+// Localization - locale-aware observables
+export type { LocaleManager, LocalizedObservableOptions } from './plugins/localization/index.ts';
+export { localizedObservable } from './plugins/localization/index.ts';
+
+// Triggering - event-based observable updates
+export { triggeredObservable } from './plugins/triggering/index.ts';
+
+// Validation
+export type { FormValidationResult, ValidationOptions, ValidationResult, ValidatorFn } from './plugins/validation/index.ts';
+export { formValidator, hasChangedFn, inputValidator, minLengthFn, uniqueValueFn, untilFalseFn, untilTrueFn, valid, valueValidator } from './plugins/validation/index.ts';
+
+// =============================================================================
+// Debugging
+// =============================================================================
+
+export type { EventStats, ModelEvent } from './statistics.ts';
 export { Statistics } from './statistics.ts';
-export type { ModelEvent, EventStats } from './statistics.ts';
-export { Inject, injectViewModels, registerInjectBinding, RECURSIVE_AUTO_INJECT, setRecursiveAutoInject } from './inject.ts';
-export type { InjectData, InjectOptions, InjectResult } from './inject.ts';
 
-// Import classes for kb namespace
-import { Factory } from './factory.ts';
-import { Store } from './store.ts';
-import { EventWatcher, emitterObservable } from './event-watcher.ts';
-import { Observable, observable } from './observable.ts';
-import { ViewModel, viewModel } from './view-model.ts';
-import { CollectionObservable, collectionObservable, observableCollection, compare } from './collection-observable.ts';
+// =============================================================================
+// Types
+// =============================================================================
 
-// Import plugins for kb namespace
-import {
-  DefaultObservable,
-  defaultObservable,
-  observableDefault,
-  setToDefault,
-  FormattedObservable,
-  formattedObservable,
-  observableFormatted,
-  toFormattedString,
-  parseFormattedString,
-  LocalizedObservable,
-  localizedObservable,
-  observableLocalized,
-  TriggeredObservable,
-  triggeredObservable,
-  observableTriggered,
-  valid,
-  hasChangedFn,
-  minLengthFn,
-  uniqueValueFn,
-  untilTrueFn,
-  untilFalseFn,
-  Validation,
-  valueValidator,
-  inputValidator,
-  formValidator,
-} from './plugins/index.ts';
+export type { CollectionObservableOptions, CreateOptions, ObservableOptions, ViewModelOptions } from './types.ts';
+export { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
-// Import additional modules for kb namespace
-import { configure, registerORM, getRegisteredORMs } from './configure.ts';
-import { Statistics } from './statistics.ts';
-import { Inject, injectViewModels, registerInjectBinding } from './inject.ts';
+// =============================================================================
+// kb namespace (for UMD/legacy support)
+// =============================================================================
 
-// Extend kb namespace with classes and factories
-const kbExtended = kb as typeof kb & {
-  utils: typeof utils;
-  Factory: typeof Factory;
-  Store: typeof Store;
-  EventWatcher: typeof EventWatcher;
-  emitterObservable: typeof emitterObservable;
-  Observable: typeof Observable;
+import { collectionObservable } from './collection-observable.ts';
+import { observable } from './observable.ts';
+import { defaultObservable, setToDefault } from './plugins/defaults/index.ts';
+import { formattedObservable, parseFormattedString, toFormattedString } from './plugins/formatting/index.ts';
+import { localizedObservable } from './plugins/localization/index.ts';
+import { triggeredObservable } from './plugins/triggering/index.ts';
+import { formValidator, hasChangedFn, inputValidator, minLengthFn, uniqueValueFn, untilFalseFn, untilTrueFn, valid, valueValidator } from './plugins/validation/index.ts';
+import { viewModel } from './view-model.ts';
+
+const kbNamespace = kb as typeof kb & {
+  // Core
   observable: typeof observable;
-  ViewModel: typeof ViewModel;
   viewModel: typeof viewModel;
-  CollectionObservable: typeof CollectionObservable;
   collectionObservable: typeof collectionObservable;
-  observableCollection: typeof observableCollection;
-  compare: typeof compare;
   // Plugins
-  DefaultObservable: typeof DefaultObservable;
   defaultObservable: typeof defaultObservable;
-  observableDefault: typeof observableDefault;
   setToDefault: typeof setToDefault;
-  FormattedObservable: typeof FormattedObservable;
   formattedObservable: typeof formattedObservable;
-  observableFormatted: typeof observableFormatted;
   toFormattedString: typeof toFormattedString;
   parseFormattedString: typeof parseFormattedString;
-  LocalizedObservable: typeof LocalizedObservable;
   localizedObservable: typeof localizedObservable;
-  observableLocalized: typeof observableLocalized;
-  TriggeredObservable: typeof TriggeredObservable;
   triggeredObservable: typeof triggeredObservable;
-  observableTriggered: typeof observableTriggered;
+  valueValidator: typeof valueValidator;
+  inputValidator: typeof inputValidator;
+  formValidator: typeof formValidator;
   valid: typeof valid;
   hasChangedFn: typeof hasChangedFn;
   minLengthFn: typeof minLengthFn;
   uniqueValueFn: typeof uniqueValueFn;
   untilTrueFn: typeof untilTrueFn;
   untilFalseFn: typeof untilFalseFn;
-  Validation: typeof Validation;
-  valueValidator: typeof valueValidator;
-  inputValidator: typeof inputValidator;
-  formValidator: typeof formValidator;
-  // Additional modules
-  configure: typeof configure;
-  registerORM: typeof registerORM;
-  getRegisteredORMs: typeof getRegisteredORMs;
-  Statistics: typeof Statistics;
-  Inject: typeof Inject;
-  injectViewModels: typeof injectViewModels;
-  registerInjectBinding: typeof registerInjectBinding;
 };
 
-kbExtended.utils = utils;
-kbExtended.Factory = Factory;
-kbExtended.Store = Store;
-kbExtended.EventWatcher = EventWatcher;
-kbExtended.emitterObservable = emitterObservable;
-kbExtended.Observable = Observable;
-kbExtended.observable = observable;
-kbExtended.ViewModel = ViewModel;
-kbExtended.viewModel = viewModel;
-kbExtended.CollectionObservable = CollectionObservable;
-kbExtended.collectionObservable = collectionObservable;
-kbExtended.observableCollection = observableCollection;
-kbExtended.compare = compare;
+// Core
+kbNamespace.observable = observable;
+kbNamespace.viewModel = viewModel;
+kbNamespace.collectionObservable = collectionObservable;
 
-// Add plugins to kb namespace
-kbExtended.DefaultObservable = DefaultObservable;
-kbExtended.defaultObservable = defaultObservable;
-kbExtended.observableDefault = observableDefault;
-kbExtended.setToDefault = setToDefault;
-kbExtended.FormattedObservable = FormattedObservable;
-kbExtended.formattedObservable = formattedObservable;
-kbExtended.observableFormatted = observableFormatted;
-kbExtended.toFormattedString = toFormattedString;
-kbExtended.parseFormattedString = parseFormattedString;
-kbExtended.LocalizedObservable = LocalizedObservable;
-kbExtended.localizedObservable = localizedObservable;
-kbExtended.observableLocalized = observableLocalized;
-kbExtended.TriggeredObservable = TriggeredObservable;
-kbExtended.triggeredObservable = triggeredObservable;
-kbExtended.observableTriggered = observableTriggered;
-kbExtended.valid = valid;
-kbExtended.hasChangedFn = hasChangedFn;
-kbExtended.minLengthFn = minLengthFn;
-kbExtended.uniqueValueFn = uniqueValueFn;
-kbExtended.untilTrueFn = untilTrueFn;
-kbExtended.untilFalseFn = untilFalseFn;
-kbExtended.Validation = Validation;
-kbExtended.valueValidator = valueValidator;
-kbExtended.inputValidator = inputValidator;
-kbExtended.formValidator = formValidator;
+// Plugins
+kbNamespace.defaultObservable = defaultObservable;
+kbNamespace.setToDefault = setToDefault;
+kbNamespace.formattedObservable = formattedObservable;
+kbNamespace.toFormattedString = toFormattedString;
+kbNamespace.parseFormattedString = parseFormattedString;
+kbNamespace.localizedObservable = localizedObservable;
+kbNamespace.triggeredObservable = triggeredObservable;
+kbNamespace.valueValidator = valueValidator;
+kbNamespace.inputValidator = inputValidator;
+kbNamespace.formValidator = formValidator;
+kbNamespace.valid = valid;
+kbNamespace.hasChangedFn = hasChangedFn;
+kbNamespace.minLengthFn = minLengthFn;
+kbNamespace.uniqueValueFn = uniqueValueFn;
+kbNamespace.untilTrueFn = untilTrueFn;
+kbNamespace.untilFalseFn = untilFalseFn;
 
-// Add additional modules to kb namespace
-kbExtended.configure = configure;
-kbExtended.registerORM = registerORM;
-kbExtended.getRegisteredORMs = getRegisteredORMs;
-kbExtended.Statistics = Statistics;
-kbExtended.Inject = Inject;
-kbExtended.injectViewModels = injectViewModels;
-kbExtended.registerInjectBinding = registerInjectBinding;
-
-// Export kb namespace and utils
-export { kbExtended as kb, utils };
-
-// Re-export dependencies
-export { _, ko, Backbone };
-
-// Default export
-export default kbExtended;
+export { kbNamespace as kb };
+export default kbNamespace;

@@ -1,5 +1,4 @@
-export { valid, hasChangedFn, minLengthFn, uniqueValueFn, untilTrueFn, untilFalseFn } from './validators.ts';
+export type { FormValidationResult, ValidationOptions, ValidationResult } from './validation.ts';
+export { formValidator, inputValidator, valueValidator } from './validation.ts';
 export type { ValidatorFn } from './validators.ts';
-
-export { Validation, valueValidator, inputValidator, formValidator } from './validation.ts';
-export type { ValidationOptions, ValidationResult, FormValidationResult } from './validation.ts';
+export { hasChangedFn, minLengthFn, uniqueValueFn, untilFalseFn, untilTrueFn, valid } from './validators.ts';

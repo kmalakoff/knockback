@@ -1,17 +1,11 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
-import _ from 'underscore';
 import kb from './kb.ts';
+import type { EventCallbackInfo, KBMetadata } from './types.ts';
 import utils from './utils.ts';
-import type { KBMetadata } from './types.ts';
 
-interface CallbackInfo {
-  obj: unknown;
-  key?: string | ko.Observable<string>;
-  path?: string;
-  update?: () => void;
-  emitter?: (model: Backbone.Model | null) => void;
-  event_selector?: string;
+/** @internal */
+export interface CallbackInfo extends EventCallbackInfo {
   unbind_fn?: (() => void) | null;
 }
 
@@ -31,12 +25,7 @@ export class EventWatcher {
   ee: Backbone.Model | null = null;
 
   // Use existing event watcher from options or create a new one
-  static useOptionsOrCreate(
-    options: { event_watcher?: EventWatcher },
-    emitter: Backbone.Model | null,
-    obj: unknown,
-    callbackOptions: CallbackInfo
-  ): EventWatcher {
+  static useOptionsOrCreate(options: { event_watcher?: EventWatcher }, emitter: Backbone.Model | null, obj: unknown, callbackOptions: CallbackInfo): EventWatcher {
     if (options.event_watcher) {
       const ew = options.event_watcher;
       if (ew.emitter() !== emitter) {
@@ -72,24 +61,24 @@ export class EventWatcher {
   }
 
   // Get or set the emitter (model)
+  emitter(): Backbone.Model | null;
+  emitter(newEmitter: Backbone.Model | null): Backbone.Model | null;
   emitter(newEmitter?: Backbone.Model | null): Backbone.Model | null {
     // Getter
-    if (arguments.length === 0) {
+    if (newEmitter === undefined) {
       return this.ee;
     }
 
-    // No change
+    // Setter - no change
     if (this.ee === newEmitter) {
       return this.ee;
     }
 
     // Switch bindings
-    if (this.ee !== newEmitter) {
-      if (newEmitter) {
-        this._onModelLoaded(newEmitter);
-      } else if (this.ee) {
-        this._onModelUnloaded(this.ee);
-      }
+    if (newEmitter) {
+      this._onModelLoaded(newEmitter);
+    } else if (this.ee) {
+      this._onModelUnloaded(this.ee);
     }
 
     return newEmitter ?? null;
@@ -112,7 +101,8 @@ export class EventWatcher {
           model: null,
           list: [],
           fn: (eventModel?: Backbone.Model): null => {
-            for (const info of callbacks!.list) {
+            const callbackList = callbacks?.list ?? [];
+            for (const info of callbackList) {
               if (!info.update) continue;
 
               // Check if key matches for change events

@@ -1,7 +1,7 @@
 import assert from 'assert';
 import Backbone from 'backbone';
+import kb, { localizedObservable, Statistics } from 'knockback';
 import ko from 'knockout';
-import kb, { LocalizedObservable, Statistics } from 'knockback';
 
 describe('Localization plugin', () => {
   // Mock locale manager
@@ -32,29 +32,6 @@ describe('Localization plugin', () => {
     }
   }
 
-  // Test localizer class
-  class SimpleLocalizer extends LocalizedObservable {
-    read(value: string): string {
-      const localeManager = kb.locale_manager as MockLocaleManager;
-      return localeManager.get(value);
-    }
-  }
-
-  // Test localizer with write support
-  class WriteableLocalizer extends LocalizedObservable {
-    read(value: string): string {
-      const localeManager = kb.locale_manager as MockLocaleManager;
-      return localeManager.get(value);
-    }
-
-    write(localizedString: string, value: string): void {
-      // For testing: reverse lookup (simplified)
-      if (ko.isObservable(this.value)) {
-        (this.value as ko.Observable<string>)(value);
-      }
-    }
-  }
-
   let originalLocaleManager: unknown;
 
   beforeEach(() => {
@@ -63,7 +40,7 @@ describe('Localization plugin', () => {
   });
 
   afterEach(() => {
-    kb.locale_manager = originalLocaleManager;
+    kb.locale_manager = originalLocaleManager as typeof kb.locale_manager;
   });
 
   describe('basic localized observable', () => {
@@ -71,7 +48,12 @@ describe('Localization plugin', () => {
       const stats = new Statistics();
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
-      const obs = new SimpleLocalizer('greeting') as unknown as ko.Observable<string>;
+      const obs = localizedObservable('greeting', {
+        read: (value: unknown) => {
+          const localeManager = kb.locale_manager as MockLocaleManager;
+          return localeManager.get(value as string);
+        },
+      });
 
       assert.strictEqual(obs(), 'Hello', 'Returns localized value');
 
@@ -84,7 +66,12 @@ describe('Localization plugin', () => {
       const stats = new Statistics();
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
-      const obs = new SimpleLocalizer('greeting') as unknown as ko.Observable<string>;
+      const obs = localizedObservable('greeting', {
+        read: (value: unknown) => {
+          const localeManager = kb.locale_manager as MockLocaleManager;
+          return localeManager.get(value as string);
+        },
+      });
       const localeManager = kb.locale_manager as MockLocaleManager;
 
       assert.strictEqual(obs(), 'Hello', 'English greeting');
@@ -106,9 +93,12 @@ describe('Localization plugin', () => {
       const stats = new Statistics();
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
-      const obs = new SimpleLocalizer('greeting') as unknown as ko.Observable<string> & {
-        observedValue: (value?: string) => string;
-      };
+      const obs = localizedObservable('greeting', {
+        read: (value: unknown) => {
+          const localeManager = kb.locale_manager as MockLocaleManager;
+          return localeManager.get(value as string);
+        },
+      });
 
       assert.strictEqual(obs(), 'Hello');
       assert.strictEqual(obs.observedValue(), 'greeting', 'Get observed value');
@@ -128,9 +118,13 @@ describe('Localization plugin', () => {
       (kb as unknown as { statistics: Statistics }).statistics = stats;
 
       const changes: string[] = [];
-      const obs = new SimpleLocalizer('greeting', {
+      const obs = localizedObservable('greeting', {
+        read: (value: unknown) => {
+          const localeManager = kb.locale_manager as MockLocaleManager;
+          return localeManager.get(value as string);
+        },
         onChange: (value: unknown) => changes.push(value as string),
-      }) as unknown as ko.Observable<string>;
+      });
 
       const localeManager = kb.locale_manager as MockLocaleManager;
 
@@ -140,6 +134,36 @@ describe('Localization plugin', () => {
       localeManager.setLocale('es');
       assert.strictEqual(changes.length, 1, 'onChange called');
       assert.strictEqual(changes[0], 'Hola', 'Received new value');
+
+      kb.release(obs);
+      assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
+      (kb as unknown as { statistics: undefined }).statistics = undefined;
+    });
+  });
+
+  describe('with write support', () => {
+    it('should support write function', () => {
+      const stats = new Statistics();
+      (kb as unknown as { statistics: Statistics }).statistics = stats;
+
+      const valueStore = ko.observable('greeting');
+
+      const obs = localizedObservable(valueStore, {
+        read: (value: unknown) => {
+          const localeManager = kb.locale_manager as MockLocaleManager;
+          return localeManager.get(value as string);
+        },
+        write: (_localizedString: unknown, _value: unknown) => {
+          // For testing: just update the underlying observable
+          valueStore('farewell');
+        },
+      });
+
+      assert.strictEqual(obs(), 'Hello', 'Initial value');
+
+      // Write to the observable
+      obs('test');
+      assert.strictEqual(obs(), 'Goodbye', 'Value changed after write');
 
       kb.release(obs);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');

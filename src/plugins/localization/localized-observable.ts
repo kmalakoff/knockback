@@ -1,46 +1,26 @@
-import type * as Backbone from 'backbone';
 import ko from 'knockout';
-import _ from 'underscore';
 import kb from '../../kb.ts';
+import type { LocaleManager } from '../../types.ts';
 import utils from '../../utils.ts';
-import extend from '../../functions/extend.ts';
 import { defaultObservable } from '../defaults/default-observable.ts';
 
 const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'] as const;
 
-export interface LocaleManager extends Backbone.Events {
-  get(attribute: string): unknown;
-  getLocale?(): string;
-}
+// Re-export LocaleManager type for backwards compatibility
+export type { LocaleManager };
 
 export interface LocalizedObservableOptions {
+  /** Required: function to read/format the localized value */
+  read: (value: unknown) => unknown;
+  /** Optional: function to write/parse the localized value back */
+  write?: (localizedString: unknown, value: unknown) => void;
+  /** Optional: default value when value is null/empty */
   default?: unknown;
+  /** Optional: callback when locale changes */
   onChange?: (value: unknown) => void;
 }
 
-/**
- * Abstract base class for observing localized data that changes when the locale changes.
- * You must provide the following methods in subclasses:
- *   - read: function(value, observable) - called to get the value and each time the locale changes
- *   - write: function(localized_string, value, observable) - called to set the value (optional)
- *
- * @example
- *   class ShortDateLocalizer extends kb.LocalizedObservable {
- *     read(value) {
- *       return Globalize.format(value, 'd', kb.locale_manager.getLocale());
- *     }
- *     write(localized_string, value) {
- *       const new_value = Globalize.parseDate(localized_string, 'd', kb.locale_manager.getLocale());
- *       if (!(new_value && _.isDate(new_value))) {
- *         return kb.utils.wrappedObservable(this).resetToCurrent();
- *       }
- *       return value.setTime(new_value.valueOf());
- *     }
- *   }
- */
-export class LocalizedObservable {
-  static extend = extend;
-
+interface LocalizedObservableState {
   __kb: {
     observable?: ko.Observable;
     _onLocaleChange?: () => void;
@@ -50,152 +30,153 @@ export class LocalizedObservable {
   value: unknown;
   vo: ko.Observable<unknown>;
   vm: Record<string, unknown>;
+  readFn: (value: unknown) => unknown;
+  writeFn?: (localizedString: unknown, value: unknown) => void;
+}
 
-  /**
-   * Create a new LocalizedObservable. This is an abstract class.
-   *
-   * @param value - The value to localize
-   * @param options - Configuration options
-   * @param options.default - A default value when value is null/empty
-   * @param options.onChange - Callback when locale changes
-   * @param viewModel - The view model context
-   * @returns A ko.observable (not 'this')
-   */
-  constructor(value: unknown, options?: LocalizedObservableOptions, viewModel?: Record<string, unknown>) {
-    const opts = options || {};
-    this.vm = viewModel || {};
-    this.value = value;
+// =============================================================================
+// Factory Function (Primary API)
+// =============================================================================
 
-    // Validate required methods
-    if (!this.read) {
-      kb._throwMissing(this, 'read');
-    }
-    if (!kb.locale_manager) {
-      kb._throwMissing(this, 'kb.locale_manager');
-    }
+/**
+ * Creates a localized observable that updates when the locale changes.
+ *
+ * @param value - The value to localize (can be an observable)
+ * @param options - Configuration options including read/write functions
+ * @param viewModel - Optional view model context
+ * @returns A ko.observable that updates on locale changes
+ *
+ * @example
+ *   // Simple translation lookup
+ *   const greeting = kb.localizedObservable('greeting_key', {
+ *     read: (key) => kb.locale_manager.get(key)
+ *   });
+ *
+ * @example
+ *   // Date formatting with write support
+ *   const localizedDate = kb.localizedObservable(dateValue, {
+ *     read: (date) => new Intl.DateTimeFormat(kb.locale_manager.getLocale()).format(date),
+ *     write: (str, date) => {
+ *       const parsed = new Date(str);
+ *       if (!isNaN(parsed.getTime())) date.setTime(parsed.getTime());
+ *     }
+ *   });
+ */
+export function localizedObservable(value: unknown, options: LocalizedObservableOptions, viewModel?: Record<string, unknown>): ko.Observable & { destroy: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void } {
+  // Validate required options
+  if (!options?.read) {
+    kb._throwMissing({ constructor: { name: 'localizedObservable' } }, 'options.read');
+  }
+  if (!kb.locale_manager) {
+    kb._throwMissing({ constructor: { name: 'localizedObservable' } }, 'kb.locale_manager');
+  }
 
-    // Initialize __kb
-    this.__kb = {};
-    this.__kb._onLocaleChange = this._onLocaleChange.bind(this);
-    this.__kb._onChange = opts.onChange;
+  // Instance state (closure-based)
+  const state: LocalizedObservableState = {
+    __kb: {},
+    __kb_released: false,
+    value,
+    vo: ko.observable(null),
+    vm: viewModel || {},
+    readFn: options.read,
+    writeFn: options.write,
+  };
 
-    // Internal state
-    const unwrappedValue = this.value ? ko.utils.unwrapObservable(this.value) : null;
-    this.vo = ko.observable(unwrappedValue ? this.read(unwrappedValue, null) : null);
+  state.__kb._onLocaleChange = onLocaleChange;
+  state.__kb._onChange = options.onChange;
 
-    let observable = utils.wrappedObservable(
-      this,
-      ko.computed({
-        read: () => {
-          if (this.value) {
-            ko.utils.unwrapObservable(this.value);
-          }
-          this.vo(); // Create a dependency
-          return this.read(ko.utils.unwrapObservable(this.value));
-        },
-        write: (val: unknown) => {
-          if (!this.write) {
-            kb._throwUnexpected(this, 'writing to read-only');
-          }
-          this.write(val, ko.utils.unwrapObservable(this.value));
-          this.vo(val);
-          if (this.__kb._onChange) {
-            this.__kb._onChange(val);
-          }
-        },
-        owner: this.vm,
-      })
-    ) as ko.Observable & { destroy: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void };
+  // Initialize value
+  const unwrappedValue = state.value ? ko.utils.unwrapObservable(state.value) : null;
+  if (unwrappedValue) {
+    state.vo(state.readFn(unwrappedValue));
+  }
 
-    // Publish public interface on the observable
-    kb.publishMethods(observable, this, KEYS_PUBLISH as unknown as string[]);
+  const observable = utils.setObservable(
+    state,
+    ko.computed({
+      read: () => {
+        if (state.value) {
+          ko.utils.unwrapObservable(state.value);
+        }
+        state.vo(); // Create a dependency
+        return state.readFn(ko.utils.unwrapObservable(state.value));
+      },
+      write: (val: unknown) => {
+        if (!state.writeFn) {
+          kb._throwUnexpected({ constructor: { name: 'localizedObservable' } }, 'writing to read-only');
+        }
+        state.writeFn(val, ko.utils.unwrapObservable(state.value));
+        state.vo(val);
+        if (state.__kb._onChange) {
+          state.__kb._onChange(val);
+        }
+      },
+      owner: state.vm,
+    })
+  ) as ko.Observable & { destroy: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void };
 
-    // Start listening to locale changes
+  // Add methods to state for publishMethods to find
+  (state as unknown as Record<string, unknown>).destroy = destroy;
+  (state as unknown as Record<string, unknown>).observedValue = observedValue;
+  (state as unknown as Record<string, unknown>).resetToCurrent = resetToCurrent;
+
+  // Publish public interface on the observable
+  kb.publishMethods(observable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
+
+  // Start listening to locale changes
+  const localeManager = kb.locale_manager as LocaleManager;
+  if (localeManager?.on && state.__kb._onLocaleChange) {
+    localeManager.on('change', state.__kb._onLocaleChange);
+  }
+
+  // Wrap with default value if specified
+  // biome-ignore lint/suspicious/noExplicitAny: Wrapping observable with default value changes type
+  let result: any = observable;
+  if (options.default !== undefined) {
+    result = defaultObservable(observable, options.default);
+  }
+
+  return result;
+
+  // =============================================================================
+  // Instance Methods (closures)
+  // =============================================================================
+
+  function destroy(): void {
     const localeManager = kb.locale_manager as LocaleManager;
-    if (localeManager?.on) {
-      localeManager.on('change', this.__kb._onLocaleChange!);
+    if (localeManager?.off && state.__kb._onLocaleChange) {
+      localeManager.off('change', state.__kb._onLocaleChange);
     }
-
-    // Wrap with default value if specified
-    if (Object.prototype.hasOwnProperty.call(opts, 'default')) {
-      observable = defaultObservable(observable, opts.default) as typeof observable;
-    }
-
-    return observable as unknown as LocalizedObservable;
+    state.vm = {};
+    utils.wrappedDestroy(state);
   }
 
-  /**
-   * Abstract method - must be implemented by subclasses.
-   * Called to get the localized value.
-   */
-  read(_value: unknown, _observable?: unknown): unknown {
-    throw new Error('read method must be implemented');
-  }
+  function resetToCurrent(): void {
+    const obs = utils.getObservable(state) as ko.Observable;
+    const currentValue = state.value ? state.readFn(ko.utils.unwrapObservable(state.value)) : null;
 
-  /**
-   * Optional method - implement in subclasses for write support.
-   * Called to set the value from a localized string.
-   */
-  write?(_localizedString: unknown, _value: unknown): void;
-
-  /**
-   * Required clean up function to break cycles, release view models, etc.
-   */
-  destroy(): void {
-    const localeManager = kb.locale_manager as LocaleManager;
-    if (localeManager?.off && this.__kb._onLocaleChange) {
-      localeManager.off('change', this.__kb._onLocaleChange);
-    }
-    this.vm = {};
-    utils.wrappedDestroy(this);
-  }
-
-  /**
-   * Used to reset the value if localization is not possible.
-   */
-  resetToCurrent(): void {
-    const observable = utils.wrappedObservable(this) as ko.Observable;
-    const currentValue = this.value ? this.read(ko.utils.unwrapObservable(this.value)) : null;
-
-    if (observable() === currentValue) {
+    if (obs() === currentValue) {
       return;
     }
-    observable(currentValue);
+    obs(currentValue);
   }
 
-  /**
-   * Dual purpose set/get for the observed value
-   */
-  observedValue(value?: unknown): unknown {
-    if (arguments.length === 0) {
-      return this.value;
+  function observedValue(newValue?: unknown): unknown {
+    if (newValue === undefined) {
+      return state.value;
     }
-    this.value = value;
-    this._onLocaleChange();
+    state.value = newValue;
+    onLocaleChange();
     return undefined;
   }
 
-  /**
-   * Internal handler for locale changes
-   * @private
-   */
-  private _onLocaleChange(): void {
-    const value = this.read(ko.utils.unwrapObservable(this.value));
-    this.vo(value);
-    if (this.__kb._onChange) {
-      this.__kb._onChange(value);
+  function onLocaleChange(): void {
+    const localizedValue = state.readFn(ko.utils.unwrapObservable(state.value));
+    state.vo(localizedValue);
+    if (state.__kb._onChange) {
+      state.__kb._onChange(localizedValue);
     }
   }
 }
 
-/**
- * Factory function for creating a LocalizedObservable
- */
-export function localizedObservable(value: unknown, options?: LocalizedObservableOptions, viewModel?: Record<string, unknown>): ko.Observable {
-  return new LocalizedObservable(value, options, viewModel) as unknown as ko.Observable;
-}
-
-// Alias
-export const observableLocalized = localizedObservable;
-
-export default LocalizedObservable;
+export default localizedObservable;

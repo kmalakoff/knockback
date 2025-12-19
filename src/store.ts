@@ -1,8 +1,8 @@
 import ko from 'knockout';
 import _ from 'underscore';
 import kb from './kb.ts';
-import utils from './utils.ts';
 import type { CreateOptions, Creator, KBObservable, StoreReference, ViewModelOptions } from './types.ts';
+import utils from './utils.ts';
 
 interface ObservableRecord {
   [cid: string]: unknown;
@@ -17,7 +17,8 @@ export class Store {
   replaced_observables: unknown[] = [];
 
   // Use existing store from options or create a new one
-  static useOptionsOrCreate(options: ViewModelOptions, obj: unknown, observable: KBObservable): Store {
+  // biome-ignore lint/suspicious/noExplicitAny: Observable can be any object with __kb
+  static useOptionsOrCreate(options: ViewModelOptions, obj: unknown, observable: any): Store {
     if (!options.store) {
       utils.wrappedStoreIsOwned(observable, true);
     }
@@ -123,9 +124,7 @@ export class Store {
 
     const newObservable = kb.ignore(() => {
       const createOptions = { store: this, creator, ...options };
-      const result = (creator as { create?: (o: unknown, opts: CreateOptions) => unknown }).create
-        ? (creator as { create: (o: unknown, opts: CreateOptions) => unknown }).create(obj, createOptions)
-        : new (creator as new (o: unknown, opts: CreateOptions) => unknown)(obj, createOptions);
+      const result = (creator as { create?: (o: unknown, opts: CreateOptions) => unknown }).create ? (creator as { create: (o: unknown, opts: CreateOptions) => unknown }).create(obj, createOptions) : new (creator as new (o: unknown, opts: CreateOptions) => unknown)(obj, createOptions);
       return result || ko.observable(null);
     });
 
@@ -290,7 +289,7 @@ export class Store {
   // Add observable to store
   private _add(observable: unknown, obj: unknown, creator?: Creator): void {
     creator = creator || (observable as { constructor: Creator }).constructor;
-    utils.wrappedObject(observable, obj);
+    utils.wrappedObject(observable, obj as Backbone.Model | Backbone.Collection | null);
     utils.wrappedCreator(observable, creator);
 
     const creatorId = this._creatorId(creator);

@@ -1,14 +1,12 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
-import _ from 'underscore';
-import kb from './kb.ts';
-import utils from './utils.ts';
-import extend from './functions/extend.ts';
 import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
-import { Store } from './store.ts';
+import kb from './kb.ts';
 import { observable as kbObservable } from './observable.ts';
+import { Store } from './store.ts';
 import type { CreateOptions, KBMetadata, ObservableOptions, ViewModelOptions } from './types.ts';
+import utils, { type KBObject } from './utils.ts';
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'] as const;
 
@@ -30,7 +28,7 @@ function assignViewModelKey(vm: ViewModel, key: string): string | undefined {
   const vmKey = __kb.internals && __kb.internals.indexOf(key) >= 0 ? `_${key}` : key;
 
   const viewModel = __kb.view_model as Record<string, unknown>;
-  if (Object.prototype.hasOwnProperty.call(viewModel, vmKey)) {
+  if (Object.hasOwn(viewModel, vmKey)) {
     return undefined; // Already exists
   }
 
@@ -73,9 +71,17 @@ function createStaticObservables(vm: ViewModel, model: Backbone.Model): void {
   }
 }
 
-// ViewModel class for Backbone models
-export class ViewModel {
-  static extend = extend;
+// =============================================================================
+// ViewModel Class
+// =============================================================================
+
+/**
+ * ViewModel class for Backbone models.
+ * Creates Knockout observables for all model attributes automatically.
+ */
+class ViewModel implements KBObject {
+  // Index signature for dynamic property access
+  [key: string]: unknown;
 
   __kb: ViewModelMetadata;
   __kb_released?: boolean;
@@ -83,113 +89,118 @@ export class ViewModel {
   model!: ko.Computed<Backbone.Model | null>;
 
   constructor(model: Backbone.Model | null, options: ViewModelOptions | string[] = {}, viewModel?: ViewModel) {
-    return kb.ignore(() => {
-      // Validate model
-      if (model && !kb.isModel(model)) {
-        kb._throwUnexpected(this, 'not a model');
+    // Initialize metadata first
+    this.__kb = {};
+
+    // Run initialization inside kb.ignore to prevent unwanted dependency tracking
+    kb.ignore(() => this._initialize(model, options, viewModel));
+  }
+
+  // Internal initialization (called in constructor)
+  private _initialize(model: Backbone.Model | null, options: ViewModelOptions | string[], viewModel?: ViewModel): void {
+    // Validate model
+    if (model && !kb.isModel(model)) {
+      kb._throwUnexpected(this, 'not a model');
+    }
+
+    // Convert array shorthand to keys option
+    let opts: ViewModelOptions = {};
+    if (Array.isArray(options)) {
+      opts = { keys: options };
+    } else if (options) {
+      opts = options;
+    }
+
+    const __kb = this.__kb as ViewModelMetadata;
+    __kb.view_model = viewModel || this;
+
+    // Collapse options
+    const mergedOptions = utils.collapseOptions(opts) as ViewModelOptions;
+
+    // Copy relevant options to __kb
+    for (const key of KEYS_OPTIONS) {
+      if (Object.hasOwn(mergedOptions, key)) {
+        (__kb as Record<string, unknown>)[key] = mergedOptions[key];
       }
+    }
 
-      // Convert array shorthand to keys option
-      let opts: ViewModelOptions = {};
-      if (Array.isArray(options)) {
-        opts = { keys: options };
-      } else if (options) {
-        opts = options;
-      }
+    // Always use a store
+    Store.useOptionsOrCreate(mergedOptions, model, this);
 
-      // Initialize __kb
-      this.__kb = {};
-      const __kb = this.__kb as ViewModelMetadata;
-      __kb.view_model = viewModel || this;
+    // Factory setup
+    __kb.path = mergedOptions.path;
+    Factory.useOptionsOrCreate(mergedOptions, this, mergedOptions.path);
 
-      // Collapse options
-      const mergedOptions = utils.collapseOptions(opts) as ViewModelOptions;
+    // Model observable (store on instance, not in __kb)
+    const _model = ko.observable<Backbone.Model | null>(null);
+    this._model = _model;
+    let eventWatcher: EventWatcher | null = null;
 
-      // Copy relevant options to __kb
-      for (const key of KEYS_OPTIONS) {
-        if (Object.prototype.hasOwnProperty.call(mergedOptions, key)) {
-          (__kb as Record<string, unknown>)[key] = mergedOptions[key];
-        }
-      }
+    this.model = ko.computed({
+      read: () => ko.utils.unwrapObservable(_model),
+      write: (newModel: Backbone.Model | null) => {
+        kb.ignore(() => {
+          if (kb.wasReleased(this) || !eventWatcher) return;
 
-      // Always use a store
-      Store.useOptionsOrCreate(mergedOptions, model, this as unknown as ko.Observable);
+          const store = utils.wrappedStore(this) as Store;
+          store.reuse(this, utils.resolveModel(newModel));
+          eventWatcher.emitter(newModel);
+          _model(eventWatcher.ee);
 
-      // Factory setup
-      __kb.path = mergedOptions.path;
-      Factory.useOptionsOrCreate(mergedOptions, this, mergedOptions.path);
+          if (eventWatcher.ee) {
+            this.createObservables(eventWatcher.ee);
+          }
+        });
+      },
+    });
 
-      // Model observable
-      const _model = utils.set(this, '_model', ko.observable()) as ko.Observable<Backbone.Model | null>;
-      let eventWatcher: EventWatcher | null = null;
-
-      this.model = ko.computed({
-        read: () => ko.utils.unwrapObservable(_model),
-        write: (newModel: Backbone.Model | null) => {
+    // Event watcher
+    eventWatcher = utils.wrappedEventWatcher(
+      this,
+      new EventWatcher(model || null, this, {
+        obj: this,
+        emitter: (m: Backbone.Model | null) => _model(m),
+        update: () => {
           kb.ignore(() => {
-            if (kb.wasReleased(this) || !eventWatcher) return;
-
-            const store = utils.wrappedStore(this) as Store;
-            store.reuse(this, utils.resolveModel(newModel));
-            eventWatcher.emitter(newModel);
-            _model(eventWatcher.ee);
-
-            if (eventWatcher.ee) {
+            if (eventWatcher?.ee) {
               this.createObservables(eventWatcher.ee);
             }
           });
         },
-      });
+      })
+    ) as EventWatcher;
 
-      // Event watcher
-      eventWatcher = utils.wrappedEventWatcher(
-        this,
-        new EventWatcher(model || null, this, {
-          emitter: (m: Backbone.Model | null) => _model(m),
-          update: () => {
-            kb.ignore(() => {
-              if (eventWatcher?.ee) {
-                this.createObservables(eventWatcher.ee);
-              }
-            });
-          },
-        })
-      ) as EventWatcher;
+    utils.wrappedObject(this, model || null);
+    _model(eventWatcher.ee);
 
-      utils.wrappedObject(this, model || null);
-      _model(eventWatcher.ee);
+    // Create options for child observables
+    __kb.create_options = {
+      store: utils.wrappedStore(this),
+      factory: utils.wrappedFactory(this),
+      path: __kb.path,
+      event_watcher: utils.wrappedEventWatcher(this),
+    };
 
-      // Create options for child observables
-      __kb.create_options = {
-        store: utils.wrappedStore(this),
-        factory: utils.wrappedFactory(this),
-        path: __kb.path,
-        event_watcher: utils.wrappedEventWatcher(this),
-      };
+    // Create observables
+    if (mergedOptions.requires) {
+      this.createObservables(model, mergedOptions.requires);
+    }
+    if (__kb.internals) {
+      this.createObservables(model, __kb.internals);
+    }
+    if (mergedOptions.mappings) {
+      this.createObservables(model, mergedOptions.mappings);
+    }
+    if (__kb.statics && model) {
+      createStaticObservables(this, model);
+    }
+    this.createObservables(model, __kb.keys);
 
-      // Create observables
-      if (mergedOptions.requires) {
-        this.createObservables(model, mergedOptions.requires);
-      }
-      if (__kb.internals) {
-        this.createObservables(model, __kb.internals);
-      }
-      if (mergedOptions.mappings) {
-        this.createObservables(model, mergedOptions.mappings);
-      }
-      if (__kb.statics && model) {
-        createStaticObservables(this, model);
-      }
-      this.createObservables(model, __kb.keys);
-
-      // Statistics tracking
-      const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
-      if (statistics) {
-        statistics.register('ViewModel', this);
-      }
-
-      return this;
-    }) as unknown as ViewModel;
+    // Statistics tracking
+    const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
+    if (statistics) {
+      statistics.register('ViewModel', this);
+    }
   }
 
   // Clean up
@@ -228,6 +239,8 @@ export class ViewModel {
   // Create observables for keys
   createObservables(model: Backbone.Model | null | undefined, keys?: string[] | Record<string, ObservableOptions>): void {
     const __kb = this.__kb as ViewModelMetadata;
+    const createOptions = __kb.create_options;
+    if (!createOptions) return;
 
     if (!keys) {
       // Use all model keys if no specific keys provided
@@ -235,7 +248,7 @@ export class ViewModel {
 
       // Create observables for all attributes
       for (const key in model.attributes) {
-        createObservable(this, model, key, __kb.create_options!);
+        createObservable(this, model, key, createOptions);
       }
 
       // ORM relationship keys
@@ -244,14 +257,14 @@ export class ViewModel {
         const relKeys = orm.keys(model);
         if (relKeys) {
           for (const key of relKeys) {
-            createObservable(this, model, key, __kb.create_options!);
+            createObservable(this, model, key, createOptions);
           }
         }
       }
     } else if (Array.isArray(keys)) {
       // Array of key names
       for (const key of keys) {
-        createObservable(this, model, key, __kb.create_options!);
+        createObservable(this, model, key, createOptions);
       }
     } else {
       // Object with mapping info
@@ -265,20 +278,29 @@ export class ViewModel {
         }
 
         const viewModel = __kb.view_model as Record<string, unknown>;
-        (this as Record<string, unknown>)[vmKey] = viewModel[vmKey] = kbObservable(
-          model,
-          mappingInfo,
-          __kb.create_options as ViewModelOptions,
-          this as unknown as Record<string, unknown>
-        );
+        (this as Record<string, unknown>)[vmKey] = viewModel[vmKey] = kbObservable(model, mappingInfo, __kb.create_options as ViewModelOptions, this as unknown as Record<string, unknown>);
       }
     }
   }
 }
 
-// Factory function
+// =============================================================================
+// Factory Function (Primary API)
+// =============================================================================
+
+// Export type for external use
+export type { ViewModel };
+
+/**
+ * Creates a ViewModel for a Backbone model.
+ *
+ * @param model - The Backbone model
+ * @param options - View model options or array of attribute keys
+ * @param vm - Parent view model (for nested creation)
+ * @returns A new ViewModel instance
+ */
 export function viewModel(model: Backbone.Model | null, options?: ViewModelOptions | string[], vm?: ViewModel): ViewModel {
   return new ViewModel(model, options, vm);
 }
 
-export default ViewModel;
+export default viewModel;

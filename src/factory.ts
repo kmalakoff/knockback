@@ -1,6 +1,6 @@
 import _ from 'underscore';
-import utils from './utils.ts';
 import type { Creator, FactoriesOption, ViewModelOptions } from './types.ts';
+import utils from './utils.ts';
 
 interface PathMapping {
   view_model?: Creator;
@@ -38,7 +38,7 @@ export class Factory {
 
   // Check if a path exists
   hasPath(path: string): boolean {
-    return Object.prototype.hasOwnProperty.call(this.paths, path) || (this.parent_factory?.hasPath(path) ?? false);
+    return Object.hasOwn(this.paths, path) || (this.parent_factory?.hasPath(path) ?? false);
   }
 
   // Add a single path mapping

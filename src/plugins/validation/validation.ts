@@ -1,6 +1,6 @@
 import ko from 'knockout';
 import _ from 'underscore';
-import { valid, type ValidatorFn } from './validators.ts';
+import { type ValidatorFn, valid } from './validators.ts';
 
 /**
  * Helper to call a function or get a value
@@ -46,11 +46,7 @@ export interface FormValidationResult {
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results
  */
-export function valueValidator(
-  value: ko.Observable<unknown>,
-  bindings: Record<string, ValidatorFn>,
-  validationOptions: ValidationOptions = {}
-): ko.Computed<ValidationResult> {
+export function valueValidator(value: ko.Observable<unknown>, bindings: Record<string, ValidatorFn>, validationOptions: ValidationOptions = {}): ko.Computed<ValidationResult> {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
 
   return ko.computed(() => {
@@ -122,11 +118,7 @@ export function valueValidator(
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results, or null if not applicable
  */
-export function inputValidator(
-  viewModel: Record<string, unknown>,
-  el: HTMLElement,
-  validationOptions: ValidationOptions = {}
-): ko.Computed<ValidationResult> | null {
+export function inputValidator(viewModel: Record<string, unknown>, el: HTMLElement, validationOptions: ValidationOptions = {}): ko.Computed<ValidationResult> | null {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
   const validators = valid;
   let inputName: string | null = el.getAttribute('name');
@@ -249,7 +241,7 @@ export function formValidator(viewModel: Record<string, unknown>, el: HTMLElemen
   });
 
   // Aggregate valid
-  results.$valid = ko.computed(() => results.$error_count!() === 0);
+  results.$valid = ko.computed(() => results.$error_count?.() === 0);
 
   // Aggregate enabled
   results.$enabled = ko.computed(() => {
@@ -261,7 +253,7 @@ export function formValidator(viewModel: Record<string, unknown>, el: HTMLElemen
   });
 
   // Aggregate disabled
-  results.$disabled = ko.computed(() => !results.$enabled!());
+  results.$disabled = ko.computed(() => !results.$enabled?.());
 
   // If there is a name, add to the view_model with $ scoping
   if (formName) {
@@ -271,13 +263,4 @@ export function formValidator(viewModel: Record<string, unknown>, el: HTMLElemen
   return results as FormValidationResult;
 }
 
-/**
- * Validation class (for compatibility)
- */
-export class Validation {
-  static valueValidator = valueValidator;
-  static inputValidator = inputValidator;
-  static formValidator = formValidator;
-}
-
-export default Validation;
+export default valueValidator;
