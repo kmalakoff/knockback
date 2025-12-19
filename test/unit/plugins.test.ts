@@ -1,6 +1,6 @@
+import { defaultObservable, formattedObservable, minLengthFn, observable, parseFormattedString, toFormattedString, triggeredObservable, valid, valueValidator } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
-import { defaultObservable, formattedObservable, minLengthFn, observable, parseFormattedString, toFormattedString, triggeredObservable, valid, valueValidator } from '@mcpeasy/knockback';
 import ko from 'knockout';
 
 describe('knockback plugins', () => {

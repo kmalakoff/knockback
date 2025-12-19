@@ -1,1 +1,1 @@
-ignores: ["ts-dev-stack", "knockback"]
+ignores: ["ts-dev-stack", "@mcpeasy/knockback"]

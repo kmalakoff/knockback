@@ -1,7 +1,7 @@
-import assert from 'assert';
-import Backbone from 'backbone';
 import * as kb from '@mcpeasy/knockback';
 import { observable, Statistics, setStatistics } from '@mcpeasy/knockback';
+import assert from 'assert';
+import Backbone from 'backbone';
 import ko from 'knockout';
 
 describe('observable advanced', () => {

@@ -1,7 +1,7 @@
-import assert from 'assert';
-import Backbone from 'backbone';
 import * as kb from '@mcpeasy/knockback';
 import { Statistics, setStatistics, type ViewModel, viewModel } from '@mcpeasy/knockback';
+import assert from 'assert';
+import Backbone from 'backbone';
 import ko from 'knockout';
 
 describe('ViewModel advanced', () => {
