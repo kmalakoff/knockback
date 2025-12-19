@@ -1,17 +1,14 @@
 .DS_Store
-npm-debug.log
-*.map
-
 node_modules/
-doc/
-_temp/
 dist/
+docs/
+npm-debug.log*
+.tmp/
+.cache/
+
+# agents
+.agents/
+AGENTS.md
 .claude/
-
-# web site noise
-tutorials/*
-stylesheets/*
-javascripts/*
-images/*
-
-components/*
+CLAUDE.md
+.cache/
