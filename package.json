@@ -1,6 +1,6 @@
 {
   "name": "@mcpeasy/knockback",
-  "version": "2.0.2",
+  "version": "2.0.1",
   "description": "Knockback.js provides Knockout.js magic for Backbone.js Models and Collections",
   "keywords": [
     "knockback",
@@ -65,6 +65,7 @@
     "underscore": ">=1.13.0"
   },
   "tsds": {
+    "entry": "src/umd.ts",
     "targets": [
       "cjs",
       "esm",

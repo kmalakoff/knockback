@@ -82,7 +82,7 @@ export type { CollectionObservable, CollectionObservableOptions, LocaleManager, 
 // Default export (compat namespace)
 // =============================================================================
 
-const _kb: {
+export const kb: {
   ViewModel: new (
     ...args: unknown[]
   ) => {
@@ -152,6 +152,23 @@ const _kb: {
   valid,
   Statistics,
 };
+
+Object.defineProperties(kb, {
+  locale_manager: {
+    enumerable: true,
+    get: () => kbCore.locale_manager,
+    set: (manager: LocaleManager | null) => {
+      kbCore.locale_manager = manager;
+    },
+  },
+  statistics: {
+    enumerable: true,
+    get: () => kbCore.statistics as Statistics | null,
+    set: (stats: Statistics | null) => {
+      kbCore.statistics = stats;
+    },
+  },
+});
 
 export default kb;
 
