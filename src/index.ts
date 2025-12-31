@@ -171,14 +171,3 @@ Object.defineProperties(kb, {
 });
 
 export default kb;
-
-export namespace kb {
-  export type Observable<T = unknown> = import('./types.ts').Observable<T>;
-  export type ObservableOptions = import('./types.ts').ObservableOptions;
-  export type CollectionObservable<T = unknown> = import('./types.ts').CollectionObservable<T>;
-  export type CollectionObservableOptions<T = unknown> = import('./types.ts').CollectionObservableOptions<T>;
-  export type ViewModel<T extends Record<string, unknown> = Record<string, ko.Observable>> = import('./types.ts').ViewModel<T>;
-  export type ViewModelOptions = import('./types.ts').ViewModelOptions;
-  export type LocaleManager = import('./types.ts').LocaleManager;
-  export type LocalizedObservableOptions = import('./plugins/localization/index.ts').LocalizedObservableOptions;
-}
