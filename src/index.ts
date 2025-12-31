@@ -79,6 +79,18 @@ export type { LocalizedObservableOptions } from './plugins/localization/index.ts
 export type { CollectionObservable, CollectionObservableOptions, LocaleManager, Observable, ObservableOptions, ViewModel, ViewModelOptions } from './types.ts';
 
 // =============================================================================
+// Namespace types (kb.Observable, kb.ViewModel, etc.)
+// =============================================================================
+
+export namespace kb {
+  export type Observable<T = unknown> = ko.Observable<T>;
+  export type Computed<T = unknown> = ko.Computed<T>;
+  export type ObservableArray<T = unknown> = ko.ObservableArray<T>;
+  export type CollectionObservable<T = unknown> = import('./types.ts').CollectionObservable<T>;
+  export type ViewModel<T extends Record<string, unknown> = Record<string, unknown>> = import('./types.ts').ViewModel<T>;
+}
+
+// =============================================================================
 // Default export (compat namespace)
 // =============================================================================
 

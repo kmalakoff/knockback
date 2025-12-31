@@ -174,13 +174,15 @@ export interface CollectionObservable<T = unknown> extends ko.ObservableArray<T>
  * const vm = viewModel<PersonVM>(model);
  * vm.name(); // returns string
  */
-export type ViewModel<T extends Record<string, unknown> = Record<string, ko.Observable>> = {
+export type ViewModel<T extends Record<string, unknown> = Record<string, unknown>> = {
   /** Destroy and release all resources */
   destroy(): void;
   /** Observable for the underlying model */
   readonly model: ko.Computed<Backbone.Model | null>;
   /** Dynamically create observables for additional keys */
   createObservables(model: Backbone.Model, keys: string[]): void;
+  /** Share options (store/factory) with other view models */
+  shareOptions(): { store: unknown; factory: unknown };
 } & T;
 
 // =============================================================================
