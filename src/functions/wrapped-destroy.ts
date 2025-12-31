@@ -21,7 +21,11 @@ export default function wrappedDestroy(obj: KBObject): void {
   if (__kb.observable) {
     // biome-ignore lint/suspicious/noExplicitAny: Clearing dynamic properties
     const obs = __kb.observable as any;
-    obs.destroy = undefined;
+    obs.dispose = undefined;
+    const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
+    if (disposeSymbol) {
+      obs[disposeSymbol] = undefined;
+    }
     obs.release = undefined;
     wrappedDestroy(__kb.observable as unknown as KBObject);
     __kb.observable = undefined;

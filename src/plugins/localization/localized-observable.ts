@@ -4,7 +4,7 @@ import type { LocaleManager } from '../../types.ts';
 import utils from '../../utils.ts';
 import { defaultObservable } from '../defaults/default-observable.ts';
 
-const KEYS_PUBLISH = ['destroy', 'observedValue', 'resetToCurrent'] as const;
+const KEYS_PUBLISH = ['dispose', 'observedValue', 'resetToCurrent'] as const;
 
 // Re-export LocaleManager type for backwards compatibility
 export type { LocaleManager };
@@ -62,7 +62,7 @@ interface LocalizedObservableState {
  *     }
  *   });
  */
-export function localizedObservable(value: unknown, options: LocalizedObservableOptions, viewModel?: Record<string, unknown>): ko.Observable & { destroy: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void } {
+export function localizedObservable(value: unknown, options: LocalizedObservableOptions, viewModel?: Record<string, unknown>): ko.Observable & { dispose: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void } {
   // Validate required options
   if (!options?.read) {
     kb._throwMissing({ constructor: { name: 'localizedObservable' } }, 'options.read');
@@ -113,15 +113,16 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
       },
       owner: state.vm,
     })
-  ) as ko.Observable & { destroy: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void };
+  ) as ko.Observable & { dispose: () => void; observedValue: (value?: unknown) => unknown; resetToCurrent: () => void };
 
   // Add methods to state for publishMethods to find
-  (state as unknown as Record<string, unknown>).destroy = destroy;
+  (state as unknown as Record<string, unknown>).dispose = dispose;
   (state as unknown as Record<string, unknown>).observedValue = observedValue;
   (state as unknown as Record<string, unknown>).resetToCurrent = resetToCurrent;
 
   // Publish public interface on the observable
   kb.publishMethods(observable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
+  utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
 
   // Start listening to locale changes
   const localeManager = kb.locale_manager as LocaleManager;
@@ -142,7 +143,7 @@ export function localizedObservable(value: unknown, options: LocalizedObservable
   // Instance Methods (closures)
   // =============================================================================
 
-  function destroy(): void {
+  function dispose(): void {
     const localeManager = kb.locale_manager as LocaleManager;
     if (localeManager?.off && state.__kb._onLocaleChange) {
       localeManager.off('change', state.__kb._onLocaleChange);

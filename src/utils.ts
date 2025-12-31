@@ -209,6 +209,15 @@ export function wrappedEventWatcherIsOwned(obj: KBObject, value?: boolean): bool
 // Utility functions
 // =============================================================================
 
+const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
+
+export function attachDispose(obj: Record<string, unknown>, dispose: () => void): void {
+  obj.dispose = dispose;
+  if (disposeSymbol) {
+    (obj as Record<symbol, unknown>)[disposeSymbol] = dispose;
+  }
+}
+
 /** Get value type from observable */
 export function valueType(observable: unknown): ValueType {
   if (!observable) return TYPE_UNKNOWN;
@@ -328,6 +337,7 @@ const utils = {
   wrappedDestroy,
 
   // Utilities
+  attachDispose,
   valueType,
   pathJoin,
   optionsPathJoin,

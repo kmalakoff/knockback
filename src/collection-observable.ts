@@ -13,7 +13,7 @@ const COMPARE_EQUAL = 0;
 const COMPARE_ASCENDING = -1;
 const COMPARE_DESCENDING = 1;
 
-const KEYS_PUBLISH = ['destroy', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'] as const;
+const KEYS_PUBLISH = ['dispose', 'shareOptions', 'filters', 'comparator', 'sortAttribute', 'viewModelByModel', 'hasViewModels'] as const;
 
 type ComparatorFn = (a: unknown, b: unknown) => number;
 type FilterFn = (model: Backbone.Model) => boolean;
@@ -33,7 +33,7 @@ export interface CollectionObservableInstance {
   collection: ko.Computed<Backbone.Collection | null>;
 
   // Methods
-  destroy(): void;
+  dispose(): void;
   shareOptions(): { store: unknown; factory: unknown };
   filters(filters?: unknown | unknown[]): void;
   comparator(comparator: ComparatorFn | null): void;
@@ -100,7 +100,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
       create_options: {} as InternalCreateOptions,
       collection: undefined as unknown as ko.Computed<Backbone.Collection | null>,
 
-      destroy,
+      dispose,
       shareOptions,
       filters,
       comparator: setComparator,
@@ -161,6 +161,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
 
     // Publish methods
     kb.publishMethods(observable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
+    utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
 
     // Collection observable
     _collection = ko.observable(collection);
@@ -255,7 +256,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
     // Instance Methods (closures)
     // =============================================================================
 
-    function destroy(): void {
+    function dispose(): void {
       state.__kb_released = true;
       const obs = utils.getObservable(state) as Observable & ko.ObservableArray;
       const coll = kb.peek(_collection);
@@ -429,7 +430,7 @@ export function collectionObservable<T = unknown>(inputCollection?: Backbone.Col
           }
 
           case 'remove':
-          case 'destroy':
+          case 'dispose':
             onModelRemove(arg);
             break;
 

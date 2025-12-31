@@ -124,7 +124,7 @@ describe('ViewModel advanced', () => {
       setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
-      const vm = viewModel(model) as ViewModel;
+      const vm = viewModel(model) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
 
       assert.ok(ko.isObservable(vm.model), 'model is observable');
       assert.strictEqual(vm.model(), model, 'model() returns the model');
@@ -253,7 +253,7 @@ describe('ViewModel advanced', () => {
       setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
-      const vm = viewModel(model) as ViewModel;
+      const vm = viewModel(model) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
 
       const options = vm.shareOptions();
       assert.ok(options.store, 'has store');
@@ -272,7 +272,7 @@ describe('ViewModel advanced', () => {
 
       // biome-ignore lint/suspicious/noExplicitAny: Creating untyped model for dynamic attributes
       const model: any = new Backbone.Model({ name: 'Bob' });
-      const vm = viewModel(model, { keys: ['name'] }) as ViewModel & Record<string, unknown>;
+      const vm = viewModel(model, { keys: ['name'] }) as ViewModel & Record<string, unknown> & { createObservables: (model: Backbone.Model, keys: string[]) => void };
 
       assert.ok(ko.isObservable(vm.name), 'name exists');
       assert.strictEqual(vm.age, undefined, 'age does not exist');

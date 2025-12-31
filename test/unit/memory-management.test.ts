@@ -42,18 +42,18 @@ describe('memory management', () => {
     }
   }
 
-  // Helper: Destroyable view model
-  class DestroyableViewModel {
-    static view_models: DestroyableViewModel[] = [];
+  // Helper: Disposable view model
+  class DisposableViewModel {
+    static view_models: DisposableViewModel[] = [];
 
     constructor() {
-      DestroyableViewModel.view_models.push(this);
+      DisposableViewModel.view_models.push(this);
     }
 
-    destroy(): void {
-      const index = DestroyableViewModel.view_models.indexOf(this);
+    dispose(): void {
+      const index = DisposableViewModel.view_models.indexOf(this);
       if (index >= 0) {
-        DestroyableViewModel.view_models.splice(index, 1);
+        DisposableViewModel.view_models.splice(index, 1);
       }
     }
   }
@@ -71,7 +71,7 @@ describe('memory management', () => {
 
   beforeEach(() => {
     RefCountableViewModel.view_models = [];
-    DestroyableViewModel.view_models = [];
+    DisposableViewModel.view_models = [];
     SimpleViewModel.view_models = [];
   });
 
@@ -165,23 +165,23 @@ describe('memory management', () => {
   });
 
   describe('CollectionObservable memory', () => {
-    it('should destroy view models when collection observable is released', () => {
+    it('should dispose view models when collection observable is released', () => {
       const stats = new Statistics();
       setStatistics(stats);
 
       // Test with destroyable view model
-      DestroyableViewModel.view_models = [];
-      const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DestroyableViewModel as unknown as new () => ViewModel });
-      assert.strictEqual(DestroyableViewModel.view_models.length, 2, 'Created: 2');
+      DisposableViewModel.view_models = [];
+      const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DisposableViewModel as unknown as new () => ViewModel });
+      assert.strictEqual(DisposableViewModel.view_models.length, 2, 'Created: 2');
 
       kb.release(co);
-      assert.strictEqual(DestroyableViewModel.view_models.length, 0, 'All destroyed');
+      assert.strictEqual(DisposableViewModel.view_models.length, 0, 'All disposed');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
       setStatistics(null);
     });
 
-    it('should handle simple view models without destroy method', () => {
+    it('should handle simple view models without dispose method', () => {
       const stats = new Statistics();
       setStatistics(stats);
 

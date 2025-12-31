@@ -1,5 +1,9 @@
 Please refer to the following release notes when upgrading your version of Knockback.js.
 
+## 2.0.0
+
+- BREAKING API CHANGE: `destroy()` has been replaced by `dispose()` across view models and observables. Use `kb.release` / `kb.releaseOnNodeRemove` to dispose automatically (and `Symbol.dispose` is supported when available).
+
 ## 1.2.3
 
 - Bug fix for failed observable update: https://github.com/kmalakoff/knockback/issues/166s

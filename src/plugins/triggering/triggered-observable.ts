@@ -4,7 +4,7 @@ import { EventWatcher } from '../../event-watcher.ts';
 import kb from '../../kb.ts';
 import utils from '../../utils.ts';
 
-const KEYS_PUBLISH = ['destroy'] as const;
+const KEYS_PUBLISH = ['dispose'] as const;
 
 // =============================================================================
 // Interface
@@ -47,7 +47,7 @@ export interface TriggeredObservableInstance {
  *   emitter.set({name: 'george'});  // trigger_count: 2
  *   emitter.set({last: 'smith'});   // trigger_count: 3
  */
-export function triggeredObservable(emitter: Backbone.Events, eventSelector: string): ko.Observable & { destroy: () => void } {
+export function triggeredObservable(emitter: Backbone.Events, eventSelector: string): ko.Observable & { dispose: () => void } {
   if (!emitter) {
     kb._throwMissing({ constructor: { name: 'TriggeredObservable' } }, 'emitter');
   }
@@ -67,13 +67,14 @@ export function triggeredObservable(emitter: Backbone.Events, eventSelector: str
   const observable = utils.setObservable(
     state,
     ko.computed(() => state.vo())
-  ) as ko.Observable & { destroy: () => void };
+  ) as ko.Observable & { dispose: () => void };
 
-  // Add destroy method to state for publishMethods
-  (state as unknown as Record<string, unknown>).destroy = () => utils.wrappedDestroy(state);
+  // Add dispose method to state for publishMethods
+  (state as unknown as Record<string, unknown>).dispose = () => utils.wrappedDestroy(state);
 
   // Publish public interface on the observable
   kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);
+  utils.attachDispose(observable as unknown as Record<string, unknown>, (state as unknown as { dispose: () => void }).dispose);
 
   // Create emitter observable via EventWatcher
   utils.setEventWatcher(

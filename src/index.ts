@@ -98,9 +98,8 @@ export const kb: {
   ViewModel: new (
     ...args: unknown[]
   ) => {
-    destroy(): void;
+    dispose(): void;
     model: ko.Computed<Backbone.Model | null>;
-    createObservables(model: Backbone.Model, keys: string[]): void;
     [key: string]: unknown;
   };
   observable: typeof observable;

@@ -122,8 +122,8 @@ export interface CollectionObservableOptions<T = unknown> {
  * Created via `observable(model, key)` or `observable(model, options)`.
  */
 export interface Observable<T = unknown> extends ko.Computed<T> {
-  /** Destroy and release all resources */
-  destroy(): void;
+  /** Dispose and release all resources (called by kb.release/releaseOnNodeRemove) */
+  dispose(): void;
   /** Get the current value type (TYPE_SIMPLE, TYPE_MODEL, etc.) */
   valueType(): typeof TYPE_UNKNOWN | typeof TYPE_SIMPLE | typeof TYPE_ARRAY | typeof TYPE_MODEL | typeof TYPE_COLLECTION;
   /** Observable for the underlying model */
@@ -136,8 +136,8 @@ export interface Observable<T = unknown> extends ko.Computed<T> {
  * Created via `collectionObservable(collection, options)`.
  */
 export interface CollectionObservable<T = unknown> extends ko.ObservableArray<T> {
-  /** Destroy and release all resources */
-  destroy(): void;
+  /** Dispose and release all resources (called by kb.release/releaseOnNodeRemove) */
+  dispose(): void;
   /** Observable for the underlying collection */
   readonly collection: ko.Computed<Backbone.Collection | null>;
   /** Set or get filters for which models to include */
@@ -175,14 +175,10 @@ export interface CollectionObservable<T = unknown> extends ko.ObservableArray<T>
  * vm.name(); // returns string
  */
 export type ViewModel<T extends object = Record<string, unknown>> = {
-  /** Destroy and release all resources */
-  destroy(): void;
+  /** Dispose and release all resources (called by kb.release/releaseOnNodeRemove) */
+  dispose(): void;
   /** Observable for the underlying model */
   readonly model: ko.Computed<Backbone.Model | null>;
-  /** Dynamically create observables for additional keys */
-  createObservables(model: Backbone.Model, keys: string[]): void;
-  /** Share options (store/factory) with other view models */
-  shareOptions(): { store: unknown; factory: unknown };
 } & T;
 
 // =============================================================================
@@ -329,7 +325,7 @@ export interface CollectionObservableInternal<T = unknown> extends Omit<Collecti
 export interface ViewModelInternal
   extends Omit<
     {
-      destroy(): void;
+      dispose(): void;
       readonly model: ko.Computed<Backbone.Model | null>;
       createObservables(model: Backbone.Model, keys: string[]): void;
     },
@@ -353,7 +349,7 @@ export interface ObservableBase {
   __kb_is_co?: boolean;
   __kb_is_vm?: boolean;
   __kb_released?: boolean;
-  destroy?: () => void;
+  dispose?: () => void;
   valueType?: () => ValueType;
   model?: ko.Computed<Backbone.Model | null>;
 }

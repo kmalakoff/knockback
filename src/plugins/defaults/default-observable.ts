@@ -3,7 +3,7 @@ import _ from 'underscore';
 import kb from '../../kb.ts';
 import utils from '../../utils.ts';
 
-const KEYS_PUBLISH = ['destroy', 'setToDefault'] as const;
+const KEYS_PUBLISH = ['dispose', 'setToDefault'] as const;
 
 // =============================================================================
 // Interface
@@ -14,7 +14,7 @@ export interface DefaultObservableInstance {
   __kb: { observable?: ko.Observable };
   __kb_released?: boolean;
   dv: unknown;
-  destroy(): void;
+  dispose(): void;
   setToDefault(): void;
 }
 
@@ -32,13 +32,13 @@ export interface DefaultObservableInstance {
  * @example
  *   const wrapped_name = kb.defaultObservable(kb.observable(model, 'name'), '(no name)');
  */
-export function defaultObservable(targetObservable: ko.Observable, defaultValue: unknown): ko.Observable & { destroy: () => void; setToDefault: () => void } {
+export function defaultObservable(targetObservable: ko.Observable, defaultValue: unknown): ko.Observable & { dispose: () => void; setToDefault: () => void } {
   // Instance state (closure-based)
   const state: DefaultObservableInstance = {
     __kb: {},
     __kb_released: false,
     dv: defaultValue,
-    destroy,
+    dispose,
     setToDefault,
   };
 
@@ -56,10 +56,11 @@ export function defaultObservable(targetObservable: ko.Observable, defaultValue:
         targetObservable(value);
       },
     })
-  ) as ko.Observable & { destroy: () => void; setToDefault: () => void };
+  ) as ko.Observable & { dispose: () => void; setToDefault: () => void };
 
   // Publish public interface on the observable
   kb.publishMethods(observable as unknown as Record<string, unknown>, state, KEYS_PUBLISH as unknown as string[]);
+  utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
 
   return observable;
 
@@ -67,7 +68,7 @@ export function defaultObservable(targetObservable: ko.Observable, defaultValue:
   // Instance Methods (closures)
   // =============================================================================
 
-  function destroy(): void {
+  function dispose(): void {
     utils.wrappedDestroy(state);
   }
 

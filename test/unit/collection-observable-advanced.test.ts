@@ -285,7 +285,7 @@ describe('CollectionObservable advanced', () => {
       setStatistics(stats);
 
       const parentModel = new Backbone.Model({ name: 'Parent' });
-      const parentVm = viewModel(parentModel) as ViewModel;
+      const parentVm = viewModel(parentModel) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
       const sharedOptions = parentVm.shareOptions();
 
       const collection = new Backbone.Collection([{ name: 'Child1' }, { name: 'Child2' }]);

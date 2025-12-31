@@ -224,6 +224,8 @@ export class ViewModelClass {
       }
     }
 
+    utils.attachDispose(this as unknown as Record<string, unknown>, this.dispose.bind(this));
+
     // Statistics tracking
     const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
     if (statistics) {
@@ -232,7 +234,7 @@ export class ViewModelClass {
   }
 
   // Clean up
-  destroy(): void {
+  dispose(): void {
     this.__kb_released = true;
     const __kb = this.__kb as ViewModelMetadata;
 

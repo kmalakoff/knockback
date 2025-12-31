@@ -7,7 +7,7 @@ import { TypedValue } from './typed-value.ts';
 import type { InternalObservableOptions, Observable, ObservableBase, ObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
-const KEYS_PUBLISH = ['value', 'valueType', 'destroy'] as const;
+const KEYS_PUBLISH = ['value', 'valueType', 'dispose'] as const;
 const KEYS_INFO = ['args', 'read', 'write'] as const;
 
 // =============================================================================
@@ -30,7 +30,7 @@ export interface ObservableInstance {
   __kb?: unknown;
 
   // Methods
-  destroy(): void;
+  dispose(): void;
   value(): unknown;
   valueType(): ValueType;
   update(newValue?: unknown): void;
@@ -64,7 +64,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
       model: undefined as unknown as ko.Computed<Backbone.Model | null>,
       __kb_released: false,
 
-      destroy,
+      dispose,
       value,
       valueType,
       update,
@@ -144,6 +144,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
 
     // Publish methods
     kb.publishMethods(koObservable as unknown as Record<string, unknown>, state as unknown as Record<string, unknown>, KEYS_PUBLISH as unknown as string[]);
+    utils.attachDispose(koObservable as unknown as Record<string, unknown>, dispose);
 
     // Create model computed
     const modelComputed = ko.computed({
@@ -200,7 +201,7 @@ export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo:
     // Instance Methods (closures)
     // =============================================================================
 
-    function destroy(): void {
+    function dispose(): void {
       const obs = utils.getObservable(state);
       state.__kb_released = true;
       state._value.destroy();

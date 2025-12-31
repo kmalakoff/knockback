@@ -3,7 +3,7 @@ import ko from 'knockout';
 import type { KBSettings, LocaleManager, ObservableBase } from './types.ts';
 import { TYPE_COLLECTION } from './types.ts';
 
-const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'] as const;
+const LIFECYCLE_METHODS = ['release', 'dispose'] as const;
 
 // Get global window object (works in browser and Node)
 const globalWindow: (Window & typeof globalThis) | undefined = typeof window !== 'undefined' ? window : undefined;
@@ -58,11 +58,15 @@ const kb = {
       return false;
     }
 
-    // Check for releaseable signature (has release/destroy/dispose method)
+    // Check for releaseable signature (has release/dispose method)
     for (const method of LIFECYCLE_METHODS) {
       if (typeof (obj as Record<string, unknown>)[method] === 'function') {
         return true;
       }
+    }
+    const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
+    if (disposeSymbol && typeof (obj as unknown as Record<symbol, unknown>)[disposeSymbol] === 'function') {
+      return true;
     }
 
     // Max depth check for ViewModel inside of ViewModel
@@ -103,7 +107,7 @@ const kb = {
 
       if (Array.isArray(array)) {
         if (kbObs.__kb_is_co || (kbObs.__kb_is_o && kbObs.valueType?.() === TYPE_COLLECTION)) {
-          kbObs.destroy?.();
+          kbObs.dispose?.();
           return;
         }
 
@@ -120,6 +124,12 @@ const kb = {
       const disposable = obj as { dispose?: () => void };
       if (typeof disposable.dispose === 'function') {
         disposable.dispose();
+      } else {
+        const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
+        const symbolDispose = disposeSymbol ? (obj as unknown as Record<symbol, unknown>)[disposeSymbol] : undefined;
+        if (typeof symbolDispose === 'function') {
+          (symbolDispose as () => void).call(obj);
+        }
       }
       return;
     }
@@ -130,6 +140,12 @@ const kb = {
         (obj as Record<string, () => void>)[method].call(obj);
         return;
       }
+    }
+    const disposeSymbol = (Symbol as unknown as { dispose?: symbol }).dispose;
+    const symbolDispose = disposeSymbol ? (obj as unknown as Record<symbol, unknown>)[disposeSymbol] : undefined;
+    if (typeof symbolDispose === 'function') {
+      (symbolDispose as () => void).call(obj);
+      return;
     }
 
     // View model - release keys

@@ -77,6 +77,9 @@ ko.applyBindings(vm);
 
 // ... do stuff then clean up
 release(vm);
+
+// dispose() is attached automatically and is called by release/releaseOnNodeRemove.
+// You no longer call destroy() manually.
 ```
 
 You can also pass `extend` as a plain object if you prefer:
@@ -108,6 +111,7 @@ Now, the greeting updates as you type!
 - `viewModel(model, options?)` - Create observables for all model attributes
 - `collectionObservable(collection, options?)` - Create an observable array bound to a collection
 - `release(obj)` - Release a view model or observable and all its resources
+- `dispose()` - Attached to view models/observables; called by `release` and `releaseOnNodeRemove`
 
 ### Plugins
 

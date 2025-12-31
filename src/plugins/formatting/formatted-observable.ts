@@ -104,7 +104,7 @@ export function parseFormattedString(string: string, format: string): string[] {
 export interface FormattedObservableInstance {
   __kb: { observable?: ko.Observable };
   __kb_released?: boolean;
-  destroy(): void;
+  dispose(): void;
 }
 
 // =============================================================================
@@ -122,12 +122,12 @@ export interface FormattedObservableInstance {
  * @example
  *   const observable = kb.formattedObservable("{0} and {1}", arg1, arg2);
  */
-export function formattedObservable(format: string | ko.Observable<string>, ...args: ko.Observable[]): ko.Observable<string> & { destroy: () => void } {
+export function formattedObservable(format: string | ko.Observable<string>, ...args: ko.Observable[]): ko.Observable<string> & { dispose: () => void } {
   // Instance state (closure-based)
   const state: FormattedObservableInstance = {
     __kb: {},
     __kb_released: false,
-    destroy,
+    dispose,
   };
 
   const observableArgs = args;
@@ -150,9 +150,9 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
         }
       },
     })
-  ) as ko.Observable<string> & { destroy: () => void };
+  ) as ko.Observable<string> & { dispose: () => void };
 
-  observable.destroy = destroy;
+  utils.attachDispose(observable as unknown as Record<string, unknown>, dispose);
 
   return observable;
 
@@ -160,7 +160,7 @@ export function formattedObservable(format: string | ko.Observable<string>, ...a
   // Instance Methods (closures)
   // =============================================================================
 
-  function destroy(): void {
+  function dispose(): void {
     utils.wrappedDestroy(state);
   }
 }
