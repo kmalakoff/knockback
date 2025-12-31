@@ -1,4 +1,4 @@
-import kb, { collectionObservable, observable, viewModel } from '@mcpeasy/knockback';
+import kb, { viewModel } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
@@ -22,14 +22,14 @@ describe('@mcpeasy/knockback', () => {
   describe('kb.observable', () => {
     it('should create an observable from a model attribute', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = observable(model, 'name');
+      const nameObs = kb.observable(model, 'name');
 
       assert.strictEqual(nameObs(), 'Bob');
     });
 
     it('should update when model changes', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = observable(model, 'name');
+      const nameObs = kb.observable(model, 'name');
 
       assert.strictEqual(nameObs(), 'Bob');
       model.set('name', 'Fred');
@@ -38,7 +38,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should update model when observable changes', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const nameObs = observable(model, 'name');
+      const nameObs = kb.observable(model, 'name');
 
       nameObs('Alice');
       assert.strictEqual(model.get('name'), 'Alice');
@@ -58,7 +58,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should sync changes with model', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const vm = viewModel(model);
+      const vm = kb.viewModel(model);
 
       ((vm as Record<string, unknown>).name as ko.Observable)('Fred');
       assert.strictEqual(model.get('name'), 'Fred');
@@ -69,7 +69,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should support keys option', () => {
       const model = new Backbone.Model({ name: 'Bob', age: 30, email: 'bob@example.com' });
-      const vm = viewModel(model, { keys: ['name', 'age'] });
+      const vm = kb.viewModel(model, { keys: ['name', 'age'] });
 
       assert.ok(ko.isObservable((vm as Record<string, unknown>).name));
       assert.ok(ko.isObservable((vm as Record<string, unknown>).age));
@@ -80,7 +80,7 @@ describe('@mcpeasy/knockback', () => {
   describe('kb.collectionObservable', () => {
     it('should create an observable array from a collection', () => {
       const collection = new Backbone.Collection([{ name: 'Bob' }, { name: 'Fred' }]);
-      const co = collectionObservable(collection);
+      const co = kb.collectionObservable(collection);
 
       assert.ok(ko.isObservableArray(co));
       assert.strictEqual(co().length, 2);
@@ -88,7 +88,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should update when collection changes', () => {
       const collection = new Backbone.Collection([{ name: 'Bob' }]);
-      const co = collectionObservable(collection);
+      const co = kb.collectionObservable(collection);
 
       assert.strictEqual(co().length, 1);
 
@@ -101,7 +101,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should support models_only option', () => {
       const collection = new Backbone.Collection([{ name: 'Bob' }]);
-      const co = collectionObservable(collection, { models_only: true });
+      const co = kb.collectionObservable(collection, { models_only: true });
 
       assert.strictEqual(co().length, 1);
       assert.ok(co()[0] instanceof Backbone.Model);
@@ -111,7 +111,7 @@ describe('@mcpeasy/knockback', () => {
   describe('kb.release', () => {
     it('should release view models', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const vm = viewModel(model);
+      const vm = kb.viewModel(model);
 
       assert.ok(!kb.wasReleased(vm));
       kb.release(vm);
@@ -120,7 +120,7 @@ describe('@mcpeasy/knockback', () => {
 
     it('should release observables', () => {
       const model = new Backbone.Model({ name: 'Bob' });
-      const obs = observable(model, 'name');
+      const obs = kb.observable(model, 'name');
 
       assert.ok(!kb.wasReleased(obs));
       kb.release(obs);

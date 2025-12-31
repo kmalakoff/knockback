@@ -38,10 +38,10 @@ npm install backbone knockout underscore
 ```typescript
 import Backbone from 'backbone';
 import ko from 'knockout';
-import { viewModel } from '@mcpeasy/knockback';
+import kb from '@mcpeasy/knockback';
 
 const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
-ko.applyBindings(viewModel(model));
+ko.applyBindings(kb.viewModel(model));
 ```
 
 When you type in the input boxes, the values are properly transferred bi-directionally to the model and all other bound view models!
@@ -54,7 +54,7 @@ When you type in the input boxes, the values are properly transferred bi-directi
 ```typescript
 import Backbone from 'backbone';
 import ko from 'knockout';
-import { viewModel, release } from '@mcpeasy/knockback';
+import kb from '@mcpeasy/knockback';
 
 // Create a model
 const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
@@ -66,17 +66,26 @@ interface PersonViewModel {
 }
 
 // Create a view model with a computed property
-const vm = viewModel<PersonViewModel>(model, {
-  extend(vm) {
-    vm.full_name = ko.computed(() => `${vm.first_name()} ${vm.last_name()}`);
-  },
+const vm = kb.viewModel<PersonViewModel>(model, {
+  extend: (vm) => ({
+    full_name: ko.computed(() => `${vm.first_name()} ${vm.last_name()}`);
+  }),
 });
 
 // Apply bindings
 ko.applyBindings(vm);
 
 // ... do stuff then clean up
+kb.release(vm);
+
+Named imports are also supported if you prefer them:
+
+```typescript
+import { viewModel, release } from '@mcpeasy/knockback';
+
+const vm = viewModel<PersonViewModel>(model);
 release(vm);
+```
 
 // dispose() is attached automatically and is called by release/releaseOnNodeRemove.
 // You no longer call destroy() manually.
@@ -85,7 +94,7 @@ release(vm);
 You can also pass `extend` as a plain object if you prefer:
 
 ```typescript
-const vm = viewModel<PersonViewModel>(model, {
+const vm = kb.viewModel<PersonViewModel>(model, {
   extend: {
     full_name: ko.computed(() => `${model.get('first_name')} ${model.get('last_name')}`),
   },

@@ -1,13 +1,15 @@
-import kb, { collectionObservable, Statistics, setStatistics, type ViewModel, viewModel } from '@mcpeasy/knockback';
+import kb from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
 
+type ViewModel = kb.ViewModel;
+
 describe('CollectionObservable advanced', () => {
   describe('sorting', () => {
     it('should sort by sort_attribute', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([
         { name: 'Charlie', age: 30 },
@@ -15,19 +17,19 @@ describe('CollectionObservable advanced', () => {
         { name: 'Bob', age: 35 },
       ]);
 
-      const co = collectionObservable(collection, { sort_attribute: 'name' });
+      const co = kb.collectionObservable(collection, { sort_attribute: 'name' });
       const names = co().map((vm: ViewModel & { name: ko.Observable<string> }) => vm.name());
 
       assert.deepStrictEqual(names, ['Alice', 'Bob', 'Charlie'], 'Sorted by name');
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should sort with custom comparator', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([
         { name: 'Charlie', age: 30 },
@@ -36,7 +38,7 @@ describe('CollectionObservable advanced', () => {
       ]);
 
       // Comparator receives view models, not raw models
-      const co = collectionObservable(collection, {
+      const co = kb.collectionObservable(collection, {
         comparator: (a: ViewModel & { age: ko.Observable<number> }, b: ViewModel & { age: ko.Observable<number> }) => {
           return b.age() - a.age(); // Descending by age
         },
@@ -47,12 +49,12 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should re-sort when sort attribute changes', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([
         { name: 'Charlie', priority: 2 },
@@ -60,7 +62,7 @@ describe('CollectionObservable advanced', () => {
         { name: 'Bob', priority: 3 },
       ]);
 
-      const co = collectionObservable(collection, { sort_attribute: 'priority' });
+      const co = kb.collectionObservable(collection, { sort_attribute: 'priority' });
 
       let names = co().map((vm: ViewModel & { name: ko.Observable<string> }) => vm.name());
       assert.deepStrictEqual(names, ['Alice', 'Charlie', 'Bob'], 'Initial sort');
@@ -73,14 +75,14 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('filters', () => {
     it('should filter with filters option', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([
         { name: 'Alice', active: true },
@@ -88,7 +90,7 @@ describe('CollectionObservable advanced', () => {
         { name: 'Charlie', active: true },
       ]);
 
-      const co = collectionObservable(collection, {
+      const co = kb.collectionObservable(collection, {
         filters: (model: Backbone.Model) => model.get('active') === true,
       });
 
@@ -98,19 +100,19 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should update when filtered attribute changes', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([
         { name: 'Alice', active: true },
         { name: 'Bob', active: false },
       ]);
 
-      const co = collectionObservable(collection, {
+      const co = kb.collectionObservable(collection, {
         filters: (model: Backbone.Model) => model.get('active') === true,
       });
 
@@ -127,17 +129,17 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('collection observable', () => {
     it('should expose collection via .collection()', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([{ name: 'Alice' }]);
-      const co = collectionObservable(collection) as unknown as ko.ObservableArray & {
+      const co = kb.collectionObservable(collection) as unknown as ko.ObservableArray & {
         collection: ko.Observable<Backbone.Collection>;
       };
 
@@ -146,17 +148,17 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should trigger updates when collection is swapped', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection1 = new Backbone.Collection([{ name: 'Alice' }]);
       const collection2 = new Backbone.Collection([{ name: 'Bob' }, { name: 'Charlie' }]);
 
-      const co = collectionObservable(collection1) as ko.ObservableArray & {
+      const co = kb.collectionObservable(collection1) as ko.ObservableArray & {
         collection: (c?: Backbone.Collection) => Backbone.Collection;
       };
 
@@ -174,17 +176,17 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('array mutations', () => {
     it('should support push and unshift', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([{ name: 'Alice' }]);
-      const co = collectionObservable(collection, { models_only: true });
+      const co = kb.collectionObservable(collection, { models_only: true });
 
       assert.strictEqual(co().length, 1);
 
@@ -198,17 +200,17 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should handle remove', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const alice = new Backbone.Model({ name: 'Alice' });
       const bob = new Backbone.Model({ name: 'Bob' });
       const collection = new Backbone.Collection([alice, bob]);
-      const co = collectionObservable(collection, { models_only: true });
+      const co = kb.collectionObservable(collection, { models_only: true });
 
       assert.strictEqual(co().length, 2);
 
@@ -218,15 +220,15 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should handle reset', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([{ name: 'Alice' }, { name: 'Bob' }]);
-      const co = collectionObservable(collection, { models_only: true });
+      const co = kb.collectionObservable(collection, { models_only: true });
 
       assert.strictEqual(co().length, 2);
 
@@ -236,18 +238,18 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('auto-generate collection', () => {
     it('should create collection when passed array of models', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const models = [new Backbone.Model({ name: 'Alice' }), new Backbone.Model({ name: 'Bob' })];
 
-      const co = collectionObservable(models as unknown as Backbone.Collection, { models_only: true }) as ko.ObservableArray & {
+      const co = kb.collectionObservable(models as unknown as Backbone.Collection, { models_only: true }) as ko.ObservableArray & {
         collection: () => Backbone.Collection;
       };
 
@@ -256,16 +258,16 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should create collection when passed array of plain objects', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const data = [{ name: 'Alice' }, { name: 'Bob' }];
 
-      const co = collectionObservable(data as unknown as Backbone.Collection) as ko.ObservableArray & {
+      const co = kb.collectionObservable(data as unknown as Backbone.Collection) as ko.ObservableArray & {
         collection: () => Backbone.Collection;
       };
 
@@ -274,21 +276,21 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('shared options', () => {
     it('should share store between parent and children', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const parentModel = new Backbone.Model({ name: 'Parent' });
-      const parentVm = viewModel(parentModel) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
+      const parentVm = kb.viewModel(parentModel) as ViewModel & { shareOptions: () => { store: unknown; factory: unknown } };
       const sharedOptions = parentVm.shareOptions();
 
       const collection = new Backbone.Collection([{ name: 'Child1' }, { name: 'Child2' }]);
-      const co = collectionObservable(collection, { ...sharedOptions });
+      const co = kb.collectionObservable(collection, { ...sharedOptions });
 
       // Both should use the same store
       assert.ok(sharedOptions.store, 'Store exists');
@@ -296,17 +298,17 @@ describe('CollectionObservable advanced', () => {
       kb.release(co);
       kb.release(parentVm);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('dependency isolation', () => {
     it('should not cause dependencies when collection changes inside ko.computed', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const collection = new Backbone.Collection([{ name: 'Alice' }]);
-      const co = collectionObservable(collection);
+      const co = kb.collectionObservable(collection);
 
       let modifyCount = 0;
       ko.computed(() => {
@@ -326,7 +328,7 @@ describe('CollectionObservable advanced', () => {
 
       kb.release(co);
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 });

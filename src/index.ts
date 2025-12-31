@@ -120,6 +120,8 @@ export const kb: {
   isModel: typeof isModel;
   isCollection: typeof isCollection;
   isViewModel: typeof isViewModel;
+  getLocaleManager: typeof getLocaleManager;
+  setLocaleManager: typeof setLocaleManager;
   localizedObservable: typeof localizedObservable;
   defaultObservable: typeof defaultObservable;
   formattedObservable: typeof formattedObservable;
@@ -130,6 +132,8 @@ export const kb: {
   formValidator: typeof formValidator;
   minLengthFn: typeof minLengthFn;
   valid: typeof valid;
+  getStatistics: typeof getStatistics;
+  setStatistics: typeof setStatistics;
   Statistics: typeof Statistics;
 } = {
   observable,
@@ -151,6 +155,8 @@ export const kb: {
   isModel,
   isCollection,
   isViewModel,
+  getLocaleManager,
+  setLocaleManager,
   localizedObservable,
   defaultObservable,
   formattedObservable,
@@ -161,6 +167,8 @@ export const kb: {
   formValidator,
   minLengthFn,
   valid,
+  getStatistics,
+  setStatistics,
   Statistics,
 };
 

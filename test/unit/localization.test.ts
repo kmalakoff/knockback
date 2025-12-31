@@ -1,4 +1,4 @@
-import { getLocaleManager, localizedObservable, release, setLocaleManager } from '@mcpeasy/knockback';
+import kb from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
@@ -35,36 +35,36 @@ describe('Localization plugin', () => {
   let originalLocaleManager: unknown;
 
   beforeEach(() => {
-    originalLocaleManager = getLocaleManager();
-    setLocaleManager(new MockLocaleManager() as ReturnType<typeof getLocaleManager>);
+    originalLocaleManager = kb.getLocaleManager();
+    kb.setLocaleManager(new MockLocaleManager() as ReturnType<typeof kb.getLocaleManager>);
   });
 
   afterEach(() => {
-    setLocaleManager(originalLocaleManager as ReturnType<typeof getLocaleManager>);
+    kb.setLocaleManager(originalLocaleManager as ReturnType<typeof kb.getLocaleManager>);
   });
 
   describe('basic localized observable', () => {
     it('should create localized observable with custom read', () => {
-      const obs = localizedObservable('greeting', {
+      const obs = kb.localizedObservable('greeting', {
         read: (value: unknown) => {
-          const localeManager = getLocaleManager() as MockLocaleManager;
+          const localeManager = kb.getLocaleManager() as MockLocaleManager;
           return localeManager.get(value as string);
         },
       });
 
       assert.strictEqual(obs(), 'Hello', 'Returns localized value');
 
-      release(obs);
+      kb.release(obs);
     });
 
     it('should update when locale changes', () => {
-      const obs = localizedObservable('greeting', {
+      const obs = kb.localizedObservable('greeting', {
         read: (value: unknown) => {
-          const localeManager = getLocaleManager() as MockLocaleManager;
+          const localeManager = kb.getLocaleManager() as MockLocaleManager;
           return localeManager.get(value as string);
         },
       });
-      const localeManager = getLocaleManager() as MockLocaleManager;
+      const localeManager = kb.getLocaleManager() as MockLocaleManager;
 
       assert.strictEqual(obs(), 'Hello', 'English greeting');
 
@@ -74,15 +74,15 @@ describe('Localization plugin', () => {
       localeManager.setLocale('fr');
       assert.strictEqual(obs(), 'Bonjour', 'French greeting after locale change');
 
-      release(obs);
+      kb.release(obs);
     });
   });
 
   describe('observedValue', () => {
     it('should get and set observed value', () => {
-      const obs = localizedObservable('greeting', {
+      const obs = kb.localizedObservable('greeting', {
         read: (value: unknown) => {
-          const localeManager = getLocaleManager() as MockLocaleManager;
+          const localeManager = kb.getLocaleManager() as MockLocaleManager;
           return localeManager.get(value as string);
         },
       });
@@ -93,22 +93,22 @@ describe('Localization plugin', () => {
       obs.observedValue('farewell');
       assert.strictEqual(obs(), 'Goodbye', 'Updated after observedValue change');
 
-      release(obs);
+      kb.release(obs);
     });
   });
 
   describe('onChange callback', () => {
     it('should call onChange when locale changes', () => {
       const changes: string[] = [];
-      const obs = localizedObservable('greeting', {
+      const obs = kb.localizedObservable('greeting', {
         read: (value: unknown) => {
-          const localeManager = getLocaleManager() as MockLocaleManager;
+          const localeManager = kb.getLocaleManager() as MockLocaleManager;
           return localeManager.get(value as string);
         },
         onChange: (value: unknown) => changes.push(value as string),
       });
 
-      const localeManager = getLocaleManager() as MockLocaleManager;
+      const localeManager = kb.getLocaleManager() as MockLocaleManager;
 
       assert.strictEqual(obs(), 'Hello');
       assert.strictEqual(changes.length, 0, 'No changes yet');
@@ -117,7 +117,7 @@ describe('Localization plugin', () => {
       assert.strictEqual(changes.length, 1, 'onChange called');
       assert.strictEqual(changes[0], 'Hola', 'Received new value');
 
-      release(obs);
+      kb.release(obs);
     });
   });
 
@@ -125,9 +125,9 @@ describe('Localization plugin', () => {
     it('should support write function', () => {
       const valueStore = ko.observable('greeting');
 
-      const obs = localizedObservable(valueStore, {
+      const obs = kb.localizedObservable(valueStore, {
         read: (value: unknown) => {
-          const localeManager = getLocaleManager() as MockLocaleManager;
+          const localeManager = kb.getLocaleManager() as MockLocaleManager;
           return localeManager.get(value as string);
         },
         write: (_localizedString: unknown, _value: unknown) => {
@@ -142,7 +142,7 @@ describe('Localization plugin', () => {
       obs('test');
       assert.strictEqual(obs(), 'Goodbye', 'Value changed after write');
 
-      release(obs);
+      kb.release(obs);
     });
   });
 });

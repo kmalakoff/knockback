@@ -1,7 +1,9 @@
-import kb, { collectionObservable, observable, Statistics, setStatistics, type ViewModel, viewModel } from '@mcpeasy/knockback';
+import kb from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
+
+type ViewModel = kb.ViewModel;
 
 describe('memory management', () => {
   // Helper: Ref-countable view model for testing
@@ -76,21 +78,21 @@ describe('memory management', () => {
 
   describe('basic view model properties', () => {
     it('should release all property types', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
-      const nestedViewModel = viewModel(new Backbone.Model({ name: 'name1' }));
+      const nestedViewModel = kb.viewModel(new Backbone.Model({ name: 'name1' }));
 
       const vm: Record<string, unknown> = {
         prop1: ko.observable(),
-        prop2: ko.observable(['test', 1, null, viewModel(new Backbone.Model({ name: 'name1' }))]),
-        prop3: ko.observableArray(['test', 1, null, viewModel(new Backbone.Model({ name: 'name1' }))]),
+        prop2: ko.observable(['test', 1, null, kb.viewModel(new Backbone.Model({ name: 'name1' }))]),
+        prop3: ko.observableArray(['test', 1, null, kb.viewModel(new Backbone.Model({ name: 'name1' }))]),
         prop4: ko.computed(() => true),
-        prop5: observable(new Backbone.Model({ name: 'name1' }), 'name'),
+        prop5: kb.observable(new Backbone.Model({ name: 'name1' }), 'name'),
         prop6: nestedViewModel,
-        prop7: collectionObservable(new Backbone.Collection(), { models_only: true }),
-        prop8: viewModel(new Backbone.Model({ name: 'name1' })),
-        prop9: collectionObservable(new Backbone.Collection()),
+        prop7: kb.collectionObservable(new Backbone.Collection(), { models_only: true }),
+        prop8: kb.viewModel(new Backbone.Model({ name: 'name1' })),
+        prop9: kb.collectionObservable(new Backbone.Collection()),
       };
 
       kb.release(vm);
@@ -101,14 +103,14 @@ describe('memory management', () => {
       }
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('reference counting', () => {
     it('should respect refCount/retain/release lifecycle', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       class RefViewModel {
         ref_count = 1;
@@ -116,7 +118,7 @@ describe('memory management', () => {
         prop: ko.Observable<string> | null;
 
         constructor() {
-          this.prop = observable(new Backbone.Model({ name: 'name1' }), 'name') as unknown as ko.Observable<string>;
+          this.prop = kb.observable(new Backbone.Model({ name: 'name1' }), 'name') as unknown as ko.Observable<string>;
         }
 
         refCount(): number {
@@ -159,33 +161,33 @@ describe('memory management', () => {
       assert.ok(!refCounted.prop, 'Property released: refCounted.prop');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('CollectionObservable memory', () => {
     it('should dispose view models when collection observable is released', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       // Test with destroyable view model
       DisposableViewModel.view_models = [];
-      const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DisposableViewModel as unknown as new () => ViewModel });
+      const co = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: DisposableViewModel as unknown as new () => ViewModel });
       assert.strictEqual(DisposableViewModel.view_models.length, 2, 'Created: 2');
 
       kb.release(co);
       assert.strictEqual(DisposableViewModel.view_models.length, 0, 'All disposed');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should handle simple view models without dispose method', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       SimpleViewModel.view_models = [];
-      const co = collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel as unknown as new () => ViewModel });
+      const co = kb.collectionObservable(new Backbone.Collection([{ name: 'name1' }, { name: 'name2' }]), { view_model: SimpleViewModel as unknown as new () => ViewModel });
       assert.strictEqual(SimpleViewModel.view_models.length, 2, 'Created: 2');
 
       kb.release(co);
@@ -196,7 +198,7 @@ describe('memory management', () => {
       }
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
@@ -212,8 +214,8 @@ describe('memory management', () => {
     });
 
     it('should release observables but preserve plain data in view models', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const vm: Record<string, unknown> = {
         array: ['Hello', 'Friend'],
@@ -221,8 +223,8 @@ describe('memory management', () => {
         value: ko.observable('hi'),
         array_value1: ko.observable(['Hello', 'Friend']),
         array_value2: ko.observableArray(['Hello', 'Friend']),
-        model_value: viewModel(new Backbone.Model()),
-        collection_value: collectionObservable(new Backbone.Collection()),
+        model_value: kb.viewModel(new Backbone.Model()),
+        collection_value: kb.collectionObservable(new Backbone.Collection()),
       };
 
       kb.release(vm);
@@ -236,45 +238,45 @@ describe('memory management', () => {
       assert.ok(!vm.collection_value, 'releases observables: collection_value');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 
   describe('event cleanup', () => {
     it('should clear all model events on release', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
-      const vm = viewModel(model);
+      const vm = kb.viewModel(model);
 
       // Model should have event listeners
       kb.release(vm);
 
       // After release, model should have no knockback event listeners
-      const eventStats = Statistics.eventsStats(model);
+      const eventStats = kb.Statistics.eventsStats(model);
       assert.strictEqual(eventStats.count, 0, 'All model events cleared');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
 
     it('should clear all events when observable is released', () => {
-      const stats = new Statistics();
-      setStatistics(stats);
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
 
       const model = new Backbone.Model({ name: 'Bob' });
-      const eventCountBefore = Statistics.eventsStats(model).count;
-      const obs = observable(model, 'name');
+      const eventCountBefore = kb.Statistics.eventsStats(model).count;
+      const obs = kb.observable(model, 'name');
 
       kb.release(obs);
 
-      const eventStats = Statistics.eventsStats(model);
+      const eventStats = kb.Statistics.eventsStats(model);
       // After release, event count should be back to pre-observable level
       assert.ok(eventStats.count <= eventCountBefore + 1, 'Model events mostly cleared');
 
       assert.strictEqual(stats.registeredStatsString('all released'), 'all released');
-      setStatistics(null);
+      kb.setStatistics(null);
     });
   });
 });
