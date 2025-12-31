@@ -123,7 +123,7 @@ describe('knockback plugins', () => {
         const validation = result();
         assert.strictEqual(validation.required, true); // empty is required error
         assert.strictEqual(validation.$error_count, 1);
-        assert.strictEqual((validation as unknown as { $kb: { valid: boolean } }).$kb.valid, false);
+        assert.strictEqual(validation.$valid, false);
       });
 
       it('should pass validation when value is kb.valid', () => {
@@ -137,7 +137,7 @@ describe('knockback plugins', () => {
         assert.strictEqual(validation.required, false);
         assert.strictEqual(validation.email, false);
         assert.strictEqual(validation.$error_count, 0);
-        assert.strictEqual((validation as unknown as { $kb: { valid: boolean } }).$kb.valid, true);
+        assert.strictEqual(validation.$valid, true);
       });
 
       it('should respect disable option', () => {
@@ -181,13 +181,13 @@ describe('knockback plugins', () => {
         // Initially enabled - should show error
         let validation = result();
         assert.strictEqual(validation.required, true, 'Error when enabled');
-        assert.strictEqual((validation as unknown as { $kb: { valid: boolean } }).$kb.valid, false);
+        assert.strictEqual(validation.$valid, false);
 
         // Disable via enable: false
         enabled(false);
         validation = result();
         assert.strictEqual(validation.required, false, 'No error when disabled via enable');
-        assert.strictEqual((validation as unknown as { $kb: { valid: boolean } }).$kb.valid, true);
+        assert.strictEqual(validation.$valid, true);
         assert.strictEqual(validation.$enabled, false);
       });
     });
