@@ -1,5 +1,6 @@
 import _ from 'underscore';
-import type { Creator, FactoriesOption, InternalViewModelOptions } from './types.ts';
+import type { Creator, FactoriesOption } from './internal-types.ts';
+import type { InternalViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
 interface PathMapping {

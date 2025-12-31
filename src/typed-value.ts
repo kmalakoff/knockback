@@ -1,8 +1,9 @@
 import type * as Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
+import type { CreateOptions, Creator } from './internal-types.ts';
 import kb from './kb.ts';
-import type { CreateOptions, Creator, InternalCreateOptions, KBObservable, KBObservableBase, Store, ValueType } from './types.ts';
+import type { InternalCreateOptions, Observable, ObservableBase, Store, ValueType } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 import utils from './utils.ts';
 
@@ -87,9 +88,9 @@ export class TypedValue {
           // Use provided CollectionObservable
           const CollectionObservable = (kb as { CollectionObservable?: { new (...args: unknown[]): unknown } }).CollectionObservable;
           if (newValue && CollectionObservable && newValue instanceof CollectionObservable) {
-            this._updateValueObservable(utils.wrappedObject(newValue as KBObservable), newValue);
+            this._updateValueObservable(utils.wrappedObject(newValue as Observable), newValue);
           } else {
-            const collectionFn = value as KBObservable & { collection?: ko.Computed<Backbone.Collection | null> };
+            const collectionFn = value as Observable & { collection?: ko.Computed<Backbone.Collection | null> };
             if (collectionFn.collection && kb.peek(collectionFn.collection) !== newValue) {
               collectionFn.collection(newValue as Backbone.Collection);
             }
@@ -103,10 +104,10 @@ export class TypedValue {
         if (newType === TYPE_MODEL || _.isNull(newValue)) {
           // Use provided ViewModel
           if (newValue && !kb.isModel(newValue)) {
-            this._updateValueObservable(utils.wrappedObject(newValue as KBObservable), newValue);
+            this._updateValueObservable(utils.wrappedObject(newValue as Observable), newValue);
           } else {
             const resolvedModel = utils.resolveModel(newValue);
-            if (utils.wrappedObject(value as KBObservable) !== resolvedModel) {
+            if (utils.wrappedObject(value as Observable) !== resolvedModel) {
               this._updateValueObservable(newValue);
             }
           }
@@ -188,7 +189,7 @@ export class TypedValue {
         // View model
         this.value_type = TYPE_MODEL;
         utils.wrappedObject(value, utils.resolveModel(newValue) as Backbone.Model | null);
-      } else if ((value as KBObservableBase).__kb_is_co) {
+      } else if ((value as ObservableBase).__kb_is_co) {
         this.value_type = TYPE_COLLECTION;
         utils.wrappedObject(value, newValue as Backbone.Collection | null);
       } else if (!this.value_type) {

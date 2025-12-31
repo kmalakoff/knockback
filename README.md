@@ -59,15 +59,34 @@ import { viewModel, release } from '@mcpeasy/knockback';
 // Create a model
 const model = new Backbone.Model({ first_name: 'Bob', last_name: 'Smith' });
 
+interface PersonViewModel {
+  first_name: ko.Observable<string>;
+  last_name: ko.Observable<string>;
+  full_name: ko.Computed<string>;
+}
+
 // Create a view model with a computed property
-const vm = viewModel(model) as Record<string, ko.Observable>;
-const full_name = ko.computed(() => `${vm.first_name()} ${vm.last_name()}`);
+const vm = viewModel<PersonViewModel>(model, {
+  extend(vm) {
+    vm.full_name = ko.computed(() => `${vm.first_name()} ${vm.last_name()}`);
+  },
+});
 
 // Apply bindings
-ko.applyBindings({ ...vm, full_name });
+ko.applyBindings(vm);
 
 // ... do stuff then clean up
 release(vm);
+```
+
+You can also pass `extend` as a plain object if you prefer:
+
+```typescript
+const vm = viewModel<PersonViewModel>(model, {
+  extend: {
+    full_name: ko.computed(() => `${model.get('first_name')} ${model.get('last_name')}`),
+  },
+});
 ```
 
 **The HTML:**

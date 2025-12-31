@@ -5,7 +5,7 @@ import { Factory } from './factory.ts';
 import kb from './kb.ts';
 import { observable as kbObservable } from './observable.ts';
 import { Store } from './store.ts';
-import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ObservableOptions, ViewModelOptions } from './types.ts';
+import type { InternalCreateOptions, InternalViewModelOptions, KBMetadata, ObservableOptions, ViewModelOptions, ViewModel as ViewModelType } from './types.ts';
 import utils from './utils.ts';
 
 const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaults'] as const;
@@ -16,7 +16,7 @@ const KEYS_OPTIONS = ['keys', 'internals', 'excludes', 'statics', 'static_defaul
  * @internal
  */
 interface ViewModelMetadata extends KBMetadata {
-  view_model?: ViewModel;
+  view_model?: Record<string, unknown>;
   keys?: string[] | Record<string, ObservableOptions>;
   internals?: string[];
   excludes?: string[];
@@ -28,7 +28,7 @@ interface ViewModelMetadata extends KBMetadata {
 }
 
 // Assign a key to the view model
-function assignViewModelKey(vm: ViewModel, key: string): string | undefined {
+function assignViewModelKey(vm: ViewModelClass, key: string): string | undefined {
   const __kb = vm.__kb as ViewModelMetadata;
   const vmKey = __kb.internals && __kb.internals.indexOf(key) >= 0 ? `_${key}` : key;
 
@@ -42,7 +42,7 @@ function assignViewModelKey(vm: ViewModel, key: string): string | undefined {
 }
 
 // Create an observable for a key
-function createObservable(vm: ViewModel, model: Backbone.Model | null, key: string, createOptions: InternalCreateOptions): void {
+function createObservable(vm: ViewModelClass, model: Backbone.Model | null, key: string, createOptions: InternalCreateOptions): void {
   const __kb = vm.__kb as ViewModelMetadata;
 
   if (__kb.excludes && __kb.excludes.indexOf(key) >= 0) return;
@@ -56,7 +56,7 @@ function createObservable(vm: ViewModel, model: Backbone.Model | null, key: stri
 }
 
 // Create static observables
-function createStaticObservables(vm: ViewModel, model: Backbone.Model): void {
+function createStaticObservables(vm: ViewModelClass, model: Backbone.Model): void {
   const __kb = vm.__kb as ViewModelMetadata;
   if (!__kb.statics) return;
 
@@ -84,7 +84,7 @@ function createStaticObservables(vm: ViewModel, model: Backbone.Model): void {
  * ViewModel class for Backbone models.
  * Creates Knockout observables for all model attributes automatically.
  */
-class ViewModel {
+export class ViewModelClass {
   // Index signature for dynamic property access
   [key: string]: unknown;
 
@@ -96,7 +96,7 @@ class ViewModel {
   __kb_is_vm = true;
   model!: ko.Computed<Backbone.Model | null>;
 
-  constructor(model: Backbone.Model | null, options: ViewModelOptions | string[] = {}, viewModel?: ViewModel) {
+  constructor(model: Backbone.Model | null, options: ViewModelOptions | string[] = {}, viewModel?: ViewModelType<Record<string, unknown>>) {
     // Initialize metadata first
     this.__kb = {};
 
@@ -105,7 +105,7 @@ class ViewModel {
   }
 
   // Internal initialization (called in constructor)
-  private _initialize(model: Backbone.Model | null, options: ViewModelOptions | string[], viewModel?: ViewModel): void {
+  private _initialize(model: Backbone.Model | null, options: ViewModelOptions | string[], viewModel?: ViewModelType<Record<string, unknown>>): void {
     // Validate model
     if (model && !kb.isModel(model)) {
       kb._throwUnexpected(this, 'not a model');
@@ -117,6 +117,15 @@ class ViewModel {
       opts = { keys: options };
     } else if (options) {
       opts = options;
+    }
+
+    const extend = (
+      opts as {
+        extend?: ((vm: ViewModelType<Record<string, unknown>>, model: Backbone.Model | null) => void) | Partial<Record<string, unknown>>;
+      }
+    ).extend;
+    if (extend) {
+      delete (opts as Record<string, unknown>).extend;
     }
 
     const __kb = this.__kb as ViewModelMetadata;
@@ -203,6 +212,14 @@ class ViewModel {
       createStaticObservables(this, model);
     }
     this.createObservables(model, __kb.keys);
+
+    if (extend) {
+      if (typeof extend === 'function') {
+        extend(this as unknown as ViewModelType<Record<string, unknown>>, model);
+      } else {
+        Object.assign(this, extend);
+      }
+    }
 
     // Statistics tracking
     const statistics = (kb as { statistics?: { register: (name: string, obj: unknown) => void } }).statistics;
@@ -296,9 +313,6 @@ class ViewModel {
 // Factory Function (Primary API)
 // =============================================================================
 
-// Export type for external use
-export type { ViewModel };
-
 /**
  * Creates a ViewModel for a Backbone model.
  *
@@ -307,8 +321,16 @@ export type { ViewModel };
  * @param vm - Parent view model (for nested creation)
  * @returns A new ViewModel instance
  */
-export function viewModel(model: Backbone.Model | null, options?: ViewModelOptions | string[], vm?: ViewModel): ViewModel {
-  return new ViewModel(model, options, vm);
+export function viewModel<T extends Record<string, unknown> = Record<string, ko.Observable>>(
+  model: Backbone.Model | null,
+  options?:
+    | (ViewModelOptions & {
+        extend?: ((vm: ViewModelType<T>, model: Backbone.Model | null) => void) | Partial<T>;
+      })
+    | string[],
+  vm?: ViewModelType<Record<string, unknown>>
+): ViewModelType<T> {
+  return new ViewModelClass(model, options, vm) as unknown as ViewModelType<T>;
 }
 
 export default viewModel;

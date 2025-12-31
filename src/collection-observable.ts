@@ -2,9 +2,10 @@ import Backbone from 'backbone';
 import ko from 'knockout';
 import _ from 'underscore';
 import { Factory } from './factory.ts';
+import type { Creator } from './internal-types.ts';
 import kb from './kb.ts';
 import { Store } from './store.ts';
-import type { CollectionObservableOptions, Creator, InternalCollectionObservableOptions, InternalCreateOptions, KBCollectionObservable, KBCollectionObservableInternal, KBObservable } from './types.ts';
+import type { CollectionObservable, CollectionObservableInternal, CollectionObservableOptions, InternalCollectionObservableOptions, InternalCreateOptions, Observable } from './types.ts';
 import utils from './utils.ts';
 import { viewModel as viewModelFactory } from './view-model.ts';
 
@@ -65,7 +66,7 @@ export function compare(valueA: unknown, valueB: unknown): number {
  * @param options - Additional options
  * @returns A Knockout observable array with Knockback extensions
  */
-export function collectionObservable(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions): KBCollectionObservable {
+export function collectionObservable<T = unknown>(inputCollection?: Backbone.Collection | unknown[], viewModelOrOptions?: unknown, options?: CollectionObservableOptions<T>): CollectionObservable<T> {
   return kb.ignore(() => {
     // Normalize arguments
     let collection: Backbone.Collection;
@@ -78,9 +79,9 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
     }
 
     // Handle viewModel as function
-    let mergedOptions: CollectionObservableOptions = {};
+    let mergedOptions: CollectionObservableOptions<T> = {};
     if (typeof viewModelOrOptions === 'function') {
-      mergedOptions = { view_model: viewModelOrOptions as Creator };
+      mergedOptions = { view_model: viewModelOrOptions as Creator<T> };
     } else if (viewModelOrOptions && typeof viewModelOrOptions === 'object') {
       Object.assign(mergedOptions, viewModelOrOptions);
     }
@@ -121,7 +122,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
     observable.__kb_is_co = true;
 
     // Options
-    mergedOptions = utils.collapseOptions(mergedOptions) as CollectionObservableOptions;
+    mergedOptions = utils.collapseOptions(mergedOptions) as CollectionObservableOptions<T>;
     if (mergedOptions.auto_compact) {
       state.auto_compact = true;
     }
@@ -188,7 +189,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
       },
     });
 
-    (observable as KBCollectionObservableInternal).collection = state.collection = collectionComputed;
+    (observable as CollectionObservableInternal).collection = state.collection = collectionComputed;
 
     // Bind to initial collection
     if (collection) {
@@ -248,7 +249,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
       statistics.register('CollectionObservable', state);
     }
 
-    return observable as KBCollectionObservable;
+    return observable as CollectionObservable<T>;
 
     // =============================================================================
     // Instance Methods (closures)
@@ -256,7 +257,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
 
     function destroy(): void {
       state.__kb_released = true;
-      const obs = utils.getObservable(state) as KBObservable & ko.ObservableArray;
+      const obs = utils.getObservable(state) as Observable & ko.ObservableArray;
       const coll = kb.peek(_collection);
 
       utils.wrappedObject(obs, null);
@@ -555,7 +556,7 @@ export function collectionObservable(inputCollection?: Backbone.Collection | unk
 
       return true;
     }
-  }) as KBCollectionObservable;
+  }) as CollectionObservable<T>;
 }
 
 export default collectionObservable;

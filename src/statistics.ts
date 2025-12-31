@@ -1,23 +1,12 @@
 import _ from 'underscore';
 
-export interface ModelEvent {
-  name: string;
-  key: string;
-  [key: string]: unknown;
-}
-
-export interface EventStats {
-  count: number;
-  [key: string]: number;
-}
-
 /**
  * Statistics is an optional component useful for measuring application performance.
  * You can record Backbone.Events that trigger ko.observable subscription updates
  * and track the memory footprint (instance count) of ViewModels and collection observables.
  */
 export class Statistics {
-  modelEventsTracker: ModelEvent[] = [];
+  modelEventsTracker: Array<{ name: string; key: string; [key: string]: unknown }> = [];
   registeredTracker: Record<string, unknown[]> = {};
 
   constructor() {
@@ -36,7 +25,7 @@ export class Statistics {
    * Register a model event
    * @param event - The event to track
    */
-  addModelEvent(event: ModelEvent): void {
+  addModelEvent(event: { name: string; key: string; [key: string]: unknown }): void {
     this.modelEventsTracker.push(event);
   }
 
@@ -143,8 +132,8 @@ export class Statistics {
    * @param key - Optional specific event key to check
    * @returns Statistics about the events
    */
-  static eventsStats(obj: unknown, key?: string): EventStats {
-    const stats: EventStats = { count: 0 };
+  static eventsStats(obj: unknown, key?: string): { count: number; [key: string]: number } {
+    const stats: { count: number; [key: string]: number } = { count: 0 };
     // biome-ignore lint/suspicious/noExplicitAny: Backbone internals
     const objAny = obj as any;
     const events = objAny._events || objAny._callbacks || {};

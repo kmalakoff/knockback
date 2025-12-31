@@ -1,6 +1,6 @@
 import Backbone from 'backbone';
 import ko from 'knockout';
-import type { KBObservableBase, KBSettings, LocaleManager } from './types.ts';
+import type { KBSettings, LocaleManager, ObservableBase } from './types.ts';
 import { TYPE_COLLECTION } from './types.ts';
 
 const LIFECYCLE_METHODS = ['release', 'destroy', 'dispose'] as const;
@@ -98,7 +98,7 @@ const kb = {
 
     // Observable or lifecycle managed
     if (ko.isObservable(obj)) {
-      const kbObs = obj as KBObservableBase;
+      const kbObs = obj as ObservableBase;
       const array = kb.peek(obj);
 
       if (Array.isArray(array)) {

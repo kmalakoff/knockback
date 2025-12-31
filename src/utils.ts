@@ -4,8 +4,9 @@ import _ from 'underscore';
 import collapseOptions from './functions/collapse-options.ts';
 import unwrapModels from './functions/unwrap-models.ts';
 import wrappedDestroy from './functions/wrapped-destroy.ts';
+import type { Creator } from './internal-types.ts';
 import kb from './kb.ts';
-import type { Creator, EventWatcher, Factory, KBMetadata, KBObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
+import type { EventWatcher, Factory, KBMetadata, ObservableBase, Store, ValueType, ViewModelOptions } from './types.ts';
 import { TYPE_ARRAY, TYPE_COLLECTION, TYPE_MODEL, TYPE_SIMPLE, TYPE_UNKNOWN } from './types.ts';
 
 /**
@@ -212,7 +213,7 @@ export function wrappedEventWatcherIsOwned(obj: KBObject, value?: boolean): bool
 export function valueType(observable: unknown): ValueType {
   if (!observable) return TYPE_UNKNOWN;
 
-  const obs = observable as KBObservableBase;
+  const obs = observable as ObservableBase;
   if (obs.__kb_is_o && typeof obs.valueType === 'function') {
     return obs.valueType();
   }

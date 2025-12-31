@@ -1,6 +1,6 @@
 import ko from 'knockout';
 import _ from 'underscore';
-import { type ValidatorFn, valid } from './validators.ts';
+import { valid } from './validators.ts';
 
 /**
  * Helper to call a function or get a value
@@ -13,14 +13,14 @@ function callOrGet(value: unknown, ...args: unknown[]): unknown {
   return unwrapped;
 }
 
-export interface ValidationOptions {
+interface ValidationOptions {
   disable?: boolean | (() => boolean);
   enable?: boolean | (() => boolean);
   priorities?: string | string[];
   no_attach?: boolean;
 }
 
-export interface ValidationResult {
+interface ValidationResult {
   [key: string]: boolean | number | string | undefined;
   $error_count: number;
   $valid: boolean;
@@ -29,7 +29,7 @@ export interface ValidationResult {
   $active_error?: string;
 }
 
-export interface FormValidationResult {
+interface FormValidationResult {
   [key: string]: ko.Computed<ValidationResult> | ko.Computed<number> | ko.Computed<boolean>;
   $error_count: ko.Computed<number>;
   $valid: ko.Computed<boolean>;
@@ -46,7 +46,23 @@ export interface FormValidationResult {
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results
  */
-export function valueValidator(value: ko.Observable<unknown>, bindings: Record<string, ValidatorFn>, validationOptions: ValidationOptions = {}): ko.Computed<ValidationResult> {
+export function valueValidator(
+  value: ko.Observable<unknown>,
+  bindings: Record<string, (value: unknown) => boolean | unknown>,
+  validationOptions: {
+    disable?: boolean | (() => boolean);
+    enable?: boolean | (() => boolean);
+    priorities?: string | string[];
+    no_attach?: boolean;
+  } = {}
+): ko.Computed<{
+  [key: string]: boolean | number | string | undefined;
+  $error_count: number;
+  $valid: boolean;
+  $enabled: boolean;
+  $disable: boolean;
+  $active_error?: string;
+}> {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
 
   return ko.computed(() => {
@@ -118,7 +134,23 @@ export function valueValidator(value: ko.Observable<unknown>, bindings: Record<s
  * @param validationOptions - Validation options
  * @returns A computed observable with validation results, or null if not applicable
  */
-export function inputValidator(viewModel: Record<string, unknown>, el: HTMLElement, validationOptions: ValidationOptions = {}): ko.Computed<ValidationResult> | null {
+export function inputValidator(
+  viewModel: Record<string, unknown>,
+  el: HTMLElement,
+  validationOptions: {
+    disable?: boolean | (() => boolean);
+    enable?: boolean | (() => boolean);
+    priorities?: string | string[];
+    no_attach?: boolean;
+  } = {}
+): ko.Computed<{
+  [key: string]: boolean | number | string | undefined;
+  $error_count: number;
+  $valid: boolean;
+  $enabled: boolean;
+  $disable: boolean;
+  $active_error?: string;
+}> | null {
   const opts = typeof validationOptions === 'function' ? {} : validationOptions || {};
   const validators = valid;
   let inputName: string | null = el.getAttribute('name');
@@ -133,7 +165,11 @@ export function inputValidator(viewModel: Record<string, unknown>, el: HTMLEleme
   }
 
   // Parse data-bind attribute
-  let options: { value?: ko.Observable; validation_options?: ValidationOptions; validations?: Record<string, ValidatorFn> };
+  let options: {
+    value?: ko.Observable;
+    validation_options?: ValidationOptions;
+    validations?: Record<string, (value: unknown) => boolean | unknown>;
+  };
   try {
     // Use Function constructor to parse the bindings (same as Knockout does)
     const fn = new Function('sc', `with(sc[0]) { return { ${bindingsAttr} } }`);
@@ -153,7 +189,7 @@ export function inputValidator(viewModel: Record<string, unknown>, el: HTMLEleme
   }
 
   // Collect validators
-  const bindings: Record<string, ValidatorFn> = {};
+  const bindings: Record<string, (value: unknown) => boolean | unknown> = {};
 
   // Add type-based validator
   const type = el.getAttribute('type');
@@ -191,7 +227,27 @@ export function inputValidator(viewModel: Record<string, unknown>, el: HTMLEleme
  * @param el - The form element
  * @returns An object with all validators and generated helpers
  */
-export function formValidator(viewModel: Record<string, unknown>, el: HTMLElement): FormValidationResult {
+export function formValidator(
+  viewModel: Record<string, unknown>,
+  el: HTMLElement
+): Record<
+  string,
+  | ko.Computed<{
+      [key: string]: boolean | number | string | undefined;
+      $error_count: number;
+      $valid: boolean;
+      $enabled: boolean;
+      $disable: boolean;
+      $active_error?: string;
+    }>
+  | ko.Computed<number>
+  | ko.Computed<boolean>
+> & {
+  $error_count: ko.Computed<number>;
+  $valid: ko.Computed<boolean>;
+  $enabled: ko.Computed<boolean>;
+  $disabled: ko.Computed<boolean>;
+} {
   const results: Partial<FormValidationResult> = {};
   const validators: ko.Computed<ValidationResult>[] = [];
 

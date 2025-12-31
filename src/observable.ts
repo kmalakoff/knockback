@@ -4,7 +4,7 @@ import { EventWatcher } from './event-watcher.ts';
 import { Factory } from './factory.ts';
 import kb from './kb.ts';
 import { TypedValue } from './typed-value.ts';
-import type { InternalObservableOptions, KBObservable, KBObservableBase, KBObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
+import type { InternalObservableOptions, Observable, ObservableBase, ObservableInternal, ObservableOptions, ValueType, ViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
 const KEYS_PUBLISH = ['value', 'valueType', 'destroy'] as const;
@@ -49,7 +49,7 @@ export interface ObservableInstance {
  * @param vm - Parent view model context
  * @returns A Knockout observable with Knockback extensions
  */
-export function observable(model: Backbone.Model | null, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}): KBObservable {
+export function observable<T = unknown>(model: Backbone.Model | null, keyOrInfo: string | ObservableOptions, options?: ViewModelOptions, vm: Record<string, unknown> = {}): Observable<T> {
   return kb.ignore(() => {
     if (!keyOrInfo) kb._throwMissing({ constructor: { name: 'Observable' } }, 'key_or_info');
 
@@ -127,9 +127,9 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
 
         owner: state._vm,
       })
-    ) as KBObservable;
+    ) as Observable;
 
-    (koObservable as KBObservableBase).__kb_is_o = true;
+    (koObservable as ObservableBase).__kb_is_o = true;
     createOptions.store = utils.wrappedStore(koObservable, createOptions.store);
     createOptions.path = utils.pathJoin(createOptions.path, state.key as string);
 
@@ -164,7 +164,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       },
     });
 
-    (koObservable as KBObservableInternal).model = state.model = modelComputed;
+    (koObservable as ObservableInternal).model = state.model = modelComputed;
 
     // Set up event watcher
     EventWatcher.useOptionsOrCreate({ event_watcher: eventWatcher }, model || null, state, {
@@ -194,7 +194,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       result = defaultObservableFn(result, info.default);
     }
 
-    return result as KBObservable;
+    return result as Observable;
 
     // =============================================================================
     // Instance Methods (closures)
@@ -208,7 +208,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       state.model.dispose();
       state.model = undefined as unknown as ko.Computed<Backbone.Model | null>;
       if (obs) {
-        (obs as unknown as KBObservableInternal).model = undefined as unknown as ko.Computed<Backbone.Model | null>;
+        (obs as unknown as ObservableInternal).model = undefined as unknown as ko.Computed<Backbone.Model | null>;
       }
       utils.wrappedDestroy(state);
     }
@@ -233,7 +233,7 @@ export function observable(model: Backbone.Model | null, keyOrInfo: string | Obs
       const newValue = kb.getValue(kb.peek(state._model), kb.peek(state.key));
       state._value.update(newValue);
     }
-  }) as KBObservable;
+  }) as Observable<T>;
 }
 
 export default observable;

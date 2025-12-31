@@ -12,5 +12,4 @@ export { localizedObservable } from './localization/index.ts';
 export { triggeredObservable } from './triggering/index.ts';
 
 // Validation plugin
-export type { FormValidationResult, ValidationOptions, ValidationResult, ValidatorFn } from './validation/index.ts';
 export { formValidator, hasChangedFn, inputValidator, minLengthFn, uniqueValueFn, untilFalseFn, untilTrueFn, valid, valueValidator } from './validation/index.ts';

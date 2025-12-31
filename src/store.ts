@@ -1,7 +1,8 @@
 import ko from 'knockout';
 import _ from 'underscore';
+import type { CreateOptions, Creator } from './internal-types.ts';
 import kb from './kb.ts';
-import type { CreateOptions, Creator, InternalCreateOptions, InternalViewModelOptions, KBObservableBase, StoreReference, ViewModelOptions } from './types.ts';
+import type { InternalCreateOptions, InternalViewModelOptions, ObservableBase, StoreReference, ViewModelOptions } from './types.ts';
 import utils from './utils.ts';
 
 interface ObservableRecord {
@@ -17,7 +18,7 @@ export class Store {
   replaced_observables: unknown[] = [];
 
   // Use existing store from options or create a new one
-  static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, observable: KBObservableBase): Store {
+  static useOptionsOrCreate(options: InternalViewModelOptions, obj: unknown, observable: ObservableBase): Store {
     if (!options.store) {
       utils.wrappedStoreIsOwned(observable, true);
     }
@@ -211,7 +212,7 @@ export class Store {
   private _canRegister(observable: unknown): boolean {
     if (!observable) return false;
     if (ko.isObservable(observable)) return false;
-    if ((observable as KBObservableBase).__kb_is_co) return false;
+    if ((observable as ObservableBase).__kb_is_co) return false;
     return true;
   }
 
