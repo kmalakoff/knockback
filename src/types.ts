@@ -88,7 +88,7 @@ export interface ViewModelOptions {
    *   },
    * });
    */
-  extend?: ((vm: ViewModel<Record<string, unknown>>, model: Backbone.Model | null) => void) | Record<string, unknown>;
+  extend?: ((vm: ViewModel<Record<string, unknown>>, model: Backbone.Model | null) => void | Record<string, unknown>) | Record<string, unknown>;
 }
 
 /** Options for kb.collectionObservable() */

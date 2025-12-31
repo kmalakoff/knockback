@@ -121,7 +121,7 @@ export class ViewModelClass {
 
     const extend = (
       opts as {
-        extend?: ((vm: ViewModelType<Record<string, unknown>>, model: Backbone.Model | null) => void) | Partial<Record<string, unknown>>;
+        extend?: ((vm: ViewModelType<Record<string, unknown>>, model: Backbone.Model | null) => void | Partial<Record<string, unknown>>) | Partial<Record<string, unknown>>;
       }
     ).extend;
     if (extend) {
@@ -215,7 +215,10 @@ export class ViewModelClass {
 
     if (extend) {
       if (typeof extend === 'function') {
-        extend(this as unknown as ViewModelType<Record<string, unknown>>, model);
+        const extension = extend(this as unknown as ViewModelType<Record<string, unknown>>, model);
+        if (extension && typeof extension === 'object') {
+          Object.assign(this, extension);
+        }
       } else {
         Object.assign(this, extend);
       }
@@ -321,11 +324,11 @@ export class ViewModelClass {
  * @param vm - Parent view model (for nested creation)
  * @returns A new ViewModel instance
  */
-export function viewModel<T extends Record<string, unknown> = Record<string, ko.Observable>>(
+export function viewModel<T extends Record<string, unknown> = Record<string, unknown>>(
   model: Backbone.Model | null,
   options?:
     | (ViewModelOptions & {
-        extend?: ((vm: ViewModelType<T>, model: Backbone.Model | null) => void) | Partial<T>;
+        extend?: ((vm: ViewModelType<T>, model: Backbone.Model | null) => void | Partial<T>) | Partial<T>;
       })
     | string[],
   vm?: ViewModelType<Record<string, unknown>>

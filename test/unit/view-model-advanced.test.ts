@@ -193,6 +193,60 @@ describe('ViewModel advanced', () => {
     });
   });
 
+  describe('extend', () => {
+    it('should support extend as an object literal', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = viewModel<{ name: ko.Observable<string>; onEdit: () => void; isAdmin: ko.Observable<boolean> }>(model, {
+        extend: {
+          onEdit: () => model.set('name', 'Alice'),
+          isAdmin: ko.observable(false),
+        },
+      });
+
+      assert.strictEqual(vm.name(), 'Bob');
+      vm.onEdit();
+      assert.strictEqual(vm.name(), 'Alice');
+      assert.strictEqual(vm.isAdmin(), false);
+      vm.isAdmin(true);
+      assert.strictEqual(vm.isAdmin(), true);
+
+      kb.release(vm);
+    });
+
+    it('should support extend as a mutating function', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = viewModel<{ name: ko.Observable<string>; onEdit: () => void; isAdmin: ko.Observable<boolean> }>(model, {
+        extend: (viewModelInstance) => {
+          viewModelInstance.onEdit = () => model.set('name', 'Alice');
+          viewModelInstance.isAdmin = ko.observable(true);
+        },
+      });
+
+      assert.strictEqual(vm.name(), 'Bob');
+      vm.onEdit();
+      assert.strictEqual(vm.name(), 'Alice');
+      assert.strictEqual(vm.isAdmin(), true);
+
+      kb.release(vm);
+    });
+
+    it('should support extend as a function returning an object', () => {
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = viewModel<{ name: ko.Observable<string>; displayName: ko.Computed<string>; onEdit: () => void }>(model, {
+        extend: (viewModelInstance) => ({
+          displayName: ko.computed(() => `User: ${viewModelInstance.name()}`),
+          onEdit: () => model.set('name', 'Alice'),
+        }),
+      });
+
+      assert.strictEqual(vm.displayName(), 'User: Bob');
+      vm.onEdit();
+      assert.strictEqual(vm.displayName(), 'User: Alice');
+
+      kb.release(vm);
+    });
+  });
+
   describe('shareOptions', () => {
     it('should share store and factory between view models', () => {
       const stats = new Statistics();
