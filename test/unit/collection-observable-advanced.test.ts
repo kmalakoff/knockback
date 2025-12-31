@@ -1,5 +1,4 @@
-import * as kb from '@mcpeasy/knockback';
-import { collectionObservable, Statistics, setStatistics, type ViewModel, viewModel } from '@mcpeasy/knockback';
+import kb, { collectionObservable, Statistics, setStatistics, type ViewModel, viewModel } from '@mcpeasy/knockback';
 import assert from 'assert';
 import Backbone from 'backbone';
 import ko from 'knockout';
