@@ -324,7 +324,7 @@ export class ViewModelClass {
  * @param vm - Parent view model (for nested creation)
  * @returns A new ViewModel instance
  */
-export function viewModel<T extends Record<string, unknown> = Record<string, unknown>>(
+export function viewModel<T extends object = Record<string, unknown>>(
   model: Backbone.Model | null,
   options?:
     | (ViewModelOptions & {

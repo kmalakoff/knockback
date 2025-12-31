@@ -174,7 +174,7 @@ export interface CollectionObservable<T = unknown> extends ko.ObservableArray<T>
  * const vm = viewModel<PersonVM>(model);
  * vm.name(); // returns string
  */
-export type ViewModel<T extends Record<string, unknown> = Record<string, unknown>> = {
+export type ViewModel<T extends object = Record<string, unknown>> = {
   /** Destroy and release all resources */
   destroy(): void;
   /** Observable for the underlying model */
