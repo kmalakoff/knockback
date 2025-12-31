@@ -65,7 +65,29 @@ export interface ViewModelOptions {
   creator?: { create?: (obj: unknown, options: { path?: string; creator?: unknown }) => unknown; models_only?: boolean } | (new (obj: unknown, options: { path?: string; creator?: unknown }) => unknown);
   /** Nested options (for inheritance) */
   options?: ViewModelOptions;
-  /** Extend the view model after it is created */
+  /**
+   * Extend the view model after observables are created.
+   *
+   * @example
+   * interface PersonViewModel {
+   *   name: ko.Observable<string>;
+   *   onSave: () => void;
+   * }
+   * const vm = viewModel<PersonViewModel>(model, {
+   *   extend(vm, model) {
+   *     vm.onSave = () => model?.save();
+   *   },
+   * });
+   *
+   * @example
+   * const vm = viewModel<PersonViewModel>(model, {
+   *   extend: {
+   *     onSave() {
+   *       model?.save();
+   *     },
+   *   },
+   * });
+   */
   extend?: ((vm: ViewModel<Record<string, unknown>>, model: Backbone.Model | null) => void) | Record<string, unknown>;
 }
 

@@ -3,7 +3,8 @@
   "compilerOptions": {
     "outDir": "dist",
     "lib": ["ES2022", "dom"],
-    "types": ["mocha", "node"]
+    "types": ["mocha", "node"],
+    "verbatimModuleSyntax": false
   },
   "include": ["src", "test"],
   "exclude": ["node_modules", "dist"]

@@ -5,7 +5,7 @@
 import type * as Backbone from 'backbone';
 import type * as ko from 'knockout';
 import { collectionObservable } from './collection-observable.ts';
-import kb from './kb.ts';
+import kbCore from './kb.ts';
 import { observable } from './observable.ts';
 import { defaultObservable } from './plugins/defaults/index.ts';
 import { formattedObservable, parseFormattedString, toFormattedString } from './plugins/formatting/index.ts';
@@ -22,29 +22,29 @@ import { ViewModelClass, viewModel } from './view-model.ts';
 // =============================================================================
 
 export { observable, viewModel, collectionObservable };
-export const VERSION = kb.VERSION;
+export const VERSION = kbCore.VERSION;
 
 // =============================================================================
 // Memory Management
 // =============================================================================
 
-export const release = kb.release.bind(kb);
-export const releaseOnNodeRemove = kb.releaseOnNodeRemove.bind(kb);
-export const applyBindings = kb.applyBindings.bind(kb);
-export const renderTemplate = kb.renderTemplate.bind(kb);
-export const wasReleased = kb.wasReleased.bind(kb);
-export const isReleaseable = kb.isReleaseable.bind(kb);
-export const isModel = kb.isModel.bind(kb);
-export const isCollection = kb.isCollection.bind(kb);
-export const isViewModel = kb.isViewModel.bind(kb);
+export const release = kbCore.release.bind(kbCore);
+export const releaseOnNodeRemove = kbCore.releaseOnNodeRemove.bind(kbCore);
+export const applyBindings = kbCore.applyBindings.bind(kbCore);
+export const renderTemplate = kbCore.renderTemplate.bind(kbCore);
+export const wasReleased = kbCore.wasReleased.bind(kbCore);
+export const isReleaseable = kbCore.isReleaseable.bind(kbCore);
+export const isModel = kbCore.isModel.bind(kbCore);
+export const isCollection = kbCore.isCollection.bind(kbCore);
+export const isViewModel = kbCore.isViewModel.bind(kbCore);
 
 // =============================================================================
 // Localization
 // =============================================================================
 
-export const getLocaleManager = (): LocaleManager | null => kb.locale_manager;
+export const getLocaleManager = (): LocaleManager | null => kbCore.locale_manager;
 export const setLocaleManager = (manager: LocaleManager | null): void => {
-  kb.locale_manager = manager;
+  kbCore.locale_manager = manager;
 };
 export { localizedObservable };
 
@@ -64,9 +64,9 @@ export { valueValidator, formValidator, minLengthFn, valid };
 // Debugging
 // =============================================================================
 
-export const getStatistics = (): Statistics | null => kb.statistics as Statistics | null;
+export const getStatistics = (): Statistics | null => kbCore.statistics as Statistics | null;
 export const setStatistics = (stats: Statistics | null): void => {
-  kb.statistics = stats;
+  kbCore.statistics = stats;
 };
 export { Statistics };
 
@@ -82,7 +82,7 @@ export type { CollectionObservable, CollectionObservableOptions, LocaleManager, 
 // Default export (compat namespace)
 // =============================================================================
 
-const kbNamespace: {
+const _kb: {
   ViewModel: new (
     ...args: unknown[]
   ) => {
@@ -153,21 +153,15 @@ const kbNamespace: {
   Statistics,
 };
 
-Object.defineProperties(kbNamespace, {
-  locale_manager: {
-    enumerable: true,
-    get: () => kb.locale_manager,
-    set: (manager: LocaleManager | null) => {
-      kb.locale_manager = manager;
-    },
-  },
-  statistics: {
-    enumerable: true,
-    get: () => kb.statistics as Statistics | null,
-    set: (stats: Statistics | null) => {
-      kb.statistics = stats;
-    },
-  },
-});
+export default kb;
 
-export default kbNamespace;
+export namespace kb {
+  export type Observable<T = unknown> = import('./types.ts').Observable<T>;
+  export type ObservableOptions = import('./types.ts').ObservableOptions;
+  export type CollectionObservable<T = unknown> = import('./types.ts').CollectionObservable<T>;
+  export type CollectionObservableOptions<T = unknown> = import('./types.ts').CollectionObservableOptions<T>;
+  export type ViewModel<T extends Record<string, unknown> = Record<string, ko.Observable>> = import('./types.ts').ViewModel<T>;
+  export type ViewModelOptions = import('./types.ts').ViewModelOptions;
+  export type LocaleManager = import('./types.ts').LocaleManager;
+  export type LocalizedObservableOptions = import('./plugins/localization/index.ts').LocalizedObservableOptions;
+}

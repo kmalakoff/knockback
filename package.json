@@ -65,7 +65,6 @@
     "underscore": ">=1.13.0"
   },
   "tsds": {
-    "entry": "src/umd.ts",
     "targets": [
       "cjs",
       "esm",
