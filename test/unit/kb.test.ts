@@ -146,4 +146,47 @@ describe('@mcpeasy/knockback', () => {
       kb.setStatistics(null);
     });
   });
+
+  describe('Statistics snapshot/diff', () => {
+    it('should return counts by type and total', () => {
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
+
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = kb.viewModel(model);
+      const co = kb.collectionObservable(new Backbone.Collection());
+
+      const snap = stats.snapshot();
+
+      assert.strictEqual(snap.ViewModel, 1);
+      assert.strictEqual(snap.CollectionObservable, 1);
+      assert.strictEqual(snap.total, 2);
+
+      vm.dispose();
+      co.dispose();
+      kb.setStatistics(null);
+    });
+
+    it('should diff snapshots by key', () => {
+      const stats = new kb.Statistics();
+      kb.setStatistics(stats);
+
+      const before = stats.snapshot();
+
+      const model = new Backbone.Model({ name: 'Bob' });
+      const vm = kb.viewModel(model);
+      const co = kb.collectionObservable(new Backbone.Collection());
+
+      const after = stats.snapshot();
+      const delta = stats.diff(before, after);
+
+      assert.strictEqual(delta.ViewModel, 1);
+      assert.strictEqual(delta.CollectionObservable, 1);
+      assert.strictEqual(delta.total, 2);
+
+      vm.dispose();
+      co.dispose();
+      kb.setStatistics(null);
+    });
+  });
 });

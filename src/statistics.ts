@@ -114,6 +114,39 @@ export class Statistics {
   }
 
   /**
+   * Capture a snapshot of registered counts by type and total.
+   * Includes a "total" key for all registered objects.
+   */
+  snapshot(): Record<string, number> {
+    const snapshot: Record<string, number> = {};
+    let total = 0;
+
+    for (const type in this.registeredTracker) {
+      const count = this.registeredTracker[type]?.length || 0;
+      snapshot[type || 'No Name'] = count;
+      total += count;
+    }
+
+    snapshot.total = total;
+    return snapshot;
+  }
+
+  /**
+   * Compute a delta between two snapshots (after - before).
+   */
+  diff(before: Record<string, number>, after?: Record<string, number>): Record<string, number> {
+    const end = after || this.snapshot();
+    const keys = new Set([...Object.keys(before), ...Object.keys(end)]);
+    const delta: Record<string, number> = {};
+
+    for (const key of keys) {
+      delta[key] = (end[key] || 0) - (before[key] || 0);
+    }
+
+    return delta;
+  }
+
+  /**
    * Get or create a tracker array for a type
    * @private
    */

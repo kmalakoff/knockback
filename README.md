@@ -147,6 +147,20 @@ class MyLocaleManager implements LocaleManager {
 kb.setLocaleManager(new MyLocaleManager());
 const localeManager = kb.getLocaleManager<MyLocaleManager>();
 ```
+
+### Leak checks with Statistics
+
+```ts
+const stats = new kb.Statistics();
+kb.setStatistics(stats);
+
+const before = stats.snapshot();
+// ... route change + dispose old page ...
+const after = stats.snapshot();
+
+const delta = stats.diff(before, after);
+console.log(delta);
+```
 - `triggeredObservable(emitter, event)` - Event-based observable updates
 - `valueValidator(observable, validators)` - Value validation
 
